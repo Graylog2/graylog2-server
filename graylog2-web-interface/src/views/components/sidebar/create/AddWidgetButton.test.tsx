@@ -14,10 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
@@ -26,12 +25,14 @@ import { createSearch } from 'fixtures/searches';
 import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import Button from 'components/bootstrap/Button';
+import { usePlugin } from 'views/test/testPlugins';
 
 import AddWidgetButton from './AddWidgetButton';
 
-const mockAggregateActionHandler = jest.fn();
-const mockAddMessageCountActionHandler = jest.fn();
-const mockAddMessageTableActionHandler = jest.fn();
+const dummyActionFunc = () => async () => 'newWidget';
+const mockAggregateActionHandler = jest.fn(dummyActionFunc);
+const mockAddMessageCountActionHandler = jest.fn(dummyActionFunc);
+const mockAddMessageTableActionHandler = jest.fn(dummyActionFunc);
 
 const MockCreateParameterDialog = ({ onClose }: { onClose: () => void }) => <Button onClick={onClose}>42</Button>;
 
@@ -74,12 +75,9 @@ describe('AddWidgetButton', () => {
     const view = createSearch();
     const dispatch = mockDispatch({ view: { view, activeQuery: 'query-id-1' } } as RootState);
     asMock(useViewsDispatch).mockReturnValue(dispatch);
-    PluginStore.register(plugin);
   });
 
-  afterEach(() => {
-    PluginStore.unregister(plugin);
-  });
+  usePlugin(plugin);
 
   const onClick = jest.fn();
 
@@ -92,34 +90,19 @@ describe('AddWidgetButton', () => {
     );
   });
 
-  it('clicking on option to add aggregation calls AggregateActionHandler', async () => {
+  it.each`
+    option             | handler
+    ${'Aggregation'}   | ${mockAggregateActionHandler}
+    ${'Message Count'} | ${mockAddMessageCountActionHandler}
+    ${'Message Table'} | ${mockAddMessageTableActionHandler}
+  `(`clicking on "$option" calls respective handler`, async ({ option, handler }) => {
     render(<AddWidgetButton onClick={onClick} />);
 
-    const addAggregation = await screen.findByRole('button', { name: 'Aggregation' });
+    const addWidget = await screen.findByRole('button', { name: option });
 
-    await userEvent.click(addAggregation);
+    await userEvent.click(addWidget);
 
-    expect(mockAggregateActionHandler).toHaveBeenCalled();
-  });
-
-  it('clicking on option to add message count calls AddMessageCountActionHandler', async () => {
-    render(<AddWidgetButton onClick={onClick} />);
-
-    const addMessageCount = await screen.findByRole('button', { name: 'Message Count' });
-
-    await userEvent.click(addMessageCount);
-
-    expect(mockAddMessageCountActionHandler).toHaveBeenCalled();
-  });
-
-  it('clicking on option to add message table calls AddMessageTableActionHandler', async () => {
-    render(<AddWidgetButton onClick={onClick} />);
-
-    const addMessageTable = await screen.findByRole('button', { name: 'Message Table' });
-
-    await userEvent.click(addMessageTable);
-
-    expect(mockAddMessageTableActionHandler).toHaveBeenCalled();
+    expect(handler).toHaveBeenCalled();
   });
 
   it('clicking on option to add a parameter renders MockCreateParameterDialog', async () => {

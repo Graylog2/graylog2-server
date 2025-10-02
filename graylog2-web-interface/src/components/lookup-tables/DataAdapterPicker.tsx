@@ -57,8 +57,7 @@ const DataAdapterPicker = ({ onCreateClick, dataAdapters = [] }: Props) => {
         bsStyle={errorMessage ? 'error' : undefined}
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
-        formGroupClassName="mb-3"
-        >
+        formGroupClassName="mb-3">
         <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
           {errorMessage || 'Select an existing data adapter'}
         </div>
@@ -69,18 +68,14 @@ const DataAdapterPicker = ({ onCreateClick, dataAdapters = [] }: Props) => {
             clearable={false}
             options={sortedAdapters}
             onBlur={() => setTouched(true)}
-            onChange={setValue}
+            onChange={(v) => setValue(v)}
             value={value}
           />
 
-          <StyledButton
-            type="button"
-            aria-label="Create Data Adapter"
-            onClick={onCreateClick}>
+          <StyledButton type="button" aria-label="Create Data Adapter" onClick={onCreateClick}>
             Create Data Adapter
           </StyledButton>
         </div>
-
       </Input>
     </fieldset>
   );

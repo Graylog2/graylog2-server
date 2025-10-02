@@ -34,7 +34,7 @@ const DetailTitle = styled.dt`
 const DetailValue = styled.dd(
   ({ theme }) => css`
     margin-left: 180px;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     &:not(:last-child) {
       border-bottom: 1px solid ${theme.colors.variant.lightest.default};

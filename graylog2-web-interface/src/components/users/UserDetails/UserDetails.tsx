@@ -61,7 +61,7 @@ const UserDetails = ({ user }: Props) => {
             <IfPermitted permissions={`users:rolesedit:${user.username}`}>
               <RolesSection user={user} />
             </IfPermitted>
-            <IfPermitted permissions={`teams:edit:${user.username}`}>
+            <IfPermitted permissions={`team:edit:${user.username}`}>
               <TeamsSection user={user} />
             </IfPermitted>
             {currentUser.id === user.id && !isLocalAdmin && (
@@ -69,11 +69,9 @@ const UserDetails = ({ user }: Props) => {
                 <TelemetrySettingsDetails />
               </IfPermitted>
             )}
-            {(currentUser.id === user.id || isLocalAdmin) && (
-              <IfPermitted permissions={`users:edit:${user.username}`}>
-                <CollectionsSection user={user} />
-              </IfPermitted>
-            )}
+            <IfPermitted permissions={`users:edit:${user.username}`}>
+              <CollectionsSection user={user} />
+            </IfPermitted>
             {currentUser.id === user.id && isLocalAdmin && (
               <IfPermitted permissions={`users:edit:${user.username}`}>
                 <TelemetrySettingsConfig />

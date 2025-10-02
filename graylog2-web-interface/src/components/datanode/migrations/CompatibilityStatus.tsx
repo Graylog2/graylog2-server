@@ -34,7 +34,7 @@ type Props = {
 const Grid = styled.div`
   display: grid;
   grid-template-columns: 25% 75%;
-  grid-gap: 0.5rem;
+  gap: 0.5rem;
   margin-bottom: 1rem;
 `;
 

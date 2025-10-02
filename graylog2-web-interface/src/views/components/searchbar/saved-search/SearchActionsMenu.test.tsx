@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, waitFor, waitForElementToBeRemoved } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';
 
@@ -241,7 +241,7 @@ describe('SearchActionsMenu', () => {
 
       const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null));
+      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
@@ -271,8 +271,9 @@ describe('SearchActionsMenu', () => {
         .id('new-search-id')
         .build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null));
-      await waitForElementToBeRemoved(screen.queryByText('Pluggable component!'));
+      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
+
+      expect(screen.queryByText('Pluggable component!')).not.toBeInTheDocument();
     });
 
     it('should save search when pressing related keyboard shortcut', async () => {

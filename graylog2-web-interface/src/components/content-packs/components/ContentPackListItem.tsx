@@ -18,15 +18,15 @@
 import * as React from 'react';
 import { useState, useRef } from 'react';
 
-import { Button, Col, DropdownButton, MenuItem, Modal, Row, ButtonToolbar, DeleteMenuItem } from 'components/bootstrap';
+import { Button, Col, DropdownButton, MenuItem, Row, ButtonToolbar, DeleteMenuItem, Modal } from 'components/bootstrap';
 import { ModalSubmit } from 'components/common';
 import ControlledTableListItem from 'components/common/ControlledTableListItem';
 import { LinkContainer, Link } from 'components/common/router';
 import ContentPackStatus from 'components/content-packs/ContentPackStatus';
-import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import ContentPackInstall from 'components/content-packs/ContentPackInstall';
 import ContentPackDownloadControl from 'components/content-packs/ContentPackDownloadControl';
 import Routes from 'routing/Routes';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import type { ContentPackInstallation, ContentPackMetadata } from '../Types';
 
@@ -34,7 +34,7 @@ type Props = {
   pack: ContentPackInstallation;
   contentPackMetadata: ContentPackMetadata;
   onDeletePack: (id: string) => void;
-  onInstall: (id: string, contentPackRev: string, parameters: unknown) => void;
+  onInstall: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
 const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstall: onInstallProp }: Props) => {
@@ -104,7 +104,7 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
         <Col md={12}>{pack.summary}&nbsp;</Col>
       </Row>
       {showInstallModal && (
-        <BootstrapModalWrapper showModal={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
+        <Modal show={showInstallModal} onHide={onCloseInstallModal} bsSize="large">
           <Modal.Header>
             <Modal.Title>Install Content Pack</Modal.Title>
           </Modal.Header>
@@ -114,7 +114,7 @@ const ContentPackListItem = ({ pack, contentPackMetadata, onDeletePack, onInstal
           <Modal.Footer>
             <ModalSubmit submitButtonText="Install" onSubmit={onInstall} onCancel={onCloseInstallModal} />
           </Modal.Footer>
-        </BootstrapModalWrapper>
+        </Modal>
       )}
       {showDownloadModal && (
         <ContentPackDownloadControl

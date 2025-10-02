@@ -21,8 +21,8 @@ import type { PreferencesMap } from 'stores/users/PreferencesStore';
 import type { AccountStatus } from './UserOverview';
 
 export type StartPage = {
-  id: string;
-  type: 'dashboard' | 'stream' | 'search';
+  id?: string;
+  type: 'dashboard' | 'stream' | 'search' | 'graylog_security_welcome';
 };
 
 export type UserJSON = {

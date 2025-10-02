@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.system.responses.IOStateSummary;
 import org.joda.time.DateTime;
 
@@ -28,9 +27,8 @@ import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class InputStateSummary extends IOStateSummary {
-    @JsonProperty
+    @JsonProperty("message_input")
     public abstract InputSummary messageInput();
 
     @JsonCreator

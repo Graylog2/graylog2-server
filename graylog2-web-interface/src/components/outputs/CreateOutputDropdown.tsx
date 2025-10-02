@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import $ from 'jquery';
+import * as React from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { Button } from 'components/bootstrap';
-import { ConfigurationForm } from 'components/configurationforms';
+import { ConfigurationForm, type ConfigurationField } from 'components/configurationforms';
 import type { RefType } from 'components/configurationforms/ConfigurationForm';
+import type { AvailableOutputSummary } from 'components/streams/useAvailableOutputTypes';
 
-const formatOutputType = (type, typeName) => (
+const formatOutputType = (type: AvailableOutputSummary, typeName: string) => (
   <option key={typeName} value={typeName}>
     {type.name}
   </option>
@@ -29,83 +30,70 @@ const formatOutputType = (type, typeName) => (
 
 type CreateOutputDropdownProps = {
   getTypeDefinition: (...args: any[]) => void;
-  types: { [key: string]: any };
+  types: { [key: string]: AvailableOutputSummary };
   onSubmit: (...args: any[]) => void;
 };
+const PLACEHOLDER = 'placeholder';
 
-class CreateOutputDropdown extends React.Component<
-  CreateOutputDropdownProps,
-  {
-    [key: string]: any;
-  }
-> {
-  PLACEHOLDER = 'placeholder';
+const CreateOutputDropdown = ({ types, getTypeDefinition, onSubmit }: CreateOutputDropdownProps) => {
+  const configurationForm = useRef<RefType<{}>>();
+  const [typeDefinition, setTypeDefinition] = useState<{
+    [key: string]: ConfigurationField;
+  }>({});
+  const [typeName, setTypeName] = useState(PLACEHOLDER);
 
-  private configurationForm: React.RefObject<RefType<{}>>;
-
-  constructor(props) {
-    super(props);
-
-    this.configurationForm = React.createRef();
-
-    this.state = {
-      typeDefinition: [],
-      typeName: this.PLACEHOLDER,
-    };
-  }
-
-  _openModal = () => {
-    if (this.state.typeName !== this.PLACEHOLDER && this.state.typeName !== '' && this.configurationForm.current) {
-      this.configurationForm.current.open();
+  const _openModal = useCallback(() => {
+    if (typeName !== PLACEHOLDER && typeName !== '' && configurationForm.current) {
+      configurationForm.current.open();
     }
-  };
+  }, [typeName]);
 
-  _onTypeChange = (evt) => {
-    const outputType = evt.target.value;
+  const _onTypeChange = useCallback(
+    (evt: React.ChangeEvent<HTMLSelectElement>) => {
+      const outputType = evt.target.value;
 
-    this.setState({ typeName: evt.target.value });
+      setTypeName(evt.target.value);
 
-    this.props.getTypeDefinition(outputType, (definition) => {
-      this.setState({ typeDefinition: definition.requested_configuration });
-    });
-  };
+      getTypeDefinition(outputType, (definition) => {
+        setTypeDefinition(definition.requested_configuration);
+      });
+    },
+    [getTypeDefinition],
+  );
+  const outputTypes = useMemo(() => Object.entries(types).map(([name, type]) => formatOutputType(type, name)), [types]);
 
-  render() {
-    const outputTypes = $.map(this.props.types, formatOutputType);
-
-    return (
-      <div>
-        <div className="form-inline">
-          <select
-            id="input-type"
-            defaultValue={this.PLACEHOLDER}
-            value={this.state.typeName}
-            onChange={this._onTypeChange}
-            className="form-control">
-            <option value={this.PLACEHOLDER} disabled>
-              Select Output Type
-            </option>
-            {outputTypes}
-          </select>
-          &nbsp;
-          <Button bsStyle="success" disabled={this.state.typeName === this.PLACEHOLDER} onClick={this._openModal}>
-            Launch new output
-          </Button>
-        </div>
-
-        <ConfigurationForm
-          ref={this.configurationForm}
-          key="configuration-form-output"
-          configFields={this.state.typeDefinition}
-          title="Create new Output"
-          titleHelpText="Select a name of your new output that describes it."
-          typeName={this.state.typeName}
-          submitButtonText="Create output"
-          submitAction={this.props.onSubmit}
-        />
+  return (
+    <div>
+      <div className="form-inline">
+        <select
+          id="input-type"
+          defaultValue={PLACEHOLDER}
+          value={typeName}
+          onChange={_onTypeChange}
+          className="form-control">
+          <option value={PLACEHOLDER} disabled>
+            Select Output Type
+          </option>
+          {outputTypes}
+        </select>
+        &nbsp;
+        <Button bsStyle="success" disabled={typeName === PLACEHOLDER} onClick={_openModal}>
+          Launch new output
+        </Button>
       </div>
-    );
-  }
-}
+
+      <ConfigurationForm
+        ref={configurationForm}
+        key="configuration-form-output"
+        configFields={typeDefinition}
+        title="Create new Output"
+        titleHelpText="Select a name of your new output that describes it."
+        typeName={typeName}
+        submitButtonText="Create output"
+        submitAction={onSubmit}
+      />
+    </div>
+  );
+};
 
 export default CreateOutputDropdown;

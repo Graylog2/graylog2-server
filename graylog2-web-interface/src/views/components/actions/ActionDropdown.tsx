@@ -87,7 +87,7 @@ type Props = {
   children: React.ReactNode;
   type: 'field' | 'value';
   handlerArgs: ActionHandlerArguments;
-  setOverflowingComponents: (components: ActionComponents) => void;
+  setOverflowingComponents: (newComponents: ActionComponents) => void;
   overflowingComponents: ActionComponents;
   onMenuToggle: () => void;
 };

@@ -36,7 +36,7 @@ import { Icon } from 'components/common';
 type Props = {
   stream: Stream;
   getTypeDefinition: (type: string) => AvailableOutputRequestedConfiguration;
-  availableOutputTypes: AvailableOutputTypes['types'];
+  availableOutputTypes: AvailableOutputTypes;
   assignableOutputs: Array<Output>;
 };
 

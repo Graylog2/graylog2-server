@@ -36,7 +36,6 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.AllowedAuxiliaryPathChecker;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
@@ -163,7 +162,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             }
 
             LOG.debug("CSV file {} has changed, updating data", config.path());
-            setLookupRefFromCSV();
+            if (!config.isMultiValueLookup()) {
+                setLookupRefFromCSV();
+            } else {
+                setMultiValueLookupRefFromCSV();
+            }
             cachePurge.purgeAll();
             // If the file has been moved, then moved back, the fileInfo might have been disconnected.
             // In this case, create a new fileInfo.
@@ -417,14 +420,27 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             return cidrLookupRef.get().getPreview(size);
         } else {
             final Map<Object, Object> result = new HashMap<>();
-            final Map<String, String> lookup = lookupRef.get();
-            for (Map.Entry<String, String> entries : lookup.entrySet()) {
-                if (result.size() == size) {
-                    break;
+            final long totalSize;
+            if (!config.isMultiValueLookup()) {
+                final Map<String, String> lookup = lookupRef.get();
+                totalSize = lookup.size();
+                for (Map.Entry<String, String> entries : lookup.entrySet()) {
+                    if (result.size() == size) {
+                        break;
+                    }
+                    result.put(entries.getKey(), entries.getValue());
                 }
-                result.put(entries.getKey(), entries.getValue());
+            } else {
+                final Map<String, Map<Object, Object>> multiLookup = multiValueLookupRef.get();
+                totalSize = multiLookup.size();
+                for (Map.Entry<String, Map<Object, Object>> entries : multiLookup.entrySet()) {
+                    if (result.size() == size) {
+                        break;
+                    }
+                    result.put(entries.getKey(), toSingleValue(entries.getValue()));
+                }
             }
-            return new LookupPreview(lookup.size(), result);
+            return new LookupPreview(totalSize, result);
         }
     }
 
@@ -516,7 +532,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_CSVFileDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)

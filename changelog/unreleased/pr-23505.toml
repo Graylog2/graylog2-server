@@ -1,0 +1,5 @@
+type = "f"
+message = 'Fix issue with output edit button not opening edit modal after first click.'
+
+issues = ['Graylog2/graylog-plugin-enterprise#8432']
+pulls = ["23505"]

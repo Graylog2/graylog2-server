@@ -81,13 +81,13 @@ const RemediationStepRenderer = ({
   );
 };
 
-const EventProcedureRenderer = ({ eventProcedureId, event }: { eventProcedureId: string; event: Event }) => {
+const EventProcedureRenderer = ({ eventProcedureId, eventId }: { eventProcedureId: string; eventId: string }) => {
   const pluggableEventProcedureSummary = usePluginEntities('views.components.eventProcedureSummary');
 
   return (
     <>
       {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
-        <PluggableEventProcedureSummary eventDefinitionEventProcedure={eventProcedureId} event={event} />
+        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} eventId={eventId} />
       ))}
     </>
   );
@@ -179,7 +179,7 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
         <>
           {ValidSecurityLicense() ? (
-            <EventProcedureRenderer eventProcedureId={eventProcedureId} event={event} />
+            <EventProcedureRenderer eventProcedureId={eventProcedureId} eventId={event?.id} />
           ) : (
             <RemediationStepRenderer meta={meta} eventDefinitionId={event.event_definition_id} />
           )}

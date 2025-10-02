@@ -31,7 +31,8 @@ type Props = {
 
 const ShareForm = ({ onChange, eventDefinition }: Props) => {
   const handleEntityShareSet = (entityShare?: EntitySharePayload) => onChange('share_request', entityShare);
-  const streamDependenciesGRN = eventDefinition?.config?.streams?.map((streamId) => createGRN('stream', streamId)) || [];
+  const streamDependenciesGRN =
+    eventDefinition?.config?.streams?.map((streamId) => createGRN('stream', streamId)) || [];
   const notificationDependenciesGRN = eventDefinition?.notifications?.map((notification) =>
     createGRN('notification', notification.notification_id),
   );

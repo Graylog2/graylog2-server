@@ -20,7 +20,10 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { Col, Row } from 'components/bootstrap';
 import { Section, StatusIcon } from 'components/common';
-import IndexMaintenanceStrategiesSummary from 'components/indices/IndexMaintenanceStrategiesSummary';
+import {
+  RotationStrategySummary,
+  RetentionStrategySummary,
+} from 'components/indices/IndexMaintenanceStrategiesSummary';
 import {
   DataTieringSummary,
   DATA_TIERING_TYPE,
@@ -28,6 +31,7 @@ import {
   DataTieringVisualisation,
 } from 'components/indices/data-tiering';
 import type { IndexSetTemplate } from 'components/indices/IndexSetTemplates/types';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 type Props = {
   template: IndexSetTemplate;
@@ -78,7 +82,7 @@ const Grid = styled.div(
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: 1fr;
-    grid-gap: ${theme.spacings.md};
+    gap: ${theme.spacings.md};
   `,
 );
 
@@ -93,9 +97,8 @@ const formatRefreshInterval = (intervalInMs: number) => {
 };
 
 const TemplateDetails = ({ template, showDescription = false }: Props) => {
-  const dataTieringPlugin = PluginStore.exports('dataTiering').find(
-    (plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM,
-  );
+  const dataTieringPlugins = usePluginEntities('dataTiering');
+  const dataTieringPlugin = dataTieringPlugins.find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
 
   return (
@@ -149,21 +152,19 @@ const TemplateDetails = ({ template, showDescription = false }: Props) => {
                 {template.index_set_config.use_legacy_rotation ? (
                   <>
                     <RotationSummaryWrapper>
-                      <IndexMaintenanceStrategiesSummary
+                      <RotationStrategySummary
                         config={{
                           strategy: template.index_set_config.rotation_strategy_class,
                           config: template.index_set_config.rotation_strategy,
                         }}
-                        pluginExports={PluginStore.exports('indexRotationConfig')}
                       />
                     </RotationSummaryWrapper>
-                    <IndexMaintenanceStrategiesSummary
+                    <RetentionStrategySummary
                       config={{
                         strategy: template.index_set_config.retention_strategy_class,
                         config: template.index_set_config.retention_strategy,
                       }}
                       rotationStrategyClass={template.index_set_config.rotation_strategy_class}
-                      pluginExports={PluginStore.exports('indexRetentionConfig')}
                     />
                   </>
                 ) : (

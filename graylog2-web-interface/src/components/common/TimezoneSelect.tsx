@@ -21,7 +21,7 @@ import type { SelectInstance } from 'react-select';
 
 import Select from 'components/common/Select';
 
-type TimezoneLabel = { label: string, disabled?: boolean, value: string }
+type TimezoneLabel = { label: string; disabled?: boolean; value: string };
 
 const renderOption = (option: { disabled: boolean; value: string; label: string }) => {
   if (!option.disabled) {

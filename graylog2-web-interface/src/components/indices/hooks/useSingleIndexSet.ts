@@ -17,7 +17,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
-import { type IndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { defaultOnError } from 'util/conditional/onError';

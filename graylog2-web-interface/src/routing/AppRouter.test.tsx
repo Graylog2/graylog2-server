@@ -88,7 +88,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
   const pluginExports: PluginExports = {
     routes,
   };
-  asMock(usePluginEntities).mockImplementation((key: keyof PluginExports) => pluginExports[key] ?? []);
+  asMock(usePluginEntities).mockImplementation((key: 'routes'): PluginExports['routes'] => pluginExports[key] ?? []);
 };
 
 describe('AppRouter', () => {

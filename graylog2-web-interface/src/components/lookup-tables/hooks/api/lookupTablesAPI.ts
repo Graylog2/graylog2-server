@@ -44,14 +44,14 @@ export const fetchErrors = async ({
 export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => {
   const { page, pageSize, query, sort } = searchParams;
 
-    const sortField = sort?.attributeId;
-    const sortOrder = sort?.direction;
+  const sortField = sort?.attributeId;
+  const sortOrder = sort?.direction;
 
-    const promise = LookupTablesStore.searchPaginated(page, pageSize, query, true, sortField, sortOrder);
+  const promise = LookupTablesStore.searchPaginated(page, pageSize, query, true, sortField, sortOrder);
 
-    LookupTablesActions.searchPaginated.promise(promise);
+  LookupTablesActions.searchPaginated.promise(promise);
 
-    return promise.then(deserializeLookupTables);
+  return promise.then(deserializeLookupTables);
 };
 
 export const createLookupTable = async (payload: LookupTableCache) => LookupTablesActions.create(payload);

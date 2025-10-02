@@ -36,6 +36,7 @@ const NAV_ITEMS = [
     description: 'Field Type Profiles',
     path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
     exactPathMatch: false,
+    permissions: 'mappingprofiles:read',
   },
 ];
 

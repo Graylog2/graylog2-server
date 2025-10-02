@@ -55,7 +55,7 @@ const StreamDataRoutingProcessing = ({ stream }: Props) => {
       <Section
         title="Pipelines"
         actions={
-          <IfPermitted permissions="streams:create">
+          <IfPermitted permissions={`streams:edit:${streamId}`}>
             <StreamPipelinesConnectionForm
               streamId={streamId}
               pipelines={pipelines}

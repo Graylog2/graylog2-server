@@ -29,9 +29,11 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import { keySeparator, humanSeparator } from 'views/Constants';
 import type { PieChartDataSettingsWithCustomUnits } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import usePieChartDataSettingsWithCustomUnits from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
+import usePlotOnClickPopover from 'views/components/visualizations/hooks/usePlotOnClickPopover';
+import OverflowingComponentsContextProvider from 'views/components/contexts/OverflowingComponentsContextProvider';
 
-import type { ChartConfig } from '../GenericPlot';
 import GenericPlot from '../GenericPlot';
+import type { ChartConfig } from '../GenericPlot';
 
 const maxItemsPerRow = 4;
 
@@ -105,17 +107,27 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
     generator: _generateSeries(mapKeys, getPieChartDataSettingsWithCustomUnits),
   });
 
+  const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('pie', config);
+
   return (
-    <PlotLegend
-      config={config}
-      chartData={transformedData}
-      labelMapper={labelMapper}
-      labelFields={rowPivotsToFields}
-      neverHide
-      height={height}
-      width={width}>
-      <GenericPlot chartData={transformedData} setChartColor={setChartColor} />
-    </PlotLegend>
+    <>
+      <PlotLegend
+        config={config}
+        chartData={transformedData}
+        labelMapper={labelMapper}
+        labelFields={rowPivotsToFields}
+        neverHide
+        height={height}
+        width={width}>
+        <GenericPlot
+          chartData={transformedData}
+          setChartColor={setChartColor}
+          onInitialized={initializeGraphDivRef}
+          onClickMarker={onChartClick}
+        />
+      </PlotLegend>
+      <OverflowingComponentsContextProvider>{popover}</OverflowingComponentsContextProvider>
+    </>
   );
 }, 'pie');
 

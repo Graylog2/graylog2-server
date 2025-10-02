@@ -58,7 +58,6 @@ describe('RuleBlockForm', () => {
     jest.clearAllMocks();
   });
 
-  // eslint-disable-next-line jest/expect-expect
   it('renders a select with all functions as options', async () => {
     render(comp());
 

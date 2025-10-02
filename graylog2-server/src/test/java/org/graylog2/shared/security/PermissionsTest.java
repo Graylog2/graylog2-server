@@ -87,13 +87,13 @@ public class PermissionsTest {
     @Test
     public void testUserSelfEditPermissions() {
         assertThat(permissions.userSelfEditPermissions("john", true))
-                .containsExactly("users:edit:john", "users:passwordchange:john", "users:tokenlist:john",
+                .containsExactly("users:read:john", "users:edit:john", "users:passwordchange:john", "users:tokenlist:john",
                         "users:tokencreate:john", "users:tokenremove:john");
     }
     @Test
     public void testUserSelfEditPermissionsNoTokenCreate() {
         assertThat(permissions.userSelfEditPermissions("john", false))
-                .containsExactly("users:edit:john", "users:passwordchange:john", "users:tokenlist:john",
+                .containsExactly("users:read:john", "users:edit:john", "users:passwordchange:john", "users:tokenlist:john",
                         "users:tokenremove:john");
     }
 

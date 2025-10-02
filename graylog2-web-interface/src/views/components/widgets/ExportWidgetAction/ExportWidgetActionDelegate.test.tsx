@@ -36,11 +36,9 @@ describe('ExtraMenuWidgetActions', () => {
 
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /export widget/i });
-    userEvent.click(exportButton);
+    await userEvent.click(exportButton);
 
-    const plugText = screen.queryByText(plugExplanation);
-
-    expect(plugText).toBeNull();
+    await screen.findByText(plugExplanation);
   });
 
   it('Render original WidgetExportActionComponent without a plug', async () => {
@@ -52,12 +50,11 @@ describe('ExtraMenuWidgetActions', () => {
 
     renderExportWidgetActionDelegate();
     const exportButton = await screen.findByRole('button', { name: /dummy export action/i });
-    const plugExportButton = screen.queryByRole('button', { name: /export widget/i });
-    userEvent.click(exportButton);
 
-    const plugText = screen.queryByText(plugExplanation);
+    expect(screen.queryByRole('button', { name: /export widget/i })).not.toBeInTheDocument();
 
-    expect(plugText).toBeNull();
-    expect(plugExportButton).toBeNull();
+    await userEvent.click(exportButton);
+
+    expect(screen.queryByText(plugExplanation)).not.toBeInTheDocument();
   });
 });

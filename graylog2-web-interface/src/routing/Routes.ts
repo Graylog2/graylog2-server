@@ -69,7 +69,7 @@ const Routes = {
     },
   },
   SECURITY: {
-    OVERVIEW: `${SECURITY_PATH}/overview`,
+    OVERVIEW: `${SECURITY_PATH}`,
     USER_ACTIVITY: `${SECURITY_PATH}/user-activity`,
     HOST_ACTIVITY: `${SECURITY_PATH}/host-activity`,
     NETWORK_ACTIVITY: `${SECURITY_PATH}/network-activity`,

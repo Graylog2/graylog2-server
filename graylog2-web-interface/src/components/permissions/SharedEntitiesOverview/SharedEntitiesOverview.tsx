@@ -73,7 +73,10 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
     () => _loadSharedEntities(pagination, searchPaginated, setPaginatedEntityShares, setLoading),
     [pagination, searchPaginated, setLoading],
   );
-  const tableHeaders = useMemo(() => [ ...TABLE_HEADERS, ...(pluggableAttributes && pluggableAttributes.attributeNames) ], [pluggableAttributes]);
+  const tableHeaders = useMemo(
+    () => [...TABLE_HEADERS, ...(pluggableAttributes && pluggableAttributes.attributeNames)],
+    [pluggableAttributes],
+  );
   const _handleSearch = (newQuery: string) => setPagination({ ...pagination, query: newQuery });
   const _handleFilter = (param: string, value: string) =>
     setPagination({ ...pagination, query, additionalQueries: { ...additionalQueries, [param]: value } });

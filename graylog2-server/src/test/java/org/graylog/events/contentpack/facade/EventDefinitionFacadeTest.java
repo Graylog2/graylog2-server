@@ -70,6 +70,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScope;
 import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -140,6 +141,8 @@ public class EventDefinitionFacadeTest {
     private EventProcessorConfig mockEventProcessorConfig;
     @Mock
     private ClusterEventBus clusterEventBus;
+    @Mock
+    private EntitySourceService entitySourceService;
 
     @Before
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
@@ -158,7 +161,7 @@ public class EventDefinitionFacadeTest {
         jobSchedulerClock = mock(JobSchedulerClock.class);
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityRegistrar, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock, clusterEventBus);
+        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock, clusterEventBus, entitySourceService);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityRegistrar);
     }
@@ -274,7 +277,7 @@ public class EventDefinitionFacadeTest {
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         when(jobTriggerService.create(any(JobTriggerDto.class))).thenReturn(jobTriggerDto);
         final UserImpl kmerzUser = new UserImpl(mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
+                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
 

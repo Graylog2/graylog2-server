@@ -37,13 +37,11 @@ import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
-import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
 import org.graylog2.syslog4j.server.impl.event.CiscoSyslogServerEvent;
-import org.graylog2.syslog4j.server.impl.event.FortiGateSyslogEvent;
 import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.joda.time.DateTime;
@@ -52,7 +50,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -141,7 +138,7 @@ public class SyslogCodec extends AbstractCodec {
         } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
             e = new CiscoSyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         } else if (FORTIGATE_PATTERN.matcher(msg).matches()) {
-            e = new FortiGateSyslogEvent(msg.trim(), defaultTimeZone);
+            e = new GLFortiGateSyslogEvent(msg.trim(), defaultTimeZone);
         } else {
             e = new SyslogServerEvent(msg, remoteAddress, defaultTimeZone);
         }
@@ -165,8 +162,8 @@ public class SyslogCodec extends AbstractCodec {
         if (e instanceof CiscoSyslogServerEvent) {
             m.addField("sequence_number", ((CiscoSyslogServerEvent) e).getSequenceNumber());
         }
-        if (e instanceof FortiGateSyslogEvent) {
-            final HashMap<String, Object> fields = new HashMap<>(((FortiGateSyslogEvent) e).getFields());
+        if (e instanceof GLFortiGateSyslogEvent) {
+            final HashMap<String, Object> fields = new HashMap<>(((GLFortiGateSyslogEvent) e).getFields());
             // The FortiGate "level" field is a string, Graylog requires a numeric value.
             fields.remove("level");
             m.addFields(fields);
@@ -234,12 +231,6 @@ public class SyslogCodec extends AbstractCodec {
         }
 
         return new DateTime(sysLogDate);
-    }
-
-    @Nullable
-    @Override
-    public CodecAggregator getAggregator() {
-        return null;
     }
 
     @FactoryClass

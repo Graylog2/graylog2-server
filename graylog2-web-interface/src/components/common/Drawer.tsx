@@ -35,7 +35,7 @@ const StyledDrawer = styled(MantineDrawer)(
     }
 
     .mantine-Drawer-title {
-      max-width: 94%;
+      width: 94%;
     }
   `,
 );
@@ -45,6 +45,7 @@ const TitleWrapper = styled.div`
   align-items: center;
   flex: 1 1 auto;
   overflow: hidden;
+  width: 100%;
 `;
 
 const Title = styled.div(
@@ -53,8 +54,10 @@ const Title = styled.div(
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 100%;
   `,
 );
+
 type Props = Pick<
   React.ComponentProps<typeof MantineDrawer>,
   | 'opened'
@@ -70,8 +73,11 @@ type Props = Pick<
   | 'overlayProps'
   | 'styles'
   | 'transitionProps'
->;
-const Drawer = ({ title, ...props }: Props) => (
+> & {
+  double?: boolean;
+};
+
+const Drawer = ({ title, double = false, ...props }: Props) => (
   <StyledDrawer
     offset={15}
     padding="lg"
@@ -83,6 +89,7 @@ const Drawer = ({ title, ...props }: Props) => (
       </TitleWrapper>
     }
     {...props}
+    size={double ? 1260 : props.size}
   />
 );
 

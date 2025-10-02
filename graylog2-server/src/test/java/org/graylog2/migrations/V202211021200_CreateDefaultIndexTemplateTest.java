@@ -19,6 +19,7 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.joschi.jadconfig.util.Duration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.IndexSetDefaultTemplateConfigFactory;
 import org.graylog2.configuration.IndexSetsDefaultConfiguration;
@@ -178,6 +179,7 @@ class V202211021200_CreateDefaultIndexTemplateTest {
         when(elasticsearchConfiguration.getRotationStrategy()).thenReturn(SizeBasedRotationStrategy.NAME);
         when(elasticsearchConfiguration.getRetentionStrategy()).thenReturn(DeletionRetentionStrategy.NAME);
         when(elasticsearchConfiguration.getAnalyzer()).thenReturn("analyzer");
+        when(elasticsearchConfiguration.getIndexFieldTypeRefreshInterval()).thenReturn(Duration.seconds(5));
         mockLifeTimeDaysElasticConfig();
     }
 

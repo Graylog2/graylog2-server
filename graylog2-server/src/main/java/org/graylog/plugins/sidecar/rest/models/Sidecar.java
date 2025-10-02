@@ -39,7 +39,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @JsonAutoDetect
 public abstract class Sidecar implements MongoEntity {
 
-    public static final String FIELD_ID = "id";
     public static final String FIELD_NODE_ID = "node_id";
     public static final String FIELD_NODE_NAME = "node_name";
     public static final String FIELD_NODE_DETAILS = "node_details";
@@ -80,12 +79,6 @@ public abstract class Sidecar implements MongoEntity {
             return valueOf(statusString.toUpperCase(Locale.ENGLISH));
         }
     }
-
-    @JsonProperty
-    @Id
-    @ObjectId
-    @Nullable
-    public abstract String id();
 
     @JsonProperty
     public abstract String nodeId();

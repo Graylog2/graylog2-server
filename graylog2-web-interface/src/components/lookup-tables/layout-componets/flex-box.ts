@@ -31,14 +31,14 @@ export type FlexItemType = FlexBaseType & {
 export type FlexContainerType = FlexBaseType & {
   $direction: 'column' | 'row';
   $alignContent?:
-  | 'normal'
-  | 'flex-start'
-  | 'flex-end'
-  | 'center'
-  | 'space-between'
-  | 'space-around'
-  | 'space-evenly'
-  | 'stretch';
+    | 'normal'
+    | 'flex-start'
+    | 'flex-end'
+    | 'center'
+    | 'space-between'
+    | 'space-around'
+    | 'space-evenly'
+    | 'stretch';
 };
 
 const FlexBase = styled.div<FlexBaseType>`
@@ -48,22 +48,22 @@ const FlexBase = styled.div<FlexBaseType>`
   flex-wrap: ${({ $wrap }) => ($wrap ? 'wrap' : 'nowrap')};
   width: ${({ $width }) => $width || '100%'};
 
-  @media (max-width: 991px) {
+  @media (width <= 991px) {
     flex-direction: column;
   }
 `;
 
-export const Container = styled(FlexBase) <FlexContainerType>`
+export const Container = styled(FlexBase)<FlexContainerType>`
   flex-direction: ${({ $direction }) => $direction};
   align-content: ${({ $alignContent }) => $alignContent || 'normal'};
 `;
 
-export const Row = styled(FlexBase) <FlexItemType>`
+export const Row = styled(FlexBase)<FlexItemType>`
   flex-direction: row;
   align-items: ${({ $align }) => $align || 'flex-start'};
 `;
 
-export const Col = styled(FlexBase) <FlexItemType>`
+export const Col = styled(FlexBase)<FlexItemType>`
   flex-direction: column;
   align-items: ${({ $align }) => $align || 'flex-start'};
 `;

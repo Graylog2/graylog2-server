@@ -45,7 +45,6 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -53,9 +52,9 @@ import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.graylog2.system.urlwhitelist.UrlNotWhitelistedException;
-import org.graylog2.system.urlwhitelist.UrlWhitelistNotificationService;
-import org.graylog2.system.urlwhitelist.UrlWhitelistService;
+import org.graylog2.system.urlallowlist.UrlAllowlistNotificationService;
+import org.graylog2.system.urlallowlist.UrlAllowlistService;
+import org.graylog2.system.urlallowlist.UrlNotAllowlistedException;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -82,8 +81,8 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final Engine templateEngine;
     private final OkHttpClient httpClient;
-    private final UrlWhitelistService urlWhitelistService;
-    private final UrlWhitelistNotificationService urlWhitelistNotificationService;
+    private final UrlAllowlistService urlAllowlistService;
+    private final UrlAllowlistNotificationService urlAllowlistNotificationService;
     private final NotificationService notificationService;
 
     private final Timer httpRequestTimer;
@@ -95,16 +94,16 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     private Headers headers;
 
     @Inject
-    protected HTTPJSONPathDataAdapter(@Assisted("dto") DataAdapterDto dto, Engine templateEngine, OkHttpClient httpClient, UrlWhitelistService urlWhitelistService,
-                                      UrlWhitelistNotificationService urlWhitelistNotificationService, MetricRegistry metricRegistry,
+    protected HTTPJSONPathDataAdapter(@Assisted("dto") DataAdapterDto dto, Engine templateEngine, OkHttpClient httpClient, UrlAllowlistService urlAllowlistService,
+                                      UrlAllowlistNotificationService urlAllowlistNotificationService, MetricRegistry metricRegistry,
                                       NotificationService notificationService) {
         super(dto, metricRegistry);
         this.config = (Config) dto.config();
         this.templateEngine = templateEngine;
         // TODO Add config options: caching, timeouts, custom headers, basic auth (See: https://github.com/square/okhttp/wiki/Recipes)
         this.httpClient = httpClient.newBuilder().build(); // Copy HTTP client to be able to modify it
-        this.urlWhitelistService = urlWhitelistService;
-        this.urlWhitelistNotificationService = urlWhitelistNotificationService;
+        this.urlAllowlistService = urlAllowlistService;
+        this.urlAllowlistNotificationService = urlAllowlistNotificationService;
         this.notificationService = notificationService;
 
         this.httpRequestTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "httpRequestTime"));
@@ -166,13 +165,13 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         }
         final String urlString = templateEngine.transform(config.url(), ImmutableMap.of("key", encodedKey));
 
-        if (!urlWhitelistService.isWhitelisted(urlString)) {
-            LOG.error("Data adapter <{}>: URL <{}> is not whitelisted. Aborting lookup request.", name(), urlString);
-            publishSystemNotificationForWhitelistFailure();
-            setError(UrlNotWhitelistedException.forUrl(urlString));
+        if (!urlAllowlistService.isAllowlisted(urlString)) {
+            LOG.error("Data adapter <{}>: URL <{}> is not allowlisted. Aborting lookup request.", name(), urlString);
+            publishSystemNotificationForAllowlistFailure();
+            setError(UrlNotAllowlistedException.forUrl(urlString));
             return getErrorResult();
         } else {
-            // we use this kind of error reporting mechanism only for whitelist errors, so we can safely clear the
+            // we use this kind of error reporting mechanism only for allowlist errors, so we can safely clear the
             // error here
             clearError();
         }
@@ -312,7 +311,6 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     }
 
     @AutoValue
-    @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_HTTPJSONPathDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)
@@ -351,8 +349,8 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
 
             if (HttpUrl.parse(url()) == null) {
                 errors.put("url", "Invalid URL.");
-            } else if (!validationContext.getUrlWhitelistService().isWhitelisted(url())) {
-                errors.put("url", "URL <" + url() + "> is not whitelisted.");
+            } else if (!validationContext.getUrlAllowlistService().isAllowlisted(url())) {
+                errors.put("url", "URL <" + url() + "> is not allowlisted.");
             }
 
             try {
@@ -398,11 +396,11 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         }
     }
 
-    private synchronized void publishSystemNotificationForWhitelistFailure() {
+    private synchronized void publishSystemNotificationForAllowlistFailure() {
         final String description =
-                "A \"HTTP JSONPath\" lookup adapter is trying to access a URL which is not whitelisted. Please " +
+                "A \"HTTP JSONPath\" lookup adapter is trying to access a URL which is not allowlisted. Please " +
                         "check your configuration. [adapter name: \"" + name() + "\", url: \"" + config.url() +
                         "\"]";
-        urlWhitelistNotificationService.publishWhitelistFailure(description);
+        urlAllowlistNotificationService.publishAllowlistFailure(description);
     }
 }

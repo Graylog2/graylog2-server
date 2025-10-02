@@ -20,9 +20,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableList;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EventProcedureTest {
     @Test
     public void testDescriptionHtmlSanitization() throws JsonProcessingException {

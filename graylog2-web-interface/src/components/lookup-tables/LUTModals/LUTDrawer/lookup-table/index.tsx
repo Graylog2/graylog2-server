@@ -122,23 +122,42 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
               <Row>
                 <span style={{ width: 100, flexShrink: 0 }}>Cache</span>
                 <Row $justify="space-between" $align="center">
-                  <LinkSpan role="link" aria-label="cache details" onClick={handleShowAttached('cache-details')}>
-                    {cache.title}
-                  </LinkSpan>
-                  <Description>
-                    <Icon name="chevron_right" rotation={showAttached === 'cache-details' ? 180 : 0} size="sm" />
-                  </Description>
+                  {cache ? (
+                    <>
+                      <LinkSpan role="link" aria-label="cache details" onClick={handleShowAttached('cache-details')}>
+                        {cache.title}
+                      </LinkSpan>
+                      <Description>
+                        <Icon name="chevron_right" rotation={showAttached === 'cache-details' ? 180 : 0} size="sm" />
+                      </Description>
+                    </>
+                  ) : (
+                    <i>
+                      <Description>No cache</Description>
+                    </i>
+                  )}
                 </Row>
               </Row>
               <Row>
                 <span style={{ width: 100, flexShrink: 0 }}>Data Adapter</span>
                 <Row $justify="space-between" $align="center">
-                  <LinkSpan role="link" aria-label="adapter details" onClick={handleShowAttached('adapter-details')}>
-                    {dataAdapter.title}
-                  </LinkSpan>
-                  <Description>
-                    <Icon name="chevron_right" rotation={showAttached === 'adapter-details' ? 180 : 0} size="sm" />
-                  </Description>
+                  {dataAdapter ? (
+                    <>
+                      <LinkSpan
+                        role="link"
+                        aria-label="adapter details"
+                        onClick={handleShowAttached('adapter-details')}>
+                        {dataAdapter.title}
+                      </LinkSpan>
+                      <Description>
+                        <Icon name="chevron_right" rotation={showAttached === 'adapter-details' ? 180 : 0} size="sm" />
+                      </Description>
+                    </>
+                  ) : (
+                    <i>
+                      <Description>No data adapter</Description>
+                    </i>
+                  )}
                 </Row>
               </Row>
             </Col>

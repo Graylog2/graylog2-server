@@ -54,6 +54,7 @@ import javax.net.ssl.TrustManagerFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -122,7 +123,7 @@ public class ClientCertResourceIT {
                 createKeystore(privateKey, certificate, caCertificate),
                 createTruststore(caCertificate));
 
-        final URL url = new URL("https://" + this.api.backend().searchServerInstance().getHttpHostAddress());
+        final URL url = new URI("https://" + this.api.backend().searchServerInstance().getHttpHostAddress()).toURL();
 
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         if (connection instanceof HttpsURLConnection) {
@@ -183,7 +184,7 @@ public class ClientCertResourceIT {
             Object parsed = pemParser.readObject();
             if (parsed instanceof PEMKeyPair keyPair) {
                 return converter.getPrivateKey(keyPair.getPrivateKeyInfo());
-            } else if(parsed instanceof PKCS8EncryptedPrivateKeyInfo keyPair) {
+            } else if (parsed instanceof PKCS8EncryptedPrivateKeyInfo keyPair) {
                 return decryptPrivateKey(privateKeyPassword, keyPair, converter);
             } else {
                 throw new IllegalArgumentException("Couldn't parse private key from provided string, unknown type");

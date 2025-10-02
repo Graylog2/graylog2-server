@@ -17,6 +17,7 @@
 package org.graylog.integrations.pagerduty.client;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
@@ -30,10 +31,9 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
-import jakarta.inject.Inject;
-
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -121,8 +121,8 @@ public class MessageFactory {
             }
         }
         try {
-            return new Link(new URL(streamUrl), stream.getTitle());
-        } catch (MalformedURLException e) {
+            return new Link(new URI(streamUrl).toURL(), stream.getTitle());
+        } catch (URISyntaxException | MalformedURLException e) {
             throw new IllegalStateException("Error when building the stream link URL.", e);
         }
     }

@@ -59,7 +59,7 @@ const VariableContainer = styled.div<{ $height: number; $width: number }>(
     width: ${$width}px;
     grid-template-columns: ${$width}px;
     grid-template-rows: ${$height}px auto;
-    grid-gap: 0;
+    gap: 0;
     justify-content: center;
   `,
 );
