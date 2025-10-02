@@ -19,6 +19,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import { theme } from 'views/components/visualizations/utils/__tests__/fixtures';
 
 import getThresholdShapes from './getThresholdShapes';
 
@@ -45,9 +46,19 @@ const mockFieldNameToAxisNameMapper = {
   foo: 'y1',
 };
 
+const mockMapperAxisNumber = {
+  'count(foo)': 1,
+};
+
 describe('getThresholdShapes', () => {
   it('should generate shapes for thresholds', () => {
-    const shapes = getThresholdShapes(mockSeries, mockWidgetUnits, mockFieldNameToAxisNameMapper);
+    const shapes = getThresholdShapes({
+      series: mockSeries,
+      widgetUnits: mockWidgetUnits,
+      fieldNameToAxisNameMapper: mockFieldNameToAxisNameMapper,
+      mapperAxisNumber: mockMapperAxisNumber,
+      theme,
+    });
 
     expect(shapes).toEqual([
       {
@@ -86,10 +97,26 @@ describe('getThresholdShapes', () => {
   });
 
   it('returns empty array when series is undefined', () => {
-    expect(getThresholdShapes(undefined, mockWidgetUnits, mockFieldNameToAxisNameMapper)).toEqual([]);
+    expect(
+      getThresholdShapes({
+        series: undefined,
+        widgetUnits: mockWidgetUnits,
+        fieldNameToAxisNameMapper: mockFieldNameToAxisNameMapper,
+        mapperAxisNumber: mockMapperAxisNumber,
+        theme,
+      }),
+    ).toEqual([]);
   });
 
   it('returns empty array when thresholds are missing', () => {
-    expect(getThresholdShapes([series], mockWidgetUnits, mockFieldNameToAxisNameMapper)).toEqual([]);
+    expect(
+      getThresholdShapes({
+        series: [series],
+        widgetUnits: mockWidgetUnits,
+        fieldNameToAxisNameMapper: mockFieldNameToAxisNameMapper,
+        mapperAxisNumber: mockMapperAxisNumber,
+        theme,
+      }),
+    ).toEqual([]);
   });
 });

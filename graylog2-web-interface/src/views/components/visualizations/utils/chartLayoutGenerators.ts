@@ -48,7 +48,7 @@ import formatValueWithUnitLabel from 'views/components/visualizations/utils/form
 
 type DefaultAxisKey = 'withoutUnit';
 
-const getYAxisPosition = (axisCount: number) => {
+export const getYAxisPosition = (axisCount: number) => {
   const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
 
   if (axisCount % 2 === 0) {
@@ -281,6 +281,7 @@ export const generateLayouts = ({
       const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
 
       if (!res[unitType]) {
+        // eslint-disable-next-line no-param-reassign
         res[unitType] = [value.y];
       } else {
         res[unitType].push(value.y);
