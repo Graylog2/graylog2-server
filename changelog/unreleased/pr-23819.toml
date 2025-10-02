@@ -1,0 +1,5 @@
+type = "f"
+message = "fix HasOwnership component children prop type issue."
+
+pulls = ["23819"]
+issues = ["graylog-plugin-enterprise#12114"]
