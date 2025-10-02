@@ -39,7 +39,7 @@ const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: O
   const convertToOriginalValue = useCallback(
     (value: number | string) => {
       if (config.isTimeline && typeof value === 'string' && isValidDate(value))
-        return adjustFormat(toUTCFromTz(value, userTimezone), 'internal');
+        return adjustFormat(toUTCFromTz(value, userTimezone), 'internalIndexer');
 
       return value;
     },
