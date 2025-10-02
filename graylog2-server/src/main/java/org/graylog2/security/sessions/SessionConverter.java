@@ -21,6 +21,7 @@ import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.slf4j.Logger;
 
 import java.util.Date;
@@ -36,8 +37,8 @@ public class SessionConverter {
     public static final Set<String> KNOWN_SESSION_KEYS = Set.of(
             DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
             DefaultSubjectContext.AUTHENTICATED_SESSION_KEY,
-            SessionDTO.USERNAME_SESSION_KEY,
-            SessionDTO.AUTH_CONTEXT_SESSION_KEY
+            SessionUtils.USERNAME_SESSION_KEY,
+            SessionUtils.AUTH_CONTEXT_SESSION_KEY
     );
 
     public static SessionDTO simpleSessionToSessionDTO(SimpleSession simpleSession) {
@@ -59,8 +60,8 @@ public class SessionConverter {
                 .userId(principalInfo.map(PrincipalInfo::userId).orElse(null))
                 .authenticationRealm(principalInfo.map(PrincipalInfo::realm).orElse(null))
                 .authenticated((Boolean) simpleSession.getAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY))
-                .userName((String) simpleSession.getAttribute(SessionDTO.USERNAME_SESSION_KEY))
-                .authContext((SessionAuthContext) simpleSession.getAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY))
+                .userName((String) simpleSession.getAttribute(SessionUtils.USERNAME_SESSION_KEY))
+                .authContext((SessionAuthContext) simpleSession.getAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY))
                 .build();
     }
 
@@ -82,11 +83,11 @@ public class SessionConverter {
                     sessionDTO.userId().get(), sessionDTO.authenticationRealm().get()));
         }
         sessionDTO.userName().ifPresent(userName ->
-                simpleSession.setAttribute(SessionDTO.USERNAME_SESSION_KEY, userName));
+                simpleSession.setAttribute(SessionUtils.USERNAME_SESSION_KEY, userName));
         sessionDTO.authenticated().ifPresent(authenticated ->
                 simpleSession.setAttribute(DefaultSubjectContext.AUTHENTICATED_SESSION_KEY, authenticated));
         sessionDTO.authContext().ifPresent(authContext ->
-                simpleSession.setAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY, authContext));
+                simpleSession.setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, authContext));
 
         return simpleSession;
     }

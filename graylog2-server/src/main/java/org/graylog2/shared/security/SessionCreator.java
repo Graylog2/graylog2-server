@@ -28,7 +28,7 @@ import org.apache.shiro.util.ThreadContext;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.sessions.SessionDTO;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserConfiguration;
 import org.slf4j.Logger;
@@ -125,7 +125,7 @@ public class SessionCreator {
         if (user != null) {
             long timeoutInMillis = user.getSessionTimeoutMs();
             session.setTimeout(timeoutInMillis);
-            session.setAttribute(SessionDTO.USERNAME_SESSION_KEY, user.getName());
+            session.setAttribute(SessionUtils.USERNAME_SESSION_KEY, user.getName());
         } else {
             // set a sane default. really we should be able to load the user from above.
             session.setTimeout(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());

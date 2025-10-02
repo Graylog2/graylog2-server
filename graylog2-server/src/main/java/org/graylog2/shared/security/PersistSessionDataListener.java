@@ -22,9 +22,9 @@ import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationListener;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.sessions.AuthenticationInfoWithSessionAuthContext;
 import org.graylog2.security.sessions.SessionAuthContext;
-import org.graylog2.security.sessions.SessionDTO;
 
 /**
  * A listener that is invoked by shiro after an authentication attempt
@@ -39,7 +39,7 @@ public class PersistSessionDataListener implements AuthenticationListener {
         )) {
             final var session = SecurityUtils.getSubject().getSession(false);
             if (session != null) {
-                session.setAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
+                session.setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
             }
         }
     }

@@ -24,6 +24,9 @@ import org.joda.time.Years;
 import java.util.Date;
 
 public class SessionUtils {
+    public static final String USERNAME_SESSION_KEY = "username";
+    public static final String AUTH_CONTEXT_SESSION_KEY = "auth_context";
+
     private SessionUtils() {
     }
 

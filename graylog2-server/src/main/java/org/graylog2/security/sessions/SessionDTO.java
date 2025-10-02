@@ -30,9 +30,6 @@ import java.util.Optional;
 @AutoValue
 @JsonDeserialize(builder = SessionDTO.Builder.class)
 public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, SessionDTO.Builder> {
-    public static final String USERNAME_SESSION_KEY = "username";
-    public static final String AUTH_CONTEXT_SESSION_KEY = "auth_context";
-
     public static final String FIELD_SESSION_ID = "session_id";
     public static final String FIELD_TIMEOUT = "timeout";
     public static final String FIELD_START_TIMESTAMP = "start_timestamp";

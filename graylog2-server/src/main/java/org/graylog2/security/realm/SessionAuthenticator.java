@@ -28,8 +28,8 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
-import org.graylog2.security.sessions.SessionDTO;
 import org.graylog2.shared.security.SessionIdToken;
 import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
@@ -82,7 +82,7 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         // username in the header. If there is a mismatch, the session will be terminated.
         final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
         if (httpHeaderConfig.enabled()) {
-            final String sessionUsername = (String) session.getAttribute(SessionDTO.USERNAME_SESSION_KEY);
+            final String sessionUsername = (String) session.getAttribute(SessionUtils.USERNAME_SESSION_KEY);
             final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
             if (usernameHeader.isPresent() && !usernameHeader.get().equalsIgnoreCase(sessionUsername)) {
                 LOG.warn("Terminating session where user <{}> does not match trusted HTTP header <{}>.", sessionUsername, usernameHeader.get());

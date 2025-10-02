@@ -20,7 +20,6 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.security.sessions.SessionAuthContext;
-import org.graylog2.security.sessions.SessionDTO;
 
 public class SessionResponseFactory {
     private SessionResponseFactory() {
@@ -31,9 +30,9 @@ public class SessionResponseFactory {
                 .validUntil(SessionUtils.getValidUntil(session))
                 .sessionId(session.getId().toString())
                 .userId(new Subject.Builder().sessionId(session.getId()).buildSubject().getPrincipal().toString())
-                .username(String.valueOf(session.getAttribute(SessionDTO.USERNAME_SESSION_KEY)))
+                .username(String.valueOf(session.getAttribute(SessionUtils.USERNAME_SESSION_KEY)))
                 .build();
-        if (session.getAttribute(SessionDTO.AUTH_CONTEXT_SESSION_KEY) instanceof SessionAuthContext authContext) {
+        if (session.getAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY) instanceof SessionAuthContext authContext) {
             return authContext.enrichSessionResponse(response);
         }
         return response;

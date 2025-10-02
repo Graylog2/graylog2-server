@@ -44,8 +44,8 @@ import static org.apache.shiro.subject.support.DefaultSubjectContext.AUTHENTICAT
 import static org.apache.shiro.subject.support.DefaultSubjectContext.PRINCIPALS_SESSION_KEY;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.graylog2.security.sessions.SessionDTO.AUTH_CONTEXT_SESSION_KEY;
-import static org.graylog2.security.sessions.SessionDTO.USERNAME_SESSION_KEY;
+import static org.graylog2.rest.models.system.sessions.SessionUtils.AUTH_CONTEXT_SESSION_KEY;
+import static org.graylog2.rest.models.system.sessions.SessionUtils.USERNAME_SESSION_KEY;
 
 @ExtendWith(MongoDBExtension.class)
 class SessionPersistenceIT {
