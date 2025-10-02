@@ -16,15 +16,12 @@
  */
 package org.graylog2.rest.models.system.sessions.responses;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.security.sessions.SessionDTO;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Years;
-
-import jakarta.inject.Inject;
 
 import java.util.Date;
 
@@ -33,19 +30,12 @@ import java.util.Date;
  */
 public class DefaultSessionResponseFactory implements SessionResponseFactory {
 
-    protected final ObjectMapper objectMapper;
-
-    @Inject
-    public DefaultSessionResponseFactory(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-    }
-
     @Override
     public SessionResponse forSession(Session session) {
-        Date validUntil = getValidUntil(session);
-        String id = session.getId().toString();
-        String userId = getSubjectFromSession(session).getPrincipal().toString();
-        String username = String.valueOf(session.getAttribute("username"));
+        final Date validUntil = getValidUntil(session);
+        final String id = session.getId().toString();
+        final String userId = getSubjectFromSession(session).getPrincipal().toString();
+        final String username = String.valueOf(session.getAttribute(SessionDTO.USERNAME_SESSION_KEY));
         return DefaultSessionResponse.create(validUntil, id, username, userId);
     }
 
@@ -60,9 +50,5 @@ public class DefaultSessionResponseFactory implements SessionResponseFactory {
     protected Subject getSubjectFromSession(Session session) {
         return new Subject.Builder().sessionId(session.getId())
                 .buildSubject();
-    }
-
-    protected JsonNode toJsonNode(Object object) {
-        return objectMapper.valueToTree(object);
     }
 }

@@ -20,6 +20,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -43,28 +60,6 @@ import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotAuthorizedException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.ServiceUnavailableException;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -138,10 +133,10 @@ public class SessionsResource extends RestResource {
             // This avoids a potential session fixation attack. (GHSA-3xf8-g8gr-g7rh)
             Optional<Session> session = sessionCreator.login(null, host, authToken);
             if (session.isPresent()) {
-                final SessionResponse token = sessionResponseFactory.forSession(session.get());
+                final SessionResponse response = sessionResponseFactory.forSession(session.get());
                 return Response.ok()
-                        .entity(token)
-                        .cookie(cookieFactory.createAuthenticationCookie(token, requestContext))
+                        .entity(response)
+                        .cookie(cookieFactory.createAuthenticationCookie(response, requestContext))
                         .build();
             } else {
                 throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
