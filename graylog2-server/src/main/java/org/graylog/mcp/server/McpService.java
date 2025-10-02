@@ -106,6 +106,22 @@ public class McpService {
                 }
                 return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
             }
+            case McpSchema.METHOD_RESOURCES_TEMPLATES_LIST -> {
+                LOG.info("Listing available resource templates");
+                final List<McpSchema.ResourceTemplate> templates = resourceProviders.values().stream()
+                        .map(ResourceProvider::resourceTemplate)
+                        .map(template -> new McpSchema.ResourceTemplate(
+                                template.uriTemplate().getTemplate(),
+                                template.name(),
+                                template.title(),
+                                template.description(),
+                                template.contentType(),
+                                null
+                        ))
+                        .toList();
+
+                return Optional.of(new McpSchema.ListResourceTemplatesResult(templates, null));
+            }
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.info("Listing available tools");
                 final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> {
