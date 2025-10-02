@@ -22,18 +22,35 @@ import * as URLUtils from 'util/URLUtils';
 type Query = { [key: string]: string | number | boolean | string[] };
 type Headers = { [key: string]: string | number | boolean | string[] };
 type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type RequestOptions = {
+  requestShouldExtendSession?: boolean;
+};
 
-const request = (method: Methods, path: string, body: any, query: Query, headers: Headers) => {
+const headersFromOptions = (options: RequestOptions): Headers => {
+  if (options?.requestShouldExtendSession) {
+    return { 'X-Graylog-No-Session-Extension': !(options?.requestShouldExtendSession ?? true) };
+  }
+
+  return {};
+};
+const request = (
+  method: Methods,
+  path: string,
+  body: any,
+  query: Query,
+  headers: Headers,
+  options: RequestOptions = {},
+) => {
   const pathWithQueryParameters =
     Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query, { indices: false })}` : path;
-  const builder = new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body);
 
-  const builderWithHeaders = Object.entries(headers).reduce(
-    (prev, [key, value]) => prev.setHeader(key, value),
-    builder,
-  );
+  const optionHeaders = headersFromOptions(options);
+  const _headers: Headers = {
+    ...headers,
+    ...optionHeaders,
+  };
 
-  return builderWithHeaders.build();
+  return new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body).setHeaders(_headers).build();
 };
 
 export default request;
