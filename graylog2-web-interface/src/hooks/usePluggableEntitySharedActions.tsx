@@ -31,8 +31,16 @@ function usePluggableEntitySharedActions<T>(entity: T, entityType: string) {
     const { key, component: PluggableEntityAction } = action;
 
     return (
-      <HasOwnership id={(entity as T & { id: string })?.id} type={entityType}>
-        <PluggableEntityAction key={`entity-action-${key}`} entity={entity} modalRef={() => modalRefs.current[key]} />
+      <HasOwnership key={`entity-action-${key}`} id={(entity as T & { id: string })?.id} type={entityType}>
+        {({ disabled }) =>
+          disabled ? null : (
+            <PluggableEntityAction
+              key={`entity-action-${key}`}
+              entity={entity}
+              modalRef={() => modalRefs.current[key]}
+            />
+          )
+        }
       </HasOwnership>
     );
   });
