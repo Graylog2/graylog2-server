@@ -39,7 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
-class V20250304090400_RemoveLegacySessionsTest {
+class V20251002090400_RemoveLegacySessionsTest {
 
     private static class TestEventBus extends ClusterEventBus {
         private final List<Object> postedEvents = new ArrayList<>();
@@ -68,7 +68,7 @@ class V20250304090400_RemoveLegacySessionsTest {
                     "attributes", Map.of("key", "value"))));
         });
 
-        V20250304090400_RemoveLegacySessions migration = new V20250304090400_RemoveLegacySessions(
+        V20251002090400_RemoveLegacySessions migration = new V20251002090400_RemoveLegacySessions(
                 mongoCollections, eventBus);
 
         migration.upgrade();

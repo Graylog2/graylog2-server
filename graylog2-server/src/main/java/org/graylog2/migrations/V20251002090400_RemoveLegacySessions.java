@@ -41,20 +41,20 @@ import java.util.List;
  * to a rolling version upgrade. Rolling version upgrades are not supported but if performed nevertheless, legacy
  * sessions would be hard to get rid of.
  */
-public class V20250304090400_RemoveLegacySessions extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20250304090400_RemoveLegacySessions.class);
+public class V20251002090400_RemoveLegacySessions extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20251002090400_RemoveLegacySessions.class);
 
     private final MongoCollection<Document> collection;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public V20250304090400_RemoveLegacySessions(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
+    public V20251002090400_RemoveLegacySessions(MongoCollections mongoCollections, ClusterEventBus clusterEventBus) {
         this.collection = mongoCollections.nonEntityCollection(MongoDbSessionService.COLLECTION_NAME, Document.class);
         this.clusterEventBus = clusterEventBus;
     }
 
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2025-03-04T09:04:00Z");
+        return ZonedDateTime.parse("2025-10-02T09:04:00Z");
     }
 
     @Override
