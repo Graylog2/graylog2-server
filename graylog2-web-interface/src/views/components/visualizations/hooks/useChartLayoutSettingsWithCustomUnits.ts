@@ -86,15 +86,16 @@ const useChartLayoutSettingsWithCustomUnits = ({
 
     return _layouts;
   }, [
+    unitFeatureEnabled,
+    ticksConfig,
+    unitTypeMapper,
     barmode,
     chartData,
+    widgetUnits,
     config,
     theme,
-    ticksConfig,
     thresholdShapes,
-    unitFeatureEnabled,
-    unitTypeMapper,
-    widgetUnits,
+    thresholdsAnnotations,
   ]);
 };
 

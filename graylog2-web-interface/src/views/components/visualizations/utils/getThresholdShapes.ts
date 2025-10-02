@@ -22,7 +22,8 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import { convertValueToBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
-import { MappersForYAxis, getYAxisPosition } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import type { MappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { getYAxisPosition } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
@@ -46,8 +47,6 @@ const getThresholdShapes = ({
   mapperAxisNumber,
   theme,
 }: Props): Result => {
-  console.log({ mapperAxisNumber });
-
   const thresholds = series?.map((curSeries) => {
     const { field } = parseSeries(curSeries.function) ?? {};
     const seriesUnit = widgetUnits.getFieldUnit(field);

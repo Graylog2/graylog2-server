@@ -19,10 +19,9 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import { theme } from 'views/components/visualizations/utils/__tests__/fixtures';
 
 import getThresholdShapes from './getThresholdShapes';
-
-import { theme } from 'views/components/visualizations/utils/__tests__/fixtures';
 
 const series = Series.create('count', 'foo');
 

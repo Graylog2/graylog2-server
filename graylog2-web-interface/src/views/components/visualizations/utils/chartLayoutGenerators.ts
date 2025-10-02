@@ -281,6 +281,7 @@ export const generateLayouts = ({
       const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
 
       if (!res[unitType]) {
+        // eslint-disable-next-line no-param-reassign
         res[unitType] = [value.y];
       } else {
         res[unitType].push(value.y);
