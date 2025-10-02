@@ -40,6 +40,7 @@ export type Rel = { x: number; y: number };
 export type FieldData = {
   field: string;
   value: Datum;
+  contexts: { valuePath: Array<{ [key: string]: Datum }> } | null;
 };
 
 export type OnClickPopoverDropdownProps = {
