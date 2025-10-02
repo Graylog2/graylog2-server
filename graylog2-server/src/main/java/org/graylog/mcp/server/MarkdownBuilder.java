@@ -16,15 +16,26 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class MarkdownBuilder {
     private final StringBuilder sb;
+    private final ObjectMapper mapper;
 
     public MarkdownBuilder() {
         this.sb = new StringBuilder();
+        this.mapper = new ObjectMapper();
+        mapper.registerModule(new Jdk8Module());
+        mapper.registerModule(new JodaModule());
     }
 
     public boolean isEmpty() {
@@ -112,7 +123,7 @@ public class MarkdownBuilder {
         }
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < values.length; i++) {
-            s.append("  ").append(keys[i]).append(": ").append(values[i]);
+            s.append("  ").append(bold(keys[i])).append(": ").append(values[i]);
             s.append("\n");
         }
         return unorderedListItem(s.toString().trim());
@@ -122,6 +133,23 @@ public class MarkdownBuilder {
         StringBuilder s = new StringBuilder();
         items.forEach((key, value) -> s.append("  ").append(key).append(": ").append(value).append("\n"));
         return unorderedListItem(s.toString().trim());
+    }
+
+    public MarkdownBuilder unorderedListKVItemFromSerializable(Object serializableItems, String[] keys) {
+        return unorderedListKVItem(castMapValues(
+                mapper.convertValue(serializableItems, new TypeReference<>() {}),
+                keys == null ? null : Set.of(keys)
+        ));
+    }
+
+    public static Map<String, String> castMapValues(Map<String, Object> items, Set<String> keys) {
+        return items.entrySet().stream()
+                .filter(e -> keys == null || keys.contains(e.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() == null ? "null" : e.getValue().toString().trim().replace("\n", " ")));
+    }
+
+    public static Map<String, String> castMapValues(Map<String, Object> items) {
+        return castMapValues(items, null);
     }
 
     public MarkdownBuilder orderedList(String... items) {
@@ -150,6 +178,32 @@ public class MarkdownBuilder {
         return this;
     }
 
+    public MarkdownBuilder tableRow(Map<String, String> items) {
+        sb.append("| ").append(String.join(" | ", items.values())).append(" |\n");
+        return this;
+    }
+
+    public MarkdownBuilder tableRow(Map<String, String> items, String[] orderedKeys) {
+        if  (orderedKeys == null || orderedKeys.length == 0) {
+            return tableRow(items);
+        }
+        List<String> orderedValues = new ArrayList<>();
+        for (String key : orderedKeys) {
+            if (items.containsKey(key)) {
+                orderedValues.add(items.get(key));
+            }
+        }
+        sb.append("| ").append(String.join(" | ", orderedValues)).append(" |\n");
+        return this;
+    }
+
+    public MarkdownBuilder tableRowFromSerializable(Object serializableItems, String[] keys) {
+        return tableRow(castMapValues(
+                mapper.convertValue(serializableItems, new TypeReference<>() {}),
+                keys == null ? null : Set.of(keys)
+        ), keys);
+    }
+
     public MarkdownBuilder table(String[] headers) {
         return table(headers, null);
     }
@@ -162,12 +216,18 @@ public class MarkdownBuilder {
 
         if (rows != null && rows.length > 0) {
             for (String[] row : rows) {
-                sb.append("| ").append(String.join(" | ", row)).append(" |\n");
+                if (row != null && row.length == headers.length) {
+                    sb.append("| ").append(String.join(" | ", row)).append(" |\n");
+                }
             }
             sb.append("\n");
         }
 
         return this;
+    }
+
+    public MarkdownBuilder table(Map<String, String> items) {
+        return table(items.keySet().toArray(String[]::new), new String[][]{items.values().toArray(String[]::new)});
     }
 
     public MarkdownBuilder table(String[] headers, Alignment[] alignments, String[][] rows) {

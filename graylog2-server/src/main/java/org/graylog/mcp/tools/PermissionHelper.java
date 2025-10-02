@@ -19,6 +19,9 @@ package org.graylog.mcp.tools;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.subject.Subject;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.search.rest.PermittedStreams;
+import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog.security.UserContext;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ShiroPrincipal;
@@ -29,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -126,6 +130,10 @@ public class PermissionHelper {
         User user = subject.getPrincipals().oneByType(User.class);
         if (user != null) return user;
         return userService.getRootUser().orElseThrow();
+    }
+
+    public SearchUser getSearchUser(UserService userService, PermittedStreams permittedStreams, Map<String, ViewResolver> viewResolvers) {
+        return new SearchUser(getUser(userService), this::isPermitted, this::isPermitted, permittedStreams, viewResolvers);
     }
 
 }

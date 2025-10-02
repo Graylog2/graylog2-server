@@ -17,6 +17,8 @@
 package org.graylog.mcp.server;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -53,5 +55,17 @@ public class OutputBuilder extends MarkdownBuilder {
                 },
                 StringWriter::toString
         );
+    }
+
+    public enum OutputFormat {
+        @JsonProperty("list")
+        @JsonAlias({"LIST", "List"})
+        LIST,
+        @JsonProperty("table")
+        @JsonAlias({"TABLE", "Table"})
+        TABLE,
+        @JsonProperty("csv")
+        @JsonAlias({"CSV", "Csv"})
+        CSV
     }
 }
