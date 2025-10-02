@@ -107,7 +107,7 @@ const Claim = styled.h1(
 );
 const Highlight = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.brand.primary};
+    color: ${theme.colors.variant.danger};
   `,
 );
 
