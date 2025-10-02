@@ -19,6 +19,7 @@ package org.graylog.mcp.server;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Maps;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import jakarta.inject.Inject;
@@ -27,6 +28,9 @@ import jakarta.ws.rs.core.SecurityContext;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventType;
 import org.graylog2.shared.ServerVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,20 +45,25 @@ public class McpService {
     private static final Logger LOG = LoggerFactory.getLogger(McpService.class);
 
     private final ObjectMapper objectMapper;
+    private final AuditEventSender auditEventSender;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
     protected final List<String> supportedVersions = List.of(ProtocolVersions.MCP_2025_06_18);
 
     @Inject
     protected McpService(ObjectMapper objectMapper,
+                         AuditEventSender auditEventSender,
                          Map<String, Tool<?, ?>> tools,
                          Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
+        this.auditEventSender = auditEventSender;
         this.tools = tools;
         this.resourceProviders = resourceProviders;
     }
 
-    public Optional<McpSchema.Result> handle(SecurityContext securityContext, McpSchema.JSONRPCRequest request, String sessionId) throws McpException, IllegalArgumentException {
+    public Optional<McpSchema.Result> handle(SecurityContext securityContext, McpSchema.JSONRPCRequest request, String sessionId)
+            throws McpException, IllegalArgumentException {
+        final AuditActor auditActor = AuditActor.user(securityContext.getUserPrincipal().getName());
 
         switch (request.method()) {
             case McpSchema.METHOD_INITIALIZE -> {
@@ -63,7 +72,8 @@ public class McpService {
                     LOG.warn("Invalid protocol version {} for request {}", initializeRequest.protocolVersion(), request.params());
                     throw new IllegalArgumentException("Invalid protocol version " + initializeRequest.protocolVersion());
                 }
-                return Optional.of(new McpSchema.InitializeResult(initializeRequest.protocolVersion(),
+                final McpSchema.InitializeResult result = new McpSchema.InitializeResult(
+                        initializeRequest.protocolVersion(),
                         new McpSchema.ServerCapabilities(
                                 null,
                                 null,
@@ -74,7 +84,13 @@ public class McpService {
                         ),
                         new McpSchema.Implementation("Graylog", ServerVersion.VERSION.toString()),
                         null,
-                        null));
+                        null);
+                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:protocol:initialize"),
+                                         Map.of("clientInfo", initializeRequest.clientInfo(),
+                                                "capabilities", initializeRequest.capabilities(),
+                                                "protocolVersion", initializeRequest.protocolVersion()
+                                         ));
+                return Optional.of(result);
             }
             case McpSchema.METHOD_PING -> {
                 return Optional.empty();
@@ -90,6 +106,7 @@ public class McpService {
                         .toList();
                 final McpSchema.ListResourcesResult result = new McpSchema.ListResourcesResult(resourceList, null);
                 LOG.info("Returning available resources {}", result);
+                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:resource:list"));
                 return Optional.of(result);
             }
             case McpSchema.METHOD_RESOURCES_READ -> {
@@ -101,6 +118,7 @@ public class McpService {
                             .read(new URI(readResourceRequest.uri())
                             );
                     contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
+                    auditEventSender.success(auditActor, AuditEventType.create("mcp_server:resource:read"));
                 } catch (Exception e) {
                     throw new McpException("Failed to read resource: " + e.getMessage());
                 }
@@ -119,7 +137,7 @@ public class McpService {
                                 null
                         ))
                         .toList();
-
+                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:resource_template:list"));
                 return Optional.of(new McpSchema.ListResourceTemplatesResult(templates, null));
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
@@ -135,11 +153,14 @@ public class McpService {
                     }
                     return builder.build();
                 }).toList();
-
+                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:tool:list"));
                 return Optional.of(new McpSchema.ListToolsResult(toolList, null));
             }
             case McpSchema.METHOD_TOOLS_CALL -> {
                 final McpSchema.CallToolRequest callToolRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                final Map<String, Object> auditContext  = Maps.newHashMap();
+                auditContext.put("request", callToolRequest);
+
                 LOG.info("Calling MCP tool: {}", callToolRequest);
                 if (tools.containsKey(callToolRequest.name())) {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
@@ -150,22 +171,27 @@ public class McpService {
                             var structuredContent = objectMapper.convertValue(result,
                                                                               new TypeReference<Map<String, Object>>() {
                                                                               });
+                            auditEventSender.success(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
                             return Optional.of(new McpSchema.CallToolResult(
                                     List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))), false,
                                     structuredContent));
                         } catch (JsonProcessingException e) {
+                            auditEventSender.failure(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
                             throw new RuntimeException(e);
                         }
                     } else {
                         // no schema, just return the string representation directly
+                        auditEventSender.success(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
                         return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
                     }
                 } else {
-                    throw new McpException("Unknown tool named: " + callToolRequest.name());
+                    auditEventSender.failure(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
+                    return Optional.of(new McpSchema.CallToolResult("Unknown tool named: " + callToolRequest.name(), true));
                 }
             }
             case McpSchema.METHOD_PROMPT_LIST -> {
                 LOG.info("Listing available prompts");
+                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:prompt:list"));
                 return Optional.of(new McpSchema.ListPromptsResult(List.of(
                         new McpSchema.Prompt(
                                 "log_sources_analysis",
@@ -195,6 +221,9 @@ public class McpService {
                     );
                     default -> throw new McpException("Unknown prompt name: " + promptRequest.name());
                 };
+                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:prompt:get"),
+                                         Map.of("name", promptRequest.name(),
+                                                "arguments", promptRequest.arguments()));
                 return Optional.of(new McpSchema.GetPromptResult("", List.of(result)));
             }
             default -> LOG.warn("Unsupported MCP method: " + request.method());

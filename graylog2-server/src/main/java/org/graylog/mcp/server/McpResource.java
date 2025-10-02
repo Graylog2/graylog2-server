@@ -60,7 +60,7 @@ public class McpResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @SkipCSRFProtection("server-to-server")
-    @NoAuditEvent("prototype")
+    @NoAuditEvent("Has custom audit events")
     public Response post(@Context HttpHeaders headers, String body) throws IOException {
         final String accept = Optional.ofNullable(headers.getHeaderString(HttpHeaders.ACCEPT)).orElse("");
         final JsonNode payload = (body == null || body.isEmpty()) ? NullNode.getInstance() : objectMapper.readTree(body);
