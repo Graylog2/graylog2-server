@@ -78,7 +78,6 @@ public class SessionsResource extends RestResource {
     private final Request grizzlyRequest;
     private final SessionCreator sessionCreator;
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
-    private final SessionResponseFactory sessionResponseFactory;
     private final CookieFactory cookieFactory;
 
     private static final String USERNAME = "username";
@@ -91,7 +90,6 @@ public class SessionsResource extends RestResource {
                             @Context Request grizzlyRequest,
                             SessionCreator sessionCreator,
                             ActorAwareAuthenticationTokenFactory tokenFactory,
-                            SessionResponseFactory sessionResponseFactory,
                             CookieFactory cookieFactory) {
         this.cookieFactory = cookieFactory;
         this.userService = userService;
@@ -101,7 +99,6 @@ public class SessionsResource extends RestResource {
         this.grizzlyRequest = grizzlyRequest;
         this.sessionCreator = sessionCreator;
         this.tokenFactory = tokenFactory;
-        this.sessionResponseFactory = sessionResponseFactory;
     }
 
     @POST
@@ -133,7 +130,7 @@ public class SessionsResource extends RestResource {
             // This avoids a potential session fixation attack. (GHSA-3xf8-g8gr-g7rh)
             Optional<Session> session = sessionCreator.login(null, host, authToken);
             if (session.isPresent()) {
-                final SessionResponse response = sessionResponseFactory.forSession(session.get());
+                final SessionResponse response = SessionResponseFactory.forSession(session.get());
                 return Response.ok()
                         .entity(response)
                         .cookie(cookieFactory.createAuthenticationCookie(session.get(), requestContext))
@@ -179,17 +176,13 @@ public class SessionsResource extends RestResource {
         final Optional<Session> optionalSession = Optional.ofNullable(retrieveOrCreateSession(subject));
 
         final User user = getCurrentUser();
-        return optionalSession.map(session -> {
-            final SessionResponse response = sessionResponseFactory.forSession(session);
-
-            return Response.ok(
-                            SessionValidationResponse.validWithNewSession(
-                                    String.valueOf(session.getId()),
-                                    String.valueOf(user.getName())
-                            ))
-                    .cookie(cookieFactory.createAuthenticationCookie(session, requestContext))
-                    .build();
-        }).orElseGet(() -> Response.ok(SessionValidationResponse.authenticatedWithNoSession(user.getName()))
+        return optionalSession.map(session -> Response.ok(
+                        SessionValidationResponse.validWithNewSession(
+                                String.valueOf(session.getId()),
+                                String.valueOf(user.getName())
+                        ))
+                .cookie(cookieFactory.createAuthenticationCookie(session, requestContext))
+                .build()).orElseGet(() -> Response.ok(SessionValidationResponse.authenticatedWithNoSession(user.getName()))
                 .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
                 .build());
     }

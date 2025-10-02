@@ -18,6 +18,7 @@ package org.graylog2.security.sessions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 
 import static org.graylog2.security.sessions.SessionAuthContext.FIELD_TYPE;
 
@@ -33,4 +34,19 @@ public interface SessionAuthContext {
 
     @JsonProperty(FIELD_TYPE)
     String type();
+
+    /**
+     * Enriches the given session response with additional context-specific information.
+     * <p>
+     * This method allows different authentication contexts to customize the session response
+     * by adding relevant data that should be exposed to clients. For example, an OIDC context
+     * might add token information.
+     * </p>
+     *
+     * @param response the original session response to enrich
+     * @return the enriched session response, or the original response if no enrichment is needed
+     */
+    default SessionResponse enrichSessionResponse(SessionResponse response) {
+        return response;
+    }
 }
