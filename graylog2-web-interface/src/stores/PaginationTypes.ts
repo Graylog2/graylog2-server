@@ -85,7 +85,7 @@ export type Attribute = {
   sortable?: boolean;
   hidden?: boolean;
   searchable?: boolean;
-  filterable?: true;
+  filterable?: boolean;
   filter_options?: Array<{ value: string; title: string }>;
   filter_component?: React.ComponentType<FilterComponentProps>;
   related_collection?: string;
