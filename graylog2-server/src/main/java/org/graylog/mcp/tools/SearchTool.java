@@ -37,7 +37,6 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.SearchResource;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamService;
 
 import java.util.Collections;
@@ -50,7 +49,6 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
     public static String NAME = "graylog_search";
 
     private final InternalRelativeSearchResource internalSearchResource;
-    private final UserService userService;
     private final StreamService streamService;
     private final List<String> essentialFields = List.of(
             "message",
@@ -64,7 +62,7 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
     );
 
     @Inject
-    public SearchTool(ObjectMapper objectMapper, InternalRelativeSearchResource searchResource, UserService userService, StreamService streamService) {
+    public SearchTool(ObjectMapper objectMapper, InternalRelativeSearchResource searchResource, StreamService streamService) {
         super(objectMapper,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
@@ -79,7 +77,6 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
                         Returns JSON array of log entries with essential fields only - ideal for quick analysis and pattern identification.
                         """);
         this.internalSearchResource = searchResource;
-        this.userService = userService;
         this.streamService = streamService;
 
     }
@@ -99,7 +96,7 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
                     "",
                     "",
                     false,
-                    new SearchUser(permissionHelper.getUser(userService), subject::isPermitted, permissionHelper::isPermitted, new PermittedStreams(streamService), Collections.emptyMap())
+                    new SearchUser(permissionHelper.getCurrentUser(), subject::isPermitted, permissionHelper::isPermitted, new PermittedStreams(streamService), Collections.emptyMap())
             );
             return getObjectMapper().writeValueAsString(res.messages().stream().map(ResultMessageSummary::message).toList());
         } catch (JsonProcessingException | NoSuchElementException e) {

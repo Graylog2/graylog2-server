@@ -22,10 +22,8 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
 import org.graylog.plugins.views.search.views.ViewResolver;
-import org.graylog.security.UserContext;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ShiroPrincipal;
-import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,9 +41,11 @@ import java.util.stream.Collectors;
 public class PermissionHelper {
     private static final Logger LOG = LoggerFactory.getLogger(PermissionHelper.class);
 
+    private final User currentUser;
     private final SecurityContext securityContext;
 
-    public PermissionHelper(SecurityContext securityContext) {
+    public PermissionHelper(final User currentUser, SecurityContext securityContext) {
+        this.currentUser = currentUser;
         this.securityContext = securityContext;
     }
 
@@ -72,7 +72,7 @@ public class PermissionHelper {
 
     public void checkPermission(String permission) {
         if (!isPermitted(permission)) {
-            LOG.info("Not authorized. User <{}> is missing permission <{}>", getSubject().getPrincipal(), permission);
+            LOG.info("Not authorized. User <{}> is missing permission <{}>", getSubject().getPrincipal(), permission, new Throwable());
             throw new ForbiddenException("Not authorized");
         }
     }
@@ -114,26 +114,11 @@ public class PermissionHelper {
         }
     }
 
-    public User getUser(UserService userService) {
-        Subject subject = getSubject();
-        if (subject == null) throw new IllegalArgumentException("Subject is null");
-        switch (subject.getPrincipal()) {
-            case null -> { throw new IllegalArgumentException("Principal is null"); }
-            case User user -> { return user; }
-            case String s -> { return userService.load(s.substring(s.indexOf(':') + 1)); }
-            default -> {}
-        }
-        try {
-            UserContext ctx = (UserContext) subject.getPrincipals().oneByType(Class.forName("org.graylog.security.UserContext"));
-            if (ctx != null && ctx.getUser() != null) { return ctx.getUser(); }
-        } catch (ClassNotFoundException | ClassCastException ignored) {}
-        User user = subject.getPrincipals().oneByType(User.class);
-        if (user != null) return user;
-        return userService.getRootUser().orElseThrow();
+    public SearchUser getSearchUser(PermittedStreams permittedStreams, Map<String, ViewResolver> viewResolvers) {
+        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted, permittedStreams, viewResolvers);
     }
 
-    public SearchUser getSearchUser(UserService userService, PermittedStreams permittedStreams, Map<String, ViewResolver> viewResolvers) {
-        return new SearchUser(getUser(userService), this::isPermitted, this::isPermitted, permittedStreams, viewResolvers);
+    public User getCurrentUser() {
+        return currentUser;
     }
-
 }

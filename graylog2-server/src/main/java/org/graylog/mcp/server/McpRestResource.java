@@ -33,6 +33,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -96,7 +97,8 @@ public class McpRestResource extends RestResource {
             final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
             LOG.info("Received JSONRPCrequest {}", request);
             try {
-                final Optional<McpSchema.Result> result = mcpService.handle(securityContext, request, sessionId);
+                final PermissionHelper permissionHelper = new PermissionHelper(getCurrentUser(), securityContext);
+                final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId);
 
                 return Response.ok(new McpSchema.JSONRPCResponse("2.0",
                                 request.id(),
@@ -117,7 +119,7 @@ public class McpRestResource extends RestResource {
                                 new McpSchema.JSONRPCResponse.JSONRPCError(McpSchema.ErrorCodes.INVALID_PARAMS, e.getMessage(), data)))
                         .header("Mcp-Session-Id", sessionId)
                         .build();
-            } catch (McpException e) {
+            } catch (Exception e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                         .entity(new McpSchema.JSONRPCResponse("2.0",
                                 request.id(),

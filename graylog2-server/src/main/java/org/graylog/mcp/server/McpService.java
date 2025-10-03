@@ -24,7 +24,6 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.core.SecurityContext;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.mcp.tools.PermissionHelper;
@@ -70,9 +69,9 @@ public class McpService {
         this.resourceProviders = resourceProviders;
     }
 
-    public Optional<McpSchema.Result> handle(SecurityContext securityContext, McpSchema.JSONRPCRequest request, String sessionId)
+    public Optional<McpSchema.Result> handle(PermissionHelper permissionHelper, McpSchema.JSONRPCRequest request, String sessionId)
             throws McpException, IllegalArgumentException {
-        final AuditActor auditActor = AuditActor.user(securityContext.getUserPrincipal().getName());
+        final AuditActor auditActor = AuditActor.user(permissionHelper.getCurrentUser().getName());
         final Map<String, Object> auditContext = Maps.newHashMap();
         auditContext.put("sessionId", sessionId);
 
@@ -172,25 +171,33 @@ public class McpService {
                 LOG.info("Calling MCP tool: {}", callToolRequest);
                 if (tools.containsKey(callToolRequest.name())) {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
-                    final Object result = tool.apply(new PermissionHelper(securityContext), callToolRequest.arguments());
-                    if (tool.outputSchema().isPresent()) {
-                        // if we have an output schema we want to return structured content
-                        try {
-                            var structuredContent = objectMapper.convertValue(result,
-                                                                              new TypeReference<Map<String, Object>>() {
-                                                                              });
+                    try {
+                        final Object result = tool.apply(permissionHelper, callToolRequest.arguments());
+                        if (tool.outputSchema().isPresent()) {
+                            // if we have an output schema we want to return structured content
+                            try {
+                                var structuredContent = objectMapper.convertValue(result,
+                                                                                  new TypeReference<Map<String, Object>>() {
+                                                                                  });
+                                auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
+                                                         auditContext);
+                                return Optional.of(new McpSchema.CallToolResult(
+                                        List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
+                                        false,
+                                        structuredContent));
+                            } catch (JsonProcessingException e) {
+                                auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
+                                                         auditContext);
+                                throw new RuntimeException(e);
+                            }
+                        } else {
+                            // no schema, just return the string representation directly
                             auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                            return Optional.of(new McpSchema.CallToolResult(
-                                    List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))), false,
-                                    structuredContent));
-                        } catch (JsonProcessingException e) {
-                            auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                            throw new RuntimeException(e);
+                            return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
                         }
-                    } else {
-                        // no schema, just return the string representation directly
-                        auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                        return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                    } catch (Exception e) {
+                        auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
+                        throw e;
                     }
                 } else {
                     auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
