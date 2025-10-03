@@ -243,7 +243,7 @@ const exports: PluginExports = {
     },
     {
       type: 'TEXT',
-      displayName: 'Text (Markdown) Widget',
+      displayName: 'Text',
       defaultHeight: 3,
       defaultWidth: 3,
       hasEditSubmitButton: false,
@@ -433,7 +433,7 @@ const exports: PluginExports = {
       icon: () => <Icon name="report" type="regular" />,
     },
     {
-      title: 'Text (Markdown) Widget',
+      title: 'Text',
       func: CreateTextWidget,
       icon: () => <Icon name="description" />,
     },
@@ -461,7 +461,7 @@ const exports: PluginExports = {
     },
     {
       type: 'generic',
-      title: 'Text (Markdown) Widget',
+      title: 'Text',
       func: AddTextWidget,
     },
   ],
