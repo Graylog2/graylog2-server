@@ -55,4 +55,11 @@ public class AWSAuthFactoryTest {
         assertThat("key").isEqualTo(awsCredentialsProvider.resolveCredentials().accessKeyId());
         assertThat("secret").isEqualTo(awsCredentialsProvider.resolveCredentials().secretAccessKey());
     }
+
+    @Test
+    public void testKeySecret_exceptionThrownWhenRequired() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                        AWSAuthFactory.create(true, null, null, null, null))
+                .withMessageContaining("Access key is required.");
+    }
 }
