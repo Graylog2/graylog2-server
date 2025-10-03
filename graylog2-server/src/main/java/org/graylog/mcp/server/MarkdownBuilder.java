@@ -21,238 +21,235 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 
-import java.util.ArrayList;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class MarkdownBuilder {
     private final StringBuilder sb;
     private final ObjectMapper mapper;
 
-    public MarkdownBuilder() {
-        this.sb = new StringBuilder();
-        this.mapper = new ObjectMapper();
-        mapper.registerModule(new Jdk8Module());
-        mapper.registerModule(new JodaModule());
-    }
-
-    public boolean isEmpty() {
-        return sb.isEmpty();
-    }
-
-    public MarkdownBuilder h1(String text) {
-        sb.append("# ").append(text).append("\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder h2(String text) {
-        sb.append("## ").append(text).append("\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder h3(String text) {
-        sb.append("### ").append(text).append("\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder h4(String text) {
-        sb.append("#### ").append(text).append("\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder h5(String text) {
-        sb.append("##### ").append(text).append("\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder h6(String text) {
-        sb.append("###### ").append(text).append("\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder paragraph(String text) {
-        sb.append(text).append("\n\n");
-        return this;
-    }
+    public static String orEmpty(Object input) { return input == null ? "" : input.toString(); }
 
     public static String bold(String text) {
-        return "**" + text + "**";
+        return "**" + orEmpty(text) + "**";
     }
 
     public static String italic(String text) {
-        return "*" + text + "*";
+        return "*" + orEmpty(text) + "*";
     }
 
     public static String code(String text) {
-        return "`" + text + "`";
+        return "`" + orEmpty(text) + "`";
     }
 
     public static String link(String text, String url) {
-        return "[" + text + "](" + url + ")";
+        return "[" + orEmpty(text) + "](" + orEmpty(url) + ")";
     }
 
-    public MarkdownBuilder codeBlock(String code) {
-        sb.append("```\n").append(code).append("\n```\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder codeBlock(String code, String language) {
-        sb.append("```").append(language).append("\n")
-                .append(code).append("\n```\n\n");
-        return this;
-    }
-
-    public MarkdownBuilder unorderedList(String... items) {
-        for (String item : items) {
-            sb.append("- ").append(item).append("\n");
+    public static Map<String, String> castMapValues(Map<String, Object> items, List<String> keys) {
+        if (items == null) return null;
+        try (var stream = (keys == null || keys.isEmpty()) ? items.entrySet().stream() : keys.stream()
+                .filter(items::containsKey).map(k -> new AbstractMap.SimpleEntry<>(k, items.get(k)))) {
+            return stream.collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> orEmpty(e.getValue()).trim().replace("\n", " "),
+                    (a, b) -> b,
+                    LinkedHashMap::new
+            ));
         }
-        sb.append("\n");
-        return this;
-    }
-
-    public MarkdownBuilder unorderedListItem(String item) {
-        sb.append("- ").append(item).append("\n");
-        return this;
-    }
-
-    public MarkdownBuilder unorderedListKVItem(String[] keys, String[] values) {
-        if (keys.length != values.length) {
-            throw new IllegalArgumentException("Arrays have different sizes");
-        }
-        StringBuilder s = new StringBuilder();
-        for (int i = 0; i < values.length; i++) {
-            s.append("  ").append(bold(keys[i])).append(": ").append(values[i]);
-            s.append("\n");
-        }
-        return unorderedListItem(s.toString().trim());
-    }
-
-    public MarkdownBuilder unorderedListKVItem(Map<String, String> items) {
-        StringBuilder s = new StringBuilder();
-        items.forEach((key, value) -> s.append("  ").append(key).append(": ").append(value).append("\n"));
-        return unorderedListItem(s.toString().trim());
-    }
-
-    public MarkdownBuilder unorderedListKVItemFromSerializable(Object serializableItems, String[] keys) {
-        return unorderedListKVItem(castMapValues(
-                mapper.convertValue(serializableItems, new TypeReference<>() {}),
-                keys == null ? null : Set.of(keys)
-        ));
-    }
-
-    public static Map<String, String> castMapValues(Map<String, Object> items, Set<String> keys) {
-        return items.entrySet().stream()
-                .filter(e -> keys == null || keys.contains(e.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue() == null ? "null" : e.getValue().toString().trim().replace("\n", " ")));
     }
 
     public static Map<String, String> castMapValues(Map<String, Object> items) {
         return castMapValues(items, null);
     }
 
-    public MarkdownBuilder orderedList(String... items) {
-        for (int i = 0; i < items.length; i++) {
-            sb.append(i + 1).append(". ").append(items[i]).append("\n");
-        }
-        sb.append("\n");
+    public MarkdownBuilder() {
+        this.sb = new StringBuilder();
+        this.mapper = new ObjectMapper().registerModule(new Jdk8Module()).registerModule(new JodaModule());
+    }
+
+    public boolean isEmpty() {
+        return sb.isEmpty();
+    }
+
+    private MarkdownBuilder heading(int level, String text) {
+        sb.append("#".repeat(Math.min(6, Math.max(level, 1)))).append(" ").append(orEmpty(text)).append("\n\n");
+        return this;
+    }
+
+    public MarkdownBuilder h1(String text) { return heading(1, text); }
+
+    public MarkdownBuilder h2(String text) { return heading(2, text); }
+
+    public MarkdownBuilder h3(String text) { return heading(3, text); }
+
+    public MarkdownBuilder h4(String text) { return heading(4, text); }
+
+    public MarkdownBuilder h5(String text) { return heading(5, text); }
+
+    public MarkdownBuilder h6(String text) { return heading(6, text); }
+
+    public MarkdownBuilder paragraph(String text) {
+        sb.append(orEmpty(text)).append("\n\n");
+        return this;
+    }
+
+    public MarkdownBuilder codeBlock(String code) {
+        return codeBlock(code, null);
+    }
+
+    public MarkdownBuilder codeBlock(String code, String language) {
+        sb.append("```").append(orEmpty(language)).append("\n").append(orEmpty(code)).append("\n```\n\n");
         return this;
     }
 
     public MarkdownBuilder blockquote(String text) {
+        if (text == null) return this;
         String[] lines = text.split("\n");
         for (String line : lines) {
-            sb.append("> ").append(line).append("\n");
+            sb.append("> ").append(orEmpty(line)).append("\n");
         }
         sb.append("\n");
         return this;
+    }
+
+    public MarkdownBuilder orderedList(List<String> items) {
+        if (items == null) return this;
+        int i = 0;
+        for (String item : items) {
+            sb.append(++i).append(". ").append(orEmpty(item)).append("\n");
+        }
+        sb.append("\n");
+        return this;
+    }
+
+    public MarkdownBuilder orderedList(String... items) {
+        if (items == null) return this;
+        return orderedList(Arrays.asList(items));
+    }
+
+    public MarkdownBuilder unorderedListItem(String item) {
+        sb.append("- ").append(orEmpty(item)).append("\n");
+        return this;
+    }
+
+    public MarkdownBuilder unorderedList(Iterable<String> items) {
+        if (items == null) return this;
+        items.forEach(this::unorderedListItem);
+        sb.append("\n");
+        return this;
+    }
+
+    public MarkdownBuilder unorderedListKVItem(String key, String value) {
+        sb.append("- ").append(bold(key)).append(": ").append(value).append("\n");
+        return this;
+    }
+
+    public MarkdownBuilder unorderedListKVItem(String[] keys, String[] values) {
+        if (keys == null || values == null) return this;
+        if (keys.length != values.length) throw new IllegalArgumentException("Arrays have different sizes");
+        StringBuilder s = new StringBuilder();
+        for (int i = 0; i < values.length; i++) {
+            s.append("  ").append(keys[i]).append(": ").append(values[i]);
+            s.append("\n");
+        }
+        return unorderedListItem(s.toString().trim());
+    }
+
+    public MarkdownBuilder unorderedListKVItem(Map<String, String> items) {
+        if (items == null) return this;
+        StringBuilder s = new StringBuilder();
+        items.forEach((key, value) -> s.append("  ").append(key).append(": ").append(value).append("\n"));
+        return unorderedListItem(s.toString().trim());
+    }
+
+    public MarkdownBuilder unorderedListKVItem(Object serializableItems, List<String> keys) {
+        return unorderedListKVItem(castMapValues(mapper.convertValue(serializableItems, new TypeReference<>() {}), keys));
     }
 
     public enum Alignment {
-        LEFT, CENTER, RIGHT
-    }
+        LEFT, CENTER, RIGHT, DEFAULT;
 
-    public MarkdownBuilder tableRow(String[] row) {
-        sb.append("| ").append(String.join(" | ", row)).append(" |\n");
-        return this;
-    }
-
-    public MarkdownBuilder tableRow(Map<String, String> items) {
-        sb.append("| ").append(String.join(" | ", items.values())).append(" |\n");
-        return this;
-    }
-
-    public MarkdownBuilder tableRow(Map<String, String> items, String[] orderedKeys) {
-        if  (orderedKeys == null || orderedKeys.length == 0) {
-            return tableRow(items);
+        public static String toString(Alignment alignment) {
+            return switch (alignment) {
+                case LEFT -> " :--- |";
+                case CENTER -> " :---: |";
+                case RIGHT -> " ---: |";
+                case null, default -> " --- |";
+            };
         }
-        List<String> orderedValues = new ArrayList<>();
-        for (String key : orderedKeys) {
-            if (items.containsKey(key)) {
-                orderedValues.add(items.get(key));
-            }
-        }
-        sb.append("| ").append(String.join(" | ", orderedValues)).append(" |\n");
+
+    }
+
+    public MarkdownBuilder tableRow(Iterable<String> rowItems) {
+        if (rowItems == null) return this;
+        sb.append("| ").append(String.join(" | ", rowItems)).append(" |\n");
         return this;
     }
 
-    public MarkdownBuilder tableRowFromSerializable(Object serializableItems, String[] keys) {
-        return tableRow(castMapValues(
-                mapper.convertValue(serializableItems, new TypeReference<>() {}),
-                keys == null ? null : Set.of(keys)
-        ), keys);
+    public MarkdownBuilder tableRow(String[] rowItems) {
+        if (rowItems == null || rowItems.length == 0) return this;
+        return tableRow(Arrays.asList(rowItems));
     }
 
-    public MarkdownBuilder table(String[] headers) {
-        return table(headers, null);
+    public MarkdownBuilder tableRow(Object serializableItems, List<String> keys) {
+        if (serializableItems == null) return this;
+        return tableRow(castMapValues(mapper.convertValue(serializableItems, new TypeReference<>() {}), keys).values());
     }
 
-    public MarkdownBuilder table(String[] headers, String[][] rows) {
-        sb.append("| ").append(String.join(" | ", headers)).append(" |\n");
-        sb.append("|");
-        sb.append(" --- |".repeat(headers.length));
-        sb.append("\n");
+    public MarkdownBuilder tableRow(Object serializableItems, String[] keys) {
+        return tableRow(serializableItems, keys == null || keys.length == 0 ? null : Arrays.asList(keys));
+    }
 
-        if (rows != null && rows.length > 0) {
-            for (String[] row : rows) {
-                if (row != null && row.length == headers.length) {
-                    sb.append("| ").append(String.join(" | ", row)).append(" |\n");
+    public MarkdownBuilder tableHeaders(List<String> headerItems, Alignment... alignments) {
+        tableRow(headerItems);
+        if (alignments != null && alignments.length > 0) {
+            sb.append("|");
+            if (alignments.length == 1) {
+                sb.append(alignments[0].toString().repeat(headerItems.size()));
+            } else {
+                for (Alignment alignment : alignments) {
+                    sb.append(alignment.toString());
                 }
             }
             sb.append("\n");
         }
-
         return this;
     }
 
-    public MarkdownBuilder table(Map<String, String> items) {
-        return table(items.keySet().toArray(String[]::new), new String[][]{items.values().toArray(String[]::new)});
+    public MarkdownBuilder tableHeaders(List<String> headerItems) {
+        return tableHeaders(headerItems, Alignment.DEFAULT);
     }
 
-    public MarkdownBuilder table(String[] headers, Alignment[] alignments, String[][] rows) {
-        sb.append("| ").append(String.join(" | ", headers)).append(" |\n");
-        sb.append("|");
-        for (Alignment alignment : alignments) {
-            switch (alignment) {
-                case LEFT:
-                    sb.append(" :--- |");
-                    break;
-                case CENTER:
-                    sb.append(" :---: |");
-                    break;
-                case RIGHT:
-                    sb.append(" ---: |");
-                    break;
+    public MarkdownBuilder tableHeaders(String... headerItems) {
+        return tableHeaders(Arrays.asList(headerItems), Alignment.DEFAULT);
+    }
+
+    public MarkdownBuilder table(String[] headers, String[][] rows, Alignment... alignments) {
+        tableHeaders(Arrays.asList(headers), alignments);
+        if (rows != null && rows.length > 0) {
+            for (String[] row : rows) {
+                tableRow(row);
             }
+            sb.append("\n");
         }
-        sb.append("\n");
+        return this;
+    }
 
-        for (String[] row : rows) {
-            sb.append("| ").append(String.join(" | ", row)).append(" |\n");
-        }
-        sb.append("\n");
+    public MarkdownBuilder table(String[] headers, String[][] rows) {
+        return table(headers, rows, Alignment.DEFAULT);
+    }
 
+    public MarkdownBuilder table(Map<String, String> items) {
+        if (items == null) return this;
+        List<String> keys = List.copyOf(items.keySet());
+        tableHeaders(keys, Alignment.DEFAULT);
+        tableRow(keys.stream().map(items::get).toList());
+        sb.append("\n");
         return this;
     }
 
