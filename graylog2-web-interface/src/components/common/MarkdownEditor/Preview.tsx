@@ -39,7 +39,7 @@ const Container = styled.div<{
     `}
   border-radius: 4px;
   flex-grow: 1;
-  overflow: hidden;
+  overflow: hidden auto;
 
   height: ${({ $height, $maxHeight }) =>
     // eslint-disable-next-line no-nested-ternary

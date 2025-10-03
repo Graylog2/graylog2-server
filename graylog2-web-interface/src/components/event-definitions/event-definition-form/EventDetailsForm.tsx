@@ -18,6 +18,8 @@ import * as React from 'react';
 import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
+import { useMantineTheme } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 import { Select } from 'components/common';
 import { Button, Col, ControlLabel, FormGroup, HelpBlock, Row, Input } from 'components/bootstrap';
@@ -54,6 +56,8 @@ type Props = {
 };
 
 const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, validation, onChange, canEdit }: Props) => {
+  const theme = useMantineTheme();
+  const ltXl = useMediaQuery(`(min-width: ${theme.breakpoints.xl}`);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState<boolean>(false);
@@ -167,6 +171,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
                 canEdit={!readOnly}
                 onEdit={() => setShowAddEventProcedureForm(true)}
                 onRemove={() => onChange('event_procedure', null)}
+                row={ltXl}
               />
             </Col>
           )}
