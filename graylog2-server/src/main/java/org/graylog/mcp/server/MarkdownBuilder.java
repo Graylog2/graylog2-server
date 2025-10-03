@@ -172,17 +172,21 @@ public class MarkdownBuilder {
     }
 
     public enum Alignment {
-        LEFT, CENTER, RIGHT, DEFAULT;
+        LEFT(" :--- |"),
+        CENTER(" :---: |"),
+        RIGHT(" ---: |"),
+        DEFAULT(" --- |");
 
-        public static String toString(Alignment alignment) {
-            return switch (alignment) {
-                case LEFT -> " :--- |";
-                case CENTER -> " :---: |";
-                case RIGHT -> " ---: |";
-                case null, default -> " --- |";
-            };
+        private final String markdown;
+
+        Alignment(String markdown) {
+            this.markdown = markdown;
         }
 
+        @Override
+        public String toString() {
+            return markdown;
+        }
     }
 
     public MarkdownBuilder tableRow(Iterable<String> rowItems) {
