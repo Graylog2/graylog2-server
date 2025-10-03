@@ -69,7 +69,7 @@ class AssignOutputDropdown extends React.Component<Props, { selectedOutput: stri
           &nbsp;
           <Button
             id="add-existing-output"
-            bsStyle="success"
+            bsStyle="primary"
             type="button"
             disabled={selectedOutput === this.PLACEHOLDER}
             onClick={this._handleClick}>

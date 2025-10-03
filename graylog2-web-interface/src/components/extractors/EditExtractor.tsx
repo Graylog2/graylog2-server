@@ -402,7 +402,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Row>
                     <Col mdOffset={2} md={10}>
-                      <Button type="submit" bsStyle="success">
+                      <Button type="submit" bsStyle="primary">
                         {action === 'create' ? 'Create extractor' : 'Update extractor'}
                       </Button>
                     </Col>

@@ -124,7 +124,7 @@ class FieldsList extends React.Component<
 
     const fieldNames = Object.keys(fields).sort(naturalSort);
     const addCustomFieldButton = (
-      <Button bsStyle="success" onClick={this.handleAddFieldClick}>
+      <Button bsStyle="primary" onClick={this.handleAddFieldClick}>
         Add custom field
       </Button>
     );

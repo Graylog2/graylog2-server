@@ -108,7 +108,7 @@ const PipelineForm = ({
         <Button
           disabled={!isPermitted(currentUser.permissions, 'pipeline:edit') || disableEdit}
           onClick={_openModal}
-          bsStyle="success">
+          bsStyle="primary">
           {create ? 'Add new pipeline' : 'Edit pipeline details'}
         </Button>
         <BootstrapModalForm

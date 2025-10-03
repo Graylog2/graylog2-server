@@ -86,7 +86,7 @@ const ContentPackVersionItem = ({
       <td>{pack.rev}</td>
       <td className="text-right">
         <ButtonToolbar className="pull-right">
-          <Button bsStyle="success" bsSize="small" onClick={() => handleDownload()}>
+          <Button bsStyle="primary" bsSize="small" onClick={() => handleDownload()}>
             Download
           </Button>
           <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">
