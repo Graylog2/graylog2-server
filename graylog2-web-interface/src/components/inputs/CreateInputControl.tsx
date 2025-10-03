@@ -137,7 +137,7 @@ const CreateInputControl = () => {
             />
           </FormGroup>
           &nbsp;
-          <Button bsStyle="success" type="submit" disabled={!selectedInput}>
+          <Button bsStyle="primary" type="submit" disabled={!selectedInput}>
             Launch new input
           </Button>
         </StyledForm>

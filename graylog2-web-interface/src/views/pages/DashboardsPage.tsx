@@ -36,7 +36,7 @@ const DashboardsPage = () => {
           <IfPermitted permissions="dashboards:create">
             <LinkContainer to={Routes.pluginRoute('DASHBOARDS_NEW')}>
               <Button
-                bsStyle="success"
+                bsStyle="primary"
                 onClick={() => {
                   sendTelemetry(TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_CLICKED, {
                     app_pathname: 'dashboard',

@@ -224,7 +224,7 @@ const UserSyncStep = ({
               Finish & Save Identity Service
             </Button>
             <Button
-              bsStyle="success"
+              bsStyle="primary"
               disabled={isSubmitting}
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_GROUP_SYNC_CLICKED, {

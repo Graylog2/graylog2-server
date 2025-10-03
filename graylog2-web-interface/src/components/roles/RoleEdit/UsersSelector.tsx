@@ -149,7 +149,7 @@ const UsersSelector = ({ role, onSubmit }: Props) => {
                   />
                 )}
               </Field>
-              <SubmitButton bsStyle="success" disabled={isSubmitting || !isValid} title="Assign User" type="submit">
+              <SubmitButton bsStyle="primary" disabled={isSubmitting || !isValid} title="Assign User" type="submit">
                 Assign User
               </SubmitButton>
             </FormElements>

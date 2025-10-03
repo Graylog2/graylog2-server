@@ -33,7 +33,7 @@ const EventNotificationsPage = () => (
       actions={
         <IfPermitted permissions="eventnotifications:create">
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-            <Button bsStyle="success">Create notification</Button>
+            <Button bsStyle="primary">Create notification</Button>
           </LinkContainer>
         </IfPermitted>
       }

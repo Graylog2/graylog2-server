@@ -144,7 +144,7 @@ function EditorModal({
             </Row>
             <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
               <Button onClick={() => onClose()}>Cancel</Button>
-              <Button bsStyle="success" onClick={handleOnDone}>
+              <Button bsStyle="primary" onClick={handleOnDone}>
                 Done
               </Button>
             </Row>

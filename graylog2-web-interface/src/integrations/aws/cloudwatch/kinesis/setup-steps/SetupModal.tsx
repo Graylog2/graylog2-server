@@ -78,7 +78,7 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
 
       <Modal.Footer>
         {agreed ? (
-          <Button bsStyle="success" onClick={success ? onSubmit : onCancel} type="button" disabled={!error && !success}>
+          <Button bsStyle="primary" onClick={success ? onSubmit : onCancel} type="button" disabled={!error && !success}>
             {buttonText}
           </Button>
         ) : (

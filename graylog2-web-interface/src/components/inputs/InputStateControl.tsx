@@ -94,7 +94,7 @@ const InputStateControl = ({ input, openWizard }: Props) => {
   }
 
   return (
-    <Button bsStyle="success" onClick={startInput} disabled={isLoading}>
+    <Button bsStyle="primary" onClick={startInput} disabled={isLoading}>
       {isLoading ? 'Starting...' : 'Start input'}
     </Button>
   );

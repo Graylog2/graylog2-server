@@ -42,7 +42,7 @@ const CreateIndexSetTemplateButton = () => {
   };
 
   return (
-    <Button bsStyle="success" onClick={handleClick}>
+    <Button bsStyle="primary" onClick={handleClick}>
       Create template
     </Button>
   );

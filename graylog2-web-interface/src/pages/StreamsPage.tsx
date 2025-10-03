@@ -72,7 +72,7 @@ const StreamsPage = () => {
         }}
         actions={
           <IfPermitted permissions="streams:create">
-            <CreateStreamButton bsStyle="success" onCreate={onSave} indexSets={indexSets} />
+            <CreateStreamButton bsStyle="primary" onCreate={onSave} indexSets={indexSets} />
           </IfPermitted>
         }>
         <span>

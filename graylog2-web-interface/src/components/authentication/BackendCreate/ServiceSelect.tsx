@@ -108,7 +108,7 @@ const BackendCreateSelect = () => {
               </Field>
             </FormGroup>
             &nbsp;
-            <Button bsStyle="success" disabled={isSubmitting || !isValid} type="submit">
+            <Button bsStyle="primary" disabled={isSubmitting || !isValid} type="submit">
               Get started
             </Button>
           </ElementsContainer>

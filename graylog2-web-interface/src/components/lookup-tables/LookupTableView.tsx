@@ -126,7 +126,7 @@ const LookupTableView = ({ table, cache, dataAdapter }: Props) => {
         <h2>Description</h2>
         <Description>{table.description}</Description>
         {!loadingScopePermissions && scopePermissions?.is_mutable && (
-          <Button bsStyle="success" onClick={handleEdit(table.name)} role="button" name="edit_square">
+          <Button bsStyle="primary" onClick={handleEdit(table.name)} role="button" name="edit_square">
             Edit
           </Button>
         )}

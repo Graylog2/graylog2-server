@@ -99,7 +99,7 @@ const ContentPacksPage = () => {
             <ButtonToolbar>
               <ContentPackUploadControls />
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
-                <Button bsStyle="success">Create a content pack</Button>
+                <Button bsStyle="primary">Create a content pack</Button>
               </LinkContainer>
             </ButtonToolbar>
           }>

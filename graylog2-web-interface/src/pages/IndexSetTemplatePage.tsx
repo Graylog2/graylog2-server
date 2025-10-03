@@ -42,7 +42,7 @@ const IndexSetTemplatePage = () => {
             {!isFetching && !data.built_in && (
               <IfPermitted permissions="indexset_templates:edit">
                 <LinkContainer to={Routes.SYSTEM.INDICES.TEMPLATES.edit(templateId)}>
-                  <Button bsStyle="success">Edit</Button>
+                  <Button bsStyle="primary">Edit</Button>
                 </LinkContainer>
               </IfPermitted>
             )}

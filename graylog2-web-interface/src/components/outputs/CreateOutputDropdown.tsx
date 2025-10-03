@@ -77,7 +77,7 @@ const CreateOutputDropdown = ({ types, getTypeDefinition, onSubmit }: CreateOutp
           {outputTypes}
         </select>
         &nbsp;
-        <Button bsStyle="success" disabled={typeName === PLACEHOLDER} onClick={_openModal}>
+        <Button bsStyle="primary" disabled={typeName === PLACEHOLDER} onClick={_openModal}>
           Launch new output
         </Button>
       </div>

@@ -50,7 +50,7 @@ const renderEmptyContent = () => (
         </p>
         <IfPermitted permissions="eventnotifications:create">
           <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-            <Button bsStyle="success">Get Started!</Button>
+            <Button bsStyle="primary">Get Started!</Button>
           </LinkContainer>
         </IfPermitted>
       </EmptyEntity>

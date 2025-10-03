@@ -32,7 +32,7 @@ const UsersOverviewPage = () => (
       actions={
         <IfPermitted permissions="users:create">
           <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
-            <Button bsStyle="success">Create user</Button>
+            <Button bsStyle="primary">Create user</Button>
           </LinkContainer>
         </IfPermitted>
       }

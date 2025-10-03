@@ -24,6 +24,7 @@ type Props = {
 };
 
 class AssignOutputDropdown extends React.Component<Props, { selectedOutput: string }> {
+  // eslint-disable-next-line
   PLACEHOLDER = 'placeholder';
 
   constructor(props: Props) {
@@ -69,7 +70,7 @@ class AssignOutputDropdown extends React.Component<Props, { selectedOutput: stri
           &nbsp;
           <Button
             id="add-existing-output"
-            bsStyle="success"
+            bsStyle="primary"
             type="button"
             disabled={selectedOutput === this.PLACEHOLDER}
             onClick={this._handleClick}>

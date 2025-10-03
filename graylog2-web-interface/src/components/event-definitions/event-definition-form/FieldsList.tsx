@@ -107,9 +107,11 @@ class FieldsList extends React.Component<
         <td>{providerFormatter(config.providers[0])}</td>
         <td className={styles.actions}>
           <ButtonToolbar>
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
               Remove Field
             </Button>
+            {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
             <Button bsStyle="info" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
               Edit
             </Button>
@@ -124,7 +126,7 @@ class FieldsList extends React.Component<
 
     const fieldNames = Object.keys(fields).sort(naturalSort);
     const addCustomFieldButton = (
-      <Button bsStyle="success" onClick={this.handleAddFieldClick}>
+      <Button bsStyle="primary" onClick={this.handleAddFieldClick}>
         Add custom field
       </Button>
     );

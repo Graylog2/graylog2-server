@@ -56,8 +56,6 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
     exampleMessage: undefined,
   };
 
-  private targetField: Input;
-
   constructor(props) {
     super(props);
 
@@ -75,6 +73,8 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
       this._updateExampleMessage(nextProps.exampleMessage);
     }
   }
+
+  private targetField: Input;
 
   _updateExampleMessage = (nextExample) => {
     this.setState({ exampleMessage: nextExample });
@@ -402,7 +402,7 @@ class EditExtractor extends React.Component<EditExtractorProps, EditExtractorSta
 
                   <Row>
                     <Col mdOffset={2} md={10}>
-                      <Button type="submit" bsStyle="success">
+                      <Button type="submit" bsStyle="primary">
                         {action === 'create' ? 'Create extractor' : 'Update extractor'}
                       </Button>
                     </Col>

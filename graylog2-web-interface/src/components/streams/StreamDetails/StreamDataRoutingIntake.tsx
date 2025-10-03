@@ -61,7 +61,7 @@ const StreamDataRoutingInstake = ({ stream }: Props) => {
         actions={
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <CreateStreamRuleButton
-              bsStyle="success"
+              bsStyle="primary"
               disabled={isDefaultStream || isNotEditable}
               streamId={stream.id}
             />

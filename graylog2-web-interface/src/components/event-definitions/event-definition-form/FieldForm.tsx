@@ -314,7 +314,7 @@ class FieldForm extends React.Component<
 
         <Col md={12}>
           <ButtonToolbar>
-            <Button bsStyle="success" onClick={this.handleSubmit}>
+            <Button bsStyle="primary" onClick={this.handleSubmit}>
               Add custom field
             </Button>
             <Button onClick={this.handleCancel}>Cancel</Button>
