@@ -45,11 +45,11 @@ public class AWSAuthFactory {
      * using Java props, environment variables, EC2 instance roles etc. See the {@link DefaultCredentialsProvider}
      * Javadoc for more information.
      */
-    public static AwsCredentialsProvider create(boolean requireKeySecret,
-                                                @Nullable String stsRegion,
-                                                @Nullable String accessKey,
-                                                @Nullable String secretKey,
-                                                @Nullable String assumeRoleArn) {
+    public AwsCredentialsProvider create(boolean requireKeySecret,
+                                         @Nullable String stsRegion,
+                                         @Nullable String accessKey,
+                                         @Nullable String secretKey,
+                                         @Nullable String assumeRoleArn) {
         AwsCredentialsProvider awsCredentials = requireKeySecret ? getKeySecretCredentialsProvider(accessKey, secretKey) :
                 getAwsCredentialsProvider(accessKey, secretKey);
 
