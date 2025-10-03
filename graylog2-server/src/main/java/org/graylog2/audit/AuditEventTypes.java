@@ -179,7 +179,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
     public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
 
-    public static final String MCP_PREFIX = "mcp_server" + ":";
+    // must be private, otherwise the sanity check test in AuditCoverageTest picks it up and fails
+    private static final String MCP_PREFIX = "mcp_server" + ":";
     public static final String MCP_PROTOCOL_INITIALIZE = MCP_PREFIX + "protocol:initialize";
     public static final String MCP_RESOURCE_LIST = MCP_PREFIX + "resource:list";
     public static final String MCP_RESOURCE_READTEMPLATES = MCP_PREFIX + "resource:read_templates";
