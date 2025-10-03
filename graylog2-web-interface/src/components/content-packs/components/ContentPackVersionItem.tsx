@@ -86,6 +86,7 @@ const ContentPackVersionItem = ({
       <td>{pack.rev}</td>
       <td className="text-right">
         <ButtonToolbar className="pull-right">
+          {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
           <Button bsStyle="primary" bsSize="small" onClick={() => handleDownload()}>
             Download
           </Button>

@@ -64,7 +64,7 @@ type Props = {
 
 const onButtonClick = (
   e: MouseEvent,
-  disabled: Boolean,
+  disabled: boolean,
   triggerTelemetry: () => void,
   onClick?: (e: MouseEvent) => void,
 ) => {

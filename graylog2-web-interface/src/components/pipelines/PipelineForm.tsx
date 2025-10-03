@@ -83,7 +83,6 @@ const PipelineForm = ({
         id="title"
         name="title"
         label="Title"
-        autoFocus
         required
         onChange={_onChange}
         help="Pipeline name."
