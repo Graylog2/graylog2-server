@@ -14,15 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.aws.json;
+import { useEffect } from 'react';
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import useHistory from 'routing/useHistory';
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SQSMessage {
-    @JsonProperty("Message")
-    public String message;
-    @JsonProperty("MessageId")
-    public String messageId;
-}
+import AWSCloudTrailRoutes from './common/Routes';
+
+const CloudTrailInputConfiguration = () => {
+  const history = useHistory();
+
+  useEffect(() => {
+    const url = AWSCloudTrailRoutes.INTEGRATIONS.AWSCloudTrail.ACTIVITYAPI.index;
+    history.push(url);
+  }, [history]);
+
+  return null;
+};
+
+export default CloudTrailInputConfiguration;
+
