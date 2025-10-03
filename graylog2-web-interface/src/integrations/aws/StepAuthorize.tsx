@@ -114,7 +114,7 @@ const StepAuthorize = ({ onChange, onSubmit, sidebarComponent = null }: StepAuth
     [
       'awsCloudWatchName',
       'awsCloudWatchAwsRegion',
-      ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsCloudWatchAwsKey', 'awsCloudWatchAwsSecret'] : []),
+      ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsAccessKey', 'awsSecretKey'] : []),
     ],
     formData,
   );

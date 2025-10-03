@@ -14,34 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.shared.rest.documentation.generator;
 
-import { Input } from 'components/bootstrap';
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.types.ObjectSchema;
 
-type ARNProps = {
-  awsARN?: {
-    value?: string;
-  };
-  onChange: (...args: any[]) => void;
-};
+import java.util.Optional;
 
-const ARN = ({
-  awsARN = {
-    value: '',
-  },
-
-  onChange,
-}: ARNProps) => (
-  <Input
-    id="awsAssumeRoleARN"
-    type="text"
-    value={awsARN.value}
-    onChange={onChange}
-    label="AWS Assume Role (ARN)"
-    help="Amazon Resource Name with required cross account permission"
-    placeholder="arn:aws:sts::123456789012:assumed-role/some-role"
-    maxLength={2048}
-  />
-);
-
-export default ARN;
+public class ObjectSchemaWithOptionalSupport extends ObjectSchema {
+    @Override
+    public void putOptionalProperty(BeanProperty property, JsonSchema jsonSchema) {
+        if (property.getType().isTypeOrSubTypeOf(Optional.class)) {
+            jsonSchema.setRequired(false);
+        }
+        super.putOptionalProperty(property, jsonSchema);
+    }
+}
