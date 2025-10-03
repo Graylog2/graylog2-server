@@ -40,6 +40,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.graylog2.audit.AuditEventTypes.MCP_PROMPT_LIST;
+import static org.graylog2.audit.AuditEventTypes.MCP_PROMPT_GET;
+import static org.graylog2.audit.AuditEventTypes.MCP_PROTOCOL_INITIALIZE;
+import static org.graylog2.audit.AuditEventTypes.MCP_RESOURCE_LIST;
+import static org.graylog2.audit.AuditEventTypes.MCP_RESOURCE_READ;
+import static org.graylog2.audit.AuditEventTypes.MCP_RESOURCE_READTEMPLATES;
+import static org.graylog2.audit.AuditEventTypes.MCP_TOOL_CALL;
+import static org.graylog2.audit.AuditEventTypes.MCP_TOOL_LIST;
+
 @Singleton
 public class McpService {
     private static final Logger LOG = LoggerFactory.getLogger(McpService.class);
@@ -64,10 +73,13 @@ public class McpService {
     public Optional<McpSchema.Result> handle(SecurityContext securityContext, McpSchema.JSONRPCRequest request, String sessionId)
             throws McpException, IllegalArgumentException {
         final AuditActor auditActor = AuditActor.user(securityContext.getUserPrincipal().getName());
+        final Map<String, Object> auditContext = Maps.newHashMap();
+        auditContext.put("sessionId", sessionId);
 
         switch (request.method()) {
             case McpSchema.METHOD_INITIALIZE -> {
                 final McpSchema.InitializeRequest initializeRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                auditContext.put("request", initializeRequest);
                 if (!supportedVersions.contains(initializeRequest.protocolVersion())) {
                     LOG.warn("Invalid protocol version {} for request {}", initializeRequest.protocolVersion(), request.params());
                     throw new IllegalArgumentException("Invalid protocol version " + initializeRequest.protocolVersion());
@@ -85,11 +97,7 @@ public class McpService {
                         new McpSchema.Implementation("Graylog", ServerVersion.VERSION.toString()),
                         null,
                         null);
-                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:protocol:initialize"),
-                                         Map.of("clientInfo", initializeRequest.clientInfo(),
-                                                "capabilities", initializeRequest.capabilities(),
-                                                "protocolVersion", initializeRequest.protocolVersion()
-                                         ));
+                auditEventSender.success(auditActor, AuditEventType.create(MCP_PROTOCOL_INITIALIZE), auditContext);
                 return Optional.of(result);
             }
             case McpSchema.METHOD_PING -> {
@@ -106,11 +114,12 @@ public class McpService {
                         .toList();
                 final McpSchema.ListResourcesResult result = new McpSchema.ListResourcesResult(resourceList, null);
                 LOG.info("Returning available resources {}", result);
-                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:resource:list"));
+                auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_LIST), auditContext);
                 return Optional.of(result);
             }
             case McpSchema.METHOD_RESOURCES_READ -> {
                 final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                auditContext.put("request", readResourceRequest);
                 McpSchema.ResourceContents contents;
                 try {
                     final McpSchema.Resource resource = this.resourceProviders
@@ -118,7 +127,7 @@ public class McpService {
                             .read(new URI(readResourceRequest.uri())
                             );
                     contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
-                    auditEventSender.success(auditActor, AuditEventType.create("mcp_server:resource:read"));
+                    auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READ), auditContext);
                 } catch (Exception e) {
                     throw new McpException("Failed to read resource: " + e.getMessage());
                 }
@@ -137,7 +146,7 @@ public class McpService {
                                 null
                         ))
                         .toList();
-                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:resource_template:list"));
+                auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READTEMPLATES), auditContext);
                 return Optional.of(new McpSchema.ListResourceTemplatesResult(templates, null));
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
@@ -153,12 +162,11 @@ public class McpService {
                     }
                     return builder.build();
                 }).toList();
-                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:tool:list"));
+                auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_LIST), auditContext);
                 return Optional.of(new McpSchema.ListToolsResult(toolList, null));
             }
             case McpSchema.METHOD_TOOLS_CALL -> {
                 final McpSchema.CallToolRequest callToolRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
-                final Map<String, Object> auditContext  = Maps.newHashMap();
                 auditContext.put("request", callToolRequest);
 
                 LOG.info("Calling MCP tool: {}", callToolRequest);
@@ -171,27 +179,27 @@ public class McpService {
                             var structuredContent = objectMapper.convertValue(result,
                                                                               new TypeReference<Map<String, Object>>() {
                                                                               });
-                            auditEventSender.success(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
+                            auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                             return Optional.of(new McpSchema.CallToolResult(
                                     List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))), false,
                                     structuredContent));
                         } catch (JsonProcessingException e) {
-                            auditEventSender.failure(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
+                            auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                             throw new RuntimeException(e);
                         }
                     } else {
                         // no schema, just return the string representation directly
-                        auditEventSender.success(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
+                        auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                         return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
                     }
                 } else {
-                    auditEventSender.failure(auditActor, AuditEventType.create("mcp_server:tool:call"), auditContext);
+                    auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                     return Optional.of(new McpSchema.CallToolResult("Unknown tool named: " + callToolRequest.name(), true));
                 }
             }
             case McpSchema.METHOD_PROMPT_LIST -> {
                 LOG.info("Listing available prompts");
-                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:prompt:list"));
+                auditEventSender.success(auditActor, AuditEventType.create(MCP_PROMPT_LIST), auditContext);
                 return Optional.of(new McpSchema.ListPromptsResult(List.of(
                         new McpSchema.Prompt(
                                 "log_sources_analysis",
@@ -199,8 +207,7 @@ public class McpService {
                                 """
                                         Asks the LLM to look at the log sources currently ingested over a certain
                                         period of time, and how those have changed in characteristics, in order to
-                                        understand if something important has changed or needs attention
-                                        """,
+                                        understand if something important has changed or needs attention""",
                                 null
                         )
 
@@ -208,23 +215,22 @@ public class McpService {
             }
             case McpSchema.METHOD_PROMPT_GET -> {
                 final McpSchema.GetPromptRequest promptRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
+                auditContext.put("request", promptRequest);
                 LOG.info("Getting prompt {}", promptRequest.name());
                 var result = switch (promptRequest.name()) {
                     case "log_sources_analysis" -> new McpSchema.PromptMessage(
-                            McpSchema.Role.ASSISTANT,
-                            new McpSchema.TextContent("""
-                                    You are an administrator for the log management system Graylog and are tasked with
-                                     understanding how the log sources sending data into Graylog are behaving over the
-                                     last two days. Use the current day and compare the situation of the log sources to
-                                     the previous 24 hours, with special attention to sources that have stopped sending
-                                     or are now sending extraordinary amounts of data.""")
+                            McpSchema.Role.USER,
+                            new McpSchema.TextContent(
+                                    "You are an administrator for the log management system Graylog and are tasked " +
+                                    "with understanding how the log sources sending data into Graylog are behaving " +
+                                    "over the last two days. Use the current day and compare the situation of the " +
+                                    "log sources to the previous 24 hours, with special attention to sources that " +
+                                    "have stopped sending or are now sending extraordinary amounts of data.")
                     );
                     default -> throw new McpException("Unknown prompt name: " + promptRequest.name());
                 };
-                auditEventSender.success(auditActor, AuditEventType.create("mcp_server:prompt:get"),
-                                         Map.of("name", promptRequest.name(),
-                                                "arguments", promptRequest.arguments()));
-                return Optional.of(new McpSchema.GetPromptResult("", List.of(result)));
+                auditEventSender.success(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);
+                return Optional.of(new McpSchema.GetPromptResult(null, List.of(result)));
             }
             default -> LOG.warn("Unsupported MCP method: " + request.method());
 
