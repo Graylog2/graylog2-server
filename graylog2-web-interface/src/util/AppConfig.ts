@@ -144,7 +144,7 @@ const AppConfig = {
     return appConfig()?.branding;
   },
 
-  globalInputsOnly():boolean {
+  globalInputsOnly(): boolean {
     return appConfig().globalInputsOnly;
   },
 };
