@@ -16,21 +16,10 @@
  */
 package org.graylog.testing.completebackend;
 
-import org.graylog2.storage.SearchVersion;
+public interface GraylogDataNodeProduct {
+    String name();
 
-import java.util.Optional;
-import java.util.ServiceLoader;
+    MavenProjectDirProvider mavenProjectDirProvider();
 
-public class SearchServerInstanceProvider {
-    private static final ServiceLoader<SearchServerInterfaceProvider> loader = ServiceLoader.load(SearchServerInterfaceProvider.class);
-
-    public static Optional<SearchServerBuilder<?>> getBuilderFor(SearchVersion searchVersion) {
-        for (SearchServerInterfaceProvider provider : loader) {
-            SearchServerBuilder<?> builder = provider.getBuilderFor(searchVersion);
-            if (builder != null) {
-                return Optional.of(builder);
-            }
-        }
-        return Optional.empty();
-    }
+    PluginJarsProvider pluginJarsProvider();
 }

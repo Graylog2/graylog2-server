@@ -19,12 +19,11 @@ package org.graylog.datanode.integration;
 import com.github.rholder.retry.RetryException;
 import io.restassured.http.ContentType;
 import io.restassured.response.ValidatableResponse;
-import org.graylog.testing.restoperations.DatanodeOpensearchWait;
-import org.graylog.testing.restoperations.RestOperationParameters;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.testing.completebackend.S3MinioContainer;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog.testing.restoperations.DatanodeOpensearchWait;
+import org.graylog.testing.restoperations.RestOperationParameters;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,7 +47,7 @@ public class DatanodeSearchableSnapshotsIT {
     @BeforeEach
     void setUp() {
         network = Network.newNetwork();
-        mongoDB = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
+        mongoDB = MongoDBTestService.create(network);
         mongoDB.start();
         s3Container = new S3MinioContainer(network);
         s3Container.start();

@@ -29,24 +29,30 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog.testing.graylognode.NodeContainerConfig.flagFromEnvVar;
+
 public class MavenPackager {
     private static final Logger LOG = LoggerFactory.getLogger(MavenPackager.class);
-    private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true ";
-    private static final String EXCLUDE_FE = " -Dskip.web.build ";
+    private static final String MVN_COMMAND = "./mvnw -V package -DskipTests -Dforbiddenapis.skip=true -Dmaven.javadoc.skip=true -Dcyclonedx.skip -Dskip.artifact.assembly ";
+    private static final String SKIP_FLAG = "GRAYLOG_IT_SKIP_PACKAGING";
 
     private static boolean jarHasBeenPackagedInThisRun = false;
 
-    private static String getMavenCommand(boolean includeFrontend) {
-        return includeFrontend ? MVN_COMMAND : MVN_COMMAND + EXCLUDE_FE;
+    private static String getMavenCommand() {
+        return MVN_COMMAND;
     }
 
     public static synchronized void packageJarIfNecessary(final MavenProjectDirProvider mavenProjectDirProvider) {
+        if (flagFromEnvVar(SKIP_FLAG)) {
+            LOG.info("Skipping packaging - {} is set", SKIP_FLAG);
+            return;
+        }
         if (isRunFromMaven()) {
-            LOG.info("Running from Maven. Assuming jars are current.");
+            LOG.debug("Running from Maven - assuming JAR files have been built.");
         } else if (jarHasBeenPackagedInThisRun) {
-            LOG.info("Assuming jars are current.");
+            LOG.debug("Assuming JAR files have been built.");
         } else {
-            LOG.info("Running from outside Maven. Packaging server jar now...");
+            LOG.info("Running from outside Maven - packaging JAR files now...");
             packageJar(mavenProjectDirProvider);
         }
     }
@@ -58,9 +64,8 @@ public class MavenPackager {
 
     public static void packageJar(final MavenProjectDirProvider mavenProjectDirProvider) {
         Path pomDir = mavenProjectDirProvider.getProjectDir();
-        boolean includeFrontend = mavenProjectDirProvider.includeFrontend();
 
-        Process p = startProcess(pomDir, includeFrontend);
+        Process p = startProcess(pomDir);
 
         Stopwatch sw = Stopwatch.createStarted();
 
@@ -70,7 +75,7 @@ public class MavenPackager {
         LOG.info("Finished packaging after {} seconds", sw.elapsed(TimeUnit.SECONDS));
         jarHasBeenPackagedInThisRun = true;
 
-        ensureZeroExitCode(p, exitCode, includeFrontend);
+        ensureZeroExitCode(p, exitCode);
     }
 
     private static int waitForExit(Process p) {
@@ -81,27 +86,27 @@ public class MavenPackager {
         }
     }
 
-    private static Process startProcess(Path pomDir, boolean includeFrontend) {
+    private static Process startProcess(Path pomDir) {
         try {
-            return new ProcessBuilder().command("sh", "-c", getMavenCommand(includeFrontend)).directory(pomDir.toFile()).inheritIO().start();
+            return new ProcessBuilder().command("sh", "-c", getMavenCommand()).directory(pomDir.toFile()).inheritIO().start();
         } catch (IOException e) {
-            String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", getMavenCommand(includeFrontend));
+            String msg = String.format(Locale.US, "Failed to start maven process with command [%s].", getMavenCommand());
             throw new RuntimeException(msg, e);
         }
     }
 
-    private static void ensureZeroExitCode(Process p, int exitCode, boolean includeFrontend) {
+    private static void ensureZeroExitCode(Process p, int exitCode) {
         if (exitCode == 0) {
             return;
         }
         if (exitCode == 127) {
-            String msg = String.format(Locale.US, "/bin/sh couldn't find Maven on your PATH when attempting to run [%s]", getMavenCommand(includeFrontend));
+            String msg = String.format(Locale.US, "/bin/sh couldn't find Maven on your PATH when attempting to run [%s]", getMavenCommand());
             throw new RuntimeException(msg);
         }
 
         printOutputFrom(p);
 
-        String msg = String.format(Locale.US, "Maven exited with %s after running [%s]. ", exitCode, getMavenCommand(includeFrontend));
+        String msg = String.format(Locale.US, "Maven exited with %s after running [%s]. ", exitCode, getMavenCommand());
         throw new RuntimeException(msg);
 
     }

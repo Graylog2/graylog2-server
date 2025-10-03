@@ -20,9 +20,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -33,13 +34,14 @@ import java.util.concurrent.ExecutionException;
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration()
+@GraylogBackendConfiguration()
 public class FieldTypeMappingsIT {
     private static final String INDEX_PREFIX = "custom-mappings";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public FieldTypeMappingsIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void init(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
     record FieldTypeChangeRequest(@JsonProperty("index_sets")
@@ -53,7 +55,7 @@ public class FieldTypeMappingsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void changeFieldTypeFromStringToIp() throws ExecutionException, RetryException {
         var indexSet = api.indices().createIndexSet("Field Type Mappings Test", "Testing custom field type mapping", INDEX_PREFIX);
         var stream = api.streams().createStream("Field Type Mappings Stream", indexSet, Streams.StreamRule.exact("field-type-mappings-test", "test-id", false));

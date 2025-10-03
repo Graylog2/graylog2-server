@@ -16,6 +16,7 @@
  */
 package org.graylog2.cluster.lock;
 
+import com.google.common.util.concurrent.Uninterruptibles;
 import com.mongodb.client.ListIndexesIterable;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -66,6 +67,9 @@ public abstract class MongoLockServiceTest {
     void reentrantLock() {
         final Lock orig = lockService.lock("test-resource", null)
                 .orElseThrow(() -> new IllegalStateException("Unable to create original lock."));
+
+        // Make sure that updatedAt is actually different after we reacquire the lock
+        Uninterruptibles.sleepUninterruptibly(Duration.ofMillis(1));
 
         final Optional<Lock> lock = lockService.lock("test-resource", null);
 

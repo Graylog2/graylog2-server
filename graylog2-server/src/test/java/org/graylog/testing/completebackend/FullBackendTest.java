@@ -14,18 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog.testing.completebackend;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog2.storage.SearchVersion;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.annotation.Testable;
 
-public class DatanodeDevInstanceBuilder extends SearchServerBuilder<DatanodeDevInstance> {
-    public DatanodeDevInstanceBuilder(SearchVersion version) {
-        super(version);
-    }
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    @Override
-    protected DatanodeDevInstance instantiate() {
-        return new DatanodeDevInstance(getVersion(), getHostname(), getNetwork(), getMongoDbUri(), getPasswordSecret(), getHeapSize(), getFeatureFlags(), getEnv(), getDatanodePluginJarsProvider()).init();
-    }
+/**
+ * Use this to run a test with a full Graylog backend, including OpenSearch / Data Node, and MongoDB.
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Testable
+@Tag("full-backend-test")
+@Test
+public @interface FullBackendTest {
 }
