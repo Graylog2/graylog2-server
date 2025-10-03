@@ -54,6 +54,7 @@ export { default as Table } from './Table';
 export { default as Tabs } from './Tabs';
 export { default as Tooltip } from './Tooltip';
 export { default as Well } from './Well';
+export { default as MantineAccordion } from './MantineAccordion';
 
 export * from './imports';
 export * from './importsTypes';
