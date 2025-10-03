@@ -30,7 +30,7 @@ export type InputSummary = {
   created_at: string;
   global: boolean;
   attributes: {
-    [_key: string]: Object;
+    [_key: string]: object;
   };
   id: string;
   title: string;
@@ -99,11 +99,11 @@ export type ExtractorType = {
   exceptions: number;
   target_field: string;
   extractor_config: {
-    [_key: string]: Object;
+    [_key: string]: object;
   };
   condition_value: string;
   converters: {
-    [_key: string]: Object;
+    [_key: string]: object;
   }[];
   id?: string;
   metrics: ExtractorMetrics;
