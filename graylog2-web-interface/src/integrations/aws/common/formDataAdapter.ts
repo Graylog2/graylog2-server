@@ -34,13 +34,13 @@ export const toAWSRequest = (formData, options) => {
   return {
     ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
       ? {
-        aws_access_key_id: awsAccessKey?.value,
-        aws_secret_access_key: awsSecretKey?.value,
-      }
+          aws_access_key_id: awsAccessKey?.value,
+          aws_secret_access_key: awsSecretKey?.value,
+        }
       : {
-        aws_access_key_id: key,
-        aws_secret_access_key: secret,
-      }),
+          aws_access_key_id: key,
+          aws_secret_access_key: secret,
+        }),
     assume_role_arn: awsAssumeRoleARN?.value,
     cloudwatch_endpoint: awsEndpointCloudWatch?.value,
     dynamodb_endpoint: awsEndpointDynamoDB?.value,
@@ -75,9 +75,9 @@ export const toGenericInputCreateRequest = ({
   configuration: {
     ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
       ? {
-        aws_access_key: awsAccessKey?.value,
-        aws_secret_key: awsSecretKey?.value,
-      }
+          aws_access_key: awsAccessKey?.value,
+          aws_secret_key: awsSecretKey?.value,
+        }
       : {
         aws_access_key: key,
         aws_secret_key: secret,

@@ -84,7 +84,7 @@ public class ActionTest {
 
         String actionText = executeNotificationConfig().getLink(event).toString();
 
-        assertThat(actionText).contains("security/security-events/alerts?query=id%3A%24%7Bevent.id%7D");
+        assertThat(actionText).contains("/security/security-events/alerts?query=id%3A" + ID);
     }
 
     private ExecuteNotification.Config executeNotificationConfig() {
