@@ -32,9 +32,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +46,8 @@ import java.util.UUID;
 
 @RequiresAuthentication
 @Path("/mcp")
-public class McpResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(McpResource.class);
+public class McpRestResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(McpRestResource.class);
 
     @Inject
     ObjectMapper objectMapper;
@@ -60,6 +62,7 @@ public class McpResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @SkipCSRFProtection("server-to-server")
+    @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("Has custom audit events")
     public Response post(@Context HttpHeaders headers, String body) throws IOException {
         final String accept = Optional.ofNullable(headers.getHeaderString(HttpHeaders.ACCEPT)).orElse("");
@@ -133,6 +136,7 @@ public class McpResource extends RestResource {
     @GET
     @Produces("text/event-stream")
     @SkipCSRFProtection("server-to-server")
+    @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("prototype")
     public Response get() {
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
