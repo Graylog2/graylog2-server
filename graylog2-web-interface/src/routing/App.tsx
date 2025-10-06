@@ -32,6 +32,7 @@ import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesP
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
 import { singleton } from 'logic/singleton';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import { QuickJumpModalContainer } from 'components/quick-jump';
 
 const AppLayout = styled.div`
   display: flex;
@@ -73,6 +74,7 @@ const App = () => (
                     </ReportedErrorBoundary>
                   </AppLayout>
                   <HotkeysModalContainer />
+                  <QuickJumpModalContainer />
                 </>
               </ScratchpadProvider>
             </HotkeysProvider>
