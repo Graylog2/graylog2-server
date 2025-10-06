@@ -46,12 +46,11 @@ const QuickJumpModal = ({ onToggle }: Props) => {
       <Modal.Body>
         <SearchInput
           value={searchQuery}
+          data-autofocus
           id="quick-jump-search"
           type="text"
           onChange={setSearchQuery}
           placeholder="Search..."
-          /* eslint-disable-next-line jsx-a11y/no-autofocus */
-          autoFocus
         />
         <List>
           <ListGroup>
