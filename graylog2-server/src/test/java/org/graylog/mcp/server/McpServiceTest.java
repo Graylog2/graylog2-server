@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
@@ -154,7 +155,7 @@ class McpServiceTest {
         // Given
         ResourceProvider mockProvider = mock(ResourceProvider.class);
         McpSchema.Resource resource1 = McpSchema.Resource.builder()
-                        .uri("grn:test:1")
+                        .uri("grn::dashboard:test123")
                         .name("Test Resource 1")
                         .description("Description 1")
                         .mimeType("text/plain")
@@ -179,7 +180,7 @@ class McpServiceTest {
 
         McpSchema.ListResourcesResult listResult = (McpSchema.ListResourcesResult) result.get();
         assertThat(listResult.resources()).hasSize(1);
-        assertThat(listResult.resources().getFirst().uri()).isEqualTo("grn:test:1");
+        assertThat(listResult.resources().getFirst().uri()).isEqualTo("grn::dashboard:test123");
 
         verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
@@ -319,7 +320,8 @@ class McpServiceTest {
 
         tools.put("test_tool", mockTool);
 
-        var callParams = new McpSchema.CallToolRequest("test_tool", Map.of("param1", "value1"));
+        Map<String, Object> args = Map.of("param1", "value1");
+        var callParams = new McpSchema.CallToolRequest("test_tool", args);
         var request = new McpSchema.JSONRPCRequest(
                 "2.0",
                 McpSchema.METHOD_TOOLS_CALL,
@@ -337,7 +339,7 @@ class McpServiceTest {
         McpSchema.CallToolResult callResult = (McpSchema.CallToolResult) result.get();
         assertThat(callResult.isError()).isFalse();
 
-        verify(mockTool).apply(eq(permissionHelper), any());
+        verify(mockTool).apply(eq(permissionHelper), eq(args));
         verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
 
@@ -390,7 +392,7 @@ class McpServiceTest {
     }
 
     @Test
-    void testListPrompts() throws Exception {
+    void testListPrompts() {
         // Given
         var request = new McpSchema.JSONRPCRequest(
                 "2.0",
@@ -399,22 +401,23 @@ class McpServiceTest {
                 null
         );
 
-        // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        // When/Then
+        assertThatNoException().isThrownBy(() -> {
+            Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
 
-        // Then
-        assertThat(result).isPresent();
-        assertThat(result.get()).isInstanceOf(McpSchema.ListPromptsResult.class);
+            assertThat(result).isPresent();
+            assertThat(result.get()).isInstanceOf(McpSchema.ListPromptsResult.class);
 
-        McpSchema.ListPromptsResult listResult = (McpSchema.ListPromptsResult) result.get();
-        assertThat(listResult.prompts()).hasSize(1);
-        assertThat(listResult.prompts().getFirst().name()).isEqualTo("log_sources_analysis");
+            McpSchema.ListPromptsResult listResult = (McpSchema.ListPromptsResult) result.get();
+            assertThat(listResult.prompts()).hasSize(1);
+            assertThat(listResult.prompts().getFirst().name()).isEqualTo("log_sources_analysis");
+        });
 
         verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
 
     @Test
-    void testGetPrompt() throws Exception {
+    void testGetPrompt() {
         // Given
         var promptParams = new McpSchema.GetPromptRequest("log_sources_analysis", null);
         var request = new McpSchema.JSONRPCRequest(
@@ -424,16 +427,17 @@ class McpServiceTest {
                 objectMapper.convertValue(promptParams, Map.class)
         );
 
-        // When
-        Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
+        // When/Then
+        assertThatNoException().isThrownBy(() -> {
+            Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, "session123");
 
-        // Then
-        assertThat(result).isPresent();
-        assertThat(result.get()).isInstanceOf(McpSchema.GetPromptResult.class);
+            assertThat(result).isPresent();
+            assertThat(result.get()).isInstanceOf(McpSchema.GetPromptResult.class);
 
-        McpSchema.GetPromptResult promptResult = (McpSchema.GetPromptResult) result.get();
-        assertThat(promptResult.messages()).hasSize(1);
-        assertThat(promptResult.messages().getFirst().role()).isEqualTo(McpSchema.Role.USER);
+            McpSchema.GetPromptResult promptResult = (McpSchema.GetPromptResult) result.get();
+            assertThat(promptResult.messages()).hasSize(1);
+            assertThat(promptResult.messages().getFirst().role()).isEqualTo(McpSchema.Role.USER);
+        });
 
         verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
