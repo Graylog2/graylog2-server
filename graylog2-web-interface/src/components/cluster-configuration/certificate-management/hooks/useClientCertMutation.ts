@@ -16,9 +16,9 @@
  */
 import { useMutation } from '@tanstack/react-query';
 
+import { ClientCertificates } from '@graylog/server-api';
+
 import UserNotification from 'util/UserNotification';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
 
 export type ClientCertFormValues = {
   principal: string;
@@ -27,9 +27,11 @@ export type ClientCertFormValues = {
   lifetimeValue: number;
   lifetimeUnit: string;
 };
+
 export type CreateClientCertRequest = {
   principal: string;
   role: string;
+  roles: Array<string>;
   password: string;
   certificate_lifetime: string;
 };
@@ -41,10 +43,11 @@ export type ClientCertCreateResponse = {
   private_key: string;
   certificate: string;
 };
-const createClientCa = (clientCertFormData: CreateClientCertRequest) =>
-  fetch<ClientCertCreateResponse>('POST', qualifyUrl('ca/clientcert'), clientCertFormData, false);
 
-const useCreateDataNodeClientCert = (): {
+const createClientCa = (clientCertFormData: CreateClientCertRequest): Promise<ClientCertCreateResponse> =>
+  ClientCertificates.createClientCert(clientCertFormData) as unknown as Promise<ClientCertCreateResponse>;
+
+const useClientCertMutation = (): {
   onCreateClientCert: (values: CreateClientCertRequest) => Promise<ClientCertCreateResponse>;
   isLoading: boolean;
   isError: boolean;
@@ -68,4 +71,4 @@ const useCreateDataNodeClientCert = (): {
   };
 };
 
-export default useCreateDataNodeClientCert;
+export default useClientCertMutation;

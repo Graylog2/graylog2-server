@@ -18,19 +18,19 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
+import { CA } from '@graylog/server-api';
+
 import type FetchError from 'logic/errors/FetchError';
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import type { DataNodesCA } from 'components/datanode/Types';
+import type { CA as CAType } from 'components/cluster-configuration/certificate-management/types';
 import { onSettled } from 'util/conditional/onError';
 
-export const QUERY_KEY = ['data-nodes', 'ca-status'];
-const fetchDataNodesCA = (): Promise<DataNodesCA> => fetch('GET', qualifyUrl('ca'), undefined, false);
+export const QUERY_KEY = ['certificates', 'ca-status'];
+const fetchCA = (): Promise<CAType> => CA.get();
 
-const useDataNodesCA = (
+const useCA = (
   refetchInterval: number | false = 3000,
 ): {
-  data: DataNodesCA;
+  data: CAType;
   isFetching: boolean;
   error: FetchError;
   isInitialLoading: boolean;
@@ -42,11 +42,11 @@ const useDataNodesCA = (
     error: null,
     isInitialLoading: false,
   });
-  const { data, isFetching } = useQuery<DataNodesCA, FetchError>({
+  const { data, isFetching } = useQuery<CAType, FetchError>({
     queryKey: QUERY_KEY,
     queryFn: () =>
       onSettled(
-        fetchDataNodesCA(),
+        fetchCA(),
         () => {
           setMetaData({
             error: null,
@@ -73,4 +73,4 @@ const useDataNodesCA = (
   };
 };
 
-export default useDataNodesCA;
+export default useCA;

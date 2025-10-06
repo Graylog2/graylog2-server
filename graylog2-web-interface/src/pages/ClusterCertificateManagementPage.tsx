@@ -18,27 +18,18 @@ import React from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
-import DocsHelper from 'util/DocsHelper';
-import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
+import CertificateManagement from 'components/cluster-configuration/certificate-management/CertificateManagement';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 
 const ClusterCertificateManagementPage = () => (
   <DocumentTitle title="Certificate Management">
     <ClusterConfigurationPageNavigation />
-    <PageHeader
-      title="Certificate Management"
-      documentationLink={{
-        title: 'Data Nodes documentation',
-        path: DocsHelper.PAGES.GRAYLOG_DATA_NODE,
-      }}>
-      <span>
-        Graylog Data Nodes offer a better integration with Graylog and simplify future updates. They allow you to index
-        and search through all the messages in your Graylog message database.
-      </span>
+    <PageHeader title="Certificate Management">
+      <span>This needs to be replaced with a better Text</span>
     </PageHeader>
     <Row className="content">
       <Col md={12}>
-        <DataNodeConfiguration />
+        <CertificateManagement />
       </Col>
     </Row>
   </DocumentTitle>

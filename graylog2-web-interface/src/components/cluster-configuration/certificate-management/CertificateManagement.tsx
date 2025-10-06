@@ -15,14 +15,22 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 
-import CreateClientCertificateButton from 'components/datanode/client-certificate/CreateClientCertificateButton';
+import { CertificateRenewalPolicyConfig } from 'components/cluster-configuration/certificate-management/CertificateRenewal';
+import { ClientCertificateConfig } from 'components/cluster-configuration/certificate-management/ClientCertificate';
 
-const ClientCertificateConfig = () => (
-  <div>
-    <h2>Client Certificate</h2>
-    <p>Generate client certificates for 3rd party tool</p>
-    <CreateClientCertificateButton />
-  </div>
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+`;
+
+const CertificateManagement = () => (
+  <Container>
+    <CertificateRenewalPolicyConfig />
+    <ClientCertificateConfig />
+  </Container>
 );
-export default ClientCertificateConfig;
+
+export default CertificateManagement;

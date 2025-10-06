@@ -19,23 +19,23 @@ import { Form, Formik } from 'formik';
 import { useState } from 'react';
 import moment from 'moment';
 
+import type { ClientCertFormValues } from 'components/cluster-configuration/certificate-management/hooks/useClientCertMutation';
+import useClientCertMutation from 'components/cluster-configuration/certificate-management/hooks/useClientCertMutation';
+import ClientCertificateView from 'components/cluster-configuration/certificate-management/ClientCertificate/ClientCertificateView';
 import { FormikInput, TimeUnitInput } from 'components/common';
 import { Button, ButtonToolbar, Checkbox, Modal } from 'components/bootstrap';
-import type { ClientCertFormValues } from 'components/datanode/hooks/useCreateDataNodeClientCert';
-import useCreateDataNodeClientCert from 'components/datanode/hooks/useCreateDataNodeClientCert';
-import ClientCertificateView from 'components/datanode/client-certificate/ClientCertificateView';
+import { TIME_UNITS_UPPER } from 'components/cluster-configuration/certificate-management/constants';
 
-import { TIME_UNITS_UPPER } from '../Constants';
-import ModalSubmit from '../../common/ModalSubmit';
+import ModalSubmit from '../../../common/ModalSubmit';
 
 type Props = {
   onCancel: () => void;
 };
 
-const ClientCertForm = ({ onCancel }: Props) => {
+const ClientCertificateForm = ({ onCancel }: Props) => {
   const [clientCerts, setClientCerts] = useState(null);
   const [isUnencrypted, setIsUnencrypted] = useState(false);
-  const { onCreateClientCert } = useCreateDataNodeClientCert();
+  const { onCreateClientCert } = useClientCertMutation();
 
   const onSubmit = (formValues: ClientCertFormValues) => {
     const { lifetimeValue, lifetimeUnit, ...restValues } = formValues;
@@ -46,7 +46,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
         .toJSON(),
     };
 
-    return onCreateClientCert(requestValues)
+    return onCreateClientCert({ roles: [], ...requestValues })
       .then((certs) => setClientCerts(certs))
       .catch(() => {});
   };
@@ -146,4 +146,4 @@ const ClientCertForm = ({ onCancel }: Props) => {
   );
 };
 
-export default ClientCertForm;
+export default ClientCertificateForm;

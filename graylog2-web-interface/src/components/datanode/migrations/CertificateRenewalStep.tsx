@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import CertificateRenewalPolicyConfig from 'components/datanode/DataNodeConfiguration/CertificateRenewalPolicyConfig';
+import { CertificateRenewalPolicyConfig } from 'components/cluster-configuration/certificate-management';
 import { Space } from 'preflight/components/common';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';

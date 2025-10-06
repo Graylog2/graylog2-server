@@ -16,8 +16,8 @@
  */
 import React, { useState } from 'react';
 
+import ClientCertificateForm from 'components/cluster-configuration/certificate-management/ClientCertificate/ClientCertificateForm';
 import { BootstrapModalWrapper, Button } from 'components/bootstrap';
-import ClientCertForm from 'components/datanode/client-certificate/ClientCertForm';
 
 const CreateClientCertificateButton = () => {
   const [showCertificateForm, setShowCertificateForm] = useState(false);
@@ -30,7 +30,7 @@ const CreateClientCertificateButton = () => {
       </Button>
       {showCertificateForm && (
         <BootstrapModalWrapper showModal={showCertificateForm} onHide={() => onCancel()} bsSize="lg">
-          <ClientCertForm onCancel={onCancel} />
+          <ClientCertificateForm onCancel={onCancel} />
         </BootstrapModalWrapper>
       )}
     </>

@@ -17,12 +17,12 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { CertificateRenewalButton } from 'components/cluster-configuration/certificate-management';
 import type { DataNode } from 'components/datanode/Types';
 import useParams from 'routing/useParams';
 import DocsHelper from 'util/DocsHelper';
 import { Row, Col, Label } from 'components/bootstrap';
 import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from 'components/common';
-import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
@@ -104,7 +104,7 @@ const DataNodePage = () => {
               <dt>Certificate valid until:</dt>
               <dd>
                 <RelativeTime dateTime={datanode.cert_valid_until} />{' '}
-                <CertRenewalButton nodeId={datanode.node_id} status={datanode.status} />
+                <CertificateRenewalButton nodeId={datanode.node_id} status={datanode.status} />
               </dd>
               <dt>Datanode version:</dt>
               <dd>{datanode.datanode_version}</dd>

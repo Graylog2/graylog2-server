@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 
-import CAConfiguration from 'components/datanode/DataNodeConfiguration/CAConfiguration';
+import { CAConfiguration } from 'components/cluster-configuration/certificate-management';
 import { Space } from 'preflight/components/common';
 import type { MigrationStepComponentProps } from 'components/datanode/Types';
 import MigrationStepTriggerButtonToolbar from 'components/datanode/migrations/common/MigrationStepTriggerButtonToolbar';

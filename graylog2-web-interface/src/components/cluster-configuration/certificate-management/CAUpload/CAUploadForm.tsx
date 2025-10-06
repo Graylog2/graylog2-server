@@ -20,12 +20,12 @@ import { useCallback } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Formik, Form, Field } from 'formik';
 
+import { QUERY_KEY as CA_QUERY_KEY } from 'components/cluster-configuration/certificate-management/hooks/useCA';
 import { fetchMultiPartFormData } from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 import { FormikInput, Icon, Dropzone } from 'components/common';
 import { Button, Label, Alert } from 'components/bootstrap';
 import { qualifyUrl } from 'util/URLUtils';
-import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import UnsecureConnectionAlert from 'preflight/components/ConfigurationWizard/UnsecureConnectionAlert';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -107,7 +107,7 @@ const CAUpload = () => {
 
     onSuccess: () => {
       UserNotification.success('CA uploaded successfully');
-      queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: CA_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
 
@@ -119,6 +119,7 @@ const CAUpload = () => {
   const onSubmit = useCallback(
     (formValues: FormValues) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_CA_CLICKED, {
+        // TODO, should we update the telemetry?
         app_pathname: 'datanode',
         app_section: 'migration',
       });

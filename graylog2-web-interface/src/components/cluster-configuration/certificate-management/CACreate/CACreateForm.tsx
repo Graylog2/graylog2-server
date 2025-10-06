@@ -18,12 +18,12 @@ import React from 'react';
 import { Formik, Form } from 'formik';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
+import { QUERY_KEY as CA_QUERY_KEY } from 'components/cluster-configuration/certificate-management/hooks/useCA';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
 import { FormikInput } from 'components/common';
 import { Button } from 'components/bootstrap';
-import { QUERY_KEY as DATA_NODES_CA_QUERY_KEY } from 'components/datanode/hooks/useDataNodesCA';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -45,7 +45,7 @@ const CaCreateForm = () => {
 
     onSuccess: () => {
       UserNotification.success('CA created successfully');
-      queryClient.invalidateQueries({ queryKey: DATA_NODES_CA_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: CA_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: MIGRATION_STATE_QUERY_KEY });
     },
 
@@ -56,6 +56,7 @@ const CaCreateForm = () => {
 
   const onSubmit = (formValues: FormValues) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_CA_CLICKED, {
+      // TODO, should we update the telemetry?
       app_pathname: 'datanode',
       app_section: 'migration',
     });

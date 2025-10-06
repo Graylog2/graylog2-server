@@ -14,6 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import DataNodeConfiguration from './DataNodeConfiguration';
+import React from 'react';
 
-export default DataNodeConfiguration;
+import { CreateClientCertificateButton } from 'components/cluster-configuration/certificate-management/ClientCertificate';
+
+const ClientCertificateConfig = () => (
+  <div>
+    <h2>Client Certificate</h2>
+    <p>Generate client certificates for 3rd party tool</p>
+    <CreateClientCertificateButton />
+  </div>
+);
+export default ClientCertificateConfig;

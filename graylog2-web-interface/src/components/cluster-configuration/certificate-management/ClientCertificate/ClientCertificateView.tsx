@@ -17,7 +17,7 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import type { ClientCertCreateResponse } from 'components/datanode/hooks/useCreateDataNodeClientCert';
+import type { ClientCertCreateResponse } from 'components/cluster-configuration/certificate-management/hooks/useClientCertMutation';
 import copyToClipboard from 'util/copyToClipboard';
 import { Button } from 'components/bootstrap';
 

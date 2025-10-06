@@ -28,7 +28,7 @@ const ClusterConfigurationPageNavigation = () => {
 
   const NAV_ITEMS = [
     { description: 'Cluster Configuration', path: Routes.SYSTEM.CLUSTER.NODES, exactPathMatch: true },
-    isDatanodeConfiguredAndUsed && {
+    {
       description: 'Certificate Management',
       path: Routes.SYSTEM.CLUSTER.CERTIFICATE_MANAGEMENT,
     },

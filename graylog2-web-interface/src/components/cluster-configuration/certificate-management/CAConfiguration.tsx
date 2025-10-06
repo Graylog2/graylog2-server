@@ -17,9 +17,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import { CAUploadForm } from 'components/cluster-configuration/certificate-management/CAUpload';
+import { CACreateForm } from 'components/cluster-configuration/certificate-management/CACreate';
 import { Tabs, Tab, Alert } from 'components/bootstrap';
-import CACreateForm from 'components/datanode/DataNodeConfiguration/CACreateForm';
-import CAUpload from 'components/datanode/DataNodeConfiguration/CAUpload';
 import DocumentationLink from 'components/support/DocumentationLink';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -42,7 +42,7 @@ const CAConfiguration = () => {
     sendTelemetry(
       e?.target?.innerText === UploadCA
         ? TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_UPLOAD_TAB_CLICKED
-        : TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_TAB_CLICKED,
+        : TELEMETRY_EVENT_TYPE.DATANODE_MIGRATION.CA_CREATE_TAB_CLICKED, // TODO, should we update the telemetry?
       {
         app_pathname: 'datanode',
         app_section: 'migration',
@@ -70,7 +70,7 @@ const CAConfiguration = () => {
           <CACreateForm />
         </Tab>
         <Tab eventKey={TAB_KEYS[1]} title={UploadCA}>
-          <CAUpload />
+          <CAUploadForm />
         </Tab>
       </Tabs>
     </>

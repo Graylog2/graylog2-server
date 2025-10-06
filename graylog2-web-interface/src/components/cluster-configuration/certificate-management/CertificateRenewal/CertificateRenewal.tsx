@@ -33,7 +33,7 @@ import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { defaultOnError } from 'util/conditional/onError';
 
-import DataNodeBadge from '../DataNodeList/DataNodeBadge';
+import DataNodeBadge from '../../../datanode/DataNodeList/DataNodeBadge';
 
 const StyledList = styled(ListGroup)`
   max-width: fit-content;
@@ -96,7 +96,7 @@ const provisioningWording = {
   buttonStyle: 'success',
 } as const;
 
-export const CertRenewalButton = ({ nodeId, status }: { nodeId: string; status: DataNode['status'] }) => {
+export const CertificateRenewalButton = ({ nodeId, status }: { nodeId: string; status: DataNode['status'] }) => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const [isRenewing, setIsRenewing] = useState(false);
@@ -171,7 +171,7 @@ const CertificateRenewal = () => {
                   {cert_valid_until && (
                     <span title={cert_valid_until}>valid until {moment(cert_valid_until).from(moment())} </span>
                   )}
-                  <CertRenewalButton nodeId={node_id} status={status} />
+                  <CertificateRenewalButton nodeId={node_id} status={status} />
                 </RightCol>
               </ListGroupItem>
             ),

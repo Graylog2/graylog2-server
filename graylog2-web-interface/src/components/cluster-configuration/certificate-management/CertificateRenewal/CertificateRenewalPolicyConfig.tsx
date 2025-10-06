@@ -34,8 +34,8 @@ import Select from 'components/common/Select';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { MIGRATION_STATE_QUERY_KEY } from 'components/datanode/hooks/useMigrationState';
 
-import { TIME_UNITS_UPPER } from '../Constants';
-import type { TIME_UNITS } from '../Constants';
+import { TIME_UNITS_UPPER } from '../../../datanode/Constants';
+import type { TIME_UNITS } from '../../../datanode/Constants';
 
 type RenewalPolicy = {
   mode: 'AUTOMATIC' | 'MANUAL';
