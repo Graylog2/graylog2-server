@@ -38,6 +38,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_COLLATION;
+import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_FIELDS;
+import static org.graylog2.plugin.quickjump.QuickJumpConstants.DUMMY_COLLECTION;
+
 public class QuickJumpService {
     private record Result(String source, String id, String title, int score) implements MongoEntity {}
 
@@ -50,19 +54,23 @@ public class QuickJumpService {
 
     @Inject
     public QuickJumpService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.collection("dummy", Result.class);
+        this.collection = mongoCollections.collection(DUMMY_COLLECTION, Result.class);
     }
 
     public QuickJumpResponse search(String query, HasPermissions user) {
         final var limit = 100;
 
-        final var baseBranch = branchPipeline(query, List.of("title"), "dummy");
+        final var baseBranch = branchPipeline(query, DEFAULT_FIELDS, DUMMY_COLLECTION);
 
-        final var collections = Stream.of("streams", "views", "reports")
-                .map(source -> new Document("$unionWith",
+        final var collections = providers.entrySet().stream()
+                .map(entry -> {
+                    final var source = entry.getKey();
+                    final var provider = entry.getValue();
+                    return new Document("$unionWith",
                         new Document("coll", source)
-                                .append("pipeline", branchPipeline(query, List.of("title", "description"), source))
-                ))
+                                .append("pipeline", branchPipeline(query, provider.fieldsToSearch(), source))
+                    );
+                })
                 .toList();
 
         final var sort = new Document("$sort",
@@ -77,7 +85,7 @@ public class QuickJumpService {
                 .add(new Document("$limit", limit))
                 .build();
 
-        final var coll = Collation.builder().locale("en").collationStrength(CollationStrength.SECONDARY).build();
+        final var coll = Collation.builder().locale(DEFAULT_COLLATION).collationStrength(CollationStrength.SECONDARY).build();
 
         final var results = StreamSupport.stream(collection.aggregate(pipeline).collation(coll).spliterator(), false).toList();
         return new QuickJumpResponse(results.stream()
@@ -99,7 +107,7 @@ public class QuickJumpService {
 
         final var fieldMatchers = IntStream.range(0, fields.size())
                 .boxed()
-                .flatMap(idx -> fieldMatchers(query, fields.get(idx), idx * 10))
+                .flatMap(idx -> fieldMatchers(query, fields.reversed().get(idx), idx * 10))
                 .toList();
 
         final var score = new Document("$switch", new Document("branches", fieldMatchers).append("default", 0));

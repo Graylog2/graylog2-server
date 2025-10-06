@@ -18,17 +18,19 @@ package org.graylog2.plugin.quickjump;
 
 import org.graylog.security.HasPermissions;
 
-import java.util.Set;
+import java.util.List;
 import java.util.function.BiFunction;
+
+import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_FIELDS;
 
 public interface QuickJumpProvider {
     String collectionName();
 
     boolean isPermitted(String id, HasPermissions user);
 
-    Set<String> fieldsToSearch();
+    List<String> fieldsToSearch();
 
-    static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, Set<String> fieldsToSearch) {
+    static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch) {
         return new QuickJumpProvider() {
             @Override
             public String collectionName() {
@@ -41,13 +43,13 @@ public interface QuickJumpProvider {
             }
 
             @Override
-            public Set<String> fieldsToSearch() {
+            public List<String> fieldsToSearch() {
                 return fieldsToSearch;
             }
         };
     }
 
     static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn) {
-        return create(collectionName, isPermittedFn, Set.of("title"));
+        return create(collectionName, isPermittedFn, DEFAULT_FIELDS);
     }
 }
