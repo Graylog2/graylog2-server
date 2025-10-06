@@ -24,6 +24,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
+import { LinkContainer } from 'components/common/router';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -83,6 +84,11 @@ const useQuickJumpSearch = () => {
   };
 };
 
+const List = styled.div`
+  overflow: auto;
+  max-height: calc(90vh - 150px);
+`;
+
 type Props = {
   onToggle: () => void;
 };
@@ -106,11 +112,15 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           /* eslint-disable-next-line jsx-a11y/no-autofocus */
           autoFocus
         />
-        <ListGroup>
-          {searchResults.map((item) => (
-            <ListGroupItem key={item.title}>{item.title}</ListGroupItem>
-          ))}
-        </ListGroup>
+        <List>
+          <ListGroup>
+            {searchResults.map((item) => (
+              <LinkContainer to={item.link} key={item.title} onClick={onToggle}>
+                <ListGroupItem>{item.title}</ListGroupItem>
+              </LinkContainer>
+            ))}
+          </ListGroup>
+        </List>
       </Modal.Body>
     </Modal>
   );
