@@ -103,10 +103,6 @@ const McpConfig = () => {
               checked={modalConfig.enable_remote_access}
               onChange={onModalClickEnableRemoteAccess}
             />
-            <Alert bsStyle="warning">
-              Please note these disclaimers when enabling remote MCP access
-              {/* todo: finalize content here 👆 */}
-            </Alert>
           </fieldset>
         </BootstrapModalForm>
       )}
