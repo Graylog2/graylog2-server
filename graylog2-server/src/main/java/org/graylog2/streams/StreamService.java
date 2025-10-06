@@ -64,6 +64,20 @@ public interface StreamService {
 
     List<Stream> loadAllEnabled();
 
+    /**
+     * Get all streams that are scoped as {@link org.graylog2.database.entities.ImmutableSystemScope}. The default
+     * stream is not given this scope because it can have some fields modified, but some calling contexts want to
+     * include the default stream as a system stream while others do not. For example, the default stream should be
+     * included when exporting system streams in content packs. However, the default stream should not be included when
+     * collecting non-message streams that should be ignored for searches.
+     * Since streams with this scope are only created at server startup, implementations of this method should load the
+     * system streams only once after server startup and then store that result for fast retrieval.
+     *
+     * @param includeDefaultStream whether to include the default stream's ID in the set
+     * @return set of system stream IDs
+     */
+    Set<String> getSystemStreamIds(boolean includeDefaultStream);
+
     default List<Stream> loadAllByTitle(String title) {
         return loadAll().stream().filter(s -> title.equals(s.getTitle())).toList();
     }
@@ -93,6 +107,10 @@ public interface StreamService {
     List<String> streamTitlesForIndexSet(String indexSetId);
 
     void addToIndexSet(String indexSetId, Collection<String> streamIds);
+
+    boolean isSystemStream(String id);
+
+    boolean isEditable(String id);
 
     /**
      * Returns a stream of all Stream IDs.

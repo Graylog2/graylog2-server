@@ -137,7 +137,7 @@ public class RuleResourceTest {
     }
 
     public RuleDao ruleDao(String id, String title) {
-        return RuleDao.create(id, title, null, f("""
+        return RuleDao.create(id, null, title, null, f("""
                 rule "%s"
                 when true
                 then

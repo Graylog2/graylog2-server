@@ -18,6 +18,7 @@ package org.graylog2.streams;
 
 import com.google.common.base.MoreObjects;
 import org.bson.types.ObjectId;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -108,6 +109,11 @@ public class StreamMock implements Stream {
     }
 
     @Override
+    public String getScope() {
+        return DefaultEntityScope.NAME;
+    }
+
+    @Override
     public String getCreatorUserId() {
         return "mock-user";
     }
@@ -179,6 +185,11 @@ public class StreamMock implements Stream {
     @Override
     public boolean getRemoveMatchesFromDefaultStream() {
         return removeMatchesFromDefaultStream;
+    }
+
+    @Override
+    public boolean isEditable() {
+        return true;
     }
 
     public void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream) {

@@ -161,27 +161,8 @@ describe('EntityShareModal', () => {
       const addGrantee = async ({ newGrantee, capability }) => {
         render(<SimpleEntityShareModal />);
 
-        // Select a grantee
-        const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-        await act(async () => {
-          await selectEvent.openMenu(granteesSelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(granteesSelect, newGrantee.title);
-        });
-
-        // Select a capability
-        const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-        await act(async () => {
-          await selectEvent.openMenu(capabilitySelect);
-        });
-
-        await act(async () => {
-          await selectEvent.select(capabilitySelect, capability.title);
-        });
+        await selectEvent.chooseOption('Search for users and teams', newGrantee.title);
+        await selectEvent.chooseOption('Select a capability', capability.title);
 
         // Submit form
         const submitButton = await screen.findByRole('button', {
@@ -216,12 +197,7 @@ describe('EntityShareModal', () => {
     it('shows confirmation dialog on save if a collaborator got selected, but not added', async () => {
       render(<SimpleEntityShareModal />);
 
-      // Select a grantee
-      const granteesSelect = screen.getByLabelText('Search for users and teams');
-
-      await selectEvent.openMenu(granteesSelect);
-
-      await selectEvent.select(granteesSelect, john.title);
+      await selectEvent.chooseOption('Search for users and teams', john.title);
 
       fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
@@ -245,15 +221,7 @@ describe('EntityShareModal', () => {
       const ownerTitle = jane.title;
       render(<SimpleEntityShareModal />);
 
-      const capabilitySelect = await screen.findByLabelText(`Change the capability for ${ownerTitle}`);
-
-      await act(async () => {
-        await selectEvent.openMenu(capabilitySelect);
-      });
-
-      await act(async () => {
-        await selectEvent.select(capabilitySelect, viewer.title);
-      });
+      await selectEvent.chooseOption(`Change the capability for ${ownerTitle}`, viewer.title);
 
       await waitFor(() => {
         expect(screen.queryAllByText(viewer.title)).toHaveLength(2);

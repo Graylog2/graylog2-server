@@ -17,8 +17,7 @@
 
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
-import type { SearchParams } from 'stores/PaginationTypes';
-import { type Attribute } from 'stores/PaginationTypes';
+import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import { defaultOnError } from 'util/conditional/onError';
 
 export type PaginatedResponse<T, M = unknown> = {

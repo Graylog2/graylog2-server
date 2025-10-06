@@ -19,13 +19,11 @@ package org.graylog.integrations.aws.resources.requests;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 /**
  * A common implementation on AWSRequest, which can be used for any AWS request that just needs region and credentials.
  */
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = AWSRequestImpl.Builder.class)
 public abstract class AWSRequestImpl implements AWSRequest {
 

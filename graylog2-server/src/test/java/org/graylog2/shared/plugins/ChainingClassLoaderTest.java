@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -104,7 +105,7 @@ public class ChainingClassLoaderTest {
     public void getResourceReturnsURLFromChildClassLoader() throws Exception {
         final ClassLoader parent = getClass().getClassLoader();
         final ClassLoader child = mock(ClassLoader.class);
-        final URL url = new URL("file://test");
+        final URL url = URI.create("file://test").toURL();
         when(child.getResource("name")).thenReturn(url);
 
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(parent);
@@ -126,14 +127,14 @@ public class ChainingClassLoaderTest {
     public void getResourcesReturnsEnumerationFromChildClassLoader() throws Exception {
         final ClassLoader parent = getClass().getClassLoader();
         final ClassLoader child = mock(ClassLoader.class);
-        final Enumeration<URL> urls = Collections.enumeration(Collections.singleton(new URL("file://test")));
+        final Enumeration<URL> urls = Collections.enumeration(Collections.singleton(URI.create("file://test").toURL()));
         when(child.getResources("name")).thenReturn(urls);
 
         final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(parent);
         chainingClassLoader.addClassLoader(child);
 
         final Enumeration<URL> resources = chainingClassLoader.getResources("name");
-        assertThat(Collections.list(resources)).containsExactly(new URL("file://test"));
+        assertThat(Collections.list(resources)).containsExactly(URI.create("file://test").toURL());
     }
 
     @Test

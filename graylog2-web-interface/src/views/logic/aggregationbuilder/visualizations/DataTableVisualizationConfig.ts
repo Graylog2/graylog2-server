@@ -22,18 +22,20 @@ export type PinnedColumns = Array<string>;
 
 export type DataTableVisualizationConfigType = {
   pinnedColumns: PinnedColumns;
+  showRowNumbers: boolean;
 };
 
 export type DataTableVisualizationConfigTypeJSON = {
   pinned_columns: PinnedColumns;
+  show_row_numbers?: boolean | null;
 };
 
 export default class DataTableVisualizationConfig extends VisualizationConfig {
   _value: DataTableVisualizationConfigType;
 
-  constructor(pinnedColumns: PinnedColumns) {
+  constructor(pinnedColumns: PinnedColumns, showRowNumbers: boolean) {
     super();
-    this._value = { pinnedColumns: pinnedColumns || [] };
+    this._value = { pinnedColumns: pinnedColumns ?? [], showRowNumbers };
   }
 
   static empty() {
@@ -44,29 +46,34 @@ export default class DataTableVisualizationConfig extends VisualizationConfig {
     return Immutable.Set(this._value.pinnedColumns);
   }
 
-  toBuilder() {
-    const { pinnedColumns } = this._value;
-
-    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return new Builder(Immutable.Map({ pinnedColumns }));
+  get showRowNumbers() {
+    return this._value.showRowNumbers ?? true;
   }
 
-  static create(pinnedColumns: PinnedColumns) {
-    return new DataTableVisualizationConfig(pinnedColumns);
+  toBuilder() {
+    const { pinnedColumns, showRowNumbers } = this._value;
+
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+    return new Builder(Immutable.Map({ pinnedColumns, showRowNumbers }));
+  }
+
+  static create(pinnedColumns: PinnedColumns, showRowNumbers: boolean = true) {
+    return new DataTableVisualizationConfig(pinnedColumns, showRowNumbers);
   }
 
   toJSON() {
-    const { pinnedColumns } = this._value;
+    const { pinnedColumns, showRowNumbers } = this._value;
 
     return {
       pinned_columns: pinnedColumns,
+      show_row_numbers: showRowNumbers,
     };
   }
 
   static fromJSON(_type: string, value: DataTableVisualizationConfigTypeJSON) {
-    const { pinned_columns } = value;
+    const { pinned_columns, show_row_numbers } = value;
 
-    return DataTableVisualizationConfig.create(pinned_columns);
+    return DataTableVisualizationConfig.create(pinned_columns, show_row_numbers);
   }
 }
 
@@ -83,9 +90,13 @@ class Builder {
     return new Builder(this.value.set('pinnedColumns', value));
   }
 
-  build() {
-    const { pinnedColumns } = this.value.toObject();
+  showRowNumbers(value: boolean) {
+    return new Builder(this.value.set('showRowNumbers', value));
+  }
 
-    return new DataTableVisualizationConfig(pinnedColumns);
+  build() {
+    const { pinnedColumns, showRowNumbers } = this.value.toObject();
+
+    return new DataTableVisualizationConfig(pinnedColumns, showRowNumbers);
   }
 }

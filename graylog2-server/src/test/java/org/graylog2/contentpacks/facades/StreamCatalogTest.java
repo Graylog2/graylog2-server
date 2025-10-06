@@ -16,12 +16,12 @@
  */
 package org.graylog2.contentpacks.facades;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
-import org.graylog.events.legacy.V20190722150700_LegacyAlertConditionMigration;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
@@ -33,13 +33,20 @@ import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.contentpacks.model.entities.EntityDescriptor;
 import org.graylog2.contentpacks.model.entities.EntityExcerpt;
 import org.graylog2.contentpacks.model.entities.EntityV1;
+import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.StreamEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.EntityScopeService;
+import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -64,6 +71,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
@@ -71,6 +79,8 @@ import java.util.Set;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class StreamCatalogTest {
@@ -88,8 +98,6 @@ public class StreamCatalogTest {
     private IndexSetService indexSetService;
     @Mock
     private MongoIndexSet.Factory mongoIndexSetFactory;
-    @Mock
-    private V20190722150700_LegacyAlertConditionMigration legacyAlertConditionMigration;
     @Mock
     private EntityRegistrar entityRegistrar;
     @Mock
@@ -110,12 +118,14 @@ public class StreamCatalogTest {
                 indexSetService,
                 mongoIndexSetFactory,
                 entityRegistrar,
-                clusterEventBus, Set.of());
+                clusterEventBus,
+                Set.of(),
+                new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
         when(outputService.load("5adf239e4b900a0fdb4e5197")).thenReturn(
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, legacyAlertConditionMigration, indexSetService, userService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService);
     }
 
     @Test
@@ -209,5 +219,74 @@ public class StreamCatalogTest {
         assertThat(streamEntity.matchingType()).isEqualTo(ValueReference.of(Stream.MatchingType.AND));
         assertThat(streamEntity.streamRules()).hasSize(7);
         assertThat(streamEntity.outputs()).containsExactly(ValueReference.of(entityDescriptorIds.get(outputDescriptor).orElse(null)));
+    }
+
+    @Test
+    public void exportEntity_descriptionNull() {
+        Stream stream = StreamImpl.builder()
+                .id(Stream.DEFAULT_STREAM_ID)
+                .title("Stream Title")
+                .description(null)
+                .indexSetId(new ObjectId().toHexString())
+                .creatorUserId(new ObjectId().toHexString())
+                .createdAt(Tools.nowUTC())
+                .disabled(false)
+                .build();
+
+        final EntityDescriptor descriptor = EntityDescriptor.create(stream.getId(), ModelTypes.STREAM_V1);
+        final Entity entity = facade.exportNativeEntity(stream, EntityDescriptorIds.of(descriptor));
+
+        assertThat(entity).isInstanceOf(EntityV1.class);
+        assertThat(entity.type()).isEqualTo(ModelTypes.STREAM_V1);
+
+        final EntityV1 entityV1 = (EntityV1) entity;
+        final StreamEntity streamEntity = objectMapper.convertValue(entityV1.data(), StreamEntity.class);
+        assertThat(streamEntity.description()).isNull();
+    }
+
+    @Test
+    public void createNativeEntity_descriptionNull() {
+        EntityV1 entity = EntityV1.builder()
+                .id(ModelId.of("id"))
+                .type(ModelTypes.STREAM_V1)
+                .data(objectMapper.convertValue(StreamEntity.create(
+                        ValueReference.of("title"),
+                        null,
+                        ValueReference.of(false),
+                        ValueReference.of("AND"),
+                        ImmutableList.of(),
+                        ImmutableList.of(),
+                        ImmutableList.of(),
+                        ImmutableSet.of(),
+                        ValueReference.of(false),
+                        ValueReference.of(true)
+                ), JsonNode.class))
+                .build();
+        final IndexSetConfig defaultIndexSetConfig = IndexSetConfig.builder()
+                .id("id")
+                .title("title")
+                .shards(1)
+                .replicas(1)
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .indexAnalyzer("")
+                .indexPrefix("")
+                .creationDate(ZonedDateTime.now())
+                .indexTemplateName("")
+                .build();
+        final User user = mock(User.class);
+
+        when(user.getName()).thenReturn("username");
+        when(userService.load(anyString())).thenReturn(user);
+        when(indexSetService.getDefault()).thenReturn(defaultIndexSetConfig);
+
+        final NativeEntity<Stream> nativeEntity = facade.createNativeEntity(
+                entity,
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+                "username"
+        );
+
+        assertThat(nativeEntity.entity().getDescription()).isNull();
     }
 }

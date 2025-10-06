@@ -89,8 +89,8 @@ public class DBEventDefinitionService {
                                                              Bson sort, int page, int perPage) {
         final Bson dbQuery = query.toBson();
         final PaginatedList<EventDefinitionDto> list = filter == null ?
-                paginationHelper.filter(dbQuery).sort(sort).perPage(perPage).page(page) :
-                paginationHelper.filter(dbQuery).sort(sort).perPage(perPage).page(page, filter);
+                paginationHelper.filter(dbQuery).includeSourceMetadata(true).sort(sort).perPage(perPage).page(page) :
+                paginationHelper.filter(dbQuery).includeSourceMetadata(true).sort(sort).perPage(perPage).page(page, filter);
         return new PaginatedList<>(
                 list.stream()
                         .map(this::getEventDefinitionWithRefetchedFilters)

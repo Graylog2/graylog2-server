@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 
-import { MenuItem } from 'components/bootstrap';
+import { DeleteMenuItem } from 'components/bootstrap';
 import StringUtils from 'util/StringUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -66,7 +66,7 @@ const BulkActions = () => {
 
   return (
     <BulkActionsDropdown>
-      <MenuItem onSelect={onDelete}>Delete</MenuItem>
+      <DeleteMenuItem onSelect={onDelete}>Delete</DeleteMenuItem>
     </BulkActionsDropdown>
   );
 };

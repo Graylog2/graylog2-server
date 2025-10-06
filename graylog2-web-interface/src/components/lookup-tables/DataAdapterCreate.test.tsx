@@ -39,48 +39,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 describe('<DataAdapterCreate />', () => {
   it('should render with empty parameters', async () => {
     const callback = () => {};
-    const types = {};
-    render(<DataAdapterCreate saved={callback} types={types} />);
+    render(<DataAdapterCreate saved={callback} onCancel={() => {}} />);
     await screen.findByText(/select data adapter type/i);
-  });
-
-  it('should render for types with defined frontend components', async () => {
-    const callback = () => {};
-    const types = {
-      someType: {
-        type: 'someType',
-      },
-    };
-    render(<DataAdapterCreate saved={callback} types={types} />);
-    await screen.findByText(/select data adapter type/i);
-  });
-
-  describe('with mocked console.error', () => {
-    // eslint-disable-next-line no-console
-    const consoleError = console.error;
-
-    beforeAll(() => {
-      // eslint-disable-next-line no-console
-      console.error = jest.fn();
-    });
-
-    afterAll(() => {
-      // eslint-disable-next-line no-console
-      console.error = consoleError;
-    });
-
-    it('should render for types without defined frontend components', async () => {
-      const callback = () => {};
-      const types = {
-        unknownType: {
-          type: 'unknownType',
-        },
-      };
-      render(<DataAdapterCreate saved={callback} types={types} />);
-      await screen.findByText(/select data adapter type/i);
-
-      // eslint-disable-next-line no-console
-      expect(console.error).toHaveBeenCalledTimes(1);
-    });
   });
 });

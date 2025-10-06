@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest-4-cores-public
     strategy:
       matrix:
-        java-version: [ 17 ]
+        java-version: [ 21 ]
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java-version }}

@@ -27,7 +27,7 @@ import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.Configuration;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
@@ -137,6 +137,9 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
                             """));
         }
 
+        // This migration installs a system-provided dashboard. The dashboard has an entry added in the entity_source
+        // collection via a different migration (V20250917184400_AddSystemEntitySource). Any future migrations that
+        // install system-provided entities should take care of adding the entity_source entry as well.
         configService.write(MigrationCompleted.create(pack.id().toString(), notPreviouslyInstalled || notLocallyModified, contentPackShouldBeUninstalled.isPresent()));
     }
 
@@ -185,7 +188,7 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
     }
 
     private ContentPackInstallation installContentPack(ContentPack contentPack) {
-        return contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Add Sources Page V2", configuration.getRootUsername());
+        return contentPackService.installContentPack(contentPack, Collections.emptyMap(), "Add Sources Page V2", configuration.getRootUsername(), EntityShareRequest.EMPTY);
     }
 
     private Optional<ContentPack> insertContentPack(ContentPack contentPack) {
@@ -208,7 +211,6 @@ public class V20230601104500_AddSourcesPageV2 extends Migration {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("content_pack_id")
         public abstract String contentPackId();

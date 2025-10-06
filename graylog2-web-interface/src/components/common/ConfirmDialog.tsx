@@ -25,14 +25,17 @@ const StyledModal = styled(Modal)`
 `;
 
 type Props = {
-  show?: boolean;
-  onConfirm: () => void;
-  onCancel?: () => void;
-  title: string | React.ReactNode;
-  children: React.ReactNode;
   btnConfirmDisabled?: boolean;
   btnConfirmText?: React.ReactNode;
+  children: React.ReactNode;
   hideCancelButton?: boolean;
+  isAsyncSubmit?: boolean;
+  isSubmitting?: boolean;
+  onCancel?: () => void;
+  onConfirm: () => void;
+  show?: boolean;
+  submitLoadingText?: string;
+  title: string | React.ReactNode;
 };
 
 /**
@@ -40,14 +43,17 @@ type Props = {
  * cancel or confirm.
  */
 const ConfirmDialog = ({
-  show = false,
-  title,
-  children,
-  onCancel = () => {},
-  onConfirm,
   btnConfirmDisabled = false,
   btnConfirmText = 'Confirm',
+  children,
   hideCancelButton = false,
+  isAsyncSubmit = undefined,
+  isSubmitting = undefined,
+  onCancel = () => {},
+  onConfirm,
+  show = false,
+  submitLoadingText = undefined,
+  title,
 }: Props) => {
   const onHide = hideCancelButton ? onConfirm : onCancel;
 
@@ -62,12 +68,15 @@ const ConfirmDialog = ({
   ) : (
     <ModalSubmit
       autoFocus
+      disabledSubmit={btnConfirmDisabled}
+      displayCancel
+      isAsyncSubmit={isAsyncSubmit}
+      isSubmitting={isSubmitting}
       onCancel={onCancel}
       onSubmit={onConfirm}
-      submitButtonType="button"
-      disabledSubmit={btnConfirmDisabled}
       submitButtonText={btnConfirmText}
-      displayCancel
+      submitButtonType="button"
+      submitLoadingText={submitLoadingText}
     />
   );
 

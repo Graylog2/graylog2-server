@@ -69,8 +69,7 @@ describe('UsersSection', () => {
     render(<UsersSection role={exampleRole} />);
 
     const assignUserButton = await screen.findByRole('button', { name: 'Assign User' });
-    const usersSelector = screen.getByLabelText('Search for users');
-    await selectEvent.select(usersSelector, bob.username);
+    await selectEvent.chooseOption('Search for users', bob.username);
 
     fireEvent.click(assignUserButton);
 

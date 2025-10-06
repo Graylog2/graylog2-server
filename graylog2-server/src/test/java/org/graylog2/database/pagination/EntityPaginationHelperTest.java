@@ -20,6 +20,7 @@ import org.graylog.grn.GRNDescriptor;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -44,8 +45,9 @@ class EntityPaginationHelperTest {
     void testBuildPredicateParameterized(String filter, boolean expected) {
         Predicate<GRNDescriptor> predicate = EntityPaginationHelper.buildPredicate(
                 filter,
-                descriptor -> "example",
-                descriptor -> "Example Title"
+                Map.of(
+                        "type", descriptor -> "example",
+                        "title", descriptor -> "Example Title")
         );
 
         assertThat(predicate.test(mock(GRNDescriptor.class))).isEqualTo(expected);

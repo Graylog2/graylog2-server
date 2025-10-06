@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -141,5 +142,13 @@ public class SyslogOctetCountFrameDecoderTest {
         final ByteBuf actual = channel.readInbound();
         assertEquals("<45>1 2014-10-21T10:21:09+00:00 c4dc57ba1ebb syslog-ng 7120 - " + longString + "\n", actual.toString(StandardCharsets.US_ASCII));
         assertNull(channel.readInbound());
+    }
+
+    @Test
+    public void testInvalidFrameLenghtThrowsDecodingException() {
+        final ByteBuf buf = Unpooled.copiedBuffer("2025-07-29 12:34:56 myhost myapp: This is a test syslog message\n", StandardCharsets.US_ASCII);
+        assertThatExceptionOfType(DecoderException.class)
+                .isThrownBy(() -> channel.writeInbound(buf))
+                .withMessage("Invalid syslog message format: missing or invalid frame length at start: 2025-07-29");
     }
 }

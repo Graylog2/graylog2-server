@@ -45,7 +45,9 @@ const StartPage = () => {
         redirect(Routes.dashboard_show(startPage.id));
       } else if (startPage.type === 'stream') {
         redirect(Routes.stream_search(startPage.id));
-      } else if (startPage.id !== 'default') {
+      } else if (startPage.type === 'graylog_security_welcome') {
+        redirect(Routes.SECURITY.OVERVIEW);
+      } else if (startPage?.id !== 'default') {
         redirect(Routes.show_saved_search(startPage.id));
       } else {
         redirect(Routes.SEARCH);

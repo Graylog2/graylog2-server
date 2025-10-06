@@ -44,7 +44,8 @@ class IndexerIndexerJwtAuthTokenProviderTest {
                 jwtSecret,
                 Duration.seconds(90),
                 Duration.seconds(60),
-                true,
+                Duration.seconds(30)
+                , true,
                 Clock.fixed(now, ZoneOffset.UTC)
         );
 
@@ -66,8 +67,12 @@ class IndexerIndexerJwtAuthTokenProviderTest {
                     // Additionally, there may be small difference, as JWT is using only seconds but now is more precise.
                     // Let's give or take 5s, this won't change the validity of the test.
                     final long delta = Duration.seconds(5).toMilliseconds();
+                    Assertions.assertThat(claims.getNotBefore()).isCloseTo(now.minus(30, ChronoUnit.SECONDS), delta); // add clock skew workaround
                     Assertions.assertThat(claims.getIssuedAt()).isCloseTo(now, delta);
-                    Assertions.assertThat(claims.getExpiration()).isCloseTo(now.plus(90, ChronoUnit.SECONDS), delta);
+                    Assertions.assertThat(claims.getExpiration()).isCloseTo(now
+                                    .plus(90, ChronoUnit.SECONDS) // add expected expiration
+                                    .plus(30, ChronoUnit.SECONDS),  // add clock skew workaround
+                            delta);
                 });
     }
 }

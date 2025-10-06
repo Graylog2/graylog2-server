@@ -24,6 +24,8 @@ type Props = {
 
 const CSVFileAdapterSummary = ({ dataAdapter }: Props) => {
   const { config } = dataAdapter;
+  const valueLabel = config.multi_value_lookup ? 'Value columns' : 'Value column';
+  const value = config.multi_value_lookup && !config.value_column ? 'All columns except the key' : config.value_column;
 
   return (
     <dl>
@@ -39,10 +41,12 @@ const CSVFileAdapterSummary = ({ dataAdapter }: Props) => {
       </dd>
       <dt>Key column</dt>
       <dd>{config.key_column}</dd>
-      <dt>Value column</dt>
-      <dd>{config.value_column}</dd>
+      <dt>{valueLabel}</dt>
+      <dd>{value}</dd>
       <dt>Check interval</dt>
       <dd>{config.check_interval} seconds</dd>
+      <dt>Multi-value lookup</dt>
+      <dd>{config.multi_value_lookup ? 'yes' : 'no'}</dd>
       <dt>Case-insensitive lookup</dt>
       <dd>{config.case_insensitive_lookup ? 'yes' : 'no'}</dd>
       <dt>CIDR lookup</dt>

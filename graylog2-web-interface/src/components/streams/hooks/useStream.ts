@@ -30,7 +30,10 @@ const fetchStream = (streamId: string) => {
 
 const useStream = (
   streamId: string,
-  { enabled } = { enabled: true },
+  { enabled, refetchInterval }: { enabled?: boolean; refetchInterval?: false | number } | undefined = {
+    enabled: true,
+    refetchInterval: false,
+  },
 ): {
   data: Stream;
   refetch: () => void;
@@ -42,6 +45,7 @@ const useStream = (
     queryFn: () => defaultOnError(fetchStream(streamId), 'Loading stream failed with status', 'Could not load Stream'),
     placeholderData: keepPreviousData,
     enabled,
+    refetchInterval,
   });
 
   return {

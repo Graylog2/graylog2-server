@@ -60,6 +60,7 @@ describe('<ContentPackParameters />', () => {
           default_value: 'test',
         },
       ])
+      // @ts-ignore
       .entities([entity])
       .build();
     render(<ContentPackParameters contentPack={contentPack} appliedParameter={{}} />);

@@ -20,6 +20,7 @@ package org.graylog2.inputs.syslog.tcp;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.DecoderException;
 import io.netty.util.ByteProcessor;
 
 import java.nio.charset.StandardCharsets;
@@ -44,7 +45,7 @@ public class SyslogOctetCountFrameDecoder extends ByteToMessageDecoder {
 
         // Convert the frame length value bytes into an integer without mutating the buffer reader index.
         final String lengthString = buffer.slice(buffer.readerIndex(), frameSizeValueLength).toString(StandardCharsets.UTF_8);
-        final int length = Integer.parseInt(lengthString);
+        final int length = getLengthFromString(lengthString);
         final int skipLength = frameSizeValueLength + 1; // Frame length value bytes and the whitespace that follows it.
 
         // We have to take the skipped bytes (frame size value length + whitespace) into account when checking if
@@ -59,6 +60,14 @@ public class SyslogOctetCountFrameDecoder extends ByteToMessageDecoder {
 
         final ByteBuf frame = buffer.readRetainedSlice(length);
         out.add(frame);
+    }
+
+    private int getLengthFromString(String lengthString) {
+        try {
+            return Integer.parseInt(lengthString);
+        } catch (NumberFormatException e) {
+            throw new DecoderException("Invalid syslog message format: missing or invalid frame length at start: " + lengthString, e);
+        }
     }
 
     /**

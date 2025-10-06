@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 
 import java.util.List;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class MessageProcessorsConfigWithDescriptors {
     @JsonProperty("processor_order")
     public abstract List<MessageProcessorDescriptor> processorOrder();

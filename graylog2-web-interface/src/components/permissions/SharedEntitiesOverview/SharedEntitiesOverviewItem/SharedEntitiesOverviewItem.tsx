@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
+import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
+import { RestrictedAccessTooltip } from 'components/common';
 import { Link } from 'components/common/router';
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
+import usePluggableSharedEntityTableElements from 'hooks/usePluggableSharedEntityTableElements';
 
 import OwnersCell from './OwnersCell';
 
@@ -27,17 +31,45 @@ type Props = {
   sharedEntity: SharedEntity;
 };
 
+const NameColumnWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
 const SharedEntitiesOverviewItem = ({ capabilityTitle, sharedEntity: { owners, title, type, id } }: Props) => {
   const entityRoute = useShowRouteFromGRN(id);
+  const { getPluggableTableCells, pluggableAttributes } = usePluggableSharedEntityTableElements();
+  const hasReadPermission = useHasEntityPermissionByGRN(id, 'read');
+  const hasEditPermission = useHasEntityPermissionByGRN(id, 'edit');
+  const hasRequiredPermission = () => {
+    switch (type) {
+      case 'user':
+      case 'team':
+        return hasEditPermission;
+
+      default:
+        return hasReadPermission;
+    }
+  };
 
   return (
     <tr key={title + type}>
       <td className="limited">
-        <Link to={entityRoute}>{title}</Link>
+        <NameColumnWrapper>
+          {hasRequiredPermission() ? (
+            <Link to={entityRoute}>{title}</Link>
+          ) : (
+            <>
+              {title}
+              <RestrictedAccessTooltip entityName={type} capabilityName="view" />
+            </>
+          )}
+        </NameColumnWrapper>
       </td>
       <td className="limited">{type}</td>
       <OwnersCell owners={owners} />
       <td className="limited">{capabilityTitle}</td>
+      {pluggableAttributes && getPluggableTableCells(id, type)}
     </tr>
   );
 };

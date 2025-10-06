@@ -243,7 +243,7 @@ const StreamActions = ({ stream, indexSets }: { stream: Stream; indexSets: Array
           </MenuItem>
         </IfPermitted>
 
-        <IfPermitted permissions={`streams:edit:${stream.id}`}>
+        <IfPermitted permissions={`streams:delete:${stream.id}`}>
           <DeleteMenuItem onSelect={toggleDeleteModal} disabled={isDefaultStream}>
             Delete this stream {isDefaultStream && <DefaultStreamHelp />}
           </DeleteMenuItem>

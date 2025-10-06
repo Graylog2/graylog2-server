@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.containermatrix.annotations;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.platform.commons.annotation.Testable;
 
 import java.lang.annotation.ElementType;
@@ -26,5 +27,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 @Testable
+@Tag("full-backend-test")
 public @interface ContainerMatrixTest {
 }

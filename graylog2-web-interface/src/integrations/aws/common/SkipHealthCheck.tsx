@@ -22,7 +22,7 @@ import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 import { renderOptions } from 'integrations/aws/common/Options';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import { KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 
 const StyledFormWrap = styled(FormWrap)`
   padding-top: 25px;

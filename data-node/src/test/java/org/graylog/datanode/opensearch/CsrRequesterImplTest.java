@@ -16,8 +16,6 @@
  */
 package org.graylog.datanode.opensearch;
 
-import com.github.joschi.jadconfig.RepositoryException;
-import com.github.joschi.jadconfig.ValidationException;
 import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
@@ -30,11 +28,7 @@ import org.bouncycastle.asn1.x509.GeneralNames;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.DatanodeTestUtils;
-import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.DatanodeKeystore;
-import org.graylog.security.certutil.CertRequest;
-import org.graylog.security.certutil.CertificateGenerator;
-import org.graylog.security.certutil.KeyPair;
 import org.graylog.security.certutil.cert.CertificateChain;
 import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.cluster.certificates.CertificateSigningRequest;
@@ -46,7 +40,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,8 +56,8 @@ class CsrRequesterImplTest {
                 "hostname", "my-datanode-machine"
         ));
 
-        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", new EventBus());
-        datanodeKeystore.create(generateKeyPair(Duration.ofDays(30)));
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", new EventBus());
+        datanodeKeystore.create(DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
 
 
         Queue<CertificateSigningRequest> signingRequests = new LinkedList<>();
@@ -109,13 +102,6 @@ class CsrRequesterImplTest {
         }
 
         return sanList;
-    }
-
-    private KeyPair generateKeyPair(Duration duration) throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(DatanodeKeystore.DATANODE_KEY_ALIAS)
-                .isCA(false)
-                .validity(duration);
-        return CertificateGenerator.generate(certRequest);
     }
 
     @Nonnull

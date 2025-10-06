@@ -68,6 +68,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.plugin.streams.Stream.NON_EDITABLE_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -99,7 +100,7 @@ public class PivotAggregationSearchTest {
     @Mock
     private SearchNormalization searchNormalization;
 
-    private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of());
+    private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS);
 
     @Test
     public void testExtractValuesWithGroupBy() throws Exception {
@@ -429,7 +430,7 @@ public class PivotAggregationSearchTest {
                 config,
                 parameters,
                 Collections.emptyList(),
-                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS),
                 new QueryStringDecorators(Optional.of((queryString, parameterProvider, query) -> {
                     if (queryString.equals("source:$secret$") && parameterProvider.getParameter("secret").isPresent()) {
                         return PositionTrackingQuery.of("source:example.org");
@@ -470,7 +471,7 @@ public class PivotAggregationSearchTest {
                         .rollup(false)
                         .series(Count.builder().build())
                         .build()),
-                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of())
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS)
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThatCollection(query.searchTypes()).contains(
@@ -511,7 +512,7 @@ public class PivotAggregationSearchTest {
                         .rollup(false)
                         .series(Count.builder().build())
                         .build()),
-                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of())
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of(), () -> NON_EDITABLE_STREAM_IDS)
         );
         when(searchNormalization.postValidation(isA(Query.class), isA(ParameterProvider.class))).thenAnswer(invocation -> {
             return invocation.getArgument(0); // Return same query received.

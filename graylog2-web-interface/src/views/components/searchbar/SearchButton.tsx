@@ -108,7 +108,7 @@ const SearchButton = ({
       className={className}
       type="submit"
       bsStyle="success"
-      $dirty={dirty}>
+      $dirty={dirty && !displaySpinner}>
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>
   );

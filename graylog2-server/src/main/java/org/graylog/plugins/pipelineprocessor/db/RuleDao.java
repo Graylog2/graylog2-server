@@ -29,8 +29,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
-public abstract class RuleDao extends ScopedEntity {
-    public static final String FIELD_ID = "id";
+public abstract class RuleDao implements ScopedEntity<RuleDao.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_SOURCE = "source";
@@ -66,24 +65,13 @@ public abstract class RuleDao extends ScopedEntity {
     public abstract String simulatorMessage();
 
     public static Builder builder() {
-        return new AutoValue_RuleDao.Builder();
+        return new AutoValue_RuleDao.Builder().scope(DefaultEntityScope.NAME);
     }
 
     public abstract Builder toBuilder();
 
-    public static RuleDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
-                                 @JsonProperty(FIELD_TITLE) String title,
-                                 @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
-                                 @JsonProperty(FIELD_SOURCE) String source,
-                                 @JsonProperty(FIELD_CREATED_AT) @Nullable DateTime createdAt,
-                                 @JsonProperty(FIELD_MODFIED_AT) @Nullable DateTime modifiedAt,
-                                 @JsonProperty(FIELD_RULEBUILDER) @Nullable RuleBuilder ruleBuilder,
-                                 @JsonProperty(FIELD_SIMULATOR_MESSAGE) @Nullable String simulatorMessage) {
-        return create(id, null, title, description, source, createdAt, modifiedAt, ruleBuilder, simulatorMessage);
-    }
-
     @JsonCreator
-    public static RuleDao create(@Id @ObjectId @JsonProperty(FIELD_ID) @Nullable String id,
+    public static RuleDao create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                  @JsonProperty(FIELD_SCOPE) @Nullable String scope,
                                  @JsonProperty(FIELD_TITLE) String title,
                                  @JsonProperty(FIELD_DESCRIPTION) @Nullable String description,
@@ -106,10 +94,12 @@ public abstract class RuleDao extends ScopedEntity {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder extends ScopedEntity.AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         public abstract RuleDao build();
 
         public abstract Builder id(String id);
+
+        public abstract Builder scope(String scope);
 
         public abstract Builder title(String title);
 

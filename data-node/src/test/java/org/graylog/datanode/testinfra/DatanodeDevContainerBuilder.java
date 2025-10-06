@@ -235,7 +235,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
         return image.withDockerfileFromBuilder(builder ->
         {
-            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:17-jre-jammy")
+            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:21-jre-jammy")
                     .workDir(IMAGE_WORKING_DIR)
                     .run("mkdir -p opensearch/config")
                     .run("mkdir -p opensearch/data")

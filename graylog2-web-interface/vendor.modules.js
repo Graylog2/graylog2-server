@@ -22,7 +22,6 @@ module.exports = [
   '@tanstack/react-query',
   'chroma-js',
   'formik',
-  'jquery',
   'leaflet',
   'moment',
   'moment-timezone',

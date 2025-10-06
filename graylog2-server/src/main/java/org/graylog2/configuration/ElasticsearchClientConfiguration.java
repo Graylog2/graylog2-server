@@ -115,6 +115,15 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     private Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
 
+    /**
+     * This should be datanode/opensearch setting. But there is a bug in current opensearch
+     * versions and the clock skew will be supported only in 3.2 and newer (see https://github.com/opensearch-project/security/pull/5506)
+     * Till then, we can work around that by generating tokens with extended validity in both directions
+     */
+    @Deprecated(forRemoval = true)
+    @Parameter(value = "indexer_jwt_clock_skew_tolerance")
+    private Duration indexerJwtAuthTokenClockSkewTolerance = Duration.seconds(30);
+
     @Parameter(value = "indexer_max_concurrent_searches")
     private Integer indexerMaxConcurrentSearches = null;
 
@@ -219,6 +228,10 @@ public class ElasticsearchClientConfiguration {
 
     public Duration indexerJwtAuthTokenExpirationDuration() {
         return indexerJwtAuthTokenExpirationDuration;
+    }
+
+    public Duration getIndexerJwtAuthTokenClockSkewTolerance() {
+        return indexerJwtAuthTokenClockSkewTolerance;
     }
 
     public Integer indexerMaxConcurrentSearches() {

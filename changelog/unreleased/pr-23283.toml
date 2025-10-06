@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix dependency check during sharing of event definitions."
+
+issues = ["graylog-plugin-enterprise#11055"]
+pulls = ["23283"]

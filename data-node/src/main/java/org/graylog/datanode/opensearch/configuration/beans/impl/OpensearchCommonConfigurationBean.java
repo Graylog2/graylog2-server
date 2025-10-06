@@ -33,7 +33,12 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     private final Configuration localConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
 
-    private static final List<String> DEFAULT_NODE_ROLES = List.of("cluster_manager", "data", "ingest", "remote_cluster_client");
+    private static final List<String> DEFAULT_NODE_ROLES = List.of(
+            OpensearchNodeRole.CLUSTER_MANAGER,
+            OpensearchNodeRole.DATA,
+            OpensearchNodeRole.INGEST,
+            OpensearchNodeRole.REMOTE_CLUSTER_CLIENT
+    );
 
     @Inject
     public OpensearchCommonConfigurationBean(Configuration localConfiguration, DatanodeConfiguration datanodeConfiguration) {

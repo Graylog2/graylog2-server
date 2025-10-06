@@ -343,8 +343,8 @@ const ApiRoutes = {
     substringTest: () => ({ url: '/tools/substring_tester' }),
     containsStringTest: () => ({ url: '/tools/contains_string_tester' }),
     lookupTableTest: () => ({ url: '/tools/lookup_table_tester' }),
-    urlWhitelistCheck: () => ({ url: '/system/urlwhitelist/check' }),
-    urlWhitelistGenerateRegex: () => ({ url: '/system/urlwhitelist/generate_regex' }),
+    urlAllowlistCheck: () => ({ url: '/system/urlallowlist/check' }),
+    urlAllowlistGenerateRegex: () => ({ url: '/system/urlallowlist/generate_regex' }),
   },
   TelemetryApiController: {
     info: () => ({ url: '/telemetry' }),

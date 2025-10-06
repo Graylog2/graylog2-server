@@ -21,21 +21,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class UpdateStreamRequest {
-    @JsonProperty
+    @JsonProperty("title")
     @Nullable
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("description")
     @Nullable
     public abstract String description();
 

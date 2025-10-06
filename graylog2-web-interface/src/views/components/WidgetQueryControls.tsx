@@ -57,7 +57,6 @@ import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import useHandlerContext from 'views/components/useHandlerContext';
 import useView from 'views/hooks/useView';
-import { isNoTimeRangeOverride } from 'views/typeGuards/timeRange';
 import { normalizeFromSearchBarForBackend } from 'views/logic/queries/NormalizeTimeRange';
 import QueryHistoryButton from 'views/components/searchbar/QueryHistoryButton';
 import type { Editor } from 'views/components/searchbar/queryinput/ace-types';
@@ -146,9 +145,7 @@ const useBindApplySearchControlsChanges = (formRef) => {
 
         if (dirty && isValid) {
           const normalizedFormValues = {
-            timerange: isNoTimeRangeOverride(timerange)
-              ? undefined
-              : normalizeFromSearchBarForBackend(timerange, userTimezone),
+            timerange: normalizeFromSearchBarForBackend(timerange, userTimezone),
             ...rest,
           };
 

@@ -50,6 +50,10 @@ public class InputDescription {
         return descriptor.isForwarderCompatible();
     }
 
+    public String getDescription() {
+        return descriptor.getDescription();
+    }
+
     public Map<String, Map<String, Object>> getRequestedConfiguration() {
         return config.combinedRequestedConfiguration().asList();
     }

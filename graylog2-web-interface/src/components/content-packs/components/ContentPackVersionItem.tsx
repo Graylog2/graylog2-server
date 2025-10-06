@@ -34,13 +34,14 @@ import {
 } from 'components/bootstrap';
 import type { ContentPackInstallation } from 'components/content-packs/Types';
 import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type Props = {
   pack: ContentPackInstallation;
   contentPackRevisions: ContentPackRevisions;
   onDeletePack?: (id: string, rev: number) => void;
   onChange?: (id: string) => void;
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
+  onInstall?: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
 const ContentPackVersionItem = ({

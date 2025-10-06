@@ -84,7 +84,7 @@ public class DatanodeSelfsignedStartupIT {
 
     @Nonnull
     private static IndexerJwtAuthToken createJwtAuthToken() {
-        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), true, Clock.systemDefaultZone());
+        final IndexerJwtAuthTokenProvider provider = new IndexerJwtAuthTokenProvider(new JwtSecret(ContainerizedGraylogBackend.PASSWORD_SECRET), Duration.seconds(120), Duration.seconds(60), Duration.seconds(30), true, Clock.systemDefaultZone());
         return provider.get();
     }
 }

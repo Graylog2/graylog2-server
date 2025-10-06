@@ -40,6 +40,7 @@ export type InputTypes = {
 export type InputDescription = {
   type: string;
   name: string;
+  description: string;
   is_exclusive: boolean;
   requested_configuration: {
     [key: string]: ConfigurationField;

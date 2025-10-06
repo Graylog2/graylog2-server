@@ -16,6 +16,7 @@
  */
 import type { Moment } from 'moment';
 import moment from 'moment-timezone';
+import 'moment-precise-range-plugin';
 
 export type DateTime = string | number | Moment | Date;
 
@@ -107,6 +108,22 @@ export const relativeDifference = (dateTime: DateTime) => {
   const dateObject = toDateObject(dateTime);
 
   return validateDateTime(dateObject, dateTime).fromNow();
+};
+
+/**
+ * Returns the difference between two dates in a human-readable format.
+ */
+export const readableDifference = (from: DateTime, to: DateTime) => {
+  const fromObject = toDateObject(from);
+  const toObject = toDateObject(to);
+  const differenceMS = toObject.diff(fromObject);
+
+  // preciseDiff does not support ms
+  if (differenceMS < 1000) {
+    return `${differenceMS} milliseconds`;
+  }
+
+  return moment.preciseDiff(fromObject, toObject);
 };
 
 /**

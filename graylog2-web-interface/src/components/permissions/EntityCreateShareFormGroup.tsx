@@ -29,9 +29,9 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import { createGRN } from 'logic/permissions/GRN';
 import { Section, Spinner } from 'components/common';
 import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
+import type { SelectionRequest } from 'components/permissions/Grantee/GranteesSelector';
+import GranteesList from 'components/permissions/Grantee/GranteesList';
 
-import type { SelectionRequest } from './GranteesSelector';
-import GranteesList from './GranteesList';
 import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
 import {
   GranteesSelect,
@@ -81,11 +81,15 @@ const EntityCreateShareFormGroup = ({
   const defaultShareSelection = { granteeId: null, capabilityId: 'view' };
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
-  const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(null);
+  const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(
+    defaultSharePayload ?? null,
+  );
   const PluggableEntityShareFormGroup = usePluggableEntityShareFormGroup();
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
+    const { selected_collections: _, ...rest } = defaultSharePayload ?? {};
+
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, rest);
   }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
 
   const resetSelection = () => {
@@ -108,7 +112,6 @@ const EntityCreateShareFormGroup = ({
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
       onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
       resetSelection();
-      setDisableSubmit(false);
 
       return response;
     });
@@ -195,7 +198,11 @@ const EntityCreateShareFormGroup = ({
             availableGrantees={entityShareState.availableGrantees}
           />
           {PluggableEntityShareFormGroup && (
-            <PluggableEntityShareFormGroup entityType={entityType} onChange={handleAdditionalFormChange} />
+            <PluggableEntityShareFormGroup
+              entityType={entityType}
+              onChange={handleAdditionalFormChange}
+              value={defaultSharePayload?.selected_collections || []}
+            />
           )}
         </>
       ) : (

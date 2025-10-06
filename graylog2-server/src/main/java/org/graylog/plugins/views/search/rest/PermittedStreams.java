@@ -26,20 +26,21 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
-
 public class PermittedStreams {
     private final Supplier<Stream<String>> allStreamsProvider;
     private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
+    private final Supplier<Collection<String>> systemStreamIdSupplier;
 
-    public PermittedStreams(Supplier<Stream<String>> allStreamsProvider, Function<Collection<String>, Stream<String>> streamCategoryMapper) {
+    public PermittedStreams(Supplier<Stream<String>> allStreamsProvider, Function<Collection<String>, Stream<String>> streamCategoryMapper, Supplier<Collection<String>> systemStreamIdSupplier) {
         this.allStreamsProvider = allStreamsProvider;
         this.streamCategoryMapper = streamCategoryMapper;
+        this.systemStreamIdSupplier = systemStreamIdSupplier;
     }
 
     @Inject
     public PermittedStreams(StreamService streamService) {
-        this(streamService::streamAllIds, streamService::mapCategoriesToIds);
+        this(streamService::streamAllIds, streamService::mapCategoriesToIds,
+                () -> streamService.getSystemStreamIds(false));
     }
 
     public ImmutableSet<String> loadAllMessageStreams(final StreamPermissions streamPermissions) {
@@ -48,7 +49,7 @@ public class PermittedStreams {
                 // Having these indices in every search, makes sorting almost impossible
                 // because it triggers https://github.com/Graylog2/graylog2-server/issues/6378
                 // TODO: this filter could be removed, once we implement https://github.com/Graylog2/graylog2-server/issues/6490
-                .filter(id -> !NON_MESSAGE_STREAM_IDS.contains(id))
+                .filter(id -> !systemStreamIdSupplier.get().contains(id))
                 .filter(streamPermissions::canReadStream)
                 .collect(ImmutableSet.toImmutableSet());
     }

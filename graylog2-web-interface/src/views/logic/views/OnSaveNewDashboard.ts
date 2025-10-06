@@ -26,10 +26,10 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 
 import type View from './View';
 
-export default (view: View, history: HistoryFunction, entityShare?: EntitySharePayload) =>
+export default (view: View, history: HistoryFunction, entityShare?: EntitySharePayload, existingViewId?: string) =>
   async (dispatch: ViewsDispatch) => {
     try {
-      const savedView = await ViewManagementActions.create(view, entityShare);
+      const savedView = await ViewManagementActions.create(view, entityShare, existingViewId);
 
       flushSync(() => {
         dispatch(setIsDirty(false));

@@ -199,9 +199,9 @@ describe('XYPlot', () => {
     const onClick = jest.fn();
     render(<SimpleXYPlot onClickMarker={onClick} />);
     const { onClickMarker } = asMock(GenericPlot).mock.calls[0][0];
-    onClickMarker({ x: 'Foo', y: '23' });
+    onClickMarker({ x: 'x', y: 'y' }, { points: [], event: null });
 
-    expect(onClick).toHaveBeenCalledWith({ x: 'Foo', y: '23' });
+    expect(onClick).toHaveBeenCalledWith({ x: 'x', y: 'y' }, { points: [], event: null });
   });
 
   it('maps axis type correctly', async () => {
