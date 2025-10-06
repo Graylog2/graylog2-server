@@ -33,8 +33,10 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -59,6 +61,9 @@ public class McpRestResource extends RestResource {
     @Inject
     SecurityContext securityContext;
 
+    @Inject
+    ClusterConfigService clusterConfig;
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -66,6 +71,12 @@ public class McpRestResource extends RestResource {
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("Has custom audit events")
     public Response post(@Context HttpHeaders headers, String body) throws IOException {
+        final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
+                                                                      McpConfiguration.DEFAULT_VALUES);
+        if (!mcpConfig.enableRemoteAccess()) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
         final String accept = Optional.ofNullable(headers.getHeaderString(HttpHeaders.ACCEPT)).orElse("");
         final JsonNode payload = (body == null || body.isEmpty()) ? NullNode.getInstance() : objectMapper.readTree(body);
 
@@ -141,6 +152,11 @@ public class McpRestResource extends RestResource {
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("prototype")
     public Response get() {
+        final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
+                                                                      McpConfiguration.DEFAULT_VALUES);
+        if (!mcpConfig.enableRemoteAccess()) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
     }
 
