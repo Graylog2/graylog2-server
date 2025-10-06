@@ -65,7 +65,6 @@ public class QuickJumpService {
                 ))
                 .toList();
 
-        // Global sort + pagination + total via $facet
         final var sort = new Document("$sort",
                 new Document("score", -1)
                         .append("createdAt", -1)
@@ -78,7 +77,6 @@ public class QuickJumpService {
                 .add(new Document("$limit", limit))
                 .build();
 
-        // Optional: case-insensitive collation for tie-break string compares if any
         final var coll = Collation.builder().locale("en").collationStrength(CollationStrength.SECONDARY).build();
 
         final var results = StreamSupport.stream(collection.aggregate(pipeline).collation(coll).spliterator(), false).toList();
@@ -104,10 +102,8 @@ public class QuickJumpService {
                 .flatMap(idx -> fieldMatchers(query, fields.get(idx), idx * 10))
                 .toList();
 
-        final var score =
-                new Document("$switch", new Document("branches", fieldMatchers).append("default", 0));
+        final var score = new Document("$switch", new Document("branches", fieldMatchers).append("default", 0));
 
-        // $project: common shape
         final var project = new Document("$project", new Document()
                 .append("_id", 1)
                 .append("title", 1)
@@ -122,20 +118,17 @@ public class QuickJumpService {
     private static Stream<Document> fieldMatchers(String query, String fieldName, int scoreBase) {
         final var regexPrefix = "^" + Pattern.quote(query);
         final var fieldRef = "$" + fieldName;
-        final var exactEq =
-                new Document("$eq", Arrays.asList(
+        final var exactEq = new Document("$eq", Arrays.asList(
                         new Document("$toLower", fieldRef),
                         new Document("$toLower", searchConst(query)) // reuse regex term as text; you can also pass an explicit lowercased plain term
                 ));
 
-        final var prefixMatch =
-                new Document("$regexMatch",
+        final var prefixMatch = new Document("$regexMatch",
                         new Document("input", fieldRef)
                                 .append("regex", regexPrefix)
                                 .append("options", "i"));
 
-        final var anywhereMatch =
-                new Document("$regexMatch",
+        final var anywhereMatch = new Document("$regexMatch",
                         new Document("input", fieldRef)
                                 .append("regex", query)
                                 .append("options", "i"));
