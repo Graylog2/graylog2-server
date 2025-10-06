@@ -14,22 +14,55 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
+import styled from 'styled-components';
 
-import { Modal } from 'components/bootstrap';
+import { Modal, Input } from 'components/bootstrap';
+
+const SearchInput = styled(Input)`
+  width: 100%;
+`;
+
+const useQuickJumpSearch = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value);
+  };
+
+  return {
+    searchQuery,
+    setSearchQuery: handleSearch,
+  };
+};
 
 type Props = {
   onToggle: () => void;
 };
 
-const QuickJumpModal = ({ onToggle }: Props) => (
-  <Modal onHide={onToggle} show bsSize="large">
-    <Modal.Header>
-      <Modal.Title>Quick Jump</Modal.Title>
-    </Modal.Header>
+const QuickJumpModal = ({ onToggle }: Props) => {
+  const { searchQuery, setSearchQuery } = useQuickJumpSearch();
 
-    <Modal.Body>Input List</Modal.Body>
-  </Modal>
-);
+  return (
+    <Modal onHide={onToggle} show bsSize="large">
+      <Modal.Header>
+        <Modal.Title>Quick Jump</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        <SearchInput
+          value={searchQuery}
+          id="quick-jump-search"
+          type="text"
+          onChange={setSearchQuery}
+          placeholder="Search..."
+          /* eslint-disable-next-line jsx-a11y/no-autofocus */
+          autoFocus
+        />
+        Input List
+      </Modal.Body>
+    </Modal>
+  );
+};
 
 export default QuickJumpModal;
