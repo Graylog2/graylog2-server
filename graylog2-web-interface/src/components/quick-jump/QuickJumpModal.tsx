@@ -17,14 +17,46 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Modal, Input } from 'components/bootstrap';
+import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
+import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 
 const SearchInput = styled(Input)`
   width: 100%;
 `;
 
+const useMainNavigationItems = () => {
+  const currentUser = useCurrentUser();
+  const allNavigationItems = usePluginEntities('navigation') as any;
+  const { activePerspective } = useActivePerspective();
+
+  return allNavigationItems.reduce((acc, item) => {
+    if (!item.children) {
+      if (
+        activePerspective.id === DEFAULT_PERSPECTIVE ? !item.perspective : item.perspective === activePerspective.id
+      ) {
+        if (!item.permissions || isPermitted(currentUser.permissions, item.permissions)) {
+          return [...acc, { type: 'page', link: item.path, title: item.description }];
+        }
+      }
+    }
+
+    return acc;
+  }, []);
+};
+
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const allNavItems = useMainNavigationItems();
+
+  // {
+  //   type: 'page'
+  //   link: '/search'
+  //   title: 'Search'
+  // }
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value);
@@ -32,6 +64,7 @@ const useQuickJumpSearch = () => {
 
   return {
     searchQuery,
+    searchResults: allNavItems,
     setSearchQuery: handleSearch,
   };
 };
@@ -41,7 +74,7 @@ type Props = {
 };
 
 const QuickJumpModal = ({ onToggle }: Props) => {
-  const { searchQuery, setSearchQuery } = useQuickJumpSearch();
+  const { searchQuery, setSearchQuery, searchResults } = useQuickJumpSearch();
 
   return (
     <Modal onHide={onToggle} show bsSize="large">
@@ -59,7 +92,11 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           /* eslint-disable-next-line jsx-a11y/no-autofocus */
           autoFocus
         />
-        Input List
+        <ListGroup>
+          {searchResults.map((item) => (
+            <ListGroupItem key={item.title}>{item.title}</ListGroupItem>
+          ))}
+        </ListGroup>
       </Modal.Body>
     </Modal>
   );
