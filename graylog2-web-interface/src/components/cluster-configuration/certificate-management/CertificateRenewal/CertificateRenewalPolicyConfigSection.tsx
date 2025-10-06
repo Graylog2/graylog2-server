@@ -16,13 +16,14 @@
  */
 import React from 'react';
 
-import { CreateClientCertificateButton } from 'components/cluster-configuration/certificate-management/ClientCertificate';
+import { Section } from 'components/common';
 
-const ClientCertificateConfig = () => (
-  <div>
-    <h2>Client Certificate</h2>
-    <p>Generate client certificates for 3rd party tool</p>
-    <CreateClientCertificateButton />
-  </div>
+import CertificateRenewalPolicyConfig from './CertificateRenewalPolicyConfig';
+
+const CertificateRenewalPolicyConfigSection = () => (
+  <Section title="Certificate Renewal Policy Configuration">
+    <CertificateRenewalPolicyConfig showHeading={false} />
+  </Section>
 );
-export default ClientCertificateConfig;
+
+export default CertificateRenewalPolicyConfigSection;

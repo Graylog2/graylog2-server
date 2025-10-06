@@ -15,22 +15,27 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
-import { CertificateRenewalPolicyConfig } from 'components/cluster-configuration/certificate-management/CertificateRenewal';
-import { ClientCertificateConfig } from 'components/cluster-configuration/certificate-management/ClientCertificate';
+import SectionGrid from 'components/common/Section/SectionGrid';
+import { CurrentCASection } from 'components/cluster-configuration/certificate-management/CurrentCA';
+import { CertificateRenewalPolicyConfigSection } from 'components/cluster-configuration/certificate-management/CertificateRenewal';
+import { ClientCertificateConfigSection } from 'components/cluster-configuration/certificate-management/ClientCertificate';
 
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-`;
+const StyledSectionGrid = styled(SectionGrid)(
+  ({ theme }) => css`
+    grid-template-rows: '1fr 1fr';
+    grid-template-columns: '1fr 1fr';
+    gap: ${theme.spacings.md};
+  `,
+);
 
 const CertificateManagement = () => (
-  <Container>
-    <CertificateRenewalPolicyConfig />
-    <ClientCertificateConfig />
-  </Container>
+  <StyledSectionGrid>
+    <CertificateRenewalPolicyConfigSection />
+    <ClientCertificateConfigSection />
+    <CurrentCASection />
+  </StyledSectionGrid>
 );
 
 export default CertificateManagement;

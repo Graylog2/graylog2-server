@@ -116,9 +116,10 @@ const lifetimeExplanation =
 
 type Props = {
   className?: string;
+  showHeading?: boolean;
 };
 
-const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
+const CertificateRenewalPolicyConfig = ({ className = undefined, showHeading = true }: Props) => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const { data: currentConfig, isLoading } = useQuery({
     queryKey: queryKey,
@@ -193,7 +194,7 @@ const CertificateRenewalPolicyConfig = ({ className = undefined }: Props) => {
 
   return (
     <div className={className}>
-      <h2>Certificate Renewal Policy Configuration</h2>
+      {showHeading && <h2>Certificate Renewal Policy Configuration</h2>}
       <p>These settings will be used when detecting expiration of certificates and/or when renewing them.</p>
       {!currentConfig ? (
         <NoExistingPolicy createPolicy={() => setShowModal(true)} />
