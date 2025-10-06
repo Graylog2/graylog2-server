@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -54,17 +55,13 @@ public class QuickJumpService {
 
     public QuickJumpResponse search(String query, HasPermissions user) {
         final var limit = 100;
-        // Precompute regex strings
-        final var regexAnywhere = query;           // e.g. "foo"
-        final var regexPrefix = "^" + Pattern.quote(query); // anchored, escapes special chars
 
-        // Build the base branch (for the base collection "streams")
-        final var baseBranch = branchPipeline(regexAnywhere, regexPrefix, "dummy");
+        final var baseBranch = branchPipeline(query, List.of("title"), "dummy");
 
         final var collections = Stream.of("streams", "views", "reports")
                 .map(source -> new Document("$unionWith",
                         new Document("coll", source)
-                                .append("pipeline", branchPipeline(regexAnywhere, regexPrefix, source))
+                                .append("pipeline", branchPipeline(query, List.of("title", "description"), source))
                 ))
                 .toList();
 
@@ -97,37 +94,19 @@ public class QuickJumpService {
         return provider != null && provider.isPermitted(result.id(), user);
     }
 
-    private static List<Bson> branchPipeline(String regexAnywhere, String regexPrefix, String sourceName) {
-        // $match: anywhere, case-insensitive
-        final var match = new Document("$match",
-                new Document("title", new Document("$regex", regexAnywhere).append("$options", "i")));
+    private static List<Bson> branchPipeline(String query, List<String> fields, String sourceName) {
+        final var regexAnywhere = query;
+        final var match = new Document("$match", new Document("$or",
+                fields.stream().map(field -> new Document(field, new Document("$regex", regexAnywhere).append("$options", "i"))).toList()
+        ));
 
-        // score expression:
-        // $switch with three branches: exact (3), prefix (2), anywhere (1)
-        final var exactEq =
-                new Document("$eq", Arrays.asList(
-                        new Document("$toLower", "$title"),
-                        new Document("$toLower", searchConst(regexAnywhere)) // reuse regex term as text; you can also pass an explicit lowercased plain term
-                ));
-
-        final var prefixMatch =
-                new Document("$regexMatch",
-                        new Document("input", "$title")
-                                .append("regex", regexPrefix)
-                                .append("options", "i"));
-
-        final var anywhereMatch =
-                new Document("$regexMatch",
-                        new Document("input", "$title")
-                                .append("regex", regexAnywhere)
-                                .append("options", "i"));
+        final var fieldMatchers = IntStream.range(0, fields.size())
+                .boxed()
+                .flatMap(idx -> fieldMatchers(query, fields.get(idx), idx * 10))
+                .toList();
 
         final var score =
-                new Document("$switch", new Document("branches", Arrays.asList(
-                        new Document("case", exactEq).append("then", 3),
-                        new Document("case", prefixMatch).append("then", 2),
-                        new Document("case", anywhereMatch).append("then", 1)
-                )).append("default", 0));
+                new Document("$switch", new Document("branches", fieldMatchers).append("default", 0));
 
         // $project: common shape
         final var project = new Document("$project", new Document()
@@ -141,9 +120,35 @@ public class QuickJumpService {
         return Arrays.asList(match, project);
     }
 
-    // Helper: if you want to pass a constant string and ensure it's treated as a value (not a field path)
+    private static Stream<Document> fieldMatchers(String query, String fieldName, int scoreBase) {
+        final var regexAnywhere = query;
+        final var regexPrefix = "^" + Pattern.quote(query);
+        final var fieldRef = "$" + fieldName;
+        final var exactEq =
+                new Document("$eq", Arrays.asList(
+                        new Document("$toLower", fieldRef),
+                        new Document("$toLower", searchConst(regexAnywhere)) // reuse regex term as text; you can also pass an explicit lowercased plain term
+                ));
+
+        final var prefixMatch =
+                new Document("$regexMatch",
+                        new Document("input", fieldRef)
+                                .append("regex", regexPrefix)
+                                .append("options", "i"));
+
+        final var anywhereMatch =
+                new Document("$regexMatch",
+                        new Document("input", fieldRef)
+                                .append("regex", regexAnywhere)
+                                .append("options", "i"));
+        return Stream.of(
+                new Document("case", exactEq).append("then", scoreBase + 3),
+                new Document("case", prefixMatch).append("then", scoreBase + 2),
+                new Document("case", anywhereMatch).append("then", scoreBase + 1)
+        );
+    }
+
     private static Object searchConst(String value) {
-        // You can just return the string; wrapping is here to make intent explicit.
         return value;
     }
 }

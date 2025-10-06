@@ -18,6 +18,7 @@ package org.graylog2.plugin.quickjump;
 
 import org.graylog.security.HasPermissions;
 
+import java.util.Set;
 import java.util.function.BiFunction;
 
 public interface QuickJumpProvider {
@@ -25,7 +26,9 @@ public interface QuickJumpProvider {
 
     boolean isPermitted(String id, HasPermissions user);
 
-    static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn) {
+    Set<String> fieldsToSearch();
+
+    static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, Set<String> fieldsToSearch) {
         return new QuickJumpProvider() {
             @Override
             public String collectionName() {
@@ -36,6 +39,15 @@ public interface QuickJumpProvider {
             public boolean isPermitted(String id, HasPermissions user) {
                 return isPermittedFn.apply(id, user);
             }
+
+            @Override
+            public Set<String> fieldsToSearch() {
+                return fieldsToSearch;
+            }
         };
+    }
+
+    static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn) {
+        return create(collectionName, isPermittedFn, Set.of("title"));
     }
 }
