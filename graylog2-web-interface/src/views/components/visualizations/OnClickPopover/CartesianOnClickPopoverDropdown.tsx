@@ -18,10 +18,9 @@ import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
 import Popover from 'components/common/Popover';
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator } from 'views/Constants';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
-import type { ValueGroups, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/visualizations/OnClickPopover/Types';
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
 
 const DivContainer = styled.div(
@@ -32,20 +31,15 @@ const DivContainer = styled.div(
   `,
 );
 
-const CartesianOnClickPopoverDropdown = ({
-  clickPoint,
-  config,
-}: {
-  clickPoint: ClickPoint;
-  config: AggregationWidgetConfig;
-}) => {
+const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const traceColor = getHoverSwatchColor(clickPoint);
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
     const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
       keySeparator,
     );
-    const metric: string = splitNames.pop() as string;
+    const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
+    const columnValues = splitNames.filter((value) => value !== metric);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
@@ -59,7 +53,7 @@ const CartesianOnClickPopoverDropdown = ({
         text: String(value),
         traceColor,
       })),
-      columnPivotValues: splitNames.map((value, i) => ({
+      columnPivotValues: columnValues.map((value, i) => ({
         value,
         field: columnPivotsToFields[i],
         text: String(value),
@@ -81,6 +75,7 @@ const CartesianOnClickPopoverDropdown = ({
           columnPivotValues={columnPivotValues}
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
+          setFieldData={setFieldData}
         />
       </DivContainer>
     </Popover.Dropdown>

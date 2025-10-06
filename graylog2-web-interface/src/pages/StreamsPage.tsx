@@ -32,6 +32,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { EntityShare } from 'actions/permissions/EntityShareActions';
 import useStreamMutations from 'hooks/useStreamMutations';
 import { KEY_PREFIX } from 'components/streams/hooks/useStreams';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 const StreamsPage = () => {
   const { indexSets } = useStore(IndexSetsStore);
@@ -39,7 +40,7 @@ const StreamsPage = () => {
   const { createStream } = useStreamMutations();
   const queryClient = useQueryClient();
 
-  const onSave = (stream: Stream & EntityShare) => {
+  const onSave = async (stream: Stream & EntityShare) => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.STREAMS.NEW_STREAM_CREATED, {
       app_pathname: 'streams',
     });
@@ -47,6 +48,7 @@ const StreamsPage = () => {
     return createStream(stream).then(() => {
       UserNotification.success('Stream has been successfully created.', 'Success');
       queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
+      CurrentUserStore.reload();
     });
   };
 

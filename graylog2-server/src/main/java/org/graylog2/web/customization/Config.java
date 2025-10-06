@@ -19,6 +19,7 @@ package org.graylog2.web.customization;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -28,6 +29,7 @@ public record Config(
         Optional<String> favicon,
         Optional<Logo> logo,
         @JsonProperty("help_url") Optional<String> helpUrl,
+        @JsonProperty("help_pages") Optional<Map<String, String>> helpPages,
         Optional<Login> login,
         Optional<Welcome> welcome,
         Optional<Navigation> navigation,
@@ -74,7 +76,12 @@ public record Config(
     public record FeaturesItem(Optional<Boolean> enabled) {}
 
     public static Config empty() {
-        return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+        return new Config(Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
+    public static Config forProductName(String productName) {
+        return new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
     }
 }

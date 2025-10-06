@@ -17,17 +17,17 @@
 import React, { useMemo } from 'react';
 
 import Popover from 'components/common/Popover';
-import type { ClickPoint, ValueGroups } from 'views/components/visualizations/OnClickPopover/Types';
+import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/visualizations/OnClickPopover/Types';
 import { keySeparator } from 'views/Constants';
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
 
-const HeatmapOnClickPopover = ({ clickPoint, config }: { config: AggregationWidgetConfig; clickPoint: ClickPoint }) => {
+const HeatmapOnClickPopover = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
     const splitXValues: Array<string | number> = (clickPoint.x as string).split(keySeparator);
     const traceColor = null;
-    const metric: string = splitXValues.pop() as string;
+    const metric: string = config.series.length === 1 ? config.series[0].function : (splitXValues.pop() as string);
+    const columnValues = splitXValues.filter((value) => value !== metric);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
@@ -41,7 +41,7 @@ const HeatmapOnClickPopover = ({ clickPoint, config }: { config: AggregationWidg
         text: String(value),
         traceColor,
       })),
-      columnPivotValues: splitXValues.map((value, i) => ({
+      columnPivotValues: columnValues.map((value, i) => ({
         value,
         field: columnPivotsToFields[i],
         text: String(value),
@@ -63,6 +63,7 @@ const HeatmapOnClickPopover = ({ clickPoint, config }: { config: AggregationWidg
           columnPivotValues={columnPivotValues}
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
+          setFieldData={setFieldData}
         />
       </Popover.Dropdown>
     )

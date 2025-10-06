@@ -105,8 +105,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
   const {
     awsAuthenticationType,
     awsCloudWatchAddFlowLogPrefix = { value: undefined },
-    awsCloudWatchAssumeARN = { value: undefined },
-    awsCloudWatchAwsKey = { value: undefined },
+    awsAssumeRoleARN = { value: undefined },
+    awsAccessKey = { value: undefined },
     awsCloudWatchAwsRegion,
     awsCloudWatchBatchSize,
     awsEndpointCloudWatch = { value: undefined },
@@ -188,17 +188,17 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <span>{awsAuthenticationType.value}</span>
           </li>
 
-          {awsCloudWatchAwsKey.value && (
+          {awsAccessKey.value && (
             <li>
               <strong>AWS Key</strong>
-              <span>{awsCloudWatchAwsKey.value}</span>
+              <span>{awsAccessKey.value}</span>
             </li>
           )}
 
-          {awsCloudWatchAssumeARN.value && (
+          {awsAssumeRoleARN.value && (
             <li>
               <strong>AWS Assumed ARN Role</strong>
-              <span>{awsCloudWatchAssumeARN.value}</span>
+              <span>{awsAssumeRoleARN.value}</span>
             </li>
           )}
 

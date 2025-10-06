@@ -27,7 +27,6 @@ import org.graylog.events.notifications.EventNotificationService;
 import org.graylog.events.notifications.PermanentEventNotificationException;
 import org.graylog.events.notifications.TemplateModelProvider;
 import org.graylog.events.notifications.TemporaryEventNotificationException;
-import org.graylog.events.procedures.EventProcedure;
 import org.graylog.events.procedures.EventProcedureProvider;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog2.notifications.Notification;
@@ -43,7 +42,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -137,11 +135,7 @@ public class SlackEventNotification implements EventNotification {
                 template = StringUtils.f("@%s\n%s", tag, template);
             }
             if (config.includeEventProcedure() && ctx.eventDefinition().isPresent()) {
-                final Optional<EventProcedure> eventProcedure = eventProcedureProvider
-                        .getDecoratedForEvent(ctx.eventDefinition().get().eventProcedureId(), ctx.event());
-                if (eventProcedure.isPresent()) {
-                    template = template + eventProcedure.get().toText(ctx.event());
-                }
+                template += eventProcedureProvider.getAsText(ctx.eventDefinition().get().eventProcedureId(), ctx.event());
             }
             customMessage = buildCustomMessage(ctx, config, template);
         }
