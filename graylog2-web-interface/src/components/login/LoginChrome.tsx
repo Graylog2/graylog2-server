@@ -110,7 +110,7 @@ const CustomizableLogo = () => {
     <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
   ) : (
     <LogoContainer>
-      <Logo />
+      <Logo color="#03C3FF" />
     </LogoContainer>
   );
 };
