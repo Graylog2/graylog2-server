@@ -16,7 +16,7 @@
  */
 package org.graylog2.plugin.quickjump.rest;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 
 public record QuickJumpRequest(@NotNull String query) {
 }
