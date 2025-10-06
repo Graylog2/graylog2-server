@@ -26,7 +26,6 @@ import { BootstrapModalForm, Button, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
-import Alert from 'components/bootstrap/Alert';
 
 type McpConfigState = {
   enable_remote_access: boolean;
