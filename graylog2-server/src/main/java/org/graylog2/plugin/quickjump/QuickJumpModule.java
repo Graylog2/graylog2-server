@@ -16,12 +16,18 @@
  */
 package org.graylog2.plugin.quickjump;
 
+import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
+import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.quickjump.rest.QuickJumpResource;
+import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.streams.StreamServiceImpl;
 
 public class QuickJumpModule extends PluginModule {
     @Override
     protected void configure() {
         addSystemRestResource(QuickJumpResource.class);
+        addQuickJumpProvider("views", QuickJumpProvider.create(ViewService.COLLECTION_NAME, (id, user) -> user.isPermitted(ViewsRestPermissions.VIEW_READ, id)));
+        addQuickJumpProvider("streams", QuickJumpProvider.create(StreamServiceImpl.COLLECTION_NAME, (id, user) -> user.isPermitted(RestPermissions.STREAMS_READ, id)));
     }
 }

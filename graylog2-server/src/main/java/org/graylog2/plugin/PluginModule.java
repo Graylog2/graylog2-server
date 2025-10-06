@@ -70,6 +70,7 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.plugin.quickjump.QuickJumpProvider;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
@@ -500,5 +501,13 @@ public abstract class PluginModule extends Graylog2Module {
 
             dbEntitiesBinder().addBinding().toInstance(entitiesClass);
         }
+    }
+
+    protected MapBinder<String, QuickJumpProvider> quickJumpProviderBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, QuickJumpProvider.class);
+    }
+
+    protected void addQuickJumpProvider(String source, QuickJumpProvider provider) {
+        quickJumpProviderBinder().addBinding(source).toInstance(provider);
     }
 }

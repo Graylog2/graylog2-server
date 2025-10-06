@@ -22,13 +22,11 @@ import com.mongodb.client.model.CollationStrength;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.security.HasPermissions;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.quickjump.rest.QuickJumpResponse;
-import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Arrays;
 import java.util.List;
@@ -46,15 +44,12 @@ public class QuickJumpService {
     private record Result(String source, String id, String title, int score) implements MongoEntity {}
 
     private final MongoCollection<Result> collection;
-    private final Map<String, QuickJumpProvider> providers = Map.of(
-            "views", QuickJumpProvider.create("views", (id, user) -> user.isPermitted(ViewsRestPermissions.VIEW_READ, id)),
-            "streams", QuickJumpProvider.create("streams", (id, user) -> user.isPermitted(RestPermissions.STREAMS_READ, id)),
-            "reports", QuickJumpProvider.create("reports", (id, user) -> user.isPermitted("reports:read", id))
-    );
+    private final Map<String, QuickJumpProvider> providers;
 
     @Inject
-    public QuickJumpService(MongoCollections mongoCollections) {
+    public QuickJumpService(MongoCollections mongoCollections, Map<String, QuickJumpProvider> providers) {
         this.collection = mongoCollections.collection(DUMMY_COLLECTION, Result.class);
+        this.providers = providers;
     }
 
     public QuickJumpResponse search(String query, HasPermissions user) {
