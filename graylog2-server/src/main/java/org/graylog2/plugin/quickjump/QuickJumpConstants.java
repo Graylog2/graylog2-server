@@ -22,4 +22,5 @@ public class QuickJumpConstants {
     static final List<String> DEFAULT_FIELDS = List.of("title", "description");
     static final String DUMMY_COLLECTION = "dummy";
     static final String DEFAULT_COLLATION = "en";
+    public static final int DEFAULT_LIMIT = 100;
 }

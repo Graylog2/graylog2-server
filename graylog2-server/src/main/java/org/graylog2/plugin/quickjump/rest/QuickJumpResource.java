@@ -35,6 +35,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 
 import java.io.IOException;
 
+import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_LIMIT;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Api(value = "QuickJump", description = "Quick Jump Functionality", tags = {CLOUD_VISIBLE})
@@ -55,6 +56,6 @@ public class QuickJumpResource implements PluginRestResource {
     @Timed
     public QuickJumpResponse search(@ApiParam(name = "JSON Body") @Valid QuickJumpRequest request,
                                     @Context UserContext userContext) throws IOException {
-        return quickJumpService.search(request.query(), request.limit().orElse(100), userContext);
+        return quickJumpService.search(request.query(), request.limit().orElse(DEFAULT_LIMIT), userContext);
     }
 }
