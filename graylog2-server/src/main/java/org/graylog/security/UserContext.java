@@ -33,7 +33,7 @@ import java.util.concurrent.Callable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-public class UserContext implements HasUser {
+public class UserContext implements HasUser, HasPermissions {
     private final UserService userService;
     private final String userId;
     private final Subject subject;
