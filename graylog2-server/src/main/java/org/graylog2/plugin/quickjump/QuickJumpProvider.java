@@ -16,22 +16,37 @@
  */
 package org.graylog2.plugin.quickjump;
 
+import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.graylog.security.HasPermissions;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_FIELDS;
 
 public interface QuickJumpProvider {
+    String type();
+
     String collectionName();
 
     boolean isPermitted(String id, HasPermissions user);
 
     List<String> fieldsToSearch();
 
-    static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch) {
+    default Bson typeField() {
+        return new Document("$literal", type());
+    }
+
+    static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch, Optional<Bson> typeField) {
         return new QuickJumpProvider() {
+
+            @Override
+            public String type() {
+                return type;
+            }
+
             @Override
             public String collectionName() {
                 return collectionName;
@@ -46,10 +61,19 @@ public interface QuickJumpProvider {
             public List<String> fieldsToSearch() {
                 return fieldsToSearch;
             }
+
+            @Override
+            public Bson typeField() {
+                return typeField.orElseGet(QuickJumpProvider.super::typeField);
+            }
         };
     }
 
-    static QuickJumpProvider create(String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn) {
-        return create(collectionName, isPermittedFn, DEFAULT_FIELDS);
+    static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn) {
+        return create(type, collectionName, isPermittedFn, DEFAULT_FIELDS, Optional.empty());
+    }
+
+    static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, Bson typeField) {
+        return create(type, collectionName, isPermittedFn, DEFAULT_FIELDS, Optional.of(typeField));
     }
 }

@@ -503,11 +503,11 @@ public abstract class PluginModule extends Graylog2Module {
         }
     }
 
-    protected MapBinder<String, QuickJumpProvider> quickJumpProviderBinder() {
-        return MapBinder.newMapBinder(binder(), String.class, QuickJumpProvider.class);
+    protected Multibinder<QuickJumpProvider> quickJumpProviderBinder() {
+        return Multibinder.newSetBinder(binder(), QuickJumpProvider.class);
     }
 
-    protected void addQuickJumpProvider(String source, QuickJumpProvider provider) {
-        quickJumpProviderBinder().addBinding(source).toInstance(provider);
+    protected void addQuickJumpProvider(QuickJumpProvider provider) {
+        quickJumpProviderBinder().addBinding().toInstance(provider);
     }
 }

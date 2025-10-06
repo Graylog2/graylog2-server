@@ -31,7 +31,10 @@ import org.graylog2.plugin.quickjump.rest.QuickJumpResponse;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -41,21 +44,21 @@ import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_FIELDS;
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DUMMY_COLLECTION;
 
 public class QuickJumpService {
-    private record Result(String source, String id, String title, int score) implements MongoEntity {}
+    private record Result(String source, String type, String id, String title, int score) implements MongoEntity {}
 
     private final MongoCollection<Result> collection;
     private final Map<String, QuickJumpProvider> providers;
 
     @Inject
-    public QuickJumpService(MongoCollections mongoCollections, Map<String, QuickJumpProvider> providers) {
+    public QuickJumpService(MongoCollections mongoCollections, Set<QuickJumpProvider> providers) {
         this.collection = mongoCollections.collection(DUMMY_COLLECTION, Result.class);
-        this.providers = providers;
+        this.providers = providers.stream().collect(Collectors.toMap(QuickJumpProvider::type, Function.identity()));
     }
 
     public QuickJumpResponse search(String query, HasPermissions user) {
         final var limit = 100;
 
-        final var baseBranch = branchPipeline(query, DEFAULT_FIELDS, DUMMY_COLLECTION);
+        final var baseBranch = branchPipeline(query, DEFAULT_FIELDS, DUMMY_COLLECTION, new Document("$literal", DUMMY_COLLECTION));
 
         final var collections = providers.entrySet().stream()
                 .map(entry -> {
@@ -63,7 +66,7 @@ public class QuickJumpService {
                     final var provider = entry.getValue();
                     return new Document("$unionWith",
                         new Document("coll", source)
-                                .append("pipeline", branchPipeline(query, provider.fieldsToSearch(), source))
+                                .append("pipeline", branchPipeline(query, provider.fieldsToSearch(), source, provider.typeField()))
                     );
                 })
                 .toList();
@@ -85,7 +88,7 @@ public class QuickJumpService {
         final var results = StreamSupport.stream(collection.aggregate(pipeline).collation(coll).spliterator(), false).toList();
         return new QuickJumpResponse(results.stream()
                 .filter(result -> checkPermission(result, user))
-                .map(result -> new QuickJumpResponse.Result(result.source(), result.id(), result.title()))
+                .map(result -> new QuickJumpResponse.Result(result.type(), result.id(), result.title()))
                 .toList()
         );
     }
@@ -95,7 +98,7 @@ public class QuickJumpService {
         return provider != null && provider.isPermitted(result.id(), user);
     }
 
-    private static List<Bson> branchPipeline(String query, List<String> fields, String sourceName) {
+    private static List<Bson> branchPipeline(String query, List<String> fields, String sourceName, Bson typeField) {
         final var match = new Document("$match", new Document("$or",
                 fields.stream().map(field -> new Document(field, new Document("$regex", query).append("$options", "i"))).toList()
         ));
@@ -111,7 +114,8 @@ public class QuickJumpService {
                 .append("_id", 1)
                 .append("title", 1)
                 .append("createdAt", 1)
-                .append("source", new Document("$literal", sourceName))
+                .append("source", sourceName)
+                .append("type", typeField)
                 .append("score", score)
         );
 
