@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Use timezone of current user for time bucketing in aggregations."
+
+issues = ["23091"]
+pulls = ["23133"]
