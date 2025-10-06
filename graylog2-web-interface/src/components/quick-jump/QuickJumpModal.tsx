@@ -16,6 +16,7 @@
  */
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import type * as Immutable from 'immutable';
 
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -28,24 +29,37 @@ const SearchInput = styled(Input)`
   width: 100%;
 `;
 
+const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
+  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
+
+const matchesPermission = (userPermissions: Immutable.List<string>, itemPermissions: Array<string>) =>
+  isPermitted(userPermissions, itemPermissions);
+
 const useMainNavigationItems = () => {
   const currentUser = useCurrentUser();
   const allNavigationItems = usePluginEntities('navigation') as any;
   const { activePerspective } = useActivePerspective();
 
-  return allNavigationItems.reduce((acc, item) => {
-    if (!item.children) {
-      if (
-        activePerspective.id === DEFAULT_PERSPECTIVE ? !item.perspective : item.perspective === activePerspective.id
-      ) {
-        if (!item.permissions || isPermitted(currentUser.permissions, item.permissions)) {
-          return [...acc, { type: 'page', link: item.path, title: item.description }];
-        }
-      }
-    }
+  const navigationLinks = allNavigationItems.filter((item) => !item.children);
+  const dropdownLinks = allNavigationItems
+    .filter((item) => item.children)
+    .flatMap((item) =>
+      item.children.map((child) => ({ ...child, description: `${item.description} / ${child.description}` })),
+    );
 
-    return acc;
-  }, []);
+  return [...navigationLinks, ...dropdownLinks]
+    .filter((item) => {
+      if (!matchesPermission(currentUser.permissions, item.permissions)) {
+        return false;
+      }
+
+      if (!matchesPerspective(activePerspective.id, item.perspective)) {
+        return false;
+      }
+
+      return true;
+    })
+    .map((item) => ({ type: 'page', link: item.path, title: item.description }));
 };
 
 const useQuickJumpSearch = () => {
