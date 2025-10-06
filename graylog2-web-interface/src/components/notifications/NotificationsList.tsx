@@ -36,7 +36,7 @@ const Title = ({ count }: { count: number }) =>
 
 const Notifications = ({ count, notifications }: { count: number; notifications: Array<NotificationType> }) =>
   count === 0 ? (
-    <Alert bsStyle="primary" className="notifications-none">
+    <Alert bsStyle="success" className="notifications-none">
       No notifications
     </Alert>
   ) : (

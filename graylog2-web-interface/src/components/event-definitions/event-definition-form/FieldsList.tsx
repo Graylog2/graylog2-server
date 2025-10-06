@@ -108,11 +108,11 @@ class FieldsList extends React.Component<
         <td className={styles.actions}>
           <ButtonToolbar>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-            <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
+            <Button bsStyle="danger" bsSize="xsmall" onClick={this.handleRemoveClick(fieldName)}>
               Remove Field
             </Button>
             {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-            <Button bsStyle="info" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
+            <Button bsStyle="primary" bsSize="xsmall" onClick={this.handleEditClick(fieldName)}>
               Edit
             </Button>
           </ButtonToolbar>
