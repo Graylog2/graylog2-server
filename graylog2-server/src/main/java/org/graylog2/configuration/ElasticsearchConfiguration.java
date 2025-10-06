@@ -61,6 +61,11 @@ public class ElasticsearchConfiguration {
     public static final String ALLOW_FLEXIBLE_RETENTION_PERIOD = "allow_flexible_retention_period";
     public static final String INDEX_FIELD_TYPE_REFRESH_INTERVAL = "index_field_type_refresh_interval";
 
+    // duplicated from the DataNode config, necessary to have the same number for the local query validation via Lucene
+    @Documentation("This setting limits the number of clauses a Lucene BooleanQuery can have.")
+    @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
+    private Integer indicesQueryBoolMaxClauseCount = 32768;
+
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String defaultIndexPrefix = "graylog";
 
