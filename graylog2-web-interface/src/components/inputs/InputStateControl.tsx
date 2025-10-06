@@ -87,14 +87,14 @@ const InputStateControl = ({ input, openWizard }: Props) => {
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsStyle="primary" onClick={stopInput} disabled={isLoading}>
+      <Button bsStyle="danger" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
       </Button>
     );
   }
 
   return (
-    <Button bsStyle="success" onClick={startInput} disabled={isLoading}>
+    <Button bsStyle="primary" onClick={startInput} disabled={isLoading}>
       {isLoading ? 'Starting...' : 'Start input'}
     </Button>
   );

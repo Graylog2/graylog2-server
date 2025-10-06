@@ -55,7 +55,7 @@ const MissingRequirements = ({ view, missingRequirements }: Props) => {
       </Col>
 
       <Col md={1} mdOffset={8}>
-        <Button bsStyle="success" onClick={() => history.goBack()}>
+        <Button bsStyle="primary" onClick={() => history.goBack()}>
           Back
         </Button>
       </Col>
