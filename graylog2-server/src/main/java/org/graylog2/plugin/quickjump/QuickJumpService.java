@@ -95,9 +95,8 @@ public class QuickJumpService {
     }
 
     private static List<Bson> branchPipeline(String query, List<String> fields, String sourceName) {
-        final var regexAnywhere = query;
         final var match = new Document("$match", new Document("$or",
-                fields.stream().map(field -> new Document(field, new Document("$regex", regexAnywhere).append("$options", "i"))).toList()
+                fields.stream().map(field -> new Document(field, new Document("$regex", query).append("$options", "i"))).toList()
         ));
 
         final var fieldMatchers = IntStream.range(0, fields.size())
@@ -121,13 +120,12 @@ public class QuickJumpService {
     }
 
     private static Stream<Document> fieldMatchers(String query, String fieldName, int scoreBase) {
-        final var regexAnywhere = query;
         final var regexPrefix = "^" + Pattern.quote(query);
         final var fieldRef = "$" + fieldName;
         final var exactEq =
                 new Document("$eq", Arrays.asList(
                         new Document("$toLower", fieldRef),
-                        new Document("$toLower", searchConst(regexAnywhere)) // reuse regex term as text; you can also pass an explicit lowercased plain term
+                        new Document("$toLower", searchConst(query)) // reuse regex term as text; you can also pass an explicit lowercased plain term
                 ));
 
         final var prefixMatch =
@@ -139,7 +137,7 @@ public class QuickJumpService {
         final var anywhereMatch =
                 new Document("$regexMatch",
                         new Document("input", fieldRef)
-                                .append("regex", regexAnywhere)
+                                .append("regex", query)
                                 .append("options", "i"));
         return Stream.of(
                 new Document("case", exactEq).append("then", scoreBase + 3),
