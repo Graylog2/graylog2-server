@@ -20,14 +20,16 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.github.victools.jsonschema.generator.OptionPreset;
 import com.github.victools.jsonschema.generator.Option;
+import com.github.victools.jsonschema.generator.OptionPreset;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
 import com.github.victools.jsonschema.generator.SchemaVersion;
 import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
+import com.github.victools.jsonschema.module.jakarta.validation.JakartaValidationModule;
+import jakarta.ws.rs.DefaultValue;
 import org.graylog.jsonschema.EmptyObjectAsObjectModule;
 import org.graylog.mcp.tools.PermissionHelper;
 
@@ -42,16 +44,31 @@ import java.util.Optional;
  */
 public abstract class Tool<P, O> {
 
-    private static final SchemaGeneratorConfig CONFIG = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_7, OptionPreset.PLAIN_JSON)
-            .with(Option.FIELDS_DERIVED_FROM_ARGUMENTFREE_METHODS,
-                  Option.NONSTATIC_NONVOID_NONGETTER_METHODS)
-            .with(new EmptyObjectAsObjectModule())
-            .with(new JacksonModule(
-                    JacksonOption.INCLUDE_ONLY_JSONPROPERTY_ANNOTATED_METHODS,
-                    JacksonOption.RESPECT_JSONPROPERTY_REQUIRED,
-                    JacksonOption.RESPECT_JSONPROPERTY_ORDER
-            ))
-            .build();
+    private static final SchemaGeneratorConfig CONFIG;
+    static {
+        var builder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
+                .with(Option.FIELDS_DERIVED_FROM_ARGUMENTFREE_METHODS,
+                      Option.NONSTATIC_NONVOID_NONGETTER_METHODS)
+                .with(new EmptyObjectAsObjectModule())
+                .with(new JacksonModule(
+                        JacksonOption.INCLUDE_ONLY_JSONPROPERTY_ANNOTATED_METHODS,
+                        JacksonOption.RESPECT_JSONPROPERTY_REQUIRED,
+                        JacksonOption.RESPECT_JSONPROPERTY_ORDER
+                ))
+                .with(new JakartaValidationModule());
+        builder.forFields()
+                // peel out default values from annotations, supports both Jakarta & Jackson annotations
+                // but gives Jakarta precedence
+                .withDefaultResolver(field -> {
+                    final DefaultValue jakarta = field.getAnnotationConsideringFieldAndGetter(DefaultValue.class);
+                    if (jakarta != null && jakarta.value() != null) {
+                        return jakarta.value();
+                    }
+                    final JsonProperty jackson = field.getAnnotationConsideringFieldAndGetter(JsonProperty.class);
+                    return jackson == null || jackson.defaultValue().isEmpty() ? null : jackson.defaultValue();
+                });
+        CONFIG = builder.build();
+    }
     private static final SchemaGenerator GENERATOR = new SchemaGenerator(CONFIG);
 
     private final ObjectMapper objectMapper;

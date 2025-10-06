@@ -17,10 +17,14 @@
 package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.ForbiddenException;
 import org.apache.shiro.subject.Subject;
 import org.graylog.mcp.server.Tool;
@@ -106,12 +110,24 @@ public class SearchTool extends Tool<SearchTool.Parameters, String> {
 
     public static class Parameters {
         @JsonProperty(value = "query", required = true)
+        @JsonPropertyDescription("The Lucene query string to search messages with")
         private String query;
-        @JsonProperty(value = "limit", required = false, defaultValue = "50")
+
+        @JsonProperty(value = "limit", defaultValue = "50")
+        @JsonPropertyDescription("The amount of messages to return, together with offset this can be used for pagination")
         private int limit = 50;
-        @JsonProperty(value = "offset", required = false, defaultValue = "0")
+
+        @JsonProperty(value = "offset", defaultValue = "0")
+        @JsonPropertyDescription("For pagination purposes, start the list at this offset, skipping the messages before")
+        @DefaultValue("0")
+        @PositiveOrZero
         private int offset = 0;
-        @JsonProperty(value = "range_seconds", required = false, defaultValue = "3600")
+
+        @JsonProperty(value = "range_seconds",
+                      defaultValue = "3600")
+        @JsonPropertyDescription("The number of seconds to look back, the search window is always up to now, with this many seconds into the past.")
+        @DefaultValue("3600")
+        @Positive
         private int rangeSeconds = 3600;
 
         public String getQuery() { return query; }
