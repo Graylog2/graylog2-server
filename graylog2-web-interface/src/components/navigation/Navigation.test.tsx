@@ -31,9 +31,12 @@ import HotkeysProvider from 'contexts/HotkeysProvider';
 
 jest.mock('./ScratchpadToggle', () => mockComponent('ScratchpadToggle'));
 jest.mock('hooks/useCurrentUser');
-jest.mock('./DevelopmentHeaderBadge', () => () => <span />);
-jest.mock('routing/withLocation', () => (x) => x);
 jest.mock('routing/useLocation', () => jest.fn(() => ({ pathname: '' })));
+jest.mock('@graylog/server-api', () => ({
+  SystemNotifications: {
+    listNotifications: jest.fn(async () => ({ total: 0 })),
+  },
+}));
 
 describe('Navigation', () => {
   const SUT = () => (
