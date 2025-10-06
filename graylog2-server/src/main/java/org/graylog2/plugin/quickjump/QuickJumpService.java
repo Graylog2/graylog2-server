@@ -55,9 +55,7 @@ public class QuickJumpService {
         this.providers = providers.stream().collect(Collectors.toMap(QuickJumpProvider::type, Function.identity()));
     }
 
-    public QuickJumpResponse search(String query, HasPermissions user) {
-        final var limit = 100;
-
+    public QuickJumpResponse search(String query, int limit, HasPermissions user) {
         final var baseBranch = branchPipeline(query, DEFAULT_FIELDS, DUMMY_COLLECTION, new Document("$literal", DUMMY_COLLECTION));
 
         final var collections = providers.entrySet().stream()
@@ -65,7 +63,7 @@ public class QuickJumpService {
                     final var source = entry.getKey();
                     final var provider = entry.getValue();
                     return new Document("$unionWith",
-                        new Document("coll", source)
+                            new Document("coll", provider.collectionName())
                                 .append("pipeline", branchPipeline(query, provider.fieldsToSearch(), source, provider.typeField()))
                     );
                 })

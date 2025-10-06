@@ -55,6 +55,6 @@ public class QuickJumpResource implements PluginRestResource {
     @Timed
     public QuickJumpResponse search(@ApiParam(name = "JSON Body") @Valid QuickJumpRequest request,
                                     @Context UserContext userContext) throws IOException {
-        return quickJumpService.search(request.query(), userContext);
+        return quickJumpService.search(request.query(), request.limit().orElse(100), userContext);
     }
 }
