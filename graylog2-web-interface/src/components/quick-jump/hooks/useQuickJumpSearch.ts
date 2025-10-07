@@ -34,17 +34,7 @@ const useMainNavigationItems = () => {
   );
 
   return allNavigationItems
-    .filter((item) => {
-      if (!isPermitted(item.permissions)) {
-        return false;
-      }
-
-      if (!matchesPerspective(activePerspective.id, item.perspective)) {
-        return false;
-      }
-
-      return true;
-    })
+    .filter((item) => isPermitted(item.permissions) && matchesPerspective(activePerspective.id, item.perspective))
     .map((item) => ({ type: PAGE_TYPE, link: item.path, title: item.description }));
 };
 
