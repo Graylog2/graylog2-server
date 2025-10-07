@@ -20,8 +20,6 @@ import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.SecurityContext;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.rest.PermittedStreams;
-import org.graylog.plugins.views.search.views.ViewResolver;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.slf4j.Logger;
@@ -30,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -43,10 +40,12 @@ public class PermissionHelper {
 
     private final User currentUser;
     private final SecurityContext securityContext;
+    private final SearchUser searchUser;
 
-    public PermissionHelper(final User currentUser, SecurityContext securityContext) {
+    public PermissionHelper(final User currentUser, SecurityContext securityContext, final SearchUser searchUser) {
         this.currentUser = currentUser;
         this.securityContext = securityContext;
+        this.searchUser = searchUser;
     }
 
     public Subject getSubject() {
@@ -114,8 +113,8 @@ public class PermissionHelper {
         }
     }
 
-    public SearchUser getSearchUser(PermittedStreams permittedStreams, Map<String, ViewResolver> viewResolvers) {
-        return new SearchUser(getCurrentUser(), this::isPermitted, this::isPermitted, permittedStreams, viewResolvers);
+    public SearchUser getSearchUser() {
+        return searchUser;
     }
 
     public User getCurrentUser() {

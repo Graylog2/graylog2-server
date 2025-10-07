@@ -35,6 +35,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.rest.SkipCSRFProtection;
@@ -70,7 +71,7 @@ public class McpRestResource extends RestResource {
     @SkipCSRFProtection("server-to-server")
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("Has custom audit events")
-    public Response post(@Context HttpHeaders headers, String body) throws IOException {
+    public Response post(@Context HttpHeaders headers, @Context SearchUser searchUser, String body) throws IOException {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
                                                                       McpConfiguration.DEFAULT_VALUES);
         if (!mcpConfig.enableRemoteAccess()) {
@@ -108,7 +109,7 @@ public class McpRestResource extends RestResource {
             final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
             LOG.info("Received JSONRPCrequest {}", request);
             try {
-                final PermissionHelper permissionHelper = new PermissionHelper(getCurrentUser(), securityContext);
+                final PermissionHelper permissionHelper = new PermissionHelper(getCurrentUser(), securityContext, searchUser);
                 final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId);
 
                 return Response.ok(new McpSchema.JSONRPCResponse("2.0",
