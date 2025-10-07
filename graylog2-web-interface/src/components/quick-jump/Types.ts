@@ -18,6 +18,7 @@ import type { PAGE_TYPE, ENTITY_TYPE } from 'components/quick-jump/Constants';
 import type { QualifiedUrl } from 'routing/Routes';
 
 export type SearchResultItem = {
+  key?: string;
   type: typeof PAGE_TYPE | typeof ENTITY_TYPE;
   link: QualifiedUrl<string>;
   title: string;

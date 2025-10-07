@@ -99,6 +99,8 @@ const getBaseEntityRoute = (id: string, type: string) => {
       return Routes.SYSTEM.PIPELINES.PIPELINE(id);
     case 'input':
       return Routes.SYSTEM.INPUT_DIAGNOSIS(id);
+    case 'event_notification':
+      return Routes.ALERTS.NOTIFICATIONS.show(id);
     default:
       return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
   }

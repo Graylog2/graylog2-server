@@ -69,7 +69,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
         <List>
           <ListGroup>
             {searchResults.map((item) => (
-              <LinkContainer to={item.link} key={item.title} onClick={onToggle}>
+              <LinkContainer to={item.link} key={item.key || item.title} onClick={onToggle}>
                 <ListGroupItem>
                   {item.title}
                   <br />
