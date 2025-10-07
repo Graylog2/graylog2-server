@@ -19,7 +19,7 @@ import type { QualifiedUrl } from 'routing/Routes';
 
 export type SearchResultItem = {
   type: typeof PAGE_TYPE | typeof ENTITY_TYPE;
-  link: QualifiedUrl<string;
+  link: QualifiedUrl<string>;
   title: string;
   backendScore?: number;
 };
