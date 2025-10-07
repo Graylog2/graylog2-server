@@ -40,8 +40,9 @@ import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.security.Principal;
 import java.util.Collection;
@@ -50,17 +51,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-
 public class McpRestResourceTest {
 
-    private final Injector injector;
-    private final InMemoryClusterConfigService clusterConfigService;
-    private McpRestResource resource;
+    private static InMemoryClusterConfigService clusterConfigService;
+    private static McpRestResource resource;
 
-    public McpRestResourceTest() {
+    @BeforeAll
+    public static void setUp() throws Exception {
         clusterConfigService = new InMemoryClusterConfigService();
-        injector = GuiceInjectorHolder.createInjector(List.of(
+        final Injector injector = GuiceInjectorHolder.createInjector(List.of(
                 new AbstractModule() {
                     @Override
                     protected void configure() {
@@ -68,15 +67,12 @@ public class McpRestResourceTest {
                         bind(SecurityContext.class).toInstance(new DummySecurityContext());
                         bind(UserService.class).toInstance(new DummyUserService());
                         bind(AuditEventSender.class).toInstance(new NullAuditEventSender());
-                        MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<Tool<?, ?>>() {});
+                        MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class),
+                                               new TypeLiteral<Tool<?, ?>>() {});
                         MapBinder.newMapBinder(binder(), GRNType.class, ResourceProvider.class);
                     }
                 }
         ));
-    }
-
-    @Before
-    public void setUp() throws Exception {
         resource = injector.getInstance(McpRestResource.class);
         clusterConfigService.write(McpConfiguration.create(false));
     }
@@ -84,13 +80,13 @@ public class McpRestResourceTest {
     @Test
     public void postDisabledWithClusterConfig() {
         final Response response = resource.get();
-        assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+        Assertions.assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
     }
 
     @Test
     public void getDisabledWithClusterConfig() {
         final Response response = resource.get();
-        assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
+        Assertions.assertEquals(Response.Status.FORBIDDEN.getStatusCode(), response.getStatus());
     }
 
     private static class DummySecurityContext implements SecurityContext {
