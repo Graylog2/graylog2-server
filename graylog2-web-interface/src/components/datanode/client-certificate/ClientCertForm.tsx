@@ -135,7 +135,7 @@ const ClientCertForm = ({ onCancel }: Props) => {
           </Modal.Body>
           <Modal.Footer>
             <ButtonToolbar>
-              <Button bsStyle="success" onClick={() => onCancel()}>
+              <Button bsStyle="primary" onClick={() => onCancel()}>
                 Close
               </Button>
             </ButtonToolbar>
