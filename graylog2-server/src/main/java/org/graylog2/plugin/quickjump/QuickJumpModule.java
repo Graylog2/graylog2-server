@@ -27,6 +27,9 @@ import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPackV1;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.inputs.InputImpl;
+import org.graylog2.lookup.db.DBCacheService;
+import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.quickjump.rest.QuickJumpResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -53,5 +56,11 @@ public class QuickJumpModule extends PluginModule {
         addQuickJumpProvider(QuickJumpProvider.create("input", InputImpl.class));
         addQuickJumpProvider(QuickJumpProvider.create("user", UserImpl.class, List.of(UserImpl.FULL_NAME, UserImpl.USERNAME)));
         addQuickJumpProvider(QuickJumpProvider.create("index_set", IndexSetConfig.class));
+        addQuickJumpProvider(QuickJumpProvider.create("lookup_table", DBLookupTableService.COLLECTION_NAME,
+                (id, user) -> user.isPermitted(RestPermissions.LOOKUP_TABLES_READ, id)));
+        addQuickJumpProvider(QuickJumpProvider.create("lookup_table_data_adapter", DBDataAdapterService.COLLECTION_NAME,
+                (id, user) -> user.isPermitted(RestPermissions.LOOKUP_TABLES_READ, id)));
+        addQuickJumpProvider(QuickJumpProvider.create("lookup_table_cache", DBCacheService.COLLECTION_NAME,
+                (id, user) -> user.isPermitted(RestPermissions.LOOKUP_TABLES_READ, id)));
     }
 }
