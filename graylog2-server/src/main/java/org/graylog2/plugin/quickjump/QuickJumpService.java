@@ -110,8 +110,7 @@ public class QuickJumpService {
 
         final var project = new Document("$project", new Document()
                 .append("_id", 1)
-                .append("title", 1)
-                .append("createdAt", 1)
+                .append("title", "$" + fields.getFirst())
                 .append("source", sourceName)
                 .append("type", typeField)
                 .append("score", score)
