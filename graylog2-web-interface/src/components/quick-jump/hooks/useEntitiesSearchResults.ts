@@ -20,6 +20,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 import { getEntityRoute } from 'routing/hooks/useShowRouteForEntity';
+import StringUtils from 'util/StringUtils';
 
 import type { SearchResultItem } from '../Types';
 import { ENTITY_TYPE } from '../Constants';
@@ -50,7 +51,7 @@ const useEntitiesSearchResults = (request: QuickJumpRequest): SearchResultItem[]
 
   const searchResultItems: SearchResultItem[]  = entitiesSearchResults?.results?.map((item) => ({
     type: ENTITY_TYPE,
-    title: `${item.type} / ${item.title}`,
+    title: `${StringUtils.capitalizeFirstLetter(item.type)} / ${item.title}`,
     link: getEntityRoute(item.id, item.type),
     backendScore: 100,
   }))
