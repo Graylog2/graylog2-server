@@ -37,7 +37,7 @@ const CreateButton = ({ entityKey }: Props) => {
   const entityCreator = useEntityCreator(entityKey);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
-  const onClick = useCallback(() => {
+  const _onClick = useCallback(() => {
     const { telemetryEvent } = entityCreator;
     if (telemetryEvent) {
       sendTelemetry(telemetryEvent.type, {
@@ -57,7 +57,7 @@ const CreateButton = ({ entityKey }: Props) => {
   return (
     <PermissionWrapper>
       <LinkContainer to={entityCreator.path}>
-        <Button bsSize="md" bsStyle="primary" onClick={onClick}>
+        <Button bsSize="md" bsStyle="primary" onClick={_onClick}>
           {entityCreator.title}
         </Button>
       </LinkContainer>

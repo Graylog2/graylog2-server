@@ -38,6 +38,7 @@ import NavigationBindings from 'components/navigation/bindings';
 import SecurityBindings from 'components/security/bindings';
 import EventsBindings from 'components/events/bindings';
 import ComponentsBindings from 'components/common/bindings';
+import EntityCreatorBindings from 'components/entityCreatorBindings';
 
 import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
@@ -58,6 +59,7 @@ PluginStore.register(new PluginManifest({}, NavigationBindings));
 PluginStore.register(new PluginManifest({}, SecurityBindings));
 PluginStore.register(new PluginManifest({}, EventsBindings));
 PluginStore.register(new PluginManifest({}, ComponentsBindings));
+PluginStore.register(new PluginManifest({}, EntityCreatorBindings));
 
 const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
