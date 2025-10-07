@@ -18,11 +18,15 @@ import Routes from 'routing/Routes';
 import assertUnreachable from 'logic/assertUnreachable';
 import usePluginEntities from 'hooks/usePluginEntities';
 
-const getFirstMatchingEntityRoute = (
+const getFirstMatchingEntityRouteFromPlugin = (
   entityRouteResolver: Array<(id: string, type: string) => string | null>,
   id: string,
   type: string,
 ) => {
+  if (!entityRouteResolver?.length) {
+    return undefined;
+  }
+
   for (let i = 0; i < entityRouteResolver.length; i += 1) {
     const entityRoute = entityRouteResolver[i](id, type);
 
@@ -40,10 +44,10 @@ const useEntityRouteFromPlugin = (id: string, type: string) => {
     return null;
   }
 
-  return getFirstMatchingEntityRoute(pluginEntityRoutesResolver, id, type);
+  return getFirstMatchingEntityRouteFromPlugin(pluginEntityRoutesResolver, id, type);
 };
 
-export const getEntityRoute = (id: string, type: string) => {
+const getBaseEntityRoute = (id: string, type: string) => {
   switch (type?.toLowerCase()) {
     case 'user':
       return Routes.SYSTEM.USERS.show(id);
@@ -100,6 +104,16 @@ export const getEntityRoute = (id: string, type: string) => {
   }
 }
 
+export const getEntityRoute = (id: string, type: string, entityRouteResolver: Array<(id: string, type: string) => string | null>) => {
+  const entityRouteFromPlugin = getFirstMatchingEntityRouteFromPlugin(entityRouteResolver, id, type)
+
+  if (entityRouteFromPlugin) {
+    return entityRouteFromPlugin;
+  }
+
+  return getBaseEntityRoute(id, type);
+}
+
 const useShowRouteForEntity = (id: string, type: string) => {
   const entityRouteFromPlugin = useEntityRouteFromPlugin(id, type);
 
@@ -107,7 +121,7 @@ const useShowRouteForEntity = (id: string, type: string) => {
     return entityRouteFromPlugin;
   }
 
-  return getEntityRoute(id, type);
+  return getBaseEntityRoute(id, type);
 };
 
 export default useShowRouteForEntity;

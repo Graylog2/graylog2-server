@@ -21,6 +21,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 import { getEntityRoute } from 'routing/hooks/useShowRouteForEntity';
 import StringUtils from 'util/StringUtils';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import type { SearchResultItem } from '../Types';
 import { ENTITY_TYPE } from '../Constants';
@@ -37,26 +38,28 @@ export type QuickJumpResponse = {
 
 export const fetchEntitiesSearchResults = (request: QuickJumpRequest) => fetch<{ results: QuickJumpResponse[] }>('POST', qualifyUrl('quickjump'), request, false);
 
-const useEntitiesSearchResults = (request: QuickJumpRequest): SearchResultItem[] => {
+const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] => {
   const { data: entitiesSearchResults } = useQuery({
     queryKey: ['quick-jump', request],
     queryFn: () =>
       defaultOnError(
         fetchEntitiesSearchResults(request),
         'Fetch Entities Search Results failed with status',
-        'Could not Fetch Entities Search Results.',
+        'Could not Fetch Entity Search Results.',
       ),
     enabled: !!request?.query,
   });
 
-  const searchResultItems: SearchResultItem[]  = entitiesSearchResults?.results?.map((item) => ({
+  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
+
+  const searchResultItems: SearchResultItem[] = entitiesSearchResults?.results?.map((item) => ({
     type: ENTITY_TYPE,
     title: `${StringUtils.capitalizeFirstLetter(item.type)} / ${item.title}`,
-    link: getEntityRoute(item.id, item.type),
+    link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver),
     backendScore: 100,
   }))
   
   return searchResultItems || [];
 };
 
-export default useEntitiesSearchResults;
+export default useEntitySearchResults;
