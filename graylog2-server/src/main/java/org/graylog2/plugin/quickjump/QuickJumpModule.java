@@ -25,6 +25,7 @@ import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPackV1;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.inputs.InputImpl;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.quickjump.rest.QuickJumpResource;
@@ -51,5 +52,6 @@ public class QuickJumpModule extends PluginModule {
                 List.of(ContentPackV1.FIELD_NAME, ContentPackV1.FIELD_DESCRIPTION, ContentPackV1.FIELD_SUMMARY)));
         addQuickJumpProvider(QuickJumpProvider.create("input", InputImpl.class));
         addQuickJumpProvider(QuickJumpProvider.create("user", UserImpl.class, List.of(UserImpl.FULL_NAME, UserImpl.USERNAME)));
+        addQuickJumpProvider(QuickJumpProvider.create("index_set", IndexSetConfig.class));
     }
 }
