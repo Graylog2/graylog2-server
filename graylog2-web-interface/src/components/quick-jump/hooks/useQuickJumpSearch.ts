@@ -1,5 +1,4 @@
 import type * as Immutable from 'immutable';
-import type React from 'react';
 import { useState } from 'react';
 
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
@@ -7,6 +6,9 @@ import { isPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
+import { PAGE_TYPE } from 'components/quick-jump/Constants';
+
+import useRankResults from './useRankResults';
 
 const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
   activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
@@ -41,27 +43,23 @@ const useMainNavigationItems = () => {
 
       return true;
     })
-    .map((item) => ({ type: 'page', link: item.path, title: item.description }));
+    .map((item) => ({ type: PAGE_TYPE, link: item.path, title: item.description }));
 };
 
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const allNavItems = useMainNavigationItems();
 
-  // {
-  //   type: 'page'
-  //   link: '/search'
-  //   title: 'Search'
-  // }
-
-  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value);
-  };
+  const searchResults = useRankResults(allNavItems, {
+    query: searchQuery,
+    categoryWeights: { page: 0.9, entity: 1.0 },
+    minRelevance: 0.35,
+  });
 
   return {
     searchQuery,
-    searchResults: allNavItems,
-    setSearchQuery: handleSearch,
+    searchResults,
+    setSearchQuery,
   };
 };
 

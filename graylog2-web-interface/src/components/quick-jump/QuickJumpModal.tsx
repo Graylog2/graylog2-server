@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback } from 'react';
 import styled from 'styled-components';
 
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -44,6 +44,13 @@ type Props = {
 const QuickJumpModal = ({ onToggle }: Props) => {
   const { searchQuery, setSearchQuery, searchResults } = useQuickJumpSearch();
 
+  const handleSearch = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchQuery(event.target.value);
+    },
+    [setSearchQuery],
+  );
+
   return (
     <Modal onHide={onToggle} show bsSize="large">
       <Modal.Header>
@@ -56,7 +63,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           data-autofocus
           id="quick-jump-search"
           type="text"
-          onChange={setSearchQuery}
+          onChange={handleSearch}
           placeholder="Search..."
         />
         <List>
