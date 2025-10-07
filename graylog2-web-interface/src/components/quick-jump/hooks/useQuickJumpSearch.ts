@@ -66,12 +66,22 @@ const usePageNavigationItems = () => {
   );
 };
 
+const useEntityCreatorItems = () => {
+  const { isPermitted } = usePermissions();
+  const entityCreators = usePluginEntities('entityCreators');
+
+  return entityCreators
+    .filter((creator) => (creator.permissions ? isPermitted(creator.permissions) : true))
+    .map((creator) => ({ type: PAGE_TYPE, link: creator.path, title: creator.title }));
+};
+
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
+  const creatorItems = useEntityCreatorItems();
 
-  const searchResults = useRankResults([...mainNavItems, ...pageNavItems], {
+  const searchResults = useRankResults([...mainNavItems, ...pageNavItems, ...creatorItems], {
     query: searchQuery,
     categoryWeights: { page: 0.9, entity: 1.0 },
     minRelevance: 0.35,
