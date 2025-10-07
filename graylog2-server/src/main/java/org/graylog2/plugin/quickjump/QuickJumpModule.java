@@ -18,17 +18,19 @@ package org.graylog2.plugin.quickjump;
 
 import org.bson.Document;
 import org.graylog.events.notifications.DBNotificationService;
-import org.graylog.events.processor.DBEventDefinitionService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.plugins.views.search.rest.ViewsRestPermissions;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.ServerNodeEntity;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPackV1;
+import org.graylog2.inputs.InputImpl;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.plugin.quickjump.rest.QuickJumpResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamServiceImpl;
+import org.graylog2.streams.StreamImpl;
+import org.graylog2.users.UserImpl;
 
 import java.util.List;
 
@@ -39,15 +41,15 @@ public class QuickJumpModule extends PluginModule {
         addQuickJumpProvider(QuickJumpProvider.create("views", ViewService.COLLECTION_NAME,
                 (id, user) -> user.isPermitted(ViewsRestPermissions.VIEW_READ, id),
                 new Document("$toLower", "$type")));
-        addQuickJumpProvider(QuickJumpProvider.create("stream", StreamServiceImpl.COLLECTION_NAME,
-                (id, user) -> user.isPermitted(RestPermissions.STREAMS_READ, id)));
-        addQuickJumpProvider(QuickJumpProvider.create("event_definition", DBEventDefinitionService.COLLECTION_NAME,
-                (id, user) -> user.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, id)));
+        addQuickJumpProvider(QuickJumpProvider.create("stream", StreamImpl.class));
+        addQuickJumpProvider(QuickJumpProvider.create("event_definition", EventDefinition.class));
         addQuickJumpProvider(QuickJumpProvider.create("event_notification", DBNotificationService.NOTIFICATION_COLLECTION_NAME,
                 (id, user) -> user.isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, id)));
         addQuickJumpProvider(QuickJumpProvider.create("node", ServerNodeEntity.class, List.of(NodeDto.FIELD_HOSTNAME, NodeDto.FIELD_NODE_ID)));
         addQuickJumpProvider(QuickJumpProvider.create("content_pack", ContentPackPersistenceService.COLLECTION_NAME,
                 (id, user) -> user.isPermitted(RestPermissions.CONTENT_PACK_READ, id),
                 List.of(ContentPackV1.FIELD_NAME, ContentPackV1.FIELD_DESCRIPTION, ContentPackV1.FIELD_SUMMARY)));
+        addQuickJumpProvider(QuickJumpProvider.create("input", InputImpl.class));
+        addQuickJumpProvider(QuickJumpProvider.create("user", UserImpl.class, List.of(UserImpl.FULL_NAME, UserImpl.USERNAME)));
     }
 }
