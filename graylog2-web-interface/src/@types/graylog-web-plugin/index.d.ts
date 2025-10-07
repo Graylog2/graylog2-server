@@ -26,6 +26,7 @@ import type { Stream } from 'logic/streams/types';
 import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
+import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 interface PluginRoute {
   path: string;
@@ -263,6 +264,19 @@ interface PageNavigation {
   }>;
 }
 
+type CreatorTelemetryEvent = {
+  type: TelemetryEventType;
+  section: string;
+  actionValue: string;
+};
+interface EntityCreator {
+  id: string;
+  title: string;
+  path: string;
+  permissions?: string | Array<string>;
+  telemetryEvent?: CreatorTelemetryEvent;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -296,6 +310,7 @@ declare module 'graylog-web-plugin/plugin' {
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
     'hooks.logout'?: Array<LogoutHook>;
+    entityCreators?: Array<EntityCreator>;
   }
   interface PluginMetadata {
     name?: string;

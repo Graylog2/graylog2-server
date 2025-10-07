@@ -18,6 +18,7 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export const EVENT_DEFINITIONS_TITLE = 'Event Definitions';
 export const ALERTS_TITLE = 'Alerts & Events';
@@ -33,6 +34,19 @@ const eventsBindings: PluginExports = {
         { description: EVENT_DEFINITIONS_TITLE, path: Routes.ALERTS.DEFINITIONS.LIST },
         { description: NOTIFICATIONS_TITLE, path: Routes.ALERTS.NOTIFICATIONS.LIST },
       ],
+    },
+  ],
+  'entityCreators': [
+    {
+      id: 'Event Definition',
+      title: 'Create event definition',
+      path: Routes.ALERTS.DEFINITIONS.CREATE,
+      telemetryEvent: {
+        type: TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CREATE_BUTTON_CLICKED,
+        section: 'event-definitions',
+        actionValue: 'create-event-definition-button',
+      },
+      permissions: 'eventdefinitions:create',
     },
   ],
 };
