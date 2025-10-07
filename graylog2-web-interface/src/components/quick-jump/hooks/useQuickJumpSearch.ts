@@ -24,6 +24,7 @@ import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
 
 import useRankResults from './useRankResults';
+import useEntitiesSearchResults from './useEntitiesSearchResults';
 
 const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
   activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
@@ -81,8 +82,9 @@ const useQuickJumpSearch = () => {
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
   const creatorItems = useEntityCreatorItems();
+  const entitiyItems = useEntitiesSearchResults({ query: searchQuery });
 
-  const searchResults = useRankResults([...mainNavItems, ...pageNavItems, ...creatorItems], {
+  const searchResults = useRankResults([...entitiyItems, ...mainNavItems, ...pageNavItems, ...creatorItems], {
     query: searchQuery,
     categoryWeights: { page: 0.9, entity: 1.0 },
     minRelevance: 0.35,

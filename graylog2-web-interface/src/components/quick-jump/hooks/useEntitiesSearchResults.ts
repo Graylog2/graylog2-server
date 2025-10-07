@@ -34,7 +34,7 @@ export type QuickJumpResponse = {
   title: string;
 }
 
-export const fetchEntitiesSearchResults = (request: QuickJumpRequest) => fetch<QuickJumpResponse[]>('POST', qualifyUrl('quickjump'), request, false);
+export const fetchEntitiesSearchResults = (request: QuickJumpRequest) => fetch<{ results: QuickJumpResponse[] }>('POST', qualifyUrl('quickjump'), request, false);
 
 const useEntitiesSearchResults = (request: QuickJumpRequest): SearchResultItem[] => {
   const { data: entitiesSearchResults } = useQuery({
@@ -45,16 +45,17 @@ const useEntitiesSearchResults = (request: QuickJumpRequest): SearchResultItem[]
         'Fetch Entities Search Results failed with status',
         'Could not Fetch Entities Search Results.',
       ),
+    enabled: !!request?.query,
   });
 
-  const searchResultItems: SearchResultItem[]  = entitiesSearchResults?.map((item) => ({
+  const searchResultItems: SearchResultItem[]  = entitiesSearchResults?.results?.map((item) => ({
     type: ENTITY_TYPE,
     title: `${item.type} / ${item.title}`,
     link: getEntityRoute(item.id, item.type),
-    backendScore: 0,
+    backendScore: 100,
   }))
-
-  return searchResultItems;
+  
+  return searchResultItems || [];
 };
 
 export default useEntitiesSearchResults;

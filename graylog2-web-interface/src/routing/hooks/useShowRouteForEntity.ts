@@ -79,6 +79,22 @@ export const getEntityRoute = (id: string, type: string) => {
       return Routes.getPluginRoute('COLLECTIONS_COLLECTIONID')?.(id);
     case 'collection_entities':
       return Routes.getPluginRoute('COLLECTIONS_COLLECTIONID')?.(id);
+    case 'index_set':
+      return Routes.SYSTEM.INDEX_SETS.SHOW(id);
+    case 'content_pack':
+      return Routes.SYSTEM.CONTENTPACKS.show(id);
+    case 'lookup_table':
+      return Routes.SYSTEM.LOOKUPTABLES.show(id);
+    case 'lookup_table_cache':
+      return Routes.SYSTEM.LOOKUPTABLES.CACHES.show(id);
+    case 'lookup_table_data_adapter':
+      return Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(id);
+    case 'pipeline_rule':
+      return Routes.SYSTEM.PIPELINES.RULE(id);
+    case 'pipeline':
+      return Routes.SYSTEM.PIPELINES.PIPELINE(id);
+    case 'input':
+      return Routes.SYSTEM.INPUT_DIAGNOSIS(id);
     default:
       return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
   }
