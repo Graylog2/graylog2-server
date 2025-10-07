@@ -11,22 +11,29 @@ import useRankResults from './useRankResults';
 const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
   activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
 
+type BaseNavigationItem = {
+  description: string;
+  path: string;
+  permissions?: string | Array<string>;
+  perspective?: string;
+};
+
 const useMainNavigationItems = () => {
   const { isPermitted } = usePermissions();
-  const allNavigationItems = usePluginEntities('navigation') as any;
+  const navigationItems = usePluginEntities('navigation');
   const { activePerspective } = useActivePerspective();
-  const navigationLinks = allNavigationItems.filter((item) => !item.children);
-  const dropdownLinks = allNavigationItems
-    .filter((item) => item.children)
-    .flatMap((item) =>
-      item.children.map((child) => ({
-        ...child,
-        description: `${item.description} / ${child.description}`,
-        perspective: item.perspective,
-      })),
-    );
 
-  return [...navigationLinks, ...dropdownLinks]
+  const allNavigationItems = navigationItems.flatMap((item) =>
+    'children' in item
+      ? item.children.map<BaseNavigationItem>((child) => ({
+          ...child,
+          description: `${item.description} / ${child.description}`,
+          perspective: item.perspective,
+        }))
+      : [item],
+  );
+
+  return allNavigationItems
     .filter((item) => {
       if (!isPermitted(item.permissions)) {
         return false;
