@@ -38,7 +38,7 @@ export const hotKeysCollections: HotkeyCollections = {
     description: 'General keyboard shortcuts',
     actions: {
       'show-hotkeys-modal': { keys: 'shift+?', displayKeys: '?', description: 'Show available keyboard shorts' },
-      'show-quick-jump-modal': { keys: 'mod+k', description: 'Show quick jump modal' },
+      'show-quick-jump-modal': { keys: ['mod+k', 'mod+space'], description: 'Show quick jump modal' },
       'submit-form': { keys: 'enter', description: 'Submit form' },
       'close-modal': { keys: 'esc', description: 'Close modal' },
       'show-scratchpad-modal': { keys: 'mod+/', description: 'Show scratchpad' },
