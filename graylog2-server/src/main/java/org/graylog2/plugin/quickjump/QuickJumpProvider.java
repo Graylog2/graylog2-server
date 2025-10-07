@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_FIELDS;
 
 public interface QuickJumpProvider {
@@ -40,6 +41,7 @@ public interface QuickJumpProvider {
     }
 
     static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch, Optional<Bson> typeField) {
+        checkArgument(fieldsToSearch != null && !fieldsToSearch.isEmpty(), "fieldsToSearch must not be null or empty");
         return new QuickJumpProvider() {
 
             @Override
