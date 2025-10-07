@@ -43,13 +43,7 @@ const useEntityRouteFromPlugin = (id: string, type: string) => {
   return getFirstMatchingEntityRoute(pluginEntityRoutesResolver, id, type);
 };
 
-const useShowRouteForEntity = (id: string, type: string) => {
-  const entityRouteFromPlugin = useEntityRouteFromPlugin(id, type);
-
-  if (entityRouteFromPlugin) {
-    return entityRouteFromPlugin;
-  }
-
+export const getEntityRoute = (id: string, type: string) => {
   switch (type?.toLowerCase()) {
     case 'user':
       return Routes.SYSTEM.USERS.show(id);
@@ -88,6 +82,16 @@ const useShowRouteForEntity = (id: string, type: string) => {
     default:
       return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
   }
+}
+
+const useShowRouteForEntity = (id: string, type: string) => {
+  const entityRouteFromPlugin = useEntityRouteFromPlugin(id, type);
+
+  if (entityRouteFromPlugin) {
+    return entityRouteFromPlugin;
+  }
+
+  return getEntityRoute(id, type);
 };
 
 export default useShowRouteForEntity;

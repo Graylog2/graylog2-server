@@ -19,6 +19,10 @@ import { useQuery } from '@tanstack/react-query';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
+import { getEntityRoute } from 'routing/hooks/useShowRouteForEntity';
+
+import type { SearchResultItem } from '../Types';
+import { ENTITY_TYPE } from '../Constants';
 
 export type QuickJumpRequest = {
   query: string;
@@ -30,9 +34,9 @@ export type QuickJumpResponse = {
   title: string;
 }
 
-export const fetchEntitiesSearchResults = (request: QuickJumpRequest) => fetch<QuickJumpResponse>('POST', qualifyUrl('quickjump'), request, false);
+export const fetchEntitiesSearchResults = (request: QuickJumpRequest) => fetch<QuickJumpResponse[]>('POST', qualifyUrl('quickjump'), request, false);
 
-const useFetchEntitiesSearchResults = (request: QuickJumpRequest) => {
+const useEntitiesSearchResults = (request: QuickJumpRequest): SearchResultItem[] => {
   const { data: entitiesSearchResults } = useQuery({
     queryKey: ['quick-jump', request],
     queryFn: () =>
@@ -43,7 +47,14 @@ const useFetchEntitiesSearchResults = (request: QuickJumpRequest) => {
       ),
   });
 
-  return entitiesSearchResults;
+  const searchResultItems: SearchResultItem[]  = entitiesSearchResults?.map((item) => ({
+    type: ENTITY_TYPE,
+    title: `${item.type} / ${item.title}`,
+    link: getEntityRoute(item.id, item.type),
+    backendScore: 0,
+  }))
+
+  return searchResultItems;
 };
 
-export default useFetchEntitiesSearchResults;
+export default useEntitiesSearchResults;
