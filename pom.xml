@@ -103,13 +103,13 @@
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.8</asm.version>
+        <asm.version>9.9</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.0</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
         <aws-java-sdk-2.version>2.34.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.3.4</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.82</bouncycastle.version>
         <caffeine.version>3.2.2</caffeine.version>
@@ -161,7 +161,7 @@
         <log4j.version>2.25.2</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <metrics.version>4.2.37</metrics.version>
-        <mongodb-driver.version>5.6.0</mongodb-driver.version>
+        <mongodb-driver.version>5.6.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.6.Final</netty.version>
@@ -191,7 +191,7 @@
         <unboundid-ldap.version>7.0.3</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-4</zstd.version>
+        <zstd.version>1.5.7-5</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -203,7 +203,7 @@
         <assertj-core.version>3.27.6</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.1.1</equalsverifier.version>
+        <equalsverifier.version>4.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
@@ -694,7 +694,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.cyclonedx</groupId>

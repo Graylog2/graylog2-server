@@ -69,7 +69,7 @@ const AuthenticationBackendDetailsPage = ({ params: { backendId } }: Props) => {
         title={_pageTitle(authBackend.title)}
         actions={
           <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authBackend?.id)}>
-            <Button bsStyle="success" type="button">
+            <Button bsStyle="primary" type="button">
               Edit Service
             </Button>
           </LinkContainer>
