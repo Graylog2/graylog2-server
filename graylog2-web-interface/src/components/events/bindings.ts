@@ -49,6 +49,12 @@ const eventsBindings: PluginExports = {
       permissions: 'eventdefinitions:create',
     },
     {
+      id: 'Event Notification',
+      title: 'Create notification',
+      path: Routes.ALERTS.NOTIFICATIONS.CREATE,
+      permissions: 'eventnotifications:create',
+    },
+    {
       id: 'Dashboard',
       title: 'Create dashboard',
       path: Routes.DASHBOARD_NEW,
