@@ -19,6 +19,7 @@ package org.graylog2.plugin.quickjump;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.security.HasPermissions;
+import org.graylog2.database.DbEntity;
 
 import java.util.List;
 import java.util.Optional;
@@ -81,5 +82,25 @@ public interface QuickJumpProvider {
 
     static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, Bson typeField) {
         return create(type, collectionName, isPermittedFn, DEFAULT_FIELDS, Optional.of(typeField));
+    }
+
+    static QuickJumpProvider create(String type, DbEntity entity) {
+        return create(type, entity.collection(), (id, user) -> user.isPermitted(entity.readPermission(), id), DEFAULT_FIELDS, Optional.empty());
+    }
+
+    static QuickJumpProvider create(String type, DbEntity entity, List<String> fieldsToSearch) {
+        return create(type, entity.collection(), (id, user) -> user.isPermitted(entity.readPermission(), id), fieldsToSearch, Optional.empty());
+    }
+
+    static QuickJumpProvider create(String type, Class<?> entityClass) {
+        return create(type, entityClass, DEFAULT_FIELDS);
+    }
+
+    static QuickJumpProvider create(String type, Class<?> entityClass, List<String> fieldsToSearch) {
+        final var dbEntity = entityClass.getAnnotation(DbEntity.class);
+        if (dbEntity == null) {
+            throw new IllegalArgumentException("Class " + entityClass.getName() + " is not annotated with @DbEntity");
+        }
+        return create(type, dbEntity, fieldsToSearch);
     }
 }
