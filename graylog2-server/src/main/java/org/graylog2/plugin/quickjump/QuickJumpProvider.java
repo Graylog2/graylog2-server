@@ -69,6 +69,10 @@ public interface QuickJumpProvider {
         };
     }
 
+    static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch) {
+        return create(type, collectionName, isPermittedFn, fieldsToSearch, Optional.empty());
+    }
+
     static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn) {
         return create(type, collectionName, isPermittedFn, DEFAULT_FIELDS, Optional.empty());
     }
