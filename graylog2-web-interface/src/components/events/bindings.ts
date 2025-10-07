@@ -36,7 +36,7 @@ const eventsBindings: PluginExports = {
       ],
     },
   ],
-  'entityCreators': [
+  entityCreators: [
     {
       id: 'Event Definition',
       title: 'Create event definition',

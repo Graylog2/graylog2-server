@@ -38,7 +38,7 @@ interface PluginRoute {
 
 interface PluginNavigationDropdownItem {
   description: string;
-  path: string;
+  path: QualifiedUrl<string>;
   permissions?: string | Array<string>;
   requiredFeatureFlag?: string;
 }
@@ -272,7 +272,7 @@ type CreatorTelemetryEvent = {
 interface EntityCreator {
   id: string;
   title: string;
-  path: string;
+  path: QualifiedUrl<string>;
   permissions?: string | Array<string>;
   telemetryEvent?: CreatorTelemetryEvent;
 }

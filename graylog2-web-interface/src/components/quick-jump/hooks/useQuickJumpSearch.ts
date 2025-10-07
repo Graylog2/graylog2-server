@@ -21,6 +21,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { PAGE_TYPE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
+import type { QualifiedUrl } from 'routing/Routes';
 
 import useRankResults from './useRankResults';
 
@@ -29,7 +30,7 @@ const matchesPerspective = (activePerspective: string, itemPerspective: string) 
 
 type BaseNavigationItem = {
   description: string;
-  path: string;
+  path: QualifiedUrl<string>;
   permissions?: string | Array<string>;
   perspective?: string;
 };
