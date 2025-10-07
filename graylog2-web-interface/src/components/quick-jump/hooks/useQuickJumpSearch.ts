@@ -54,11 +54,24 @@ const useMainNavigationItems = () => {
     .map((item) => ({ type: PAGE_TYPE, link: item.path, title: item.description }));
 };
 
+const usePageNavigationItems = () => {
+  const { isPermitted } = usePermissions();
+  const pageNavigationItems = usePluginEntities('pageNavigation');
+
+  return pageNavigationItems.flatMap((group) =>
+    [...group.children]
+      .filter((page) => isPermitted(page.permissions))
+      .slice(1)
+      .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
+  );
+};
+
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const allNavItems = useMainNavigationItems();
+  const mainNavItems = useMainNavigationItems();
+  const pageNavItems = usePageNavigationItems();
 
-  const searchResults = useRankResults(allNavItems, {
+  const searchResults = useRankResults([...mainNavItems, ...pageNavItems], {
     query: searchQuery,
     categoryWeights: { page: 0.9, entity: 1.0 },
     minRelevance: 0.35,
