@@ -30,39 +30,7 @@ import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
 import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 
-const _existingDropdownItemIndex = (
-  existingNavigationItems: Array<PluginNavigation>,
-  newNavigationItem: PluginNavigation,
-) => {
-  if (!newNavigationItem.children) {
-    return -1;
-  }
-
-  return existingNavigationItems.findIndex(
-    ({ description, perspective, children }) =>
-      newNavigationItem.description === description && newNavigationItem.perspective === perspective && children,
-  );
-};
-
-const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> =>
-  navigationItems.reduce((result, current) => {
-    const existingDropdownItemIndex = _existingDropdownItemIndex(result, current);
-
-    if (existingDropdownItemIndex >= 0) {
-      const existingDropdownItem = result[existingDropdownItemIndex];
-      const newDropdownItem = {
-        ...current,
-        ...existingDropdownItem,
-        children: [...existingDropdownItem.children, ...current.children],
-      };
-      const newResult = [...result];
-      newResult[existingDropdownItemIndex] = newDropdownItem;
-
-      return newResult;
-    }
-
-    return [...result, current];
-  }, []);
+import mergeNavigationItems from './util/mergeNavigationItems';
 
 const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, description: string) => {
   if (!navigationItems?.length) {
@@ -83,7 +51,7 @@ const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
   const { activePerspective } = useActivePerspective();
   const allNavigationItems = usePluginEntities('navigation');
-  const navigationItems = useMemo(() => mergeDuplicateDropdowns(allNavigationItems), [allNavigationItems]);
+  const navigationItems = useMemo(() => mergeNavigationItems(allNavigationItems), [allNavigationItems]);
 
   const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
 

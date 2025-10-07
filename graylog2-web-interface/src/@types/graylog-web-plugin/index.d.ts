@@ -251,9 +251,27 @@ interface PluginDataLake {
   DataLakeStreamDeleteWarning: React.ComponentType;
 }
 
+interface PageNavigation {
+  description: string;
+  children: Array<{
+    description: string;
+    position?: PluginNavigation['position'];
+    permissions?: string | Array<string>;
+    useIsValidLicense?: () => boolean;
+    path: QualifiedUrl<string>;
+    exactPathMatch?: boolean;
+  }>;
+}
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    /**
+     * List of nav items. Define permissions if the item should only be displayed for users with specific permissions.
+     * By default, an item is active if the current URL starts with the item URL.
+     * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
+     */
+    pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;

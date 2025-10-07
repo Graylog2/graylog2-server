@@ -28,6 +28,8 @@ import NavItemStateIndicator, {
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
+import usePluginEntities from 'hooks/usePluginEntities';
+import mergeNavigationItems from 'components/navigation/util/mergeNavigationItems';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -64,6 +66,18 @@ const StyledButton = styled(Button)(
 
 StyledButton.displayName = 'Button';
 
+const usePageNavigationItems = (page: string, itemsProp: Array<PageNavItem>) => {
+  const allPageNavigationItems = usePluginEntities('pageNavigation');
+
+  return useMemo(() => {
+    if (itemsProp) {
+      return itemsProp;
+    }
+
+    return mergeNavigationItems(allPageNavigationItems).find((item) => item.description === page)?.children ?? [];
+  }, [allPageNavigationItems, itemsProp, page]);
+};
+
 type PageNavItem = {
   description: string;
   path: string;
@@ -74,20 +88,18 @@ type PageNavItem = {
 };
 
 type Props = {
-  /**
-   * List of nav items. Define permissions if the item should only be displayed for users with specific permissions.
-   * By default, an item is active if the current URL starts with the item URL.
-   * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
-   */
-  items: Array<PageNavItem>;
+  // key of the group in the plugin system
+  page?: string;
+  items?: Array<PageNavItem>;
 };
 
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
-const PageNavigation = ({ items }: Props) => {
+const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Props) => {
   const currentUser = useCurrentUser();
 
+  const items = usePageNavigationItems(page, itemsProp);
   const formatedItems = useMemo(() => {
     const availableItems = items.filter(
       (item) =>
