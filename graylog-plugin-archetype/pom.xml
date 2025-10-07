@@ -46,7 +46,7 @@
             <extension>
                 <groupId>org.apache.maven.archetype</groupId>
                 <artifactId>archetype-packaging</artifactId>
-                <version>3.4.0</version>
+                <version>3.4.1</version>
             </extension>
         </extensions>
 
