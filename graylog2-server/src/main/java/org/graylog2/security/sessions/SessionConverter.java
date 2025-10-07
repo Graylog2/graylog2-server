@@ -23,18 +23,14 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.graylog2.rest.models.system.sessions.SessionUtils;
-import org.slf4j.Logger;
 
 import java.util.Date;
 import java.util.Optional;
 import java.util.Set;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
-import static org.slf4j.LoggerFactory.getLogger;
 
 public class SessionConverter {
-    private static final Logger LOG = getLogger(SessionConverter.class);
-
     public static final Set<String> KNOWN_SESSION_KEYS = Set.of(
             DefaultSubjectContext.PRINCIPALS_SESSION_KEY,
             DefaultSubjectContext.AUTHENTICATED_SESSION_KEY,
