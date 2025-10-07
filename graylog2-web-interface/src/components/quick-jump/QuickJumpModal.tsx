@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
 import useQuickJumpSearch from 'components/quick-jump/hooks/useQuickJumpSearch';
+import StringUtils from 'util/StringUtils';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -29,6 +30,12 @@ const List = styled.div`
   overflow: auto;
   max-height: calc(90vh - 150px);
 `;
+
+const EntityType = styled.div(
+  ({ theme }) => `
+  color: ${theme.colors.text.secondary};
+`,
+);
 
 type Props = {
   onToggle: () => void;
@@ -56,7 +63,11 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           <ListGroup>
             {searchResults.map((item) => (
               <LinkContainer to={item.link} key={item.title} onClick={onToggle}>
-                <ListGroupItem>{item.title}</ListGroupItem>
+                <ListGroupItem>
+                  {item.title}
+                  <br />
+                  <EntityType>{StringUtils.capitalizeFirstLetter(item.type)}</EntityType>
+                </ListGroupItem>
               </LinkContainer>
             ))}
           </ListGroup>
