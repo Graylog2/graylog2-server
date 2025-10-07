@@ -29,6 +29,7 @@ import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.quickjump.rest.QuickJumpResponse;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,11 +49,16 @@ public class QuickJumpService {
 
     private final MongoCollection<Result> collection;
     private final Map<String, QuickJumpProvider> providers;
+    private final int maxFieldsLength;
 
     @Inject
     public QuickJumpService(MongoCollections mongoCollections, Set<QuickJumpProvider> providers) {
         this.collection = mongoCollections.collection(DUMMY_COLLECTION, Result.class);
         this.providers = providers.stream().collect(Collectors.toMap(QuickJumpProvider::type, Function.identity()));
+        this.maxFieldsLength = providers.stream()
+                .map(provider -> provider.fieldsToSearch().size())
+                .max(Comparator.naturalOrder())
+                .orElse(DEFAULT_FIELDS.size());
     }
 
     public QuickJumpResponse search(String query, int limit, HasPermissions user) {
@@ -96,14 +102,14 @@ public class QuickJumpService {
         return provider != null && provider.isPermitted(result.id(), user);
     }
 
-    private static List<Bson> branchPipeline(String query, List<String> fields, String sourceName, Bson typeField) {
+    private List<Bson> branchPipeline(String query, List<String> fields, String sourceName, Bson typeField) {
         final var match = new Document("$match", new Document("$or",
                 fields.stream().map(field -> new Document(field, new Document("$regex", query).append("$options", "i"))).toList()
         ));
 
         final var fieldMatchers = IntStream.range(0, fields.size())
                 .boxed()
-                .flatMap(idx -> fieldMatchers(query, fields.reversed().get(idx), idx * 10))
+                .flatMap(idx -> fieldMatchers(query, fields.get(idx), (maxFieldsLength - idx) * 10))
                 .toList();
 
         final var score = new Document("$switch", new Document("branches", fieldMatchers).append("default", 0));
