@@ -48,6 +48,17 @@ const eventsBindings: PluginExports = {
       },
       permissions: 'eventdefinitions:create',
     },
+    {
+      id: 'Dashboard',
+      title: 'Create dashboard',
+      path: Routes.DASHBOARD_NEW,
+      telemetryEvent: {
+        type: TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_CLICKED,
+        section: 'dashboard',
+        actionValue: 'dashboard-create-button',
+      },
+      permissions: 'dashboard:create',
+    },
   ],
 };
 
