@@ -1,23 +1,18 @@
-import type * as Immutable from 'immutable';
 import { useState } from 'react';
 
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
-import { isPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import { PAGE_TYPE } from 'components/quick-jump/Constants';
+import usePermissions from 'hooks/usePermissions';
 
 import useRankResults from './useRankResults';
 
 const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
   activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
 
-const matchesPermission = (userPermissions: Immutable.List<string>, itemPermissions: Array<string>) =>
-  isPermitted(userPermissions, itemPermissions);
-
 const useMainNavigationItems = () => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const allNavigationItems = usePluginEntities('navigation') as any;
   const { activePerspective } = useActivePerspective();
   const navigationLinks = allNavigationItems.filter((item) => !item.children);
@@ -33,7 +28,7 @@ const useMainNavigationItems = () => {
 
   return [...navigationLinks, ...dropdownLinks]
     .filter((item) => {
-      if (!matchesPermission(currentUser.permissions, item.permissions)) {
+      if (!isPermitted(item.permissions)) {
         return false;
       }
 
