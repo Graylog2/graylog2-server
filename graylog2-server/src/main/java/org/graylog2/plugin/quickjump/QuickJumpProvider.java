@@ -85,7 +85,7 @@ public interface QuickJumpProvider {
     }
 
     static QuickJumpProvider create(String type, DbEntity entity) {
-        return create(type, entity.collection(), (id, user) -> user.isPermitted(entity.readPermission(), id), DEFAULT_FIELDS, Optional.empty());
+        return create(type, entity, DEFAULT_FIELDS);
     }
 
     static QuickJumpProvider create(String type, DbEntity entity, List<String> fieldsToSearch) {
