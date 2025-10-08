@@ -39,15 +39,6 @@ const getFirstMatchingEntityRouteFromPlugin = (
   return undefined;
 };
 
-const useEntityRouteFromPlugin = (id: string, type: string) => {
-  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
-  if (!pluginEntityRoutesResolver?.length) {
-    return null;
-  }
-
-  return getFirstMatchingEntityRouteFromPlugin(pluginEntityRoutesResolver, id, type);
-};
-
 const getBaseEntityRoute = (id: string, type: string): QualifiedUrl<string> => {
   switch (type?.toLowerCase()) {
     case 'user':
@@ -122,13 +113,12 @@ export const getEntityRoute = (
 };
 
 const useShowRouteForEntity = (id: string, type: string) => {
-  const entityRouteFromPlugin = useEntityRouteFromPlugin(id, type);
-
-  if (entityRouteFromPlugin) {
-    return entityRouteFromPlugin;
+  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
+  if (!pluginEntityRoutesResolver?.length) {
+    return null;
   }
 
-  return getBaseEntityRoute(id, type);
+  return getEntityRoute(id, type, pluginEntityRoutesResolver);
 };
 
 export default useShowRouteForEntity;
