@@ -45,16 +45,14 @@ import java.util.Optional;
 public abstract class Tool<P, O> {
 
     private static final SchemaGeneratorConfig CONFIG;
+
     static {
-        var builder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
-                .with(Option.FIELDS_DERIVED_FROM_ARGUMENTFREE_METHODS,
-                      Option.NONSTATIC_NONVOID_NONGETTER_METHODS)
+        var builder = new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON).with(
+                        Option.FIELDS_DERIVED_FROM_ARGUMENTFREE_METHODS, Option.NONSTATIC_NONVOID_NONGETTER_METHODS)
                 .with(new EmptyObjectAsObjectModule())
-                .with(new JacksonModule(
-                        JacksonOption.INCLUDE_ONLY_JSONPROPERTY_ANNOTATED_METHODS,
-                        JacksonOption.RESPECT_JSONPROPERTY_REQUIRED,
-                        JacksonOption.RESPECT_JSONPROPERTY_ORDER
-                ))
+                .with(new JacksonModule(JacksonOption.INCLUDE_ONLY_JSONPROPERTY_ANNOTATED_METHODS,
+                                        JacksonOption.RESPECT_JSONPROPERTY_REQUIRED,
+                                        JacksonOption.RESPECT_JSONPROPERTY_ORDER))
                 .with(new JakartaValidationModule());
         builder.forFields()
                 // peel out default values from annotations, supports both Jakarta & Jackson annotations
@@ -67,8 +65,45 @@ public abstract class Tool<P, O> {
                     final JsonProperty jackson = field.getAnnotationConsideringFieldAndGetter(JsonProperty.class);
                     return jackson == null || jackson.defaultValue().isEmpty() ? null : jackson.defaultValue();
                 });
+        // Methods: allow (1) bean getters, (2) @JsonProperty methods, (3) zero-arg non-void accessors (AutoValue).
+        builder.forMethods().withIgnoreCheck(m -> {
+                    // keep bean getters
+                    if (m.isGetter()) return false;
+
+                    // keep explicit @JsonProperty methods
+                    if (m.getAnnotation(JsonProperty.class) != null) return false;
+
+                    // keep AutoValue-style accessors: zero-arg, non-void
+                    boolean zeroArgNonVoid = m.getRawMember().getParameterCount() == 0 &&
+                                             m.getRawMember().getReturnType() != Void.TYPE;
+                    if (!zeroArgNonVoid) return true;
+
+                    // if there's a field with the same name, prefer the field (avoid dupes like "type" + "type()")
+                    String candidate = m.getName(); // e.g., "fields" from "fields()"
+                    return m.getDeclaringType()
+                            .getMemberFields()
+                            .stream()
+                            .anyMatch(f -> f.getName().equals(candidate)); // ignore method when a same-named field exists
+                })
+                .withPropertyNameOverrideResolver(m -> {
+                    // @JsonProperty wins (also covers non-bean methods if you annotate them)
+                    JsonProperty jp = m.getAnnotation(JsonProperty.class);
+                    if (jp != null && jp.value() != null && !jp.value().isEmpty()) {
+                        return jp.value();
+                    }
+
+                    // Bean getters resolve to their normal JSON names (getFoo/isBar -> "foo"/"bar")
+                    if (m.isGetter()) {
+                        return m.getSchemaPropertyName();
+                    }
+
+                    // AutoValue-style accessors: use the method name without "()"
+                    // e.g., "fields()" -> "fields"
+                    return m.getName();
+                });
         CONFIG = builder.build();
     }
+
     private static final SchemaGenerator GENERATOR = new SchemaGenerator(CONFIG);
 
     private final ObjectMapper objectMapper;
