@@ -95,8 +95,7 @@ public class QuickJumpService {
         return new QuickJumpResponse(results.stream()
                 .filter(result -> checkPermission(result, user))
                 .map(result -> new QuickJumpResponse.Result(result.type(), result.entityId(), result.title(), result.score()))
-                .toList(),
-                maxFieldsLength * 10
+                .toList()
         );
     }
 

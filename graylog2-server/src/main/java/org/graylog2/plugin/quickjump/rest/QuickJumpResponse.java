@@ -18,10 +18,10 @@ package org.graylog2.plugin.quickjump.rest;
 
 import java.util.List;
 
-public record QuickJumpResponse(List<Result> results, int maxBaseScore) {
+public record QuickJumpResponse(List<Result> results) {
     public record Result(String type, String id, String title, int score) {}
 
     public static QuickJumpResponse empty() {
-        return new QuickJumpResponse(List.of(), 0);
+        return new QuickJumpResponse(List.of());
     }
 }
