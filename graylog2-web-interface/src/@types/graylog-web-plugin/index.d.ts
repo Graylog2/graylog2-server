@@ -254,6 +254,7 @@ interface PluginDataLake {
 
 interface PageNavigation {
   description: string;
+  perspective?: string;
   children: Array<{
     description: string;
     position?: PluginNavigation['position'];

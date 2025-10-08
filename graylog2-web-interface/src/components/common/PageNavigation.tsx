@@ -31,6 +31,8 @@ import sortNavigationItems from 'components/navigation/util/sortNavigationItems'
 import usePluginEntities from 'hooks/usePluginEntities';
 import mergeNavigationItems from 'components/navigation/util/mergeNavigationItems';
 import AppConfig from 'util/AppConfig';
+import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
+import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -67,16 +69,24 @@ const StyledButton = styled(Button)(
 
 StyledButton.displayName = 'Button';
 
+const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
+  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
+
 const usePageNavigationItems = (page: string, itemsProp: Array<PageNavItem>) => {
+  const { activePerspective } = useActivePerspective();
   const allPageNavigationItems = usePluginEntities('pageNavigation');
+
+  const perspectiveNavItems = allPageNavigationItems.filter((group) =>
+    matchesPerspective(activePerspective.id, group.perspective),
+  );
 
   return useMemo(() => {
     if (itemsProp) {
       return itemsProp;
     }
 
-    return mergeNavigationItems(allPageNavigationItems).find((item) => item.description === page)?.children ?? [];
-  }, [allPageNavigationItems, itemsProp, page]);
+    return mergeNavigationItems(perspectiveNavItems).find((item) => item.description === page)?.children ?? [];
+  }, [perspectiveNavItems, itemsProp, page]);
 };
 
 type PageNavItem = {
@@ -103,7 +113,7 @@ const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Prop
 
   const availableItems = items.filter(
     (item) =>
-      (item.featureFlag ? AppConfig.isFeatureEnabled(item.requiredFeatureFlag) : true) &&
+      (item.requiredFeatureFlag ? AppConfig.isFeatureEnabled(item.requiredFeatureFlag) : true) &&
       (typeof item.useCondition === 'function' ? item.useCondition() : true) &&
       isPermitted(currentUser.permissions, item.permissions) &&
       !!item.path,
@@ -111,7 +121,7 @@ const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Prop
 
   const formatedItems = sortNavigationItems<PageNavItem>(availableItems);
 
-  if (formatedItems.length === 0) {
+  if (formatedItems.length <= 1) {
     return null;
   }
 
