@@ -16,8 +16,8 @@
  */
 import { useQuery } from '@tanstack/react-query';
 
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
+import { QuickJump } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 import { getEntityRoute, usePluginEntityTypeGenerators } from 'routing/hooks/useShowRouteForEntity';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -36,19 +36,16 @@ export type QuickJumpResponse = {
   score: number;
 };
 
-export const fetchEntitiesSearchResults = (request: QuickJumpRequest) =>
-  fetch<{ results: QuickJumpResponse[] }>('POST', qualifyUrl('quickjump'), request, false);
-
-const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] => {
+const useEntitySearchResults = (request: QuickJumpRequest) => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
   const [searchQuery] = useDebouncedValue(request?.query, 500);
 
-  const { data: entitiesSearchResults, isSuccess } = useQuery({
+  const { data: entitiesSearchResults, isLoading } = useQuery({
     queryKey: ['quick-jump', request],
     queryFn: () =>
       defaultOnError(
-        fetchEntitiesSearchResults(request),
+        QuickJump.search({ ...request, limit: 100 }),
         'Fetch Entities Search Results failed with status',
         'Could not Fetch Entity Search Results.',
       ),
@@ -62,10 +59,18 @@ const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] =
     type: item.type,
     title: item.title,
     link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver, entityTypeGenerators),
-    backendScore: item.score,
+    score: item.score,
   }));
 
-  return isSuccess ? (searchResultItems ?? []) : [];
+  return entitiesSearchResults
+    ? {
+        data: {
+          searchResultItems,
+          maxBaseScore: entitiesSearchResults.max_base_score,
+        },
+        isLoading,
+      }
+    : { isLoading };
 };
 
 export default useEntitySearchResults;

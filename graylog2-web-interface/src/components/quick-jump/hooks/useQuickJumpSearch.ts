@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import { PAGE_TYPE } from 'components/quick-jump/Constants';
+import { PAGE_TYPE, PAGE_WEIGHT } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 
-import useRankResults from './useRankResults';
 import useEntitySearchResults from './useEntitySearchResults';
 
 const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
@@ -79,6 +78,34 @@ const usePageNavigationItems = () => {
     );
 };
 
+const normalize = (s: string) => s.toLocaleLowerCase().trim();
+
+const scoreItem = (item: { title: string }, query: string) => {
+  const normalizedTitle = normalize(item.title);
+  const normalizedQuery = normalize(query);
+  if (normalizedTitle === normalizedQuery) {
+    return 3;
+  }
+  if (normalizedTitle.startsWith(query)) {
+    return 2;
+  }
+  if (normalizedTitle.includes(normalizedQuery)) {
+    return 1;
+  }
+
+  return 0;
+};
+
+const useScoreResults = (items: Array<{ title: string }>, query: string, maxBaseScore: number, weight = 1.0) =>
+  items.flatMap((item) => {
+    const score = scoreItem(item, query);
+    if (score === 0) {
+      return [];
+    }
+
+    return [{ ...item, score: (maxBaseScore + score) * weight }];
+  });
+
 const useEntityCreatorItems = () => {
   const { isPermitted } = usePermissions();
   const entityCreators = usePluginEntities('entityCreators');
@@ -93,13 +120,24 @@ const useQuickJumpSearch = () => {
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
   const creatorItems = useEntityCreatorItems();
-  const entityItems = useEntitySearchResults({ query: searchQuery });
+  const { data: entityItems } = useEntitySearchResults({ query: searchQuery });
 
-  const searchResults = useRankResults([...entityItems, ...mainNavItems, ...pageNavItems, ...creatorItems], {
-    query: searchQuery,
-    categoryWeights: { page: 0.9, entity: 1.0 },
-    minRelevance: 0.35,
-  });
+  const scoredNavItems = useScoreResults(
+    [...mainNavItems, ...pageNavItems, ...creatorItems],
+    searchQuery,
+    entityItems?.maxBaseScore,
+    PAGE_WEIGHT,
+  );
+
+  const searchResults = useMemo(
+    () =>
+      entityItems
+        ? [...entityItems.searchResultItems, ...scoredNavItems].sort(
+            (result1, result2) => result2.score - result1.score,
+          )
+        : [],
+    [entityItems, scoredNavItems],
+  );
 
   return {
     searchQuery,

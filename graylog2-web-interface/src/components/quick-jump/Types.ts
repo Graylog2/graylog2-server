@@ -21,5 +21,5 @@ export type SearchResultItem = {
   type: string;
   link: QualifiedUrl<string>;
   title: string;
-  backendScore?: number;
+  score: number;
 };
