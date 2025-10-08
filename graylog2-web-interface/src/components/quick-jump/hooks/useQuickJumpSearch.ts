@@ -96,7 +96,7 @@ const scoreItem = (item: { title: string }, query: string) => {
   return 0;
 };
 
-const useScoreResults = (items: Array<{ title: string }>, query: string, weight = 1.0) =>
+const useScoreResults = (items: Array<SearchResultItem>, query: string, weight = 1.0) =>
   items.flatMap((item) => {
     const score = scoreItem(item, query);
     if (score === 0) {
@@ -115,12 +115,18 @@ const useEntityCreatorItems = () => {
     .map((creator) => ({ type: PAGE_TYPE, link: creator.path, title: creator.title }));
 };
 
+type SearchResultItem = {
+  key?: string;
+  type: string;
+  link: QualifiedUrl<string>;
+  title: string;
+};
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
   const creatorItems = useEntityCreatorItems();
-  const { data: entityItems } = useEntitySearchResults({ query: searchQuery });
+  const { data: entityItems, isLoading } = useEntitySearchResults({ query: searchQuery });
 
   const scoredNavItems = useScoreResults([...mainNavItems, ...pageNavItems, ...creatorItems], searchQuery, PAGE_WEIGHT);
 
@@ -131,6 +137,7 @@ const useQuickJumpSearch = () => {
   );
 
   return {
+    isLoading,
     searchQuery,
     searchResults,
     setSearchQuery,
