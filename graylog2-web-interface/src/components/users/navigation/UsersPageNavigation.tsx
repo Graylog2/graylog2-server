@@ -16,26 +16,14 @@
  */
 import * as React from 'react';
 
-import Routes from 'routing/Routes';
 import PageNavigation from 'components/common/PageNavigation';
 import { Row } from 'components/bootstrap';
+import { PAGE_NAV_TITLE } from 'components/users/bindings';
 
-const UsersPageNavigation = () => {
-  const NAV_ITEMS = [
-    { description: 'Users Overview', path: Routes.SYSTEM.USERS.OVERVIEW },
-    { description: 'Teams Overview', path: Routes.getPluginRoute('SYSTEM_TEAMS') },
-    {
-      description: 'Token Management',
-      path: Routes.SYSTEM.USERS_TOKEN_MANAGEMENT.overview,
-      permissions: 'users:tokenlist',
-    },
-  ];
-
-  return (
-    <Row>
-      <PageNavigation items={NAV_ITEMS} />
-    </Row>
-  );
-};
+const UsersPageNavigation = () => (
+  <Row>
+    <PageNavigation page={PAGE_NAV_TITLE} />
+  </Row>
+);
 
 export default UsersPageNavigation;

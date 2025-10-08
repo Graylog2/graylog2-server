@@ -39,6 +39,7 @@ import SecurityBindings from 'components/security/bindings';
 import EventsBindings from 'components/events/bindings';
 import ComponentsBindings from 'components/common/bindings';
 import EntityCreatorBindings from 'components/entityCreatorBindings';
+import UsersBindings from 'components/users/bindings';
 
 import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
@@ -58,6 +59,7 @@ PluginStore.register(new PluginManifest({}, PerspectivesBindings));
 PluginStore.register(new PluginManifest({}, NavigationBindings));
 PluginStore.register(new PluginManifest({}, SecurityBindings));
 PluginStore.register(new PluginManifest({}, EventsBindings));
+PluginStore.register(new PluginManifest({}, UsersBindings));
 PluginStore.register(new PluginManifest({}, ComponentsBindings));
 PluginStore.register(new PluginManifest({}, EntityCreatorBindings));
 
