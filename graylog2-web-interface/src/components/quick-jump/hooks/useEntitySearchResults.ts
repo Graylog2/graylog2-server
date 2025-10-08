@@ -33,6 +33,7 @@ export type QuickJumpResponse = {
   id: string;
   type: string;
   title: string;
+  score: number;
 };
 
 export const fetchEntitiesSearchResults = (request: QuickJumpRequest) =>
@@ -61,7 +62,7 @@ const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] =
     type: item.type,
     title: item.title,
     link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver, entityTypeGenerators),
-    backendScore: 100,
+    backendScore: item.score,
   }));
 
   return isSuccess ? (searchResultItems ?? []) : [];
