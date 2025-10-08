@@ -73,6 +73,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 @Singleton
 public class UserServiceImpl extends PersistedServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final int USER_PERMISSION_PARTS_LENGTH = 3;
+    private static final String USER_PERMISSION_DOMAIN = "users";
 
     private final Configuration configuration;
     private final RoleService roleService;
@@ -417,10 +419,35 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         return permSet.build().asList();
     }
 
-    @Override
+
     public List<WildcardPermission> getWildcardPermissionsForUser(User user) {
-        return getPermissionsForUser(user).stream()
-                .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).toList();
+        return resolveUserPermissions(getPermissionsForUser(user).stream()
+                .filter(WildcardPermission.class::isInstance).map(WildcardPermission.class::cast).toList(), user);
+    }
+
+    private List<WildcardPermission> resolveUserPermissions(List<WildcardPermission> permSet, User user) {
+        ImmutableSet.Builder<WildcardPermission> permissions = ImmutableSet.builder();
+        final Map<String, String> userIdCache = new HashMap<>();
+        if (user != null) {
+            userIdCache.put(user.getName(), user.getId());
+        }
+        for (WildcardPermission permission : permSet) {
+            String[] parts = permission.toString().split(":", USER_PERMISSION_PARTS_LENGTH);
+            boolean hasUsername = parts.length == USER_PERMISSION_PARTS_LENGTH && USER_PERMISSION_DOMAIN.equals(parts[0]);
+            if (hasUsername) {
+                String username = parts[2];
+                String userId = userIdCache.computeIfAbsent(username, name -> {
+                    final User loadedUser = load(name);
+                    return loadedUser != null ? loadedUser.getId() : null; // null return avoids caching missing user
+                });
+                if (userId != null) {
+                    parts[2] = userId;
+                    permissions.add(new CaseSensitiveWildcardPermission(String.join(":", parts)));
+                }
+            }
+
+        }
+        return permissions.addAll(permSet).build().asList();
     }
 
     @Override

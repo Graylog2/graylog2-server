@@ -395,4 +395,42 @@ public class UserServiceImplTest {
         return user;
     }
 
+    private List<String> wildcardPermissionStrings(User user) {
+        return userService.getWildcardPermissionsForUser(user).stream()
+                .map(Object::toString)
+                .collect(Collectors.toList());
+    }
+
+    @Test
+    public void testResolveUserPermissionsAddsTransformedForCurrentUser() throws Exception {
+        final var user = createDummyUser("alice", "uid-alice");
+        user.setPermissions(List.of(RestPermissions.USERS_EDIT + ":alice"));
+        userService.save(user);
+
+        assertThat(wildcardPermissionStrings(user))
+                .contains("users:edit:alice", "users:edit:" + user.getId());
+    }
+
+    @Test
+    public void testResolveUserPermissionsAddsTransformedForOtherUser() throws Exception {
+        final var target = createDummyUser("bob", "uid-bob");
+        userService.save(target);
+
+        final var actor = createDummyUser("alice", "uid-alice");
+        actor.setPermissions(List.of(RestPermissions.USERS_EDIT + ":bob"));
+        userService.save(actor);
+
+        assertThat(wildcardPermissionStrings(actor))
+                .contains("users:edit:bob", "users:edit:" + target.getId());
+    }
+
+    @Test
+    public void testResolveUserPermissionsNoTransformationIfUserNotFound() throws Exception {
+        final var user = createDummyUser("alice", "uid-alice");
+        user.setPermissions(List.of(RestPermissions.USERS_EDIT + ":unknown"));
+        userService.save(user);
+
+        assertThat(wildcardPermissionStrings(user))
+                .contains("users:edit:unknown");
+    }
 }
