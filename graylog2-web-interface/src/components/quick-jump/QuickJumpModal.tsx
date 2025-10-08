@@ -14,13 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
 import useQuickJumpSearch from 'components/quick-jump/hooks/useQuickJumpSearch';
 import StringUtils from 'util/StringUtils';
+import type { SearchResultItem } from 'components/quick-jump/Types';
+import useLogout from 'hooks/useLogout';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -39,6 +41,33 @@ const EntityType = styled.div(
 
 type Props = {
   onToggle: () => void;
+};
+
+const useActionArguments = () => {
+  const logout = useLogout();
+
+  return useMemo(() => ({ logout }), [logout]);
+};
+
+const SearchResultEntry = ({ item, onToggle }: { item: SearchResultItem; onToggle: () => void }) => {
+  const actionArguments = useActionArguments();
+  const isLinkItem = 'link' in item;
+  const onClick = isLinkItem
+    ? onToggle
+    : () => {
+        item.action(actionArguments);
+        onToggle();
+      };
+
+  return (
+    <LinkContainer to={isLinkItem ? item.link : undefined} onClick={onClick}>
+      <ListGroupItem>
+        {item.title}
+        <br />
+        <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+      </ListGroupItem>
+    </LinkContainer>
+  );
 };
 
 const QuickJumpModal = ({ onToggle }: Props) => {
@@ -69,13 +98,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
         <List>
           <ListGroup>
             {searchResults.map((item) => (
-              <LinkContainer to={item.link} key={item.key || item.title} onClick={onToggle}>
-                <ListGroupItem>
-                  {item.title}
-                  <br />
-                  <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-                </ListGroupItem>
-              </LinkContainer>
+              <SearchResultEntry key={item.key || item.title} item={item} onToggle={onToggle} />
             ))}
           </ListGroup>
         </List>

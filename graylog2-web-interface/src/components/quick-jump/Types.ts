@@ -16,10 +16,22 @@
  */
 import type { QualifiedUrl } from 'routing/Routes';
 
-export type SearchResultItem = {
+type SearchResultItemBase = {
   key?: string;
   type: string;
-  link: QualifiedUrl<string>;
   title: string;
-  score: number;
+  score?: number;
 };
+
+type SearchResultItemLink = {
+  link: QualifiedUrl<string>;
+};
+
+type ActionArguments = {
+  logout: () => void;
+};
+type SearchResultItemAction = {
+  action: (args: ActionArguments) => void;
+};
+
+export type SearchResultItem = SearchResultItemBase & (SearchResultItemLink | SearchResultItemAction);

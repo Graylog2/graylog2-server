@@ -24,6 +24,7 @@ import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
 import Routes, { prefixUrl } from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
+import type { SearchResultItem } from 'components/quick-jump/Types';
 
 import useEntitySearchResults from './useEntitySearchResults';
 
@@ -41,13 +42,6 @@ type BaseNavigationItem = {
   path: QualifiedUrl<string>;
   permissions?: string | Array<string>;
   perspective?: string;
-};
-
-type SearchResultItem = {
-  key?: string;
-  type: string;
-  link: QualifiedUrl<string>;
-  title: string;
 };
 
 const useMainNavigationItems = () => {
@@ -148,21 +142,32 @@ const useConfigurationPages = () => {
   return [...coreNavItems, ...pluginNavItems];
 };
 
+const useQuickJumpActions = () => [
+  {
+    type: 'action',
+    title: 'Logout current user',
+    action: ({ logout }) => {
+      logout();
+    },
+  },
+];
+
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
   const creatorItems = useEntityCreatorItems();
   const configurationPageNavItems = useConfigurationPages();
+  const quickJumpActions = useQuickJumpActions();
   const { data: entityItems, isLoading } = useEntitySearchResults({ query: searchQuery });
 
   const scoredNavItems = useScoreResults(
-    [...mainNavItems, ...pageNavItems, ...creatorItems, ...configurationPageNavItems],
+    [...mainNavItems, ...pageNavItems, ...creatorItems, ...configurationPageNavItems, ...quickJumpActions],
     searchQuery,
     PAGE_WEIGHT,
   );
 
-  const searchResults = useMemo(
+  const searchResults: SearchResultItem[] = useMemo(
     () =>
       entityItems ? [...entityItems, ...scoredNavItems].sort((result1, result2) => result2.score - result1.score) : [],
     [entityItems, scoredNavItems],
