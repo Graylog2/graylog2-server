@@ -98,18 +98,16 @@ type Props = {
  */
 const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Props) => {
   const currentUser = useCurrentUser();
-
   const items = usePageNavigationItems(page, itemsProp);
-  const formatedItems = useMemo(() => {
-    const availableItems = items.filter(
-      (item) =>
-        (typeof item.useCondition === 'function' ? item.useCondition() : true) &&
-        isPermitted(currentUser.permissions, item.permissions) &&
-        !!item.path,
-    );
 
-    return sortNavigationItems<PageNavItem>(availableItems);
-  }, [currentUser.permissions, items]);
+  const availableItems = items.filter(
+    (item) =>
+      (typeof item.useCondition === 'function' ? item.useCondition() : true) &&
+      isPermitted(currentUser.permissions, item.permissions) &&
+      !!item.path,
+  );
+
+  const formatedItems = sortNavigationItems<PageNavItem>(availableItems);
 
   return (
     <Container>

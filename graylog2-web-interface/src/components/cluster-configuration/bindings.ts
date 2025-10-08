@@ -4,9 +4,8 @@ import Routes from 'routing/Routes';
 import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
 import AppConfig from 'util/AppConfig';
 
-export const PAGE_NAV_TITLE = 'Indices';
-
 const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
+export const PAGE_NAV_TITLE = 'Indices';
 
 const bindings: PluginExports = {
   pageNavigation: [
