@@ -60,7 +60,7 @@ const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] =
 
   const searchResultItems: SearchResultItem[] = entitiesSearchResults?.results?.map((item) => ({
     key: item.id,
-    type: formatType(item.type),
+    type: item.type,
     title: item.title,
     link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver),
     backendScore: 100,

@@ -73,7 +73,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
                 <ListGroupItem>
                   {item.title}
                   <br />
-                  <EntityType>{StringUtils.capitalizeFirstLetter(item.type)}</EntityType>
+                  <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
                 </ListGroupItem>
               </LinkContainer>
             ))}
