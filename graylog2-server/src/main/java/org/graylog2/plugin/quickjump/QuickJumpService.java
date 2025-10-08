@@ -94,7 +94,7 @@ public class QuickJumpService {
         final var results = StreamSupport.stream(collection.aggregate(pipeline).collation(coll).spliterator(), false).toList();
         return new QuickJumpResponse(results.stream()
                 .filter(result -> checkPermission(result, user))
-                .map(result -> new QuickJumpResponse.Result(result.type(), result.entityId(), result.title()))
+                .map(result -> new QuickJumpResponse.Result(result.type(), result.entityId(), result.title(), result.score()))
                 .toList()
         );
     }
