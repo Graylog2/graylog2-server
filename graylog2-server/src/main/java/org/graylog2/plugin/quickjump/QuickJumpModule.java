@@ -50,10 +50,12 @@ public class QuickJumpModule extends PluginModule {
         addQuickJumpProvider(QuickJumpProvider.create("event_definition", EventDefinition.class));
         addQuickJumpProvider(QuickJumpProvider.create("event_notification", DBNotificationService.NOTIFICATION_COLLECTION_NAME,
                 (id, user) -> user.isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, id)));
-        addQuickJumpProvider(QuickJumpProvider.create("node", ServerNodeEntity.class, List.of(NodeDto.FIELD_HOSTNAME, NodeDto.FIELD_NODE_ID), Optional.of(NodeDto.FIELD_NODE_ID)));
+        addQuickJumpProvider(QuickJumpProvider.create("node", ServerNodeEntity.class,
+                List.of(NodeDto.FIELD_HOSTNAME, NodeDto.FIELD_NODE_ID), Optional.of(NodeDto.FIELD_NODE_ID)));
         addQuickJumpProvider(QuickJumpProvider.create("content_pack", ContentPackPersistenceService.COLLECTION_NAME,
                 (id, user) -> user.isPermitted(RestPermissions.CONTENT_PACK_READ, id),
-                List.of(ContentPackV1.FIELD_NAME, ContentPackV1.FIELD_DESCRIPTION, ContentPackV1.FIELD_SUMMARY)));
+                List.of(ContentPackV1.FIELD_NAME, ContentPackV1.FIELD_DESCRIPTION, ContentPackV1.FIELD_SUMMARY),
+                Optional.empty(), Optional.of("id")));
         addQuickJumpProvider(QuickJumpProvider.create("input", InputImpl.class));
         addQuickJumpProvider(QuickJumpProvider.create("user", UserImpl.class, List.of(UserImpl.FULL_NAME, UserImpl.USERNAME)));
         addQuickJumpProvider(QuickJumpProvider.create("index_set", IndexSetConfig.class));
