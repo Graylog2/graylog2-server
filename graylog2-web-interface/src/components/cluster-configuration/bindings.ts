@@ -5,7 +5,7 @@ import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeM
 import AppConfig from 'util/AppConfig';
 
 const enableDataNodeMigration = AppConfig.isFeatureEnabled('data_node_migration');
-export const PAGE_NAV_TITLE = 'Indices';
+export const PAGE_NAV_TITLE = 'Cluster Configuration';
 
 const bindings: PluginExports = {
   pageNavigation: [
