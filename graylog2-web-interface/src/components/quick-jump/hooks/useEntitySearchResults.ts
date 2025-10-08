@@ -32,7 +32,7 @@ export type QuickJumpRequest = {
 const useEntitySearchResults = (request: QuickJumpRequest) => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
-  const [searchQuery] = useDebouncedValue(request?.query, 500);
+  const [searchQuery] = useDebouncedValue(request?.query, 300);
 
   const { data: entitiesSearchResults, isLoading } = useQuery({
     queryKey: ['quick-jump', request],
