@@ -20,6 +20,7 @@ import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
 import org.graylog.mcp.tools.AggregateMessagesTool;
+import org.graylog.mcp.tools.ListFieldsTool;
 import org.graylog.mcp.tools.ListIndexSetsTool;
 import org.graylog.mcp.tools.ListIndicesTool;
 import org.graylog.mcp.tools.ListInputsTool;
@@ -41,6 +42,7 @@ public class McpServerModule extends PluginModule {
         addMcpTool(ListIndexSetsTool.NAME, ListIndexSetsTool.class);
         addMcpTool(SearchMessagesTool.NAME, SearchMessagesTool.class);
         addMcpTool(AggregateMessagesTool.NAME, AggregateMessagesTool.class);
+        addMcpTool(ListFieldsTool.NAME, ListFieldsTool.class);
         addMcpTool(SystemInfoTool.NAME, SystemInfoTool.class);
         addMcpTool(ListResourceTool.NAME, ListResourceTool.class);
         addMcpTool(ReadResourceTool.NAME, ReadResourceTool.class);
