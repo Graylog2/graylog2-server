@@ -42,6 +42,7 @@ import EntityCreatorBindings from 'components/entityCreatorBindings';
 import UsersBindings from 'components/users/bindings';
 import SidecarsBindings from 'components/sidecars/bindings';
 import PipelinesBindings from 'components/pipelines/bindings';
+import IndicesBindings from 'components/indices/bindings';
 
 import '@graylog/sawmill/fonts';
 import '@mantine/core/styles.css';
@@ -66,6 +67,7 @@ PluginStore.register(new PluginManifest({}, SidecarsBindings));
 PluginStore.register(new PluginManifest({}, ComponentsBindings));
 PluginStore.register(new PluginManifest({}, EntityCreatorBindings));
 PluginStore.register(new PluginManifest({}, PipelinesBindings));
+PluginStore.register(new PluginManifest({}, IndicesBindings));
 
 const appContainer = document.querySelector('div#app-root');
 const root = createRoot(appContainer);
