@@ -16,17 +16,18 @@
  */
 package org.graylog.mcp.server;
 
-import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.DashboardResourceProvider;
+import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
-import org.graylog.mcp.tools.ListIndicesTool;
+import org.graylog.mcp.tools.AggregateMessagesTool;
 import org.graylog.mcp.tools.ListIndexSetsTool;
+import org.graylog.mcp.tools.ListIndicesTool;
 import org.graylog.mcp.tools.ListInputsTool;
+import org.graylog.mcp.tools.ListResourceTool;
 import org.graylog.mcp.tools.ListStreamsTool;
+import org.graylog.mcp.tools.ReadResourceTool;
 import org.graylog.mcp.tools.SearchMessagesTool;
 import org.graylog.mcp.tools.SystemInfoTool;
-import org.graylog.mcp.tools.ListResourceTool;
-import org.graylog.mcp.tools.ReadResourceTool;
 import org.graylog2.plugin.PluginModule;
 
 public class McpServerModule extends PluginModule {
@@ -39,6 +40,7 @@ public class McpServerModule extends PluginModule {
         addMcpTool(ListIndicesTool.NAME, ListIndicesTool.class);
         addMcpTool(ListIndexSetsTool.NAME, ListIndexSetsTool.class);
         addMcpTool(SearchMessagesTool.NAME, SearchMessagesTool.class);
+        addMcpTool(AggregateMessagesTool.NAME, AggregateMessagesTool.class);
         addMcpTool(SystemInfoTool.NAME, SystemInfoTool.class);
         addMcpTool(ListResourceTool.NAME, ListResourceTool.class);
         addMcpTool(ReadResourceTool.NAME, ReadResourceTool.class);
