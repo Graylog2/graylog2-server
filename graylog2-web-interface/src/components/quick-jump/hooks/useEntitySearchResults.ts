@@ -20,7 +20,6 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 import { getEntityRoute } from 'routing/hooks/useShowRouteForEntity';
-import StringUtils from 'util/StringUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 
@@ -38,8 +37,6 @@ export type QuickJumpResponse = {
 
 export const fetchEntitiesSearchResults = (request: QuickJumpRequest) =>
   fetch<{ results: QuickJumpResponse[] }>('POST', qualifyUrl('quickjump'), request, false);
-
-const formatType = (type: string) => StringUtils.toTitleCase(type, '_');
 
 const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
