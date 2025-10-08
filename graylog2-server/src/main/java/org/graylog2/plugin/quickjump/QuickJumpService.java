@@ -82,9 +82,18 @@ public class QuickJumpService {
                         .append("createdAt", -1)
                         .append("_id", 1));
 
+        final var group = new Document("$group", new Document()
+                .append("_id", new Document("source", "$source").append("entity_id", "$entity_id"))
+                .append("doc", new Document("$first", "$$ROOT")));
+
+        final var replaceRoot = new Document("$replaceRoot", new Document("newRoot", "$doc"));
+
         final var pipeline = ImmutableList.<Bson>builder()
                 .addAll(baseBranch)
                 .addAll(collections)
+                .add(sort)
+                .add(group)
+                .add(replaceRoot)
                 .add(sort)
                 .add(new Document("$limit", limit))
                 .build();
