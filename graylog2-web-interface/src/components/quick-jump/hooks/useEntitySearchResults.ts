@@ -29,13 +29,6 @@ export type QuickJumpRequest = {
   query: string;
   limit?: number;
 };
-export type QuickJumpResponse = {
-  id: string;
-  type: string;
-  title: string;
-  score: number;
-};
-
 const useEntitySearchResults = (request: QuickJumpRequest) => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
@@ -64,10 +57,7 @@ const useEntitySearchResults = (request: QuickJumpRequest) => {
 
   return entitiesSearchResults
     ? {
-        data: {
-          searchResultItems,
-          maxBaseScore: entitiesSearchResults.max_base_score,
-        },
+        data: searchResultItems,
         isLoading,
       }
     : { isLoading };

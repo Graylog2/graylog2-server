@@ -17,3 +17,4 @@
 export const PAGE_TYPE = 'page' as const;
 export const ENTITY_TYPE = 'entity' as const;
 export const PAGE_WEIGHT = 0.9;
+export const BASE_SCORE = 100;

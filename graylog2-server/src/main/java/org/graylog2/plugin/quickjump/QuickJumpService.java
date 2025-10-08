@@ -112,7 +112,7 @@ public class QuickJumpService {
 
         final var fieldMatchers = IntStream.range(0, fields.size())
                 .boxed()
-                .flatMap(idx -> fieldMatchers(query, fields.get(idx), (maxFieldsLength - idx) * 10))
+                .flatMap(idx -> fieldMatchers(query, fields.get(idx), idx * 10))
                 .toList();
 
         final var score = new Document("$switch", new Document("branches", fieldMatchers).append("default", 0));
@@ -129,7 +129,7 @@ public class QuickJumpService {
         return Arrays.asList(match, project);
     }
 
-    private static Stream<Document> fieldMatchers(String query, String fieldName, int scoreBase) {
+    private static Stream<Document> fieldMatchers(String query, String fieldName, int basePenalty) {
         final var regexPrefix = "^" + Pattern.quote(query);
         final var fieldRef = "$" + fieldName;
         final var exactEq = new Document("$eq", Arrays.asList(
@@ -146,10 +146,12 @@ public class QuickJumpService {
                         new Document("input", fieldRef)
                                 .append("regex", query)
                                 .append("options", "i"));
+
+        final var baseScore = 100 - basePenalty;
         return Stream.of(
-                new Document("case", exactEq).append("then", scoreBase + 3),
-                new Document("case", prefixMatch).append("then", scoreBase + 2),
-                new Document("case", anywhereMatch).append("then", scoreBase + 1)
+                new Document("case", exactEq).append("then", baseScore),
+                new Document("case", prefixMatch).append("then", baseScore - 1),
+                new Document("case", anywhereMatch).append("then", baseScore - 2)
         );
     }
 

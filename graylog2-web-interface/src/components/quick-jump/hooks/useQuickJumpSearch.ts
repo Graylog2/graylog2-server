@@ -19,7 +19,7 @@ import { useMemo, useState } from 'react';
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import { PAGE_TYPE, PAGE_WEIGHT } from 'components/quick-jump/Constants';
+import { PAGE_TYPE, PAGE_WEIGHT, BASE_SCORE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
@@ -84,26 +84,26 @@ const scoreItem = (item: { title: string }, query: string) => {
   const normalizedTitle = normalize(item.title);
   const normalizedQuery = normalize(query);
   if (normalizedTitle === normalizedQuery) {
-    return 3;
+    return BASE_SCORE;
   }
   if (normalizedTitle.startsWith(query)) {
-    return 2;
+    return BASE_SCORE - 1;
   }
   if (normalizedTitle.includes(normalizedQuery)) {
-    return 1;
+    return BASE_SCORE - 2;
   }
 
   return 0;
 };
 
-const useScoreResults = (items: Array<{ title: string }>, query: string, maxBaseScore: number, weight = 1.0) =>
+const useScoreResults = (items: Array<{ title: string }>, query: string, weight = 1.0) =>
   items.flatMap((item) => {
     const score = scoreItem(item, query);
     if (score === 0) {
       return [];
     }
 
-    return [{ ...item, score: (maxBaseScore + score) * weight }];
+    return [{ ...item, score: score * weight }];
   });
 
 const useEntityCreatorItems = () => {
@@ -122,20 +122,11 @@ const useQuickJumpSearch = () => {
   const creatorItems = useEntityCreatorItems();
   const { data: entityItems } = useEntitySearchResults({ query: searchQuery });
 
-  const scoredNavItems = useScoreResults(
-    [...mainNavItems, ...pageNavItems, ...creatorItems],
-    searchQuery,
-    entityItems?.maxBaseScore,
-    PAGE_WEIGHT,
-  );
+  const scoredNavItems = useScoreResults([...mainNavItems, ...pageNavItems, ...creatorItems], searchQuery, PAGE_WEIGHT);
 
   const searchResults = useMemo(
     () =>
-      entityItems
-        ? [...entityItems.searchResultItems, ...scoredNavItems].sort(
-            (result1, result2) => result2.score - result1.score,
-          )
-        : [],
+      entityItems ? [...entityItems, ...scoredNavItems].sort((result1, result2) => result2.score - result1.score) : [],
     [entityItems, scoredNavItems],
   );
 
