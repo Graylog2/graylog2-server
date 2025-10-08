@@ -49,7 +49,7 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class SessionDAO extends CachingSessionDAO {
     private static final Logger LOG = LoggerFactory.getLogger(SessionDAO.class);
-    public static final Retryer<Void> UPSERT_RETRYER = RetryerBuilder.<Void>newBuilder()
+    private static final Retryer<Void> UPSERT_RETRYER = RetryerBuilder.<Void>newBuilder()
             .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))
             .withWaitStrategy(WaitStrategies.randomWait(5, TimeUnit.MILLISECONDS))
             .withStopStrategy(StopStrategies.stopAfterAttempt(10))
