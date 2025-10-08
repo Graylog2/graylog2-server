@@ -53,17 +53,21 @@ import java.util.UUID;
 public class McpRestResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(McpRestResource.class);
 
-    @Inject
-    ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+
+    private final McpService mcpService;
+
+    private final SecurityContext securityContext;
+
+    private final ClusterConfigService clusterConfig;
 
     @Inject
-    McpService mcpService;
-
-    @Inject
-    SecurityContext securityContext;
-
-    @Inject
-    ClusterConfigService clusterConfig;
+    public McpRestResource(final ClusterConfigService clusterConfig, final McpService mcpService, final ObjectMapper objectMapper, final SecurityContext securityContext) {
+        this.clusterConfig = clusterConfig;
+        this.mcpService = mcpService;
+        this.objectMapper = objectMapper;
+        this.securityContext = securityContext;
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)

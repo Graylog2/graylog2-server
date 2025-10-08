@@ -40,15 +40,15 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class SearchTool extends Tool<SearchTool.Parameters, TabularResponse> {
-    private static final Logger LOG = LoggerFactory.getLogger(SearchTool.class);
+public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, TabularResponse> {
+    private static final Logger LOG = LoggerFactory.getLogger(SearchMessagesTool.class);
 
     public static String NAME = "search_messages";
 
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public SearchTool(ObjectMapper objectMapper, ScriptingApiService scriptingApiService) {
+    public SearchMessagesTool(ObjectMapper objectMapper, ScriptingApiService scriptingApiService) {
         super(objectMapper,
               new TypeReference<>() {},
               new TypeReference<>() {},
@@ -66,7 +66,7 @@ public class SearchTool extends Tool<SearchTool.Parameters, TabularResponse> {
     }
 
     @Override
-    public TabularResponse apply(PermissionHelper permissionHelper, SearchTool.Parameters parameters) {
+    public TabularResponse apply(PermissionHelper permissionHelper, SearchMessagesTool.Parameters parameters) {
         try {
             final MessagesRequestSpec spec = new MessagesRequestSpec(
                     parameters.query(),
@@ -77,12 +77,10 @@ public class SearchTool extends Tool<SearchTool.Parameters, TabularResponse> {
                     null,
                     parameters.offset(),
                     parameters.limit(),
-                    List.of()
+                    parameters.fields()
             );
             // the query engine performs permission checks, so we don't have to do that here.
-            final TabularResponse tabularResponse = scriptingApiService.executeQuery(spec,
-                                                                                     permissionHelper.getSearchUser(), /* unused TODO remove */
-                                                                                     null);
+            final TabularResponse tabularResponse = scriptingApiService.executeQuery(spec, permissionHelper.getSearchUser());
             LOG.debug("Search returned {} rows for timerange {}", tabularResponse.datarows().size(), tabularResponse.metadata().effectiveTimerange());
             return tabularResponse;
 
@@ -135,7 +133,7 @@ public class SearchTool extends Tool<SearchTool.Parameters, TabularResponse> {
             @JsonCreator
             public static Builder create() {
                 // initialize with defaults during deserialization
-                return new AutoValue_SearchTool_Parameters.Builder()
+                return new AutoValue_SearchMessagesTool_Parameters.Builder()
                         .query("")
                         .streams(Set.of())
                         .streamCategories(Set.of())
