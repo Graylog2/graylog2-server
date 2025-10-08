@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import { LinkContainer } from 'components/common/router';
@@ -23,6 +23,8 @@ import useQuickJumpSearch from 'components/quick-jump/hooks/useQuickJumpSearch';
 import StringUtils from 'util/StringUtils';
 import type { SearchResultItem } from 'components/quick-jump/Types';
 import useLogout from 'hooks/useLogout';
+import useQuickJumpKeyboardNavigation from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
+import type { QuickJumpItemProps } from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -31,12 +33,53 @@ const SearchInput = styled(Input)`
 const List = styled.div`
   overflow: auto;
   max-height: calc(90vh - 150px);
+  outline: none;
 `;
 
 const EntityType = styled.div(
   ({ theme }) => `
   color: ${theme.colors.text.secondary};
 `,
+);
+
+const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(
+  ({ theme, $active }) => {
+    const highlightColor = theme.utils.colorLevel(theme.colors.global.contentBackground, 10);
+
+    return css`
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.15s ease-in-out;
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 0;
+        background-color: ${theme.colors.variant.primary};
+        transition: width 0.15s ease-in-out;
+      }
+
+      ${$active &&
+      css`
+        background-color: ${highlightColor};
+
+        & > .list-group-item {
+          background-color: ${highlightColor};
+          color: ${theme.colors.text.primary};
+        }
+
+        &::before {
+          width: 4px;
+        }
+
+        a {
+          color: inherit;
+          text-decoration: none;
+        }
+      `}
+    `;
+  },
 );
 
 type Props = {
@@ -49,7 +92,7 @@ const useActionArguments = () => {
   return useMemo(() => ({ logout }), [logout]);
 };
 
-const SearchResultEntry = ({ item, onToggle }: { item: SearchResultItem; onToggle: () => void }) => {
+const SearchResultEntry = ({ item, onToggle, itemProps, isActive }: { item: SearchResultItem; onToggle: () => void; itemProps: QuickJumpItemProps; isActive: boolean }) => {
   const actionArguments = useActionArguments();
   const isLinkItem = 'link' in item;
   const onClick = isLinkItem
@@ -61,17 +104,23 @@ const SearchResultEntry = ({ item, onToggle }: { item: SearchResultItem; onToggl
 
   return (
     <LinkContainer to={isLinkItem ? item.link : undefined} onClick={onClick}>
-      <ListGroupItem>
+      <StyledListGroupItem $active={isActive} {...itemProps}>
         {item.title}
         <br />
         <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-      </ListGroupItem>
+      </StyledListGroupItem>
     </LinkContainer>
   );
 };
 
 const QuickJumpModal = ({ onToggle }: Props) => {
   const { searchQuery, setSearchQuery, searchResults } = useQuickJumpSearch();
+  const {
+    highlightedIndex,
+    searchInputProps,
+    getItemProps,
+    onHide,
+  } = useQuickJumpKeyboardNavigation({ items: searchResults, onToggle });
 
   const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,7 +130,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   );
 
   return (
-    <Modal onHide={onToggle} show bsSize="large">
+    <Modal onHide={onHide} show bsSize="large">
       <Modal.Header>
         <Modal.Title>Quick Jump</Modal.Title>
       </Modal.Header>
@@ -94,11 +143,18 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           type="text"
           onChange={handleSearch}
           placeholder="Search..."
+          {...searchInputProps}
         />
         <List>
           <ListGroup>
-            {searchResults.map((item) => (
-              <SearchResultEntry key={item.key || item.title} item={item} onToggle={onToggle} />
+            {searchResults.map((item, index) => (
+              <SearchResultEntry
+                key={item.key || item.title}
+                item={item}
+                onToggle={onToggle}
+                isActive={highlightedIndex === index}
+                itemProps={getItemProps(index)}
+              />
             ))}
           </ListGroup>
         </List>
