@@ -302,7 +302,7 @@ declare module 'graylog-web-plugin/plugin' {
     // access to certain contexts like PerspectivesContext
     pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
     routes?: Array<PluginRoute>;
-    entityRoutes?: Array<(id: string, type: string) => string>;
+    entityRoutes?: Array<(id: string, type: string) => QualifiedUrl<string>>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;

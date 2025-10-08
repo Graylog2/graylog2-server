@@ -14,12 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import type { QualifiedUrl } from 'routing/Routes';
 import Routes from 'routing/Routes';
 import assertUnreachable from 'logic/assertUnreachable';
 import usePluginEntities from 'hooks/usePluginEntities';
 
 const getFirstMatchingEntityRouteFromPlugin = (
-  entityRouteResolver: Array<(id: string, type: string) => string | null>,
+  entityRouteResolver: Array<(id: string, type: string) => QualifiedUrl<string> | null>,
   id: string,
   type: string,
 ) => {
@@ -47,7 +48,7 @@ const useEntityRouteFromPlugin = (id: string, type: string) => {
   return getFirstMatchingEntityRouteFromPlugin(pluginEntityRoutesResolver, id, type);
 };
 
-const getBaseEntityRoute = (id: string, type: string) => {
+const getBaseEntityRoute = (id: string, type: string): QualifiedUrl<string> => {
   switch (type?.toLowerCase()) {
     case 'user':
       return Routes.SYSTEM.USERS.show(id);
@@ -104,17 +105,21 @@ const getBaseEntityRoute = (id: string, type: string) => {
     default:
       return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
   }
-}
+};
 
-export const getEntityRoute = (id: string, type: string, entityRouteResolver: Array<(id: string, type: string) => string | null>) => {
-  const entityRouteFromPlugin = getFirstMatchingEntityRouteFromPlugin(entityRouteResolver, id, type)
+export const getEntityRoute = (
+  id: string,
+  type: string,
+  entityRouteResolver: Array<(id: string, type: string) => QualifiedUrl<string> | null>,
+): QualifiedUrl<string> => {
+  const entityRouteFromPlugin = getFirstMatchingEntityRouteFromPlugin(entityRouteResolver, id, type);
 
   if (entityRouteFromPlugin) {
     return entityRouteFromPlugin;
   }
 
   return getBaseEntityRoute(id, type);
-}
+};
 
 const useShowRouteForEntity = (id: string, type: string) => {
   const entityRouteFromPlugin = useEntityRouteFromPlugin(id, type);

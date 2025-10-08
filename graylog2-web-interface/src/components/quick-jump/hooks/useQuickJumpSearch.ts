@@ -82,9 +82,9 @@ const useQuickJumpSearch = () => {
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
   const creatorItems = useEntityCreatorItems();
-  const entitiyItems = useEntitySearchResults({ query: searchQuery });
+  const entityItems = useEntitySearchResults({ query: searchQuery });
 
-  const searchResults = useRankResults([...entitiyItems, ...mainNavItems, ...pageNavItems, ...creatorItems], {
+  const searchResults = useRankResults([...entityItems, ...mainNavItems, ...pageNavItems, ...creatorItems], {
     query: searchQuery,
     categoryWeights: { page: 0.9, entity: 1.0 },
     minRelevance: 0.35,
