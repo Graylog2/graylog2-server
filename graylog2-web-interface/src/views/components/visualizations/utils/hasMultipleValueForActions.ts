@@ -14,23 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
+import type { ActionContexts } from 'views/types';
+import { multipleValuesActionsSupportedVisualizations } from 'views/Constants';
 
-type Props = {
-  authenticationBackendId: string;
-  stepKey: string;
-};
+const hasMultipleValueForActions = (actionContexts: Partial<ActionContexts>): boolean =>
+  !!(
+    actionContexts?.valuePath?.length &&
+    multipleValuesActionsSupportedVisualizations.includes(actionContexts.widget.config.visualization)
+  );
 
-const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => (
-  <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId, stepKey)}>
-    <Button bsStyle="primary" bsSize="small">
-      Edit
-    </Button>
-  </LinkContainer>
-);
-
-export default EditLinkButton;
+export default hasMultipleValueForActions;
