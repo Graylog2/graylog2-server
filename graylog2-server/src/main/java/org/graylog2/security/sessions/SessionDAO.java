@@ -17,6 +17,7 @@
 package org.graylog2.security.sessions;
 
 import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
@@ -48,6 +49,11 @@ import java.util.concurrent.TimeUnit;
 @Singleton
 public class SessionDAO extends CachingSessionDAO {
     private static final Logger LOG = LoggerFactory.getLogger(SessionDAO.class);
+    public static final Retryer<Void> UPSERT_RETRYER = RetryerBuilder.<Void>newBuilder()
+            .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))
+            .withWaitStrategy(WaitStrategies.randomWait(5, TimeUnit.MILLISECONDS))
+            .withStopStrategy(StopStrategies.stopAfterAttempt(10))
+            .build();
 
     private final SessionService sessionService;
 
@@ -110,13 +116,8 @@ public class SessionDAO extends CachingSessionDAO {
         // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
         // We need to retry the update, and stagger them a bit, so not all the retries attempt it at the same time again.
         // Usually this should succeed the first time, though
-        final var retryer = RetryerBuilder.<Void>newBuilder()
-                .retryIfException(e -> e instanceof MongoException me && MongoUtils.isDuplicateKeyError(me))
-                .withWaitStrategy(WaitStrategies.randomWait(5, TimeUnit.MILLISECONDS))
-                .withStopStrategy(StopStrategies.stopAfterAttempt(10))
-                .build();
         try {
-            retryer.call(() -> {
+            UPSERT_RETRYER.call(() -> {
                 sessionService.update(sessionDTO);
                 return null;
             });
