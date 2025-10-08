@@ -64,16 +64,19 @@ const useMainNavigationItems = () => {
 };
 
 const usePageNavigationItems = () => {
+  const { activePerspective } = useActivePerspective();
   const { isPermitted } = usePermissions();
   const pageNavigationItems = usePluginEntities('pageNavigation');
 
-  return pageNavigationItems.flatMap((group) =>
-    [...group.children]
-      .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
-      .filter((page) => isPermitted(page.permissions))
-      .slice(1)
-      .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
-  );
+  return pageNavigationItems
+    .filter((group) => matchesPerspective(activePerspective.id, group.perspective))
+    .flatMap((group) =>
+      [...group.children]
+        .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
+        .filter((page) => isPermitted(page.permissions))
+        .slice(1)
+        .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
+    );
 };
 
 const useEntityCreatorItems = () => {
