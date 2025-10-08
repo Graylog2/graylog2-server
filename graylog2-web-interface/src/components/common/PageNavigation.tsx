@@ -83,7 +83,7 @@ type PageNavItem = {
   path: string;
   permissions?: string | Array<string>;
   exactPathMatch?: boolean;
-  useIsValidLicense?: () => boolean;
+  useCondition?: () => boolean;
   position?: PluginNavigation['position'];
 };
 
@@ -103,7 +103,7 @@ const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Prop
   const formatedItems = useMemo(() => {
     const availableItems = items.filter(
       (item) =>
-        (typeof item.useIsValidLicense === 'function' ? item.useIsValidLicense() : true) &&
+        (typeof item.useCondition === 'function' ? item.useCondition() : true) &&
         isPermitted(currentUser.permissions, item.permissions) &&
         !!item.path,
     );

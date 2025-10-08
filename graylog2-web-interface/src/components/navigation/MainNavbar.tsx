@@ -44,7 +44,7 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
   if (!navigationItems?.length) return false;
   const menuItem = navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 
-  return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
+  return menuItem && Object.keys(menuItem).includes('useCondition') ? menuItem.useCondition() : true;
 };
 
 const useNavigationItems = () => {

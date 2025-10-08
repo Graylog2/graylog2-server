@@ -58,7 +58,7 @@ type PluginNavigation = {
   BadgeComponent?: React.ComponentType<{ text: string }>;
   position?: { last: true } | { after: string } | undefined;
   permissions?: string | Array<string>;
-  useIsValidLicense?: () => boolean;
+  useCondition?: () => boolean;
 } & (PluginNavigationLink | PluginNavigationDropdown);
 
 interface PluginNavigationItems {
@@ -258,7 +258,7 @@ interface PageNavigation {
     description: string;
     position?: PluginNavigation['position'];
     permissions?: string | Array<string>;
-    useIsValidLicense?: () => boolean;
+    useCondition?: () => boolean;
     path: QualifiedUrl<string>;
     exactPathMatch?: boolean;
   }>;
