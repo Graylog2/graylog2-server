@@ -24,7 +24,6 @@ import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
 import Routes, { prefixUrl } from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
-import type { SearchResultItem } from 'components/quick-jump/Types';
 
 import useEntitySearchResults from './useEntitySearchResults';
 
@@ -42,6 +41,13 @@ type BaseNavigationItem = {
   path: QualifiedUrl<string>;
   permissions?: string | Array<string>;
   perspective?: string;
+};
+
+type SearchResultItem = {
+  key?: string;
+  type: string;
+  link: QualifiedUrl<string>;
+  title: string;
 };
 
 const useMainNavigationItems = () => {
