@@ -19,7 +19,7 @@ import { useQuery } from '@tanstack/react-query';
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
-import { getEntityRoute } from 'routing/hooks/useShowRouteForEntity';
+import { getEntityRoute, usePluginEntityTypeGenerators } from 'routing/hooks/useShowRouteForEntity';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 
@@ -40,6 +40,7 @@ export const fetchEntitiesSearchResults = (request: QuickJumpRequest) =>
 
 const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
+  const entityTypeGenerators = usePluginEntityTypeGenerators();
   const [searchQuery] = useDebouncedValue(request?.query, 500);
 
   const { data: entitiesSearchResults, isSuccess } = useQuery({
@@ -59,7 +60,7 @@ const useEntitySearchResults = (request: QuickJumpRequest): SearchResultItem[] =
     key: item.id,
     type: item.type,
     title: item.title,
-    link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver),
+    link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver, entityTypeGenerators),
     backendScore: 100,
   }));
 

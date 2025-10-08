@@ -277,6 +277,10 @@ interface EntityCreator {
   telemetryEvent?: CreatorTelemetryEvent;
 }
 
+type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
+
+type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -302,7 +306,6 @@ declare module 'graylog-web-plugin/plugin' {
     // access to certain contexts like PerspectivesContext
     pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
     routes?: Array<PluginRoute>;
-    entityRoutes?: Array<(id: string, type: string) => QualifiedUrl<string>>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
@@ -310,6 +313,8 @@ declare module 'graylog-web-plugin/plugin' {
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
     'hooks.logout'?: Array<LogoutHook>;
+    entityRoutes?: Array<RouteGenerator>;
+    entityTypeRoute?: Array<EntityTypeRouteGenerator>;
     entityCreators?: Array<EntityCreator>;
   }
   interface PluginMetadata {
@@ -324,6 +329,7 @@ declare module 'graylog-web-plugin/plugin' {
   }
 
   interface PluginManifest extends PluginRegistration {
+    // eslint-disable-next-line @typescript-eslint/no-misused-new
     new (json: {}, exports: PluginExports): PluginManifest;
   }
 
