@@ -23,4 +23,5 @@ public class QuickJumpConstants {
     static final String DUMMY_COLLECTION = "dummy";
     static final String DEFAULT_COLLATION = "en";
     public static final int DEFAULT_LIMIT = 100;
+    static final String DEFAULT_ID_FIELD = "$_id";
 }

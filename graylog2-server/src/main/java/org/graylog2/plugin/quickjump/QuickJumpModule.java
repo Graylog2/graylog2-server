@@ -37,6 +37,7 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.users.UserImpl;
 
 import java.util.List;
+import java.util.Optional;
 
 public class QuickJumpModule extends PluginModule {
     @Override
@@ -49,7 +50,7 @@ public class QuickJumpModule extends PluginModule {
         addQuickJumpProvider(QuickJumpProvider.create("event_definition", EventDefinition.class));
         addQuickJumpProvider(QuickJumpProvider.create("event_notification", DBNotificationService.NOTIFICATION_COLLECTION_NAME,
                 (id, user) -> user.isPermitted(RestPermissions.EVENT_NOTIFICATIONS_READ, id)));
-        addQuickJumpProvider(QuickJumpProvider.create("node", ServerNodeEntity.class, List.of(NodeDto.FIELD_HOSTNAME, NodeDto.FIELD_NODE_ID)));
+        addQuickJumpProvider(QuickJumpProvider.create("node", ServerNodeEntity.class, List.of(NodeDto.FIELD_HOSTNAME, NodeDto.FIELD_NODE_ID), Optional.of(NodeDto.FIELD_NODE_ID)));
         addQuickJumpProvider(QuickJumpProvider.create("content_pack", ContentPackPersistenceService.COLLECTION_NAME,
                 (id, user) -> user.isPermitted(RestPermissions.CONTENT_PACK_READ, id),
                 List.of(ContentPackV1.FIELD_NAME, ContentPackV1.FIELD_DESCRIPTION, ContentPackV1.FIELD_SUMMARY)));

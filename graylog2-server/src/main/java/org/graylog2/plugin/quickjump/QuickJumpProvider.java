@@ -27,6 +27,7 @@ import java.util.function.BiFunction;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_FIELDS;
+import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_ID_FIELD;
 
 public interface QuickJumpProvider {
     String type();
@@ -41,7 +42,11 @@ public interface QuickJumpProvider {
         return new Document("$literal", type());
     }
 
-    static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch, Optional<Bson> typeField) {
+    default String idField() {
+        return DEFAULT_ID_FIELD;
+    }
+
+    static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch, Optional<Bson> typeField, Optional<String> idField) {
         checkArgument(fieldsToSearch != null && !fieldsToSearch.isEmpty(), "fieldsToSearch must not be null or empty");
         return new QuickJumpProvider() {
 
@@ -69,9 +74,17 @@ public interface QuickJumpProvider {
             public Bson typeField() {
                 return typeField.orElseGet(QuickJumpProvider.super::typeField);
             }
+
+            @Override
+            public String idField() {
+                return idField.map(field -> field.startsWith("$") ? field : "$" + field).orElseGet(QuickJumpProvider.super::idField);
+            }
         };
     }
 
+    static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch, Optional<Bson> typeField) {
+        return create(type, collectionName, isPermittedFn, fieldsToSearch, typeField, Optional.empty());
+    }
     static QuickJumpProvider create(String type, String collectionName, BiFunction<String, HasPermissions, Boolean> isPermittedFn, List<String> fieldsToSearch) {
         return create(type, collectionName, isPermittedFn, fieldsToSearch, Optional.empty());
     }
@@ -88,6 +101,9 @@ public interface QuickJumpProvider {
         return create(type, entity, DEFAULT_FIELDS);
     }
 
+    static QuickJumpProvider create(String type, DbEntity entity, List<String> fieldsToSearch, Optional<String> idField) {
+        return create(type, entity.collection(), (id, user) -> user.isPermitted(entity.readPermission(), id), fieldsToSearch, Optional.empty(), idField);
+    }
     static QuickJumpProvider create(String type, DbEntity entity, List<String> fieldsToSearch) {
         return create(type, entity.collection(), (id, user) -> user.isPermitted(entity.readPermission(), id), fieldsToSearch, Optional.empty());
     }
@@ -97,10 +113,14 @@ public interface QuickJumpProvider {
     }
 
     static QuickJumpProvider create(String type, Class<?> entityClass, List<String> fieldsToSearch) {
+        return create(type, entityClass, fieldsToSearch, Optional.empty());
+    }
+
+    static QuickJumpProvider create(String type, Class<?> entityClass, List<String> fieldsToSearch, Optional<String> idField) {
         final var dbEntity = entityClass.getAnnotation(DbEntity.class);
         if (dbEntity == null) {
             throw new IllegalArgumentException("Class " + entityClass.getName() + " is not annotated with @DbEntity");
         }
-        return create(type, dbEntity, fieldsToSearch);
+        return create(type, dbEntity, fieldsToSearch, idField);
     }
 }
