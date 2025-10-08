@@ -78,6 +78,8 @@ const getBaseEntityRoute = (id: string, type: string): QualifiedUrl<string> | un
       return Routes.SYSTEM.INPUT_DIAGNOSIS(id);
     case 'event_notification':
       return Routes.ALERTS.NOTIFICATIONS.show(id);
+    case 'node':
+      return Routes.SYSTEM.CLUSTER.NODE_SHOW(id);
   }
 
   return undefined;
