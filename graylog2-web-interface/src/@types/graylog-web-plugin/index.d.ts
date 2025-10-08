@@ -259,6 +259,7 @@ interface PageNavigation {
     position?: PluginNavigation['position'];
     permissions?: string | Array<string>;
     useCondition?: () => boolean;
+    requiredFeatureFlag?: string;
     path: QualifiedUrl<string>;
     exactPathMatch?: boolean;
   }>;

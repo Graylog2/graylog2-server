@@ -30,6 +30,7 @@ import { isPermitted } from 'util/PermissionsMixin';
 import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 import usePluginEntities from 'hooks/usePluginEntities';
 import mergeNavigationItems from 'components/navigation/util/mergeNavigationItems';
+import AppConfig from 'util/AppConfig';
 
 const Container = styled(ButtonToolbar)`
   margin-bottom: 10px;
@@ -102,12 +103,17 @@ const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Prop
 
   const availableItems = items.filter(
     (item) =>
+      (item.featureFlag ? AppConfig.isFeatureEnabled(item.requiredFeatureFlag) : true) &&
       (typeof item.useCondition === 'function' ? item.useCondition() : true) &&
       isPermitted(currentUser.permissions, item.permissions) &&
       !!item.path,
   );
 
   const formatedItems = sortNavigationItems<PageNavItem>(availableItems);
+
+  if (formatedItems.length === 0) {
+    return null;
+  }
 
   return (
     <Container>

@@ -22,12 +22,19 @@ import useActivePerspective from 'components/perspectives/hooks/useActivePerspec
 import { PAGE_TYPE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
+import AppConfig from 'util/AppConfig';
 
 import useRankResults from './useRankResults';
 import useEntitySearchResults from './useEntitySearchResults';
 
 const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
   activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
+
+const isFeatureEnabled = (featureFlag?: string) => {
+  if (!featureFlag) return true;
+
+  return AppConfig.isFeatureEnabled(featureFlag);
+};
 
 type BaseNavigationItem = {
   description: string;
@@ -62,6 +69,7 @@ const usePageNavigationItems = () => {
 
   return pageNavigationItems.flatMap((group) =>
     [...group.children]
+      .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
       .filter((page) => isPermitted(page.permissions))
       .slice(1)
       .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
