@@ -21,6 +21,11 @@ in that release. Please refer to the Mongo DB upgrade documentation for details:
 - [7.0](https://www.mongodb.com/docs/manual/release-notes/7.0-upgrade/)
 - [8.0](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade/)
 
+Graylog users who cannot upgrade to MongoDB >= 7.0 prior to upgrading Graylog to 7.0.x can disable Graylog's preflight 
+check via its configuration setting (`skip_preflight_checks = true`) to let Graylog start regardless of the used MongoDB 
+version. This approach is not recommended though, as Graylog might start using MongoDB 7.0 features over the course of 
+the Graylog 7.x series.
+
 ### Kafka Inputs
 
 The `kafka-clients` library was updated to 4.x which removes support for Kafka
