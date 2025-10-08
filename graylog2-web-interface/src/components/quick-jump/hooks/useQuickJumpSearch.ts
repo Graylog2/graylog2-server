@@ -22,7 +22,9 @@ import useActivePerspective from 'components/perspectives/hooks/useActivePerspec
 import { PAGE_TYPE, PAGE_WEIGHT, BASE_SCORE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
+import Routes, { prefixUrl } from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
+import type { SearchResultItem } from 'components/quick-jump/Types';
 
 import useEntitySearchResults from './useEntitySearchResults';
 
@@ -115,20 +117,44 @@ const useEntityCreatorItems = () => {
     .map((creator) => ({ type: PAGE_TYPE, link: creator.path, title: creator.title }));
 };
 
-type SearchResultItem = {
-  key?: string;
-  type: string;
-  link: QualifiedUrl<string>;
-  title: string;
+const useConfigurationPages = () => {
+  const { isPermitted } = usePermissions();
+  const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
+  const pluginSystemConfigurations = usePluginEntities('systemConfigurations');
+
+  const coreNavItems = coreSystemConfigurations
+    .filter(({ permissions }) => isPermitted(permissions))
+    .map((page) => ({
+      type: PAGE_TYPE,
+      link: prefixUrl(`${Routes.SYSTEM.CONFIGURATIONS}/${page.name}`),
+      title: `Configurations / ${page.name}`,
+    }));
+
+  const pluginNavItems = pluginSystemConfigurations
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    .filter(({ useCondition }) => (typeof useCondition === 'function' ? useCondition() : true))
+    .map((page) => ({
+      type: PAGE_TYPE,
+      link: prefixUrl(`${Routes.SYSTEM.configurationsSection('Plugins', page.configType)}`),
+      title: `Configurations / ${page.displayName}`,
+    }));
+
+  return [...coreNavItems, ...pluginNavItems];
 };
+
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
   const creatorItems = useEntityCreatorItems();
+  const configurationPageNavItems = useConfigurationPages();
   const { data: entityItems, isLoading } = useEntitySearchResults({ query: searchQuery });
 
-  const scoredNavItems = useScoreResults([...mainNavItems, ...pageNavItems, ...creatorItems], searchQuery, PAGE_WEIGHT);
+  const scoredNavItems = useScoreResults(
+    [...mainNavItems, ...pageNavItems, ...creatorItems, ...configurationPageNavItems],
+    searchQuery,
+    PAGE_WEIGHT,
+  );
 
   const searchResults = useMemo(
     () =>
