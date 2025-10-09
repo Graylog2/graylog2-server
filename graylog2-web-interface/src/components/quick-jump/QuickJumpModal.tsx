@@ -26,6 +26,7 @@ import useLogout from 'hooks/useLogout';
 import useQuickJumpKeyboardNavigation from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
 import type { QuickJumpItemProps } from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
 import Badge from 'components/bootstrap/Badge';
+import Spinner from 'components/common/Spinner';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -134,7 +135,7 @@ const SearchResultEntry = ({
 };
 
 const QuickJumpModal = ({ onToggle }: Props) => {
-  const { searchQuery, setSearchQuery, searchResults } = useQuickJumpSearch();
+  const { searchQuery, setSearchQuery, searchResults, isLoading } = useQuickJumpSearch();
   const { highlightedIndex, searchInputProps, getItemProps, onHide } = useQuickJumpKeyboardNavigation({
     items: searchResults,
     onToggle,
@@ -163,20 +164,24 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           placeholder="Search for pages/dashboards/streams ..."
           {...searchInputProps}
         />
-        <List>
-          <ListGroup className="no-bm">
-            {searchResults.map((item, index) => (
-              <SearchResultEntry
-                key={item.key || item.title}
-                item={item}
-                onToggle={onToggle}
-                isActive={highlightedIndex === index}
-                itemProps={getItemProps(index)}
-                lastOpened={item.lastOpened}
-              />
-            ))}
-          </ListGroup>
-        </List>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <List>
+            <ListGroup className="no-bm">
+              {searchResults.map((item, index) => (
+                <SearchResultEntry
+                  key={item.key || item.title}
+                  item={item}
+                  onToggle={onToggle}
+                  isActive={highlightedIndex === index}
+                  itemProps={getItemProps(index)}
+                  lastOpened={item.lastOpened}
+                />
+              ))}
+            </ListGroup>
+          </List>
+        )}
       </Modal.Body>
     </Modal>
   );
