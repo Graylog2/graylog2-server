@@ -181,7 +181,7 @@ const SearchResults = ({ searchResults, onToggle, highlightedIndex, getItemProps
           onToggle={onToggle}
           isActive={highlightedIndex === index}
           itemProps={getItemProps(index)}
-          lastOpened={item.lastOpened}
+          lastOpened={item.last_opened}
         />
       ))}
     </ListGroup>

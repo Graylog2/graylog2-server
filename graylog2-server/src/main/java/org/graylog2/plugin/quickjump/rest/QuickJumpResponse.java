@@ -19,7 +19,7 @@ package org.graylog2.plugin.quickjump.rest;
 import java.util.List;
 
 public record QuickJumpResponse(List<Result> results) {
-    public record Result(String type, String id, String title, int score) {}
+    public record Result(String type, String id, String title, int score, boolean favorite, boolean lastOpened) {}
 
     public static QuickJumpResponse empty() {
         return new QuickJumpResponse(List.of());

@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { QuickJump } from '@graylog/server-api';
 
-import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import { defaultOnError } from 'util/conditional/onError';
 import { getEntityRoute, usePluginEntityTypeGenerators } from 'routing/hooks/useShowRouteForEntity';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useDebouncedValue from 'hooks/useDebouncedValue';
-import { createGRN } from 'logic/permissions/GRN';
-import { LAST_OPENED_ITEMS_LOOKBACK } from 'components/quick-jump/Constants';
 
 import type { SearchResultItem } from '../Types';
 
@@ -34,12 +30,6 @@ export type QuickJumpRequest = {
   limit?: number;
 };
 const useEntitySearchResults = (request: QuickJumpRequest) => {
-  const lastOpened = useLastOpened({ page: 1, per_page: LAST_OPENED_ITEMS_LOOKBACK });
-  const lastOpenedGRNs = useMemo(
-    () => lastOpened?.data?.lastOpened?.map((item) => item.grn) ?? [],
-    [lastOpened?.data?.lastOpened],
-  );
-
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
   const [debouncedQuery] = useDebouncedValue(request, 300);
@@ -57,12 +47,9 @@ const useEntitySearchResults = (request: QuickJumpRequest) => {
   });
 
   const searchResultItems: SearchResultItem[] = entitiesSearchResults?.results?.map((item) => ({
+    ...item,
     key: item.id,
-    type: item.type,
-    title: item.title,
     link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver, entityTypeGenerators),
-    score: item.score,
-    lastOpened: lastOpenedGRNs.includes(createGRN(item.type, item.id)),
   }));
 
   return entitiesSearchResults
