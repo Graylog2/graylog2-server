@@ -32,9 +32,23 @@ const ModalContent = styled(MantineModal.Content)`
   border-radius: 10px;
 `;
 
-const ModalRoot = styled(MantineModal.Root)(
-  ({ theme }) => css`
+const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>(
+  ({ theme, $scrollInContent }) => css`
     --mantine-color-body: ${theme.colors.global.contentBackground};
+    ${$scrollInContent &&
+    css`
+      .mantine-Modal-content {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mantine-Modal-body {
+        flex: 1;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+      }
+    `})
   `,
 );
 
@@ -59,6 +73,7 @@ type Props = {
   backdrop?: boolean;
   closable?: boolean;
   fullScreen?: boolean;
+  scrollInContent?: boolean;
 };
 
 const Modal = ({
@@ -69,8 +84,10 @@ const Modal = ({
   backdrop = true,
   closable = true,
   fullScreen = false,
+  scrollInContent = false,
 }: Props) => (
-  <ModalRoot
+  <StyledModalRoot
+    $scrollInContent={scrollInContent}
     opened={show}
     onClose={onHide}
     size={sizeForMantine(bsSize)}
@@ -79,7 +96,7 @@ const Modal = ({
     fullScreen={fullScreen}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
-  </ModalRoot>
+  </StyledModalRoot>
 );
 
 Modal.Header = ({ children, showCloseButton = true }: { children: React.ReactNode; showCloseButton?: boolean }) => (

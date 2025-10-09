@@ -32,7 +32,6 @@ const SearchInput = styled(Input)`
 
 const List = styled.div`
   overflow: auto;
-  max-height: calc(90vh - 150px);
   outline: none;
 `;
 
@@ -136,7 +135,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   );
 
   return (
-    <Modal onHide={onHide} show bsSize="large">
+    <Modal onHide={onHide} show bsSize="large" scrollInContent>
       <Modal.Header>
         <Modal.Title>Quick Jump</Modal.Title>
       </Modal.Header>
