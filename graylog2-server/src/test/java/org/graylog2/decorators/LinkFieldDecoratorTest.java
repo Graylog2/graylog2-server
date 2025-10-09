@@ -49,7 +49,6 @@ public class LinkFieldDecoratorTest {
 
     @Test
     public void verifyUnsafeLinksAreRemoved() {
-
         // Verify that real, safe URLs are rendered as links.
         Assert.assertEquals("http://full-local-allowed", getDecoratorUrl("http://full-local-allowed"));
         Assert.assertEquals("http://full-url-allowed.com", getDecoratorUrl("http://full-url-allowed.com"));
@@ -57,6 +56,7 @@ public class LinkFieldDecoratorTest {
         Assert.assertEquals("http://full-url-allowed.com/test?with=param", getDecoratorUrl("http://full-url-allowed.com/test?with=param"));
         Assert.assertEquals("https://https-is-allowed-too.com", getDecoratorUrl("https://https-is-allowed-too.com"));
         Assert.assertEquals("HTTPS://upper-case-https-all-good.com", getDecoratorUrl("HTTPS://upper-case-https-all-good.com"));
+        Assert.assertEquals("https://nedlog.local:9000/search?q=event_source_product%3Alinux", getDecoratorUrl("https://nedlog.local:9000/search?q=event_source_product%3Alinux"));
 
         // Links with double slashes should be allowed.
         Assert.assertEquals("https://graylog.com//releases", getDecoratorUrl("https://graylog.com//releases"));
@@ -65,6 +65,7 @@ public class LinkFieldDecoratorTest {
         Assert.assertEquals("javascript:alert('Javascript is not allowed.')", getDecoratorMessage("javascript:alert('Javascript is not allowed.')"));
         Assert.assertEquals("alert('Javascript this way is still not allowed", getDecoratorMessage("alert('Javascript this way is still not allowed"));
         Assert.assertEquals("ntp://other-stuff-is-not-allowed", getDecoratorMessage("ntp://other-stuff-is-not-allowed"));
+        Assert.assertEquals("ftp://full-local-allowed", getDecoratorMessage("ftp://full-local-allowed"));
     }
 
     /**
