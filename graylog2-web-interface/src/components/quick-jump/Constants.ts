@@ -18,3 +18,4 @@ export const PAGE_TYPE = 'page' as const;
 export const ENTITY_TYPE = 'entity' as const;
 export const PAGE_WEIGHT = 0.99;
 export const BASE_SCORE = 100;
+export const LAST_OPENED_ITEMS_LOOKBACK = 50;

@@ -25,6 +25,7 @@ import { getEntityRoute, usePluginEntityTypeGenerators } from 'routing/hooks/use
 import usePluginEntities from 'hooks/usePluginEntities';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 import { createGRN } from 'logic/permissions/GRN';
+import { LAST_OPENED_ITEMS_LOOKBACK } from 'components/quick-jump/Constants';
 
 import type { SearchResultItem } from '../Types';
 
@@ -33,7 +34,7 @@ export type QuickJumpRequest = {
   limit?: number;
 };
 const useEntitySearchResults = (request: QuickJumpRequest) => {
-  const lastOpened = useLastOpened({ page: 1, per_page: 50 });
+  const lastOpened = useLastOpened({ page: 1, per_page: LAST_OPENED_ITEMS_LOOKBACK });
   const lastOpenedGRNs = useMemo(() => lastOpened?.data?.lastOpened?.map((item) => item.grn) ?? [], [lastOpened]);
 
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
