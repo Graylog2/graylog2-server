@@ -184,7 +184,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
     searchInputProps,
     getItemProps,
     onHide,
-    onKeyDownCapture,
+    handleTyping,
   } = useQuickJumpKeyboardNavigation({
     items: searchResults,
     onToggle,
@@ -201,7 +201,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   );
 
   return (
-    <Modal onHide={onHide} show bsSize="large" scrollInContent rootProps={{ onKeyDownCapture }}>
+    <Modal onHide={onHide} show bsSize="large" scrollInContent rootProps={{ onKeyDownCapture: handleTyping }}>
       <Modal.Header>
         <Modal.Title>Quick Jump</Modal.Title>
       </Modal.Header>

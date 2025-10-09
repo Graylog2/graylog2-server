@@ -47,7 +47,7 @@ type Result = {
   };
   getItemProps: (index: number) => QuickJumpItemProps;
   onHide: () => void;
-  onKeyDownCapture: (event: React.KeyboardEvent) => void;
+  handleTyping: (event: React.KeyboardEvent) => void;
 };
 
 const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Options): Result => {
@@ -98,10 +98,6 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
   }, [focusSearchInput]);
 
   useEffect(() => {
-    itemRefs.current.length = items.length;
-  }, [items.length]);
-
-  useEffect(() => {
     if (highlightedIndex < 0) {
       return;
     }
@@ -111,13 +107,9 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
 
   const handleSearchInputKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
-      if (items.length === 0) {
-        return;
-      }
-
       onKeyDown(event);
     },
-    [items, onKeyDown],
+    [onKeyDown],
   );
 
   useEffect(() => {
@@ -128,8 +120,8 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
       setHighlightedIndex(-1);
       skipInitialHoverRef.current = false;
     } else if (queryChanged || highlightedIndex === -1) {
-      setHighlightedIndex(0);
       skipInitialHoverRef.current = false;
+      setHighlightedIndex(0);
     }
 
     previousQueryRef.current = searchQuery;
@@ -172,7 +164,7 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
     [handleSearchInputKeyDown],
   );
 
-  const onKeyDownCapture = useCallback(
+  const handleTyping = useCallback(
     (event: React.KeyboardEvent) => {
       if (isClosingRef.current) {
         return;
@@ -207,9 +199,9 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
       searchInputProps,
       getItemProps,
       onHide,
-      onKeyDownCapture,
+      handleTyping,
     }),
-    [highlightedIndex, searchInputProps, getItemProps, onHide, onKeyDownCapture],
+    [highlightedIndex, searchInputProps, getItemProps, onHide, handleTyping],
   );
 };
 
