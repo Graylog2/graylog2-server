@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { ModalRootProps } from '@mantine/core';
 import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
@@ -74,6 +75,7 @@ type Props = {
   closable?: boolean;
   fullScreen?: boolean;
   scrollInContent?: boolean;
+  rootProps?: Partial<Omit<ModalRootProps, 'opened' | 'onClose'>>;
 };
 
 const Modal = ({
@@ -85,6 +87,7 @@ const Modal = ({
   closable = true,
   fullScreen = false,
   scrollInContent = false,
+  rootProps = {},
 }: Props) => (
   <StyledModalRoot
     $scrollInContent={scrollInContent}
@@ -93,7 +96,8 @@ const Modal = ({
     size={sizeForMantine(bsSize)}
     trapFocus
     closeOnEscape={closable}
-    fullScreen={fullScreen}>
+    fullScreen={fullScreen}
+    {...(rootProps || {})}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
   </StyledModalRoot>

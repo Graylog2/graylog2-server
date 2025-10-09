@@ -32,9 +32,9 @@ type Options = {
 };
 
 export type QuickJumpItemProps = {
+  tabIndex: number;
   ref: (node: HTMLSpanElement | null) => void;
   onMouseEnter: () => void;
-  onMouseDown: (event: React.MouseEvent) => void;
   onFocus: () => void;
   onClick: () => void;
 };
@@ -44,10 +44,10 @@ type Result = {
   searchInputProps: {
     ref: React.MutableRefObject<React.ComponentRef<typeof Input> | null>;
     onKeyDown: (event: React.KeyboardEvent) => void;
-    onBlur: () => void;
   };
   getItemProps: (index: number) => QuickJumpItemProps;
   onHide: () => void;
+  onKeyDownCapture: (event: React.KeyboardEvent) => void;
 };
 
 const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Options): Result => {
@@ -56,7 +56,6 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
   const searchInputRef = useRef<React.ComponentRef<typeof Input>>(null);
   const itemRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const isClosingRef = useRef(false);
-  const blurTimeoutRef = useRef<number | null>(null);
   const skipInitialHoverRef = useRef(false);
   const previousQueryRef = useRef<string>();
 
@@ -68,18 +67,10 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
     }
   }, []);
 
-  const clearBlurTimeout = useCallback(() => {
-    if (blurTimeoutRef.current) {
-      window.clearTimeout(blurTimeoutRef.current);
-      blurTimeoutRef.current = null;
-    }
-  }, []);
-
   const onHide = useCallback(() => {
     isClosingRef.current = true;
-    clearBlurTimeout();
     onToggle();
-  }, [clearBlurTimeout, onToggle]);
+  }, [onToggle]);
 
   const handleItemSelect = useCallback(
     (item: SearchResultItem) => {
@@ -104,11 +95,7 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
   useEffect(() => {
     isClosingRef.current = false;
     focusSearchInput();
-
-    return () => {
-      clearBlurTimeout();
-    };
-  }, [clearBlurTimeout, focusSearchInput]);
+  }, [focusSearchInput]);
 
   useEffect(() => {
     itemRefs.current.length = items.length;
@@ -148,34 +135,9 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
     previousQueryRef.current = searchQuery;
   }, [highlightedIndex, items, searchQuery, setHighlightedIndex]);
 
-  const handleSearchInputBlur = useCallback(() => {
-    if (isClosingRef.current) {
-      return;
-    }
-
-    blurTimeoutRef.current = window.setTimeout(() => {
-      if (!isClosingRef.current) {
-        focusSearchInput();
-      }
-
-      blurTimeoutRef.current = null;
-    }, 0);
-  }, [focusSearchInput]);
-
-  const handleItemMouseDown = useCallback(
-    (event: React.MouseEvent) => {
-      if (event.defaultPrevented) {
-        return;
-      }
-
-      event.preventDefault();
-      focusSearchInput();
-    },
-    [focusSearchInput],
-  );
-
   const getItemProps = useCallback(
     (index: number): QuickJumpItemProps => ({
+      tabIndex: -1,
       ref: (node: HTMLSpanElement | null) => {
         itemRefs.current[index] = node;
       },
@@ -186,7 +148,6 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
           setHighlightedIndex(index);
         }
       },
-      onMouseDown: handleItemMouseDown,
       onFocus: () => {
         setHighlightedIndex(index);
       },
@@ -200,16 +161,44 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
         }
       },
     }),
-    [handleItemMouseDown, handleItemSelect, items, setHighlightedIndex],
+    [handleItemSelect, items, setHighlightedIndex],
   );
 
   const searchInputProps = useMemo(
     () => ({
       ref: searchInputRef,
       onKeyDown: handleSearchInputKeyDown,
-      onBlur: handleSearchInputBlur,
     }),
-    [handleSearchInputBlur, handleSearchInputKeyDown],
+    [handleSearchInputKeyDown],
+  );
+
+  const onKeyDownCapture = useCallback(
+    (event: React.KeyboardEvent) => {
+      if (isClosingRef.current) {
+        return;
+      }
+
+      const input = searchInputRef.current?.getInputDOMNode?.();
+
+      if (!input || event.target === input) {
+        return;
+      }
+
+      if (event.metaKey || event.altKey || event.ctrlKey) {
+        return;
+      }
+
+      const { key } = event;
+      const isCharacter = key.length === 1;
+      const isEditingKey = key === 'Backspace' || key === 'Delete';
+
+      if (!isCharacter && !isEditingKey) {
+        return;
+      }
+
+      focusSearchInput();
+    },
+    [focusSearchInput],
   );
 
   return useMemo(
@@ -218,8 +207,9 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
       searchInputProps,
       getItemProps,
       onHide,
+      onKeyDownCapture,
     }),
-    [searchInputProps, getItemProps, onHide, highlightedIndex],
+    [highlightedIndex, searchInputProps, getItemProps, onHide, onKeyDownCapture],
   );
 };
 

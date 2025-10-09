@@ -108,7 +108,6 @@ const SearchResultEntry = ({
   favorite,
 }: {
   item: SearchResultItem;
-  onToggle: () => void;
   itemProps: QuickJumpItemProps;
   isActive: boolean;
   lastOpened: boolean;
@@ -131,18 +130,16 @@ const SearchResultEntry = ({
 
 type SearchResultsProps = {
   searchResults: SearchResultItem[];
-  onToggle: () => void;
   highlightedIndex: number;
   getItemProps: (index: number) => QuickJumpItemProps;
 };
-const SearchResults = ({ searchResults, onToggle, highlightedIndex, getItemProps }: SearchResultsProps) => (
+const SearchResults = ({ searchResults, highlightedIndex, getItemProps }: SearchResultsProps) => (
   <List>
     <ListGroup className="no-bm">
       {searchResults.map((item, index) => (
         <SearchResultEntry
           key={item.key || item.title}
           item={item}
-          onToggle={onToggle}
           isActive={highlightedIndex === index}
           itemProps={getItemProps(index)}
           lastOpened={item.last_opened}
@@ -182,7 +179,13 @@ const QuickJumpIntro = () => (
 
 const QuickJumpModal = ({ onToggle }: Props) => {
   const { searchQuery, setSearchQuery, searchResults, isLoading } = useQuickJumpSearch();
-  const { highlightedIndex, searchInputProps, getItemProps, onHide } = useQuickJumpKeyboardNavigation({
+  const {
+    highlightedIndex,
+    searchInputProps,
+    getItemProps,
+    onHide,
+    onKeyDownCapture,
+  } = useQuickJumpKeyboardNavigation({
     items: searchResults,
     onToggle,
     searchQuery,
@@ -198,7 +201,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   );
 
   return (
-    <Modal onHide={onHide} show bsSize="large" scrollInContent>
+    <Modal onHide={onHide} show bsSize="large" scrollInContent rootProps={{ onKeyDownCapture }}>
       <Modal.Header>
         <Modal.Title>Quick Jump</Modal.Title>
       </Modal.Header>
@@ -222,7 +225,6 @@ const QuickJumpModal = ({ onToggle }: Props) => {
               searchResults={searchResults}
               getItemProps={getItemProps}
               highlightedIndex={highlightedIndex}
-              onToggle={onToggle}
             />
           </>
         )}
