@@ -73,7 +73,7 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
         actions={
           isRuleBuilder && create ? (
             <Button
-              bsStyle="success"
+              bsStyle="primary"
               bsSize="small"
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.USE_SOURCE_CODE_EDITOR_CLICKED, {
