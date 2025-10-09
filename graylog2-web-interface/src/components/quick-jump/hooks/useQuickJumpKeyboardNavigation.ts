@@ -26,6 +26,7 @@ import type { SearchResultItem } from '../Types';
 type Options = {
   items: SearchResultItem[];
   onToggle: () => void;
+  searchQuery: string;
 };
 
 export type QuickJumpItemProps = {
@@ -47,12 +48,13 @@ type Result = {
   onHide: () => void;
 };
 
-const useQuickJumpKeyboardNavigation = ({ items, onToggle }: Options): Result => {
+const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Options): Result => {
   const history = useHistory();
   const searchInputRef = useRef<React.ComponentRef<typeof Input>>(null);
   const itemRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const isClosingRef = useRef(false);
   const blurTimeoutRef = useRef<number | null>(null);
+  const previousQueryRef = useRef<string>();
 
   const focusSearchInput = useCallback(() => {
     const node = searchInputRef.current?.getInputDOMNode?.();
@@ -116,74 +118,23 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle }: Options): Result =>
         return;
       }
 
-      if (event.key === 'Enter') {
-        event.preventDefault();
-
-        const index = highlightedIndex === -1 ? 0 : highlightedIndex;
-        const item = items[index];
-
-        if (item) {
-          if (highlightedIndex === -1) {
-            setHighlightedIndex(index);
-          }
-
-          handleItemSelect(item);
-        }
-
-        return;
-      }
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
-
-        if (highlightedIndex === -1) {
-          setHighlightedIndex(0);
-
-          return;
-        }
-      }
-
-      if (event.key === 'ArrowUp') {
-        if (highlightedIndex === -1) {
-          return;
-        }
-
-        if (highlightedIndex === 0) {
-          event.preventDefault();
-          setHighlightedIndex(-1);
-
-          return;
-        }
-      }
-
       onKeyDown(event);
     },
-    [handleItemSelect, highlightedIndex, items, onKeyDown, setHighlightedIndex],
+    [items, onKeyDown],
   );
 
-  const didInitialHighlightRef = useRef(false);
-
   useEffect(() => {
-    if (items.length === 0) {
-      setHighlightedIndex(-1);
+    const queryChanged = previousQueryRef.current !== searchQuery;
+    const listIsEmpty = items.length === 0;
 
-      return;
+    if (listIsEmpty) {
+      setHighlightedIndex(-1);
+    } else if (queryChanged || highlightedIndex === -1) {
+      setHighlightedIndex(0);
     }
 
-    setHighlightedIndex((prev) => {
-      if (prev !== -1) {
-        return prev;
-      }
-
-      if (didInitialHighlightRef.current) {
-        return prev;
-      }
-
-      didInitialHighlightRef.current = true;
-
-      return 0;
-    });
-  }, [items, setHighlightedIndex]);
+    previousQueryRef.current = searchQuery;
+  }, [highlightedIndex, items, searchQuery, setHighlightedIndex]);
 
   const handleSearchInputBlur = useCallback(() => {
     if (isClosingRef.current) {

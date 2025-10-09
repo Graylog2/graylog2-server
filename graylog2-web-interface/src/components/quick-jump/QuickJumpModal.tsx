@@ -139,6 +139,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   const { highlightedIndex, searchInputProps, getItemProps, onHide } = useQuickJumpKeyboardNavigation({
     items: searchResults,
     onToggle,
+    searchQuery,
   });
 
   const handleSearch = useCallback(
