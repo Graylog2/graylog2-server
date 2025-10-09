@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -35,7 +36,11 @@ import org.graylog.security.certutil.audit.CaAuditEventTypes;
 import org.graylog.security.certutil.csr.ClientCertGenerator;
 import org.graylog.security.certutil.csr.exceptions.ClientCertGenerationException;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
+import org.graylog2.indexer.security.SecurityAdapter;
+import org.graylog2.indexer.security.SecurityRole;
+import org.graylog2.indexer.security.PrincipalRoles;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.rest.ApiError;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -43,19 +48,40 @@ import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Path("/ca/clientcert")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@Api(value = "Client Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
+@Api(value = "Client/Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
 public class ClientCertResource extends RestResource {
+    private final SecurityAdapter securityAdapter;
     private final ClientCertGenerator clientCertGenerator;
 
     @Inject
-    public ClientCertResource(final ClientCertGenerator clientCertGenerator) {
+    public ClientCertResource(SecurityAdapter securityAdapter, final ClientCertGenerator clientCertGenerator) {
+        this.securityAdapter = securityAdapter;
         this.clientCertGenerator = clientCertGenerator;
+    }
+
+    @GET
+    @ApiOperation(value = "Returns all available indexer roles")
+    @Path("roles")
+    @NoAuditEvent("This does not change any data")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
+    public List<SecurityRole> getRoles() {
+        return securityAdapter.getRoles();
+    }
+
+    @GET
+    @ApiOperation(value = "Returns all known principals and their roles")
+    @Path("principals")
+    @NoAuditEvent("This does not change any data")
+    @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
+    public List<PrincipalRoles> getPrincipals() {
+        return securityAdapter.getPrincipals();
     }
 
     @POST
