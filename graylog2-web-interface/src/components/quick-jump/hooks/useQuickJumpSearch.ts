@@ -19,7 +19,7 @@ import { useMemo, useState } from 'react';
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import { PAGE_TYPE, PAGE_WEIGHT, BASE_SCORE } from 'components/quick-jump/Constants';
+import { PAGE_TYPE, PAGE_WEIGHT, BASE_SCORE, ACTION_TYPE, EXTERNAL_PAGE_TYPE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
 import Routes, { prefixUrl } from 'routing/Routes';
@@ -144,13 +144,40 @@ const useConfigurationPages = () => {
 
 const useQuickJumpActions = () => [
   {
-    type: 'action',
+    type: ACTION_TYPE,
     title: 'Logout current user',
     action: ({ logout }) => {
       logout();
     },
   },
 ];
+
+const useHelpMenuItems = () => {
+  const menuItems = usePluginEntities('helpMenu');
+  const { isPermitted } = usePermissions();
+
+  return menuItems
+    .filter((item) => isPermitted(item.permissions))
+    .map((item) => {
+      if ('externalLink' in item) {
+        return {
+          type: EXTERNAL_PAGE_TYPE,
+          externalLink: item.externalLink,
+          title: item.description,
+        };
+      }
+
+      if ('action' in item) {
+        return {
+          type: ACTION_TYPE,
+          title: item.description,
+          action: item.action,
+        };
+      }
+
+      throw Error('Help menu item must have either external link or action defined');
+    });
+};
 
 const compareSearchItems = (result1: SearchResultItem, result2: SearchResultItem) => {
   const scoreDifference = result2.score - result1.score;
@@ -168,10 +195,18 @@ const useQuickJumpSearch = () => {
   const creatorItems = useEntityCreatorItems();
   const configurationPageNavItems = useConfigurationPages();
   const quickJumpActions = useQuickJumpActions();
+  const helpMenuItems = useHelpMenuItems();
   const { data: entityItems, isLoading } = useEntitySearchResults({ query: searchQuery });
 
   const scoredNavItems = useScoreResults(
-    [...mainNavItems, ...pageNavItems, ...creatorItems, ...configurationPageNavItems, ...quickJumpActions],
+    [
+      ...mainNavItems,
+      ...pageNavItems,
+      ...creatorItems,
+      ...configurationPageNavItems,
+      ...quickJumpActions,
+      ...helpMenuItems,
+    ],
     searchQuery,
     PAGE_WEIGHT,
   );

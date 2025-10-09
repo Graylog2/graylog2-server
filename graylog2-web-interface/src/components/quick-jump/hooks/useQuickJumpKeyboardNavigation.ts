@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type React from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 import type Input from 'components/bootstrap/Input';
 import useHistory from 'routing/useHistory';
@@ -80,8 +80,12 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
 
   const handleItemSelect = useCallback(
     (item: SearchResultItem) => {
-      if ((item as any)?.link) {
+      if ('link' in item) {
         history.push((item as any)?.link);
+      }
+
+      if ('externalLink' in item) {
+        window.open(item.externalLink, '_blank', 'noopener');
       }
 
       onHide();
@@ -89,8 +93,10 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
     [history, onHide],
   );
 
-  const { highlightedIndex, setHighlightedIndex, onKeyDown } =
-    useListKeyboardNavigation<SearchResultItem>(items, handleItemSelect);
+  const { highlightedIndex, setHighlightedIndex, onKeyDown } = useListKeyboardNavigation<SearchResultItem>(
+    items,
+    handleItemSelect,
+  );
 
   useEffect(() => {
     isClosingRef.current = false;
@@ -210,12 +216,7 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
       getItemProps,
       onHide,
     }),
-    [
-      searchInputProps,
-      getItemProps,
-      onHide,
-      highlightedIndex,
-    ],
+    [searchInputProps, getItemProps, onHide, highlightedIndex],
   );
 };
 

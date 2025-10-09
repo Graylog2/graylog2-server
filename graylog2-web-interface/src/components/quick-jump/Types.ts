@@ -28,11 +28,17 @@ type SearchResultItemLink = {
   link: QualifiedUrl<string>;
 };
 
+type SearchResultItemExternalLink = {
+  externalLink: string;
+};
+
 type ActionArguments = {
   logout: () => void;
+  showHotkeysModal: () => void;
 };
 type SearchResultItemAction = {
   action: (args: ActionArguments) => void;
 };
 
-export type SearchResultItem = SearchResultItemBase & (SearchResultItemLink | SearchResultItemAction);
+export type SearchResultItem = SearchResultItemBase &
+  (SearchResultItemLink | SearchResultItemExternalLink | SearchResultItemAction);

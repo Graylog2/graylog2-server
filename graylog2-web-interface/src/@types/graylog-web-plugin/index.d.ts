@@ -302,7 +302,7 @@ declare module 'graylog-web-plugin/plugin' {
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
-    helpMenu: Array<HelpMenuItem>;
+    helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;

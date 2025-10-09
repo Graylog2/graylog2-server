@@ -27,6 +27,9 @@ import useQuickJumpKeyboardNavigation from 'components/quick-jump/hooks/useQuick
 import type { QuickJumpItemProps } from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
 import Badge from 'components/bootstrap/Badge';
 import Spinner from 'components/common/Spinner';
+import useHotkeysContext from 'hooks/useHotkeysContext';
+import { Icon } from 'components/common';
+import { EXTERNAL_PAGE_TYPE } from 'components/quick-jump/Constants';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -87,14 +90,37 @@ const TitleRow = styled.div`
 const Title = styled.div``;
 const LastOpened = () => <Badge bsStyle="primary">Recent</Badge>;
 
+const ExternalIcon = styled(Icon)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xxs};
+    font-size: ${theme.fonts.size.small};
+    top: -1px;
+    position: relative;
+  `,
+);
+
 type Props = {
   onToggle: () => void;
 };
 
 const useActionArguments = () => {
   const logout = useLogout();
+  const { setShowHotkeysModal } = useHotkeysContext();
+  const showHotkeysModal = useCallback(() => setShowHotkeysModal(true), [setShowHotkeysModal]);
 
-  return useMemo(() => ({ logout }), [logout]);
+  return useMemo(() => ({ logout, showHotkeysModal }), [logout, showHotkeysModal]);
+};
+
+const itemLink = (item: SearchResultItem) => {
+  if ('link' in item) {
+    return item.link;
+  }
+
+  if ('externalLink' in item) {
+    return item.externalLink;
+  }
+
+  return undefined;
 };
 
 const SearchResultEntry = ({
@@ -111,7 +137,9 @@ const SearchResultEntry = ({
   lastOpened: boolean;
 }) => {
   const actionArguments = useActionArguments();
-  const isLinkItem = 'link' in item;
+  const isExternalLinkItem = 'externalLink' in item;
+  const isLinkItem = 'link' in item || isExternalLinkItem;
+
   const onClick = isLinkItem
     ? onToggle
     : () => {
@@ -120,10 +148,13 @@ const SearchResultEntry = ({
       };
 
   return (
-    <LinkContainer to={isLinkItem ? item.link : undefined} onClick={onClick}>
+    <LinkContainer to={itemLink(item)} onClick={onClick}>
       <StyledListGroupItem $active={isActive} {...itemProps}>
         <TitleRow>
-          <Title>{item.title}</Title>
+          <Title>
+            {item.title}
+            {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
+          </Title>
           {lastOpened ? <LastOpened /> : null}
         </TitleRow>
         <Badge>
