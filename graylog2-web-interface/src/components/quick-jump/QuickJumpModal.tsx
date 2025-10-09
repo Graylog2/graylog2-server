@@ -42,45 +42,43 @@ const EntityType = styled.div(
 `,
 );
 
-const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(
-  ({ theme, $active }) => {
-    const highlightColor = theme.utils.colorLevel(theme.colors.global.contentBackground, 10);
+const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ theme, $active }) => {
+  const highlightColor = theme.utils.colorLevel(theme.colors.global.contentBackground, 10);
 
-    return css`
-      position: relative;
-      cursor: pointer;
-      transition: background-color 0.15s ease-in-out;
+  return css`
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out;
 
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 0 auto 0 0;
-        width: 0;
-        background-color: ${theme.colors.variant.primary};
-        transition: width 0.15s ease-in-out;
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 0;
+      background-color: ${theme.colors.variant.primary};
+      transition: width 0.15s ease-in-out;
+    }
+
+    ${$active &&
+    css`
+      background-color: ${highlightColor};
+
+      & > .list-group-item {
+        background-color: ${highlightColor};
+        color: ${theme.colors.text.primary};
       }
 
-      ${$active &&
-      css`
-        background-color: ${highlightColor};
+      &::before {
+        width: 4px;
+      }
 
-        & > .list-group-item {
-          background-color: ${highlightColor};
-          color: ${theme.colors.text.primary};
-        }
-
-        &::before {
-          width: 4px;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-      `}
-    `;
-  },
-);
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+    `}
+  `;
+});
 
 type Props = {
   onToggle: () => void;
@@ -92,7 +90,17 @@ const useActionArguments = () => {
   return useMemo(() => ({ logout }), [logout]);
 };
 
-const SearchResultEntry = ({ item, onToggle, itemProps, isActive }: { item: SearchResultItem; onToggle: () => void; itemProps: QuickJumpItemProps; isActive: boolean }) => {
+const SearchResultEntry = ({
+  item,
+  onToggle,
+  itemProps,
+  isActive,
+}: {
+  item: SearchResultItem;
+  onToggle: () => void;
+  itemProps: QuickJumpItemProps;
+  isActive: boolean;
+}) => {
   const actionArguments = useActionArguments();
   const isLinkItem = 'link' in item;
   const onClick = isLinkItem
@@ -115,12 +123,10 @@ const SearchResultEntry = ({ item, onToggle, itemProps, isActive }: { item: Sear
 
 const QuickJumpModal = ({ onToggle }: Props) => {
   const { searchQuery, setSearchQuery, searchResults } = useQuickJumpSearch();
-  const {
-    highlightedIndex,
-    searchInputProps,
-    getItemProps,
-    onHide,
-  } = useQuickJumpKeyboardNavigation({ items: searchResults, onToggle });
+  const { highlightedIndex, searchInputProps, getItemProps, onHide } = useQuickJumpKeyboardNavigation({
+    items: searchResults,
+    onToggle,
+  });
 
   const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +152,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           {...searchInputProps}
         />
         <List>
-          <ListGroup>
+          <ListGroup className="no-bm">
             {searchResults.map((item, index) => (
               <SearchResultEntry
                 key={item.key || item.title}
