@@ -29,7 +29,6 @@ import org.graylog2.inputs.InputImpl;
 import org.graylog2.notifications.NotificationImpl;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.security.AccessTokenImpl;
-import org.graylog2.security.MongoDbSession;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleImpl;
@@ -50,7 +49,6 @@ public class DbEntitiesModule extends PluginModule {
                 IndexFailureImpl.class,
                 IndexSetConfig.class,
                 InputImpl.class,
-                MongoDbSession.class,
                 NotificationImpl.class,
                 OutputImpl.class,
                 ServerNodeEntity.class,

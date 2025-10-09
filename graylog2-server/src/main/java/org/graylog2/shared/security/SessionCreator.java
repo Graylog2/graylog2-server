@@ -17,6 +17,7 @@
 package org.graylog2.shared.security;
 
 import com.google.common.collect.ImmutableMap;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -26,21 +27,14 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.headerauth.HTTPHeaderAuthConfig;
-import org.graylog2.security.realm.HTTPHeaderAuthenticationRealm;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,13 +45,11 @@ public class SessionCreator {
 
     private final UserService userService;
     private final AuditEventSender auditEventSender;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
-    public SessionCreator(UserService userService, AuditEventSender auditEventSender, ClusterConfigService clusterConfigService) {
+    public SessionCreator(UserService userService, AuditEventSender auditEventSender) {
         this.userService = userService;
         this.auditEventSender = auditEventSender;
-        this.clusterConfigService = clusterConfigService;
     }
 
     /**
@@ -123,12 +115,6 @@ public class SessionCreator {
 
         final Session session = subject.getSession();
 
-        final HTTPHeaderAuthConfig httpHeaderConfig = loadHTTPHeaderConfig();
-        final Optional<String> usernameHeader = ShiroRequestHeadersBinder.getHeaderFromThreadContext(httpHeaderConfig.usernameHeader());
-        if (httpHeaderConfig.enabled() && usernameHeader.isPresent()) {
-            session.setAttribute(HTTPHeaderAuthenticationRealm.SESSION_AUTH_HEADER, usernameHeader.get());
-        }
-
         return createSession(subject, session, host);
     }
 
@@ -139,15 +125,14 @@ public class SessionCreator {
         if (user != null) {
             long timeoutInMillis = user.getSessionTimeoutMs();
             session.setTimeout(timeoutInMillis);
-            session.setAttribute("username", user.getName());
-            getSessionAttributes(subject).forEach(session::setAttribute);
+            session.setAttribute(SessionUtils.USERNAME_SESSION_KEY, user.getName());
         } else {
             // set a sane default. really we should be able to load the user from above.
             session.setTimeout(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());
         }
         session.touch();
 
-        // save subject in session, otherwise we can't get the username back in subsequent requests.
+        // save subject in session, otherwise we can't get the user ID back in subsequent requests.
         ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
         final Map<String, Object> auditEventContext = ImmutableMap.of(
@@ -157,27 +142,5 @@ public class SessionCreator {
         auditEventSender.success(AuditActor.user(user.getName()), SESSION_CREATE, auditEventContext);
 
         return Optional.of(session);
-    }
-
-    /**
-     * Extract additional session attributes out of a subject's principal collection. We assume that if there is a
-     * second principal, that this would be a map of session attributes.
-     */
-    private Map<?, ?> getSessionAttributes(Subject subject) {
-        final List<?> principals = subject.getPrincipals().asList();
-        if (principals.size() < 2) {
-            return Collections.emptyMap();
-        }
-        Object sessionAttributes = principals.get(1);
-        if (sessionAttributes instanceof Map) {
-            return (Map<?, ?>) sessionAttributes;
-        }
-        log.error("Unable to extract session attributes from subject. Expected <Map.class> but got <{}>.",
-                sessionAttributes.getClass().getSimpleName());
-        return Collections.emptyMap();
-    }
-
-    private HTTPHeaderAuthConfig loadHTTPHeaderConfig() {
-        return clusterConfigService.getOrDefault(HTTPHeaderAuthConfig.class, HTTPHeaderAuthConfig.createDisabled());
     }
 }
