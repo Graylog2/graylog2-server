@@ -54,6 +54,7 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
   const itemRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const isClosingRef = useRef(false);
   const blurTimeoutRef = useRef<number | null>(null);
+  const skipInitialHoverRef = useRef(false);
   const previousQueryRef = useRef<string>();
 
   const focusSearchInput = useCallback(() => {
@@ -129,8 +130,10 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
 
     if (listIsEmpty) {
       setHighlightedIndex(-1);
+      skipInitialHoverRef.current = false;
     } else if (queryChanged || highlightedIndex === -1) {
       setHighlightedIndex(0);
+      skipInitialHoverRef.current = false;
     }
 
     previousQueryRef.current = searchQuery;
@@ -168,7 +171,11 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
         itemRefs.current[index] = node;
       },
       onMouseEnter: () => {
-        setHighlightedIndex(index);
+        if (!skipInitialHoverRef.current) {
+          skipInitialHoverRef.current = true;
+        } else {
+          setHighlightedIndex(index);
+        }
       },
       onMouseDown: handleItemMouseDown,
       onFocus: () => {
