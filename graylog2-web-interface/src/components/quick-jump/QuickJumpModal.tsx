@@ -160,7 +160,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           id="quick-jump-search"
           type="text"
           onChange={handleSearch}
-          placeholder="Search..."
+          placeholder="Search for pages/dashboards/streams ..."
           {...searchInputProps}
         />
         <List>
