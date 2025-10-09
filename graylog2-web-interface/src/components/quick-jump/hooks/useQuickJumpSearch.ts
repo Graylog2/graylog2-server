@@ -152,6 +152,15 @@ const useQuickJumpActions = () => [
   },
 ];
 
+const compareSearchItems = (result1: SearchResultItem, result2: SearchResultItem) => {
+  const scoreDifference = result2.score - result1.score;
+  if (scoreDifference === 0) {
+    return Number(result2.lastOpened ?? false) - Number(result1.lastOpened ?? false);
+  }
+
+  return scoreDifference;
+};
+
 const useQuickJumpSearch = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const mainNavItems = useMainNavigationItems();
@@ -168,8 +177,7 @@ const useQuickJumpSearch = () => {
   );
 
   const searchResults: SearchResultItem[] = useMemo(
-    () =>
-      entityItems ? [...entityItems, ...scoredNavItems].sort((result1, result2) => result2.score - result1.score) : [],
+    () => (entityItems ? [...entityItems, ...scoredNavItems].sort(compareSearchItems) : []),
     [entityItems, scoredNavItems],
   );
 

@@ -78,6 +78,14 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
   `;
 });
 
+const TitleRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const Title = styled.div``;
+const LastOpened = () => <Badge bsStyle="primary">Recent</Badge>;
+
 type Props = {
   onToggle: () => void;
 };
@@ -93,11 +101,13 @@ const SearchResultEntry = ({
   onToggle,
   itemProps,
   isActive,
+  lastOpened,
 }: {
   item: SearchResultItem;
   onToggle: () => void;
   itemProps: QuickJumpItemProps;
   isActive: boolean;
+  lastOpened: boolean;
 }) => {
   const actionArguments = useActionArguments();
   const isLinkItem = 'link' in item;
@@ -111,8 +121,10 @@ const SearchResultEntry = ({
   return (
     <LinkContainer to={isLinkItem ? item.link : undefined} onClick={onClick}>
       <StyledListGroupItem $active={isActive} {...itemProps}>
-        {item.title}
-        <br />
+        <TitleRow>
+          <Title>{item.title}</Title>
+          {lastOpened ? <LastOpened /> : null}
+        </TitleRow>
         <Badge>
           <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
         </Badge>
@@ -160,6 +172,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
                 onToggle={onToggle}
                 isActive={highlightedIndex === index}
                 itemProps={getItemProps(index)}
+                lastOpened={item.lastOpened}
               />
             ))}
           </ListGroup>

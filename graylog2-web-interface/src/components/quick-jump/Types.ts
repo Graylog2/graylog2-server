@@ -21,6 +21,7 @@ type SearchResultItemBase = {
   type: string;
   title: string;
   score?: number;
+  lastOpened?: boolean;
 };
 
 type SearchResultItemLink = {

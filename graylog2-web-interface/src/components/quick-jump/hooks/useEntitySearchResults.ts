@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 
 import { QuickJump } from '@graylog/server-api';
 
+import useLastOpened from 'components/welcome/hooks/useLastOpened';
 import { defaultOnError } from 'util/conditional/onError';
 import { getEntityRoute, usePluginEntityTypeGenerators } from 'routing/hooks/useShowRouteForEntity';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useDebouncedValue from 'hooks/useDebouncedValue';
+import { createGRN } from 'logic/permissions/GRN';
 
 import type { SearchResultItem } from '../Types';
 
@@ -30,6 +33,9 @@ export type QuickJumpRequest = {
   limit?: number;
 };
 const useEntitySearchResults = (request: QuickJumpRequest) => {
+  const lastOpened = useLastOpened({ page: 1 });
+  const lastOpenedGRNs = useMemo(() => lastOpened?.data?.lastOpened?.map((item) => item.grn) ?? [], [lastOpened]);
+
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
   const [searchQuery] = useDebouncedValue(request?.query, 300);
@@ -53,6 +59,7 @@ const useEntitySearchResults = (request: QuickJumpRequest) => {
     title: item.title,
     link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver, entityTypeGenerators),
     score: item.score,
+    lastOpened: lastOpenedGRNs.includes(createGRN(item.type, item.id)),
   }));
 
   return entitiesSearchResults
