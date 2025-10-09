@@ -21,6 +21,8 @@ import type Input from 'components/bootstrap/Input';
 import useHistory from 'routing/useHistory';
 import useListKeyboardNavigation from 'hooks/useListKeyboardNavigation';
 
+import useActionArguments from './useActionArguments';
+
 import type { SearchResultItem } from '../Types';
 
 type Options = {
@@ -49,6 +51,7 @@ type Result = {
 };
 
 const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Options): Result => {
+  const actionArguments = useActionArguments();
   const history = useHistory();
   const searchInputRef = useRef<React.ComponentRef<typeof Input>>(null);
   const itemRefs = useRef<(HTMLSpanElement | null)[]>([]);
@@ -81,16 +84,16 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
   const handleItemSelect = useCallback(
     (item: SearchResultItem) => {
       if ('link' in item) {
-        history.push((item as any)?.link);
-      }
-
-      if ('externalLink' in item) {
+        history.push(item.link);
+      } else if ('externalLink' in item) {
         window.open(item.externalLink, '_blank', 'noopener');
+      } else {
+        item.action(actionArguments);
       }
 
       onHide();
     },
-    [history, onHide],
+    [actionArguments, history, onHide],
   );
 
   const { highlightedIndex, setHighlightedIndex, onKeyDown } = useListKeyboardNavigation<SearchResultItem>(

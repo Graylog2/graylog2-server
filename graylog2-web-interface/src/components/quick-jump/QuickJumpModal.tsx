@@ -14,20 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
-import { LinkContainer } from 'components/common/router';
 import useQuickJumpSearch from 'components/quick-jump/hooks/useQuickJumpSearch';
 import StringUtils from 'util/StringUtils';
 import type { SearchResultItem } from 'components/quick-jump/Types';
-import useLogout from 'hooks/useLogout';
 import useQuickJumpKeyboardNavigation from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
 import type { QuickJumpItemProps } from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
 import Badge from 'components/bootstrap/Badge';
 import Spinner from 'components/common/Spinner';
-import useHotkeysContext from 'hooks/useHotkeysContext';
 import { Icon } from 'components/common';
 import { EXTERNAL_PAGE_TYPE } from 'components/quick-jump/Constants';
 
@@ -103,29 +100,8 @@ type Props = {
   onToggle: () => void;
 };
 
-const useActionArguments = () => {
-  const logout = useLogout();
-  const { setShowHotkeysModal } = useHotkeysContext();
-  const showHotkeysModal = useCallback(() => setShowHotkeysModal(true), [setShowHotkeysModal]);
-
-  return useMemo(() => ({ logout, showHotkeysModal }), [logout, showHotkeysModal]);
-};
-
-const itemLink = (item: SearchResultItem) => {
-  if ('link' in item) {
-    return item.link;
-  }
-
-  if ('externalLink' in item) {
-    return item.externalLink;
-  }
-
-  return undefined;
-};
-
 const SearchResultEntry = ({
   item,
-  onToggle,
   itemProps,
   isActive,
   lastOpened,
@@ -135,35 +111,20 @@ const SearchResultEntry = ({
   itemProps: QuickJumpItemProps;
   isActive: boolean;
   lastOpened: boolean;
-}) => {
-  const actionArguments = useActionArguments();
-  const isExternalLinkItem = 'externalLink' in item;
-  const isLinkItem = 'link' in item || isExternalLinkItem;
-
-  const onClick = isLinkItem
-    ? onToggle
-    : () => {
-        item.action(actionArguments);
-        onToggle();
-      };
-
-  return (
-    <LinkContainer to={itemLink(item)} onClick={onClick}>
-      <StyledListGroupItem $active={isActive} {...itemProps}>
-        <TitleRow>
-          <Title>
-            {item.title}
-            {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
-          </Title>
-          {lastOpened ? <LastOpened /> : null}
-        </TitleRow>
-        <Badge>
-          <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-        </Badge>
-      </StyledListGroupItem>
-    </LinkContainer>
+}) => (
+    <StyledListGroupItem $active={isActive} {...itemProps}>
+      <TitleRow>
+        <Title>
+          {item.title}
+          {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
+        </Title>
+        {lastOpened ? <LastOpened /> : null}
+      </TitleRow>
+      <Badge>
+        <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+      </Badge>
+    </StyledListGroupItem>
   );
-};
 
 type SearchResultsProps = {
   searchResults: SearchResultItem[];
