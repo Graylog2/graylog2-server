@@ -25,6 +25,7 @@ import type { SearchResultItem } from 'components/quick-jump/Types';
 import useLogout from 'hooks/useLogout';
 import useQuickJumpKeyboardNavigation from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
 import type { QuickJumpItemProps } from 'components/quick-jump/hooks/useQuickJumpKeyboardNavigation';
+import Badge from 'components/bootstrap/Badge';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -35,11 +36,9 @@ const List = styled.div`
   outline: none;
 `;
 
-const EntityType = styled.div(
-  ({ theme }) => `
-  color: ${theme.colors.text.secondary};
-`,
-);
+const EntityType = styled.div`
+  font-weight: normal;
+`;
 
 const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ theme, $active }) => {
   const highlightColor = theme.utils.colorLevel(theme.colors.global.contentBackground, 10);
@@ -114,7 +113,9 @@ const SearchResultEntry = ({
       <StyledListGroupItem $active={isActive} {...itemProps}>
         {item.title}
         <br />
-        <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+        <Badge>
+          <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+        </Badge>
       </StyledListGroupItem>
     </LinkContainer>
   );
