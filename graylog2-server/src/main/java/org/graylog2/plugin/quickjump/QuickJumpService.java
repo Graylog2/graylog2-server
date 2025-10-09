@@ -22,6 +22,7 @@ import com.mongodb.client.model.CollationStrength;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.grn.GRN;
 import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.StartPageService;
@@ -49,6 +50,7 @@ import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_ID_FIELD;
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DUMMY_COLLECTION;
 
 public class QuickJumpService {
+    private static final int BASE_SCORE = 100;
     private static final int DEFAULT_CONTENT_LIMIT = 5;
     private record Result(String source, String type, String id, String title, int score,
                           String entityId) implements MongoEntity {}
@@ -72,17 +74,25 @@ public class QuickJumpService {
                 : searchForQuery(query, limit, user);
     }
 
+    private record IntermediateResult(String type, String id, String title) {
+        static IntermediateResult create(GRN grn, String title) {
+            return new IntermediateResult(grn.type(), grn.entity(), title);
+        }
+    }
+
     private QuickJumpResponse lastOpenedAndFavorites(SearchUser user) {
         final var lastOpened = startPageService.findLastOpenedFor(user, 1, DEFAULT_CONTENT_LIMIT)
-                .paginatedList()
-                .stream()
-                .map(item -> new QuickJumpResponse.Result(item.grn().type(), item.grn().entity(), item.title(), 100));
-        final var newestFavorites = favoritesService.findFavoritesFor(user, Optional.empty(), 1, 5)
-                .paginatedList()
-                .stream()
-                .map(item -> new QuickJumpResponse.Result(item.grn().type(), item.grn().entity(), item.title(), 100));
+                .paginatedList();
+        final var newestFavorites = favoritesService.findFavoritesFor(user, Optional.empty(), 1, DEFAULT_CONTENT_LIMIT)
+                .paginatedList();
 
-        return new QuickJumpResponse(Stream.concat(lastOpened, newestFavorites).toList());
+        return new QuickJumpResponse(Stream.concat(
+                        lastOpened.stream().map(item -> IntermediateResult.create(item.grn(), item.title())),
+                        newestFavorites.stream().map(item -> IntermediateResult.create(item.grn(), item.title()))
+                )
+                .distinct()
+                .map(item -> new QuickJumpResponse.Result(item.type(), item.id(), item.title(), BASE_SCORE))
+                .toList());
     }
 
     private QuickJumpResponse searchForQuery(String query, int limit, HasPermissions user) {
@@ -177,7 +187,7 @@ public class QuickJumpService {
                                 .append("regex", query)
                                 .append("options", "i"));
 
-        final var baseScore = 100 - basePenalty;
+        final var baseScore = BASE_SCORE - basePenalty;
         return Stream.of(
                 new Document("case", exactEq).append("then", baseScore),
                 new Document("case", prefixMatch).append("then", baseScore - 1),
