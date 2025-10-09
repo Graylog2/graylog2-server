@@ -28,7 +28,7 @@ const CreatePipelineButton = () => {
   return (
     <div className="pull-right">
       <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
-        <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:create')} bsStyle="success">
+        <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:create')} bsStyle="primary">
           Add new pipeline
         </Button>
       </LinkContainer>
