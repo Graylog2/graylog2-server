@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import memoize from 'lodash/memoize';
+import JSONbig from 'json-bigint';
 
 import FetchError from 'logic/errors/FetchError';
 import ErrorsActions from 'actions/errors/ErrorsActions';
@@ -64,6 +65,8 @@ type RequestHeaders = {
   'Content-Type'?: string;
 };
 
+const jsonParser = JSONbig({ useNativeBigInt: true }).parse;
+
 const defaultResponseHandler = (resp: Response) => {
   if (resp.ok) {
     const { status } = resp;
@@ -72,7 +75,7 @@ const defaultResponseHandler = (resp: Response) => {
 
     reportServerSuccess();
 
-    return noContent ? null : resp.json();
+    return noContent ? null : resp.text().then(jsonParser);
   }
 
   throw resp;
