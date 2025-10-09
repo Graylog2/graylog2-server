@@ -279,6 +279,11 @@ interface EntityCreator {
   telemetryEvent?: CreatorTelemetryEvent;
 }
 
+type HelpMenuItem = {
+  description: string;
+  permissions?: string | Array<string>;
+} & ({ externalLink?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
+
 type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
 
 type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
@@ -297,6 +302,7 @@ declare module 'graylog-web-plugin/plugin' {
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
+    helpMenu: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;
