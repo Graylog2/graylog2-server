@@ -17,12 +17,10 @@
 package org.graylog2.rest.models.tokenusage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
-@WithBeanGetter
 public record TokenUsageDTO(
         @JsonProperty(FIELD_TOKEN_ID) String tokenId,
         @JsonProperty(FIELD_USERNAME) String username,

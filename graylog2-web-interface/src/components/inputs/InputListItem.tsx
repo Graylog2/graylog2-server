@@ -303,6 +303,7 @@ const InputListItem = ({ input, currentNode }: Props) => {
           globalValue={input.global}
           nodeValue={input.node}
           configFields={definition.requested_configuration}
+          description={definition?.description}
           title={`Editing Input ${input.title}`}
           titleValue={input.title}
           typeName={input.type}

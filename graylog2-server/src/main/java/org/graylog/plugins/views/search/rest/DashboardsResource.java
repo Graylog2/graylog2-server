@@ -38,6 +38,8 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryDTO;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.DBEntitySourceService;
+import org.graylog2.database.entities.source.EntitySource;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.database.utils.SourcedMongoEntityUtils;
 import org.graylog2.rest.models.SortOrder;
@@ -53,6 +55,8 @@ import java.util.Locale;
 import java.util.function.Predicate;
 
 import static java.util.Locale.ENGLISH;
+import static org.graylog2.database.entities.source.DBEntitySourceService.FILTER_OPTIONS;
+import static org.graylog2.database.utils.SourcedMongoEntityUtils.FILTERABLE_FIELD;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
@@ -82,7 +86,7 @@ public class DashboardsResource extends RestResource {
 
     private static final String DEFAULT_SORT_FIELD = ViewDTO.FIELD_TITLE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
-    private static final List<EntityAttribute> attributes = List.of(
+    private static List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("_id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_TITLE).title("Title").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
@@ -90,7 +94,14 @@ public class DashboardsResource extends RestResource {
             EntityAttribute.builder().id(ViewDTO.FIELD_DESCRIPTION).title("Description").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_SUMMARY).title("Summary").searchable(true).build(),
             EntityAttribute.builder().id(ViewDTO.FIELD_OWNER).title("Owner").build(),
-            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build()
+            EntityAttribute.builder().id(ViewDTO.FIELD_FAVORITE).title("Favorite").sortable(false).build(),
+            EntityAttribute.builder().id(FILTERABLE_FIELD).title("Source")
+                    .filterable(true)
+                    .sortable(false)
+                    .relatedCollection(DBEntitySourceService.COLLECTION_NAME)
+                    .relatedProperty(EntitySource.FIELD_ENTITY_ID)
+                    .filterOptions(FILTER_OPTIONS)
+                    .build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))

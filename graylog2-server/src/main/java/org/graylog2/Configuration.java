@@ -224,6 +224,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "enable_preflight_web")
     private boolean enablePreflightWeb = false;
 
+    @Parameter(value = "preflight_web_password")
+    private String preflightWebPassword = null;
+
     @Parameter(value = "query_latency_monitoring_enabled")
     private boolean queryLatencyMonitoringEnabled = false;
 
@@ -294,6 +297,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     // nodes before giving up
     @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES, validators = PositiveIntegerValidator.class)
     private int installOutputBufferDrainingMaxRetries = DEFAULT_INSTALL_RETRIES;
+
+    @Parameter(value = "global_inputs_only")
+    private boolean globalInputsOnly = false;
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -611,6 +617,10 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         return searchQueryEngineDataLakeJobsQueueSize;
     }
 
+    public String getPreflightWebPassword() {
+        return preflightWebPassword;
+    }
+
     public static class NodeIdFileValidator implements Validator<String> {
         @Override
         public void validate(String name, String path) throws ValidationException {
@@ -713,5 +723,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Override
     public boolean withInputs() {
         return true;
+    }
+
+    public boolean isGlobalInputsOnly() {
+        return globalInputsOnly;
     }
 }

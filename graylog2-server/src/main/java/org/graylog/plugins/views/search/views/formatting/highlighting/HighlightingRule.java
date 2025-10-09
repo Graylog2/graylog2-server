@@ -20,11 +20,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
 @JsonDeserialize(builder = HighlightingRule.Builder.class)
-@WithBeanGetter
 public abstract class HighlightingRule {
     static final String FIELD_FIELD = "field";
     static final String FIELD_VALUE = "value";

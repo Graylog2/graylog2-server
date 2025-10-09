@@ -282,7 +282,7 @@ components:
           description: "The destination type"
           enum:
             - "indexer"
-            - "data-warehouse"
+            - "data-lake"
         title:
           type: "string"
           description: "The filter title"

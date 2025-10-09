@@ -1,0 +1,4 @@
+type = "f"
+message = "Optional description for input types to be shown in the input creation modal."
+
+pulls = ["23698"]

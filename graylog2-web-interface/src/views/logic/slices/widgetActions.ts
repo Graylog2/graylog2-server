@@ -149,3 +149,16 @@ export const setChartColor =
 
     return dispatch(updateWidget(widgetId, newWidget));
   };
+
+export const setWidgetTitle =
+  (widgetId: string, newTitle: string) => async (dispatch: ViewsDispatch, getState: GetState) => {
+    const activeQuery = selectActiveQuery(getState());
+
+    return dispatch(setTitle(activeQuery, 'widget', widgetId, newTitle));
+  };
+
+export const updateDescription = (widget: Widget, newDescription: string) => async (dispatch: ViewsDispatch) => {
+  const updatedWidget = widget.withDescription(newDescription);
+
+  return dispatch(updateWidget(widget.id, updatedWidget));
+};

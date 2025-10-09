@@ -14,21 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useContext } from 'react';
 
-import type { ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type {
+  ClickPoint,
+  OnClickPopoverDropdown,
+  FieldData,
+} from 'views/components/visualizations/OnClickPopover/Types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ClickPointSelector from 'views/components/visualizations/OnClickPopover/ClickPointSelector';
+import ValueActionsDropdown from 'views/components/visualizations/OnClickPopover/ValueActionsDropdown';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 
 type Props = {
-  component: React.ComponentType<{
-    clickPoint: ClickPoint;
-    config: AggregationWidgetConfig;
-  }>;
+  component: OnClickPopoverDropdown;
   clickPoint: ClickPoint;
   config: AggregationWidgetConfig;
   clickPointsInRadius?: Array<ClickPoint>;
   metricMapper?: (clickPoint: ClickPoint) => { value: string; metric: string };
+  onPopoverClose: () => void;
 };
 
 const defaultMetricMapper = (clickPoint: ClickPoint) => ({
@@ -36,31 +41,61 @@ const defaultMetricMapper = (clickPoint: ClickPoint) => ({
   metric: clickPoint.data.originalName ?? clickPoint.data.name,
 });
 
+const useQueryFieldTypes = () => {
+  const fieldTypes = useContext(FieldTypesContext);
+
+  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
+};
+
 const DropdownSwitcher = ({
   component: Component,
   clickPoint,
   config,
   clickPointsInRadius = [],
   metricMapper = defaultMetricMapper,
+  onPopoverClose,
 }: Props) => {
   const [selectedClickPoint, setSelectedClickPoint] = useState<ClickPoint>();
-  const [showComponent, setShowComponent] = useState<boolean>();
+  const [showValuesComponent, setShowValuesComponent] = useState<boolean>();
+  const [fieldData, setFieldData] = useState<FieldData>(null);
+  const types = useQueryFieldTypes();
 
   const onSelect = (pt: ClickPoint) => {
-    setShowComponent(true);
+    setShowValuesComponent(true);
     setSelectedClickPoint(pt);
   };
 
   useEffect(() => {
     setSelectedClickPoint(clickPoint);
     const len = clickPointsInRadius?.length;
-    setShowComponent(!len || len === 1);
+    setShowValuesComponent(!len || len === 1);
+    setFieldData(null);
   }, [clickPoint, clickPointsInRadius]);
+
+  const additionalContextValue = useMemo(
+    () => ({
+      valuePath: fieldData?.contexts?.valuePath,
+      fieldTypes: types,
+    }),
+    [fieldData?.contexts?.valuePath, types],
+  );
 
   if (!selectedClickPoint) return null;
 
-  return showComponent ? (
-    <Component clickPoint={selectedClickPoint} config={config} />
+  const onActionRun = () => {
+    onPopoverClose();
+    setFieldData(null);
+  };
+
+  if (fieldData)
+    return (
+      <AdditionalContext.Provider value={additionalContextValue}>
+        <ValueActionsDropdown field={fieldData.field} value={fieldData.value} onActionRun={onActionRun} />
+      </AdditionalContext.Provider>
+    );
+
+  return showValuesComponent ? (
+    <Component clickPoint={selectedClickPoint} config={config} setFieldData={setFieldData} />
   ) : (
     <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
   );

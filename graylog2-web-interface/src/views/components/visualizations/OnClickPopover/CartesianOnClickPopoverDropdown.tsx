@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import Popover from 'components/common/Popover';
-import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { keySeparator } from 'views/Constants';
 import OnClickPopoverValueGroups from 'views/components/visualizations/OnClickPopover/OnClickPopoverValueGroups';
-import type { ValueGroups, ClickPoint } from 'views/components/visualizations/OnClickPopover/Types';
+import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/visualizations/OnClickPopover/Types';
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
+import useUserDateTime from 'hooks/useUserDateTime';
+import { adjustFormat, toUTCFromTz, isValidDate } from 'util/DateTime';
 
 const DivContainer = styled.div(
   ({ theme }) => css`
@@ -32,20 +33,26 @@ const DivContainer = styled.div(
   `,
 );
 
-const CartesianOnClickPopoverDropdown = ({
-  clickPoint,
-  config,
-}: {
-  clickPoint: ClickPoint;
-  config: AggregationWidgetConfig;
-}) => {
+const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const traceColor = getHoverSwatchColor(clickPoint);
+  const { userTimezone } = useUserDateTime();
+  const convertToOriginalValue = useCallback(
+    (value: number | string) => {
+      if (config.isTimeline && typeof value === 'string' && isValidDate(value))
+        return adjustFormat(toUTCFromTz(value, userTimezone), 'internalIndexer');
+
+      return value;
+    },
+    [config.isTimeline, userTimezone],
+  );
+
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
     const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
       keySeparator,
     );
-    const metric: string = splitNames.pop() as string;
+    const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
+    const columnValues = splitNames.filter((value) => value !== metric);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
@@ -53,13 +60,17 @@ const CartesianOnClickPopoverDropdown = ({
     const splitXValues: Array<string | number> = `${String(clickPoint.x)}`.split(keySeparator);
 
     return {
-      rowPivotValues: splitXValues.map((value, i) => ({
-        value,
-        field: rowPivotsToFields[i],
-        text: String(value),
-        traceColor,
-      })),
-      columnPivotValues: splitNames.map((value, i) => ({
+      rowPivotValues: splitXValues.map((labelValue, i) => {
+        const value = convertToOriginalValue(labelValue);
+
+        return {
+          value,
+          field: rowPivotsToFields[i],
+          text: String(labelValue),
+          traceColor,
+        };
+      }),
+      columnPivotValues: columnValues.map((value, i) => ({
         value,
         field: columnPivotsToFields[i],
         text: String(value),
@@ -72,7 +83,7 @@ const CartesianOnClickPopoverDropdown = ({
         traceColor,
       },
     };
-  }, [clickPoint, config, traceColor]);
+  }, [clickPoint, config, convertToOriginalValue, traceColor]);
 
   return (
     <Popover.Dropdown>
@@ -81,6 +92,8 @@ const CartesianOnClickPopoverDropdown = ({
           columnPivotValues={columnPivotValues}
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
+          setFieldData={setFieldData}
+          config={config}
         />
       </DivContainer>
     </Popover.Dropdown>

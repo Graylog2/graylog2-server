@@ -19,18 +19,16 @@ package org.graylog2.rest.resources.streams.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class TestMatchResponse {
-    @JsonProperty
+    @JsonProperty("matches")
     public abstract boolean matches();
 
-    @JsonProperty
+    @JsonProperty("rules")
     public abstract Map<String, Boolean> rules();
 
     public static TestMatchResponse create(boolean matches, Map<String, Boolean> rules) {

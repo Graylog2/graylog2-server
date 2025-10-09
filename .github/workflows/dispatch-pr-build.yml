@@ -4,9 +4,14 @@ on:
   pull_request:
     types: [ opened, reopened, synchronize, edited, labeled ]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# The PR dispatch workflow runs should not cancel each other!
+# When opening a PR with labels (e.g., dependabot), we receive one "opened"
+# and one or more "labeled" events. If we would cancel the workflow run
+# for "opened" when receiving a "labeled", the PR build in
+# graylog-project-internal would not be triggered.
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.ref }}
+#  cancel-in-progress: true
 
 jobs:
   dispatchedPR:

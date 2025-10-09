@@ -29,6 +29,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.VM, searchVersions = SearchServer.DATANODE_DEV)
 public class InputPermissionsIT {
+    private static final Duration TIMEOUT = Duration.ofSeconds(30);
 
     private final GraylogApis apis;
 
@@ -126,7 +128,7 @@ public class InputPermissionsIT {
                         apis.inputs().getInputState(inputId)
                                 .extract().body().jsonPath().get("state")
                                 .equals("RUNNING"),
-                "Timed out waiting for HTTP Random Message Input to become available");
+                "Timed out waiting for HTTP Random Message Input to become available", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
 
@@ -141,7 +143,7 @@ public class InputPermissionsIT {
                         apis.inputs().getInputState(inputId2)
                                 .extract().body().jsonPath().get("state")
                                 .equals("RUNNING"),
-                "Timed out waiting for HTTP Random Message Input to become available");
+                "Timed out waiting for HTTP Random Message Input to become available", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId2).assertThat().body("id", equalTo(inputId2));
 
@@ -161,7 +163,7 @@ public class InputPermissionsIT {
                         apis.inputs().getInputState(inputId)
                                 .extract().body().jsonPath().get("state")
                                 .equals("RUNNING"),
-                "Timed out waiting for Json Input to become available");
+                "Timed out waiting for Json Input to become available", TIMEOUT);
 
         apis.forUser(inputsReader).inputs().getInput(inputId).assertThat().body("id", equalTo(inputId));
 

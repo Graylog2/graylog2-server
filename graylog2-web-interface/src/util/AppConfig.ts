@@ -51,6 +51,7 @@ export type Branding = {
     help?: { icon: string };
   };
   help_url?: string;
+  help_pages?: { [key: string]: string };
   footer?: { enabled: boolean };
   resources?: BrandingResources;
   features?: {
@@ -68,6 +69,7 @@ export type AppConfigs = {
   telemetry: { api_key: string; host: string; enabled: boolean };
   contentStream: { refresh_interval: string; rss_url: string };
   branding: Branding | undefined;
+  globalInputsOnly: boolean;
 };
 
 declare global {
@@ -140,6 +142,10 @@ const AppConfig = {
 
   branding(): Branding | undefined {
     return appConfig()?.branding;
+  },
+
+  globalInputsOnly():boolean {
+    return appConfig().globalInputsOnly;
   },
 };
 

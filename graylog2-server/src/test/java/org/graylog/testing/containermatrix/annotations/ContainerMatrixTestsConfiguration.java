@@ -74,7 +74,7 @@ public @interface ContainerMatrixTestsConfiguration {
      * matrix rule
      * If no version is explicitly specified, then {@link MongodbServer#DEFAULT_VERSION will be used by the tests}
      */
-    MongodbServer[] mongoVersions() default {MongodbServer.MONGO5};
+    MongodbServer[] mongoVersions() default {MongodbServer.MONGO7};
 
     // are run after the initialization of mongoDb, gets concatenated for all tests below the above rules
     String[] mongoDBFixtures() default {};
