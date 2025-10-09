@@ -29,10 +29,12 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -121,9 +123,12 @@ public class LinkFieldDecorator implements SearchResponseDecorator {
      */
     private boolean isValidUrl(String url) {
         try {
-            final var uri = new URL(url).toURI();
-            return uri.getScheme().equals("http") || uri.getScheme().equals("https");
-        } catch (MalformedURLException | URISyntaxException e) {
+            // uppercase schema is fine per RFC2396 but the parsing in Java considers it an error, so we lowercase the beginning of the url for testing if necessary
+            final var fixedUrl = (url.startsWith("HTTP:") || url.startsWith("HTTPS:")) ?
+                    url.substring(0, 5).toLowerCase(Locale.ROOT) + url.substring(5): url;
+            final var uri = URI.create(fixedUrl);
+            return uri.getScheme() != null && (uri.getScheme().equals("http") || uri.getScheme().equals("https"));
+        } catch (IllegalArgumentException e) {
             return false;
         }
     }

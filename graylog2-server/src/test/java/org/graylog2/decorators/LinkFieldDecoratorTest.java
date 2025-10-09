@@ -56,6 +56,7 @@ public class LinkFieldDecoratorTest {
         Assert.assertEquals("http://full-url-allowed.com/test?with=param", getDecoratorUrl("http://full-url-allowed.com/test?with=param"));
         Assert.assertEquals("https://https-is-allowed-too.com", getDecoratorUrl("https://https-is-allowed-too.com"));
         Assert.assertEquals("HTTPS://upper-case-https-all-good.com", getDecoratorUrl("HTTPS://upper-case-https-all-good.com"));
+        Assert.assertEquals("HTTP://upper-case-https-all-good.com", getDecoratorUrl("HTTP://upper-case-https-all-good.com"));
         Assert.assertEquals("https://nedlog.local:9000/search?q=event_source_product%3Alinux", getDecoratorUrl("https://nedlog.local:9000/search?q=event_source_product%3Alinux"));
 
         // Links with double slashes should be allowed.
@@ -66,6 +67,10 @@ public class LinkFieldDecoratorTest {
         Assert.assertEquals("alert('Javascript this way is still not allowed", getDecoratorMessage("alert('Javascript this way is still not allowed"));
         Assert.assertEquals("ntp://other-stuff-is-not-allowed", getDecoratorMessage("ntp://other-stuff-is-not-allowed"));
         Assert.assertEquals("ftp://ftp-not-allowed", getDecoratorMessage("ftp://ftp-not-allowed"));
+        Assert.assertEquals("HTTP:", getDecoratorMessage("HTTP:"));
+        Assert.assertEquals("HTTP", getDecoratorMessage("HTTP"));
+        Assert.assertEquals("HTTPS:", getDecoratorMessage("HTTPS:"));
+        Assert.assertEquals("HTTPS", getDecoratorMessage("HTTPS"));
     }
 
     /**
