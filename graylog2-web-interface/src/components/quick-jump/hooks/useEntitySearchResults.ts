@@ -33,7 +33,7 @@ export type QuickJumpRequest = {
   limit?: number;
 };
 const useEntitySearchResults = (request: QuickJumpRequest) => {
-  const lastOpened = useLastOpened({ page: 1 });
+  const lastOpened = useLastOpened({ page: 1, per_page: 50 });
   const lastOpenedGRNs = useMemo(() => lastOpened?.data?.lastOpened?.map((item) => item.grn) ?? [], [lastOpened]);
 
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
