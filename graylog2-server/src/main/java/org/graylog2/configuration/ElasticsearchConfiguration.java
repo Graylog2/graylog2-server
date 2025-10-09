@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;

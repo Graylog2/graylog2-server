@@ -22,6 +22,7 @@ import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -37,7 +38,8 @@ import org.graylog2.cluster.leader.AutomaticLeaderElectionService;
 import org.graylog2.cluster.leader.LeaderElectionMode;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.lock.MongoLockService;
-import org.graylog2.configuration.Documentation;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import org.graylog2.configuration.DocumentationConstants;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 import org.graylog2.notifications.Notification;
 import org.graylog2.outputs.BatchSizeConfig;
@@ -62,6 +64,7 @@ import static org.graylog2.shared.utilities.StringUtils.f;
  * Helper class to hold configuration of Graylog
  */
 @SuppressWarnings("FieldMayBeFinal")
+@DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = DocumentationConstants.SERVER_DOCUMENTATION_DESCRIPTION)
 public class Configuration extends CaConfiguration implements CommonNodeConfiguration {
     public static final String SAFE_CLASSES = "safe_classes";
 
@@ -79,6 +82,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
      * Used for initializing static leader election. You shouldn't use this for other purposes, but if you must, don't
      * use @{@link jakarta.inject.Named} injection but the getter isLeader() instead.
      **/
+    @Documentation("If you are running more than one instances of Graylog server you have to select one of these instances as leader. The leader will perform some periodical tasks that other nodes won't perform.")
     @Parameter(value = "is_leader")
     private Boolean isLeader;
 
