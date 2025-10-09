@@ -14,19 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.junit.jupiter.engine.descriptor;
+package org.graylog.testing.completebackend;
 
-import org.junit.platform.engine.TestDescriptor;
+public class OpenDataNodeProduct implements GraylogDataNodeProduct {
+    @Override
+    public String name() {
+        return "Open Data Node";
+    }
 
-import java.net.URL;
-import java.util.List;
-import java.util.Set;
+    @Override
+    public MavenProjectDirProvider mavenProjectDirProvider() {
+        return new DefaultMavenProjectDirProvider();
+    }
 
-public class ContainerMatrixTestWithRunningESMongoTestsDescriptor extends ContainerMatrixTestsDescriptor {
-    public ContainerMatrixTestWithRunningESMongoTestsDescriptor(TestDescriptor parent,
-                                                                List<URL> mongoDBFixtures) {
-        super(parent, "Testing with running ES and MongoDB instances.", mongoDBFixtures);
+    @Override
+    public PluginJarsProvider pluginJarsProvider() {
+        return new NoPluginJarsProvider();
     }
 }
-
-

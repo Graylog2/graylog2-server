@@ -22,10 +22,9 @@ import io.restassured.http.Cookie;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.not;
 
-@ContainerMatrixTestsConfiguration(searchVersions = {SearchServer.OS1})
+@GraylogBackendConfiguration
 public class SessionsResourceIT {
     private static final String SESSIONS_RESOURCE = "/system/sessions";
     private static final String AUTHENTICATION_COOKIE = "authentication";
@@ -49,7 +48,7 @@ public class SessionsResourceIT {
             "password", "wrongpassword"
     );
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
     private static RequestSpecification makeRequestSpec(GraylogApis api) {
         return new RequestSpecBuilder().build()
@@ -61,11 +60,12 @@ public class SessionsResourceIT {
                 .header("X-Requested-By", "peterchen");
     }
 
-    public SessionsResourceIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void failingLoginShouldNotReturnCookieOrToken() {
         given()
                 .spec(makeRequestSpec(api))
@@ -85,7 +85,7 @@ public class SessionsResourceIT {
                 .cookies(Collections.emptyMap());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void successfulLoginShouldReturnCookieAndToken() {
         final Response response = given()
                 .spec(makeRequestSpec(api))
