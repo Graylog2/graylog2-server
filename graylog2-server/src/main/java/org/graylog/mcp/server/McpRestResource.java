@@ -116,6 +116,9 @@ public class McpRestResource extends RestResource {
                 final PermissionHelper permissionHelper = new PermissionHelper(getCurrentUser(), securityContext, searchUser);
                 final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId);
 
+                if (result.isPresent() && LOG.isTraceEnabled()) {
+                    LOG.trace("Successfully handled JSONRPCrequest: {}", objectMapper.writeValueAsString(result));
+                }
                 return Response.ok(new McpSchema.JSONRPCResponse("2.0",
                                 request.id(),
                                 result.orElse(null),
