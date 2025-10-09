@@ -19,10 +19,12 @@ package org.graylog2.plugin.quickjump;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.client.model.Collation;
 import com.mongodb.client.model.CollationStrength;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.grn.GRN;
+import org.graylog.plugins.views.favorites.Favorite;
 import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.startpage.StartPageService;
@@ -40,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -74,10 +77,11 @@ public class QuickJumpService {
     public QuickJumpResponse search(String query, int limit, SearchUser user) {
         final var lastOpened = startPageService.findLastOpenedFor(user, 1, LAST_OPENED_LOOKBACK)
                 .paginatedList();
+        final var favorites = favoritesService.findFavoritesFor(user, Optional.empty());
 
         return query.isBlank()
-                ? lastOpenedAndFavorites(user, lastOpened)
-                : searchForQuery(query, limit, user, lastOpened);
+                ? lastOpenedAndFavorites(lastOpened, favorites)
+                : searchForQuery(query, limit, user, lastOpened, favorites);
     }
 
     private record IntermediateResult(GRN grn, String title) {
@@ -86,24 +90,23 @@ public class QuickJumpService {
         }
     }
 
-    private QuickJumpResponse lastOpenedAndFavorites(SearchUser user, PaginatedList<LastOpened> lastOpened) {
-        final var newestFavorites = favoritesService.findFavoritesFor(user, Optional.empty(), 1, DEFAULT_CONTENT_LIMIT)
-                .paginatedList();
-
+    private QuickJumpResponse lastOpenedAndFavorites(PaginatedList<LastOpened> lastOpened, List<Favorite> favorites) {
         final var lastOpenedGRNs = lastOpened.stream().map(LastOpened::grn).collect(Collectors.toSet());
+        final var favoritesGRNs = favorites.stream().map(Favorite::grn).collect(Collectors.toSet());
 
         return new QuickJumpResponse(Stream.concat(
                         lastOpened.stream().limit(DEFAULT_CONTENT_LIMIT).map(item -> IntermediateResult.create(item.grn(), item.title())),
-                        newestFavorites.stream().map(item -> IntermediateResult.create(item.grn(), item.title()))
+                        favorites.stream().limit(DEFAULT_CONTENT_LIMIT).map(item -> IntermediateResult.create(item.grn(), item.title()))
                 )
                 .distinct()
                 .map(item -> new QuickJumpResponse.Result(item.grn().type(), item.grn().entity(), item.title(),
-                        BASE_SCORE, false, lastOpenedGRNs.contains(item.grn())))
+                        BASE_SCORE, favoritesGRNs.contains(item.grn()), lastOpenedGRNs.contains(item.grn())))
                 .toList());
     }
 
-    private QuickJumpResponse searchForQuery(String query, int limit, HasPermissions user, PaginatedList<LastOpened> lastOpened) {
+    private QuickJumpResponse searchForQuery(String query, int limit, HasPermissions user, PaginatedList<LastOpened> lastOpened, List<Favorite> favorites) {
         final var lastOpenedGRNs = lastOpened.stream().map(LastOpened::grn).collect(Collectors.toSet());
+        final var favoritesGRNs = favorites.stream().map(Favorite::grn).collect(Collectors.toSet());
 
         final var baseBranch = branchPipeline(query, DEFAULT_FIELDS, DUMMY_COLLECTION, new Document("$literal", DUMMY_COLLECTION), DEFAULT_ID_FIELD);
 
@@ -144,10 +147,21 @@ public class QuickJumpService {
         final var results = StreamSupport.stream(collection.aggregate(pipeline).collation(coll).spliterator(), false).toList();
         return new QuickJumpResponse(results.stream()
                 .filter(result -> checkPermission(result, user))
-                .map(result -> new QuickJumpResponse.Result(result.type(), result.entityId(), result.title(),
-                        result.score(), false, lastOpenedGRNs.stream().anyMatch(grn -> grn.type().equals(result.type()) && grn.entity().equals(result.entityId()))))
+                .map(result -> new QuickJumpResponse.Result(
+                        result.type(),
+                        result.entityId(),
+                        result.title(),
+                        result.score(),
+                        favoritesGRNs.stream().anyMatch(isItemInList(result)),
+                        lastOpenedGRNs.stream().anyMatch(isItemInList(result))
+                ))
                 .toList()
         );
+    }
+
+    @Nonnull
+    private static Predicate<GRN> isItemInList(Result result) {
+        return grn -> grn.type().equals(result.type()) && grn.entity().equals(result.entityId());
     }
 
     private boolean checkPermission(QuickJumpService.Result result, HasPermissions user) {

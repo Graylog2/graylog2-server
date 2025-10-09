@@ -105,16 +105,19 @@ const SearchResultEntry = ({
   itemProps,
   isActive,
   lastOpened,
+  favorite,
 }: {
   item: SearchResultItem;
   onToggle: () => void;
   itemProps: QuickJumpItemProps;
   isActive: boolean;
   lastOpened: boolean;
+  favorite: boolean;
 }) => (
     <StyledListGroupItem $active={isActive} {...itemProps}>
       <TitleRow>
         <Title>
+            {favorite ? <Icon name="star" type="solid" /> : null}
           {item.title}
           {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
         </Title>
@@ -143,6 +146,7 @@ const SearchResults = ({ searchResults, onToggle, highlightedIndex, getItemProps
           isActive={highlightedIndex === index}
           itemProps={getItemProps(index)}
           lastOpened={item.last_opened}
+          favorite={item.favorite}
         />
       ))}
     </ListGroup>
