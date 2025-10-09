@@ -18,18 +18,16 @@ import mockDispatch from 'views/test/mockDispatch';
 import type { RootState } from 'views/types';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import { setIsDirty, setIsNew } from 'views/logic/slices/viewSlice';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import { asMock } from 'helpers/mocking';
+import { updateView } from 'views/api/views';
 
 import View from './View';
 
 jest.mock('routing/Routes', () => ({ VIEWS: { VIEWID: (viewId: string) => `/views/${viewId}` } }));
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    update: jest.fn((view: View) => Promise.resolve(view)),
-  },
+jest.mock('views/api/views', () => ({
+  updateView: jest.fn((view: View) => Promise.resolve(view)),
 }));
 
 jest.mock('util/UserNotification');
@@ -47,7 +45,7 @@ describe('OnSaveViewAction', () => {
 
     expect(dispatch).toHaveBeenCalledWith(setIsDirty(false));
     expect(dispatch).toHaveBeenCalledWith(setIsNew(false));
-    expect(ViewManagementActions.update).toHaveBeenCalledWith(view, undefined);
+    expect(updateView).toHaveBeenCalledWith(view, undefined);
   });
 
   it('shows notification upon success', async () => {
@@ -60,7 +58,7 @@ describe('OnSaveViewAction', () => {
   });
 
   it('does not do anything if saving fails', async () => {
-    asMock(ViewManagementActions.update).mockRejectedValue(new Error('Something bad happened!'));
+    asMock(updateView).mockRejectedValue(new Error('Something bad happened!'));
     const view = View.create();
     const dispatch = mockDispatch({ view: { view } } as RootState);
 
