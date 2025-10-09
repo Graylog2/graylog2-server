@@ -42,17 +42,16 @@ const useEntitySearchResults = (request: QuickJumpRequest) => {
 
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
-  const [searchQuery] = useDebouncedValue(request?.query, 300);
+  const [debouncedQuery] = useDebouncedValue(request, 300);
 
   const { data: entitiesSearchResults, isLoading } = useQuery({
-    queryKey: ['quick-jump', request],
+    queryKey: ['quick-jump', debouncedQuery],
     queryFn: () =>
       defaultOnError(
-        QuickJump.search({ ...request, limit: 100 }),
+        QuickJump.search({ ...debouncedQuery, limit: 100 }),
         'Fetch Entities Search Results failed with status',
         'Could not Fetch Entity Search Results.',
       ),
-    enabled: !!searchQuery,
     refetchOnMount: 'always',
     staleTime: 0,
   });

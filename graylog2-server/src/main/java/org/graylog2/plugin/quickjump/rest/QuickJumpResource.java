@@ -28,7 +28,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.security.UserContext;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.quickjump.QuickJumpService;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -55,7 +55,7 @@ public class QuickJumpResource implements PluginRestResource {
     @NoAuditEvent("Not changing any data")
     @Timed
     public QuickJumpResponse search(@ApiParam(name = "JSON Body") @Valid QuickJumpRequest request,
-                                    @Context UserContext userContext) throws IOException {
+                                    @Context SearchUser userContext) throws IOException {
         return quickJumpService.search(request.query(), request.limit().orElse(DEFAULT_LIMIT), userContext);
     }
 }

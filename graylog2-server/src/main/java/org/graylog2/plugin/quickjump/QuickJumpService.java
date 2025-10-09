@@ -22,6 +22,9 @@ import com.mongodb.client.model.CollationStrength;
 import jakarta.inject.Inject;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.graylog.plugins.views.favorites.FavoritesService;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.startpage.StartPageService;
 import org.graylog.security.HasPermissions;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -29,9 +32,9 @@ import org.graylog2.database.MongoEntity;
 import org.graylog2.plugin.quickjump.rest.QuickJumpResponse;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -46,24 +49,43 @@ import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_ID_FIELD;
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DUMMY_COLLECTION;
 
 public class QuickJumpService {
+    private static final int DEFAULT_CONTENT_LIMIT = 5;
     private record Result(String source, String type, String id, String title, int score,
                           String entityId) implements MongoEntity {}
 
     private final MongoCollection<Result> collection;
     private final Map<String, QuickJumpProvider> providers;
-    private final int maxFieldsLength;
+    private final FavoritesService favoritesService;
+    private final StartPageService startPageService;
 
     @Inject
-    public QuickJumpService(MongoCollections mongoCollections, Set<QuickJumpProvider> providers) {
+    public QuickJumpService(MongoCollections mongoCollections, Set<QuickJumpProvider> providers, FavoritesService favoritesService, StartPageService startPageService) {
         this.collection = mongoCollections.collection(DUMMY_COLLECTION, Result.class);
         this.providers = providers.stream().collect(Collectors.toMap(QuickJumpProvider::type, Function.identity()));
-        this.maxFieldsLength = providers.stream()
-                .map(provider -> provider.fieldsToSearch().size())
-                .max(Comparator.naturalOrder())
-                .orElse(DEFAULT_FIELDS.size());
+        this.favoritesService = favoritesService;
+        this.startPageService = startPageService;
     }
 
-    public QuickJumpResponse search(String query, int limit, HasPermissions user) {
+    public QuickJumpResponse search(String query, int limit, SearchUser user) {
+        return query.isBlank()
+                ? lastOpenedAndFavorites(user)
+                : searchForQuery(query, limit, user);
+    }
+
+    private QuickJumpResponse lastOpenedAndFavorites(SearchUser user) {
+        final var lastOpened = startPageService.findLastOpenedFor(user, 1, DEFAULT_CONTENT_LIMIT)
+                .paginatedList()
+                .stream()
+                .map(item -> new QuickJumpResponse.Result(item.grn().type(), item.grn().entity(), item.title(), 100));
+        final var newestFavorites = favoritesService.findFavoritesFor(user, Optional.empty(), 1, 5)
+                .paginatedList()
+                .stream()
+                .map(item -> new QuickJumpResponse.Result(item.grn().type(), item.grn().entity(), item.title(), 100));
+
+        return new QuickJumpResponse(Stream.concat(lastOpened, newestFavorites).toList());
+    }
+
+    private QuickJumpResponse searchForQuery(String query, int limit, HasPermissions user) {
         final var baseBranch = branchPipeline(query, DEFAULT_FIELDS, DUMMY_COLLECTION, new Document("$literal", DUMMY_COLLECTION), DEFAULT_ID_FIELD);
 
         final var collections = providers.entrySet().stream()

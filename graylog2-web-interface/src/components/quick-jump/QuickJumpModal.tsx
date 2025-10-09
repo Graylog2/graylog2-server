@@ -134,6 +134,56 @@ const SearchResultEntry = ({
   );
 };
 
+type SearchResultsProps = {
+  searchResults: SearchResultItem[];
+  onToggle: () => void;
+  highlightedIndex: number;
+  getItemProps: (index: number) => QuickJumpItemProps;
+};
+const SearchResults = ({ searchResults, onToggle, highlightedIndex, getItemProps }: SearchResultsProps) => (
+  <List>
+    <ListGroup className="no-bm">
+      {searchResults.map((item, index) => (
+        <SearchResultEntry
+          key={item.key || item.title}
+          item={item}
+          onToggle={onToggle}
+          isActive={highlightedIndex === index}
+          itemProps={getItemProps(index)}
+          lastOpened={item.lastOpened}
+        />
+      ))}
+    </ListGroup>
+  </List>
+);
+
+const IntroContainer = styled.div`
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+`;
+const Description = styled.div(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
+    margin: 0;
+  `,
+);
+
+const QuickJumpIntro = () => (
+  <IntroContainer>
+    <Description>
+      Please enter a search query to search for a page, stream, dashboard, input or other entities.{' '}
+    </Description>
+    <Description>
+      To give you a head start, you will find a list of your <strong>last opened</strong> and <strong>favorite</strong>{' '}
+      items below:
+    </Description>
+    <br />
+  </IntroContainer>
+);
+
 const QuickJumpModal = ({ onToggle }: Props) => {
   const { searchQuery, setSearchQuery, searchResults, isLoading } = useQuickJumpSearch();
   const { highlightedIndex, searchInputProps, getItemProps, onHide } = useQuickJumpKeyboardNavigation({
@@ -141,6 +191,8 @@ const QuickJumpModal = ({ onToggle }: Props) => {
     onToggle,
     searchQuery,
   });
+
+  const hasEmptySearchQuery = searchQuery.trim() === '';
 
   const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -168,20 +220,15 @@ const QuickJumpModal = ({ onToggle }: Props) => {
         {isLoading ? (
           <Spinner />
         ) : (
-          <List>
-            <ListGroup className="no-bm">
-              {searchResults.map((item, index) => (
-                <SearchResultEntry
-                  key={item.key || item.title}
-                  item={item}
-                  onToggle={onToggle}
-                  isActive={highlightedIndex === index}
-                  itemProps={getItemProps(index)}
-                  lastOpened={item.lastOpened}
-                />
-              ))}
-            </ListGroup>
-          </List>
+          <>
+            {hasEmptySearchQuery && <QuickJumpIntro />}
+            <SearchResults
+              searchResults={searchResults}
+              getItemProps={getItemProps}
+              highlightedIndex={highlightedIndex}
+              onToggle={onToggle}
+            />
+          </>
         )}
       </Modal.Body>
     </Modal>
