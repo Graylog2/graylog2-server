@@ -177,8 +177,8 @@ const useQuickJumpSearch = () => {
   );
 
   const searchResults: SearchResultItem[] = useMemo(
-    () => (entityItems ? [...entityItems, ...scoredNavItems].sort(compareSearchItems) : []),
-    [entityItems, scoredNavItems],
+    () => (searchQuery.trim() && entityItems ? [...entityItems, ...scoredNavItems].sort(compareSearchItems) : []),
+    [entityItems, scoredNavItems, searchQuery],
   );
 
   return {
