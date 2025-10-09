@@ -35,7 +35,10 @@ export type QuickJumpRequest = {
 };
 const useEntitySearchResults = (request: QuickJumpRequest) => {
   const lastOpened = useLastOpened({ page: 1, per_page: LAST_OPENED_ITEMS_LOOKBACK });
-  const lastOpenedGRNs = useMemo(() => lastOpened?.data?.lastOpened?.map((item) => item.grn) ?? [], [lastOpened]);
+  const lastOpenedGRNs = useMemo(
+    () => lastOpened?.data?.lastOpened?.map((item) => item.grn) ?? [],
+    [lastOpened?.data?.lastOpened],
+  );
 
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
