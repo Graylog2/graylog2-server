@@ -65,7 +65,7 @@ public class LinkFieldDecoratorTest {
         Assert.assertEquals("javascript:alert('Javascript is not allowed.')", getDecoratorMessage("javascript:alert('Javascript is not allowed.')"));
         Assert.assertEquals("alert('Javascript this way is still not allowed", getDecoratorMessage("alert('Javascript this way is still not allowed"));
         Assert.assertEquals("ntp://other-stuff-is-not-allowed", getDecoratorMessage("ntp://other-stuff-is-not-allowed"));
-        Assert.assertEquals("ftp://full-local-allowed", getDecoratorMessage("ftp://full-local-allowed"));
+        Assert.assertEquals("ftp://ftp-not-allowed", getDecoratorMessage("ftp://ftp-not-allowed"));
     }
 
     /**
