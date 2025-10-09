@@ -182,7 +182,7 @@ const useHelpMenuItems = () => {
 const compareSearchItems = (result1: SearchResultItem, result2: SearchResultItem) => {
   const scoreDifference = result2.score - result1.score;
   if (scoreDifference === 0) {
-    return Number(result2.lastOpened ?? false) - Number(result1.lastOpened ?? false);
+    return Number(result2.last_opened ?? false) - Number(result1.last_opened ?? false);
   }
 
   return scoreDifference;
