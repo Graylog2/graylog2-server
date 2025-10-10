@@ -135,7 +135,7 @@ const InputForm = ({
       cancelAction={onCancel}>
       {description && <Alert bsStyle="info">{description}</Alert>}
       <HideOnCloud>
-        {!AppConfig.globalInputsOnly() && (<NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />)}
+        {!AppConfig.globalInputsOnly() && <NodeOrGlobalSelect onChange={handleChange} global={global} node={node} />}
       </HideOnCloud>
     </ConfigurationForm>
   );
