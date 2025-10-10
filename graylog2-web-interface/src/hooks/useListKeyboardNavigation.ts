@@ -18,7 +18,12 @@ import { useState, useCallback } from 'react';
 
 export type OnSelect<T> = (item: T, index: number) => void;
 
-const useListKeyboardNavigation = <T>(items: T[], onSelect?: OnSelect<T>): {
+const PAGE_SIZE = 10;
+
+const useListKeyboardNavigation = <T>(
+  items: T[],
+  onSelect?: OnSelect<T>,
+): {
   highlightedIndex: number;
   setHighlightedIndex: React.Dispatch<React.SetStateAction<number>>;
   onKeyDown: (e: React.KeyboardEvent) => void;
@@ -29,6 +34,7 @@ const useListKeyboardNavigation = <T>(items: T[], onSelect?: OnSelect<T>): {
     (e: React.KeyboardEvent) => {
       if (!items || items.length === 0) return;
 
+      console.log(e.key);
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
@@ -37,6 +43,22 @@ const useListKeyboardNavigation = <T>(items: T[], onSelect?: OnSelect<T>): {
         case 'ArrowUp':
           e.preventDefault();
           setHighlightedIndex((prev) => (prev - 1 + items.length) % items.length);
+          break;
+        case 'PageDown':
+          e.preventDefault();
+          setHighlightedIndex((prev) => Math.min(prev + PAGE_SIZE, items.length - 1));
+          break;
+        case 'PageUp':
+          e.preventDefault();
+          setHighlightedIndex((prev) => Math.max(prev - PAGE_SIZE, 0));
+          break;
+        case 'Home':
+          e.preventDefault();
+          setHighlightedIndex(0);
+          break;
+        case 'End':
+          e.preventDefault();
+          setHighlightedIndex(items.length - 1);
           break;
         case 'Enter':
           e.preventDefault();
@@ -48,7 +70,7 @@ const useListKeyboardNavigation = <T>(items: T[], onSelect?: OnSelect<T>): {
           break;
       }
     },
-    [highlightedIndex, items, onSelect]
+    [highlightedIndex, items, onSelect],
   );
 
   return { highlightedIndex, setHighlightedIndex, onKeyDown };

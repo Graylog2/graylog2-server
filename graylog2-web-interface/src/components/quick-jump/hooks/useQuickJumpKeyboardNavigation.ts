@@ -105,13 +105,6 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
     itemRefs.current[highlightedIndex]?.scrollIntoView({ block: 'nearest' });
   }, [highlightedIndex]);
 
-  const handleSearchInputKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      onKeyDown(event);
-    },
-    [onKeyDown],
-  );
-
   useEffect(() => {
     const queryChanged = previousQueryRef.current !== searchQuery;
     const listIsEmpty = items.length === 0;
@@ -159,9 +152,9 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
   const searchInputProps = useMemo(
     () => ({
       ref: searchInputRef,
-      onKeyDown: handleSearchInputKeyDown,
+      onKeyDown,
     }),
-    [handleSearchInputKeyDown],
+    [onKeyDown],
   );
 
   const handleTyping = useCallback(
