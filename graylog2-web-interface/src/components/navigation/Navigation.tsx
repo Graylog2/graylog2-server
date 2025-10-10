@@ -25,7 +25,6 @@ import Routes from 'routing/Routes';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import NavIcon from 'components/navigation/NavIcon';
 
 import UserMenu from './UserMenu';
@@ -42,7 +41,6 @@ type Props = {
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
-  const { activePerspective } = useActivePerspective();
 
   return (
     <StyledNavbar fluid fixedTop collapseOnSelect>
@@ -62,6 +60,10 @@ const Navigation = React.memo(({ pathname }: Props) => {
         <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">
+          <NavItem id="quickjump-search-nav">
+            <NavIcon type="search" title="Search" />
+          </NavItem>
+          
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (
@@ -79,12 +81,6 @@ const Navigation = React.memo(({ pathname }: Props) => {
           <ScratchpadToggle />
 
           <HelpMenu />
-
-          <LinkContainer relativeActive to={activePerspective.welcomeRoute}>
-            <NavItem id="welcome-nav-link">
-              <NavIcon type="home" title="Welcome" />
-            </NavItem>
-          </LinkContainer>
 
           <UserMenu />
         </Nav>
