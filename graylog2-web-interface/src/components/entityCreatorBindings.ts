@@ -89,6 +89,11 @@ const entityCreatorBindings: PluginExports = {
         actionValue: 'create-rule-button',
       },
     },
+    {
+      id: 'Content Pack',
+      title: 'Create content pack',
+      path: Routes.SYSTEM.CONTENTPACKS.CREATE,
+    },
   ],
 };
 
