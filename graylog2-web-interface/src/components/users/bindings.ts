@@ -6,13 +6,6 @@ export const PAGE_NAV_TITLE = 'Users';
 export const USERS_OVERVIEW_TITLE = 'Users Overview';
 
 const bindings: PluginExports = {
-  systemConfigurations: [
-    {
-      component: ThreatIntelPluginConfig,
-      displayName: 'Threat Intelligence Lookup',
-      configType: 'org.graylog.plugins.threatintel.ThreatIntelPluginConfiguration',
-    },
-  ],
   pageNavigation: [
     {
       description: PAGE_NAV_TITLE,
