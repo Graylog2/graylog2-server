@@ -25,6 +25,7 @@ import type { QualifiedUrl } from 'routing/Routes';
 import Routes, { prefixUrl } from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import type { SearchResultItem } from 'components/quick-jump/Types';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 import useEntitySearchResults from './useEntitySearchResults';
 
@@ -152,6 +153,18 @@ const useQuickJumpActions = () => [
   },
 ];
 
+const useQuickJumpLinks = () => {
+  const { readOnly, id: userId } = useCurrentUser();
+
+  return [
+    {
+      type: PAGE_TYPE,
+      title: `${readOnly ? 'Show' : 'Edit'} profile for current user`,
+      link: readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId),
+    },
+  ];
+};
+
 const useHelpMenuItems = () => {
   const menuItems = usePluginEntities('helpMenu');
   const { isPermitted } = usePermissions();
@@ -194,6 +207,7 @@ const useQuickJumpSearch = (searchQuery: string) => {
   const creatorItems = useEntityCreatorItems();
   const configurationPageNavItems = useConfigurationPages();
   const quickJumpActions = useQuickJumpActions();
+  const quickJumpLinks = useQuickJumpLinks();
   const helpMenuItems = useHelpMenuItems();
   const { data: entityItems, isLoading } = useEntitySearchResults({ query: searchQuery });
 
@@ -204,6 +218,7 @@ const useQuickJumpSearch = (searchQuery: string) => {
       ...creatorItems,
       ...configurationPageNavItems,
       ...quickJumpActions,
+      ...quickJumpLinks,
       ...helpMenuItems,
     ],
     searchQuery,
