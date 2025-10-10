@@ -21,11 +21,12 @@ import com.google.common.collect.ImmutableSet;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
+import org.graylog.security.UserContext;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
@@ -75,6 +76,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -102,9 +104,6 @@ public class UsersResourceTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private UsersResource usersResource;
@@ -141,6 +140,7 @@ public class UsersResourceTest {
                 roleService, sessionService, new HttpConfiguration(), subject,
                 sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, userService);
         lenient().when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
+        lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
     }
 
     /**
@@ -226,7 +226,6 @@ public class UsersResourceTest {
             assertEquals(expected, actual);
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
-            //Before calling the service, the configuration for the default TTL is already loaded in the resource:
             verify(accessTokenService).create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)));
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
@@ -294,6 +293,45 @@ public class UsersResourceTest {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
         }
+    }
+
+    @Test
+    public void getByIdUserWithAdditionalUserIdPermissions() {
+        String alice = "alice";
+        String bob = "bob";
+        String unknown = "unknown";
+        List<WildcardPermission> permissions = List.of(
+                new WildcardPermission(RestPermissions.USERS_EDIT + ":" + alice),
+                new WildcardPermission(RestPermissions.USERS_EDIT + ":" + bob),
+                new WildcardPermission(RestPermissions.USERS_EDIT + ":" + unknown),
+                new WildcardPermission("streams:read:12345"),
+                new WildcardPermission("streams:read")
+        );
+        User userAlice = setupUser(alice, permissions);
+        User userBob = userImplFactory.create(Map.of(UserImpl.USERNAME, bob));
+        when(userManagementService.load(bob)).thenReturn(userBob);
+
+        assertThat(usersResource.getbyId(userAlice.getId(), new UserContext(userAlice.getId(), subject, userService)).permissions().stream()
+                .map(Object::toString).toList())
+                .contains("users:edit:" + alice,
+                        "users:edit:" + bob,
+                        "users:edit:" + unknown,
+                        "streams:read:12345",
+                        "streams:read",
+                        "users:edit:" + userAlice.getId(),
+                        "users:edit:" + userBob.getId())
+                .hasSize(permissions.size() + 2);
+    }
+
+    private User setupUser(String username, List<WildcardPermission> basePerms) {
+        User user = userImplFactory.create(Map.of(UserImpl.USERNAME, username));
+        String userId = user.getId();
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":" + username)).thenReturn(true);
+        when(userManagementService.loadById(userId)).thenReturn(user);
+        when(userService.loadById(userId)).thenReturn(user);
+        when(userManagementService.getWildcardPermissionsForUser(user)).thenReturn(basePerms);
+        when(userManagementService.getGRNPermissionsForUser(user)).thenReturn(List.of());
+        return user;
     }
 
     private CreateUserRequest buildCreateUserRequest(List<String> roles, String password) {
