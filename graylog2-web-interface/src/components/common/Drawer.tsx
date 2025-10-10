@@ -55,6 +55,7 @@ const Title = styled.div(
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+    line-height: 1.2;
   `,
 );
 
@@ -73,6 +74,7 @@ type Props = Pick<
   | 'overlayProps'
   | 'styles'
   | 'transitionProps'
+  | 'styles'
 > & {
   double?: boolean;
 };
