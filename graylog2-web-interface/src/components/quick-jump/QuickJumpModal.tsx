@@ -85,8 +85,12 @@ const TitleRow = styled.div`
   justify-content: space-between;
 `;
 
+const RecentBadge = styled(Badge)`
+  font-weight: normal;
+`;
+
 const Title = styled.div``;
-const LastOpened = () => <Badge bsStyle="primary">Recent</Badge>;
+const LastOpened = () => <RecentBadge>Recent</RecentBadge>;
 
 const ExternalIcon = styled(Icon)(
   ({ theme }) => css`
