@@ -14,19 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useMemo } from 'react';
+import { useCallback, useContext, useMemo } from 'react';
 
 import useLogout from 'hooks/useLogout';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import useTheme from 'theme/hooks/useTheme';
+import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
 const useActionArguments = () => {
   const logout = useLogout();
   const { setShowHotkeysModal } = useHotkeysContext();
   const showHotkeysModal = useCallback(() => setShowHotkeysModal(true), [setShowHotkeysModal]);
   const { toggleThemeMode } = useTheme();
+  const { toggleScratchpadVisibility: toggleScratchpad } = useContext(ScratchpadContext);
 
-  return useMemo(() => ({ logout, showHotkeysModal, toggleThemeMode }), [logout, showHotkeysModal, toggleThemeMode]);
+  return useMemo(
+    () => ({ logout, showHotkeysModal, toggleThemeMode, toggleScratchpad }),
+    [logout, showHotkeysModal, toggleScratchpad, toggleThemeMode],
+  );
 };
 
 export default useActionArguments;

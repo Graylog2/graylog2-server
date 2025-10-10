@@ -36,6 +36,7 @@ type SearchResultItemExternalLink = {
 type ActionArguments = {
   logout: () => void;
   showHotkeysModal: () => void;
+  toggleScratchpad: () => void;
   toggleThemeMode: () => void;
 };
 type SearchResultItemAction = {

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -26,6 +26,7 @@ import Routes, { prefixUrl } from 'routing/Routes';
 import AppConfig from 'util/AppConfig';
 import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
+import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
 import useEntitySearchResults from './useEntitySearchResults';
 
@@ -143,22 +144,33 @@ const useConfigurationPages = () => {
   return [...coreNavItems, ...pluginNavItems];
 };
 
-const useQuickJumpActions = (): SearchResultItem[] => [
-  {
-    type: ACTION_TYPE,
-    title: 'Logout current user',
-    action: ({ logout }) => {
-      logout();
+const useQuickJumpActions = (): SearchResultItem[] => {
+  const { isScratchpadVisible } = useContext(ScratchpadContext);
+
+  return [
+    {
+      type: ACTION_TYPE,
+      title: 'Logout current user',
+      action: ({ logout }) => {
+        logout();
+      },
     },
-  },
-  {
-    type: ACTION_TYPE,
-    title: 'Toggle Theme',
-    action: ({ toggleThemeMode }) => {
-      toggleThemeMode();
+    {
+      type: ACTION_TYPE,
+      title: 'Toggle Theme',
+      action: ({ toggleThemeMode }) => {
+        toggleThemeMode();
+      },
     },
-  },
-];
+    {
+      type: ACTION_TYPE,
+      title: `${isScratchpadVisible ? 'Hide' : 'Show'} Scratchpad`,
+      action: ({ toggleScratchpad }) => {
+        toggleScratchpad();
+      },
+    },
+  ];
+};
 
 const useQuickJumpLinks = () => {
   const { readOnly, id: userId } = useCurrentUser();
