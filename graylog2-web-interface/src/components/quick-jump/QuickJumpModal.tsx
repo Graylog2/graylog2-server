@@ -192,6 +192,19 @@ const NoResultsFound = () => (
   </Explanation>
 );
 
+const SearchInputContainer = styled.div`
+  display: inline-block;
+  position: relative;
+`;
+const InputFeedback = styled.div`
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  min-height: 34px;
+  padding-right: 3px;
+`;
+
 const QuickJumpModal = ({ onToggle }: Props) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 500);
@@ -218,19 +231,21 @@ const QuickJumpModal = ({ onToggle }: Props) => {
       </Modal.Header>
 
       <Modal.Body>
-        <SearchInput
-          value={searchQuery}
-          data-autofocus
-          id="quick-jump-search"
-          type="text"
-          onChange={handleSearch}
-          placeholder="Search for pages/dashboards/streams ..."
-          {...searchInputProps}
-        />
-        {/* eslint-disable-next-line no-nested-ternary */}
-        {isLoading ? (
-          <Spinner />
-        ) : searchResults.length ? (
+        <SearchInputContainer>
+          <SearchInput
+            value={searchQuery}
+            data-autofocus
+            id="quick-jump-search"
+            type="text"
+            onChange={handleSearch}
+            placeholder="Search for pages/dashboards/streams ..."
+            {...searchInputProps}
+          />
+          <InputFeedback>{isLoading && <Spinner delay={0} text="" />}</InputFeedback>
+        </SearchInputContainer>
+        {!isLoading && searchResults.length === 0 ? (
+          <NoResultsFound />
+        ) : (
           <>
             {hasEmptySearchQuery && <QuickJumpIntro />}
             <SearchResults
@@ -239,8 +254,6 @@ const QuickJumpModal = ({ onToggle }: Props) => {
               highlightedIndex={highlightedIndex}
             />
           </>
-        ) : (
-          <NoResultsFound />
         )}
       </Modal.Body>
     </Modal>
