@@ -86,7 +86,6 @@ export const parseFilters = (filters: UrlQueryFilters, defaultTimerange: TimeRan
   }
 
   if (filters.get('part_of_detection_chain')?.length > 0) {
-    // eslint-disable-next-line prefer-destructuring
     result.filter.part_of_detection_chain = filters.get('part_of_detection_chain')[0];
   }
 
