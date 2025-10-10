@@ -143,12 +143,19 @@ const useConfigurationPages = () => {
   return [...coreNavItems, ...pluginNavItems];
 };
 
-const useQuickJumpActions = () => [
+const useQuickJumpActions = (): SearchResultItem[] => [
   {
     type: ACTION_TYPE,
     title: 'Logout current user',
     action: ({ logout }) => {
       logout();
+    },
+  },
+  {
+    type: ACTION_TYPE,
+    title: 'Toggle Theme',
+    action: ({ toggleThemeMode }) => {
+      toggleThemeMode();
     },
   },
 ];

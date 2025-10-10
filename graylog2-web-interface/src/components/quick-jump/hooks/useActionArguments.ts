@@ -18,13 +18,15 @@ import { useCallback, useMemo } from 'react';
 
 import useLogout from 'hooks/useLogout';
 import useHotkeysContext from 'hooks/useHotkeysContext';
+import useTheme from 'theme/hooks/useTheme';
 
 const useActionArguments = () => {
   const logout = useLogout();
   const { setShowHotkeysModal } = useHotkeysContext();
   const showHotkeysModal = useCallback(() => setShowHotkeysModal(true), [setShowHotkeysModal]);
+  const { toggleThemeMode } = useTheme();
 
-  return useMemo(() => ({ logout, showHotkeysModal }), [logout, showHotkeysModal]);
+  return useMemo(() => ({ logout, showHotkeysModal, toggleThemeMode }), [logout, showHotkeysModal, toggleThemeMode]);
 };
 
 export default useActionArguments;
