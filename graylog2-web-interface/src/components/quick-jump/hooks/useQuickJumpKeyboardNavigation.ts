@@ -46,7 +46,6 @@ type Result = {
   }
   searchInputProps: {
     ref: React.MutableRefObject<React.ComponentRef<typeof Input> | null>;
-    onKeyDown: (event: React.KeyboardEvent) => void;
   };
   getItemProps: (index: number) => QuickJumpItemProps;
   onHide: () => void;
@@ -154,12 +153,11 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
   const searchInputProps = useMemo(
     () => ({
       ref: searchInputRef,
-      onKeyDown,
     }),
-    [onKeyDown],
+    [],
   );
 
-  const handleTyping = useCallback(
+  const handleKeyDownCapture = useCallback(
     (event: React.KeyboardEvent) => {
       onKeyDown(event);
 
@@ -192,9 +190,9 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
 
   const modalProps = useMemo(
     () => ({
-      onKeyDownCapture: handleTyping,
+      onKeyDownCapture: handleKeyDownCapture,
     }),
-    [handleTyping],
+    [handleKeyDownCapture],
   );
 
   return useMemo(
