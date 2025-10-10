@@ -65,6 +65,7 @@ import org.graylog2.shared.rest.RequestIdFilter;
 import org.graylog2.shared.rest.RestAccessLogFilter;
 import org.graylog2.shared.rest.VerboseCsrfProtectionFilter;
 import org.graylog2.shared.rest.XHRFilter;
+import org.graylog2.shared.rest.documentation.openapi.OpenAPIGenerator;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonMappingExceptionMapper;
@@ -122,6 +123,7 @@ public class JerseyService extends AbstractIdleService {
     private final ErrorPageGenerator errorPageGenerator;
     private final TLSProtocolsConfiguration tlsConfiguration;
     private final int shutdownTimeoutMs;
+    private final OpenAPIGenerator openAPIGenerator;
 
     private HttpServer apiHttpServer = null;
 
@@ -138,7 +140,8 @@ public class JerseyService extends AbstractIdleService {
                          MetricRegistry metricRegistry,
                          ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration,
-                         @Named("shutdown_timeout") int shutdownTimeoutMs) {
+                         @Named("shutdown_timeout") int shutdownTimeoutMs,
+                         OpenAPIGenerator openAPIGenerator) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -152,6 +155,7 @@ public class JerseyService extends AbstractIdleService {
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         this.shutdownTimeoutMs = shutdownTimeoutMs;
+        this.openAPIGenerator = openAPIGenerator;
     }
 
     @Override
@@ -289,7 +293,8 @@ public class JerseyService extends AbstractIdleService {
                 .register(new UserContextBinder())
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
-                .registerResources(additionalResources);
+                .registerResources(additionalResources)
+                .register(openAPIGenerator.openAPIResource());
 
         exceptionMappers.forEach(rc::registerClasses);
         dynamicFeatures.forEach(rc::registerClasses);

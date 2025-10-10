@@ -145,6 +145,7 @@
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
+        <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
@@ -184,7 +185,8 @@
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
-        <swagger.version>1.6.16</swagger.version>
+        <swagger-legacy.version>1.6.16</swagger-legacy.version>
+        <swagger.version>2.2.37</swagger.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
