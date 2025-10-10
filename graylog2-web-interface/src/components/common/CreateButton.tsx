@@ -26,6 +26,7 @@ import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 
 type Props = {
+  disabled?: boolean;
   entityKey: string;
 };
 const useEntityCreator = (entityKey: string) => {
@@ -33,7 +34,7 @@ const useEntityCreator = (entityKey: string) => {
 
   return useMemo(() => entityCreators.find((creator) => creator.id === entityKey), [entityCreators, entityKey]);
 };
-const CreateButton = ({ entityKey }: Props) => {
+const CreateButton = ({ disabled, entityKey }: Props) => {
   const entityCreator = useEntityCreator(entityKey);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -57,7 +58,7 @@ const CreateButton = ({ entityKey }: Props) => {
   return (
     <PermissionWrapper>
       <LinkContainer to={entityCreator.path}>
-        <Button bsSize="md" bsStyle="primary" onClick={_onClick}>
+        <Button bsSize="md" bsStyle="primary" onClick={_onClick} disabled={disabled}>
           {entityCreator.title}
         </Button>
       </LinkContainer>

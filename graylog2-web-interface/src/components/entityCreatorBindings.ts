@@ -60,6 +60,18 @@ const entityCreatorBindings: PluginExports = {
       },
       permissions: 'streams:create',
     },
+    {
+      id: 'Index Set',
+      title: 'Create index set',
+      path: Routes.SYSTEM.INDEX_SETS.CREATE,
+      permissions: 'indexsets:create',
+    },
+    {
+      id: 'User',
+      title: 'Create User',
+      path: Routes.SYSTEM.USERS.CREATE,
+      permissions: 'users:create',
+    },
   ],
 };
 
