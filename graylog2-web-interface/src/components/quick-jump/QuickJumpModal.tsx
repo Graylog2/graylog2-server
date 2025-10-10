@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, useTheme } from 'styled-components';
 
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
 import useQuickJumpSearch from 'components/quick-jump/hooks/useQuickJumpSearch';
@@ -26,7 +26,7 @@ import type { QuickJumpItemProps } from 'components/quick-jump/hooks/useQuickJum
 import Badge from 'components/bootstrap/Badge';
 import Spinner from 'components/common/Spinner';
 import { Icon } from 'components/common';
-import { EXTERNAL_PAGE_TYPE } from 'components/quick-jump/Constants';
+import { EXTERNAL_PAGE_TYPE, PAGE_TYPE, ACTION_TYPE } from 'components/quick-jump/Constants';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 
 const SearchInput = styled(Input)`
@@ -47,21 +47,13 @@ const EntityType = styled.div(
 );
 
 const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ theme, $active }) => {
-  const highlightColor = theme.utils.colorLevel(theme.colors.global.contentBackground, 10);
+  const highlightColor = theme.utils.opacify(theme.utils.colorLevel(theme.colors.global.contentBackground, 10), 0.5);
 
   return css`
+    display: flex;
     position: relative;
     cursor: pointer;
     transition: background-color 0.15s ease-in-out;
-
-    &::before {
-      content: '';
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 0;
-      background-color: ${theme.colors.variant.primary};
-      transition: width 0.15s ease-in-out;
-    }
 
     ${$active &&
     css`
@@ -70,10 +62,6 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
       & > .list-group-item {
         background-color: ${highlightColor};
         color: ${theme.colors.text.primary};
-      }
-
-      &::before {
-        width: 4px;
       }
 
       a {
@@ -106,6 +94,34 @@ const ExternalIcon = styled(Icon)(
   `,
 );
 
+const useTypeColor = (type: string) => {
+  const theme = useTheme();
+
+  if (type === PAGE_TYPE) {
+    return theme.colors.variant.lighter.primary;
+  }
+
+  if (type === ACTION_TYPE) {
+    return theme.colors.variant.lighter.warning;
+  }
+
+  return theme.colors.variant.lighter.success;
+};
+
+const TypeColorIndicator = styled.div<{ $color: string }>(
+  ({ $color }) => css`
+    background-color: ${$color};
+    width: 3px;
+    border-radius: 2px;
+    left: -6px;
+    position: relative;
+  `,
+);
+
+const FullWidthCol = styled.div`
+  flex: 1;
+`;
+
 type Props = {
   onToggle: () => void;
 };
@@ -122,20 +138,27 @@ const SearchResultEntry = ({
   isActive: boolean;
   lastOpened: boolean;
   favorite: boolean;
-}) => (
-  <StyledListGroupItem $active={isActive} {...itemProps}>
-    <HeaderRow>
-      <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-      {lastOpened ? <LastOpened /> : null}
-    </HeaderRow>
+}) => {
+  const typeColor = useTypeColor(item.type);
 
-    <Title>
-      {favorite ? <Icon name="star" type="solid" /> : null}
-      {item.title}
-      {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
-    </Title>
-  </StyledListGroupItem>
-);
+  return (
+    <StyledListGroupItem $active={isActive} {...itemProps}>
+      <TypeColorIndicator $color={typeColor} />
+      <FullWidthCol>
+        <HeaderRow>
+          <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+          {lastOpened ? <LastOpened /> : null}
+        </HeaderRow>
+
+        <Title>
+          {favorite ? <Icon name="star" type="solid" /> : null}
+          {item.title}
+          {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
+        </Title>
+      </FullWidthCol>
+    </StyledListGroupItem>
+  );
+};
 
 type SearchResultsProps = {
   searchResults: SearchResultItem[];
