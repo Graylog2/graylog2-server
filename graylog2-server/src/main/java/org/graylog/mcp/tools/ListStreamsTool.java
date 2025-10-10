@@ -21,6 +21,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -34,8 +35,10 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     private final StreamService streamService;
 
     @Inject
-    public ListStreamsTool(ObjectMapper objectMapper, StreamService streamService) {
+    public ListStreamsTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, StreamService streamService) {
         super(objectMapper,
+                schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,

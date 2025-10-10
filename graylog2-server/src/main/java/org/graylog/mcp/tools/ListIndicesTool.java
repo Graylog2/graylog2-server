@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.MongoIndexSet;
@@ -52,8 +53,10 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public ListIndicesTool(ObjectMapper objectMapper, Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry) {
+    public ListIndicesTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry) {
         super(objectMapper,
+                schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,

@@ -28,6 +28,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.ws.rs.DefaultValue;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
@@ -48,8 +49,10 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public SearchMessagesTool(ObjectMapper objectMapper, ScriptingApiService scriptingApiService) {
+    public SearchMessagesTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
         super(objectMapper,
+                schemaGeneratorProvider,
               new TypeReference<>() {},
               new TypeReference<>() {},
               NAME,

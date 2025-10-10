@@ -28,6 +28,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.ws.rs.DefaultValue;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
@@ -50,8 +51,10 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public AggregateMessagesTool(ObjectMapper objectMapper, ScriptingApiService scriptingApiService) {
+    public AggregateMessagesTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
         super(objectMapper,
+                schemaGeneratorProvider,
               new TypeReference<>() {},
               new TypeReference<>() {},
               NAME,

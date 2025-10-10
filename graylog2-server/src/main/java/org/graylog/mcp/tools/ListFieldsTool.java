@@ -26,6 +26,7 @@ import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -39,8 +40,10 @@ public class ListFieldsTool extends Tool<ListFieldsTool.Parameters, ListFieldsTo
     private final MappedFieldTypesService mappedFieldTypesService;
 
     @Inject
-    protected ListFieldsTool(final ObjectMapper objectMapper, MappedFieldTypesService mappedFieldTypesService) {
+    protected ListFieldsTool(final ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, MappedFieldTypesService mappedFieldTypesService) {
         super(objectMapper,
+                schemaGeneratorProvider,
               new TypeReference<>() {},
               new TypeReference<>() {},
               NAME,

@@ -24,6 +24,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog2.database.NotFoundException;
 
 import java.net.URI;
@@ -37,8 +38,10 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
 
     @Inject
-    public ReadResourceTool(ObjectMapper objectMapper, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
+    public ReadResourceTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         super(objectMapper,
+                schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,

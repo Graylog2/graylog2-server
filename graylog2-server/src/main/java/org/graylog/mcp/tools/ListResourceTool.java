@@ -26,6 +26,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 
 import java.util.List;
 import java.util.Locale;
@@ -37,8 +38,10 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, String> 
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
 
     @Inject
-    public ListResourceTool(ObjectMapper objectMapper, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
+    public ListResourceTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         super(objectMapper,
+                schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -44,8 +45,10 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
     private final Map<String, InputDescription> availableInputs;
 
     @Inject
-    public ListInputsTool(ObjectMapper objectMapper, InputService inputService, MessageInputFactory messageInputFactory) {
+    public ListInputsTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, InputService inputService, MessageInputFactory messageInputFactory) {
         super(objectMapper,
+                schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,

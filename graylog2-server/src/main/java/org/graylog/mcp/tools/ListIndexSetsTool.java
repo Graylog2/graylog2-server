@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 //import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -48,9 +49,11 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
 
     @Inject
     public ListIndexSetsTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider,
                              IndexSetService indexSetService,
                              Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         super(objectMapper,
+                schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,

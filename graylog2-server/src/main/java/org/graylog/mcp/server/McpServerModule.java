@@ -34,6 +34,13 @@ import org.graylog2.plugin.PluginModule;
 public class McpServerModule extends PluginModule {
     @Override
     protected void configure() {
+        // Initialize schema module binder (empty set by default, plugins can contribute)
+        schemaModuleBinder();
+
+        // Bind the schema generator provider as eager singleton
+        // This ensures it's created during startup and logs will show if modules are contributed
+        bind(SchemaGeneratorProvider.class).asEagerSingleton();
+
         // initialize so that we never miss installing the map binder, even though we are directly adding tools
         mcpToolBinder();
         addMcpTool(ListStreamsTool.NAME, ListStreamsTool.class);

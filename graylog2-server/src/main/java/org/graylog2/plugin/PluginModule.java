@@ -519,4 +519,16 @@ public abstract class PluginModule extends Graylog2Module {
     protected void addMcpResource(GRNType grnType, Class<? extends ResourceProvider> resourceClass) {
         mcpResourceBinder().addBinding(grnType).to(resourceClass);
     }
+
+    protected Multibinder<com.github.victools.jsonschema.generator.Module> schemaModuleBinder() {
+        return Multibinder.newSetBinder(
+                binder(),
+                com.github.victools.jsonschema.generator.Module.class,
+                org.graylog.mcp.server.McpSchemaModule.class
+        );
+    }
+
+    protected void addSchemaModule(Class<? extends com.github.victools.jsonschema.generator.Module> moduleClass) {
+        schemaModuleBinder().addBinding().to(moduleClass);
+    }
 }

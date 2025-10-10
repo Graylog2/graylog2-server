@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.OutputBuilder;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -42,8 +43,10 @@ public class SystemInfoFormattedTool extends Tool<SystemInfoFormattedTool.Parame
     private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public SystemInfoFormattedTool(ObjectMapper objectMapper, ServerStatus serverStatus, ClusterConfigService clusterConfigService, LeaderElectionService leaderElectionService) {
+    public SystemInfoFormattedTool(ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider, ServerStatus serverStatus, ClusterConfigService clusterConfigService, LeaderElectionService leaderElectionService) {
         super(objectMapper,
+                schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
