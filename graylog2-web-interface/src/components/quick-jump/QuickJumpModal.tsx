@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Modal, Input, ListGroup, ListGroupItem } from 'components/bootstrap';
@@ -27,6 +27,7 @@ import Badge from 'components/bootstrap/Badge';
 import Spinner from 'components/common/Spinner';
 import { Icon } from 'components/common';
 import { EXTERNAL_PAGE_TYPE } from 'components/quick-jump/Constants';
+import useDebouncedValue from 'hooks/useDebouncedValue';
 
 const SearchInput = styled(Input)`
   width: 100%;
@@ -113,20 +114,20 @@ const SearchResultEntry = ({
   lastOpened: boolean;
   favorite: boolean;
 }) => (
-    <StyledListGroupItem $active={isActive} {...itemProps}>
-      <TitleRow>
-        <Title>
-            {favorite ? <Icon name="star" type="solid" /> : null}
-          {item.title}
-          {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
-        </Title>
-        {lastOpened ? <LastOpened /> : null}
-      </TitleRow>
-      <Badge>
-        <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-      </Badge>
-    </StyledListGroupItem>
-  );
+  <StyledListGroupItem $active={isActive} {...itemProps}>
+    <TitleRow>
+      <Title>
+        {favorite ? <Icon name="star" type="solid" /> : null}
+        {item.title}
+        {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
+      </Title>
+      {lastOpened ? <LastOpened /> : null}
+    </TitleRow>
+    <Badge>
+      <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
+    </Badge>
+  </StyledListGroupItem>
+);
 
 type SearchResultsProps = {
   searchResults: SearchResultItem[];
@@ -178,20 +179,16 @@ const QuickJumpIntro = () => (
 );
 
 const QuickJumpModal = ({ onToggle }: Props) => {
-  const { searchQuery, setSearchQuery, searchResults, isLoading } = useQuickJumpSearch();
-  const {
-    highlightedIndex,
-    searchInputProps,
-    getItemProps,
-    onHide,
-    handleTyping,
-  } = useQuickJumpKeyboardNavigation({
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 500);
+  const { searchResults, isLoading } = useQuickJumpSearch(debouncedSearchQuery);
+  const { highlightedIndex, searchInputProps, getItemProps, onHide, handleTyping } = useQuickJumpKeyboardNavigation({
     items: searchResults,
     onToggle,
     searchQuery,
   });
 
-  const hasEmptySearchQuery = searchQuery.trim() === '';
+  const hasEmptySearchQuery = debouncedSearchQuery.trim() === '';
 
   const handleSearch = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {

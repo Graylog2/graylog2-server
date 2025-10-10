@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -188,8 +188,7 @@ const compareSearchItems = (result1: SearchResultItem, result2: SearchResultItem
   return scoreDifference;
 };
 
-const useQuickJumpSearch = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+const useQuickJumpSearch = (searchQuery: string) => {
   const mainNavItems = useMainNavigationItems();
   const pageNavItems = usePageNavigationItems();
   const creatorItems = useEntityCreatorItems();
@@ -218,9 +217,7 @@ const useQuickJumpSearch = () => {
 
   return {
     isLoading,
-    searchQuery,
     searchResults,
-    setSearchQuery,
   };
 };
 
