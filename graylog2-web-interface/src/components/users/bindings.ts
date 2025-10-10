@@ -1,6 +1,5 @@
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
-import ThreatIntelPluginConfig from 'threatintel/components/ThreatIntelPluginConfig';
 import Routes from 'routing/Routes';
 export const PAGE_NAV_TITLE = 'Users';
 export const USERS_OVERVIEW_TITLE = 'Users Overview';
