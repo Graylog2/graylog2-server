@@ -86,9 +86,15 @@ const EntityType = styled.div(
   `,
 );
 
-const RecentBadge = styled(Badge)`
-  font-weight: normal;
-`;
+const RecentBadge = styled(Badge)(
+  ({ theme }) => css`
+    font-weight: normal;
+
+    .mantine-Badge-label {
+      font-size: ${theme.fonts.size.tiny};
+    }
+  `,
+);
 
 const ExternalIcon = styled(Icon)(
   ({ theme }) => css`
