@@ -19,13 +19,12 @@ import * as React from 'react';
 import useLocation from 'routing/useLocation';
 import { LinkContainer } from 'components/common/router';
 import AppConfig from 'util/AppConfig';
-import { Navbar, Nav, NavItem } from 'components/bootstrap';
+import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
-import NavIcon from 'components/navigation/NavIcon';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -34,6 +33,8 @@ import DevelopmentHeaderBadge from './DevelopmentHeaderBadge';
 import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
+
+import { QuickJumpModalContainer } from '../quick-jump';
 
 type Props = {
   pathname: string;
@@ -60,9 +61,7 @@ const Navigation = React.memo(({ pathname }: Props) => {
         <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">
-          <NavItem id="quickjump-search-nav">
-            <NavIcon type="search" title="Search" />
-          </NavItem>
+          <QuickJumpModalContainer />
           
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
