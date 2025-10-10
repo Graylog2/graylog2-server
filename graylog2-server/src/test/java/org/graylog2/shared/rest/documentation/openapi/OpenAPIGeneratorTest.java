@@ -25,6 +25,7 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import org.graylog.grn.GRNRegistry;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.Version;
 import org.graylog2.security.encryption.EncryptedValueService;
@@ -90,7 +91,7 @@ class OpenAPIGeneratorTest {
     }
 
     @Test
-    void canGenerateSchemaForResourceWithOptionalPrimitives() throws Exception {
+    void canGenerateSchemaForResourceWithOptionalPrimitives() {
         // This test verifies that the OpenAPI generation correctly handles OptionalInt/OptionalLong/OptionalDouble
         // fields by treating them the same as Optional<Integer>/Optional<Long>/Optional<Double>.
         //
@@ -156,6 +157,7 @@ class OpenAPIGeneratorTest {
     @Consumes(MediaType.APPLICATION_JSON)
     public static class TestResource {
 
+        @NoAuditEvent("Test")
         @GET
         public TestResponse getTest() {
             return new TestResponse(
@@ -170,6 +172,7 @@ class OpenAPIGeneratorTest {
             );
         }
 
+        @NoAuditEvent("Test")
         @POST
         public TestResponse createTest(TestRequest request) {
             return new TestResponse(
