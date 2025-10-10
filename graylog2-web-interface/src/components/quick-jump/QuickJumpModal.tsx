@@ -118,6 +118,12 @@ const TypeColorIndicator = styled.div<{ $color: string }>(
   `,
 );
 
+const FavIcon = styled(Icon)`
+  margin-left: 3px;
+  bottom: 2px;
+  position: relative;
+`;
+
 const FullWidthCol = styled.div`
   flex: 1;
 `;
@@ -151,9 +157,9 @@ const SearchResultEntry = ({
         </HeaderRow>
 
         <Title>
-          {favorite ? <Icon name="star" type="solid" /> : null}
           {item.title}
           {item.type === LINK_TYPE && <ExternalIcon name="open_in_new" />}
+          {favorite ? <FavIcon name="star" type="solid" size="xs" /> : null}
         </Title>
       </FullWidthCol>
     </StyledListGroupItem>
