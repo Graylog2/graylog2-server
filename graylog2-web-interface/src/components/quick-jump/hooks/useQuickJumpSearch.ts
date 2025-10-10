@@ -105,7 +105,7 @@ const useQuickJumpSearch = (searchQuery: string) => {
   });
 
   return {
-    data: searchResultItems ?? [],
+    searchResults: searchResultItems ?? [],
     isLoading,
   };
 };
