@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { Drawer as MantineDrawer } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import styled, { css } from 'styled-components';
 
 const StyledDrawer = styled(MantineDrawer)(
@@ -61,7 +62,6 @@ const Title = styled.div(
 
 type Props = Pick<
   React.ComponentProps<typeof MantineDrawer>,
-  | 'opened'
   | 'onClose'
   | 'position'
   | 'size'
@@ -79,20 +79,35 @@ type Props = Pick<
   double?: boolean;
 };
 
-const Drawer = ({ title, double = false, ...props }: Props) => (
-  <StyledDrawer
-    offset={15}
-    padding="lg"
-    radius={5}
-    zIndex={1032}
-    title={
-      <TitleWrapper>
-        <Title>{title}</Title>
-      </TitleWrapper>
-    }
-    {...props}
-    size={double ? 1260 : props.size}
-  />
-);
+const Drawer = ({ title, double = false, ...props }: Props) => {
+  const [opened, { open, close }] = useDisclosure(false);
+
+  React.useLayoutEffect(() => {
+    setTimeout(() => open(), 80);
+  }, [open, close, props.onClose]);
+
+  const handleClose = () => {
+    close();
+    setTimeout(() => props.onClose?.(), 200);
+  };
+
+  return (
+    <StyledDrawer
+      opened={opened}
+      offset={15}
+      padding="lg"
+      radius={5}
+      zIndex={1032}
+      title={
+        <TitleWrapper>
+          <Title>{title}</Title>
+        </TitleWrapper>
+      }
+      {...props}
+      onClose={handleClose}
+      size={double ? 1260 : props.size}
+    />
+  );
+};
 
 export default Drawer;
