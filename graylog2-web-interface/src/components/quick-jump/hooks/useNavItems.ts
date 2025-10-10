@@ -102,6 +102,11 @@ const useQuickJumpLinks = () => {
       title: `${readOnly ? 'Show' : 'Edit'} profile for current user`,
       link: readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId),
     },
+    {
+      type: PAGE_TYPE,
+      title: 'Welcome',
+      link: Routes.WELCOME,
+    },
   ];
 };
 
