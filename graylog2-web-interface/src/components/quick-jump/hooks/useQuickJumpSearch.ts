@@ -27,6 +27,8 @@ import AppConfig from 'util/AppConfig';
 import type { SearchResultItem } from 'components/quick-jump/Types';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
+import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
+import useHistory from 'routing/useHistory';
 
 import useEntitySearchResults from './useEntitySearchResults';
 
@@ -146,6 +148,23 @@ const useConfigurationPages = () => {
 
 const useQuickJumpActions = (): SearchResultItem[] => {
   const { isScratchpadVisible } = useContext(ScratchpadContext);
+  const { activePerspective, availablePerspectives, setActivePerspective } = useContext(PerspectivesContext);
+  const history = useHistory();
+  const perspectiveActions = useMemo(
+    () =>
+      availablePerspectives
+        .filter((perspective) => perspective !== activePerspective)
+        .filter((perspective) => (perspective.useCondition ? perspective.useCondition() : true))
+        .map((perspective) => ({
+          type: ACTION_TYPE,
+          title: `Switch to ${perspective.title} perspective`,
+          action: () => {
+            setActivePerspective(perspective.id);
+            history.push(perspective.welcomeRoute);
+          },
+        })),
+    [activePerspective, availablePerspectives, history, setActivePerspective],
+  );
 
   return [
     {
@@ -169,6 +188,7 @@ const useQuickJumpActions = (): SearchResultItem[] => {
         toggleScratchpad();
       },
     },
+    ...perspectiveActions,
   ];
 };
 
