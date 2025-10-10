@@ -25,6 +25,7 @@ enum ConfigurationType {
   USER_CONFIG = 'org.graylog2.users.UserConfiguration',
   CERTIFICATE_RENEWAL_POLICY_CONFIG = 'org.graylog2.plugin.certificates.RenewalPolicy',
   GLOBAL_PROCESSING_RULE_CONFIG = 'org.graylog2.shared.buffers.processors.TimeStampConfig',
+  MCP_CONFIG = 'org.graylog.mcp.config.McpConfiguration',
 }
 export default ConfigurationType;
 export { ConfigurationType };
