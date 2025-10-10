@@ -34,7 +34,6 @@ const useListKeyboardNavigation = <T>(
     (e: React.KeyboardEvent) => {
       if (!items || items.length === 0) return;
 
-      console.log(e.key);
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
