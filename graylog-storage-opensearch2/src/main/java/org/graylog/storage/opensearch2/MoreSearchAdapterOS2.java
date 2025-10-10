@@ -26,6 +26,7 @@ import org.graylog.events.search.MoreSearch;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
@@ -187,24 +188,37 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
             LOG.debug("Execute search: {}", searchRequest);
         }
 
-        final var searchResult = client.search(searchRequest, "Unable to perform search query");
+        try {
+            final var searchResult = client.search(searchRequest, "Unable to perform search query");
 
-        final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
-        final var histogramBuckets = histogramResult.getBuckets();
+            final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+            final var histogramBuckets = histogramResult.getBuckets();
 
-        final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
-        final var events = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+            final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
+            final var events = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
 
-        histogramBuckets.forEach(bucket -> {
-            final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
-            final var dateTime = ((ZonedDateTime) bucket.getKey()).withZoneSameInstant(timeZone);
-            final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
-            final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
-            alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
-            events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
-        });
+            histogramBuckets.forEach(bucket -> {
+                final var parsedTerms = (ParsedTerms) bucket.getAggregations().get(termsAggregationName);
+                final var dateTime = ((ZonedDateTime) bucket.getKey()).withZoneSameInstant(timeZone);
+                final var alertCount = Optional.ofNullable(parsedTerms.getBucketByKey("true")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+                final var eventCount = Optional.ofNullable(parsedTerms.getBucketByKey("false")).map(MultiBucketsAggregation.Bucket::getDocCount).orElse(0L);
+                alerts.add(new MoreSearch.Histogram.Bucket(dateTime, alertCount));
+                events.add(new MoreSearch.Histogram.Bucket(dateTime, eventCount));
+            });
 
-        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+            return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(events, alerts));
+        } catch (final OpenSearchException ose) {
+            // filter exception cause for invalid queries, suppress exception if it's a parse error
+            if(ose.getCause() != null) {
+                for(var suppressedCause : ose.getCause().getSuppressed()) {
+                    if(suppressedCause.getMessage().contains("reason=Failed to parse query")) {
+                        return new MoreSearch.Histogram(new MoreSearch.Histogram.EventsBuckets(Collections.emptyList(), Collections.emptyList()));
+                    }
+                }
+            }
+            // re-throw unexpected exceptions
+            throw ose;
+        }
     }
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
