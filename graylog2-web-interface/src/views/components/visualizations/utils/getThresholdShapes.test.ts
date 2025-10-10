@@ -19,6 +19,7 @@ import Series from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
+import { theme } from 'views/components/visualizations/utils/__tests__/fixtures';
 
 import getThresholdShapes from './getThresholdShapes';
 
@@ -45,51 +46,115 @@ const mockFieldNameToAxisNameMapper = {
   foo: 'y1',
 };
 
+const mockMapperAxisNumber = {
+  'count(foo)': 1,
+};
+
 describe('getThresholdShapes', () => {
   it('should generate shapes for thresholds', () => {
-    const shapes = getThresholdShapes(mockSeries, mockWidgetUnits, mockFieldNameToAxisNameMapper);
+    const shapes = getThresholdShapes({
+      series: mockSeries,
+      widgetUnits: mockWidgetUnits,
+      fieldNameToAxisNameMapper: mockFieldNameToAxisNameMapper,
+      mapperAxisNumber: mockMapperAxisNumber,
+      theme,
+    });
 
-    expect(shapes).toEqual([
-      {
-        type: 'line',
-        y0: 10,
-        y1: 10,
-        x0: 0,
-        x1: 1,
-        xref: 'paper',
-        yref: 'y1',
-        name: 'Warning',
-        line: { color: '#fff000' },
-        label: {
-          text: 'Warning (10 s)',
-          textposition: 'top right',
-          font: { color: '#fff000' },
+    expect(shapes).toEqual({
+      annotations: [
+        {
+          'align': 'left',
+          'bgcolor': '#fff000',
+          'bordercolor': '#fff000',
+          'borderpad': 3,
+          'font': {
+            'color': '#fff000',
+            'size': 12,
+          },
+          'showarrow': false,
+          'text': 'Warning (10 s)',
+          'x': 0,
+          'xanchor': 'left',
+          'xref': 'paper',
+          'xshift': 0,
+          'y': 10,
+          'yanchor': 'bottom',
+          'yref': 'y1',
+          'yshift': 0,
         },
-      },
-      {
-        type: 'line',
-        y0: 20,
-        y1: 20,
-        x0: 0,
-        x1: 1,
-        xref: 'paper',
-        yref: 'y1',
-        name: 'Critical',
-        line: { color: '#ff0000' },
-        label: {
-          text: 'Critical (20 s)',
-          textposition: 'top right',
-          font: { color: '#ff0000' },
+        {
+          'align': 'left',
+          'bgcolor': '#ff0000',
+          'bordercolor': '#ff0000',
+          'borderpad': 3,
+          'font': {
+            'color': '#ff0000',
+            'size': 12,
+          },
+          'showarrow': false,
+          'text': 'Critical (20 s)',
+          'x': 0,
+          'xanchor': 'left',
+          'xref': 'paper',
+          'xshift': 0,
+          'y': 20,
+          'yanchor': 'bottom',
+          'yref': 'y1',
+          'yshift': 0,
         },
-      },
-    ]);
+      ],
+      'shapes': [
+        {
+          'line': {
+            'color': '#fff000',
+          },
+          'name': 'Warning',
+          'type': 'line',
+          'x0': 0,
+          'x1': 1,
+          'xref': 'paper',
+          'y0': 10,
+          'y1': 10,
+          'yref': 'y1',
+        },
+        {
+          'line': {
+            'color': '#ff0000',
+          },
+          'name': 'Critical',
+          'type': 'line',
+          'x0': 0,
+          'x1': 1,
+          'xref': 'paper',
+          'y0': 20,
+          'y1': 20,
+          'yref': 'y1',
+        },
+      ],
+    });
   });
 
   it('returns empty array when series is undefined', () => {
-    expect(getThresholdShapes(undefined, mockWidgetUnits, mockFieldNameToAxisNameMapper)).toEqual([]);
+    expect(
+      getThresholdShapes({
+        series: undefined,
+        widgetUnits: mockWidgetUnits,
+        fieldNameToAxisNameMapper: mockFieldNameToAxisNameMapper,
+        mapperAxisNumber: mockMapperAxisNumber,
+        theme,
+      }),
+    ).toEqual({ annotations: [], 'shapes': [] });
   });
 
   it('returns empty array when thresholds are missing', () => {
-    expect(getThresholdShapes([series], mockWidgetUnits, mockFieldNameToAxisNameMapper)).toEqual([]);
+    expect(
+      getThresholdShapes({
+        series: [series],
+        widgetUnits: mockWidgetUnits,
+        fieldNameToAxisNameMapper: mockFieldNameToAxisNameMapper,
+        mapperAxisNumber: mockMapperAxisNumber,
+        theme,
+      }),
+    ).toEqual({ annotations: [], 'shapes': [] });
   });
 });
