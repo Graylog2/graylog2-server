@@ -16,9 +16,7 @@
  */
 import React from 'react';
 
-import { useStore } from 'stores/connect';
-import { NodesStore } from 'stores/nodes/NodesStore';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader } from 'components/common';
 import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import PluginList from 'components/enterprise/PluginList';
 import EnterpriseProductLink from 'components/enterprise/EnterpriseProductLink';
@@ -28,13 +26,8 @@ import AdvertisementSection from 'components/enterprise/AdvertisementSection';
 import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 
 const EnterprisePage = () => {
-  const nodes = useStore(NodesStore);
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
-
-  if (!nodes) {
-    return <Spinner />;
-  }
 
   return (
     <DocumentTitle title={`${productName} Enterprise`}>
