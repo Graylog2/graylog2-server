@@ -209,7 +209,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebouncedValue(searchQuery, 500);
   const { searchResults, isLoading } = useQuickJumpSearch(debouncedSearchQuery);
-  const { highlightedIndex, searchInputProps, getItemProps, onHide, handleTyping } = useQuickJumpKeyboardNavigation({
+  const { highlightedIndex, modalProps, searchInputProps, getItemProps, onHide } = useQuickJumpKeyboardNavigation({
     items: searchResults,
     onToggle,
     searchQuery,
@@ -225,7 +225,7 @@ const QuickJumpModal = ({ onToggle }: Props) => {
   );
 
   return (
-    <Modal onHide={onHide} show bsSize="large" scrollInContent rootProps={{ onKeyDownCapture: handleTyping }}>
+    <Modal onHide={onHide} show bsSize="large" scrollInContent rootProps={modalProps}>
       <Modal.Header>
         <Modal.Title>Quick Jump</Modal.Title>
       </Modal.Header>

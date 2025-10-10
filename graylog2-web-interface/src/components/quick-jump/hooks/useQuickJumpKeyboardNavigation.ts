@@ -41,13 +41,15 @@ export type QuickJumpItemProps = {
 
 type Result = {
   highlightedIndex: number;
+  modalProps: {
+    onKeyDownCapture: (event: React.KeyboardEvent) => void;
+  }
   searchInputProps: {
     ref: React.MutableRefObject<React.ComponentRef<typeof Input> | null>;
     onKeyDown: (event: React.KeyboardEvent) => void;
   };
   getItemProps: (index: number) => QuickJumpItemProps;
   onHide: () => void;
-  handleTyping: (event: React.KeyboardEvent) => void;
 };
 
 const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Options): Result => {
@@ -159,6 +161,8 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
 
   const handleTyping = useCallback(
     (event: React.KeyboardEvent) => {
+      onKeyDown(event);
+
       if (isClosingRef.current) {
         return;
       }
@@ -183,18 +187,25 @@ const useQuickJumpKeyboardNavigation = ({ items, onToggle, searchQuery }: Option
 
       focusSearchInput();
     },
-    [focusSearchInput],
+    [focusSearchInput, onKeyDown],
+  );
+
+  const modalProps = useMemo(
+    () => ({
+      onKeyDownCapture: handleTyping,
+    }),
+    [handleTyping],
   );
 
   return useMemo(
     () => ({
       highlightedIndex,
       searchInputProps,
+      modalProps,
       getItemProps,
       onHide,
-      handleTyping,
     }),
-    [highlightedIndex, searchInputProps, getItemProps, onHide, handleTyping],
+    [highlightedIndex, modalProps, searchInputProps, getItemProps, onHide],
   );
 };
 
