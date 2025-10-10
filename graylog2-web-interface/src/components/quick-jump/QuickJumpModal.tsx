@@ -26,7 +26,7 @@ import type { QuickJumpItemProps } from 'components/quick-jump/hooks/useQuickJum
 import Badge from 'components/bootstrap/Badge';
 import Spinner from 'components/common/Spinner';
 import { Icon } from 'components/common';
-import { EXTERNAL_PAGE_TYPE, PAGE_TYPE, ACTION_TYPE } from 'components/quick-jump/Constants';
+import { LINK_TYPE, PAGE_TYPE, ACTION_TYPE } from 'components/quick-jump/Constants';
 import useDebouncedValue from 'hooks/useDebouncedValue';
 
 const SearchInput = styled(Input)`
@@ -153,7 +153,7 @@ const SearchResultEntry = ({
         <Title>
           {favorite ? <Icon name="star" type="solid" /> : null}
           {item.title}
-          {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
+          {item.type === LINK_TYPE && <ExternalIcon name="open_in_new" />}
         </Title>
       </FullWidthCol>
     </StyledListGroupItem>

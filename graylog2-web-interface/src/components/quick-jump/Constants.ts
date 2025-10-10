@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export const PAGE_TYPE = 'page' as const;
-export const EXTERNAL_PAGE_TYPE = 'external_page' as const;
+export const LINK_TYPE = 'link' as const;
 export const ACTION_TYPE = 'action' as const;
 export const ENTITY_TYPE = 'entity' as const;
 export const PAGE_WEIGHT = 0.99;

@@ -3,7 +3,7 @@ import { useContext, useMemo } from 'react';
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import { PAGE_TYPE, ACTION_TYPE, EXTERNAL_PAGE_TYPE } from 'components/quick-jump/Constants';
+import { PAGE_TYPE, ACTION_TYPE, LINK_TYPE } from 'components/quick-jump/Constants';
 import usePermissions from 'hooks/usePermissions';
 import type { QualifiedUrl } from 'routing/Routes';
 import Routes, { prefixUrl } from 'routing/Routes';
@@ -114,7 +114,7 @@ const useHelpMenuItems = () => {
     .map((item) => {
       if ('externalLink' in item) {
         return {
-          type: EXTERNAL_PAGE_TYPE,
+          type: LINK_TYPE,
           externalLink: item.externalLink,
           title: item.description,
         };
