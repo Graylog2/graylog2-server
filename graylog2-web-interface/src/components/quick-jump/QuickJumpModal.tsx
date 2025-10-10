@@ -38,9 +38,13 @@ const List = styled.div`
   outline: none;
 `;
 
-const EntityType = styled.div`
-  font-weight: normal;
-`;
+const EntityType = styled.div(
+  ({ theme }) => css`
+    font-weight: normal;
+    color: ${theme.colors.text.secondary};
+    font-size: ${theme.fonts.size.small};
+  `,
+);
 
 const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ theme, $active }) => {
   const highlightColor = theme.utils.colorLevel(theme.colors.global.contentBackground, 10);
@@ -80,7 +84,8 @@ const StyledListGroupItem = styled(ListGroupItem)<{ $active?: boolean }>(({ them
   `;
 });
 
-const TitleRow = styled.div`
+const HeaderRow = styled.div`
+  max-height: 18px;
   display: flex;
   justify-content: space-between;
 `;
@@ -119,17 +124,16 @@ const SearchResultEntry = ({
   favorite: boolean;
 }) => (
   <StyledListGroupItem $active={isActive} {...itemProps}>
-    <TitleRow>
-      <Title>
-        {favorite ? <Icon name="star" type="solid" /> : null}
-        {item.title}
-        {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
-      </Title>
-      {lastOpened ? <LastOpened /> : null}
-    </TitleRow>
-    <Badge>
+    <HeaderRow>
       <EntityType>{StringUtils.toTitleCase(item.type, '_')}</EntityType>
-    </Badge>
+      {lastOpened ? <LastOpened /> : null}
+    </HeaderRow>
+
+    <Title>
+      {favorite ? <Icon name="star" type="solid" /> : null}
+      {item.title}
+      {item.type === EXTERNAL_PAGE_TYPE && <ExternalIcon name="open_in_new" />}
+    </Title>
   </StyledListGroupItem>
 );
 
