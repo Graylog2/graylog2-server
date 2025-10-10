@@ -14,74 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext, useMemo } from 'react';
+import { useCallback } from 'react';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
-import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
+import { QuickJump } from '@graylog/server-api';
+
+import { defaultOnError } from 'util/conditional/onError';
+import { getEntityRoute, usePluginEntityTypeGenerators } from 'routing/hooks/useShowRouteForEntity';
 import usePluginEntities from 'hooks/usePluginEntities';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import { PAGE_TYPE, PAGE_WEIGHT, BASE_SCORE, ACTION_TYPE, EXTERNAL_PAGE_TYPE } from 'components/quick-jump/Constants';
-import usePermissions from 'hooks/usePermissions';
-import type { QualifiedUrl } from 'routing/Routes';
-import Routes, { prefixUrl } from 'routing/Routes';
-import AppConfig from 'util/AppConfig';
+import useNavItems from 'components/quick-jump/hooks/useNavItems';
+import { PAGE_WEIGHT, BASE_SCORE } from 'components/quick-jump/Constants';
 import type { SearchResultItem } from 'components/quick-jump/Types';
-import useCurrentUser from 'hooks/useCurrentUser';
-import { ScratchpadContext } from 'contexts/ScratchpadProvider';
-import PerspectivesContext from 'components/perspectives/contexts/PerspectivesContext';
-import useHistory from 'routing/useHistory';
 
-import useEntitySearchResults from './useEntitySearchResults';
+const compareSearchItems = (result1: SearchResultItem, result2: SearchResultItem) => {
+  const scoreDifference = result2.score - result1.score;
+  if (scoreDifference === 0) {
+    return Number(result2.last_opened ?? false) - Number(result1.last_opened ?? false);
+  }
 
-const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
-  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
-
-const isFeatureEnabled = (featureFlag?: string) => {
-  if (!featureFlag) return true;
-
-  return AppConfig.isFeatureEnabled(featureFlag);
-};
-
-type BaseNavigationItem = {
-  description: string;
-  path: QualifiedUrl<string>;
-  permissions?: string | Array<string>;
-  perspective?: string;
-};
-
-const useMainNavigationItems = () => {
-  const { isPermitted } = usePermissions();
-  const navigationItems = usePluginEntities('navigation');
-  const { activePerspective } = useActivePerspective();
-
-  const allNavigationItems = navigationItems.flatMap((item) =>
-    'children' in item
-      ? item.children.map<BaseNavigationItem>((child) => ({
-          ...child,
-          description: `${item.description} / ${child.description}`,
-          perspective: item.perspective,
-        }))
-      : [item],
-  );
-
-  return allNavigationItems
-    .filter((item) => isPermitted(item.permissions) && matchesPerspective(activePerspective.id, item.perspective))
-    .map((item) => ({ type: PAGE_TYPE, link: item.path, title: item.description }));
-};
-
-const usePageNavigationItems = () => {
-  const { activePerspective } = useActivePerspective();
-  const { isPermitted } = usePermissions();
-  const pageNavigationItems = usePluginEntities('pageNavigation');
-
-  return pageNavigationItems
-    .filter((group) => matchesPerspective(activePerspective.id, group.perspective))
-    .flatMap((group) =>
-      [...group.children]
-        .filter((page) => isFeatureEnabled(page.requiredFeatureFlag))
-        .filter((page) => isPermitted(page.permissions))
-        .slice(1)
-        .map((page) => ({ type: PAGE_TYPE, link: page.path, title: `${group.description} / ${page.description}` })),
-    );
+  return scoreDifference;
 };
 
 const normalize = (s: string) => s.toLocaleLowerCase().trim();
@@ -102,7 +53,7 @@ const scoreItem = (item: { title: string }, query: string) => {
   return 0;
 };
 
-const useScoreResults = (items: Array<SearchResultItem>, query: string, weight = 1.0) =>
+const scoreResults = (items: Array<SearchResultItem>, query: string, weight = 1.0) =>
   items.flatMap((item) => {
     const score = scoreItem(item, query);
     if (score === 0) {
@@ -112,166 +63,50 @@ const useScoreResults = (items: Array<SearchResultItem>, query: string, weight =
     return [{ ...item, score: score * weight }];
   });
 
-const useEntityCreatorItems = () => {
-  const { isPermitted } = usePermissions();
-  const entityCreators = usePluginEntities('entityCreators');
+type Unpromise<T> = T extends Promise<infer U> ? U : never;
+type ItemResultType = Unpromise<ReturnType<typeof QuickJump.search>>['results'][number];
 
-  return entityCreators
-    .filter((creator) => (creator.permissions ? isPermitted(creator.permissions) : true))
-    .map((creator) => ({ type: PAGE_TYPE, link: creator.path, title: creator.title }));
-};
+const useEntityResultMapper = () => {
+  const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
+  const entityTypeGenerators = usePluginEntityTypeGenerators();
 
-const useConfigurationPages = () => {
-  const { isPermitted } = usePermissions();
-  const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
-  const pluginSystemConfigurations = usePluginEntities('systemConfigurations');
-
-  const coreNavItems = coreSystemConfigurations
-    .filter(({ permissions }) => isPermitted(permissions))
-    .map((page) => ({
-      type: PAGE_TYPE,
-      link: prefixUrl(`${Routes.SYSTEM.CONFIGURATIONS}/${page.name}`),
-      title: `Configurations / ${page.name}`,
-    }));
-
-  const pluginNavItems = pluginSystemConfigurations
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    .filter(({ useCondition }) => (typeof useCondition === 'function' ? useCondition() : true))
-    .map((page) => ({
-      type: PAGE_TYPE,
-      link: prefixUrl(`${Routes.SYSTEM.configurationsSection('Plugins', page.configType)}`),
-      title: `Configurations / ${page.displayName}`,
-    }));
-
-  return [...coreNavItems, ...pluginNavItems];
-};
-
-const useQuickJumpActions = (): SearchResultItem[] => {
-  const { isScratchpadVisible } = useContext(ScratchpadContext);
-  const { activePerspective, availablePerspectives, setActivePerspective } = useContext(PerspectivesContext);
-  const history = useHistory();
-  const perspectiveActions = useMemo(
-    () =>
-      availablePerspectives
-        .filter((perspective) => perspective !== activePerspective)
-        .filter((perspective) => (perspective.useCondition ? perspective.useCondition() : true))
-        .map((perspective) => ({
-          type: ACTION_TYPE,
-          title: `Switch to ${perspective.title} perspective`,
-          action: () => {
-            setActivePerspective(perspective.id);
-            history.push(perspective.welcomeRoute);
-          },
-        })),
-    [activePerspective, availablePerspectives, history, setActivePerspective],
+  return useCallback(
+    (item: ItemResultType): SearchResultItem => ({
+      ...item,
+      key: item.id,
+      link: getEntityRoute(item.id, item.type, pluginEntityRoutesResolver, entityTypeGenerators),
+    }),
+    [entityTypeGenerators, pluginEntityRoutesResolver],
   );
-
-  return [
-    {
-      type: ACTION_TYPE,
-      title: 'Logout current user',
-      action: ({ logout }) => {
-        logout();
-      },
-    },
-    {
-      type: ACTION_TYPE,
-      title: 'Toggle Theme',
-      action: ({ toggleThemeMode }) => {
-        toggleThemeMode();
-      },
-    },
-    {
-      type: ACTION_TYPE,
-      title: `${isScratchpadVisible ? 'Hide' : 'Show'} Scratchpad`,
-      action: ({ toggleScratchpad }) => {
-        toggleScratchpad();
-      },
-    },
-    ...perspectiveActions,
-  ];
-};
-
-const useQuickJumpLinks = () => {
-  const { readOnly, id: userId } = useCurrentUser();
-
-  return [
-    {
-      type: PAGE_TYPE,
-      title: `${readOnly ? 'Show' : 'Edit'} profile for current user`,
-      link: readOnly ? Routes.SYSTEM.USERS.show(userId) : Routes.SYSTEM.USERS.edit(userId),
-    },
-  ];
-};
-
-const useHelpMenuItems = () => {
-  const menuItems = usePluginEntities('helpMenu');
-  const { isPermitted } = usePermissions();
-
-  return menuItems
-    .filter((item) => isPermitted(item.permissions))
-    .map((item) => {
-      if ('externalLink' in item) {
-        return {
-          type: EXTERNAL_PAGE_TYPE,
-          externalLink: item.externalLink,
-          title: item.description,
-        };
-      }
-
-      if ('action' in item) {
-        return {
-          type: ACTION_TYPE,
-          title: item.description,
-          action: item.action,
-        };
-      }
-
-      throw Error('Help menu item must have either external link or action defined');
-    });
-};
-
-const compareSearchItems = (result1: SearchResultItem, result2: SearchResultItem) => {
-  const scoreDifference = result2.score - result1.score;
-  if (scoreDifference === 0) {
-    return Number(result2.last_opened ?? false) - Number(result1.last_opened ?? false);
-  }
-
-  return scoreDifference;
 };
 
 const useQuickJumpSearch = (searchQuery: string) => {
-  const mainNavItems = useMainNavigationItems();
-  const pageNavItems = usePageNavigationItems();
-  const creatorItems = useEntityCreatorItems();
-  const configurationPageNavItems = useConfigurationPages();
-  const quickJumpActions = useQuickJumpActions();
-  const quickJumpLinks = useQuickJumpLinks();
-  const helpMenuItems = useHelpMenuItems();
-  const { data: entityItems, isLoading } = useEntitySearchResults({ query: searchQuery });
+  const mapEntityResult = useEntityResultMapper();
+  const navItems = useNavItems();
 
-  const scoredNavItems = useScoreResults(
-    [
-      ...mainNavItems,
-      ...pageNavItems,
-      ...creatorItems,
-      ...configurationPageNavItems,
-      ...quickJumpActions,
-      ...quickJumpLinks,
-      ...helpMenuItems,
-    ],
-    searchQuery,
-    PAGE_WEIGHT,
-  );
+  const { data: searchResultItems, isLoading } = useQuery({
+    queryKey: ['quick-jump', searchQuery],
+    queryFn: () =>
+      defaultOnError(
+        (async () => {
+          const entities = await QuickJump.search({ query: searchQuery, limit: 100 });
+          const scoredNavItems: SearchResultItem[] = scoreResults(navItems, searchQuery, PAGE_WEIGHT);
+          const entityResultItems = entities.results.map(mapEntityResult);
 
-  const searchResults: SearchResultItem[] = useMemo(
-    () => [...(entityItems ?? []), ...(searchQuery.trim() !== '' ? scoredNavItems : [])].sort(compareSearchItems),
-    [entityItems, scoredNavItems, searchQuery],
-  );
+          return (searchQuery.trim() !== '' ? [...entityResultItems, ...scoredNavItems] : [...entityResultItems]).sort(
+            compareSearchItems,
+          );
+        })(),
+        'Fetch Entities Search Results failed with status',
+        'Could not Fetch Entity Search Results.',
+      ),
+    placeholderData: keepPreviousData,
+    refetchOnMount: 'always',
+  });
 
   return {
+    data: searchResultItems ?? [],
     isLoading,
-    searchResults,
   };
 };
 
