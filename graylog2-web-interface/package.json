@@ -9,6 +9,9 @@
     "url": "git://github.com/graylog2/graylog2-web-interface.git"
   },
   "readme": "../README.md",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "start": "webpack serve -c webpack.bundled.ts",
     "start:preflight": "webpack serve -c webpack.preflight.ts",
