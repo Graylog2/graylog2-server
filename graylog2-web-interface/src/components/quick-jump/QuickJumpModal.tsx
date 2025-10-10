@@ -151,7 +151,7 @@ const SearchResults = ({ searchResults, highlightedIndex, getItemProps }: Search
   </List>
 );
 
-const IntroContainer = styled.div`
+const Explanation = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -166,7 +166,7 @@ const Description = styled.div(
 );
 
 const QuickJumpIntro = () => (
-  <IntroContainer>
+  <Explanation>
     <Description>
       Please enter a search query to search for a page, stream, dashboard, input or other entities.{' '}
     </Description>
@@ -175,7 +175,13 @@ const QuickJumpIntro = () => (
       items below:
     </Description>
     <br />
-  </IntroContainer>
+  </Explanation>
+);
+
+const NoResultsFound = () => (
+  <Explanation>
+    <Description>No search results found. Please try different search terms.</Description>
+  </Explanation>
 );
 
 const QuickJumpModal = ({ onToggle }: Props) => {
@@ -213,9 +219,10 @@ const QuickJumpModal = ({ onToggle }: Props) => {
           placeholder="Search for pages/dashboards/streams ..."
           {...searchInputProps}
         />
+        {/* eslint-disable-next-line no-nested-ternary */}
         {isLoading ? (
           <Spinner />
-        ) : (
+        ) : searchResults.length ? (
           <>
             {hasEmptySearchQuery && <QuickJumpIntro />}
             <SearchResults
@@ -224,6 +231,8 @@ const QuickJumpModal = ({ onToggle }: Props) => {
               highlightedIndex={highlightedIndex}
             />
           </>
+        ) : (
+          <NoResultsFound />
         )}
       </Modal.Body>
     </Modal>
