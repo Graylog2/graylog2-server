@@ -27,7 +27,7 @@ const UsersPageNavigation = () => {
     {
       description: 'Token Management',
       path: Routes.SYSTEM.USERS_TOKEN_MANAGEMENT.overview,
-      permissions: 'users:tokenlist',
+      permissions: 'tokenusage:read',
     },
   ];
 

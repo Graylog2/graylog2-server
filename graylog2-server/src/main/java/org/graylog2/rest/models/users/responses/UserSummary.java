@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.database.users.User;
@@ -35,14 +36,7 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class UserSummary {
-
-    @JsonProperty("id")
-    @Nullable
-    public abstract String id();
-
-    @JsonProperty("username")
-    public abstract String username();
+public abstract class UserSummary implements BasicUserFields {
 
     @JsonProperty("email")
     public abstract String email();
@@ -54,10 +48,6 @@ public abstract class UserSummary {
     @JsonProperty("last_name")
     @Nullable
     public abstract String lastName();
-
-    @JsonProperty("full_name")
-    @Nullable
-    public abstract String fullName();
 
     @JsonProperty("permissions")
     @JsonSerialize(contentUsing = ToStringSerializer.class)
@@ -77,9 +67,6 @@ public abstract class UserSummary {
     @JsonProperty("session_timeout_ms")
     @Nullable
     public abstract Long sessionTimeoutMs();
-
-    @JsonProperty("read_only")
-    public abstract boolean readOnly();
 
     @JsonProperty("external")
     public abstract boolean external();
@@ -106,14 +93,11 @@ public abstract class UserSummary {
     @JsonProperty("account_status")
     public abstract User.AccountStatus accountStatus();
 
-    @JsonProperty("service_account")
-    public abstract boolean isServiceAccount();
-
     @JsonProperty("auth_service_enabled")
     public abstract boolean authServiceEnabled();
 
     @JsonCreator
-    public static UserSummary create(@JsonProperty("id") @Nullable String id,
+    public static UserSummary create(@JsonProperty("id") @NotBlank String id,
                                      @JsonProperty("username") String username,
                                      @JsonProperty("email") String email,
                                      @JsonProperty("first_name") @Nullable String firstName,
@@ -136,16 +120,17 @@ public abstract class UserSummary {
                                      @JsonProperty("auth_service_enabled") boolean authServiceEnabled) {
         return new AutoValue_UserSummary(id,
                 username,
+                fullName,
+                readOnly,
+                (isServiceAccount != null && isServiceAccount),
                 email,
                 firstName,
                 lastName,
-                fullName,
                 permissions,
                 grnPermissions,
                 preferences,
                 timezone,
                 sessionTimeoutMs,
-                readOnly,
                 external,
                 startpage,
                 roles,
@@ -153,7 +138,6 @@ public abstract class UserSummary {
                 lastActivity,
                 clientAddress,
                 accountStatus,
-                (isServiceAccount != null && isServiceAccount),
                 authServiceEnabled);
     }
 }

@@ -39,8 +39,8 @@ const Header = styled.div`
 
 const TokenManagement = () => {
   const tokenAction = useCallback(
-    ({ user_id, id: tokenId, NAME: tokenName }: Token) => (
-      <TokenActions userId={user_id} tokenId={tokenId} tokenName={tokenName} />
+    ({ user_id, username, id: tokenId, NAME: tokenName }: Token) => (
+      <TokenActions userId={user_id} username={username} tokenId={tokenId} tokenName={tokenName} />
     ),
     [],
   );

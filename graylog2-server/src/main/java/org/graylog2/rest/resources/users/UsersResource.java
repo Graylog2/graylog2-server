@@ -74,6 +74,7 @@ import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
+import org.graylog2.rest.models.users.responses.BasicUserResponse;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
 import org.graylog2.rest.models.users.responses.TokenSummary;
@@ -239,6 +240,28 @@ public class UsersResource extends RestResource {
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
 
         return toUserResponse(user, isSelf || canEditUserPermissions, Optional.of(AllUserSessions.create(sessionService)));
+    }
+
+    @GET
+    @Path("/basic/id/{userId}")
+    @ApiOperation(value = "Get basic user data by userId")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "The user could not be found.")
+    })
+    public BasicUserResponse getBasicUserById(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+                                              @PathParam("userId") String userId) {
+
+        final User user = loadUserById(userId);
+        if (!isPermitted(USERS_READ, user.getName())) {
+            throw new ForbiddenException("Not allowed to view userId " + userId);
+        }
+        return BasicUserResponse.builder()
+                .id(user.getId())
+                .username(user.getName())
+                .fullName(user.getFullName())
+                .readOnly(user.isReadOnly())
+                .isServiceAccount(user.isServiceAccount())
+                .build();
     }
 
     /**
