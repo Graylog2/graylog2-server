@@ -42,8 +42,6 @@ type ChildrenProps = {
   className: string;
   href: string;
   disabled: boolean;
-  target?: string;
-  rel?: 'noopener noreferrer';
 };
 
 type Props = {
@@ -60,16 +58,8 @@ const isLeftClickEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
 
 const isModifiedEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
   !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
-const isExternal = (to: string) => /^http?:\/\//.test(to);
 
-const LinkContainer = ({
-  children,
-  onClick = undefined,
-  to: toProp,
-  relativeActive = false,
-  target,
-  ...rest
-}: Props) => {
+const LinkContainer = ({ children, onClick = undefined, to: toProp, relativeActive = false, ...rest }: Props) => {
   const { pathname } = useLocation();
   const {
     props: { onClick: childrenOnClick, className, disabled },
@@ -106,24 +96,11 @@ const LinkContainer = ({
     [disabled, childrenOnClick, onClick, handleClick],
   );
 
-  if (isExternal(to)) {
-    return React.cloneElement(React.Children.only(children), {
-      ...rest,
-      className: childrenClassName,
-      onClick,
-      disabled: !!disabled,
-      href: to,
-      target,
-      rel: 'noopener noreferrer',
-    });
-  }
-
   return React.cloneElement(React.Children.only(children), {
     ...rest,
     className: childrenClassName,
     onClick: _onClick,
     disabled: !!disabled,
-    target,
     href: disabled ? undefined : to,
   });
 };
