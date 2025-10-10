@@ -68,9 +68,26 @@ const entityCreatorBindings: PluginExports = {
     },
     {
       id: 'User',
-      title: 'Create User',
+      title: 'Create user',
       path: Routes.SYSTEM.USERS.CREATE,
       permissions: 'users:create',
+    },
+    {
+      id: 'Pipeline',
+      title: 'Create pipeline',
+      path: Routes.SYSTEM.PIPELINES.CREATE,
+      permissions: 'pipeline:create',
+    },
+    {
+      id: 'Pipeline Rule',
+      title: 'Create pipeline rule',
+      path: Routes.SYSTEM.PIPELINES.RULE('new?rule_builder=true'),
+      permissions: 'pipeline:create',
+      telemetryEvent: {
+        type: TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_RULE_CLICKED,
+        section: 'pipeline-rules',
+        actionValue: 'create-rule-button',
+      },
     },
   ],
 };

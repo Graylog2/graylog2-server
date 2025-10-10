@@ -196,6 +196,7 @@ const Routes = {
       },
     },
     PIPELINES: {
+      CREATE: '/system/pipelines/new',
       OVERVIEW: '/system/pipelines',
       PIPELINE: (pipelineId: string) => `/system/pipelines/${pipelineId}`,
       RULES: '/system/pipelines/rules',
