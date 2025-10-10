@@ -34,6 +34,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.zafarkhaja.semver.Version;
 import com.vdurmont.semver4j.Requirement;
 import com.vdurmont.semver4j.Semver;
+import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNDeserializer;
 import org.graylog.grn.GRNKeyDeserializer;
@@ -53,11 +54,13 @@ import org.graylog2.jackson.SemverRequirementSerializer;
 import org.graylog2.jackson.SemverSerializer;
 import org.graylog2.jackson.VersionDeserializer;
 import org.graylog2.jackson.VersionSerializer;
+import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueDeserializer;
 import org.graylog2.security.encryption.EncryptedValueSerializer;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.jackson.SizeSerializer;
+import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.Duration;
 import org.joda.time.Period;
@@ -67,13 +70,27 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class ObjectMapperConfiguration {
+    private final ClassLoader classLoader;
+    private final Set<NamedType> subtypes;
+    private final EncryptedValueService encryptedValueService;
+    private final GRNRegistry grnRegistry;
+    private final InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier;
 
-    public static <T extends ObjectMapper> T configureMapper(T mapper,
-                                                             final ClassLoader classLoader,
-                                                             final Set<NamedType> subtypes,
-                                                             final EncryptedValueService encryptedValueService,
-                                                             final GRNRegistry grnRegistry,
-                                                             final InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
+    @Inject
+    public ObjectMapperConfiguration(
+            @GraylogClassLoader final ClassLoader classLoader,
+            @JacksonSubTypes final Set<NamedType> subtypes,
+            final EncryptedValueService encryptedValueService,
+            final GRNRegistry grnRegistry,
+            final InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
+        this.classLoader = classLoader;
+        this.subtypes = subtypes;
+        this.encryptedValueService = encryptedValueService;
+        this.grnRegistry = grnRegistry;
+        this.inputConfigurationBeanDeserializerModifier = inputConfigurationBeanDeserializerModifier;
+    }
+
+    public <T extends ObjectMapper> T configure(T mapper) {
 
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
         final AutoValueSubtypeResolver subtypeResolver = new AutoValueSubtypeResolver();
