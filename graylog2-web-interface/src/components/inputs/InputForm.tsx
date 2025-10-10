@@ -45,7 +45,7 @@ type Props = {
 };
 
 const InputForm = ({
-  globalValue = false,
+  globalValue = true,
   configFields,
   nodeValue = undefined,
   titleValue = undefined,
@@ -58,7 +58,7 @@ const InputForm = ({
   setShowModal,
   submitButtonText,
 }: Props) => {
-  const [global, setGlobal] = useState<boolean>(globalValue ?? false);
+  const [global, setGlobal] = useState<boolean>(globalValue ?? true);
   const [node, setNode] = useState<string | undefined>(nodeValue);
   const configFormRef = useRef(null);
 
