@@ -22,20 +22,34 @@ import FormDataContext from 'integrations/contexts/FormDataContext';
 import { AdvancedOptionsContext } from 'integrations/aws/context/AdvancedOptions';
 import AdditionalFields from 'integrations/aws/common/AdditionalFields';
 
+import type { HandleSqsBatchSizeType } from './types';
+
 type FormAdvancedOptionsProps = {
   onChange: (...args: any[]) => void;
+  handleSqsMessageBatchSizeChange: HandleSqsBatchSizeType;
 };
 
-const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
+const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: FormAdvancedOptionsProps) => {
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { overrideSource, awsCloudTrailThrottleEnabled } =
+  const { overrideSource, awsCloudTrailThrottleEnabled, sqsMessageBatchSize } =
     formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);
   };
+
+  const internalHandleSqsBatchSizeChange = (e) => {
+    const { value } = e.target;
+    onChange(e, formData);
+
+    if (value >= 1 && value <= 10) {
+      handleSqsMessageBatchSizeChange('');
+    } else {
+      handleSqsMessageBatchSizeChange('Please select SQS Message Batch Size between 1 - 10.');
+    }
+  }
 
   return (
     <AdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
@@ -52,6 +66,16 @@ const FormAdvancedOptions = ({ onChange }: FormAdvancedOptionsProps) => {
         onChange={onChange}
         label="Override Source (optional)"
         help="The source is set to aws-cloudtrail by default.If desired, you may override it with a custom value."
+      />
+
+      <Input
+        id="sqsMessageBatchSize"
+        type="number"
+        min="1"
+        value={sqsMessageBatchSize?.value}
+        onChange={internalHandleSqsBatchSizeChange}
+        label="SQS Message Batch Size"
+        help="The maximum number of messages to query from SQS at a time. The maximum acceptable value is 10."
       />
 
     </AdditionalFields>

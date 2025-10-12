@@ -103,6 +103,7 @@ public class CloudTrailDriver {
         configuration.put(CloudTrailInput.CK_CLOUDTRAIL_QUEUE_NAME, request.sqsQueueName());
         configuration.put(CloudTrailInput.CK_POLLING_INTERVAL, request.pollingInterval());
         configuration.put(CloudTrailInput.CK_OVERRIDE_SOURCE, request.overrideSource());
+        configuration.put(CloudTrailInput.CK_SQS_MESSAGE_BATCH_SIZE, request.sqsMessageBatchSize());
 
         final InputCreateRequest inputCreateRequest = InputCreateRequest.create(request.name(),
                 CloudTrailInput.TYPE,

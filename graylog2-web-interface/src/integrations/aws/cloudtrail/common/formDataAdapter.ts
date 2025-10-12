@@ -31,7 +31,8 @@ export const toAWSCloudTrailInputCreateRequest = ({
   awsAssumeRoleArn,
   overrideSource,
   key,
-  secret
+  secret,
+  sqsMessageBatchSize,
 }: FormDataType): AWSCloudTrailInputCreateRequest => ({
   name: awsCloudTrailName?.value,
   ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
@@ -49,6 +50,7 @@ export const toAWSCloudTrailInputCreateRequest = ({
   aws_region: awsCloudTrailRegion?.value,
   assume_role_arn: awsAssumeRoleArn?.value,
   override_source: overrideSource?.value,
+  sqs_message_batch_size: sqsMessageBatchSize?.value,
 });
 
 export const toGenericInputCreateRequest = ({
@@ -64,6 +66,7 @@ export const toGenericInputCreateRequest = ({
   key,
   secret,
   overrideSource,
+  sqsMessageBatchSize,
 }: FormDataType): AWSCloudTrailGenericInputCreateRequest => ({
   type: 'org.graylog.aws.inputs.cloudtrail.CloudTrailInput',
   title: awsCloudTrailName?.value,
@@ -84,5 +87,6 @@ export const toGenericInputCreateRequest = ({
     aws_region: awsCloudTrailRegion?.value,
     assume_role_arn: awsAssumeRoleArn?.value,
     override_source: overrideSource?.value,
+    sqs_message_batch_size: sqsMessageBatchSize?.value,
   },
 });

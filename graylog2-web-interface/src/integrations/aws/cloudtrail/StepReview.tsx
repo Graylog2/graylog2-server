@@ -113,31 +113,35 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
         <Subheader>Input Configuration</Subheader>
         <ReviewItems>
           <li>
-            <strong>Name</strong>
+            <strong>Name </strong>
             <span>{formData.awsCloudTrailName.value}</span>
           </li>
           {formData.awsAccessKey?.value && (
             <li>
-              <strong>AWS Access Key: </strong>
+              <strong>AWS Access Key </strong>
               <span>{formData.awsAccessKey?.value}</span>
             </li>
           )}
           <li>
-            <strong>Subscriber Region</strong>
+            <strong>Subscriber Region </strong>
             <span>{formData.awsCloudTrailRegion.value}</span>
           </li>
           {formData.assumeRoleArn?.value && (
             <li>
-              <strong>AWS Assume Role (ARN): </strong>
+              <strong>AWS Assume Role (ARN)  </strong>
               <span>{formData.assumeRoleArn?.value}</span>
             </li>
           )}
           <li>
-            <strong>AWS SQS Queue name: </strong>
+            <strong>AWS SQS Queue name </strong>
             <span>{formData.awsCloudTrailSqsQueueName?.value}</span>
           </li>
           <li>
-            <strong>Polling Interval</strong>
+            <strong>SQS Message Batch Size </strong>
+            <span>{formData.sqsMessageBatchSize?.value}</span>
+          </li>
+          <li>
+            <strong>Polling Interval </strong>
             <span>{formData.pollingInterval.value}</span>
           </li>
           <li>

@@ -29,6 +29,7 @@ export type AWSCloudTrailGenericInputCreateRequest = {
     aws_region: string;
     assume_role_arn: string;
     override_source?: string;
+    sqs_message_batch_size: number;
   };
 };
 
@@ -42,6 +43,7 @@ export type AWSCloudTrailInputCreateRequest = {
   aws_region: string;
   assume_role_arn: string;
   override_source?: string;
+  sqs_message_batch_size: number;
 };
 
 export type ErrorMessageType = {
@@ -59,6 +61,7 @@ export type SidebarContextType = {
 
 export type isDisabledStepType = (step: string) => boolean;
 export type SetEnabledStepType = (step: string) => void;
+export type HandleSqsBatchSizeType = (step: string) => void;
 
 export interface StepsContextType {
   availableSteps: string[];

@@ -61,7 +61,8 @@ public class InputCreationIT {
                         "cloudtrail_queue_name", "invalid-queue-no-messages-read",
                         "aws_access_key", "invalid-access-key",
                         "aws_secret_key", "invalid-secret-key",
-                        "polling_interval", 1));
+                        "polling_interval", 1,
+                        "sqs_message_batch_size", 10));
         apis.inputs().getInput(inputId)
                 .assertThat().body("attributes.aws_access_key", equalTo("invalid-access-key"));
         apis.waitFor(() ->

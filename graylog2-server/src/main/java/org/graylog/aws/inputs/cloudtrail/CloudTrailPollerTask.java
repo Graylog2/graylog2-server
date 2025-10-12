@@ -34,18 +34,19 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_SQS_MESSAGE_BATCH_SIZE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class CloudTrailPollerTask implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailPollerTask.class);
-    private static final int BATCH_SIZE = 10;
     private final MessageInput input;
     private final CloudTrailTransport transport;
     private final CloudTrailS3Client cloudTrailS3Client;
     private final InputFailureRecorder failureRecorder;
     private final CloudTrailSQSReader sqsReader;
     private final ObjectMapper objectMapper;
+    private static final int DEFAULT_BATCH_SIZE = 5;
 
     public CloudTrailPollerTask(MessageInput input,
                                 SQSClient sqsClient,
@@ -59,7 +60,7 @@ public class CloudTrailPollerTask implements Runnable {
         this.failureRecorder = failureRecorder;
         this.objectMapper = objectMapper;
         this.cloudTrailS3Client = cloudTrailS3Client;
-        this.sqsReader = new CloudTrailSQSReader(interrupt, sqsClient, failureRecorder, BATCH_SIZE);
+        this.sqsReader = new CloudTrailSQSReader(interrupt, sqsClient, failureRecorder, input.getConfiguration().getInt(CK_SQS_MESSAGE_BATCH_SIZE, DEFAULT_BATCH_SIZE));
     }
 
     @Override

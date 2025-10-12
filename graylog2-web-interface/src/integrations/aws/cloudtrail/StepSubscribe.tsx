@@ -47,6 +47,17 @@ const StepSubscribe = ({ onSubmit, onChange }: Props) => {
     }
   };
 
+  const handleSqsMessageBatchSizeChange = (errorMessage) => {
+    if (errorMessage) {
+      setFormError({
+        full_message: errorMessage,
+        nice_message: errorMessage,
+      });
+    } else {
+      setFormError(null); // Reset formError if no error message
+    }
+  };
+
   return (
     <FormWrap onSubmit={handleSubmit} buttonContent="Proceed" title="" error={formError} description="">
       <Input
@@ -63,7 +74,7 @@ const StepSubscribe = ({ onSubmit, onChange }: Props) => {
         label="Polling Interval"
       />
 
-      <FormAdvancedOptions onChange={onChange} />
+      <FormAdvancedOptions onChange={onChange} handleSqsMessageBatchSizeChange={handleSqsMessageBatchSizeChange} />
     </FormWrap>
   );
 };

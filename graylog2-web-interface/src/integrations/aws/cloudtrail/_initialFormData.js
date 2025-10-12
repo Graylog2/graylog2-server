@@ -32,6 +32,9 @@ const DEFAULT_SETTINGS = {
   pollingInterval: {
     value: 1,
   },
+  sqsMessageBatchSize: {
+    value: 5,
+  },
 };
 
 export default DEFAULT_SETTINGS;

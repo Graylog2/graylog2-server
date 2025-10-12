@@ -31,6 +31,7 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
     private static final String THROTTLING_ALLOWED = "enable_throttling";
     private static final String POLLING_INTERVAL = "polling_interval";
     private static final String OVERRIDE_SOURCE = "override_source";
+    private static final String SQS_MESSAGE_BATCH_SIZE = "sqs_message_batch_size";
 
     @JsonProperty(NAME)
     public abstract String name();
@@ -43,6 +44,9 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
 
     @JsonProperty(OVERRIDE_SOURCE)
     public abstract String overrideSource();
+
+    @JsonProperty(SQS_MESSAGE_BATCH_SIZE)
+    public abstract int sqsMessageBatchSize();
 
     @AutoValue.Builder
     public static abstract class Builder implements CloudTrailRequest.Builder<Builder> {
@@ -63,6 +67,9 @@ public abstract class CloudTrailCreateInputRequest implements CloudTrailRequest 
 
         @JsonProperty(OVERRIDE_SOURCE)
         public abstract Builder overrideSource(String overrideSource);
+
+        @JsonProperty(SQS_MESSAGE_BATCH_SIZE)
+        public abstract Builder sqsMessageBatchSize(int sqsMessageBatchSize);
 
         public abstract CloudTrailCreateInputRequest build();
     }

@@ -23,6 +23,7 @@ import org.graylog.aws.notifications.SNSNotification;
 import org.graylog.aws.notifications.SNSNotificationParser;
 import org.graylog.aws.notifications.SQSClient;
 import org.graylog2.plugin.InputFailureRecorder;
+import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTimeUtils;
@@ -43,6 +44,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -65,9 +67,13 @@ public class CloudTrailPollerTaskTest {
     private CloudTrailTransport mockTransport;
     @Mock
     private InputFailureRecorder inputFailureRecorder;
+    private static final int DEFAULT_BATCH_SIZE = 5;
 
     @Before
     public void setUp() throws Exception {
+        Configuration mockConfig = mock(Configuration.class);
+        given(mockInput.getConfiguration()).willReturn(mockConfig);
+        given(mockConfig.getInt(CloudTrailInput.CK_SQS_MESSAGE_BATCH_SIZE, DEFAULT_BATCH_SIZE)).willReturn(BATCH_SIZE);
         cut = new CloudTrailPollerTask(mockInput,
                 sqsClient,
                 mockS3Client,

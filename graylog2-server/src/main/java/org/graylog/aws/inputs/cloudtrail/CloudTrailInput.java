@@ -48,6 +48,7 @@ public class CloudTrailInput extends MessageInput {
     private static final Regions DEFAULT_REGION = Regions.US_EAST_1;
     public static final String CK_OVERRIDE_SOURCE = "override_source";
     public static final String CK_POLLING_INTERVAL = "polling_interval";
+    public static final String CK_SQS_MESSAGE_BATCH_SIZE = "sqs_message_batch_size";
 
     @Inject
     public CloudTrailInput(@Assisted Configuration configuration,
@@ -150,6 +151,12 @@ public class CloudTrailInput extends MessageInput {
                     "The role ARN with required permissions (cross account access)",
                     ConfigurationField.Optional.OPTIONAL
             ));
+            r.addField(new NumberField(
+                    CK_SQS_MESSAGE_BATCH_SIZE,
+                    "SQS Message Batch Size",
+                    5,
+                    "The maximum number of messages to query from SQS at a time. The maximum acceptable value is 10.",
+                    ConfigurationField.Optional.OPTIONAL));
             r.addField(getOverrideSourceFieldDefinition());
 
             return r;
