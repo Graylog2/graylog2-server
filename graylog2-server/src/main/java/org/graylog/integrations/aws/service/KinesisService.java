@@ -173,7 +173,7 @@ public class KinesisService {
         }
 
         DateTime timestamp = new DateTime(record.approximateArrivalTimestamp().toEpochMilli(), DateTimeZone.UTC);
-        return detectAndParseMessage(new String(payloadBytes, StandardCharsets.UTF_8), timestamp, request.streamName(), "test-graylog", "", compressed, request);
+        return detectAndParseMessage(new String(payloadBytes, StandardCharsets.UTF_8), timestamp, request.streamName(), "test-kinesis-input", "", compressed, request);
     }
 
     public StreamsResponse getKinesisStreamNames(AWSRequest request) throws ExecutionException {
