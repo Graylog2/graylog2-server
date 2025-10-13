@@ -31,7 +31,7 @@ import type { Token, TokenSummary } from 'stores/users/UsersStore';
 import { sortByDate } from 'util/SortUtils';
 import { Headline } from 'components/common/Section/SectionComponent';
 import useCurrentUser from 'hooks/useCurrentUser';
-import type User from 'logic/users/User';
+import type { BasicUser } from 'hooks/useBasicUser';
 
 import CreateTokenForm from './CreateTokenForm';
 import TokenActions from './UsersTokenManagement/TokenManagementActions';
@@ -60,7 +60,7 @@ type Props = {
   creatingToken?: boolean;
   onCreate: ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) => Promise<Token>;
   tokens?: TokenSummary[];
-  user: User;
+  user: BasicUser;
   onDelete?: () => void;
 };
 

@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 
-import type User from 'logic/users/User';
 import withParams from 'routing/withParams';
 import { Row, Col } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
@@ -26,6 +25,7 @@ import { PageHeader, DocumentTitle, Spinner } from 'components/common';
 import TokenList from 'components/users/TokenList';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
+import useBasicUser from 'hooks/useBasicUser';
 
 type Props = {
   params: {
@@ -67,11 +67,12 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl)
 };
 
 const UserEditPage = ({ params }: Props) => {
-  const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const [tokens, setTokens] = useState([]);
   const [creatingToken, setCreatingToken] = useState(false);
 
   const userId = params?.userId;
+
+  const { data: loadedUser } = useBasicUser(userId, { enabled: !!userId });
 
   const loadTokens = useCallback(() => _loadTokens(loadedUser, setTokens), [loadedUser]);
   const _handleTokenCreate = ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) =>
@@ -80,9 +81,6 @@ const UserEditPage = ({ params }: Props) => {
   useEffect(() => {
     loadTokens();
   }, [loadTokens, loadedUser]);
-  useEffect(() => {
-    UsersDomain.load(userId).then(setLoadedUser);
-  }, [userId]);
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
