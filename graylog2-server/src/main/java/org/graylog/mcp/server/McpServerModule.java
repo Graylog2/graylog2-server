@@ -20,6 +20,7 @@ import org.graylog.mcp.resources.DashboardResourceProvider;
 import org.graylog.mcp.resources.EventDefinitionResourceProvider;
 import org.graylog.mcp.resources.StreamResourceProvider;
 import org.graylog.mcp.tools.AggregateMessagesTool;
+import org.graylog.mcp.tools.CurrentTimeTool;
 import org.graylog.mcp.tools.ListFieldsTool;
 import org.graylog.mcp.tools.ListIndexSetsTool;
 import org.graylog.mcp.tools.ListIndicesTool;
@@ -43,6 +44,7 @@ public class McpServerModule extends PluginModule {
 
         // initialize so that we never miss installing the map binder, even though we are directly adding tools
         mcpToolBinder();
+        addMcpTool(CurrentTimeTool.NAME, CurrentTimeTool.class);
         addMcpTool(ListStreamsTool.NAME, ListStreamsTool.class);
         addMcpTool(ListInputsTool.NAME, ListInputsTool.class);
         addMcpTool(ListIndicesTool.NAME, ListIndicesTool.class);
