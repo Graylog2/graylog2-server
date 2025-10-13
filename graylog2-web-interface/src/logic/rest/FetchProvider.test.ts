@@ -18,6 +18,7 @@ import express from 'express';
 import nodeFetch from 'node-fetch';
 import formidableMiddleware from 'express-formidable';
 import FormData from 'form-data';
+import JSONbig from 'json-bigint';
 
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import { asMock } from 'helpers/mocking';
@@ -74,6 +75,10 @@ const setUpServer = () => {
 
   app.delete('/test5', (_req, res) => {
     res.status(204).end();
+  });
+
+  app.post('/test_bigint', (_req, res) => {
+    res.send(JSONbig.stringify({ text: 'test', foo: BigInt('6674029904495870944') }));
   });
 
   app.post('/failIfWrongAcceptHeader', (req, res) => {
@@ -134,12 +139,13 @@ describe('FetchProvider', () => {
   it.each([
     ['GET with json', 'GET' as const, 'test1', { text: 'test' }],
     ['POST with json', 'POST' as const, 'test2', { text: 'test' }],
+    ['POST with json + bigint', 'POST' as const, 'test_bigint', { text: 'test', foo: BigInt('6674029904495870944') }],
     ['POST with text', 'POST' as const, 'test3', 'uuid-beef-feed'],
     ['POST without content', 'POST' as const, 'test4', null],
     ['DELETE without content and status 204', 'DELETE' as const, 'test5', null],
   ])('should receive a %s', async (_text, method, url, expectedResponse) =>
     fetch(method, `${baseUrl}/${url}`).then((response) => {
-      expect(response).toStrictEqual(expectedResponse);
+      expect(response).toEqual(expectedResponse);
     }),
   );
 
