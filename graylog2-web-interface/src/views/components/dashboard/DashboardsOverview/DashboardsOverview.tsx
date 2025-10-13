@@ -23,6 +23,9 @@ import DashboardActions from 'views/components/dashboard/DashboardsOverview/Dash
 import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/useColumnRenderers';
 import { DEFAULT_LAYOUT, COLUMNS_ORDER } from 'views/components/dashboard/DashboardsOverview/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
 import BulkActions from './BulkActions';
 
@@ -38,6 +41,12 @@ const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
     [isEvidenceModal],
   );
 
+  const fetchEntities = (searchParams: SearchParamsForDashboards): Promise<PaginatedResponse<View>> => {
+    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+    return fetchDashboards(searchParams);
+  };
+  
   return (
     <PaginatedEntityTable<View>
       humanName="dashboards"
@@ -47,7 +56,7 @@ const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
       }
       entityActions={renderDashboardActions}
       tableLayout={DEFAULT_LAYOUT(isEvidenceModal)}
-      fetchEntities={fetchDashboards}
+      fetchEntities={fetchEntities}
       keyFn={keyFn}
       entityAttributesAreCamelCase
       bulkSelection={{ actions: <BulkActions /> }}
