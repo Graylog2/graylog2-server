@@ -109,7 +109,7 @@ const ModalSubmit = ({ ...props }: Props) => {
       )}
       <Button
         ref={confirmRef}
-        bsStyle="success"
+        bsStyle="primary"
         bsSize={bsSize}
         disabled={disabledSubmit || submittingAsync}
         form={formId}

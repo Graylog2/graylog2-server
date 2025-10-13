@@ -20,8 +20,8 @@ import { AWS_AUTH_TYPES, DEFAULT_KINESIS_LOG_TYPE } from 'integrations/aws/commo
 export const exampleFormDataWithKeySecretAuth = {
   awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
   awsCloudWatchAddFlowLogPrefix: { value: true },
-  awsCloudWatchAssumeARN: { value: '' },
-  awsCloudWatchAwsKey: { value: 'mykey' },
+  awsAssumeRoleARN: { value: '' },
+  awsAccessKey: { value: 'mykey' },
   awsCloudWatchAwsRegion: { value: 'us-east-1' },
   awsCloudWatchBatchSize: { value: 10000 },
   awsEndpointCloudWatch: { value: undefined },
@@ -32,14 +32,14 @@ export const exampleFormDataWithKeySecretAuth = {
   awsEndpointDynamoDB: { value: undefined },
   awsEndpointIAM: { value: undefined },
   awsEndpointKinesis: { value: undefined },
-  awsCloudWatchAwsSecret: { value: 'mysecret' },
+  awsSecretKey: { value: 'mysecret' },
   overrideSource: { value: '' },
 };
 
 export const exampleFormDataWithAutomaticAuth = {
   awsAuthenticationType: { value: AWS_AUTH_TYPES.automatic },
   awsCloudWatchAddFlowLogPrefix: { value: true },
-  awsCloudWatchAssumeARN: { value: '' },
+  awsAssumeRoleARN: { value: '' },
   awsCloudWatchAwsRegion: { value: 'us-east-1' },
   awsCloudWatchBatchSize: { value: 10000 },
   awsEndpointCloudWatch: { value: undefined },

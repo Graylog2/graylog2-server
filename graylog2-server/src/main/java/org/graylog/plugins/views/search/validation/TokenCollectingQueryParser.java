@@ -23,6 +23,7 @@ import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
@@ -40,12 +41,13 @@ public class TokenCollectingQueryParser extends QueryParser {
     private final Set<ImmutableToken> processedTokens = new HashSet<>();
     private final Map<Query, Collection<ImmutableToken>> tokenLookup = new IdentityHashMap<>();
 
-    public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer) {
-        this(new CollectingQueryParserTokenManager(), defaultFieldName, analyzer);
+    public TokenCollectingQueryParser(String defaultFieldName, Analyzer analyzer, Integer maxClauseCount) {
+        this(new CollectingQueryParserTokenManager(), defaultFieldName, analyzer, maxClauseCount);
     }
 
-    TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer) {
+    TokenCollectingQueryParser(CollectingQueryParserTokenManager collectingQueryParserTokenManager, String defaultFieldName, Analyzer analyzer, Integer maxClauseCount) {
         super(collectingQueryParserTokenManager);
+        IndexSearcher.setMaxClauseCount(maxClauseCount);
         this.tokenManager = collectingQueryParserTokenManager;
         this.init(defaultFieldName, analyzer);
     }

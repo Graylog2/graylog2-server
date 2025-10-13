@@ -17,6 +17,7 @@
 package org.graylog.integrations.aws;
 
 import com.google.common.base.Preconditions;
+import jakarta.inject.Provider;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.integrations.aws.resources.requests.AWSRequest;
 import org.graylog2.Configuration;
@@ -44,17 +45,19 @@ import java.util.Optional;
  */
 public class AWSClientBuilderUtil {
 
+    private final Provider<AWSAuthFactory> authFactoryProvider;
     private final EncryptedValueService encryptedValueService;
     private final Configuration configuration;
 
     @Inject
-    public AWSClientBuilderUtil(EncryptedValueService encryptedValueService, Configuration configuration) {
+    public AWSClientBuilderUtil(Provider<AWSAuthFactory> authFactoryProvider, EncryptedValueService encryptedValueService, Configuration configuration) {
+        this.authFactoryProvider = authFactoryProvider;
         this.encryptedValueService = encryptedValueService;
         this.configuration = configuration;
     }
 
     public AwsCredentialsProvider createCredentialsProvider(AWSRequest request) {
-        return AWSAuthFactory.create(
+        return authFactoryProvider.get().create(
                 configuration.isCloud(),
                 request.region(),
                 request.awsAccessKeyId(),
