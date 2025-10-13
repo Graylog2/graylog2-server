@@ -87,6 +87,7 @@ public class SchemaGeneratorProvider {
                 .with(new EmptyObjectAsObjectModule())
                 .with(new JacksonModule(
                         JacksonOption.INCLUDE_ONLY_JSONPROPERTY_ANNOTATED_METHODS,
+                        JacksonOption.FLATTENED_ENUMS_FROM_JSONVALUE,
                         JacksonOption.RESPECT_JSONPROPERTY_REQUIRED,
                         JacksonOption.RESPECT_JSONPROPERTY_ORDER))
                 .with(new JakartaValidationModule());
