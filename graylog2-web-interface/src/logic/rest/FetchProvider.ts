@@ -58,7 +58,7 @@ const onServerError = async (error: Response | undefined, onUnauthorized = defau
   throw fetchError;
 };
 
-const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSON.stringify(body) : body);
+const maybeStringify = (body: any) => (body && typeof body !== 'string' ? JSONbig.stringify(body) : body);
 
 type RequestHeaders = {
   Accept?: string;
