@@ -41,12 +41,6 @@ const defaultMetricMapper = (clickPoint: ClickPoint) => ({
   metric: clickPoint.data.originalName ?? clickPoint.data.name,
 });
 
-const useQueryFieldTypes = () => {
-  const fieldTypes = useContext(FieldTypesContext);
-
-  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
-};
-
 const DropdownSwitcher = ({
   component: Component,
   clickPoint,
