@@ -207,37 +207,14 @@ public class McpService {
             case McpSchema.METHOD_PROMPT_LIST -> {
                 LOG.info("Listing available prompts");
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_PROMPT_LIST), auditContext);
-                return Optional.of(new McpSchema.ListPromptsResult(List.of(
-                        new McpSchema.Prompt(
-                                "log_sources_analysis",
-                                "Analyze current log source state",
-                                """
-                                        Asks the LLM to look at the log sources currently ingested over a certain
-                                        period of time, and how those have changed in characteristics, in order to
-                                        understand if something important has changed or needs attention""",
-                                null
-                        )
-
-                ), null));
+                return Optional.of(new McpSchema.ListPromptsResult(List.of(), null));
             }
             case McpSchema.METHOD_PROMPT_GET -> {
                 final McpSchema.GetPromptRequest promptRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", promptRequest);
                 LOG.info("Getting prompt {}", promptRequest.name());
-                var result = switch (promptRequest.name()) {
-                    case "log_sources_analysis" -> new McpSchema.PromptMessage(
-                            McpSchema.Role.USER,
-                            new McpSchema.TextContent(
-                                    "You are an administrator for the log management system Graylog and are tasked " +
-                                    "with understanding how the log sources sending data into Graylog are behaving " +
-                                    "over the last two days. Use the current day and compare the situation of the " +
-                                    "log sources to the previous 24 hours, with special attention to sources that " +
-                                    "have stopped sending or are now sending extraordinary amounts of data.")
-                    );
-                    default -> throw new McpException("Unknown prompt name: " + promptRequest.name());
-                };
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);
-                return Optional.of(new McpSchema.GetPromptResult(null, List.of(result)));
+                return Optional.of(new McpSchema.GetPromptResult(null, List.of()));
             }
             default -> LOG.warn("Unsupported MCP method: " + request.method());
 
