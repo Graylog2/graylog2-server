@@ -18,8 +18,6 @@ package org.graylog2.shared.rest.documentation.openapi;
 
 import io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
-import io.swagger.v3.jaxrs2.integration.resources.BaseOpenApiResource;
-import io.swagger.v3.jaxrs2.integration.resources.OpenApiResource;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -67,16 +65,6 @@ public class OpenAPIGenerator {
     }
 
     /**
-     * Builds and returns a configured OpenApiResource that can be registered with Jersey.
-     * This is the main entry point for production use.
-     *
-     * @return A configured BaseOpenApiResource ready to be registered with Jersey
-     */
-    public BaseOpenApiResource openAPIResource() {
-        return new OpenApiResource().openApiConfiguration(swaggerConfig());
-    }
-
-    /**
      * Generates and returns the complete OpenAPI specification.
      * This is useful for testing or exporting the spec without running a server.
      *
@@ -96,7 +84,12 @@ public class OpenAPIGenerator {
         }
     }
 
-    private SwaggerConfiguration swaggerConfig() {
+    /**
+     * Creates the SwaggerConfiguration used to configure the OpenAPI generation.
+     *
+     * @return Configured SwaggerConfiguration instance
+     */
+    public SwaggerConfiguration swaggerConfig() {
         final var info = new Info()
                 .title("Graylog REST API")
                 .version(version.toString())

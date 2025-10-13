@@ -84,13 +84,6 @@ class OpenAPIGeneratorTest {
     }
 
     @Test
-    void openAPIResource_returnsConfiguredResource() {
-        final var resource = generator.openAPIResource();
-
-        assertThat(resource).isNotNull();
-    }
-
-    @Test
     void canGenerateSchemaForResourceWithOptionalPrimitives() {
         // This test verifies that the OpenAPI generation correctly handles OptionalInt/OptionalLong/OptionalDouble
         // fields by treating them the same as Optional<Integer>/Optional<Long>/Optional<Double>.

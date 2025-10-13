@@ -37,7 +37,7 @@ const OpenApiBrowserPage = () => {
       if (containerRef.current && window.Redoc) {
         // @ts-ignore
         window.Redoc.init(
-          '/api/openapi.yaml',
+          '/api/openapi/yaml',
           {
             nativeScrollbars: true,
             theme: {

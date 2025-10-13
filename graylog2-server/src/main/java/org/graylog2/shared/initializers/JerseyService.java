@@ -293,8 +293,7 @@ public class JerseyService extends AbstractIdleService {
                 .register(new UserContextBinder())
                 .register(MultiPartFeature.class)
                 .registerClasses(systemRestResources)
-                .registerResources(additionalResources)
-                .register(openAPIGenerator.openAPIResource());
+                .registerResources(additionalResources);
 
         exceptionMappers.forEach(rc::registerClasses);
         dynamicFeatures.forEach(rc::registerClasses);
