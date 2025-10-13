@@ -35,7 +35,7 @@ const IndicesPage = () => (
         <ButtonToolbar>
           <IfPermitted permissions="indexsets:create">
             <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
-              <Button bsStyle="success">Create index set</Button>
+              <Button bsStyle="primary">Create index set</Button>
             </LinkContainer>
           </IfPermitted>
           <IfPermitted permissions="indexranges:rebuild">
