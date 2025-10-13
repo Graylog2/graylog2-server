@@ -210,11 +210,13 @@ public class McpService {
                 return Optional.of(new McpSchema.ListPromptsResult(List.of(), null));
             }
             case McpSchema.METHOD_PROMPT_GET -> {
+                // disabled for now
                 final McpSchema.GetPromptRequest promptRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", promptRequest);
                 LOG.info("Getting prompt {}", promptRequest.name());
-                auditEventSender.success(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);
-                return Optional.of(new McpSchema.GetPromptResult(null, List.of()));
+                auditEventSender.failure(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);
+                throw new McpException("Unknown prompt name");
+//                return Optional.of(new McpSchema.GetPromptResult(null, List.of()));
             }
             default -> LOG.warn("Unsupported MCP method: " + request.method());
 

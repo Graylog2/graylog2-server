@@ -29,6 +29,7 @@ import org.graylog2.audit.AuditEventType;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -409,14 +410,14 @@ class McpServiceTest {
             assertThat(result.get()).isInstanceOf(McpSchema.ListPromptsResult.class);
 
             McpSchema.ListPromptsResult listResult = (McpSchema.ListPromptsResult) result.get();
-            assertThat(listResult.prompts()).hasSize(1);
-            assertThat(listResult.prompts().getFirst().name()).isEqualTo("log_sources_analysis");
+            assertThat(listResult.prompts()).hasSize(0);
         });
 
         verify(auditEventSender).success(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
 
     @Test
+    @Disabled("not handling prompts for now")
     void testGetPrompt() {
         // Given
         var promptParams = new McpSchema.GetPromptRequest("log_sources_analysis", null);
