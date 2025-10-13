@@ -41,7 +41,7 @@ const EventDefinitionsPage = () => {
           <IfPermitted permissions="eventdefinitions:create">
             <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
               <Button
-                bsStyle="success"
+                bsStyle="primary"
                 onClick={() => {
                   sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CREATE_BUTTON_CLICKED, {
                     app_pathname: getPathnameWithoutId(pathname),

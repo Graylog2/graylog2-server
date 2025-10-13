@@ -101,6 +101,8 @@ public class GeneratorTest {
         assertThat(jsonResult.read("$.apis[0].operations[0].nickname", String.class)).isEqualTo("sample");
 
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleEntity.properties.type.type", String.class)).isEqualTo("string");
+        assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.foo.type", String.class)).isEqualTo("string");
+        assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.foo.required", String.class)).isEqualTo("false");
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.entity[\"$ref\"]", String.class)).isEqualTo("GeneratorTest__SampleEntity");
         assertThat(jsonResult.read("$.models.GeneratorTest__SampleResponse.properties.another_entity[\"$ref\"]", String.class)).isEqualTo("GeneratorTest__SampleEntity");
     }

@@ -36,9 +36,16 @@ public interface ActionConfig {
 
     URIBuilder getLink(EventDto event);
 
+    String validate();
+
     class FallbackConfig implements ActionConfig {
         @Override
         public String type() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public String validate() {
             throw new UnsupportedOperationException();
         }
 

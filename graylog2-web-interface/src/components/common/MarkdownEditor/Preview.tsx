@@ -98,7 +98,7 @@ const MarkdownStyles = styled.div<{ $noPadding?: boolean }>`
   }
 
   & p {
-    white-space: pre;
+    white-space: pre-line;
     margin: 8px 0;
   }
 

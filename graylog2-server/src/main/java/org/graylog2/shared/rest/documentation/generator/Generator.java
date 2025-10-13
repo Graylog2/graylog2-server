@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.documentation.generator;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchemaGenerator;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
@@ -123,7 +124,7 @@ public class Generator {
         this.resourceClasses = resourceClasses;
         this.pluginMapping = pluginMapping;
         this.pluginPathPrefix = pluginPathPrefix;
-        this.mapper = mapper;
+        this.mapper = mapper.copy().registerModule(new Jdk8Module());
         this.isCloud = isCloud;
         this.prefixPlugins = prefixPlugins;
     }
@@ -631,7 +632,7 @@ public class Generator {
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
-        final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {};
+        final SchemaFactoryWrapper schemaFactoryWrapper = new CustomSchemaFactoryWrapper();
         final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper, schemaFactoryWrapper);
         try {
             final JsonSchema schema = schemaGenerator.generateSchema(mapper.getTypeFactory().constructType(valueType));

@@ -65,7 +65,7 @@ const ConvertToSourceCodeModal = ({ show, onHide, onNavigateAway, rule }: Props)
         <ModalButtonToolbar>
           <Button
             type="button"
-            bsStyle="success"
+            bsStyle="primary"
             onClick={async () => {
               sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_NEW_RULE_FROM_CODE_CLICKED, {
                 app_pathname: getPathnameWithoutId(pathname),

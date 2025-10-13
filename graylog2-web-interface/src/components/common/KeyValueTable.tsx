@@ -194,7 +194,7 @@ class KeyValueTable extends React.Component<
           </StyledDiv>
         </td>
         <td>
-          <Button bsStyle="success" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>
+          <Button bsStyle="primary" bsSize="small" onClick={this._addRow} disabled={addRowDisabled}>
             Add
           </Button>
         </td>
