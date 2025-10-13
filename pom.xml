@@ -114,7 +114,7 @@
         <bouncycastle.version>1.82</bouncycastle.version>
         <caffeine.version>3.2.2</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.181</classgraph.version>
+        <classgraph.version>4.8.184</classgraph.version>
         <commons-codec.version>1.19.0</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -166,7 +166,7 @@
         <natty.version>0.13</natty.version>
         <netty.version>4.2.6.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>5.2.0</okhttp.version>
+        <okhttp.version>5.2.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.54.1</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.20.1</opentelemetry-instrumentation.version>
@@ -644,7 +644,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.27.0</version>
+                    <version>3.28.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
