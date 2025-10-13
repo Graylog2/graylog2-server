@@ -64,7 +64,7 @@ type Props = {
 
 const onButtonClick = (
   e: MouseEvent,
-  disabled: Boolean,
+  disabled: boolean,
   triggerTelemetry: () => void,
   onClick?: (e: MouseEvent) => void,
 ) => {
@@ -107,7 +107,7 @@ const SearchButton = ({
       title={title}
       className={className}
       type="submit"
-      bsStyle="success"
+      bsStyle="primary"
       $dirty={dirty && !displaySpinner}>
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>

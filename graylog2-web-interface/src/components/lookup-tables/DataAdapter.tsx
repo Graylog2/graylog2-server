@@ -103,7 +103,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
               help="Key to look up a value for."
               value={lookupKey}
             />
-            <Button type="submit" bsStyle="success">
+            <Button type="submit" bsStyle="primary">
               Look up
             </Button>
           </fieldset>

@@ -14,23 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.shared.rest.documentation.generator;
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
+import com.fasterxml.jackson.databind.BeanProperty;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.types.ObjectSchema;
 
-type Props = {
-  authenticationBackendId: string;
-  stepKey: string;
-};
+import java.util.Optional;
 
-const EditLinkButton = ({ authenticationBackendId, stepKey }: Props) => (
-  <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.BACKENDS.edit(authenticationBackendId, stepKey)}>
-    <Button bsStyle="primary" bsSize="small">
-      Edit
-    </Button>
-  </LinkContainer>
-);
-
-export default EditLinkButton;
+public class ObjectSchemaWithOptionalSupport extends ObjectSchema {
+    @Override
+    public void putOptionalProperty(BeanProperty property, JsonSchema jsonSchema) {
+        if (property.getType().isTypeOrSubTypeOf(Optional.class)) {
+            jsonSchema.setRequired(false);
+        }
+        super.putOptionalProperty(property, jsonSchema);
+    }
+}
