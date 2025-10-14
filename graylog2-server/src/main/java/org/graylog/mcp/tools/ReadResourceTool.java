@@ -48,8 +48,8 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "Describe a specific Graylog Resource with a given GRN",
-                "A brief description of the Graylog Resource.");
+                "Describe a specific resource with a given GRN",
+                "A brief description of the resource.");
         this.grnRegistry = grnRegistry;
         this.resourceProviders = resourceProviders;
     }
