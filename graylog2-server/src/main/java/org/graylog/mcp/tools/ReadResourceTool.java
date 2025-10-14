@@ -18,6 +18,7 @@ package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -25,12 +26,15 @@ import org.graylog.grn.GRNType;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
-import org.graylog2.database.NotFoundException;
+import org.graylog2.shared.utilities.StringUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> {
     public static String NAME = "describe_resource";
@@ -54,9 +58,14 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
     public String apply(PermissionHelper permissionHelper, ReadResourceTool.Parameters parameters) {
         try {
             GRN grn = GRNRegistry.createWithBuiltinTypes().parse(parameters.grn);
-            return this.resourceProviders.get(grn.grnType()).read(permissionHelper, new URI(parameters.grn)).description();
-        } catch (NotFoundException | URISyntaxException e) {
-            return String.format(Locale.US, "Unable to read resource %s", parameters.grn);
+            final Optional<McpSchema.Resource> resource = this.resourceProviders.get(grn.grnType())
+                    .read(permissionHelper, new URI(parameters.grn));
+            if (resource.isEmpty()) {
+               return f("Unable to read resource %s", parameters.grn);
+            }
+            return resource.get().description();
+        } catch (URISyntaxException e) {
+            return f("Unable to read resource %s", parameters.grn);
         }
     }
 

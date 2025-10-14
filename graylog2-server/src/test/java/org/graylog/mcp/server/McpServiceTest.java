@@ -196,7 +196,7 @@ class McpServiceTest {
                 .description("Dashboard description")
                 .mimeType("text/plain")
                 .build();
-        when(mockProvider.read(eq(permissionHelper), any(URI.class))).thenReturn(resource);
+        when(mockProvider.read(eq(permissionHelper), any(URI.class))).thenReturn(Optional.of(resource));
 
         resourceProviders.put(GRNTypes.DASHBOARD, mockProvider);
 
@@ -225,7 +225,7 @@ class McpServiceTest {
     void testReadResourceThrowsException() throws NotFoundException {
         // Given
         ResourceProvider mockProvider = mock(ResourceProvider.class);
-        when(mockProvider.read(eq(permissionHelper), any(URI.class))).thenThrow(new NotFoundException("Resource not found"));
+        when(mockProvider.read(eq(permissionHelper), any(URI.class))).thenReturn(Optional.empty());
 
         resourceProviders.put(GRNTypes.DASHBOARD, mockProvider);
 

@@ -24,6 +24,7 @@ import org.graylog2.database.NotFoundException;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Subclasses provide MCP resources.
@@ -47,17 +48,17 @@ public abstract class ResourceProvider {
     /**
      * Produce the resource identified by the given URI.
      *
-     * @param permissionHelper
+     * @param permissionHelper helper class encapsulating subject and permission check code
      * @param uri              a {@link org.graylog.grn.GRN GRN}
      * @return the loaded resource object
      * @throws NotFoundException if Graylog cannot find this resource
      */
-    public abstract McpSchema.Resource read(final PermissionHelper permissionHelper, URI uri) throws NotFoundException;
+    public abstract Optional<McpSchema.Resource> read(final PermissionHelper permissionHelper, URI uri);
 
     /**
      * Provide a list of available resources
      *
-     * @param permissionHelper
+     * @param permissionHelper helper class encapsulating subject and permission check code
      * @param cursor           a nullable cursor to provide pagination information
      * @param pageSize         number of items to return
      */

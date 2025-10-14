@@ -124,8 +124,8 @@ public class McpService {
                 try {
                     final McpSchema.Resource resource = this.resourceProviders
                             .get(GRNRegistry.createWithBuiltinTypes().parse(readResourceRequest.uri()).grnType())
-                            .read(permissionHelper, new URI(readResourceRequest.uri())
-                            );
+                            .read(permissionHelper, new URI(readResourceRequest.uri()))
+                            .orElseThrow();
                     contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
                     auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READ), auditContext);
                 } catch (Exception e) {

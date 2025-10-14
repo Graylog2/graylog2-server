@@ -29,11 +29,11 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.tools.PermissionHelper;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 public class EventDefinitionResourceProvider extends ResourceProvider {
     public static final GRNType GRN_TYPE = GRNTypes.EVENT_DEFINITION;
@@ -60,20 +60,24 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public McpSchema.Resource read(final PermissionHelper permissionHelper, URI uri) throws NotFoundException {
+    public Optional<McpSchema.Resource> read(final PermissionHelper permissionHelper, URI uri) {
         final GRN grn = grnRegistry.parse(uri.toString());
         if (!grn.isType(GRNTypes.EVENT_DEFINITION)) {
             throw new IllegalArgumentException("Invalid GRN URI, expected an Event Definition GRN: " + uri);
         }
-        final EventDefinitionDto eventDefinition = eventDefinitionService.get(grn.entity()).orElseThrow(NotFoundException::new);
         if (!permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, grn.entity())) {
-            throw new NotFoundException("Cannot find event definition " + uri);
+            return Optional.empty();
         }
-        return McpSchema.Resource.builder()
-                .name(eventDefinition.title())
-                .description(eventDefinition.description())
-                .uri(grn.toString())
-                .build();
+        final Optional<EventDefinitionDto> definitionDto = eventDefinitionService.get(grn.entity());
+        if (definitionDto.isEmpty()) {
+            return Optional.empty();
+        }
+        final var eventDefinition = definitionDto.get();
+        return Optional.of(McpSchema.Resource.builder()
+                                   .name(eventDefinition.title())
+                                   .description(eventDefinition.description())
+                                   .uri(grn.toString())
+                                   .build());
     }
 
     @Override

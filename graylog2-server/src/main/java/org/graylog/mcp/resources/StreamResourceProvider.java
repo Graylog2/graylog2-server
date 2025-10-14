@@ -34,6 +34,7 @@ import jakarta.annotation.Nullable;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 public class StreamResourceProvider extends ResourceProvider {
     public static final GRNType GRN_TYPE = GRNTypes.STREAM;
@@ -60,20 +61,24 @@ public class StreamResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public McpSchema.Resource read(final PermissionHelper permissionHelper, URI uri) throws NotFoundException {
+    public Optional<McpSchema.Resource> read(final PermissionHelper permissionHelper, URI uri) {
         final GRN grn = grnRegistry.parse(uri.toString());
         if (!grn.isType(GRNTypes.STREAM)) {
             throw new IllegalArgumentException("Invalid GRN URI, expected a stream GRN: " + uri);
         }
         if (!permissionHelper.isPermitted(RestPermissions.STREAMS_READ, grn.entity())) {
-            throw new NotFoundException("Cannot find stream " + uri);
+            return Optional.empty();
         }
-        final Stream stream = streamService.load(grn.entity());
-        return McpSchema.Resource.builder()
-                .name(stream.getTitle())
-                .description(stream.getDescription())
-                .uri(grn.toString())
-                .build();
+        try {
+            final Stream stream = streamService.load(grn.entity());
+            return Optional.of(McpSchema.Resource.builder()
+                                       .name(stream.getTitle())
+                                       .description(stream.getDescription())
+                                       .uri(grn.toString())
+                                       .build());
+        } catch (NotFoundException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
