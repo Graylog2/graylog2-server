@@ -24,7 +24,9 @@ import { RestrictedAccessTooltip } from 'components/common';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { GranteesList } from 'logic/permissions/EntityShareState';
 import useShowRouteFromGRN from 'routing/hooks/useShowRouteFromGRN';
-import useHasEntityPermissionByGRN from 'hooks/useHasEntityPermissionByGRN';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { getValuesFromGRN } from 'logic/permissions/GRN';
 
 type Props = {
   owners: GranteesList;
@@ -39,8 +41,8 @@ const OwnerTitleWrapper = styled.span`
   align-items: center;
 `;
 
-const TitleWithLink = ({ title, entityId }: { title: string; entityId: string }) => {
-  const entityRoute = useShowRouteFromGRN(entityId);
+const TitleWithLink = ({ title, entityGrn }: { title: string; entityGrn: string }) => {
+  const entityRoute = useShowRouteFromGRN(entityGrn);
 
   return <Link to={entityRoute}>{title}</Link>;
 };
@@ -53,28 +55,29 @@ type OwnerTitleProps = {
   owner: Grantee;
 };
 
-const OwnerTitle = ({ owner: { type, id, title } }: OwnerTitleProps) => {
-  const hasEditPermission = useHasEntityPermissionByGRN(id, 'edit');
+const OwnerTitle = ({ owner: { type, id: grn, title } }: OwnerTitleProps) => {
+  const currentUser = useCurrentUser();
+  const { id: ownerId } = getValuesFromGRN(grn);
 
   switch (type) {
     case 'user':
-      if (!hasEditPermission)
+      if (!isPermitted(currentUser.permissions, `users:edit:${ownerId}`))
         return (
           <OwnerTitleWrapper>
             {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
           </OwnerTitleWrapper>
         );
 
-      return <TitleWithLink title={title} entityId={id} />;
+      return <TitleWithLink title={title} entityGrn={grn} />;
     case 'team':
-      if (!hasEditPermission)
+      if (!isPermitted(currentUser.permissions, `team:edit:${ownerId}`))
         return (
           <OwnerTitleWrapper>
             {title} <RestrictedAccessTooltip entityName={type} capabilityName="view" />
           </OwnerTitleWrapper>
         );
 
-      return <TitleWithLink title={title} entityId={id} />;
+      return <TitleWithLink title={title} entityGrn={grn} />;
     case 'global':
       return <span>Everyone</span>;
     default:
@@ -95,7 +98,7 @@ const OwnersCell = ({ owners }: Props) => {
             return (
               <React.Fragment key={owner.id}>
                 <OwnerTitle owner={owner} />
-                {!isLast && ', '}
+                {!isLast && <>, &nbsp;</>}
               </React.Fragment>
             );
           })
