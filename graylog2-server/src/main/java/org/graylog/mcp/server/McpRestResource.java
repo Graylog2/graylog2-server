@@ -18,11 +18,14 @@ package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import io.modelcontextprotocol.spec.McpSchema;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -48,10 +51,15 @@ import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+
 @RequiresAuthentication
 @Path("/mcp")
+@Api(value = "MCP", description = "Endpoints allowing MCP clients to connect to", tags = {CLOUD_VISIBLE})
 public class McpRestResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(McpRestResource.class);
+    private static final String HEADER_MCP_SESSION_ID = "Mcp-Session-Id";
+    private static final String HEADER_MCP_PROTOCOL_VERSION = "MCP-Protocol-Version";
 
     private final ObjectMapper objectMapper;
 
@@ -75,15 +83,17 @@ public class McpRestResource extends RestResource {
     @SkipCSRFProtection("server-to-server")
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("Has custom audit events")
-    public Response post(@Context HttpHeaders headers, @Context SearchUser searchUser, String body) throws IOException {
+    @ApiOperation("JSON-RPC endpoint for MCP clients to connect to")
+    public Response post(@HeaderParam(HttpHeaders.ACCEPT) String acceptHeader,
+                         @HeaderParam(HEADER_MCP_PROTOCOL_VERSION) String protocolVersionHeader,
+                         @HeaderParam(HEADER_MCP_SESSION_ID) String mcpSessionIdHeader,
+                         @Context SearchUser searchUser,
+                         @ApiParam(value = "jsonrpc_message", required = true) JsonNode payload) throws IOException {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
                                                                       McpConfiguration.DEFAULT_VALUES);
         if (!mcpConfig.enableRemoteAccess()) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
-
-        final String accept = Optional.ofNullable(headers.getHeaderString(HttpHeaders.ACCEPT)).orElse("");
-        final JsonNode payload = (body == null || body.isEmpty()) ? NullNode.getInstance() : objectMapper.readTree(body);
 
         if (!containsAnyRequests(payload)) {
             // no requests, simply respond, responses or notifications
@@ -91,14 +101,16 @@ public class McpRestResource extends RestResource {
             return Response.accepted().build();
         }
 
-        // TODO we don't actually use the session id right now, figure out whether it needs to go into the DB for progress notifications
-        final String sessionId = Optional.ofNullable(headers.getHeaderString("Mcp-Session-Id"))
+        // we don't actually use the session id right now, but it's good practice to honor the protocol.
+        // if we later need to store state, we already have a way to find it again.
+        final String sessionId = Optional.ofNullable(mcpSessionIdHeader)
                 .filter(s -> !s.isBlank())
                 .orElse(UUID.randomUUID().toString());
 
         // According to: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#protocol-version-header
-        // TODO: (mcpService.currentSessions.get(sessionId).negotiatedProtocol() != headers.getHeaderString("MCP-Protocol-Version"))
-        if (Optional.ofNullable(headers.getHeaderString("MCP-Protocol-Version"))
+        // technically we should ensure that the negotiated version doesn't change over multiple requests, but in
+        // practice we don't mind
+        if (Optional.ofNullable(protocolVersionHeader)
                 .map(version -> !mcpService.supportedVersions.contains(version))
                 .orElse(false)) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -106,12 +118,13 @@ public class McpRestResource extends RestResource {
                     .build();
         }
 
-        // TODO: prefers non-streaming for now if the client is willing to go one-shot. we should still support SSE eventually.
+        // We only implement non-streaming for now if the client is willing to go one-shot. we might support SSE later.
+        final String accept = Optional.ofNullable(acceptHeader).orElse("");
         final boolean stream = accept.contains("text/event-stream") && !accept.contains("application/json");
         if (!stream) {
             // Simple one-shot JSON reply
             final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
-            LOG.info("Received JSONRPCrequest {}", request);
+            LOG.trace("Received JSONRPCrequest {}", request);
             try {
                 final PermissionHelper permissionHelper = new PermissionHelper(getCurrentUser(), securityContext, searchUser);
                 final Optional<McpSchema.Result> result = mcpService.handle(permissionHelper, request, sessionId);
@@ -123,7 +136,7 @@ public class McpRestResource extends RestResource {
                                 request.id(),
                                 result.orElse(null),
                                 null))
-                        .header("Mcp-Session-Id", sessionId)
+                        .header(HEADER_MCP_SESSION_ID, sessionId)
                         .build();
             } catch (IllegalArgumentException e) {
                 JsonNode data = objectMapper.nullNode();
@@ -136,7 +149,7 @@ public class McpRestResource extends RestResource {
                                 request.id(),
                                 null,
                                 new McpSchema.JSONRPCResponse.JSONRPCError(McpSchema.ErrorCodes.INVALID_PARAMS, e.getMessage(), data)))
-                        .header("Mcp-Session-Id", sessionId)
+                        .header(HEADER_MCP_SESSION_ID, sessionId)
                         .build();
             } catch (Exception e) {
                 return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -144,13 +157,12 @@ public class McpRestResource extends RestResource {
                                 request.id(),
                                 null,
                                 new McpSchema.JSONRPCResponse.JSONRPCError(McpSchema.ErrorCodes.INTERNAL_ERROR, e.getMessage(), null)))
-                        .header("Mcp-Session-Id", sessionId)
+                        .header(HEADER_MCP_SESSION_ID, sessionId)
                         .build();
             }
         }
 
-        // TODO we should support SSE as well
-        LOG.info("SSE is not supported at the moment, returning 405 Method Not Allowed");
+        LOG.warn("SSE is not supported at the moment, returning 405 Method Not Allowed");
         return Response.status(Response.Status.METHOD_NOT_ALLOWED).build();
     }
 
@@ -159,6 +171,7 @@ public class McpRestResource extends RestResource {
     @SkipCSRFProtection("server-to-server")
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("prototype")
+    @ApiOperation("Unused endpoint for MCP protocol compatibility")
     public Response get() {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
                                                                       McpConfiguration.DEFAULT_VALUES);
