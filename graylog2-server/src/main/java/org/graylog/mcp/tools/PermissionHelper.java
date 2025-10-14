@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Thin wrapper around SecurityContext, providing similar helper methods for permission checks as RestResource does.
@@ -55,13 +54,12 @@ public class PermissionHelper {
         }
 
         final Principal p = securityContext.getUserPrincipal();
-        if (!(p instanceof ShiroPrincipal)) {
+        if (!(p instanceof final ShiroPrincipal principal)) {
             final String msg = "Unknown SecurityContext class " + securityContext + ", cannot continue.";
             LOG.error(msg);
             throw new IllegalStateException(msg);
         }
 
-        final ShiroPrincipal principal = (ShiroPrincipal) p;
         return principal.getSubject();
     }
 
@@ -91,7 +89,7 @@ public class PermissionHelper {
     public boolean isAnyPermitted(String[] permissions, final String instanceId) {
         final List<String> instancePermissions = Arrays.stream(permissions)
                 .map(permission -> permission + ":" + instanceId)
-                .collect(Collectors.toList());
+                .toList();
         return isAnyPermitted(instancePermissions.toArray(new String[0]));
     }
 
@@ -105,7 +103,7 @@ public class PermissionHelper {
         return false;
     }
 
-    public void checkAnyPermission(String permissions[], String instanceId) {
+    public void checkAnyPermission(String[] permissions, String instanceId) {
         if (!isAnyPermitted(permissions, instanceId)) {
             LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permissions {} on instance <{}>",
                     instanceId, getSubject().getPrincipal(), Arrays.toString(permissions), instanceId);
