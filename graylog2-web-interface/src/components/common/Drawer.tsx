@@ -21,6 +21,15 @@ import styled, { css } from 'styled-components';
 
 const StyledDrawer = styled(MantineDrawer)(
   ({ theme }) => css`
+    @keyframes changeWidth {
+      from {
+        flex-basis: var(--drawer-size);
+      }
+      to {
+        flex-basis: calc(var(--drawer-size) * 2);
+      }
+    }
+
     .mantine-Drawer-content,
     .mantine-Drawer-header {
       background-color: ${theme.colors.global.contentBackground};
@@ -29,6 +38,12 @@ const StyledDrawer = styled(MantineDrawer)(
     .mantine-Drawer-content {
       display: flex;
       flex-direction: column;
+
+      &.double {
+        animation-name: changeWidth;
+        animation-duration: 0.3s;
+        animation-fill-mode: forwards;
+      }
     }
 
     .mantine-Drawer-body {
@@ -60,6 +75,23 @@ const Title = styled.div(
   `,
 );
 
+export const getDrawerPropsByLevel = ({
+  parentSize,
+  level = 0,
+  parentPosition = 'right',
+}: {
+  parentSize: string;
+  level?: number;
+  parentPosition?: 'left' | 'right' | 'top' | 'bottom';
+}) => ({
+  position: parentPosition,
+  withOverlay: level === 0,
+  styles: parentPosition
+    ? { inner: { [parentPosition]: `calc((var(--drawer-size-${parentSize}) + 0.8rem) * ${level})` } }
+    : undefined,
+  overlayProps: { zIndex: `103${level}` },
+});
+
 type Props = Pick<
   React.ComponentProps<typeof MantineDrawer>,
   | 'onClose'
@@ -76,10 +108,21 @@ type Props = Pick<
   | 'transitionProps'
   | 'styles'
 > & {
+  opened?: boolean;
   double?: boolean;
+  parentSize?: string;
+  level?: number;
+  parentPosition?: 'left' | 'right' | 'top' | 'bottom';
 };
 
-const Drawer = ({ title, double = false, ...props }: Props) => {
+const Drawer = ({
+  title,
+  double = false,
+  parentSize = undefined,
+  level = 0,
+  parentPosition = 'right',
+  ...props
+}: Props) => {
   const [opened, { open, close }] = useDisclosure(false);
 
   React.useLayoutEffect(() => {
@@ -98,14 +141,15 @@ const Drawer = ({ title, double = false, ...props }: Props) => {
       padding="lg"
       radius={5}
       zIndex={1032}
+      classNames={{ content: double ? 'double' : '' }}
       title={
         <TitleWrapper>
           <Title>{title}</Title>
         </TitleWrapper>
       }
+      {...getDrawerPropsByLevel({ parentSize, level, parentPosition })}
       {...props}
       onClose={handleClose}
-      size={double ? 1260 : props.size}
     />
   );
 };

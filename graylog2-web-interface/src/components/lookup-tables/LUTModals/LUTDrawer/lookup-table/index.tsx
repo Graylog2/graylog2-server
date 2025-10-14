@@ -68,7 +68,7 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
 
   const handleShowAttached = (type: string) => () => {
     setDouble(showAttached === type ? !double : true);
-    setShowAttached(showAttached === type ? undefined : type);
+    setTimeout(() => setShowAttached(showAttached === type ? undefined : type), 300);
   };
 
   React.useEffect(() => () => setDouble(false), [setDouble]);
