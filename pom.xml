@@ -103,18 +103,18 @@
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.8</asm.version>
+        <asm.version>9.9</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.0</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.34.3</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.35.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
-        <aws-msk-iam-auth.version>2.3.2</aws-msk-iam-auth.version>
+        <aws-msk-iam-auth.version>2.3.4</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
         <bouncycastle.version>1.82</bouncycastle.version>
         <caffeine.version>3.2.2</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.181</classgraph.version>
+        <classgraph.version>4.8.184</classgraph.version>
         <commons-codec.version>1.19.0</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -126,11 +126,11 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.42.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.58.0</gcs.version>
+        <gcs.version>2.58.1</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.4.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.75.0</grpc.version>
+        <grpc.version>1.76.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.5.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -161,14 +161,14 @@
         <log4j.version>2.25.2</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <metrics.version>4.2.37</metrics.version>
-        <mongodb-driver.version>5.6.0</mongodb-driver.version>
+        <mongodb-driver.version>5.6.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.6.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>5.1.0</okhttp.version>
+        <okhttp.version>5.2.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.54.1</opentelemetry.version>
+        <opentelemetry.version>1.55.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.20.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -191,7 +191,7 @@
         <unboundid-ldap.version>7.0.3</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
-        <zstd.version>1.5.7-4</zstd.version>
+        <zstd.version>1.5.7-5</zstd.version>
         <cron-utils.version>9.2.1</cron-utils.version>
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
@@ -203,7 +203,7 @@
         <assertj-core.version>3.27.6</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.1.1</equalsverifier.version>
+        <equalsverifier.version>4.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>5.12.2</junit-jupiter.version>
@@ -644,7 +644,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.27.0</version>
+                    <version>3.28.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -674,7 +674,7 @@
                 <plugin>
                     <groupId>de.thetaphi</groupId>
                     <artifactId>forbiddenapis</artifactId>
-                    <version>3.9</version>
+                    <version>3.10</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
@@ -694,7 +694,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.cyclonedx</groupId>
@@ -870,8 +870,7 @@
                         <bundledSignature>jdk-reflection</bundledSignature>
                         <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                         <bundledSignature>jdk-non-portable</bundledSignature>
-                        <!-- Workaround until signatures for ${commons-io.version} are released: -->
-                        <bundledSignature>commons-io-unsafe-2.14.0</bundledSignature>
+                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
                     </bundledSignatures>
                     <signatures>
                         <![CDATA[
