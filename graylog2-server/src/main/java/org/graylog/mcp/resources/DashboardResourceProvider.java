@@ -86,12 +86,11 @@ public class DashboardResourceProvider extends ResourceProvider {
         final Stream<ViewDTO> resultStream = viewService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
                 new SearchQuery(""),
-                dashboard -> true,
+                dashboard -> permissionHelper.getSearchUser().canReadView(dashboard),
                 SortOrder.ASCENDING, ViewDTO.FIELD_ID, 1, 0).stream();
 
         try (resultStream) {
             return resultStream
-                    .filter(dashboard -> permissionHelper.getSearchUser().canReadView(dashboard))
                     .map(dashboard -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(dashboard.id()).toString(),
                             dashboard.title(),
