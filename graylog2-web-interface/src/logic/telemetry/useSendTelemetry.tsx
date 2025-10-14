@@ -21,8 +21,9 @@ import type { DataRouterContextObject } from 'react-router/dist/lib/context';
 
 import type { TelemetryEventType, TelemetryEvent } from 'logic/telemetry/TelemetryContext';
 import TelemetryContext from 'logic/telemetry/TelemetryContext';
-import { currentPathname, stripPrefixFromPathname } from 'util/URLUtils';
+import { currentPathname, stripPrefixFromPathname, getPathnameWithoutId } from 'util/URLUtils';
 import { singleton } from 'logic/singleton';
+import useLocation from 'routing/useLocation';
 
 const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
   if (!dataRouterContext?.router?.routes) {
@@ -39,16 +40,21 @@ const retrieveCurrentRoute = (dataRouterContext: DataRouterContextObject) => {
 };
 
 const useSendTelemetry = () => {
+  const { pathname } = useLocation();
   const { sendTelemetry } = useContext(TelemetryContext);
   const dataRouterContext = useContext(DataRouterContext);
 
   return useCallback(
     (eventType: TelemetryEventType, event: Optional<TelemetryEvent, 'app_path_pattern'>) => {
       const route = retrieveCurrentRoute(dataRouterContext);
+      const baseEvent = {
+        app_path_pattern: route,
+        app_pathname: getPathnameWithoutId(pathname),
+      };
 
-      return sendTelemetry(eventType, { app_path_pattern: route, ...event });
+      return sendTelemetry(eventType, { ...baseEvent, ...event });
     },
-    [dataRouterContext, sendTelemetry],
+    [dataRouterContext, pathname, sendTelemetry],
   );
 };
 
