@@ -20,8 +20,8 @@ import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -30,8 +30,11 @@ import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Locale;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOverviewResponse> {
     public static String NAME = "get_system_status";
@@ -42,17 +45,21 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
 
     @Inject
     public SystemInfoTool(ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, ServerStatus serverStatus, ClusterConfigService clusterConfigService, LeaderElectionService leaderElectionService) {
+                          SchemaGeneratorProvider schemaGeneratorProvider,
+                          ServerStatus serverStatus,
+                          CustomizationConfig customizationConfig,
+                          ClusterConfigService clusterConfigService,
+                          LeaderElectionService leaderElectionService) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "Get Graylog System Information",
+                f("Get %s System Information", customizationConfig.productName()),
                 """
-                        Returns system information about the Graylog installation, including
+                        Returns system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """);
+                        """.formatted(customizationConfig.productName()));
         this.serverStatus = serverStatus;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
         this.leaderElectionService = leaderElectionService;

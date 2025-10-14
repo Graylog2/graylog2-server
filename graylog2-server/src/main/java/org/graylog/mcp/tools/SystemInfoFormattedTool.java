@@ -21,8 +21,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.OutputBuilder;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -31,30 +31,39 @@ import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.List;
 import java.util.Locale;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class SystemInfoFormattedTool extends Tool<SystemInfoFormattedTool.Parameters, String> {
     public static String NAME = "get_formatted_system_status";
 
+    private final CustomizationConfig customizationConfig;
     private final ServerStatus serverStatus;
     private final ClusterId clusterId;
     private final LeaderElectionService leaderElectionService;
 
     @Inject
     public SystemInfoFormattedTool(ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, ServerStatus serverStatus, ClusterConfigService clusterConfigService, LeaderElectionService leaderElectionService) {
+                                   SchemaGeneratorProvider schemaGeneratorProvider,
+                                   CustomizationConfig customizationConfig,
+                                   ServerStatus serverStatus,
+                                   ClusterConfigService clusterConfigService,
+                                   LeaderElectionService leaderElectionService) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "Get Graylog System Information",
+                f("Get %s System Information", customizationConfig.productName()),
                 """
-                        Returns Markdown containing system information about the Graylog installation, including
+                        Returns Markdown containing system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """);
+                        """.formatted(customizationConfig.productName()));
+        this.customizationConfig = customizationConfig;
         this.serverStatus = serverStatus;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
         this.leaderElectionService = leaderElectionService;
@@ -68,8 +77,8 @@ public class SystemInfoFormattedTool extends Tool<SystemInfoFormattedTool.Parame
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
             OutputBuilder output = new OutputBuilder();
-            output.h1("Graylog System Information");
-            return output.unorderedListKVItem(SystemOverviewResponse.create("graylog-server",
+            output.h1(f("%s System Information", customizationConfig.productName()));
+            return output.unorderedListKVItem(SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
                     clusterId.clusterId(),

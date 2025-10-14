@@ -29,6 +29,7 @@ import org.graylog.mcp.tools.ListResourceTool;
 import org.graylog.mcp.tools.ListStreamsTool;
 import org.graylog.mcp.tools.ReadResourceTool;
 import org.graylog.mcp.tools.SearchMessagesTool;
+import org.graylog.mcp.tools.SystemInfoFormattedTool;
 import org.graylog.mcp.tools.SystemInfoTool;
 import org.graylog2.plugin.PluginModule;
 
@@ -52,7 +53,9 @@ public class McpServerModule extends PluginModule {
         addMcpTool(SearchMessagesTool.NAME, SearchMessagesTool.class);
         addMcpTool(AggregateMessagesTool.NAME, AggregateMessagesTool.class);
         addMcpTool(ListFieldsTool.NAME, ListFieldsTool.class);
+        // TODO: Do we really need both SystemInfoTool and SystemInfoFormattedTool?
         addMcpTool(SystemInfoTool.NAME, SystemInfoTool.class);
+        addMcpTool(SystemInfoFormattedTool.NAME, SystemInfoFormattedTool.class);
         addMcpTool(ListResourceTool.NAME, ListResourceTool.class);
         addMcpTool(ReadResourceTool.NAME, ReadResourceTool.class);
 
