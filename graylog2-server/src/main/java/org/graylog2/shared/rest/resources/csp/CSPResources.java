@@ -82,14 +82,14 @@ public class CSPResources {
      * @return CSP string
      */
     public String cspString(String group) {
-        return cspTable.row(group).entrySet()
+        return cspTable.row(group).keySet()
                 .stream()
-                .map(entry -> {
-                    final var key = entry.getKey();
+                .sorted()
+                .map(key -> {
                     final var providerResources = resourceProviders.getOrDefault(key, Set.<ResourceProvider>of())
                             .stream()
                             .flatMap(provider -> provider.resources().stream());
-                    final var fileResources = entry.getValue()
+                    final var fileResources = cspTable.get(group, key)
                             .stream();
                     final var resources = Stream.concat(fileResources, providerResources)
                             .sorted()
