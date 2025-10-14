@@ -108,7 +108,7 @@ public class McpService {
                 // currently, so we need to skip it at the moment. MCP doesn't have any way to scope it to resource types
                 // so we are a bit dead in the water in the way we need to adapt it.
                 final List<McpSchema.Resource> resourceList = this.resourceProviders.values().stream()
-                        .map(resourceProvider -> resourceProvider.list(null, null))
+                        .map(resourceProvider -> resourceProvider.list(permissionHelper, null, null))
                         .flatMap(List::stream)
                         .toList();
                 final McpSchema.ListResourcesResult result = new McpSchema.ListResourcesResult(resourceList, null);
@@ -123,7 +123,7 @@ public class McpService {
                 try {
                     final McpSchema.Resource resource = this.resourceProviders
                             .get(GRNRegistry.createWithBuiltinTypes().parse(readResourceRequest.uri()).grnType())
-                            .read(new URI(readResourceRequest.uri())
+                            .read(permissionHelper, new URI(readResourceRequest.uri())
                             );
                     contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
                     auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READ), auditContext);

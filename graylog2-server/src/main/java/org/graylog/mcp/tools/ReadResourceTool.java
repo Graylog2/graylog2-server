@@ -54,7 +54,7 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
     public String apply(PermissionHelper permissionHelper, ReadResourceTool.Parameters parameters) {
         try {
             GRN grn = GRNRegistry.createWithBuiltinTypes().parse(parameters.grn);
-            return this.resourceProviders.get(grn.grnType()).read(new URI(parameters.grn)).description();
+            return this.resourceProviders.get(grn.grnType()).read(permissionHelper, new URI(parameters.grn)).description();
         } catch (NotFoundException | URISyntaxException e) {
             return String.format(Locale.US, "Unable to read resource %s", parameters.grn);
         }

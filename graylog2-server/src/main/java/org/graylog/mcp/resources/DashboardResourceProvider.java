@@ -26,11 +26,14 @@ import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
+import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog.plugins.views.search.permissions.ViewPermissions;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.net.URI;
 import java.util.List;
@@ -61,12 +64,15 @@ public class DashboardResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public McpSchema.Resource read(URI uri) throws NotFoundException {
+    public McpSchema.Resource read(final PermissionHelper permissionHelper, URI uri) throws NotFoundException {
         final GRN grn = grnRegistry.parse(uri.toString());
         if (!grn.isType(GRNTypes.DASHBOARD)) {
             throw new IllegalArgumentException("Invalid GRN URI, expected a Dashboard GRN: " + uri);
         }
         final ViewDTO dashboard = viewService.get(grn.entity()).orElseThrow(NotFoundException::new);
+        if (!permissionHelper.getSearchUser().canReadView(dashboard)) {
+            throw new NotFoundException("Cannot find dashboard " + uri);
+        }
         return McpSchema.Resource.builder()
                 .name(dashboard.title())
                 .description(dashboard.description())
@@ -75,7 +81,8 @@ public class DashboardResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
+    public List<McpSchema.Resource> list(final PermissionHelper permissionHelper,
+                                         @Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
         final Stream<ViewDTO> resultStream = viewService.searchPaginatedByType(
                 ViewDTO.Type.DASHBOARD,
                 new SearchQuery(""),
@@ -84,6 +91,7 @@ public class DashboardResourceProvider extends ResourceProvider {
 
         try (resultStream) {
             return resultStream
+                    .filter(dashboard -> permissionHelper.getSearchUser().canReadView(dashboard))
                     .map(dashboard -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(dashboard.id()).toString(),
                             dashboard.title(),

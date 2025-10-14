@@ -28,7 +28,9 @@ import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
+import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.net.URI;
 import java.util.List;
@@ -58,12 +60,15 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public McpSchema.Resource read(URI uri) throws NotFoundException {
+    public McpSchema.Resource read(final PermissionHelper permissionHelper, URI uri) throws NotFoundException {
         final GRN grn = grnRegistry.parse(uri.toString());
         if (!grn.isType(GRNTypes.EVENT_DEFINITION)) {
             throw new IllegalArgumentException("Invalid GRN URI, expected an Event Definition GRN: " + uri);
         }
         final EventDefinitionDto eventDefinition = eventDefinitionService.get(grn.entity()).orElseThrow(NotFoundException::new);
+        if (permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, grn.entity())) {
+            throw new NotFoundException("Cannot find event definition " + uri);
+        }
         return McpSchema.Resource.builder()
                 .name(eventDefinition.title())
                 .description(eventDefinition.description())
@@ -72,9 +77,12 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
+    public List<McpSchema.Resource> list(final PermissionHelper permissionHelper,
+                                         @Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
         try (var dtos = eventDefinitionService.streamAll()) {
             return dtos
+                    .filter(eventDefinition -> permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ,
+                                                                            eventDefinition.id()))
                     .map(eventDefinition -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(eventDefinition.id()).toString(),
                             eventDefinition.title(),

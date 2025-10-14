@@ -19,6 +19,7 @@ package org.graylog.mcp.server;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.annotation.Nullable;
 import org.glassfish.jersey.uri.UriTemplate;
+import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.database.NotFoundException;
 
 import java.net.URI;
@@ -46,19 +47,22 @@ public abstract class ResourceProvider {
     /**
      * Produce the resource identified by the given URI.
      *
-     * @param uri a {@link org.graylog.grn.GRN GRN}
+     * @param permissionHelper
+     * @param uri              a {@link org.graylog.grn.GRN GRN}
      * @return the loaded resource object
      * @throws NotFoundException if Graylog cannot find this resource
      */
-    public abstract McpSchema.Resource read(URI uri) throws NotFoundException;
+    public abstract McpSchema.Resource read(final PermissionHelper permissionHelper, URI uri) throws NotFoundException;
 
     /**
      * Provide a list of available resources
      *
-     * @param cursor a nullable cursor to provide pagination information
-     * @param pageSize number of items to return
+     * @param permissionHelper
+     * @param cursor           a nullable cursor to provide pagination information
+     * @param pageSize         number of items to return
      */
-    public abstract List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize);
+    public abstract List<McpSchema.Resource> list(final PermissionHelper permissionHelper,
+                                                  @Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize);
 
     /**
      * Templates are used to guide MCP clients, <a href="https://modelcontextprotocol.io/specification/2025-06-18/server/resources#resource-templates">see the spec.</a>

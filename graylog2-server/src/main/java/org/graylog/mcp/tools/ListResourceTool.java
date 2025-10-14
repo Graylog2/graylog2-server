@@ -68,7 +68,7 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, String> 
         };
 
         PaginatedList.Cursor cursor = new PaginatedList.Cursor(PaginatedList.decodeCursor(parameters.cursor));
-        List<McpSchema.Resource> resources = this.resourceProviders.get(grnType).list(cursor, pageSize);
+        List<McpSchema.Resource> resources = this.resourceProviders.get(grnType).list(permissionHelper, cursor, pageSize);
         boolean hasMore = resources.size() == pageSize + 1;
         List<McpSchema.Resource> pageItems = hasMore ? resources.subList(0, pageSize) : resources;
         String next = null;

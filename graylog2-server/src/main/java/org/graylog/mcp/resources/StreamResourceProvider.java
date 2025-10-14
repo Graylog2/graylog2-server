@@ -25,8 +25,10 @@ import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
+import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import jakarta.annotation.Nullable;
 
@@ -58,25 +60,29 @@ public class StreamResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public McpSchema.Resource read(URI uri) throws NotFoundException {
+    public McpSchema.Resource read(final PermissionHelper permissionHelper, URI uri) throws NotFoundException {
         final GRN grn = grnRegistry.parse(uri.toString());
         if (!grn.isType(GRNTypes.STREAM)) {
             throw new IllegalArgumentException("Invalid GRN URI, expected a stream GRN: " + uri);
+        }
+        if (!permissionHelper.isPermitted(RestPermissions.STREAMS_READ, grn.entity())) {
+            throw new NotFoundException("Cannot find stream " + uri);
         }
         final Stream stream = streamService.load(grn.entity());
         return McpSchema.Resource.builder()
                 .name(stream.getTitle())
                 .description(stream.getDescription())
-//                .uri(URI.create(GRN.builder().grnType(GRNTypes.STREAM).entity(stream.getId()).build().toString()).toString())  // <--- This throws a "Missing required properties: type" error
                 .uri(grn.toString())
                 .build();
     }
 
     @Override
-    public List<McpSchema.Resource> list(@Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
+    public List<McpSchema.Resource> list(final PermissionHelper permissionHelper,
+                                         @Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
         // TODO adapting pagination is a bit awkward right now, we'll simply skip it to make it work
         try (var dtos = streamService.streamAllDTOs()) {
             return dtos
+                    .filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                     .map(stream -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(stream.getId()).toString(),
                             stream.getTitle(),
