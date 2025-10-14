@@ -30,11 +30,14 @@ import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class DashboardResourceProvider extends ResourceProvider {
     public static final GRNType GRN_TYPE = GRNTypes.DASHBOARD;
@@ -42,11 +45,15 @@ public class DashboardResourceProvider extends ResourceProvider {
 
     private final ViewService viewService;
     private final GRNRegistry grnRegistry;
+    private final String productName;
 
     @Inject
-    public DashboardResourceProvider(ViewService viewService, GRNRegistry grnRegistry) {
+    public DashboardResourceProvider(ViewService viewService,
+                                     CustomizationConfig customizationConfig,
+                                     GRNRegistry grnRegistry) {
         this.viewService = viewService;
         this.grnRegistry = grnRegistry;
+        this.productName = customizationConfig.productName();
     }
 
     @Override
@@ -55,7 +62,7 @@ public class DashboardResourceProvider extends ResourceProvider {
                 new UriTemplate(GRN_TEMPLATE),
                 "Dashboards",
                 "Dashboards",
-                "Access dashboards in this cluster",
+                f("Access dashboards in this %s cluster", productName),
                 MediaType.APPLICATION_JSON
         );
     }

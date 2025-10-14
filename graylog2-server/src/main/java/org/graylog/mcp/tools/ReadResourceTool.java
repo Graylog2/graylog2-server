@@ -25,6 +25,7 @@ import org.graylog.grn.GRNType;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,14 +43,15 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
     public ReadResourceTool(ObjectMapper objectMapper,
                             GRNRegistry grnRegistry,
                             SchemaGeneratorProvider schemaGeneratorProvider,
+                            CustomizationConfig customizationConfig,
                             Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "Describe a specific resource with a given GRN",
-                "A brief description of the resource.");
+                f("Describe a specific %s resource with a given GRN", customizationConfig.productName()),
+                f("A brief description of the %s resource.", customizationConfig.productName()));
         this.grnRegistry = grnRegistry;
         this.resourceProviders = resourceProviders;
     }

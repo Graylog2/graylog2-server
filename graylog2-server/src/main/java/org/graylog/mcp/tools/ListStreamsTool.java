@@ -24,8 +24,11 @@ import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 // TODO convert this into a resource, tools should not be simple "read operations" but perform actions
 public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
@@ -35,14 +38,16 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
 
     @Inject
     public ListStreamsTool(ObjectMapper objectMapper,
-                           SchemaGeneratorProvider schemaGeneratorProvider, StreamService streamService) {
+                           CustomizationConfig customizationConfig,
+                           SchemaGeneratorProvider schemaGeneratorProvider,
+                           StreamService streamService) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "List all Streams",
-                "List all available streams in the server instance.");
+                f("List all %s Streams", customizationConfig.productName()),
+                f("List all available streams in the %s instance.", customizationConfig.productName()));
         this.streamService = streamService;
     }
 

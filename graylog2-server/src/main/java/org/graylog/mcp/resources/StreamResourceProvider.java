@@ -30,10 +30,13 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class StreamResourceProvider extends ResourceProvider {
     public static final GRNType GRN_TYPE = GRNTypes.STREAM;
@@ -41,11 +44,15 @@ public class StreamResourceProvider extends ResourceProvider {
 
     private final StreamService streamService;
     private final GRNRegistry grnRegistry;
+    private final String productName;
 
     @Inject
-    public StreamResourceProvider(StreamService streamService, GRNRegistry grnRegistry) {
+    public StreamResourceProvider(StreamService streamService,
+                                  CustomizationConfig customizationConfig,
+                                  GRNRegistry grnRegistry) {
         this.streamService = streamService;
         this.grnRegistry = grnRegistry;
+        this.productName = customizationConfig.productName();
     }
 
     @Override
@@ -54,7 +61,7 @@ public class StreamResourceProvider extends ResourceProvider {
                 new UriTemplate(GRN_TEMPLATE),
                 "Streams",
                 "Streams",
-                "Access streams in this cluster",
+                f("Access streams in this %s cluster", productName),
                 MediaType.APPLICATION_JSON
         );
     }

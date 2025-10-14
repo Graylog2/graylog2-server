@@ -29,10 +29,13 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class EventDefinitionResourceProvider extends ResourceProvider {
     public static final GRNType GRN_TYPE = GRNTypes.EVENT_DEFINITION;
@@ -40,11 +43,15 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
 
     private final DBEventDefinitionService eventDefinitionService;
     private final GRNRegistry grnRegistry;
+    private final String productName;
 
     @Inject
-    public EventDefinitionResourceProvider(DBEventDefinitionService eventDefinitionService, GRNRegistry grnRegistry) {
+    public EventDefinitionResourceProvider(DBEventDefinitionService eventDefinitionService,
+                                           CustomizationConfig customizationConfig,
+                                           GRNRegistry grnRegistry) {
         this.eventDefinitionService = eventDefinitionService;
         this.grnRegistry = grnRegistry;
+        this.productName = customizationConfig.productName();
     }
 
     @Override
@@ -53,7 +60,7 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
                 new UriTemplate(GRN_TEMPLATE),
                 "EventDefinition",
                 "EventDefinition",
-                "Access Event Definitions in this cluster",
+                f("Access Event Definitions in this %s cluster", productName),
                 MediaType.APPLICATION_JSON
         );
     }

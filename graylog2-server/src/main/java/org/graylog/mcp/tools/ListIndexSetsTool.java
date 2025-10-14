@@ -29,6 +29,7 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyC
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -39,24 +40,27 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String> {
     public static String NAME = "list_index_sets";
 
+    private final String productName;
     private final IndexSetService indexSetService;
 
     @Inject
     public ListIndexSetsTool(ObjectMapper objectMapper,
                              SchemaGeneratorProvider schemaGeneratorProvider,
+                             CustomizationConfig customizationConfig,
                              IndexSetService indexSetService) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "List Index Sets",
+                f("List %s Index Sets", customizationConfig.productName()),
                 """
-                        List all index sets. Returns comprehensive information about index set configurations including rotation policies (time/size based),
+                        List all %1$s index sets. Returns comprehensive information about index set configurations including rotation policies (time/size based),
                         retention settings (how long data is kept), index prefix patterns, and current state. Use this to understand data lifecycle management,
                         troubleshoot retention issues, or plan storage capacity. Essential for understanding how your log data is organized and managed over time.
                         No parameters required. Returns index set details.
-                        """);
+                        """.formatted(customizationConfig.productName()));
+        this.productName = customizationConfig.productName();
         this.indexSetService = indexSetService;
     }
 
@@ -66,7 +70,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
 
         final var indexSets = indexSetService.findAll();
         if (indexSets.isEmpty()) {
-            return "No index sets found in the server.";
+            return f("No index sets found in the %s server.", productName);
         }
 
         final var defaultIndexSet = indexSetService.getDefault();
@@ -79,7 +83,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
         final var sw = new StringWriter();
         final var pw = new PrintWriter(sw);
 
-        pw.println("Index Sets:");
+        pw.println(f("%s Index Sets:", productName));
         indexSetConfigStream.forEach(pw::println);
 
         return sw.toString();

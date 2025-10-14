@@ -26,10 +26,13 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListResourceTool.Result> {
     public static String NAME = "list_resource";
@@ -38,17 +41,19 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
 
     @Inject
     public ListResourceTool(ObjectMapper objectMapper,
-                            SchemaGeneratorProvider schemaGeneratorProvider, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
+                            SchemaGeneratorProvider schemaGeneratorProvider,
+                            CustomizationConfig customizationConfig,
+                            Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "List Resources",
+                f("List %s Resources", customizationConfig.productName()),
                 """
-                        List all Resources available in the server for one resource type out of the following: {stream,dashboard,event_definition}.
+                        List all Resources available in %1$s for one resource type out of the following: {stream,dashboard,event_definition}.
                         Returns: A list of tuples with both the GRN and name of each resource.
-                        """);
+                        """.formatted(customizationConfig.productName()));
         this.resourceProviders = resourceProviders;
     }
 

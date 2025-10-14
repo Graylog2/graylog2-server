@@ -36,6 +36,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,9 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
 
     @Inject
     public AggregateMessagesTool(ObjectMapper objectMapper,
-                                 SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
+                                 CustomizationConfig customizationConfig,
+                                 SchemaGeneratorProvider schemaGeneratorProvider,
+                                 ScriptingApiService scriptingApiService) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
@@ -60,13 +63,14 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                 NAME,
                 "Aggregate/group by field values of messages based on a query",
                 """
-                        Execute Lucene search queries against log messages and calculate aggregations on based on field values and metrics
+                        Execute Lucene search queries against %1$s log messages and calculate aggregations on based on field values and metrics
                         You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
                         It's more efficient to scope by streams.
                         Pass the timerange as a parameter, never put it into the query itself.
                         You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
                         For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
-                        The query string supports Lucene query language, but be careful about leading wildcards, the server configuration might not have them enabled.""");
+                        The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
+                        """.formatted(customizationConfig.productName()));
         this.scriptingApiService = scriptingApiService;
     }
 

@@ -34,6 +34,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedExc
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
     @Inject
     public SearchMessagesTool(ObjectMapper objectMapper,
-                              SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
+                              SchemaGeneratorProvider schemaGeneratorProvider,
+                              CustomizationConfig customizationConfig,
+                              ScriptingApiService scriptingApiService) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
@@ -58,13 +61,14 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                 NAME,
                 "Search for messages based on a query",
                 """
-                        Execute Lucene search queries against log messages.
+                        Execute Lucene search queries against %1$s log messages.
                         You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
                         It's more efficient to scope by streams.
                         This call supports pagination through offset and limit, but avoid deep pagination as that becomes expensive.
                         Pass the timerange as a parameter, never put it into the query itself.
                         List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves.
-                        The query string supports Lucene query language, but be careful about leading wildcards, the server might not have them enabled.""");
+                        The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
+                        """.formatted(customizationConfig.productName()));
         this.scriptingApiService = scriptingApiService;
     }
 
