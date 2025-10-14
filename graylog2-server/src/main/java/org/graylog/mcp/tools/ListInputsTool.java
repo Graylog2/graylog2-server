@@ -20,9 +20,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
-import org.graylog2.inputs.Input;
+import org.graylog.mcp.server.Tool;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -74,7 +73,7 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
     public String apply(PermissionHelper permissionHelper, ListInputsTool.Parameters unused) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        pw.append(productName).append(" Inputs:");
+        pw.append(productName).append("Inputs:");
         try (var inputs = inputService.all().stream()) {
             inputs.filter(input -> permissionHelper.isPermitted(RestPermissions.INPUTS_READ, input.getId()))
                     .map(input -> {
