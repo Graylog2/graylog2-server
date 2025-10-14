@@ -19,6 +19,7 @@ package org.graylog.mcp.resources;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
 import org.glassfish.jersey.uri.UriTemplate;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -56,8 +57,8 @@ public class DashboardResourceProvider extends ResourceProvider {
                 new UriTemplate(GRN_TEMPLATE),
                 "Dashboards",
                 "Dashboards",
-                "Access dashboards in this Graylog cluster",
-                "application/json"
+                "Access dashboards in this cluster",
+                MediaType.APPLICATION_JSON
         );
     }
 
