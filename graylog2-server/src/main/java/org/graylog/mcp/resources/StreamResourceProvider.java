@@ -17,7 +17,6 @@
 package org.graylog.mcp.resources;
 
 import io.modelcontextprotocol.spec.McpSchema;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.MediaType;
 import org.glassfish.jersey.uri.UriTemplate;
@@ -25,7 +24,6 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
-import org.graylog.mcp.server.PaginatedList;
 import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.database.NotFoundException;
@@ -83,8 +81,7 @@ public class StreamResourceProvider extends ResourceProvider {
     }
 
     @Override
-    public List<McpSchema.Resource> list(final PermissionHelper permissionHelper,
-                                         @Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize) {
+    public List<McpSchema.Resource> list(final PermissionHelper permissionHelper) {
         // TODO adapting pagination is a bit awkward right now, we'll simply skip it to make it work
         try (var dtos = streamService.streamAllDTOs()) {
             return dtos

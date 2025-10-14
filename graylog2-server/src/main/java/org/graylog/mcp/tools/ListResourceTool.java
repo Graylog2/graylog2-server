@@ -62,7 +62,7 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
             default -> throw new IllegalArgumentException("Unsupported type " + parameters.type);
         };
 
-        List<McpSchema.Resource> resources = this.resourceProviders.get(grnType).list(permissionHelper, null, null);
+        List<McpSchema.Resource> resources = this.resourceProviders.get(grnType).list(permissionHelper);
         return new Result(resources);
     }
 

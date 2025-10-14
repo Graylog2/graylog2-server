@@ -169,7 +169,7 @@ class McpServiceTest {
                 .description("Description 1")
                 .mimeType("text/plain")
                 .build();
-        when(mockProvider.list(eq(permissionHelper), any(), any())).thenReturn(List.of(resource1));
+        when(mockProvider.list(eq(permissionHelper))).thenReturn(List.of(resource1));
 
         resourceProviders.put(GRNTypes.DASHBOARD, mockProvider);
 

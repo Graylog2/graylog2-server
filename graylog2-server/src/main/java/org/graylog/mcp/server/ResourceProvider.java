@@ -17,7 +17,6 @@
 package org.graylog.mcp.server;
 
 import io.modelcontextprotocol.spec.McpSchema;
-import jakarta.annotation.Nullable;
 import org.glassfish.jersey.uri.UriTemplate;
 import org.graylog.mcp.tools.PermissionHelper;
 
@@ -57,11 +56,8 @@ public abstract class ResourceProvider {
      * Provide a list of available resources
      *
      * @param permissionHelper helper class encapsulating subject and permission check code
-     * @param cursor           a nullable cursor to provide pagination information
-     * @param pageSize         number of items to return
      */
-    public abstract List<McpSchema.Resource> list(final PermissionHelper permissionHelper,
-                                                  @Nullable PaginatedList.Cursor cursor, @Nullable Integer pageSize);
+    public abstract List<McpSchema.Resource> list(final PermissionHelper permissionHelper);
 
     /**
      * Templates are used to guide MCP clients, <a href="https://modelcontextprotocol.io/specification/2025-06-18/server/resources#resource-templates">see the spec.</a>
