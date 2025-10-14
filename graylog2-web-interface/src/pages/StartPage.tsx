@@ -58,7 +58,7 @@ const StartPage = () => {
     }
 
     redirect(activePerspective.welcomeRoute);
-  }, [activePerspective, currentUser?.startpage, redirect]);
+  }, [activePerspective, setActivePerspective, currentUser?.startpage, redirect]);
 
   useEffect(() => {
     CurrentUserStore.reload();
