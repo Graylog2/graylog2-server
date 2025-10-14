@@ -127,18 +127,17 @@ public class McpService {
                 final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", readResourceRequest);
                 LOG.debug("Reading resource: {}", readResourceRequest);
-                McpSchema.ResourceContents contents;
                 try {
                     final McpSchema.Resource resource = this.resourceProviders
                             .get(grnRegistry.parse(readResourceRequest.uri()).grnType())
                             .read(permissionHelper, new URI(readResourceRequest.uri()))
                             .orElseThrow();
-                    contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
                     auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_READ), auditContext);
+                    final var contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
+                    return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
                 } catch (Exception e) {
                     throw new McpException("Failed to read resource: " + e.getMessage());
                 }
-                return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
             }
             case McpSchema.METHOD_RESOURCES_TEMPLATES_LIST -> {
                 LOG.debug("Listing available resource templates");
