@@ -48,6 +48,7 @@ import static org.graylog2.audit.AuditEventTypes.MCP_RESOURCE_READ;
 import static org.graylog2.audit.AuditEventTypes.MCP_RESOURCE_READTEMPLATES;
 import static org.graylog2.audit.AuditEventTypes.MCP_TOOL_CALL;
 import static org.graylog2.audit.AuditEventTypes.MCP_TOOL_LIST;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class McpService {
@@ -204,7 +205,7 @@ public class McpService {
                         }
                     } catch (Exception e) {
                         auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                        throw e;
+                        return Optional.of(new McpSchema.CallToolResult(f("Tool call failed: ", e.getMessage()), true));
                     }
                 } else {
                     auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
