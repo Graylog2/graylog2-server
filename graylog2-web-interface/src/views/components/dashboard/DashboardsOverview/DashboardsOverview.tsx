@@ -24,6 +24,9 @@ import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/us
 import getDashboardTableElements from 'views/components/dashboard/DashboardsOverview/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
 
 import BulkActions from './BulkActions';
 
@@ -50,6 +53,12 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
     [pluggableExpandedSections],
   );
 
+  const fetchEntities = (searchParams: SearchParamsForDashboards): Promise<PaginatedResponse<View>> => {
+    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+    return fetchDashboards(searchParams);
+  };
+
   return (
     <PaginatedEntityTable<View>
       humanName="dashboards"
@@ -59,7 +68,7 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
       }
       entityActions={renderDashboardActions}
       tableLayout={getDefaultLayout(hideAdditionalColumns)}
-      fetchEntities={fetchDashboards}
+      fetchEntities={fetchEntities}
       additionalAttributes={additionalAttributes}
       expandedSectionsRenderer={expandedSections}
       keyFn={keyFn}
