@@ -23,6 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import { defaultOnError } from 'util/conditional/onError';
+import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -42,10 +43,6 @@ type PaginatedDashboardsResponse = PaginatedListJSON & {
 
 type Options = {
   enabled?: boolean;
-};
-
-type SearchParamsForDashboards = SearchParams & {
-  scope: 'read' | 'update';
 };
 
 export const fetchDashboards = (searchParams: SearchParamsForDashboards) => {

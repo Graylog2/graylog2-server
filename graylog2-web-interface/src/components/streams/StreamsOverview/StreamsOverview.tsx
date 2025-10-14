@@ -28,9 +28,12 @@ import getStreamTableElements from 'components/streams/StreamsOverview/Constants
 import FilterValueRenderers from 'components/streams/StreamsOverview/FilterValueRenderers';
 import useTableElements from 'components/streams/StreamsOverview/hooks/useTableComponents';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import type { SearchParams } from 'stores/PaginationTypes';
 
-import CustomColumnRenderers from './ColumnRenderers';
 import usePipelineColumn from './hooks/usePipelineColumn';
+import CustomColumnRenderers from './ColumnRenderers';
 
 const useRefetchStreamsOnStoreChange = (refetchStreams: () => void) => {
   useEffect(() => {
@@ -65,6 +68,12 @@ const StreamsOverview = ({ indexSets }: Props) => {
     [currentUser.permissions, isPipelineColumnPermitted],
   );
 
+  const fetchEntities = (options: SearchParams): Promise<PaginatedResponse<Stream>> => {
+    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+    return fetchStreams(options);
+  };
+
   return (
     <PaginatedEntityTable<Stream>
       humanName="streams"
@@ -73,7 +82,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
       queryHelpComponent={<QueryHelper entityName="stream" />}
       entityActions={entityActions}
       tableLayout={defaultLayout}
-      fetchEntities={fetchStreams}
+      fetchEntities={fetchEntities}
       keyFn={keyFn}
       actionsCellWidth={220}
       expandedSectionsRenderer={expandedSections}
