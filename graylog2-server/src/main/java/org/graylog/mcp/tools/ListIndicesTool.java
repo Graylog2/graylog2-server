@@ -34,6 +34,8 @@ import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.shared.utilities.StringUtils;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -45,6 +47,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.graylog2.shared.utilities.StringUtils.f;
+
 public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     public static String NAME = "list_indices";
 
@@ -54,18 +58,22 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
 
     @Inject
     public ListIndicesTool(ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, Indices indices, NodeInfoCache nodeInfoCache, IndexSetRegistry indexSetRegistry) {
+                           SchemaGeneratorProvider schemaGeneratorProvider,
+                           Indices indices,
+                           NodeInfoCache nodeInfoCache,
+                           IndexSetRegistry indexSetRegistry,
+                           CustomizationConfig customizationConfig) {
         super(objectMapper,
-                schemaGeneratorProvider,
-                new TypeReference<>() {},
-                new TypeReference<>() {},
-                NAME,
-                "List Graylog Indices",
-                """
-                        List all Graylog indices from the Graylog server. Returns comprehensive index information including status (open/closed),
-                        document counts, storage size, and health metrics. Use this to understand data distribution, identify problematic indices,
-                        or before performing queries to understand available data sources. No parameters required. Returns JSON-formatted index details.
-                        """);
+              schemaGeneratorProvider,
+              new TypeReference<>() {},
+              new TypeReference<>() {},
+              NAME,
+              f("List %s Indices", customizationConfig.productName()),
+              f("""
+                List all %s indices from the cluster. Returns comprehensive index information including status (open/closed),
+                document counts, storage size, and health metrics. Use this to understand data distribution, identify problematic indices,
+                or before performing queries to understand available data sources. No parameters required.
+                """, customizationConfig.productName()));
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
