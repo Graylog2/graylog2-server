@@ -31,6 +31,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.shared.ServerVersion;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +55,7 @@ public class McpService {
 
     private final ObjectMapper objectMapper;
     private final AuditEventSender auditEventSender;
+    private final CustomizationConfig customizationConfig;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
     protected final List<String> supportedVersions = List.of(ProtocolVersions.MCP_2025_06_18);
@@ -61,10 +63,12 @@ public class McpService {
     @Inject
     protected McpService(ObjectMapper objectMapper,
                          AuditEventSender auditEventSender,
+                         CustomizationConfig customizationConfig,
                          Map<String, Tool<?, ?>> tools,
                          Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
         this.auditEventSender = auditEventSender;
+        this.customizationConfig = customizationConfig;
         this.tools = tools;
         this.resourceProviders = resourceProviders;
     }
@@ -93,7 +97,7 @@ public class McpService {
                                 new McpSchema.ServerCapabilities.ResourceCapabilities(false, false),
                                 new McpSchema.ServerCapabilities.ToolCapabilities(false)
                         ),
-                        new McpSchema.Implementation("Graylog", ServerVersion.VERSION.toString()),
+                        new McpSchema.Implementation(customizationConfig.productName(), ServerVersion.VERSION.toString()),
                         null,
                         null);
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_PROTOCOL_INITIALIZE), auditContext);

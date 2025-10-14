@@ -27,6 +27,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -76,7 +77,7 @@ class McpServiceTest {
         when(permissionHelper.getCurrentUser()).thenReturn(user);
         when(user.getName()).thenReturn("testuser");
 
-        mcpService = new McpService(objectMapper, auditEventSender, tools, resourceProviders);
+        mcpService = new McpService(objectMapper, auditEventSender, new CustomizationConfig(null), tools, resourceProviders);
     }
 
     @Test
