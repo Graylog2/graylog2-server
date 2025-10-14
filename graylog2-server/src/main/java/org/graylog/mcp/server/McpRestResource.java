@@ -48,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -90,7 +91,7 @@ public class McpRestResource extends RestResource {
                          @Context SearchUser searchUser,
                          @ApiParam(value = "jsonrpc_message", required = true) JsonNode payload) throws IOException {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
-                                                                      McpConfiguration.DEFAULT_VALUES);
+                McpConfiguration.DEFAULT_VALUES);
         if (!mcpConfig.enableRemoteAccess()) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
@@ -114,13 +115,13 @@ public class McpRestResource extends RestResource {
                 .map(version -> !mcpService.supportedVersions.contains(version))
                 .orElse(false)) {
             return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(objectMapper.createObjectNode().put("error", "Invalid protocol version"))
+                    .entity(Map.of("error", "Invalid protocol version"))
                     .build();
         }
 
         // We only implement non-streaming for now if the client is willing to go one-shot. we might support SSE later.
         final String accept = Optional.ofNullable(acceptHeader).orElse("");
-        final boolean stream = accept.contains("text/event-stream") && !accept.contains("application/json");
+        final boolean stream = accept.contains(MediaType.SERVER_SENT_EVENTS) && !accept.contains(MediaType.APPLICATION_JSON);
         if (!stream) {
             // Simple one-shot JSON reply
             final McpSchema.JSONRPCRequest request = objectMapper.convertValue(payload, McpSchema.JSONRPCRequest.class);
@@ -167,14 +168,14 @@ public class McpRestResource extends RestResource {
     }
 
     @GET
-    @Produces("text/event-stream")
+    @Produces(MediaType.SERVER_SENT_EVENTS)
     @SkipCSRFProtection("server-to-server")
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("prototype")
     @ApiOperation("Unused endpoint for MCP protocol compatibility")
     public Response get() {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
-                                                                      McpConfiguration.DEFAULT_VALUES);
+                McpConfiguration.DEFAULT_VALUES);
         if (!mcpConfig.enableRemoteAccess()) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
