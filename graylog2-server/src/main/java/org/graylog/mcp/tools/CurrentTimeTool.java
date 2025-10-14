@@ -36,7 +36,7 @@ public class CurrentTimeTool extends Tool<CurrentTimeTool.Parameters, String> {
                 new TypeReference<>() {},
                 NAME,
                 "Get current time",
-                "Return the current time from the Graylog server in ISO‑8601 UTC format.");
+                "Return the current time from the server in ISO‑8601 UTC format.");
     }
 
     @Override

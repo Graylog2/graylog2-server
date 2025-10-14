@@ -27,8 +27,8 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.ws.rs.DefaultValue;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
@@ -52,21 +52,21 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
 
     @Inject
     public AggregateMessagesTool(ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
+                                 SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
         super(objectMapper,
                 schemaGeneratorProvider,
-              new TypeReference<>() {},
-              new TypeReference<>() {},
-              NAME,
-              "Aggregate/group by field values of messages based on a query",
-              """
-                      Execute Lucene search queries against Graylog log messages and calculate aggregations on based on field values and metrics
-                      You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
-                      It's more efficient to scope by streams.
-                      Pass the timerange as a parameter, never put it into the query itself.
-                      You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
-                      For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
-                      The query string supports Lucene query language, but be careful about leading wildcards, Graylog might not have them enabled.""");
+                new TypeReference<>() {},
+                new TypeReference<>() {},
+                NAME,
+                "Aggregate/group by field values of messages based on a query",
+                """
+                        Execute Lucene search queries against log messages and calculate aggregations on based on field values and metrics
+                        You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
+                        It's more efficient to scope by streams.
+                        Pass the timerange as a parameter, never put it into the query itself.
+                        You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
+                        For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
+                        The query string supports Lucene query language, but be careful about leading wildcards, the server configuration might not have them enabled.""");
         this.scriptingApiService = scriptingApiService;
     }
 
@@ -116,13 +116,13 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
 
         @JsonProperty("groupings")
         @JsonPropertyDescription("The list of group by clauses to apply, each grouping consists of a field name and a " +
-                                 "limit of the maximum number of groups to create. You have to specify at least one grouping.")
+                "limit of the maximum number of groups to create. You have to specify at least one grouping.")
         @NotEmpty
         public abstract List<Grouping> groupings();
 
         @JsonProperty("metrics")
         @JsonPropertyDescription("The list of metrics to calculate for each series of groupings. By default it calculates the count of matching messages, " +
-                                 "but you can also pass a function like avg, min, max, card, sum, percentage, percentile, stddev, sumofsquares, variance, latest, count.")
+                "but you can also pass a function like avg, min, max, card, sum, percentage, percentile, stddev, sumofsquares, variance, latest, count.")
         @NotEmpty
         public abstract List<Metric> metrics();
 
@@ -147,8 +147,7 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
 
             @JsonProperty("range_seconds")
             public abstract Builder rangeSeconds(
-                    @Positive
-                    final int rangeSeconds);
+                    @Positive final int rangeSeconds);
 
             @JsonProperty("streams")
             public abstract Builder streams(final Set<String> streams);
