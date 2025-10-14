@@ -58,6 +58,15 @@ public class ExecuteNotification extends Action {
             return Builder.create();
         }
 
+        @JsonIgnore
+        @Override
+        public String validate() {
+            if (notificationId() == null || notificationId().isEmpty()) {
+                return "Notification cannot be empty";
+            }
+            return null;
+        }
+
         @AutoValue.Builder
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)

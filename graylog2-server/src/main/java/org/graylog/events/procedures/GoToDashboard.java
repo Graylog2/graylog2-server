@@ -69,6 +69,15 @@ public class GoToDashboard extends Action {
 
         public abstract Builder toBuilder();
 
+        @JsonIgnore
+        @Override
+        public String validate() {
+            if (dashboardId() == null || dashboardId().isEmpty()) {
+                return "Dashboard cannot be empty";
+            }
+            return null;
+        }
+
         @AutoValue.Builder
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)

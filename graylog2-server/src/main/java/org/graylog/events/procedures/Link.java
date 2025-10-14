@@ -60,6 +60,15 @@ public class Link extends Action {
 
         public abstract Builder toBuilder();
 
+        @JsonIgnore
+        @Override
+        public String validate() {
+            if (link() == null || link().isEmpty()) {
+                return "Link cannot be empty";
+            }
+            return null;
+        }
+
         @AutoValue.Builder
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)
