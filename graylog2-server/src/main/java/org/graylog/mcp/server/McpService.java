@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.graylog2.audit.AuditEventTypes.MCP_PROMPT_LIST;
 import static org.graylog2.audit.AuditEventTypes.MCP_PROMPT_GET;
+import static org.graylog2.audit.AuditEventTypes.MCP_PROMPT_LIST;
 import static org.graylog2.audit.AuditEventTypes.MCP_PROTOCOL_INITIALIZE;
 import static org.graylog2.audit.AuditEventTypes.MCP_RESOURCE_LIST;
 import static org.graylog2.audit.AuditEventTypes.MCP_RESOURCE_READ;
@@ -112,7 +112,7 @@ public class McpService {
                         .flatMap(List::stream)
                         .toList();
                 final McpSchema.ListResourcesResult result = new McpSchema.ListResourcesResult(resourceList, null);
-                LOG.info("Returning available resources {}", result);
+                LOG.debug("Returning available resources {}", result);
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_RESOURCE_LIST), auditContext);
                 return Optional.of(result);
             }
@@ -178,17 +178,17 @@ public class McpService {
                             // if we have an output schema we want to return structured content
                             try {
                                 var structuredContent = objectMapper.convertValue(result,
-                                                                                  new TypeReference<Map<String, Object>>() {
-                                                                                  });
+                                        new TypeReference<Map<String, Object>>() {
+                                        });
                                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
-                                                         auditContext);
+                                        auditContext);
                                 return Optional.of(new McpSchema.CallToolResult(
                                         List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
                                         false,
                                         structuredContent));
                             } catch (JsonProcessingException e) {
                                 auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
-                                                         auditContext);
+                                        auditContext);
                                 throw new RuntimeException(e);
                             }
                         } else {
