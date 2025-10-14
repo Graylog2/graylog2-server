@@ -33,8 +33,8 @@ type McpConfigState = {
 
 const McpConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
-  const [modalConfig, setModalConfig] = useState<McpConfigState|undefined>(undefined);
-  const [viewConfig, setViewConfig] = useState<McpConfigState|undefined>(undefined);
+  const [modalConfig, setModalConfig] = useState<McpConfigState | undefined>(undefined);
+  const [viewConfig, setViewConfig] = useState<McpConfigState | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
 
   useEffect(() => {
@@ -50,7 +50,7 @@ const McpConfig = () => {
   };
 
   const onModalClickEnableRemoteAccess = () => {
-    setModalConfig({...modalConfig, enable_remote_access: !modalConfig.enable_remote_access});
+    setModalConfig({ ...modalConfig, enable_remote_access: !modalConfig.enable_remote_access });
   };
 
   const onModalCancel = () => {
@@ -59,8 +59,7 @@ const McpConfig = () => {
   };
 
   const onModalSave = () => {
-    // todo send telemetry
-    ConfigurationsActions.update(ConfigurationType.MCP_CONFIG, {...modalConfig}).then(() => {
+    ConfigurationsActions.update(ConfigurationType.MCP_CONFIG, { ...modalConfig }).then(() => {
       setShowConfigModal(false);
     });
   };
@@ -71,14 +70,13 @@ const McpConfig = () => {
 
   return (
     <div>
-      <h2>MCP Configuration</h2>
+      <h2>MCP Server Configuration</h2>
 
       <dl className="deflist">
         <dt>Remote MCP access</dt>
-        <dd>{viewConfig.enable_remote_access ? "Enabled" : "Disabled"}</dd>
+        <dd>{viewConfig.enable_remote_access ? 'Enabled' : 'Disabled'}</dd>
       </dl>
 
-      {/* todo: set proper role here 👇*/}
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
           Edit configuration
@@ -89,7 +87,7 @@ const McpConfig = () => {
         <BootstrapModalForm
           show
           bsSize="large"
-          title="Update MCP Configuration"
+          title="Update MCP Server Configuration"
           onSubmitForm={onModalSave}
           onCancel={onModalCancel}
           submitButtonText="Update configuration">
