@@ -205,7 +205,7 @@ public class McpService {
                         }
                     } catch (Exception e) {
                         auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
-                        return Optional.of(new McpSchema.CallToolResult(f("Tool call failed: ", e.getMessage()), true));
+                        return Optional.of(new McpSchema.CallToolResult(f("Tool call failed: %s", e.getMessage()), true));
                     }
                 } else {
                     auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
