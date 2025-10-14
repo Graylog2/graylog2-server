@@ -27,8 +27,8 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.ws.rs.DefaultValue;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
@@ -50,21 +50,21 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
     @Inject
     public SearchMessagesTool(ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
+                              SchemaGeneratorProvider schemaGeneratorProvider, ScriptingApiService scriptingApiService) {
         super(objectMapper,
                 schemaGeneratorProvider,
-              new TypeReference<>() {},
-              new TypeReference<>() {},
-              NAME,
-              "Search for messages based on a query",
-              """
-                      Execute Lucene search queries against Graylog log messages.
-                      You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
-                      It's more efficient to scope by streams.
-                      This call supports pagination through offset and limit, but avoid deep pagination as that becomes expensive.
-                      Pass the timerange as a parameter, never put it into the query itself.
-                      List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves.
-                      The query string supports Lucene query language, but be careful about leading wildcards, Graylog might not have them enabled.""");
+                new TypeReference<>() {},
+                new TypeReference<>() {},
+                NAME,
+                "Search for messages based on a query",
+                """
+                        Execute Lucene search queries against log messages.
+                        You can scope the search to streams (by passing their IDs) or stream categories, which are used by Illuminate to group streams.
+                        It's more efficient to scope by streams.
+                        This call supports pagination through offset and limit, but avoid deep pagination as that becomes expensive.
+                        Pass the timerange as a parameter, never put it into the query itself.
+                        List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves.
+                        The query string supports Lucene query language, but be careful about leading wildcards, the server might not have them enabled.""");
         this.scriptingApiService = scriptingApiService;
     }
 
@@ -113,6 +113,8 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
         @JsonProperty("limit")
         @JsonPropertyDescription("The amount of messages to return, together with offset this can be used for pagination")
+        @DefaultValue("50")
+        @PositiveOrZero
         public abstract int limit();
 
         @JsonProperty("offset")
@@ -154,13 +156,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
 
             @JsonProperty("offset")
             public abstract Builder offset(
-                    @PositiveOrZero
-                    final int offset);
+                    @PositiveOrZero final int offset);
 
             @JsonProperty("range_seconds")
             public abstract Builder rangeSeconds(
-                    @Positive
-                    final int rangeSeconds);
+                    @Positive final int rangeSeconds);
 
             @JsonProperty("streams")
             public abstract Builder streams(final Set<String> streams);
