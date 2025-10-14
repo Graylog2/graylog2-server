@@ -66,7 +66,7 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
             throw new IllegalArgumentException("Invalid GRN URI, expected an Event Definition GRN: " + uri);
         }
         final EventDefinitionDto eventDefinition = eventDefinitionService.get(grn.entity()).orElseThrow(NotFoundException::new);
-        if (permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, grn.entity())) {
+        if (!permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ, grn.entity())) {
             throw new NotFoundException("Cannot find event definition " + uri);
         }
         return McpSchema.Resource.builder()
