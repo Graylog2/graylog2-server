@@ -103,7 +103,7 @@ public class McpService {
                 return Optional.empty();
             }
             case McpSchema.METHOD_RESOURCES_LIST -> {
-                LOG.info("Listing available resources");
+                LOG.debug("Listing available resources");
                 // TODO pagination needs to hold a cursor across _all_ resource types, which we don't have support for
                 // currently, so we need to skip it at the moment. MCP doesn't have any way to scope it to resource types
                 // so we are a bit dead in the water in the way we need to adapt it.
@@ -119,6 +119,7 @@ public class McpService {
             case McpSchema.METHOD_RESOURCES_READ -> {
                 final McpSchema.ReadResourceRequest readResourceRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", readResourceRequest);
+                LOG.debug("Reading resource: {}", readResourceRequest);
                 McpSchema.ResourceContents contents;
                 try {
                     final McpSchema.Resource resource = this.resourceProviders
@@ -133,7 +134,7 @@ public class McpService {
                 return Optional.of(new McpSchema.ReadResourceResult(List.of(contents)));
             }
             case McpSchema.METHOD_RESOURCES_TEMPLATES_LIST -> {
-                LOG.info("Listing available resource templates");
+                LOG.debug("Listing available resource templates");
                 final List<McpSchema.ResourceTemplate> templates = resourceProviders.values().stream()
                         .map(ResourceProvider::resourceTemplate)
                         .map(template -> new McpSchema.ResourceTemplate(
@@ -149,7 +150,7 @@ public class McpService {
                 return Optional.of(new McpSchema.ListResourceTemplatesResult(templates, null));
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
-                LOG.info("Listing available tools");
+                LOG.debug("Listing available tools");
                 final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> {
                     var builder = McpSchema.Tool.builder()
                             .name(tool.name())
@@ -168,7 +169,7 @@ public class McpService {
                 final McpSchema.CallToolRequest callToolRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", callToolRequest);
 
-                LOG.info("Calling MCP tool: {}", callToolRequest);
+                LOG.debug("Calling MCP tool: {}", callToolRequest);
                 if (tools.containsKey(callToolRequest.name())) {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
                     try {
@@ -205,7 +206,7 @@ public class McpService {
                 }
             }
             case McpSchema.METHOD_PROMPT_LIST -> {
-                LOG.info("Listing available prompts");
+                LOG.debug("Listing available prompts");
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_PROMPT_LIST), auditContext);
                 return Optional.of(new McpSchema.ListPromptsResult(List.of(), null));
             }
@@ -213,7 +214,7 @@ public class McpService {
                 // disabled for now
                 final McpSchema.GetPromptRequest promptRequest = objectMapper.convertValue(request.params(), new TypeReference<>() {});
                 auditContext.put("request", promptRequest);
-                LOG.info("Getting prompt {}", promptRequest.name());
+                LOG.debug("Getting prompt {}", promptRequest.name());
                 auditEventSender.failure(auditActor, AuditEventType.create(MCP_PROMPT_GET), auditContext);
                 throw new McpException("Unknown prompt name");
 //                return Optional.of(new McpSchema.GetPromptResult(null, List.of()));
