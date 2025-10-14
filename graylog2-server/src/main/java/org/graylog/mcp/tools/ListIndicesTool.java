@@ -19,8 +19,8 @@ package org.graylog.mcp.tools;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.MongoIndexSet;
@@ -34,7 +34,6 @@ import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.PrintWriter;
@@ -64,16 +63,16 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
                            IndexSetRegistry indexSetRegistry,
                            CustomizationConfig customizationConfig) {
         super(objectMapper,
-              schemaGeneratorProvider,
-              new TypeReference<>() {},
-              new TypeReference<>() {},
-              NAME,
-              f("List %s Indices", customizationConfig.productName()),
-              f("""
-                List all %s indices from the cluster. Returns comprehensive index information including status (open/closed),
-                document counts, storage size, and health metrics. Use this to understand data distribution, identify problematic indices,
-                or before performing queries to understand available data sources. No parameters required.
-                """, customizationConfig.productName()));
+                schemaGeneratorProvider,
+                new TypeReference<>() {},
+                new TypeReference<>() {},
+                NAME,
+                f("List %s Indices", customizationConfig.productName()),
+                f("""
+                        List all %s indices from the cluster. Returns comprehensive index information including status (open/closed),
+                        document counts, storage size, and health metrics. Use this to understand data distribution, identify problematic indices,
+                        or before performing queries to understand available data sources. No parameters required.
+                        """, customizationConfig.productName()));
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;
@@ -81,16 +80,17 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListIndicesTool.Parameters unused) {
-        AllIndices all = AllIndices.create(this.closed(permissionHelper), this.reopened(permissionHelper), this.open());
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
+        final var all = AllIndices.create(closed(permissionHelper), reopened(permissionHelper), open(permissionHelper));
+        final var sw = new StringWriter();
+        final var pw = new PrintWriter(sw);
+
         if (!all.closed().indices().isEmpty()) {
             pw.println("Closed indices:");
             all.closed().indices().forEach(index -> pw.printf(Locale.US, "  - %s%n", index));
         }
         if (!all.reopened().indices().isEmpty()) {
             pw.println("\nReopened indices:");
-            all.reopened().indices().forEach(index -> pw.printf(Locale.US,"  - %s%n", index));
+            all.reopened().indices().forEach(index -> pw.printf(Locale.US, "  - %s%n", index));
         }
         if (!all.all().indices().isEmpty()) {
             pw.println("\nActive indices:");
@@ -98,10 +98,11 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
                 String name = index.indexName();
                 long size = index.allShards().storeSizeBytes();
                 long docsCount = index.allShards().documents().count();
-                pw.printf(Locale.US,"  - %s (size: %d bytes, docs: %d)%n", name, size, docsCount);
+                pw.printf(Locale.US, "  - %s (size: %d bytes, docs: %d)%n", name, size, docsCount);
             });
         }
-        String result = sw.toString();
+
+        final var result = sw.toString();
         return result.isEmpty() ? "No indices found" : result;
     }
 
@@ -109,12 +110,14 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
 
     // TODO: find a better way to do this. These are all verbatim from org.graylog2.rest.resources.system.indexer.IndicesResource
 
-    public OpenIndicesInfo open() {
+    public OpenIndicesInfo open(PermissionHelper permissionHelper) {
         final Set<IndexSet> indexSets = indexSetRegistry.getAll();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexWildcards);
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexWildcards).stream()
+                .filter(index -> permissionHelper.isPermitted(RestPermissions.INDICES_READ, index.index()))
+                .collect(Collectors.toSet());
 
         return getOpenIndicesInfo(indicesStats);
     }
