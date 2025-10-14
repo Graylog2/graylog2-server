@@ -377,7 +377,7 @@ class McpServiceTest {
     }
 
     @Test
-    void testCallToolThrowsException() {
+    void testCallToolReturnsCallToolError() throws Exception {
         // Given
         Tool<Map<String, Object>, String> mockTool = mock(Tool.class);
         when(mockTool.apply(eq(permissionHelper), any())).thenThrow(new RuntimeException("Tool error"));
@@ -393,9 +393,11 @@ class McpServiceTest {
         );
 
         // When/Then
-        assertThatThrownBy(() -> mcpService.handle(permissionHelper, request, "session123"))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessageContaining("Tool error");
+        assertThat(mcpService.handle(permissionHelper, request, "session123")).get().satisfies(result -> {
+            assertThat(result).isInstanceOf(McpSchema.CallToolResult.class);
+            final McpSchema.CallToolResult callResult = (McpSchema.CallToolResult) result;
+            assertThat(callResult.isError()).isTrue();
+        });
 
         verify(auditEventSender).failure(any(AuditActor.class), any(AuditEventType.class), anyMap());
     }
