@@ -16,19 +16,16 @@
  */
 package org.graylog.mcp.server;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.Base64;
+
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 // TODO pagination is really awkward to apply to our internal paginated services at the moment.
@@ -54,13 +51,6 @@ public record PaginatedList<T>(@Nonnull List<T> list, @Nullable Cursor cursor) {
         List<? extends R> mapped = list.stream().map(mapper).toList();
         return new PaginatedList<>(mapped, cursor);
     }
-
-//    public <R> PaginatedList<? extends List<? extends R>> mapCompact(@Nonnull Function<? super T, List<? extends R>> flattener) {
-//        List<? extends List<? extends R>> mapped = list.stream()
-//                .map(flattener::apply)
-//                .toList();
-//        return new PaginatedList<>(mapped, cursor);
-//    }
 
     public static <T> PaginatedList<T> empty() {
         return new PaginatedList<>(List.of(), null);
