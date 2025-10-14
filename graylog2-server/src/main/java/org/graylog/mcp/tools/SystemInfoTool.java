@@ -16,7 +16,6 @@
  */
 package org.graylog.mcp.tools;
 
-import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
@@ -25,8 +24,6 @@ import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
@@ -40,7 +37,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
     public static String NAME = "get_system_status";
 
     private final ServerStatus serverStatus;
-    private final ClusterId clusterId;
+    private final CustomizationConfig customizationConfig;
     private final LeaderElectionService leaderElectionService;
 
     @Inject
@@ -48,7 +45,6 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
                           SchemaGeneratorProvider schemaGeneratorProvider,
                           ServerStatus serverStatus,
                           CustomizationConfig customizationConfig,
-                          ClusterConfigService clusterConfigService,
                           LeaderElectionService leaderElectionService) {
         super(objectMapper,
                 schemaGeneratorProvider,
@@ -61,7 +57,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
                         cluster ID, installed version, hostname, timezone, and operating system.
                         """.formatted(customizationConfig.productName()));
         this.serverStatus = serverStatus;
-        this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
+        this.customizationConfig = customizationConfig;
         this.leaderElectionService = leaderElectionService;
     }
 
@@ -72,10 +68,10 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
 
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-            return SystemOverviewResponse.create("graylog-server",
+            return SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
-                    clusterId.clusterId(),
+                    serverStatus.getClusterId(),
                     ServerVersion.VERSION.toString(),
                     Tools.getISO8601String(serverStatus.getStartedAt()),
                     serverStatus.isProcessing(),
