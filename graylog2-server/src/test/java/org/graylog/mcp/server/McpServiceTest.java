@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.ProtocolVersions;
 import org.glassfish.jersey.uri.UriTemplate;
+import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.tools.PermissionHelper;
@@ -77,7 +78,14 @@ class McpServiceTest {
         when(permissionHelper.getCurrentUser()).thenReturn(user);
         when(user.getName()).thenReturn("testuser");
 
-        mcpService = new McpService(objectMapper, auditEventSender, new CustomizationConfig(null), tools, resourceProviders);
+        mcpService = new McpService(
+                objectMapper,
+                auditEventSender,
+                new CustomizationConfig(null),
+                GRNRegistry.createWithBuiltinTypes(),
+                tools,
+                resourceProviders
+        );
     }
 
     @Test

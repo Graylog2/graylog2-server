@@ -17,7 +17,9 @@
 package org.graylog.mcp.resources;
 
 import io.modelcontextprotocol.spec.McpSchema;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
 import org.glassfish.jersey.uri.UriTemplate;
 import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
@@ -30,7 +32,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
-import jakarta.annotation.Nullable;
 
 import java.net.URI;
 import java.util.List;
@@ -55,8 +56,8 @@ public class StreamResourceProvider extends ResourceProvider {
                 new UriTemplate(GRN_TEMPLATE),
                 "Streams",
                 "Streams",
-                "Access streams in this Graylog cluster",
-                "application/json"
+                "Access streams in this cluster",
+                MediaType.APPLICATION_JSON
         );
     }
 
@@ -72,10 +73,10 @@ public class StreamResourceProvider extends ResourceProvider {
         try {
             final Stream stream = streamService.load(grn.entity());
             return Optional.of(McpSchema.Resource.builder()
-                                       .name(stream.getTitle())
-                                       .description(stream.getDescription())
-                                       .uri(grn.toString())
-                                       .build());
+                    .name(stream.getTitle())
+                    .description(stream.getDescription())
+                    .uri(grn.toString())
+                    .build());
         } catch (NotFoundException e) {
             return Optional.empty();
         }

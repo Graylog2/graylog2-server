@@ -19,6 +19,7 @@ package org.graylog.mcp.resources;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.MediaType;
 import org.glassfish.jersey.uri.UriTemplate;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -54,8 +55,8 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
                 new UriTemplate(GRN_TEMPLATE),
                 "EventDefinition",
                 "EventDefinition",
-                "Access Event Definitions in this Graylog cluster",
-                "application/json"
+                "Access Event Definitions in this cluster",
+                MediaType.APPLICATION_JSON
         );
     }
 
@@ -74,10 +75,10 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
         }
         final var eventDefinition = definitionDto.get();
         return Optional.of(McpSchema.Resource.builder()
-                                   .name(eventDefinition.title())
-                                   .description(eventDefinition.description())
-                                   .uri(grn.toString())
-                                   .build());
+                .name(eventDefinition.title())
+                .description(eventDefinition.description())
+                .uri(grn.toString())
+                .build());
     }
 
     @Override
@@ -86,7 +87,7 @@ public class EventDefinitionResourceProvider extends ResourceProvider {
         try (var dtos = eventDefinitionService.streamAll()) {
             return dtos
                     .filter(eventDefinition -> permissionHelper.isPermitted(RestPermissions.EVENT_DEFINITIONS_READ,
-                                                                            eventDefinition.id()))
+                            eventDefinition.id()))
                     .map(eventDefinition -> new McpSchema.Resource(
                             GRN_TYPE.toGRN(eventDefinition.id()).toString(),
                             eventDefinition.title(),

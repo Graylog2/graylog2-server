@@ -20,30 +20,29 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
-import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNType;
 import org.graylog.mcp.server.ResourceProvider;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
-import org.graylog2.shared.utilities.StringUtils;
+import org.graylog.mcp.server.Tool;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> {
     public static String NAME = "describe_resource";
 
+    private final GRNRegistry grnRegistry;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
 
     @Inject
     public ReadResourceTool(ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
+                            GRNRegistry grnRegistry,
+                            SchemaGeneratorProvider schemaGeneratorProvider,
+                            Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
@@ -51,19 +50,18 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
                 NAME,
                 "Describe a specific Graylog Resource with a given GRN",
                 "A brief description of the Graylog Resource.");
+        this.grnRegistry = grnRegistry;
         this.resourceProviders = resourceProviders;
     }
 
     @Override
     public String apply(PermissionHelper permissionHelper, ReadResourceTool.Parameters parameters) {
         try {
-            GRN grn = GRNRegistry.createWithBuiltinTypes().parse(parameters.grn);
-            final Optional<McpSchema.Resource> resource = this.resourceProviders.get(grn.grnType())
-                    .read(permissionHelper, new URI(parameters.grn));
-            if (resource.isEmpty()) {
-               return f("Unable to read resource %s", parameters.grn);
-            }
-            return resource.get().description();
+            final var grn = grnRegistry.parse(parameters.grn);
+            return resourceProviders.get(grn.grnType())
+                    .read(permissionHelper, new URI(parameters.grn))
+                    .map(McpSchema.Resource::description)
+                    .orElse(f("Unable to read resource %s", parameters.grn));
         } catch (URISyntaxException e) {
             return f("Unable to read resource %s", parameters.grn);
         }

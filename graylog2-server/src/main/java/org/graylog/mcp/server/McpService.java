@@ -56,6 +56,7 @@ public class McpService {
     private final ObjectMapper objectMapper;
     private final AuditEventSender auditEventSender;
     private final CustomizationConfig customizationConfig;
+    private final GRNRegistry grnRegistry;
     private final Map<String, Tool<?, ?>> tools;
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
     protected final List<String> supportedVersions = List.of(ProtocolVersions.MCP_2025_06_18);
@@ -64,11 +65,13 @@ public class McpService {
     protected McpService(ObjectMapper objectMapper,
                          AuditEventSender auditEventSender,
                          CustomizationConfig customizationConfig,
+                         GRNRegistry grnRegistry,
                          Map<String, Tool<?, ?>> tools,
                          Map<GRNType, ? extends ResourceProvider> resourceProviders) {
         this.objectMapper = objectMapper;
         this.auditEventSender = auditEventSender;
         this.customizationConfig = customizationConfig;
+        this.grnRegistry = grnRegistry;
         this.tools = tools;
         this.resourceProviders = resourceProviders;
     }
@@ -127,7 +130,7 @@ public class McpService {
                 McpSchema.ResourceContents contents;
                 try {
                     final McpSchema.Resource resource = this.resourceProviders
-                            .get(GRNRegistry.createWithBuiltinTypes().parse(readResourceRequest.uri()).grnType())
+                            .get(grnRegistry.parse(readResourceRequest.uri()).grnType())
                             .read(permissionHelper, new URI(readResourceRequest.uri()))
                             .orElseThrow();
                     contents = new McpSchema.TextResourceContents(resource.uri(), null, resource.description());
