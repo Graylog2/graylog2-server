@@ -20,7 +20,6 @@ import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.annotation.Nullable;
 import org.glassfish.jersey.uri.UriTemplate;
 import org.graylog.mcp.tools.PermissionHelper;
-import org.graylog2.database.NotFoundException;
 
 import java.net.URI;
 import java.util.List;
@@ -51,7 +50,6 @@ public abstract class ResourceProvider {
      * @param permissionHelper helper class encapsulating subject and permission check code
      * @param uri              a {@link org.graylog.grn.GRN GRN}
      * @return the loaded resource object
-     * @throws NotFoundException if Graylog cannot find this resource
      */
     public abstract Optional<McpSchema.Resource> read(final PermissionHelper permissionHelper, URI uri);
 

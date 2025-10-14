@@ -29,7 +29,6 @@ import org.graylog.mcp.server.ResourceProvider;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQuery;
 
@@ -77,10 +76,10 @@ public class DashboardResourceProvider extends ResourceProvider {
             return Optional.empty();
         }
         return Optional.of(McpSchema.Resource.builder()
-                                   .name(dashboard.title())
-                                   .description(dashboard.description())
-                                   .uri(grn.toString())
-                                   .build());
+                .name(dashboard.title())
+                .description(dashboard.description())
+                .uri(grn.toString())
+                .build());
     }
 
     @Override

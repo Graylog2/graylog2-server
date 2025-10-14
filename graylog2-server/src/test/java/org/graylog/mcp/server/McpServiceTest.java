@@ -26,7 +26,6 @@ import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.users.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -156,11 +155,11 @@ class McpServiceTest {
         // Given
         ResourceProvider mockProvider = mock(ResourceProvider.class);
         McpSchema.Resource resource1 = McpSchema.Resource.builder()
-                        .uri("grn::dashboard:test123")
-                        .name("Test Resource 1")
-                        .description("Description 1")
-                        .mimeType("text/plain")
-                        .build();
+                .uri("grn::dashboard:test123")
+                .name("Test Resource 1")
+                .description("Description 1")
+                .mimeType("text/plain")
+                .build();
         when(mockProvider.list(eq(permissionHelper), any(), any())).thenReturn(List.of(resource1));
 
         resourceProviders.put(GRNTypes.DASHBOARD, mockProvider);
@@ -222,7 +221,7 @@ class McpServiceTest {
     }
 
     @Test
-    void testReadResourceThrowsException() throws NotFoundException {
+    void testReadResourceThrowsException() {
         // Given
         ResourceProvider mockProvider = mock(ResourceProvider.class);
         when(mockProvider.read(eq(permissionHelper), any(URI.class))).thenReturn(Optional.empty());
