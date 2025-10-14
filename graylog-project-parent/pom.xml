@@ -416,29 +416,6 @@
                 </exclusions>
             </dependency>
 
-            <dependency>
-                <groupId>io.modelcontextprotocol.sdk</groupId>
-                <artifactId>mcp-bom</artifactId>
-                <type>pom</type>
-                <version>${mcp-bom.version}</version>
-                <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.github.victools</groupId>
-                <artifactId>jsonschema-generator</artifactId>
-                <version>${json-schema-generator.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.victools</groupId>
-                <artifactId>jsonschema-module-jackson</artifactId>
-                <version>${json-schema-generator.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.victools</groupId>
-                <artifactId>jsonschema-module-jakarta-validation</artifactId>
-                <version>${json-schema-generator.version}</version>
-            </dependency>
-
             <!-- Test dependencies -->
             <dependency>
                 <groupId>junit</groupId>
