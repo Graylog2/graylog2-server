@@ -20,9 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.mcp.server.Tool;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
-import org.graylog2.plugin.streams.Stream;
+import org.graylog.mcp.server.Tool;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
@@ -36,27 +35,26 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
 
     @Inject
     public ListStreamsTool(ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, StreamService streamService) {
+                           SchemaGeneratorProvider schemaGeneratorProvider, StreamService streamService) {
         super(objectMapper,
                 schemaGeneratorProvider,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                "List all Graylog Streams",
-                "List all available streams in the Graylog instance.");
+                "List all Streams",
+                "List all available streams in the server instance.");
         this.streamService = streamService;
     }
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListStreamsTool.Parameters unused) {
-        try (java.util.stream.Stream<Stream> dtos = streamService.streamAllDTOs()) {
+        try (var dtos = streamService.streamAllDTOs()) {
             return getObjectMapper().writeValueAsString(
                     dtos.filter(stream -> permissionHelper.isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                             .map(stream -> Map.of(
                                     "id", stream.getId(),
                                     "title", stream.getTitle(),
                                     "description", stream.getDescription(),
-//                                    "indexset", stream.getIndexSet() == null ? "Unknown indexset" : stream.getIndexSet().getConfig().title(),
                                     "disabled", stream.getDisabled(),
                                     "matching_type", stream.getMatchingType(),
                                     "created_at", stream.getCreatedAt(),
