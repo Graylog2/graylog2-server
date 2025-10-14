@@ -14,20 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import TextWidget from 'views/logic/widgets/TextWidget';
-import TextWidgetConfig from 'views/logic/widgets/TextWidgetConfig';
-import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
-import { addWidget } from 'views/logic/slices/widgetActions';
+import type { SearchParams } from 'stores/PaginationTypes';
 
-const defaultText = `
-Please edit me to set the text (Markdown) you want to display. You can include:
-   - tables
-   - images
-   - links
-   - lists 
-   
-and more.
-`;
-
-export const CreateTextWidget = () => TextWidget.builder().newId().config(new TextWidgetConfig(defaultText)).build();
-export default () => (dispatch: ViewsDispatch) => dispatch(addWidget(CreateTextWidget()));
+export type SearchParamsForDashboards = SearchParams & {
+  scope: 'read' | 'update';
+};
