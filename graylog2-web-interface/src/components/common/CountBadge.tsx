@@ -19,20 +19,26 @@ import { forwardRef } from 'react';
 
 import Badge from 'components/bootstrap/Badge';
 
+const StyledBadge = styled(Badge)<{ onClick: () => void }>(
+  ({ onClick }) => css`
+    cursor: ${onClick ? 'pointer' : 'default'};
+  `,
+);
+
 type Props = {
-  children: React.ReactNode;
   onClick?: () => void;
   className?: string;
   title?: string;
+  count: number;
 };
 
 const CountBadge = (
-  { children, onClick = undefined, className = '', title = undefined }: Props,
+  { onClick = undefined, className = '', title = undefined, count }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
-  <Badge bsStyle="info" className={className} onClick={onClick} ref={ref} title={title}>
-    {children}
-  </Badge>
+  <StyledBadge bsStyle={!count ? 'gray' : 'info'} className={className} onClick={onClick} ref={ref} title={title}>
+    {count}
+  </StyledBadge>
 );
 
 export default forwardRef(CountBadge);
