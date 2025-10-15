@@ -28,6 +28,14 @@ import org.joda.time.DateTimeZone;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+/**
+ * This tool is needed because an LLM has no way of knowing the current time. So if you want to ask the LLM how long
+ * ago an event happened, it won't be able to answer without a tool to get the "current time" or the
+ * "time of last query".
+ * <p>
+ * Without this tool, we've seen multiple cases where the LLM assumes that the "started_at" time provided by the
+ * system info tool is the current time, which obviously will lead to misleading conclusions.
+ */
 public class CurrentTimeTool extends Tool<CurrentTimeTool.Parameters, String> {
     public static String NAME = "get_current_time";
 
