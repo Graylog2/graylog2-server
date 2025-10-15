@@ -21,7 +21,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import type { EntitySharedAction, ModalHandler } from 'components/permissions/types';
 import { HasOwnership } from 'components/common';
 
-function usePluggableEntitySharedActions<T>(entity: T, entityType: string, modalOnUnmount = undefined) {
+function usePluggableEntitySharedActions<T>(entity: T, entityType: string, onCloseModal = undefined) {
   const modalRefs = useRef({});
   const pluginActions = usePluginEntities('components.shared.entityActions');
 
@@ -54,7 +54,7 @@ function usePluggableEntitySharedActions<T>(entity: T, entityType: string, modal
         <ActionModal
           entity={entity}
           entityType={entityType}
-          cb={modalOnUnmount}
+          onClose={onCloseModal}
           key={`entity-action-modal-${key}`}
           ref={(ref) => {
             modalRefs.current[key] = ref;
