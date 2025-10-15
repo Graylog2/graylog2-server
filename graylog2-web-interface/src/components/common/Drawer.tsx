@@ -72,13 +72,18 @@ type Props = Pick<
   | 'overlayProps'
   | 'styles'
   | 'transitionProps'
->;
-const Drawer = ({ title, ...props }: Props) => (
+  | 'lockScroll'
+> & {
+  double?: boolean;
+};
+
+const Drawer = ({ title, double = false, lockScroll = false, ...props }: Props) => (
   <StyledDrawer
     offset={15}
     padding="lg"
     radius={5}
     zIndex={1032}
+    lockScroll={lockScroll}
     title={
       <TitleWrapper>
         <Title>{title}</Title>
