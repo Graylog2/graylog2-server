@@ -21,9 +21,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 
 import java.util.List;
@@ -31,10 +31,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.graylog.plugins.views.search.aggregations.MissingBucketConstants.MISSING_BUCKET_NAME;
-import static org.graylog.testing.containermatrix.SearchServer.ES7;
-import static org.graylog.testing.containermatrix.SearchServer.OS1;
-import static org.graylog.testing.containermatrix.SearchServer.OS2;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItems;
@@ -43,22 +39,19 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.IsNot.not;
 
-@ContainerMatrixTestsConfiguration(searchVersions = {OS1, ES7, OS2, OS2_LATEST})
+@GraylogBackendConfiguration
 public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     @SuppressWarnings("unused")
     //use this fixtureType:474877 in all fixtures to assure this test isolation from the others
     private static final String FIXTURE_TYPE_FIELD_VALUE = "474877";
 
-    private final GraylogApis api;
-
-    public SearchWithAggregationsSupportingMissingBucketsIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static GraylogApis api;
 
     @BeforeAll
-    public void setUp() {
-        this.api.backend().importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
+        api.backend().importElasticsearchFixture("messages-for-missing-aggregation-check.json", SearchWithAggregationsSupportingMissingBucketsIT.class);
     }
 
     private ValidatableResponse execute(Pivot pivot) {
@@ -66,7 +59,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .body(".total", equalTo(5));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleFieldAggregationHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -103,7 +96,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSingleFieldAggregationHasNoMissingBucketWhenSkipEmptyValuesIsUsed() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -136,7 +129,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupledFieldAggregationHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -167,7 +160,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         return ".rows.findAll { " + condition + " }.values.value";
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoTupledFieldAggregationHasNoMissingBucketWhenSkipEmptyValuesIsUsed() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -192,7 +185,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", nullValue());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoNestedFieldAggregationHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)
@@ -219,7 +212,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
         validatableResponse.body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "', 'Cooper'] }.values.value", hasItems(1, 60.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRowAndColumnPivotHasProperMissingBucket() {
         final Pivot pivot = Pivot.builder()
                 .rollup(false)
@@ -233,7 +226,7 @@ public class SearchWithAggregationsSupportingMissingBucketsIT {
                 .body(".rows.find{ it.key == ['" + MISSING_BUCKET_NAME + "'] }.values.value", hasItems(1, 60.0f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMissingBucketIsNotPresentIfItHasZeroValues() {
         final Pivot pivot = Pivot.builder()
                 .rollup(true)

@@ -14,13 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.lock;
+package org.graylog.testing.storage;
 
-import org.graylog.testing.containermatrix.MongodbServer;
-import org.graylog.testing.mongodb.MongoDBExtension;
-import org.junit.jupiter.api.extension.RegisterExtension;
+import com.github.zafarkhaja.semver.Version;
+import org.graylog2.storage.SearchVersion;
 
-public class MongoLockServiceTest7 extends MongoLockServiceTest {
-    @RegisterExtension
-    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongodbServer.MONGO7);
+public class SearchServer {
+    private static final String DEFAULT_VERSION_STRING = "2.19.3";
+
+    public static final SearchVersion DEFAULT_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.parse(DEFAULT_VERSION_STRING));
+
+    private SearchServer() {
+    }
 }
