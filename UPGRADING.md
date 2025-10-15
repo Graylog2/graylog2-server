@@ -147,7 +147,10 @@ The following REST API changes have been made.
 | All `/api/plugins/org.graylog.plugins.securityapp.asset/assets/history/...` | Removed all endpoints. Contents of underlying `asset_history` MongoDB collection migrated to `Asset History` Index set and Stream               |
 | `GET /<endpoint>`                                                           | description                                                                                                                                        |
 
-## Deprecation of Elasticsearch
+
+## Deprecation of old Search Backends
+
+### Deprecation of Elasticsearch
 
 Graylog introduced support for OpenSearch as its new search backend in 2022. To simplify the installation and management
 of OpenSearch, the Graylog Data Node component was later developed. Today, Data Node or a self-managed OpenSearch
@@ -157,3 +160,18 @@ Starting with Graylog 7.0, the use of Elasticsearch as a search backend is depre
 
 Graylog users are encouraged to migrate to Data Node or self-managed OpenSearch, as Elasticsearch support will be 
 removed entirely in Graylog 8.0.
+
+### Deprecation of OpenSearch 1.x
+
+According to the official OpenSearch Maintenance Policy, the OpenSearch 1.x maintenance window ended in May 2025. As a 
+result, OpenSearch 1.x will no longer receive back-port fixes or features.
+
+Therefore, starting with Graylog 7.0, the use of OpenSearch 1.x is deprecated.
+
+Graylog users are encouraged to use Graylog Data Node or a supported, self-managed version of OpenSearch. See Graylog's 
+Compatibility Matrix for details on supported OpenSearch versions.
+
+Links:
+- [OpenSearch Release Schedule and Maintenance Policy](https://opensearch.org/releases/)
+- [Graylog Data Node](https://go2docs.graylog.org/current/downloading_and_installing_graylog/install_graylog_data_node.htm)
+- [Graylog Compatibility Matrix](https://go2docs.graylog.org/current/downloading_and_installing_graylog/compatibility_matrix.htm)
