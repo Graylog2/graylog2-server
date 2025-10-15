@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import type {
   ClickPoint,
@@ -24,6 +24,8 @@ import type {
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ClickPointSelector from 'views/components/visualizations/OnClickPopover/ClickPointSelector';
 import ValueActionsDropdown from 'views/components/visualizations/OnClickPopover/ValueActionsDropdown';
+import { AdditionalContext } from 'views/logic/ActionContext';
+import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
 
 type Props = {
   component: OnClickPopoverDropdown;
@@ -50,6 +52,7 @@ const DropdownSwitcher = ({
   const [selectedClickPoint, setSelectedClickPoint] = useState<ClickPoint>();
   const [showValuesComponent, setShowValuesComponent] = useState<boolean>();
   const [fieldData, setFieldData] = useState<FieldData>(null);
+  const types = useQueryFieldTypes();
 
   const onSelect = (pt: ClickPoint) => {
     setShowValuesComponent(true);
@@ -63,6 +66,14 @@ const DropdownSwitcher = ({
     setFieldData(null);
   }, [clickPoint, clickPointsInRadius]);
 
+  const additionalContextValue = useMemo(
+    () => ({
+      valuePath: fieldData?.contexts?.valuePath,
+      fieldTypes: types,
+    }),
+    [fieldData?.contexts?.valuePath, types],
+  );
+
   if (!selectedClickPoint) return null;
 
   const onActionRun = () => {
@@ -71,7 +82,11 @@ const DropdownSwitcher = ({
   };
 
   if (fieldData)
-    return <ValueActionsDropdown field={fieldData.field} value={fieldData.value} onActionRun={onActionRun} />;
+    return (
+      <AdditionalContext.Provider value={additionalContextValue}>
+        <ValueActionsDropdown field={fieldData.field} value={fieldData.value} onActionRun={onActionRun} />
+      </AdditionalContext.Provider>
+    );
 
   return showValuesComponent ? (
     <Component clickPoint={selectedClickPoint} config={config} setFieldData={setFieldData} />
