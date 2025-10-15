@@ -41,7 +41,7 @@ const StyledLabel = styled.b(
   `,
 );
 
-type Props = React.PropsWithChildren<{ onBackClick?: () => void | false }>;
+type Props = React.PropsWithChildren<{ onBackClick?: (() => void) | false }>;
 
 const PopoverTitle = ({ children = null, onBackClick = false }: Props) => (
   <Title>
