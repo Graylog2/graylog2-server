@@ -18,11 +18,11 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
@@ -68,7 +68,7 @@ import java.util.SortedSet;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/IndexRanges", description = "Index timeranges", tags = {CLOUD_VISIBLE})
+@Tag(name = "System/IndexRanges", description = "Index timeranges")
 @Path("/system/indices/ranges")
 public class IndexRangesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
@@ -97,7 +97,7 @@ public class IndexRangesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a list of all index ranges")
+    @Operation(summary = "Get a list of all index ranges")
     @Produces(MediaType.APPLICATION_JSON)
     public IndexRangesResponse list() {
         final SortedSet<IndexRange> all = indexRangeService.findAll();
@@ -122,10 +122,10 @@ public class IndexRangesResource extends RestResource {
     @GET
     @Path("/{index: [a-z_0-9]+}")
     @Timed
-    @ApiOperation(value = "Show single index range")
+    @Operation(summary = "Show single index range")
     @Produces(MediaType.APPLICATION_JSON)
     public IndexRangeSummary show(
-            @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
+            @Parameter(name = "index", description = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) throws NotFoundException {
         if (!indexSetRegistry.isManagedIndex(index)) {
             throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
@@ -146,12 +146,12 @@ public class IndexRangesResource extends RestResource {
     @Timed
     @Path("/rebuild")
     @RequiresPermissions(RestPermissions.INDEXRANGES_REBUILD)
-    @ApiOperation(value = "Rebuild/sync index range information.",
-                  notes = "This triggers a systemjob that scans every index and stores meta information " +
+    @Operation(summary = "Rebuild/sync index range information.",
+                  description = "This triggers a systemjob that scans every index and stores meta information " +
                           "about what indices contain messages in what timeranges. It atomically overwrites " +
                           "already existing meta information.")
     @ApiResponses(value = {
-            @ApiResponse(code = 202, message = "Rebuild/sync systemjob triggered.")
+            @ApiResponse(responseCode = "202", description = "Rebuild/sync systemjob triggered.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
@@ -166,16 +166,16 @@ public class IndexRangesResource extends RestResource {
     @Timed
     @Path("/index_set/{indexSetId}/rebuild")
     @RequiresPermissions(RestPermissions.INDEXRANGES_REBUILD)
-    @ApiOperation(value = "Rebuild/sync index range information for the given index set.",
-                  notes = "This triggers a systemjob that scans every index in the given index set and stores meta information " +
+    @Operation(summary = "Rebuild/sync index range information for the given index set.",
+                  description = "This triggers a systemjob that scans every index in the given index set and stores meta information " +
                           "about what indices contain messages in what timeranges. It atomically overwrites " +
                           "already existing meta information.")
     @ApiResponses(value = {
-            @ApiResponse(code = 202, message = "Rebuild/sync systemjob triggered.")
+            @ApiResponse(responseCode = "202", description = "Rebuild/sync systemjob triggered.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
-    public Response rebuildIndexSet(@ApiParam(name = "indexSetId") @PathParam("indexSetId") @NotBlank final String indexSetId) {
+    public Response rebuildIndexSet(@Parameter(name = "indexSetId") @PathParam("indexSetId") @NotBlank final String indexSetId) {
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
                 .orElseThrow(() -> new jakarta.ws.rs.NotFoundException("Index set <" + indexSetId + "> not found!"));
 
@@ -187,17 +187,17 @@ public class IndexRangesResource extends RestResource {
     @POST
     @Timed
     @Path("/{index: [a-z_0-9-]+}/rebuild")
-    @ApiOperation(value = "Rebuild/sync index range information.",
-                  notes = "This triggers a system job that scans an index and stores meta information " +
+    @Operation(summary = "Rebuild/sync index range information.",
+                  description = "This triggers a system job that scans an index and stores meta information " +
                           "about what indices contain messages in what time ranges. It atomically overwrites " +
                           "already existing meta information.")
     @ApiResponses(value = {
-            @ApiResponse(code = 202, message = "Rebuild/sync system job triggered.")
+            @ApiResponse(responseCode = "202", description = "Rebuild/sync system job triggered.")
     })
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuildIndex(
-            @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
+            @Parameter(name = "index", description = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) {
         if (!indexSetRegistry.isManagedIndex(index)) {
             throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");

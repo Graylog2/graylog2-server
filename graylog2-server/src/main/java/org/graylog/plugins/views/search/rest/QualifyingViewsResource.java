@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.views.QualifyingViewsService;
@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Views/QualifyingViews", tags = {CLOUD_VISIBLE})
+@Tag(name = "Views/QualifyingViews")
 @Path("/views/forValue")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -52,7 +52,7 @@ public class QualifyingViewsResource extends RestResource implements PluginRestR
     }
 
     @POST
-    @ApiOperation("Get all views that match given parameter value")
+    @Operation(summary = "Get all views that match given parameter value")
     @NoAuditEvent("Only returning matching views, not changing any data")
     public Collection<ViewParameterSummaryDTO> forParameter(@Context SearchUser searchUser) {
         return qualifyingViewsService.forValue()

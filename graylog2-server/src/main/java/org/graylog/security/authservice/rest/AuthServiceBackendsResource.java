@@ -18,9 +18,9 @@ package org.graylog.security.authservice.rest;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -78,7 +78,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 @Path("/system/authentication/services/backends")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "System/Authentication/Services/Backends", description = "Manage authentication service backends")
+@Tag(name = "System/Authentication/Services/Backends", description = "Manage authentication service backends")
 @RequiresAuthentication
 public class AuthServiceBackendsResource extends RestResource {
     private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
@@ -112,7 +112,7 @@ public class AuthServiceBackendsResource extends RestResource {
     @GET
     @RequiresGuest
     @Path("active-backend/type")
-    @ApiOperation("Returns type of currently active authentication service backend")
+    @Operation(summary = "Returns type of currently active authentication service backend")
     public Response getActiveType() {
         String type = null;
         final AuthServiceBackendDTO activeBackendConfig = globalAuthServiceConfig.getActiveBackendConfig().orElse(null);
@@ -123,8 +123,8 @@ public class AuthServiceBackendsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Returns available authentication service backends")
-    public PaginatedResponse<AuthServiceBackendDTO> list(@ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParameters) {
+    @Operation(summary = "Returns available authentication service backends")
+    public PaginatedResponse<AuthServiceBackendDTO> list(@Parameter(name = "pagination parameters") @BeanParam PaginationParameters paginationParameters) {
         final AuthServiceBackendDTO activeBackendConfig = globalAuthServiceConfig.getActiveBackendConfig()
                 .filter(this::checkReadPermission)
                 .orElse(null);
@@ -139,18 +139,18 @@ public class AuthServiceBackendsResource extends RestResource {
 
     @GET
     @Path("{backendId}")
-    @ApiOperation("Returns the authentication service backend for the given ID")
-    public Response get(@ApiParam(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId) {
+    @Operation(summary = "Returns the authentication service backend for the given ID")
+    public Response get(@Parameter(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId) {
         checkPermission(RestPermissions.AUTH_SERVICE_BACKEND_READ, backendId);
 
         return toResponse(loadConfig(backendId));
     }
 
     @POST
-    @ApiOperation("Creates a new authentication service backend")
+    @Operation(summary = "Creates a new authentication service backend")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_BACKEND_CREATE)
     @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_BACKEND_CREATE)
-    public Response create(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendDTO newConfig) {
+    public Response create(@Parameter(name = "JSON body", required = true) @NotNull AuthServiceBackendDTO newConfig) {
         validateConfig(newConfig);
 
         return toResponse(dbService.save(newConfig));
@@ -158,10 +158,10 @@ public class AuthServiceBackendsResource extends RestResource {
 
     @PUT
     @Path("{backendId}")
-    @ApiOperation("Updates an existing authentication service backend")
+    @Operation(summary = "Updates an existing authentication service backend")
     @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_BACKEND_UPDATE)
-    public Response update(@ApiParam(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId,
-                           @ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendDTO updatedConfig) {
+    public Response update(@Parameter(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId,
+                           @Parameter(name = "JSON body", required = true) @NotNull AuthServiceBackendDTO updatedConfig) {
         checkPermission(RestPermissions.AUTH_SERVICE_BACKEND_EDIT, backendId);
         validateConfig(updatedConfig);
 
@@ -172,9 +172,9 @@ public class AuthServiceBackendsResource extends RestResource {
 
     @DELETE
     @Path("{backendId}")
-    @ApiOperation("Delete authentication service backend")
+    @Operation(summary = "Delete authentication service backend")
     @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_BACKEND_DELETE)
-    public void delete(@ApiParam(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId) {
+    public void delete(@Parameter(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId) {
         checkPermission(RestPermissions.AUTH_SERVICE_BACKEND_DELETE, backendId);
 
         final AuthServiceBackendDTO config = loadConfig(backendId);
@@ -187,17 +187,17 @@ public class AuthServiceBackendsResource extends RestResource {
 
     @GET
     @Path("{backendId}/users")
-    @ApiOperation("Get paginated users for an authentication service backend")
+    @Operation(summary = "Get paginated users for an authentication service backend")
     @RequiresPermissions({RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_READ, RestPermissions.USERS_READ})
     public PaginatedResponse<UserOverviewDTO> getUsers(
-            @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @ApiParam(name = "sort", value = "The field to sort the result on", required = true, allowableValues = "username,full_name,email")
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "sort", description = "The field to sort the result on", required = true)
             @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
-            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+            @Parameter(name = "order", description = "The sort direction")
             @DefaultValue("asc") @QueryParam("order") SortOrder order,
-            @ApiParam(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId
+            @Parameter(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId
     ) {
         final AuthServiceBackendDTO activeConfig = loadConfig(backendId);
 

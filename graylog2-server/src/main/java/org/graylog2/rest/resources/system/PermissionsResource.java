@@ -19,9 +19,9 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Ordering;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -44,7 +44,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/Permissions", description = "Retrieval of system permissions.", tags = {CLOUD_VISIBLE})
+@Tag(name = "System/Permissions", description = "Retrieval of system permissions.")
 @Path("/system/permissions")
 @Produces(APPLICATION_JSON)
 public class PermissionsResource extends RestResource {
@@ -62,7 +62,7 @@ public class PermissionsResource extends RestResource {
     @GET
     @Timed
     @RequiresGuest // turns off authentication for this action
-    @ApiOperation(value = "Get all available user permissions.")
+    @Operation(summary = "Get all available user permissions.")
     public Map<String, Map<String, Collection<String>>> permissions() {
         return ImmutableMap.of("permissions", permissions.allPermissionsMap());
     }
@@ -70,11 +70,11 @@ public class PermissionsResource extends RestResource {
     @GET
     @Timed
     @RequiresGuest
-    @ApiOperation(value = "Get the initial permissions assigned to a reader account")
+    @Operation(summary = "Get the initial permissions assigned to a reader account")
     @Path("reader/{username}")
     @Produces(APPLICATION_JSON)
     public ReaderPermissionResponse readerPermissions(
-            @ApiParam(name = "username", required = true)
+            @Parameter(name = "username", required = true)
             @PathParam("username") String username) {
         final User user = userService.load(username);
         final boolean isExternal = user == null || user.isExternalUser();

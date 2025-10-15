@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -73,7 +73,7 @@ import java.util.Set;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Path("/system/sessions")
-@Api(value = "System/Sessions", tags = {CLOUD_VISIBLE})
+@Tag(name = "System/Sessions")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SessionsResource extends RestResource {
@@ -110,12 +110,11 @@ public class SessionsResource extends RestResource {
     }
 
     @POST
-    @ApiOperation(value = "Create a new session",
-                  notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.",
-                  response = SessionResponse.class)
+    @Operation(summary = "Create a new session",
+                  description = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
     @NoAuditEvent("dispatches audit events in the method body")
     public Response newSession(@Context ContainerRequestContext requestContext,
-                               @ApiParam(name = "Login request", value = "Credentials. The default " +
+                               @Parameter(name = "Login request", description = "Credentials. The default " +
                                        "implementation requires presence of two properties: 'username' and " +
                                        "'password'. However a plugin may customize which kind of credentials " +
                                        "are accepted and therefore expect different properties.",
@@ -161,11 +160,8 @@ public class SessionsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Validate an existing session",
-                  notes = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.",
-                  code = 204,
-                  response = SessionValidationResponse.class
-    )
+    @Operation(summary = "Validate an existing session",
+                  description = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.")
     public Response validateSession(@Context ContainerRequestContext requestContext) {
         try {
             this.authenticationFilter.filter(requestContext);
@@ -221,12 +217,12 @@ public class SessionsResource extends RestResource {
     }
 
     @DELETE
-    @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
+    @Operation(summary = "Terminate an existing session", description = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
     @Deprecated
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
-    public Response terminateSessionWithId(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId,
+    public Response terminateSessionWithId(@Parameter(name = "sessionId", required = true) @PathParam("sessionId") String sessionId,
                                            @Context ContainerRequestContext requestContext) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
@@ -237,7 +233,7 @@ public class SessionsResource extends RestResource {
     }
 
     @DELETE
-    @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
+    @Operation(summary = "Terminate an existing session", description = "Destroys the session with the given ID: the equivalent of logging out.")
     @RequiresAuthentication
     @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
     public Response terminateSession(@Context ContainerRequestContext requestContext) {

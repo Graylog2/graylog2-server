@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.system;
 
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.system.traffic.TrafficCounterService;
@@ -36,7 +36,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "System/ClusterTraffic", description = "Cluster traffic stats", tags = {CLOUD_VISIBLE})
+@Tag(name = "System/ClusterTraffic", description = "Cluster traffic stats")
 @RequiresAuthentication
 @Path("/system/cluster/traffic")
 @Produces(MediaType.APPLICATION_JSON)
@@ -50,12 +50,12 @@ public class TrafficResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Get the cluster traffic stats")
-    public TrafficCounterService.TrafficHistogram get(@ApiParam(name = "days", value = "For how many days the traffic stats should be returned")
+    @Operation(summary = "Get the cluster traffic stats")
+    public TrafficCounterService.TrafficHistogram get(@Parameter(name = "days", description = "For how many days the traffic stats should be returned")
                                                       @QueryParam("days") @DefaultValue("30") int days,
-                                                      @ApiParam(name = "daily", value = "Whether the traffic should be aggregate to daily values")
+                                                      @Parameter(name = "daily", description = "Whether the traffic should be aggregate to daily values")
                                                       @QueryParam("daily") @DefaultValue("false") boolean daily,
-                                                      @ApiParam(name = "includeToday", value = "Whether the traffic should include up to the current date/time (in UTC).")
+                                                      @Parameter(name = "includeToday", description = "Whether the traffic should include up to the current date/time (in UTC).")
                                                       @QueryParam("includeToday") @DefaultValue("true") boolean includeToday) {
         return trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(days),
                 daily ? TrafficCounterService.Interval.DAILY : TrafficCounterService.Interval.HOURLY,

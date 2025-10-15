@@ -17,11 +17,11 @@
 package org.graylog2.rest.resources.streams.rules;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -61,7 +61,7 @@ import java.util.List;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "StreamRules", description = "Manage stream rules", tags = {CLOUD_VISIBLE})
+@Tag(name = "StreamRules", description = "Manage stream rules")
 @Path("/streams/{streamid}/rules")
 public class StreamRuleResource extends RestResource {
     private final StreamRuleService streamRuleService;
@@ -76,13 +76,13 @@ public class StreamRuleResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Create a stream rule")
+    @Operation(summary = "Create a stream rule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_RULE_CREATE)
-    public Response create(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+    public Response create(@Parameter(name = "streamid", description = "The stream id this new rule belongs to.", required = true)
                            @PathParam("streamid") String streamId,
-                           @ApiParam(name = "JSON body", required = true)
+                           @Parameter(name = "JSON body", required = true)
                            @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditable(streamId, "Cannot add stream rules to non-editable streams.");
@@ -105,19 +105,19 @@ public class StreamRuleResource extends RestResource {
     @PUT
     @Path("/{streamRuleId}")
     @Timed
-    @ApiOperation(value = "Update a stream rule")
+    @Operation(summary = "Update a stream rule")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream or stream rule not found."),
-            @ApiResponse(code = 400, message = "Invalid JSON Body.")
+            @ApiResponse(responseCode = "404", description = "Stream or stream rule not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid JSON Body.")
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_RULE_UPDATE)
-    public SingleStreamRuleSummaryResponse update(@ApiParam(name = "streamid", value = "The stream id this rule belongs to.", required = true)
+    public SingleStreamRuleSummaryResponse update(@Parameter(name = "streamid", description = "The stream id this rule belongs to.", required = true)
                                                   @PathParam("streamid") String streamid,
-                                                  @ApiParam(name = "streamRuleId", value = "The stream rule id we are updating", required = true)
+                                                  @Parameter(name = "streamRuleId", description = "The stream rule id we are updating", required = true)
                                                   @PathParam("streamRuleId") String streamRuleId,
-                                                  @ApiParam(name = "JSON body", required = true)
+                                                  @Parameter(name = "JSON body", required = true)
                                                   @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkNotEditable(streamid, "Cannot update stream rules on non-editable streams.");
@@ -162,9 +162,9 @@ public class StreamRuleResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a list of all stream rules")
+    @Operation(summary = "Get a list of all stream rules")
     @Produces(MediaType.APPLICATION_JSON)
-    public StreamRuleListResponse get(@ApiParam(name = "streamid", value = "The id of the stream whose stream rules we want.", required = true)
+    public StreamRuleListResponse get(@Parameter(name = "streamid", description = "The id of the stream whose stream rules we want.", required = true)
                                       @PathParam("streamid") String streamid) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
@@ -177,10 +177,10 @@ public class StreamRuleResource extends RestResource {
     @GET
     @Path("/{streamRuleId}")
     @Timed
-    @ApiOperation(value = "Get a single stream rules")
+    @Operation(summary = "Get a single stream rules")
     @Produces(MediaType.APPLICATION_JSON)
-    public StreamRule get(@ApiParam(name = "streamid", value = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
-                          @ApiParam(name = "streamRuleId", value = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) throws NotFoundException {
+    public StreamRule get(@Parameter(name = "streamid", description = "The id of the stream whose stream rule we want.", required = true) @PathParam("streamid") String streamid,
+                          @Parameter(name = "streamRuleId", description = "The stream rule id we are getting", required = true) @PathParam("streamRuleId") String streamRuleId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         return streamRuleService.load(streamRuleId);
@@ -189,15 +189,15 @@ public class StreamRuleResource extends RestResource {
     @DELETE
     @Path("/{streamRuleId}")
     @Timed
-    @ApiOperation(value = "Delete a stream rule")
+    @Operation(summary = "Delete a stream rule")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Stream rule not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(responseCode = "404", description = "Stream rule not found."),
+            @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_RULE_DELETE)
-    public void delete(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+    public void delete(@Parameter(name = "streamid", description = "The stream id this new rule belongs to.", required = true)
                        @PathParam("streamid") String streamid,
-                       @ApiParam(name = "streamRuleId", required = true)
+                       @Parameter(name = "streamRuleId", required = true)
                        @PathParam("streamRuleId") @NotEmpty String streamRuleId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkNotEditable(streamid, "Cannot delete stream rule on non-editable streams.");
@@ -213,10 +213,10 @@ public class StreamRuleResource extends RestResource {
     @GET
     @Path("/types")
     @Timed
-    @ApiOperation(value = "Get all available stream types")
+    @Operation(summary = "Get all available stream types")
     @Produces(MediaType.APPLICATION_JSON)
     // TODO: Move this to a better place. This method is not related to a context that is bound to the instance of a stream.
-    public List<StreamRuleTypeResponse> types(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
+    public List<StreamRuleTypeResponse> types(@Parameter(name = "streamid", description = "The stream id this new rule belongs to.", required = true)
                                               @PathParam("streamid") String streamid) {
         final List<StreamRuleTypeResponse> result = new ArrayList<>(StreamRuleType.values().length);
         for (StreamRuleType type : StreamRuleType.values()) {

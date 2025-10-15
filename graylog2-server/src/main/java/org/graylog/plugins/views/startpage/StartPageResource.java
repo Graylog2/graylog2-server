@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.startpage;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
@@ -49,7 +49,7 @@ import java.util.Optional;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "StartPage", tags = {CLOUD_VISIBLE})
+@Tag(name = "StartPage")
 @Path("/startpage")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -63,18 +63,18 @@ public class StartPageResource extends RestResource implements PluginRestResourc
 
     @GET
     @Path("/lastOpened")
-    @ApiOperation("Get the Last Opened Items for the Start Page for the user")
-    public PaginatedResponse<LastOpened> getLastOpened(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                       @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+    @Operation(summary = "Get the Last Opened Items for the Start Page for the user")
+    public PaginatedResponse<LastOpened> getLastOpened(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                       @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
                                                        @Context SearchUser searchUser) {
         return service.findLastOpenedFor(searchUser, page, perPage);
     }
 
     @GET
     @Path("/recentActivity")
-    @ApiOperation("Get Recent Activities for the Start Page for the user")
-    public PaginatedResponse<RecentActivity> getRecentActivity(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                               @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
+    @Operation(summary = "Get Recent Activities for the Start Page for the user")
+    public PaginatedResponse<RecentActivity> getRecentActivity(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                               @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("5") int perPage,
                                                                @Context SearchUser searchUser) {
         return service.findRecentActivityFor(searchUser, page, perPage);
     }

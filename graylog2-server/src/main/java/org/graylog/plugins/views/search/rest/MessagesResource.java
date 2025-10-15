@@ -17,9 +17,9 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.eventbus.EventBus;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BadRequestException;
@@ -71,7 +71,7 @@ import java.util.stream.Stream;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.", tags = {CLOUD_VISIBLE})
+@Tag(name = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
 @Path("/views/search/messages")
 @RequiresAuthentication
 public class MessagesResource extends RestResource implements PluginRestResource {
@@ -117,14 +117,14 @@ public class MessagesResource extends RestResource implements PluginRestResource
         this.streamCategoryMapper = streamCategoryMapper;
     }
 
-    @ApiOperation(
-            value = "Export messages as CSV",
-            notes = "Use this endpoint, if you want to configure export parameters freely instead of relying on an existing Search"
+    @Operation(
+            summary = "Export messages as CSV",
+            description = "Use this endpoint, if you want to configure export parameters freely instead of relying on an existing Search"
     )
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
-    public ChunkedOutput<SimpleMessageChunk> retrieve(@ApiParam @Valid MessagesRequest rawrequest,
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@Parameter @Valid MessagesRequest rawrequest,
                                                       @Context SearchUser searchUser) {
 
         final MessagesRequest request = fillInIfNecessary(rawrequest, searchUser);
@@ -167,14 +167,14 @@ public class MessagesResource extends RestResource implements PluginRestResource
                 : resultFormat.withTimeZone(searchUser.timeZone().orElse(FALLBACK_TIME_ZONE));
     }
 
-    @ApiOperation(value = "Export a search result as CSV")
+    @Operation(summary = "Export a search result as CSV")
     @POST
     @Path("{searchId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
-            @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
+            @Parameter(description = "Optional overrides") @Valid ResultFormat formatFromClient,
             @Context SearchUser searchUser) {
         ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 
@@ -185,14 +185,14 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return asyncRunner.apply(chunkConsumer -> exporter(searchId).export(command, chunkConsumer));
     }
 
-    @ApiOperation(value = "Export a message table as CSV")
+    @Operation(summary = "Export a message table as CSV")
     @POST
     @Path("{searchId}/{searchTypeId}")
     @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
-            @ApiParam(value = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @ApiParam(value = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
-            @ApiParam(value = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
+            @Parameter(description = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
+            @Parameter(description = "Optional overrides") @Valid ResultFormat formatFromClient,
             @Context SearchUser searchUser) {
         ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 
@@ -203,12 +203,12 @@ public class MessagesResource extends RestResource implements PluginRestResource
         return asyncRunner.apply(chunkConsumer -> exporter(searchId, searchTypeId).export(command, chunkConsumer));
     }
 
-    @ApiOperation("Retrieve results for export job")
+    @Operation(summary = "Retrieve results for export job")
     @GET
     @Path("job/{exportJobId}/{filename}")
-    public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@ApiParam(value = "ID of an existing export job", name = "exportJobId")
+    public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@Parameter(description = "ID of an existing export job", name = "exportJobId")
                                                                   @PathParam("exportJobId") String exportJobId,
-                                                                  @ApiParam(value = "Resulting filename", name = "filename")
+                                                                  @Parameter(description = "Resulting filename", name = "filename")
                                                                   @PathParam("filename") String filename,
                                                                   @Context SearchUser searchUser) {
         final ExportJob exportJob = exportJobService.get(exportJobId)

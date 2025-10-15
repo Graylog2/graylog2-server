@@ -18,11 +18,11 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -84,7 +84,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/Inputs", description = "Message inputs", tags = {CLOUD_VISIBLE})
+@Tag(name = "System/Inputs", description = "Message inputs")
 @Path("/system/inputs")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -123,12 +123,12 @@ public class InputsResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get information of a single input on this node")
+    @Operation(summary = "Get information of a single input on this node")
     @Path("/{inputId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input.")
+            @ApiResponse(responseCode = "404", description = "No such input.")
     })
-    public InputSummary get(@ApiParam(name = "inputId", required = true)
+    public InputSummary get(@Parameter(name = "inputId", required = true)
                             @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
@@ -139,12 +139,12 @@ public class InputsResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get diagnostic information of a single input")
+    @Operation(summary = "Get diagnostic information of a single input")
     @Path("/diagnostics/{inputId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input.")
+            @ApiResponse(responseCode = "404", description = "No such input.")
     })
-    public InputDiagnostics diagnostics(@ApiParam(name = "inputId", required = true)
+    public InputDiagnostics diagnostics(@Parameter(name = "inputId", required = true)
                                         @PathParam("inputId") String inputId,
                                         @Context SearchUser searchUser) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
@@ -165,12 +165,12 @@ public class InputsResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Returns any streams or pipeline that reference the given input")
+    @Operation(summary = "Returns any streams or pipeline that reference the given input")
     @Path("/references/{inputId}")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input.")
+            @ApiResponse(responseCode = "404", description = "No such input.")
     })
-    public InputReferences getReferences(@ApiParam(name = "inputId", required = true)
+    public InputReferences getReferences(@Parameter(name = "inputId", required = true)
                                              @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         checkPermission(PipelineRestPermissions.PIPELINE_READ);
@@ -189,7 +189,7 @@ public class InputsResource extends AbstractInputsResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get all inputs")
+    @Operation(summary = "Get all inputs")
     public InputsList list() {
         final Set<InputSummary> inputs = inputService.all().stream()
                 .filter(input -> isPermitted(RestPermissions.INPUTS_READ, input.getId()))
@@ -201,19 +201,17 @@ public class InputsResource extends AbstractInputsResource {
 
     @POST
     @Timed
-    @ApiOperation(
-            value = "Launch input on this node",
-            response = InputCreated.class
-    )
+    @Operation(
+            summary = "Launch input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input type registered"),
-            @ApiResponse(code = 400, message = "Missing or invalid configuration"),
-            @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
+            @ApiResponse(responseCode = "404", description = "No such input type registered"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid configuration"),
+            @ApiResponse(responseCode = "400", description = "Type is exclusive and already has input running")
     })
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_CREATE)
-    public Response create(@ApiParam @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
-                           @ApiParam(name = "JSON body", required = true)
+    public Response create(@Parameter @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
+                           @Parameter(name = "JSON body", required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
             throwBadRequestIfNotGlobal(lr);
@@ -246,12 +244,12 @@ public class InputsResource extends AbstractInputsResource {
     @DELETE
     @Timed
     @Path("/{inputId}")
-    @ApiOperation(value = "Terminate input on this node")
+    @Operation(summary = "Terminate input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node.")
+            @ApiResponse(responseCode = "404", description = "No such input on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_DELETE)
-    public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+    public void terminate(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_TERMINATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
@@ -263,17 +261,15 @@ public class InputsResource extends AbstractInputsResource {
     @PUT
     @Timed
     @Path("/{inputId}")
-    @ApiOperation(
-            value = "Update input on this node",
-            response = InputCreated.class
-    )
+    @Operation(
+            summary = "Update input on this node")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid input configuration.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_UPDATE)
-    public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputCreateRequest lr,
-                           @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
+    public Response update(@Parameter(name = "JSON body", required = true) @Valid @NotNull InputCreateRequest lr,
+                           @Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
 
         throwBadRequestIfNotGlobal(lr);
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);

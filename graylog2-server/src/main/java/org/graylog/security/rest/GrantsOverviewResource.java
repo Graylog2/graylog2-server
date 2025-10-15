@@ -18,8 +18,8 @@ package org.graylog.security.rest;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.grn.GRN;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Authorization/GrantsOverview", description = "Grants overview", tags = {CLOUD_VISIBLE})
+@Tag(name = "Authorization/GrantsOverview", description = "Grants overview")
 @Path("/authz/grants-overview")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -66,7 +66,7 @@ public class GrantsOverviewResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Return an overview of all grants in the system")
+    @Operation(summary = "Return an overview of all grants in the system")
     @RequiresPermissions(RestPermissions.GRANTS_OVERVIEW_READ)
     public Response getOverview() {
         final List<GrantSummary> grants = grantService.getAll().stream()

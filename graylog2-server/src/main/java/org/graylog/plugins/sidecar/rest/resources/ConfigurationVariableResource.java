@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.sidecar.rest.resources;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
@@ -57,7 +57,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Sidecar/ConfigurationVariables", description = "Manage collector configuration variables", tags = {CLOUD_VISIBLE})
+@Tag(name = "Sidecar/ConfigurationVariables", description = "Manage collector configuration variables")
 @Path("/sidecar/configuration_variables")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -80,7 +80,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @GET
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "List all configuration variables")
+    @Operation(summary = "List all configuration variables")
     public List<ConfigurationVariable> listConfigurationVariables() {
         final List<ConfigurationVariable> configurationVariables = this.configurationVariableService.all();
 
@@ -91,8 +91,8 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @Path("/{id}/configurations")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Show configurations using this variable")
-    public List<Configuration> getConfigurationVariablesConfigurations(@ApiParam(name = "id", required = true)
+    @Operation(summary = "Show configurations using this variable")
+    public List<Configuration> getConfigurationVariablesConfigurations(@Parameter(name = "id", required = true)
                                                                        @PathParam("id") String id) {
         final ConfigurationVariable configurationVariable = findVariableOrFail(id);
         final List<Configuration> configurations = this.configurationService.findByConfigurationVariable(configurationVariable);
@@ -103,9 +103,9 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @POST
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Create new configuration variable")
+    @Operation(summary = "Create new configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_CREATE)
-    public Response createConfigurationVariable(@ApiParam(name = "JSON body", required = true)
+    public Response createConfigurationVariable(@Parameter(name = "JSON body", required = true)
                                                 @Valid @NotNull ConfigurationVariable request) {
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
         if (validationResult.failed()) {
@@ -119,11 +119,11 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update a configuration variable")
+    @Operation(summary = "Update a configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_UPDATE)
-    public Response updateConfigurationVariable(@ApiParam(name = "id", required = true)
+    public Response updateConfigurationVariable(@Parameter(name = "id", required = true)
                                                 @PathParam("id") String id,
-                                                @ApiParam(name = "JSON body", required = true)
+                                                @Parameter(name = "JSON body", required = true)
                                                 @Valid @NotNull ConfigurationVariable request) {
         final ConfigurationVariable previousConfigurationVariable = findVariableOrFail(id);
 
@@ -143,9 +143,9 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @POST
     @Path("/validate")
     @NoAuditEvent("Validation only")
-    @ApiOperation(value = "Validate a configuration variable")
+    @Operation(summary = "Validate a configuration variable")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
-    public ValidationResult validateConfigurationVariable(@ApiParam(name = "JSON body", required = true)
+    public ValidationResult validateConfigurationVariable(@Parameter(name = "JSON body", required = true)
                                                           @Valid @NotNull ConfigurationVariable toValidate) {
         return validateConfigurationVariableHelper(toValidate);
     }
@@ -154,9 +154,9 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Delete a configuration variable")
+    @Operation(summary = "Delete a configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_DELETE)
-    public Response deleteConfigurationVariable(@ApiParam(name = "id", required = true)
+    public Response deleteConfigurationVariable(@Parameter(name = "id", required = true)
                                                 @PathParam("id") String id) {
         final ConfigurationVariable configurationVariable = findVariableOrFail(id);
         final List<Configuration> configurations = this.configurationService.findByConfigurationVariable(configurationVariable);

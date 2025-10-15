@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
@@ -53,7 +53,7 @@ import static java.util.Locale.ENGLISH;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Saved", tags = {CLOUD_VISIBLE})
+@Tag(name = "Search/Saved")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/search/saved")
 public class SavedSearchesResource extends RestResource {
@@ -85,16 +85,15 @@ public class SavedSearchesResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all searches")
-    public PageListResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                  @ApiParam(name = "sort",
-                                                            value = "The field to sort the result on",
-                                                            required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
-                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                                  @ApiParam(name = "query") @QueryParam("query") String query,
-                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+    @Operation(summary = "Get a list of all searches")
+    public PageListResponse<ViewSummaryDTO> views(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @Parameter(name = "sort",
+                                                            description = "The field to sort the result on",
+                                                            required = true) @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                  @Parameter(name = "order", description = "The sort direction") @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                  @Parameter(name = "query") @QueryParam("query") String query,
+                                                  @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
                                                   @Context SearchUser searchUser) {
 
         if (!ViewDTO.SORT_FIELDS.contains(sortField.toLowerCase(ENGLISH))) {

@@ -17,9 +17,9 @@
 package org.graylog.plugins.pipelineprocessor.rest;
 
 import com.google.common.base.Strings;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -51,7 +51,7 @@ import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Pipelines/Simulator", description = "Simulate pipeline message processor", tags = {CLOUD_VISIBLE})
+@Tag(name = "Pipelines/Simulator", description = "Simulate pipeline message processor")
 @Path("/system/pipelines/simulate")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -73,11 +73,11 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         this.messageFactory = messageFactory;
     }
 
-    @ApiOperation(value = "Simulate the execution of the pipeline message processor")
+    @Operation(summary = "Simulate the execution of the pipeline message processor")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
     @NoAuditEvent("only used to test pipelines, no changes made in the system")
-    public SimulationResponse simulate(@ApiParam(name = "simulation", required = true) @NotNull SimulationRequest request) throws NotFoundException {
+    public SimulationResponse simulate(@Parameter(name = "simulation", required = true) @NotNull SimulationRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, request.streamId());
 
         final Message message = messageFactory.createMessage(request.message());

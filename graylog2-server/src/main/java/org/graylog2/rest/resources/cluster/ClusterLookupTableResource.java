@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -56,7 +56,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
  * Originally was introduced to perform cluster-wide Cache purging.
  */
 @RequiresAuthentication
-@Api(value = "Cluster/LookupTable", tags = {CLOUD_VISIBLE})
+@Tag(name = "Cluster/LookupTable")
 @Path("/cluster/system/lookup")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterLookupTableResource extends ProxiedResource {
@@ -78,12 +78,12 @@ public class ClusterLookupTableResource extends ProxiedResource {
     @POST
     @Timed
     @Path("tables/{idOrName}/purge")
-    @ApiOperation(value = "Purge Lookup Table Cache on the cluster-wide level")
+    @Operation(summary = "Purge Lookup Table Cache on the cluster-wide level")
     @NoAuditEvent("Cache purge only")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public Map<String, CallResult<Void>> performPurge(
-            @ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-            @ApiParam(name = "key") @QueryParam("key") String key) {
+            @Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+            @Parameter(name = "key") @QueryParam("key") String key) {
         return requestOnAllNodes(RemoteLookupTableResource.class, client -> client.performPurge(idOrName, key));
     }
 }

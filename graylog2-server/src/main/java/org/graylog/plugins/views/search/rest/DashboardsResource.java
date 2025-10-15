@@ -19,9 +19,9 @@ package org.graylog.plugins.views.search.rest;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DefaultValue;
@@ -60,7 +60,7 @@ import static org.graylog2.database.utils.SourcedMongoEntityUtils.FILTERABLE_FIE
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Dashboards", tags = {CLOUD_VISIBLE})
+@Tag(name = "Dashboards")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/dashboards")
 public class DashboardsResource extends RestResource {
@@ -116,21 +116,19 @@ public class DashboardsResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get a list of all dashboards")
+    @Operation(summary = "Get a list of all dashboards")
     @Timed
-    public PageListResponse<ViewSummaryDTO> views(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                  @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                  @ApiParam(name = "sort",
-                                                            value = "The field to sort the result on",
-                                                            required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
-                                                  @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                                  @ApiParam(name = "query") @QueryParam("query") String query,
-                                                  @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                  @ApiParam(name = "scope",
-                                                            value = "The scope of the permissions",
-                                                            required = true,
-                                                            allowableValues = "read,update") @DefaultValue("read") @QueryParam("scope") Scope scope,
+    public PageListResponse<ViewSummaryDTO> views(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                  @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                  @Parameter(name = "sort",
+                                                            description = "The field to sort the result on",
+                                                            required = true) @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                  @Parameter(name = "order", description = "The sort direction") @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                  @Parameter(name = "query") @QueryParam("query") String query,
+                                                  @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                  @Parameter(name = "scope",
+                                                            description = "The scope of the permissions",
+                                                            required = true) @DefaultValue("read") @QueryParam("scope") Scope scope,
                                                   @Context SearchUser searchUser) {
 
         Predicate<ViewSummaryDTO> predicate = switch (scope) {

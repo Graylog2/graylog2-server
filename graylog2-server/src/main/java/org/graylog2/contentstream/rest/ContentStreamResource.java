@@ -16,9 +16,9 @@
  */
 package org.graylog2.contentstream.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -46,7 +46,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 
 @RequiresAuthentication
-@Api(value = "ContentStream", description = "Content Stream", tags = {CLOUD_VISIBLE})
+@Tag(name = "ContentStream", description = "Content Stream")
 @Path("/contentstream/")
 @Produces(MediaType.APPLICATION_JSON)
 //@Consumes(MediaType.APPLICATION_JSON)
@@ -62,16 +62,16 @@ public class ContentStreamResource extends RestResource {
 
     @GET
     @Path("tags")
-    @ApiOperation("Retrieve valid feed tags based on license")
+    @Operation(summary = "Retrieve valid feed tags based on license")
     public List<String> getContentStreamTags() throws NotFoundException {
         return contentStreamService.getTags();
     }
 
     @GET
     @Path("settings/{username}")
-    @ApiOperation("Retrieve Content Stream settings for specified user")
+    @Operation(summary = "Retrieve Content Stream settings for specified user")
     public ContentStreamSettings getContentStreamUserSettings(
-            @ApiParam(name = "username") @PathParam("username") String username
+            @Parameter(name = "username") @PathParam("username") String username
     ) throws NotFoundException {
         if (isPermitted(USERS_EDIT, username)) {
             return contentStreamService.getUserSettings(loadUser(username));
@@ -81,11 +81,11 @@ public class ContentStreamResource extends RestResource {
 
     @PUT
     @Path("settings/{username}")
-    @ApiOperation("Update Content Stream settings for specified user")
+    @Operation(summary = "Update Content Stream settings for specified user")
     @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
     public ContentStreamSettings setContentStreamUserSettings(
-            @ApiParam(name = "username") @PathParam("username") String username,
-            @ApiParam(name = "JSON body", value = "Content Stream settings for the specified user.", required = true)
+            @Parameter(name = "username") @PathParam("username") String username,
+            @Parameter(name = "JSON body", description = "Content Stream settings for the specified user.", required = true)
             @Valid @NotNull ContentStreamSettings settings
     ) throws NotFoundException {
         if (isPermitted(USERS_EDIT, username)) {

@@ -18,9 +18,9 @@ package org.graylog2.rest.resources.tokenusage;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -60,7 +60,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/token_usage")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Token-Usage", description = "Listing usage of Tokens", tags = {CLOUD_VISIBLE})
+@Tag(name = "Token-Usage", description = "Listing usage of Tokens")
 public class TokenUsageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(TokenUsageResource.class);
     private static final String DEFAULT_SORT_FIELD = AccessTokenEntity.FIELD_NAME;
@@ -100,18 +100,17 @@ public class TokenUsageResource extends RestResource {
     @GET
     @Timed
     @Path("/paginated")
-    @ApiOperation(value = "Get paginated list of tokens")
+    @Operation(summary = "Get paginated list of tokens")
     @RequiresPermissions(RestPermissions.TOKEN_USAGE_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public PageListResponse<TokenUsageDTO> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                    @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                    @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                    @ApiParam(name = "sort",
-                                                              value = "The field to sort the result on",
-                                                              required = true,
-                                                              allowableValues = "username,NAME")
+    public PageListResponse<TokenUsageDTO> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                    @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                    @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                    @Parameter(name = "sort",
+                                                              description = "The field to sort the result on",
+                                                              required = true)
                                                         @DefaultValue(AccessTokenEntity.FIELD_NAME) @QueryParam("sort") String sort,
-                                                    @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                    @Parameter(name = "order", description = "The sort direction")
                                                     @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         LOG.debug("Incoming request to list token usages{}, on page {} with {} items per page.", query.isEmpty() ? "" : " matching " + query, page, perPage);
         final SearchQuery searchQuery;

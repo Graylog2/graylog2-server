@@ -18,9 +18,9 @@ package org.graylog.security.rest;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.Consumes;
@@ -47,7 +47,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Authorization/Capabilities", description = "Capabilities overview", tags = {CLOUD_VISIBLE})
+@Tag(name = "Authorization/Capabilities", description = "Capabilities overview")
 @Path("/authz/capabilities")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -63,7 +63,7 @@ public class CapabilitiesResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Return a list of all capabilities in the system")
+    @Operation(summary = "Return a list of all capabilities in the system")
     public CapabilitiesResponse list() {
         return new CapabilitiesResponse(
                 capabilityRegistry.allSharingCapabilities()
@@ -76,8 +76,8 @@ public class CapabilitiesResource extends RestResource {
 
     @GET
     @Path("/{capability}")
-    @ApiOperation("Return the requested capability")
-    public CapabilityDescriptorResponse get(@ApiParam("capability") @PathParam("capability") @NotBlank String capabilityString) {
+    @Operation(summary = "Return the requested capability")
+    public CapabilityDescriptorResponse get(@Parameter(description = "capability") @PathParam("capability") @NotBlank String capabilityString) {
         final var capability = parseCapability(capabilityString);
 
         checkPermission(RestPermissions.CAPABILITIES_READ, capability.name());
@@ -123,9 +123,9 @@ public class CapabilitiesResource extends RestResource {
 
     @GET
     @Path("/{capability}/{entity}")
-    @ApiOperation("Get permissions for a specific capability and entity")
-    public CapabilityPermissionsResponse entityCapabilityPermissions(@ApiParam("capability") @PathParam("capability") @NotBlank String capabilityString,
-                                                                     @ApiParam("entity") @PathParam("entity") @NotBlank String entity) {
+    @Operation(summary = "Get permissions for a specific capability and entity")
+    public CapabilityPermissionsResponse entityCapabilityPermissions(@Parameter(description = "capability") @PathParam("capability") @NotBlank String capabilityString,
+                                                                     @Parameter(description = "entity") @PathParam("entity") @NotBlank String entity) {
         final var entityGrn = grnRegistry.parse(entity);
         final var capability = parseCapability(capabilityString);
 

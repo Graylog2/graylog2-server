@@ -18,11 +18,11 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.eaio.uuid.UUID;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
@@ -46,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Api(value = "System/Cluster", description = "Node discovery")
+@Tag(name = "System/Cluster", description = "Node discovery")
 @RequiresAuthentication
 @Path("/system/cluster")
 @Produces(MediaType.APPLICATION_JSON)
@@ -68,7 +68,7 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/nodes")
-    @ApiOperation(value = "List all active nodes in this cluster.")
+    @Operation(summary = "List all active nodes in this cluster.")
     public NodeSummaryList nodes() {
         final Map<String, Node> nodes = nodeService.allActive();
         final List<NodeSummary> nodeList = new ArrayList<>(nodes.size());
@@ -82,8 +82,8 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/node")
-    @ApiOperation(value = "Information about this node.",
-                  notes = "This is returning information of this node in context to its state in the cluster. " +
+    @Operation(summary = "Information about this node.",
+                  description = "This is returning information of this node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")
     public NodeSummary node() throws NodeNotFoundException {
         return nodeSummary(nodeService.byNodeId(nodeId));
@@ -92,13 +92,13 @@ public class ClusterResource extends RestResource {
     @GET
     @Timed
     @Path("/nodes/{nodeId}")
-    @ApiOperation(value = "Information about a node.",
-                  notes = "This is returning information of a node in context to its state in the cluster. " +
+    @Operation(summary = "Information about a node.",
+                  description = "This is returning information of a node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Node not found.")
+            @ApiResponse(responseCode = "404", description = "Node not found.")
     })
-    public NodeSummary node(@ApiParam(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId) throws NodeNotFoundException {
+    public NodeSummary node(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId) throws NodeNotFoundException {
         return nodeSummary(nodeService.byNodeId(nodeId));
     }
 

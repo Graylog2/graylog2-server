@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system.monitoring;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -49,7 +49,7 @@ import java.util.Map;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/Monitoring", tags = {CLOUD_VISIBLE})
+@Tag(name = "System/Monitoring")
 @Path("/system/monitoring")
 public class MonitoringResource extends RestResource {
 
@@ -78,7 +78,7 @@ public class MonitoringResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get timerange-based histogram of queries durations and percentage in recent query population")
+    @Operation(summary = "Get timerange-based histogram of queries durations and percentage in recent query population")
     @Path("query_duration_histogram")
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
     @RequiresPermissions({RestPermissions.MONITORING_READ})

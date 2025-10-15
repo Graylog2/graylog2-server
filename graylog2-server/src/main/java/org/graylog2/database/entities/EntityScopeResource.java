@@ -16,8 +16,8 @@
  */
 package org.graylog2.database.entities;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "EntityScope", description = "Provide a list of available Entity Scopes", tags = {CLOUD_VISIBLE})
+@Tag(name = "EntityScope", description = "Provide a list of available Entity Scopes")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/entity_scopes")
 @RequiresAuthentication
@@ -47,7 +47,7 @@ public class EntityScopeResource extends RestResource {
         this.entityScopeService = entityScopeService;
     }
 
-    @ApiOperation("Generate a mapping of available Entity Scopes")
+    @Operation(summary = "Generate a mapping of available Entity Scopes")
     @GET
     public EntityScopes getAllEntityScopes() {
 

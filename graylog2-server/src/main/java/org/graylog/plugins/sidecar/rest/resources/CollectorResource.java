@@ -20,9 +20,9 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
@@ -82,7 +82,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Sidecar/Collectors", description = "Manage collectors", tags = {CLOUD_VISIBLE})
+@Tag(name = "Sidecar/Collectors", description = "Manage collectors")
 @Path("/sidecar/collectors")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -123,8 +123,8 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Show collector details")
-    public Collector getCollector(@ApiParam(name = "id", required = true)
+    @Operation(summary = "Show collector details")
+    public Collector getCollector(@Parameter(name = "id", required = true)
                                   @PathParam("id") String id) {
 
         final Collector collector = this.collectorService.find(id);
@@ -139,7 +139,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Timed
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "List all collectors")
+    @Operation(summary = "List all collectors")
     public Response listCollectors(@Context HttpHeaders httpHeaders) throws JsonProcessingException {
         String ifNoneMatch = httpHeaders.getHeaderString("If-None-Match");
         Boolean etagCached = false;
@@ -180,16 +180,15 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Path("/summary")
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "List a summary of all collectors")
-    public CollectorSummaryResponse listSummary(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                @ApiParam(name = "sort",
-                                                          value = "The field to sort the result on",
-                                                          required = true,
-                                                          allowableValues = "name,id,collector_id")
+    @Operation(summary = "List a summary of all collectors")
+    public CollectorSummaryResponse listSummary(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                @Parameter(name = "sort",
+                                                          description = "The field to sort the result on",
+                                                          required = true)
                                                 @DefaultValue(Collector.FIELD_NAME) @QueryParam("sort") String sort,
-                                                @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                @Parameter(name = "order", description = "The sort direction")
                                                 @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Collector> collectors = this.collectorService.findPaginated(searchQuery, page, perPage, sort, order);
@@ -204,9 +203,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @POST
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Create a new collector")
+    @Operation(summary = "Create a new collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
-    public Response createCollector(@ApiParam(name = "JSON body", required = true)
+    public Response createCollector(@Parameter(name = "JSON body", required = true)
                                     @Valid @NotNull Collector request) throws BadRequestException {
         return saveCollector(collectorService.fromRequest(request));
     }
@@ -215,11 +214,11 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_UPDATE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Update a collector")
+    @Operation(summary = "Update a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_UPDATE)
-    public Response updateCollector(@ApiParam(name = "id", required = true)
+    public Response updateCollector(@Parameter(name = "id", required = true)
                                     @PathParam("id") String id,
-                                    @ApiParam(name = "JSON body", required = true)
+                                    @Parameter(name = "JSON body", required = true)
                                     @Valid @NotNull Collector request) throws BadRequestException {
         return saveCollector(collectorService.fromRequest(id, request));
     }
@@ -237,11 +236,11 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @POST
     @Path("/{id}/{name}")
     @RequiresPermissions({SidecarRestPermissions.COLLECTORS_READ, SidecarRestPermissions.COLLECTORS_CREATE})
-    @ApiOperation(value = "Copy a collector")
+    @Operation(summary = "Copy a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CLONE)
-    public Response copyCollector(@ApiParam(name = "id", required = true)
+    public Response copyCollector(@Parameter(name = "id", required = true)
                                   @PathParam("id") String id,
-                                  @ApiParam(name = "name", required = true)
+                                  @Parameter(name = "name", required = true)
                                   @PathParam("name") String name) throws NotFoundException, BadRequestException {
         final Collector collector = collectorService.copy(id, name);
         final ValidationResult validationResult = validate(collector);
@@ -257,9 +256,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Path("/{id}")
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Delete a collector")
+    @Operation(summary = "Delete a collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_DELETE)
-    public Response deleteCollector(@ApiParam(name = "id", required = true)
+    public Response deleteCollector(@Parameter(name = "id", required = true)
                                     @PathParam("id") String id) {
         final long configurationsForCollector = configurationService.all().stream()
                 .filter(configuration -> configuration.collectorId().equals(id))
@@ -281,9 +280,9 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @NoAuditEvent("Validation only")
     @RequiresPermissions(SidecarRestPermissions.COLLECTORS_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Validates collector parameters")
+    @Operation(summary = "Validates collector parameters")
     public ValidationResult validateCollector(
-            @Valid @ApiParam("collector") Collector toValidate) {
+            @Valid @Parameter(description = "collector") Collector toValidate) {
         return validate(toValidate);
     }
 

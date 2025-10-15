@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.search.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -38,7 +38,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Query Strings", tags = {CLOUD_VISIBLE})
+@Tag(name = "Search/Query Strings")
 @Path("/search/query_strings")
 public class QueryStringsResource extends RestResource implements PluginRestResource {
     private final LastUsedQueryStringsService lastUsedQueryStringsService;
@@ -50,9 +50,9 @@ public class QueryStringsResource extends RestResource implements PluginRestReso
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Register a query string used")
+    @Operation(summary = "Register a query string used")
     @NoAuditEvent("No audit event needed for this operation")
-    public Response queryStringUsed(@ApiParam(name = "queryStringRequest") @Valid @NotNull final QueryStringUsedDTO queryStringUsed,
+    public Response queryStringUsed(@Parameter(name = "queryStringRequest") @Valid @NotNull final QueryStringUsedDTO queryStringUsed,
                                     @Context final SearchUser searchUser) {
         this.lastUsedQueryStringsService.save(searchUser.getUser(), queryStringUsed.queryString());
         return Response.noContent().build();

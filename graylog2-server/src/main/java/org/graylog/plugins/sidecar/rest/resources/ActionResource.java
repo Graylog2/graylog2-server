@@ -17,11 +17,11 @@
 package org.graylog.plugins.sidecar.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -50,7 +50,7 @@ import java.util.List;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "Sidecar/Collector/Actions", description = "Manage Collector actions", tags = {CLOUD_VISIBLE})
+@Tag(name = "Sidecar/Collector/Actions", description = "Manage Collector actions")
 @Path("/sidecar/action")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -66,12 +66,12 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @GET
     @Timed
     @Path("/{sidecarId}")
-    @ApiOperation(value = "Returns queued actions for the specified Sidecar id")
+    @Operation(summary = "Returns queued actions for the specified Sidecar id")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No actions found for specified id")
+            @ApiResponse(responseCode = "404", description = "No actions found for specified id")
     })
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
-    public List<CollectorAction> getAction(@ApiParam(name = "sidecarId", required = true)
+    public List<CollectorAction> getAction(@Parameter(name = "sidecarId", required = true)
                                            @PathParam("sidecarId") @NotEmpty String sidecarId) {
         final CollectorActions collectorActions = actionService.findActionBySidecar(sidecarId, false);
         if (collectorActions != null) {
@@ -84,12 +84,12 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @Timed
     @Path("/{sidecarId}")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
-    @ApiOperation(value = "Set a collector action")
-    @ApiResponses(value = {@ApiResponse(code = 400, message = "The supplied action is not valid.")})
+    @Operation(summary = "Set a collector action")
+    @ApiResponses(value = {@ApiResponse(responseCode = "400", description = "The supplied action is not valid.")})
     @AuditEvent(type = SidecarAuditEventTypes.ACTION_UPDATE)
-    public Response setAction(@ApiParam(name = "sidecarId", value = "The id this Sidecar is registering as.", required = true)
+    public Response setAction(@Parameter(name = "sidecarId", description = "The id this Sidecar is registering as.", required = true)
                               @PathParam("sidecarId") @NotEmpty String sidecarId,
-                              @ApiParam(name = "JSON body", required = true)
+                              @Parameter(name = "JSON body", required = true)
                               @Valid @NotNull List<CollectorAction> request) {
         final CollectorActions collectorActions = actionService.fromRequest(sidecarId, request);
         actionService.saveAction(collectorActions);

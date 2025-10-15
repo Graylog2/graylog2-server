@@ -17,9 +17,9 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -70,7 +70,7 @@ import static org.graylog.plugins.views.search.querystrings.LastUsedQueryStrings
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Suggestions", tags = {CLOUD_VISIBLE})
+@Tag(name = "Search/Suggestions")
 @Path("/search/suggest")
 @Produces(MediaType.APPLICATION_JSON)
 public class SuggestionsResource extends RestResource implements PluginRestResource {
@@ -105,16 +105,16 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     @GET
     @Path("/query_strings")
-    @ApiOperation("Suggest last used query strings")
+    @Operation(summary = "Suggest last used query strings")
     public List<QueryString> suggestQueryStrings(@Context SearchUser searchUser,
-                                                 @ApiParam("limit") @QueryParam("limit") Integer limit) {
+                                                 @Parameter(description = "limit") @QueryParam("limit") Integer limit) {
         return lastUsedQueryStringsService.get(searchUser.getUser(), Optional.ofNullable(limit).orElse(DEFAULT_LIMIT));
     }
 
     @POST
-    @ApiOperation("Suggest field value")
+    @Operation(summary = "Suggest field value")
     @NoAuditEvent("Only suggesting field value for query, not changing any data")
-    public SuggestionsDTO suggestFieldValue(@ApiParam(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
+    public SuggestionsDTO suggestFieldValue(@Parameter(name = "validationRequest") SuggestionsRequestDTO suggestionsRequest,
                                             @Context SearchUser searchUser) {
         if (fieldValueSuggestionMode == OFF) {
             return getNoSuggestionResponse(suggestionsRequest.field(), suggestionsRequest.input());
