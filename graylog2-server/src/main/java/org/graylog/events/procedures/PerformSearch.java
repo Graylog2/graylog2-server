@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -92,6 +93,21 @@ public class PerformSearch extends Action {
         }
 
         public abstract Builder toBuilder();
+
+        @JsonIgnore
+        @Override
+        public String validate() {
+            if (Boolean.TRUE.equals(useSavedSearch())) {
+                if (savedSearch() == null || savedSearch().isEmpty()) {
+                    return "Saved search cannot be empty";
+                }
+            } else {
+                if (query() == null || query().isEmpty()) {
+                    return "Search query cannot be empty";
+                }
+            }
+            return null;
+        }
 
         @AutoValue.Builder
         public abstract static class Builder {
