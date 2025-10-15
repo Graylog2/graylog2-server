@@ -40,7 +40,11 @@ public class MarkdownCSPResourceProvider implements CSPResources.ResourceProvide
     @Override
     public Set<String> resources() {
         return Optional.ofNullable(configService.get(MarkdownConfiguration.class))
-                .map(c -> c.allowAllImageSources() ? Set.of("*") : Set.of(c.allowedImageSources().split(",")))
+                .flatMap(c -> c.allowAllImageSources()
+                        ? Optional.of(Set.of("*"))
+                        : Optional.ofNullable(c.allowedImageSources())
+                        .map(sources -> sources.split(","))
+                        .map(Set::of))
                 .orElse(Set.of());
     }
 }
