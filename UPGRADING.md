@@ -166,7 +166,8 @@ removed entirely in Graylog 8.0.
 According to the official OpenSearch Maintenance Policy, the OpenSearch 1.x maintenance window ended in May 2025. As a 
 result, OpenSearch 1.x will no longer receive back-port fixes or features.
 
-Therefore, starting with Graylog 7.0, the use of OpenSearch 1.x is deprecated.
+Therefore, starting with Graylog 7.0, the use of OpenSearch 1.x is deprecated. Support for OpenSearch 1.x will be 
+removed in Graylog 8.0.
 
 Graylog users are encouraged to use Graylog Data Node or a supported, self-managed version of OpenSearch. See Graylog's 
 Compatibility Matrix for details on supported OpenSearch versions.
