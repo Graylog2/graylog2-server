@@ -16,25 +16,20 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
-import io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
+import io.swagger.v3.oas.integration.OpenApiConfigurationException;
+import io.swagger.v3.oas.integration.OpenApiContextLocator;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
+import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.Version;
-import org.graylog2.plugin.inject.Graylog2Module;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
 
-import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Configuration and setup for OpenAPI 3.1 specification generation.
@@ -43,25 +38,23 @@ import java.util.stream.Stream;
 @Singleton
 public class OpenAPIGenerator {
 
-    private final Set<Class<?>> resourceClasses;
     private final Version version;
+    private final CustomOpenAPIScanner scanner;
+    private final CustomObjectMapperProcessor objectMapperProcessor;
+    private final CustomModelConverter modelConverter;
+    private final CustomReader.Factory readerFactory;
 
     @Inject
-    public OpenAPIGenerator(
-            @Named(Graylog2Module.SYSTEM_REST_RESOURCES) final Set<Class<?>> systemRestResources,
-            final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
-            Version version,
-            ObjectMapperConfiguration objectMapperConfiguration) {
-
-        this.resourceClasses = Stream.concat(systemRestResources.stream(),
-                        pluginRestResources.values().stream().flatMap(Set::stream))
-                .collect(Collectors.toSet());
+    public OpenAPIGenerator(Version version,
+                            CustomOpenAPIScanner scanner,
+                            CustomObjectMapperProcessor objectMapperProcessor,
+                            CustomModelConverter modelConverter,
+                            CustomReader.Factory readerFactory) {
         this.version = version;
-
-        // Globally register our custom object mapper configuration
-        if (!ObjectMapperConfigurer.isInitialized()) {
-            ObjectMapperConfigurer.initialize(objectMapperConfiguration);
-        }
+        this.scanner = scanner;
+        this.objectMapperProcessor = objectMapperProcessor;
+        this.modelConverter = modelConverter;
+        this.readerFactory = readerFactory;
     }
 
     /**
@@ -72,24 +65,14 @@ public class OpenAPIGenerator {
      * @throws RuntimeException if the OpenAPI generation fails
      */
     public OpenAPI generateOpenApiSpec() {
-        try {
-            // Build the OpenAPI context which triggers schema generation
-            var context = new JaxrsOpenApiContextBuilder<>()
-                    .openApiConfiguration(swaggerConfig())
-                    .buildContext(true);
-
-            return context.read();
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to generate OpenAPI specification", e);
-        }
+        return openAPIContext().read();
     }
 
-    /**
-     * Creates the SwaggerConfiguration used to configure the OpenAPI generation.
-     *
-     * @return Configured SwaggerConfiguration instance
-     */
-    public SwaggerConfiguration swaggerConfig() {
+    public void ensureInitializedContext() {
+        openAPIContext();
+    }
+
+    private SwaggerConfiguration swaggerConfig() {
         final var info = new Info()
                 .title("Graylog REST API")
                 .version(version.toString())
@@ -105,23 +88,37 @@ public class OpenAPIGenerator {
                 .info(info);
         // TODO: add server and security spec
 
-        // TODO: We have to filter the resources based on certain criteria (e.g. CLOUD_VISIBLE).
-        //   We might want to do this with a custom io.swagger.v3.jaxrs2.integration.JaxrsAnnotationScanner
-        //   implementation, or with a custom io.swagger.v3.core.filter.OpenAPISpecFilter, if possible
-
-        final var resourceClassNames = resourceClasses.stream()
-                .map(Class::getName)
-                .collect(Collectors.toSet());
-
         return new SwaggerConfiguration()
                 .openAPI31(true)
                 .openAPI(openAPI)
                 .prettyPrint(true)
-                .sortOutput(true)
-                .scannerClass(JaxrsAnnotationScanner.class.getName())
-                .objectMapperProcessorClass(CustomObjectMapperProcessor.class.getName())
-                .modelConverterClasses(Set.of(CustomModelConverter.class.getName()))
-                .resourceClasses(resourceClassNames);
+                .sortOutput(true);
     }
+
+    private OpenApiContext openAPIContext() {
+
+        final var ctx = OpenApiContextLocator.getInstance().getOpenApiContext(OpenApiContext.OPENAPI_CONTEXT_ID_DEFAULT);
+
+        if (ctx != null) {
+            return ctx;
+        }
+
+        final var openApiConfiguration = swaggerConfig();
+
+        try {
+            final var context = new JaxrsOpenApiContextBuilder<>()
+//                    .resourceClasses(resourceClassNames)
+                    .openApiConfiguration(openApiConfiguration)
+                    .buildContext(false);
+            context.setModelConverters(Set.of(modelConverter));
+            context.setObjectMapperProcessor(objectMapperProcessor);
+            context.setOpenApiScanner(scanner);
+            context.setOpenApiReader(readerFactory.create(openApiConfiguration));
+            return context.init();
+        } catch (OpenApiConfigurationException e) {
+            throw new RuntimeException("Unable to set up OpenAPI context" + e);
+        }
+    }
+
 
 }

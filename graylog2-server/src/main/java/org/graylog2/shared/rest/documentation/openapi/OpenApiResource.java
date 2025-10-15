@@ -40,7 +40,7 @@ public class OpenApiResource extends BaseOpenApiResource {
 
     @Inject
     public OpenApiResource(OpenAPIGenerator openApiGenerator) {
-        openApiConfiguration(openApiGenerator.swaggerConfig());
+        openApiGenerator.ensureInitializedContext();
     }
 
     @GET

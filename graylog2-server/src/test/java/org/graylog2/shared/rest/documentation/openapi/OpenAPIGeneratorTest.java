@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
-import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -24,10 +23,12 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.Version;
+import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
@@ -35,6 +36,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -50,17 +52,21 @@ class OpenAPIGeneratorTest {
 
     @BeforeEach
     void setUp() {
+        final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
+                Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class));
+        final var objectMapperConfiguration = new ObjectMapperConfiguration(
+                ObjectMapperProvider.class.getClassLoader(),
+                Collections.emptySet(),
+                new EncryptedValueService(UUID.randomUUID().toString()),
+                GRNRegistry.createWithBuiltinTypes(),
+                InputConfigurationBeanDeserializerModifier.withoutConfig()
+        );
         generator = new OpenAPIGenerator(
-                Set.of(TestResource.class),
-                Collections.emptyMap(),
                 Version.from(1, 0, 0),
-                new ObjectMapperConfiguration(
-                        ObjectMapperProvider.class.getClassLoader(),
-                        Collections.emptySet(),
-                        new EncryptedValueService(UUID.randomUUID().toString()),
-                        GRNRegistry.createWithBuiltinTypes(),
-                        InputConfigurationBeanDeserializerModifier.withoutConfig()
-                )
+                new CustomOpenAPIScanner(Set.of(RootTestResource.class), pluginRestResources),
+                new CustomObjectMapperProcessor(objectMapperConfiguration),
+                new CustomModelConverter(),
+                (config) -> new CustomReader(pluginRestResources, config)
         );
     }
 
@@ -79,7 +85,7 @@ class OpenAPIGeneratorTest {
         assertThat(openAPI.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
 
         // Verify that paths and schemas are generated
-        assertThat(openAPI.getPaths()).isNotEmpty();
+        assertThat(openAPI.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test", "/plugins/my.plugin.id/test2");
         assertThat(openAPI.getComponents().getSchemas()).isNotEmpty();
     }
 
@@ -96,15 +102,15 @@ class OpenAPIGeneratorTest {
         assertThat(generatedOpenAPI.getPaths()).isNotEmpty();
 
         // Verify that the /test path exists
-        assertThat(generatedOpenAPI.getPaths()).containsKey("/test");
+        assertThat(generatedOpenAPI.getPaths()).containsKey("/plugins/my.plugin.id/test");
 
         // Print the generated spec for debugging
-        final var spec = Json.pretty(generatedOpenAPI);
-        System.out.println("Generated OpenAPI spec:");
-        System.out.println(spec);
+//        final var spec = Json.pretty(generatedOpenAPI);
+//        System.out.println("Generated OpenAPI spec:");
+//        System.out.println(spec);
 
         // Verify the schema contains our test endpoint
-        final var postOperation = generatedOpenAPI.getPaths().get("/test").getPost();
+        final var postOperation = generatedOpenAPI.getPaths().get("/plugins/my.plugin.id/test").getPost();
         assertThat(postOperation).isNotNull();
         assertThat(postOperation.getOperationId()).isEqualTo("createTest");
 
@@ -144,11 +150,23 @@ class OpenAPIGeneratorTest {
         assertThat(rateProperty.getProperties()).isNullOrEmpty();
     }
 
+    @Path("/test")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class RootTestResource {
+
+        @NoAuditEvent("RootTest")
+        @GET
+        public Response getTest() {
+            return Response.ok().build();
+        }
+    }
+
     // Test resource with primitive Optional types to verify schema generation
     @Path("/test")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public static class TestResource {
+    public static class TestResource implements PluginRestResource {
 
         @NoAuditEvent("Test")
         @GET
@@ -178,6 +196,18 @@ class OpenAPIGeneratorTest {
                     request.optionalDouble(),
                     request.rate()
             );
+        }
+    }
+
+    @Path("/test2")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class TestResource2 implements PluginRestResource {
+
+        @NoAuditEvent("Test2")
+        @GET
+        public Response getTest() {
+            return Response.ok().build();
         }
     }
 

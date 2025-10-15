@@ -18,18 +18,23 @@ package org.graylog2.shared.rest.documentation.openapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.integration.api.ObjectMapperProcessor;
+import jakarta.inject.Inject;
+import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
 
 /**
  * Configures Swagger's internal ObjectMapper with Graylog's application-wide Jackson configuration.
- * <p>
- * NOTE: Swagger instantiates this class via reflection using a no-arg constructor, so dependency
- * injection cannot be used. Configuration is retrieved from {@link ObjectMapperConfigurer}.
- * </p>
  */
 public class CustomObjectMapperProcessor implements ObjectMapperProcessor {
 
+    private final ObjectMapperConfiguration objectMapperConfiguration;
+
+    @Inject
+    public CustomObjectMapperProcessor(ObjectMapperConfiguration objectMapperConfiguration) {
+        this.objectMapperConfiguration = objectMapperConfiguration;
+    }
+
     @Override
     public void processJsonObjectMapper(ObjectMapper swaggerMapper) {
-        ObjectMapperConfigurer.getInstance().configure(swaggerMapper);
+        objectMapperConfiguration.configure(swaggerMapper);
     }
 }
