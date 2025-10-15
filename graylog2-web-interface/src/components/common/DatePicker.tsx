@@ -19,8 +19,6 @@ import type { Modifiers } from 'react-day-picker';
 import { DayPicker } from 'react-day-picker';
 import styled, { css } from 'styled-components';
 
-import useUserDateTime from 'hooks/useUserDateTime';
-
 import 'react-day-picker/style.css';
 
 import { isValidDate, toDateObject, adjustFormat } from 'util/DateTime';
@@ -56,7 +54,6 @@ type Props = {
 };
 
 const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOutsideDays = false }: Props) => {
-  const { userTimezone } = useUserDateTime();
   const selectedDate = useSelectedDate(date);
 
   const modifiers = useMemo(
@@ -80,7 +77,7 @@ const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOuts
       defaultMonth={selectedDate ? toDateObject(selectedDate).toDate() : undefined}
       onDayClick={onChange}
       modifiers={modifiers}
-      timeZone={userTimezone}
+      timeZone="UTC"
       showOutsideDays={showOutsideDays}
     />
   );
