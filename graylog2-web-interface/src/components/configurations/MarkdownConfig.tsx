@@ -31,6 +31,7 @@ import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
+import reloadPage from 'preflight/components/reloadPage';
 
 import Spinner from '../common/Spinner';
 
@@ -84,7 +85,14 @@ const MarkdownConfig = () => {
       app_action_value: 'configuration-save',
     });
     ConfigurationsActions.update(configType, values).then(() => {
-      setShowModal(false);
+      if (
+        values.allow_all_image_sources !== viewConfig.allow_all_image_sources ||
+        values.allowed_image_sources !== viewConfig.allowed_image_sources
+      ) {
+        reloadPage();
+      } else {
+        setShowModal(false);
+      }
     });
   };
 
@@ -100,7 +108,8 @@ const MarkdownConfig = () => {
       <h2>Markdown Configuration</h2>
       <p>
         These settings can be used to configure Markdown rendering in different parts of the product, including the
-        Text/Markdown widget.
+        Text/Markdown widget. When changing settings for allowed image sources, the page will be reloaded afterwards to
+        make sure they are applied.
       </p>
 
       {!viewConfig ? (
