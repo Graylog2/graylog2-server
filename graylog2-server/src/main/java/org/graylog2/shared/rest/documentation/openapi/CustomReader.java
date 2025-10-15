@@ -27,7 +27,6 @@ import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.inject.Inject;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.initializers.JerseyService;
-import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
@@ -35,11 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
 public class CustomReader extends Reader {
-    private static final Logger LOG = getLogger(CustomReader.class);
-
     public interface Factory {
         CustomReader create(OpenAPIConfiguration openAPIConfig);
     }
@@ -75,8 +70,6 @@ public class CustomReader extends Reader {
         final var openAPI = super.read(cls, parentPath, parentMethod, isSubresource, parentRequestBody, parentResponses, parentTags, parentParameters, scannedResources);
 
         final var newPaths = Optional.ofNullable(getPaths()).orElse(new Paths());
-
-        LOG.info("{} added {} path(s): {}", cls.getSimpleName(), newPaths.size(), newPaths.keySet());
 
         if (pathPrefix == null) {
             handledPaths.putAll(newPaths);
