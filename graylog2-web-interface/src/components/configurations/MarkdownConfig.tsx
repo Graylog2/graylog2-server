@@ -32,6 +32,7 @@ import type { Store } from 'stores/StoreTypes';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import reloadPage from 'preflight/components/reloadPage';
+import type { MarkdownConfigType } from 'components/common/types';
 
 import Spinner from '../common/Spinner';
 
@@ -52,11 +53,6 @@ const LabelSpan = styled.span(
     font-weight: bold;
   `,
 );
-
-type MarkdownConfigType = {
-  allow_all_image_sources: boolean;
-  allowed_image_sources: string;
-};
 
 const configType = ConfigurationType.MARKDOWN_CONFIG;
 
@@ -120,7 +116,7 @@ const MarkdownConfig = () => {
             <dt>Allow images from all sources:</dt>
             <dd>{viewConfig.allow_all_image_sources ? 'Enabled' : 'Disabled'}</dd>
             <dt>Allowed imaged sources (comma-separated):</dt>
-            <dd>{viewConfig.allowed_image_sources ?? '-'}</dd>
+            <dd>{viewConfig.allowed_image_sources || '-'}</dd>
           </StyledDefList>
 
           <IfPermitted permissions="clusterconfigentry:edit">
