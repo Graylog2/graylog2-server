@@ -19,6 +19,10 @@ package org.graylog2.rest.resources.system.debug;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -85,6 +89,10 @@ public class DebugEventsResource extends RestResource {
     @GET
     @Path("/cluster")
     @Operation(summary = "Show last received cluster debug event.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Show last received cluster debug event. retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DebugEvent.class)))
+    })
     public DebugEvent showLastClusterDebugEvent() {
         return DebugEventHolder.getClusterDebugEvent();
     }
@@ -93,6 +101,10 @@ public class DebugEventsResource extends RestResource {
     @GET
     @Path("/local")
     @Operation(summary = "Show last received local debug event.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Show last received local debug event. retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DebugEvent.class)))
+    })
     public DebugEvent showLastDebugEvent() {
         return DebugEventHolder.getLocalDebugEvent();
     }

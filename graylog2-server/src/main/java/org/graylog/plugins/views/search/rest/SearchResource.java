@@ -18,6 +18,10 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -95,6 +99,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @Operation(summary = "Create a search query")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Create a search query successful",
+                    content = @Content(schema = @Schema(implementation = SearchDTO.class)))
+    })
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     @Consumes({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
@@ -112,6 +120,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @Operation(summary = "Create a search query")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Create a search query successful",
+                    content = @Content(schema = @Schema(implementation = SearchDTO.class)))
+    })
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     @Consumes({SEARCH_FORMAT_V2})
     @Produces({SEARCH_FORMAT_V2})
@@ -175,6 +187,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @Operation(summary = "Explains how the referenced search would be executed")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Explains how the referenced search would be executed retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = ExplainResults.class)))
+    })
     @Path("{id}/explain")
     @NoAuditEvent("Does not return any actual data")
     public ExplainResults explainQuery(@Parameter(name = "id") @PathParam("id") String id,
@@ -185,6 +201,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @Operation(summary = "Execute a new synchronous search", description = "Executes a new search and waits for its result")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Execute a new synchronous search retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = SearchJobDTO.class)))
+    })
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
     @Consumes({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
@@ -199,6 +219,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
     @POST
     @Operation(summary = "Execute a new synchronous search", description = "Executes a new search and waits for its result")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Execute a new synchronous search retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = SearchJobDTO.class)))
+    })
     @Path("sync")
     @NoAuditEvent("Creating audit event manually in method body.")
     @Consumes({SEARCH_FORMAT_V2})

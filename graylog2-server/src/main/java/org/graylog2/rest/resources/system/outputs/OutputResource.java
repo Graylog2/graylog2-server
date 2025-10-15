@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.system.outputs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -116,6 +118,8 @@ public class OutputResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Output created successfully",
+                    content = @Content(schema = @Schema(implementation = OutputSummary.class))),
             @ApiResponse(responseCode = "400", description = "Invalid output specification in input.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_CREATE)

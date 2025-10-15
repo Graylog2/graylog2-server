@@ -19,6 +19,10 @@ package org.graylog2.rest.resources.datanodes;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -124,6 +128,10 @@ public class DataNodeManagementResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Remove multiple nodes from the cluster")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Remove multiple nodes from the cluster retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkRemove(@Parameter(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context UserContext userContext) {
@@ -170,6 +178,10 @@ public class DataNodeManagementResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Stop multiple nodes in the cluster")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Stop multiple nodes in the cluster retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkStop(@Parameter(name = "Entities to stop", required = true) final BulkOperationRequest bulkOperationRequest,
                              @Context UserContext userContext) {
@@ -202,6 +214,10 @@ public class DataNodeManagementResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Start multiple nodes in the cluster")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Start multiple nodes in the cluster retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkStart(@Parameter(name = "Entities to start", required = true) final BulkOperationRequest bulkOperationRequest,
                               @Context UserContext userContext) {

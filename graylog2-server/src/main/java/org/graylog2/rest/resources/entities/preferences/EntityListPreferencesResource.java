@@ -18,6 +18,8 @@ package org.graylog2.rest.resources.entities.preferences;
 
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -91,10 +93,12 @@ public class EntityListPreferencesResource {
     @Path("/{entity_list_id}")
     @Timed
     @Operation(summary = "Get preferences for user's entity list")
-    @Produces(MediaType.APPLICATION_JSON)
-    @ApiResponses(value = {
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Get preferences for user's entity list retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = EntityListPreferences.class))),
             @ApiResponse(responseCode = "404", description = "Preferences not found.")
     })
+    @Produces(MediaType.APPLICATION_JSON)
     public EntityListPreferences get(@Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
                                      @Context UserContext userContext) throws NotFoundException {
 

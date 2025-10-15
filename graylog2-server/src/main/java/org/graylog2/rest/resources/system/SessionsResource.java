@@ -18,6 +18,10 @@ package org.graylog2.rest.resources.system;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authc.LockedAccountException;
@@ -112,6 +116,10 @@ public class SessionsResource extends RestResource {
     @POST
     @Operation(summary = "Create a new session",
                   description = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Session created successfully",
+                    content = @Content(schema = @Schema(implementation = SessionResponse.class)))
+    })
     @NoAuditEvent("dispatches audit events in the method body")
     public Response newSession(@Context ContainerRequestContext requestContext,
                                @Parameter(name = "Login request", description = "Credentials. The default " +
@@ -162,6 +170,10 @@ public class SessionsResource extends RestResource {
     @GET
     @Operation(summary = "Validate an existing session",
                   description = "Checks the session with the given ID: returns http status 204 (No Content) if session is valid.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Session validation result",
+                    content = @Content(schema = @Schema(implementation = SessionValidationResponse.class)))
+    })
     public Response validateSession(@Context ContainerRequestContext requestContext) {
         try {
             this.authenticationFilter.filter(requestContext);

@@ -18,6 +18,10 @@ package org.graylog.integrations.aws.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -131,6 +135,10 @@ public class AWSResource extends AbstractInputsResource implements PluginRestRes
     @Path("/kinesis/health_check")
     @Operation(
             summary = "Attempt to retrieve logs from the indicated AWS log group with the specified credentials.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "AWS log retrieval health check completed successfully",
+                    content = @Content(schema = @Schema(implementation = KinesisHealthCheckResponse.class)))
+    })
     @RequiresPermissions(AWSPermissions.AWS_READ)
     @NoAuditEvent("This does not change any data")
     public Response kinesisHealthCheck(@Parameter(name = "JSON body", required = true) @Valid @NotNull KinesisRequest heathCheckRequest) throws ExecutionException, IOException {

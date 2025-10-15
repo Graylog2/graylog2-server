@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.system.inputs;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -204,6 +206,8 @@ public class InputsResource extends AbstractInputsResource {
     @Operation(
             summary = "Launch input on this node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Input launched successfully",
+                    content = @Content(schema = @Schema(implementation = InputCreated.class))),
             @ApiResponse(responseCode = "404", description = "No such input type registered"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid configuration"),
             @ApiResponse(responseCode = "400", description = "Type is exclusive and already has input running")
@@ -264,6 +268,8 @@ public class InputsResource extends AbstractInputsResource {
     @Operation(
             summary = "Update input on this node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Input updated successfully",
+                    content = @Content(schema = @Schema(implementation = InputCreated.class))),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
             @ApiResponse(responseCode = "400", description = "Missing or invalid input configuration.")
     })

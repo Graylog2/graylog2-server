@@ -17,6 +17,10 @@
 package org.graylog.plugins.views.search.rest.scriptingapi;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -71,6 +75,10 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @POST
     @Operation(summary = "Execute query specified by `queryRequestSpec`",
                   operationId = "messagesByQueryRequestSpec")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Query executed successfully",
+                    content = @Content(schema = @Schema(implementation = TabularResponse.class)))
+    })
     @Path("messages")
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@Parameter(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
@@ -116,6 +124,10 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     @POST
     @Operation(summary = "Execute aggregation specified by `searchRequestSpec`",
                   operationId = "aggregateSearchRequestSpec")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Aggregation executed successfully",
+                    content = @Content(schema = @Schema(implementation = TabularResponse.class)))
+    })
     @Path("aggregate")
     @NoAuditEvent("Creating audit event manually in method body.")
     public TabularResponse executeQuery(@Parameter(name = "searchRequestSpec") @Valid AggregationRequestSpec aggregationRequestSpec,

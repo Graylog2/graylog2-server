@@ -20,6 +20,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -106,6 +108,8 @@ public class ExtractorsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Add an extractor to an input")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Extractor created successfully",
+                    content = @Content(schema = @Schema(implementation = ExtractorCreated.class))),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
             @ApiResponse(responseCode = "400", description = "No such extractor type."),
             @ApiResponse(responseCode = "400", description = "Field the extractor should write on is reserved."),

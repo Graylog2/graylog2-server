@@ -22,6 +22,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -211,6 +213,10 @@ public class StreamResource extends RestResource {
     @POST
     @Timed
     @Operation(summary = "Create a stream")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Create a stream successful",
+                    content = @Content(schema = @Schema(implementation = StreamCreatedResponse.class)))
+    })
     @RequiresPermissions(RestPermissions.STREAMS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -420,6 +426,10 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Delete a bulk of streams")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Deletion successful",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkDelete(@Parameter(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final UserContext userContext) {
@@ -439,6 +449,10 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Pause a bulk of streams")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pause a bulk of streams retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkPause(@Parameter(name = "Streams to pause", required = true) final BulkOperationRequest bulkOperationRequest,
                               @Context final UserContext userContext) {
@@ -458,6 +472,10 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Resume a bulk of streams")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Resume a bulk of streams retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public Response bulkResume(@Parameter(name = "Streams to resume", required = true) final BulkOperationRequest bulkOperationRequest,
                                @Context final UserContext userContext) {

@@ -24,6 +24,10 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -297,6 +301,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @POST
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Create new event definition")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Event definition created successfully",
+                    content = @Content(schema = @Schema(implementation = EventDefinitionDto.class)))
+    })
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
     public Response create(@Parameter(description = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
@@ -322,6 +330,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @PUT
     @Path("{definitionId}")
     @Operation(summary = "Update existing event definition")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Event definition updated successfully",
+                    content = @Content(schema = @Schema(implementation = EventDefinitionDto.class)))
+    })
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public Response update(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
                            @Parameter(description = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
@@ -381,6 +393,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Delete multiple event definitions")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Bulk deletion completed",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkDelete(@Parameter(name = "Entities to remove", required = true) final BulkOperationRequest bulkOperationRequest,
                                             @Context UserContext userContext) {
@@ -409,6 +425,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Enable multiple event definitions")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Bulk enable completed",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkSchedule(@Parameter(name = "Event definitions to enable", required = true) final BulkOperationRequest bulkOperationRequest,
                                               @Context UserContext userContext) {
@@ -436,6 +456,10 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @Consumes(MediaType.APPLICATION_JSON)
     @Timed
     @Operation(summary = "Disable multiple event definitions")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Disable multiple event definitions retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = BulkOperationResponse.class)))
+    })
     @NoAuditEvent("Audit events triggered manually")
     public BulkOperationResponse bulkUnschedule(@Parameter(name = "Event definitions to disable", required = true) final BulkOperationRequest bulkOperationRequest,
                                                 @Context UserContext userContext) {

@@ -20,6 +20,10 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.krakens.grok.api.exception.GrokException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
@@ -168,6 +172,10 @@ public class GrokResource extends RestResource {
     @POST
     @Timed
     @Operation(summary = "Add a new named pattern")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Add a new named pattern retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = GrokPattern.class)))
+    })
     @AuditEvent(type = AuditEventTypes.GROK_PATTERN_CREATE)
     public Response createPattern(@Parameter(name = "pattern", required = true)
                                   @Valid @NotNull GrokPattern pattern) throws ValidationException {
