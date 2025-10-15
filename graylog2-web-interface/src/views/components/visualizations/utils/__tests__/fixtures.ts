@@ -320,6 +320,10 @@ export const theme = {
     family: { body: 'defaultFont' },
     size: { small: '1rem' },
   },
+  utils: {
+    opacify: (color: string, _: number) => color,
+    readableColor: (color: string) => color,
+  },
 } as DefaultTheme;
 
 export const layoutsFor4axis = {
