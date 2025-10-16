@@ -19,11 +19,11 @@ package org.graylog2.rest.resources.system.jobs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.scheduler.rest.JobResourceHandlerService;
 import org.graylog.security.UserContext;
@@ -66,7 +66,7 @@ import java.util.List;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "System/Jobs", description = "System Jobs")
+@Tag(name = "System/Jobs", description = "System Jobs")
 @Path("/system/jobs")
 public class SystemJobResource extends RestResource {
 
@@ -91,7 +91,7 @@ public class SystemJobResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List currently running jobs")
+    @Operation(summary = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, List<SystemJobSummary>> list() {
         final List<SystemJobSummary> jobs = Lists.newArrayListWithCapacity(systemJobManager.getRunningJobs().size());
@@ -120,12 +120,12 @@ public class SystemJobResource extends RestResource {
     @GET
     @Timed
     @Path("/{jobId}")
-    @ApiOperation(value = "Get information of a specific currently running job")
+    @Operation(summary = "Get information of a specific currently running job")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Job not found.")
+            @ApiResponse(responseCode = "404", description = "Job not found.")
     })
-    public SystemJobSummary get(@ApiParam(name = "jobId", required = true)
+    public SystemJobSummary get(@Parameter(name = "jobId", required = true)
                                 @PathParam("jobId") @NotEmpty String jobId) {
         // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
         checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
@@ -150,16 +150,16 @@ public class SystemJobResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Trigger new job")
+    @Operation(summary = "Trigger new job")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(code = 202, message = "Job accepted."),
-            @ApiResponse(code = 400, message = "There is no such systemjob type."),
-            @ApiResponse(code = 403, message = "Maximum concurrency level of this systemjob type reached.")
+            @ApiResponse(responseCode = "202", description = "Job accepted."),
+            @ApiResponse(responseCode = "400", description = "There is no such systemjob type."),
+            @ApiResponse(responseCode = "403", description = "Maximum concurrency level of this systemjob type reached.")
     })
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_START)
-    public Response trigger(@ApiParam(name = "JSON body", required = true)
+    public Response trigger(@Parameter(name = "JSON body", required = true)
                             @Valid @NotNull TriggerRequest tr) {
         // TODO cleanup jobId vs jobName checking in permissions
         checkPermission(RestPermissions.SYSTEMJOBS_CREATE, tr.jobName());
@@ -185,10 +185,10 @@ public class SystemJobResource extends RestResource {
     @DELETE
     @Timed
     @Path("/{jobId}")
-    @ApiOperation(value = "Cancel running job")
+    @Operation(summary = "Cancel running job")
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
-    public SystemJobSummary cancel(@ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
+    public SystemJobSummary cancel(@Parameter(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
         SystemJob systemJob = systemJobManager.getRunningJobs().get(jobId);
         if (systemJob == null) {
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
@@ -217,10 +217,10 @@ public class SystemJobResource extends RestResource {
 
     @DELETE
     @Path("/acknowledge/{jobId}")
-    @ApiOperation(value = "Acknowledge job with the given ID")
+    @Operation(summary = "Acknowledge job with the given ID")
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_ACKNOWLEDGE)
     public Response acknowledgeJob(@Context UserContext userContext,
-                                   @ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
+                                   @Parameter(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
         final int n = jobResourceHandlerService.acknowledgeJob(userContext, jobId);
         if (n < 1) {
             throw new NotFoundException("System job with ID <" + jobId + "> not found!");

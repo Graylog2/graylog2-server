@@ -21,16 +21,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
-import org.graylog2.database.MongoCollection;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,12 +55,13 @@ class EncryptedValueTest {
     void setUp(MongoDBTestService mongodb) {
         encryptedValueService = new EncryptedValueService("1234567890abcdef");
         this.objectMapper = new ObjectMapperProvider(
-                ObjectMapperProvider.class.getClassLoader(),
-                Collections.emptySet(),
-                encryptedValueService,
-                GRNRegistry.createWithBuiltinTypes(),
-                InputConfigurationBeanDeserializerModifier.withoutConfig()
-        ).get();
+                new ObjectMapperConfiguration(
+                        ObjectMapperProvider.class.getClassLoader(),
+                        Collections.emptySet(),
+                        encryptedValueService,
+                        GRNRegistry.createWithBuiltinTypes(),
+                        InputConfigurationBeanDeserializerModifier.withoutConfig()
+                )).get();
 
         this.dbService = new TestService(new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
                 mongodb.mongoConnection()));

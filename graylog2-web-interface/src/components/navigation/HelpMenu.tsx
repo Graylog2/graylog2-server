@@ -42,6 +42,10 @@ const HelpMenu = () => {
       <IfPermitted permissions="api_browser:read">
         <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
       </IfPermitted>
+
+      <IfPermitted permissions="api_browser:read">
+        <HelpMenuLinkItem href={Routes.openapi_browser()}>OpenAPI browser</HelpMenuLinkItem>
+      </IfPermitted>
     </NavDropdown>
   );
 };

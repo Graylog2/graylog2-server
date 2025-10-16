@@ -24,6 +24,7 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.rest.resources.RestResourcesModule;
 import org.graylog2.rest.resources.system.CookieFactory;
+import org.graylog2.shared.rest.documentation.openapi.OpenAPIBindings;
 import org.graylog2.shared.rest.resources.RestResourcesSharedModule;
 import org.graylog2.shared.security.ShiroSecurityBinding;
 import org.graylog2.web.IndexHtmlGenerator;
@@ -54,6 +55,8 @@ public class RestApiBindings extends PluginModule {
         bind(IndexHtmlGenerator.class).toProvider(IndexHtmlGeneratorProvider.class);
         bind(Config.class).toProvider(ConfigProvider.class);
         bind(CookieFactory.class).in(Scopes.SINGLETON);
+
+        install(new OpenAPIBindings());
 
         // Install all resource modules
         install(new WebResourcesModule());

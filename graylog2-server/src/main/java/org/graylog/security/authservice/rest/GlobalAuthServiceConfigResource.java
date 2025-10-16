@@ -16,9 +16,9 @@
  */
 package org.graylog.security.authservice.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.SecurityAuditEventTypes;
@@ -44,7 +44,7 @@ import java.util.Collections;
 @Path("/system/authentication/services/configuration")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "System/Authentication/Services/Configuration", description = "Manage global authentication services configuration")
+@Tag(name = "System/Authentication/Services/Configuration", description = "Manage global authentication services configuration")
 @RequiresAuthentication
 public class GlobalAuthServiceConfigResource extends RestResource {
     private final GlobalAuthServiceConfig authServiceConfig;
@@ -55,17 +55,17 @@ public class GlobalAuthServiceConfigResource extends RestResource {
     }
 
     @GET
-    @ApiOperation("Get global authentication services configuration")
+    @Operation(summary = "Get global authentication services configuration")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_READ)
     public Response get() {
         return toResponse(authServiceConfig.getConfiguration());
     }
 
     @POST
-    @ApiOperation("Update global authentication services configuration")
+    @Operation(summary = "Update global authentication services configuration")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_EDIT)
     @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_GLOBAL_CONFIG_UPDATE)
-    public Response update(@ApiParam(name = "JSON body", required = true) @NotNull GlobalAuthServiceConfig.Data body) {
+    public Response update(@Parameter(name = "JSON body", required = true) @NotNull GlobalAuthServiceConfig.Data body) {
         return toResponse(authServiceConfig.updateConfiguration(body));
     }
 

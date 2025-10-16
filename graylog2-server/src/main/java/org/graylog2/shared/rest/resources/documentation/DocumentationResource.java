@@ -19,9 +19,9 @@ package org.graylog2.shared.rest.resources.documentation;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -50,7 +50,7 @@ import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 
-@Api(value = "Documentation", description = "Documentation of this API in JSON format.")
+@Tag(name = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
 @CSP(group = CSP.SWAGGER)
 @RequiresAuthentication
@@ -86,7 +86,7 @@ public class DocumentationResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get API documentation")
+    @Operation(summary = "Get API documentation")
     @Produces(MediaType.APPLICATION_JSON)
     public Response overview() {
         return buildSuccessfulCORSResponse(generator.generateOverview());
@@ -94,7 +94,7 @@ public class DocumentationResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get API documentation with cluster global URI path")
+    @Operation(summary = "Get API documentation with cluster global URI path")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/global")
     public Response globalOverview() {
@@ -103,10 +103,10 @@ public class DocumentationResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get detailed API documentation of a single resource")
+    @Operation(summary = "Get detailed API documentation of a single resource")
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{route: .+}")
-    public Response route(@ApiParam(name = "route", value = "Route to fetch. For example /system", required = true)
+    public Response route(@Parameter(name = "route", description = "Route to fetch. For example /system", required = true)
                           @PathParam("route") String route,
                           @Context HttpHeaders httpHeaders) {
         // If the documentation was requested from "cluster global mode", use the HttpExternalUri for the baseUri.
