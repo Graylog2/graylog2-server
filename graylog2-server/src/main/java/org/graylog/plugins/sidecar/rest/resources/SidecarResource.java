@@ -25,9 +25,29 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.EntityTag;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
+import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.sidecar.filter.ActiveSidecarFilter;
 import org.graylog.plugins.sidecar.mapper.SidecarStatusMapper;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
@@ -50,35 +70,17 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.models.SortOrder;
+import org.graylog2.rest.models.users.responses.BasicUserResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.users.UserManagementService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.HeaderParam;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.EntityTag;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 import java.util.Map;
@@ -87,6 +89,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 
 @Api(value = "Sidecar", description = "Manage Sidecar fleet", tags = {CLOUD_VISIBLE})
 @Path("/sidecars")
@@ -111,16 +114,22 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     private final SearchQueryParser searchQueryParser;
     private final SidecarStatusMapper sidecarStatusMapper;
     private final SidecarConfiguration sidecarConfiguration;
+    private final UserManagementService userManagementService;
+    private final String sidecarUserName;
 
     @Inject
     public SidecarResource(SidecarService sidecarService,
                            ActionService actionService,
                            ClusterConfigService clusterConfigService,
                            SidecarStatusMapper sidecarStatusMapper,
-                           EtagService etagService) {
+                           EtagService etagService,
+                           UserManagementService userManagementService,
+                           SidecarPluginConfiguration sidecarPluginConfiguration) {
         this.sidecarService = sidecarService;
         this.sidecarConfiguration = clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration());
         this.actionService = actionService;
+        this.userManagementService = userManagementService;
+        this.sidecarUserName = sidecarPluginConfiguration.getUser();
         this.activeSidecarFilter = new ActiveSidecarFilter(sidecarConfiguration.sidecarInactiveThreshold());
         this.sidecarStatusMapper = sidecarStatusMapper;
         this.etagService = etagService;
@@ -289,5 +298,30 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     private static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor) {
         Map<Object, Boolean> map = new ConcurrentHashMap<>();
         return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+    }
+
+    @GET
+    @Path("/user")
+    @ApiOperation(value = "Get basic sidecar user")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "The sidecar user could not be found.")
+    })
+    public BasicUserResponse getBasicForwarderUser() {
+
+        if (!isPermitted(USERS_READ, sidecarUserName)) {
+            throw new ForbiddenException("Not allowed to view user " + sidecarUserName);
+        }
+
+        final User user = userManagementService.load(sidecarUserName);
+        if (user == null) {
+            throw new NotFoundException("Couldn't find user " + sidecarUserName);
+        }
+        return BasicUserResponse.builder()
+                .id(user.getId())
+                .username(user.getName())
+                .fullName(user.getFullName())
+                .readOnly(user.isReadOnly())
+                .isServiceAccount(user.isServiceAccount())
+                .build();
     }
 }
