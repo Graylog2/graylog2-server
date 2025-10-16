@@ -7238,7 +7238,7 @@ escodegen@^2.1.0:
     eslint-config-prettier "10.1.5"
     eslint-import-resolver-webpack "0.13.10"
     eslint-plugin-compat "6.0.2"
-    eslint-plugin-graylog "file:../../../../.cache/yarn/v6/npm-eslint-config-graylog-1.3.0-35006e50-97d3-437e-8621-407787c28399-1760315605936/node_modules/eslint-plugin-graylog"
+    eslint-plugin-graylog "file:packages/eslint-plugin-graylog"
     eslint-plugin-import "2.32.0"
     eslint-plugin-jest "29.0.1"
     eslint-plugin-jest-dom "5.5.0"
@@ -7246,7 +7246,7 @@ escodegen@^2.1.0:
     eslint-plugin-jsx-a11y "6.10.2"
     eslint-plugin-react "7.37.5"
     eslint-plugin-react-hooks "5.2.0"
-    eslint-plugin-testing-library "7.13.1"
+    eslint-plugin-testing-library "7.13.3"
     typescript-eslint "^8.44.1"
 
 eslint-config-prettier@10.1.5:
@@ -7398,10 +7398,10 @@ eslint-plugin-react@7.37.5:
     string.prototype.matchall "^4.0.12"
     string.prototype.repeat "^1.0.0"
 
-eslint-plugin-testing-library@7.13.1:
-  version "7.13.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.13.1.tgz#fa1841555e6e3f8833b373b5896d28fb56242ade"
-  integrity sha512-y56YvbFc3Tm4zNHjaZsbXLo15JHlPkvonOwqX9avACi/TrvknT8cMyJ6T5KJq0ExrlJjH8gIPE6wCloohMYPIQ==
+eslint-plugin-testing-library@7.13.3:
+  version "7.13.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.13.3.tgz#6edaca5609098e8869fd75afc48d7aa5ebfd0bc4"
+  integrity sha512-STwyXN7GnHulgsfdXVd5iC8fFCJVRQj2AcKtMmQOsA8G4oMnSCOX1p3MjbrDQ9fmwVf5wZy6vboTOTFobWuxOA==
   dependencies:
     "@typescript-eslint/scope-manager" "^8.15.0"
     "@typescript-eslint/utils" "^8.15.0"
@@ -8768,12 +8768,12 @@ graphemer@^1.4.0:
     "@reduxjs/toolkit" "^2.5.1"
     "@tanstack/react-query" "5.89.0"
     "@types/react" "18.3.13"
-    babel-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-eabd3957-1bf6-4ac3-85f3-b28653fa0068-1760315605678/node_modules/babel-preset-graylog"
-    eslint-config-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-eabd3957-1bf6-4ac3-85f3-b28653fa0068-1760315605678/node_modules/eslint-config-graylog"
+    babel-preset-graylog "file:packages/babel-preset-graylog"
+    eslint-config-graylog "file:packages/eslint-config-graylog"
     formik "2.4.6"
     history "^5.3.0"
     html-webpack-plugin "^5.5.0"
-    jest-preset-graylog "file:../../../../.cache/yarn/v6/npm-graylog-web-plugin-7.0.0-SNAPSHOT-eabd3957-1bf6-4ac3-85f3-b28653fa0068-1760315605678/node_modules/jest-preset-graylog"
+    jest-preset-graylog "file:packages/jest-preset-graylog"
     moment "2.30.1"
     moment-timezone "0.6.0"
     react "18.3.1"
@@ -11025,10 +11025,10 @@ material-colors@^1.2.1:
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
-material-symbols@^0.35.1:
-  version "0.35.1"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.35.1.tgz#deb4db7717026c8143abe33792584adda1944997"
-  integrity sha512-QnWsPGnSZyrB+fzvt51EVnOiiw7ne6FpgUp91VrFwsoEfwkVO/eaGYVSW30lgsb2hEw37ekSLisslIh5+AA8Cg==
+material-symbols@^0.36.4:
+  version "0.36.4"
+  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.36.4.tgz#6a0dacc4b4cd9d400b010d2138e56dc7eb0ba862"
+  integrity sha512-tmSc/Mexz9WSuCcf7WRpOdR5IJ59eFGrEWSvZG07STrC4qcsj1bX8Z7l5axoCAwvfMBS0R3RCYC1aQB4B2ANZA==
 
 math-intrinsics@^1.0.0, math-intrinsics@^1.1.0:
   version "1.1.0"
