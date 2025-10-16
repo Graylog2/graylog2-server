@@ -18,6 +18,7 @@ package org.graylog.security.certutil;
 
 import org.graylog2.cluster.ClusterConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.shared.utilities.AutoValueUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -60,12 +61,12 @@ public class InMemoryClusterConfigService implements ClusterConfigService {
 
     @Override
     public <T> void write(T payload) {
-        storage.put(payload.getClass().getCanonicalName(), payload);
+        storage.put(AutoValueUtils.getCanonicalName(payload.getClass()), payload);
     }
 
     @Override
     public <T> int remove(Class<T> type) {
-        final Object removed = storage.remove(type.getCanonicalName());
+        final Object removed = storage.remove(AutoValueUtils.getCanonicalName(type));
         return removed != null ? 1 : 0;
     }
 

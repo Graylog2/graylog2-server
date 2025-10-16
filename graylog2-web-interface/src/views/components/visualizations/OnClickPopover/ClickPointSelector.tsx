@@ -42,8 +42,8 @@ const ClickPointSelector = ({ clickPointsInRadius, onSelect, metricMapper }: Pro
         const traceColor = getHoverSwatchColor(clickPoint);
 
         return (
-          <ListGroupItem onClick={() => onSelect(clickPoint)}>
-            <ValueRenderer value={value} label={metric} traceColor={traceColor} />
+          <ListGroupItem onClick={() => onSelect(clickPoint)} key={metric}>
+            <ValueRenderer value={value} field={metric} traceColor={traceColor} />
           </ListGroupItem>
         );
       })}

@@ -36,11 +36,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.search.Search;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.search.rest.ExecutionState;
-import org.graylog.plugins.views.search.rest.scriptingapi.mapping.AggregationTabularResponseCreator;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryParamsToFullRequestSpecificationMapper;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
@@ -86,7 +82,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
     public TabularResponse executeQuery(@Parameter(name = "queryRequestSpec") @Valid MessagesRequestSpec messagesRequestSpec,
                                         @Context SearchUser searchUser) {
         try {
-            return service.executeQuery(messagesRequestSpec, searchUser, getSubject());
+            return service.executeQuery(messagesRequestSpec, searchUser);
         } catch (IllegalArgumentException | ValidationException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }
@@ -119,7 +115,7 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                     sortOrder,
                     from,
                     size);
-            return service.executeQuery(messagesRequestSpec, searchUser, getSubject());
+            return service.executeQuery(messagesRequestSpec, searchUser);
         } catch (IllegalArgumentException | QueryFailedException ex) {
             throw new BadRequestException(ex.getMessage(), ex);
         }

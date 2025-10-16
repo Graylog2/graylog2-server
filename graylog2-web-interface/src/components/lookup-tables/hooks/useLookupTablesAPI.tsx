@@ -125,9 +125,6 @@ export function usePurgeAllLookupTableKey() {
 export function useTestLookupTableKey() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: testLookupTableKey,
-    onSuccess: () => {
-      UserNotification.success('Lookup table purged successfully');
-    },
     onError: (error: Error) => UserNotification.error(error.message),
   });
 
