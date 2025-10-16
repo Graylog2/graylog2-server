@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { DateUtils } from 'react-day-picker';
 
 import { DatePicker } from 'components/common';
 import { toUTCFromTz, toDateObject } from 'util/DateTime';
@@ -33,7 +32,7 @@ const AbsoluteDatePicker = ({ dateTime, onChange = () => {}, startDate = undefin
   const initialDate = formatTime(initialDateTime, 'date');
 
   const _onDatePicked = (selectedDate: Date) => {
-    if (!!startDate && DateUtils.isDayBefore(selectedDate, startDate)) {
+    if (!!startDate && toDateObject(selectedDate).isBefore(toDateObject(startDate), 'day')) {
       return false;
     }
 
