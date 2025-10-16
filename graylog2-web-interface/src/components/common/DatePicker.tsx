@@ -18,7 +18,7 @@ import React, { useMemo } from 'react';
 import type { DayModifiers } from 'react-day-picker';
 import DayPicker from 'react-day-picker';
 import styled, { css } from 'styled-components';
-import * as moment from 'moment';
+import moment from 'moment';
 import 'react-day-picker/lib/style.css';
 
 import { isValidDate, toDateObject, adjustFormat, DATE_TIME_FORMATS } from 'util/DateTime';
