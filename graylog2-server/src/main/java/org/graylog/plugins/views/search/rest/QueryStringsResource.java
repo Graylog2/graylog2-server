@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -38,6 +39,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "Search/Query Strings")
 @Path("/search/query_strings")
 public class QueryStringsResource extends RestResource implements PluginRestResource {

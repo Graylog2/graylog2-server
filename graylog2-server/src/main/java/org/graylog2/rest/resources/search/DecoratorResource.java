@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "Search/Decorators", description = "Message search decorators")
 @Path("/search/decorators")
 @Produces(MediaType.APPLICATION_JSON)

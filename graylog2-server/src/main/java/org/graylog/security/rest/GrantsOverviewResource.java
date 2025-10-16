@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.grn.GRN;
@@ -49,6 +50,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "Authorization/GrantsOverview", description = "Grants overview")
 @Path("/authz/grants-overview")
 @Consumes(MediaType.APPLICATION_JSON)

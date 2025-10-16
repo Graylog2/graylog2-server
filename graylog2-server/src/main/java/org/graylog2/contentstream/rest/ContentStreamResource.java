@@ -19,6 +19,7 @@ package org.graylog2.contentstream.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -46,6 +47,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "ContentStream", description = "Content Stream")
 @Path("/contentstream/")
 @Produces(MediaType.APPLICATION_JSON)

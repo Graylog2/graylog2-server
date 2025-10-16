@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.Validator;
@@ -106,6 +107,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/system/lookup")
 @Produces("application/json")
 @Consumes("application/json")
+@PublicCloudAPI
 @Tag(name = "System/Lookup", description = "Lookup tables")
 public class LookupTableResource extends RestResource {
     private static final ImmutableSet<String> LUT_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(

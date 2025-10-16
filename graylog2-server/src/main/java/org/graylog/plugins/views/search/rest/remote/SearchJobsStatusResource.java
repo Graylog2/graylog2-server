@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest.remote;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.Consumes;
@@ -51,6 +52,7 @@ import java.util.concurrent.ExecutorService;
 import static org.graylog.plugins.views.search.rest.SearchResource.SEARCH_FORMAT_V1;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "SearchJobs")
 @Path("/views/searchjobs")
 @Produces(MediaType.APPLICATION_JSON)

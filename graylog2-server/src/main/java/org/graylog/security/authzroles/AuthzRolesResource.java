@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -70,6 +71,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "Authorization/Roles", description = "Manage roles")
 @Path("/authz/roles")
 @Produces(MediaType.APPLICATION_JSON)

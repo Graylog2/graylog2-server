@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -51,6 +52,7 @@ import jakarta.ws.rs.core.Response;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "EntityLists", description = "Entity Lists Preferences")
 @Path("/entitylists/preferences")
 public class EntityListPreferencesResource {

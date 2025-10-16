@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -142,6 +143,7 @@ import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS_COD
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@PublicCloudAPI
 @Tag(name = "Users", description = "User accounts")
 public class UsersResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);

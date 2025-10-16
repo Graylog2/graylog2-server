@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -59,6 +60,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "Pipelines/Rulebuilder", description = "Rules for the pipeline message processor generated using the rulebuilder")
 @Path("/system/pipelines/rulebuilder")
 @Consumes(MediaType.APPLICATION_JSON)

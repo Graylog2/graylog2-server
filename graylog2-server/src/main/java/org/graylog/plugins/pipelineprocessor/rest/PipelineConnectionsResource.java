@@ -21,6 +21,7 @@ import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -52,6 +53,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "Pipelines/Connections", description = "Stream connections of processing pipelines")
 @Path("/system/pipelines/connections")
 @Consumes(MediaType.APPLICATION_JSON)

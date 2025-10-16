@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +47,7 @@ import java.util.Set;
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_POLLING_TRIGGERED;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "FieldTypes")
 @Path("/views/fields")
 @Produces(MediaType.APPLICATION_JSON)

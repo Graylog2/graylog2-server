@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BadRequestException;
@@ -71,6 +72,7 @@ import java.util.stream.Stream;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
 @Path("/views/search/messages")
 @RequiresAuthentication

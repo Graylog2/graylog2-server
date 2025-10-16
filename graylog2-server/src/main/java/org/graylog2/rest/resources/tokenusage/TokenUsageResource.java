@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.Consumes;
@@ -61,6 +62,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/token_usage")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@PublicCloudAPI
 @Tag(name = "Token-Usage", description = "Listing usage of Tokens")
 public class TokenUsageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(TokenUsageResource.class);

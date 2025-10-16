@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.streams.rules;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "StreamRulesInputs", description = "Provide stream rule inputs")
 @Path("/streams/rules/inputs")
 public class StreamRuleInputsResource extends RestResource {

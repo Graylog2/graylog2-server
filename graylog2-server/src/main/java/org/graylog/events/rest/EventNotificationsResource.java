@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.ws.rs.BadRequestException;
@@ -85,6 +86,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
 
+@PublicCloudAPI
 @Tag(name = "Events/Notifications", description = "Manage event notifications")
 @Path("/events/notifications")
 @Produces(MediaType.APPLICATION_JSON)

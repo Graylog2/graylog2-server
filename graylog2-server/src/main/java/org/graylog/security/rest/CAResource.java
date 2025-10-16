@@ -19,6 +19,7 @@ package org.graylog.security.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -52,6 +53,7 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Path("/ca")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "CA", description = "Certificate Authority")
 public class CAResource extends RestResource {
     private final CaKeystore caKeystore;

@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -54,6 +55,7 @@ import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_UPDATE
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "System/IndexSets/FieldTypeProfiles")
 @Path("/system/indices/index_sets/profiles")
 @Produces(MediaType.APPLICATION_JSON)

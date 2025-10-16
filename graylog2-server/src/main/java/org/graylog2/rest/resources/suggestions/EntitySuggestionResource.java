@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.database.suggestions.EntitySuggestionResponse;
 import org.graylog2.database.suggestions.EntitySuggestionService;
@@ -37,6 +38,7 @@ import jakarta.ws.rs.core.MediaType;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "EntitySuggestions")
 @Path("/entity_suggestions")
 @Produces(MediaType.APPLICATION_JSON)

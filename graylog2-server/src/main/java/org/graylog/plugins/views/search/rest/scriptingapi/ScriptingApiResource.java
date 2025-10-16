@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
@@ -57,6 +58,7 @@ import java.util.Set;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.splitByComma;
 
+@PublicCloudAPI
 @Tag(name = "Search/Simple", description = "Simple search API for aggregating and messages retrieval")
 @Path("/search")
 @Consumes({MediaType.APPLICATION_JSON})

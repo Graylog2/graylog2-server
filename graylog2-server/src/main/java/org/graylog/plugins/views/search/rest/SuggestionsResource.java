@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -70,6 +71,7 @@ import static org.graylog.plugins.views.search.querystrings.LastUsedQueryStrings
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "Search/Suggestions")
 @Path("/search/suggest")
 @Produces(MediaType.APPLICATION_JSON)

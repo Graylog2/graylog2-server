@@ -20,6 +20,7 @@ import com.google.common.base.Strings;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -51,6 +52,7 @@ import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "Pipelines/Simulator", description = "Simulate pipeline message processor")
 @Path("/system/pipelines/simulate")
 @Consumes(MediaType.APPLICATION_JSON)

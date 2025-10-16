@@ -22,6 +22,7 @@ import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -44,6 +45,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "System/Fields", description = "Get list of message fields that exist.")
 @Path("/system/fields")
 public class SystemFieldsResource extends RestResource {

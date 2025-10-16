@@ -20,6 +20,7 @@ package org.graylog2.rest.resources.system;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.system.traffic.TrafficCounterService;
@@ -36,6 +37,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "System/ClusterTraffic", description = "Cluster traffic stats")
 @RequiresAuthentication
 @Path("/system/cluster/traffic")

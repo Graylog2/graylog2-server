@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeService;
@@ -44,6 +45,7 @@ import java.util.concurrent.ExecutorService;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "Cluster/Deflector", description = "Cluster-wide deflector handling")
 @Path("/cluster/deflector")
 @Produces(MediaType.APPLICATION_JSON)

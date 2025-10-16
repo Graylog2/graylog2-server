@@ -20,6 +20,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 
 import jakarta.ws.rs.GET;
@@ -31,6 +32,7 @@ import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "Search/Functions")
 @Path("/views/functions")
 @Produces(MediaType.APPLICATION_JSON)

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.events.fields.providers.FieldValueProvider;
 import org.graylog.events.processor.EventProcessor;
@@ -43,6 +44,7 @@ import java.util.Set;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "Events/EntityTypes", description = "Event entity types")
 @Path("/events/entity_types")
 @Produces(MediaType.APPLICATION_JSON)

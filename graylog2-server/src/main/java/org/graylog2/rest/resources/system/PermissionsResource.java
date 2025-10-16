@@ -22,6 +22,7 @@ import com.google.common.collect.Ordering;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -44,6 +45,7 @@ import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
+@PublicCloudAPI
 @Tag(name = "System/Permissions", description = "Retrieval of system permissions.")
 @Path("/system/permissions")
 @Produces(APPLICATION_JSON)

@@ -20,6 +20,7 @@ import com.mongodb.client.model.Sorts;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -55,6 +56,7 @@ import java.util.Map;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+@PublicCloudAPI
 @Tag(name = "Stream/Destinations/Filters", description = "Manage stream destination filter rules")
 @Path("/streams/{streamId}/destinations")
 @Produces(MediaType.APPLICATION_JSON)

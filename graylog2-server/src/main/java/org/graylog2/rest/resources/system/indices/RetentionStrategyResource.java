@@ -26,6 +26,7 @@ import com.fasterxml.jackson.module.jsonSchema.jakarta.types.StringSchema;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -56,6 +57,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "System/Indices/Retention", description = "Index retention strategy settings")
 @Path("/system/indices/retention")
 @Produces(MediaType.APPLICATION_JSON)

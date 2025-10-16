@@ -23,6 +23,7 @@ import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWr
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -50,6 +51,7 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
+@PublicCloudAPI
 @Tag(name = "System/Indices/Rotation", description = "Index rotation strategy settings")
 @Path("/system/indices/rotation")
 @Produces(MediaType.APPLICATION_JSON)
