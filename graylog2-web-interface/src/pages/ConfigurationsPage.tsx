@@ -31,6 +31,7 @@ import EventsConfig from 'components/configurations/EventsConfig';
 import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
+import McpConfig from 'components/configurations/McpConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
@@ -145,6 +146,7 @@ const ConfigurationsPage = () => {
         },
         {
           name: 'Users',
+          hide: !isPermitted(currentUser.permissions, ['users:edit', 'users:tokencreate']),
           SectionComponent: ConfigurationSection,
           props: {
             ConfigurationComponent: UserConfig,
@@ -156,6 +158,14 @@ const ConfigurationsPage = () => {
           SectionComponent: PluginsConfig,
           showCaret: true,
           catchAll: true,
+        },
+        {
+          name: 'MCP',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: McpConfig,
+            title: 'MCP',
+          },
         },
       ].filter(({ hide }) => !hide),
     [currentUser?.permissions],

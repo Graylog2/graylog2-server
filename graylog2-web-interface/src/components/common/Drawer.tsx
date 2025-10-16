@@ -107,6 +107,7 @@ type Props = Pick<
   | 'styles'
   | 'transitionProps'
   | 'styles'
+  | 'lockScroll'
 > & {
   opened?: boolean;
   double?: boolean;
