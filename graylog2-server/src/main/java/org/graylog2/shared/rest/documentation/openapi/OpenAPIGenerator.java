@@ -34,6 +34,11 @@ import java.util.Set;
 /**
  * Configuration and setup for OpenAPI 3.1 specification generation.
  * This class encapsulates the logic for configuring Swagger/OpenAPI to work with Graylog's REST API.
+ *
+ * TODO: this class can't really be reused for multiple contexts right now, because it uses the global
+ *   default context it. if used outside the usual application lifecycle, e.g. for stub generation or in
+ *   tests, this is not ideal. Maybe we should expose the context and provide means to create it with a
+ *   user-defined context id.
  */
 @Singleton
 public class OpenAPIGenerator {
@@ -107,7 +112,6 @@ public class OpenAPIGenerator {
 
         try {
             final var context = new JaxrsOpenApiContextBuilder<>()
-//                    .resourceClasses(resourceClassNames)
                     .openApiConfiguration(openApiConfiguration)
                     .buildContext(false);
             context.setModelConverters(Set.of(modelConverter));

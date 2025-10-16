@@ -32,6 +32,7 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,7 +54,7 @@ class OpenAPIGeneratorTest {
     @BeforeEach
     void setUp() {
         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
-                Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class));
+                Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class, NotPublicCloudResource.class));
         final var objectMapperConfiguration = new ObjectMapperConfiguration(
                 ObjectMapperProvider.class.getClassLoader(),
                 Collections.emptySet(),
@@ -63,7 +64,7 @@ class OpenAPIGeneratorTest {
         );
         generator = new OpenAPIGenerator(
                 Version.from(1, 0, 0),
-                new CustomOpenAPIScanner(Set.of(RootTestResource.class), pluginRestResources),
+                new CustomOpenAPIScanner(Set.of(RootTestResource.class), pluginRestResources, true),
                 new CustomObjectMapperProcessor(objectMapperConfiguration),
                 new CustomModelConverter(),
                 (config) -> new CustomReader(pluginRestResources, config)
@@ -150,6 +151,7 @@ class OpenAPIGeneratorTest {
         assertThat(rateProperty.getProperties()).isNullOrEmpty();
     }
 
+    @PublicCloudAPI
     @Path("/test")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -163,6 +165,7 @@ class OpenAPIGeneratorTest {
     }
 
     // Test resource with primitive Optional types to verify schema generation
+    @PublicCloudAPI
     @Path("/test")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
@@ -199,12 +202,25 @@ class OpenAPIGeneratorTest {
         }
     }
 
+    @PublicCloudAPI
     @Path("/test2")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public static class TestResource2 implements PluginRestResource {
 
         @NoAuditEvent("Test2")
+        @GET
+        public Response getTest() {
+            return Response.ok().build();
+        }
+    }
+
+    @Path("/not-public-cloud-api")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class NotPublicCloudResource implements PluginRestResource {
+
+        @NoAuditEvent("Test")
         @GET
         public Response getTest() {
             return Response.ok().build();

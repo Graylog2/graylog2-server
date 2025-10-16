@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 
 import java.util.Map;
 import java.util.Set;
@@ -31,13 +32,16 @@ import java.util.stream.Stream;
 public class CustomOpenAPIScanner implements OpenApiScanner {
     private final Set<Class<?>> systemRestResources;
     private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
+    private final boolean isCloud;
 
     @Inject
     public CustomOpenAPIScanner(@Named(Graylog2Module.SYSTEM_REST_RESOURCES) final Set<Class<?>> systemRestResources,
-                                final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources
+                                final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
+                                @Named("is_cloud") final boolean isCloud
     ) {
         this.systemRestResources = systemRestResources;
         this.pluginRestResources = pluginRestResources;
+        this.isCloud = isCloud;
     }
 
     @Override
@@ -47,8 +51,11 @@ public class CustomOpenAPIScanner implements OpenApiScanner {
 
     @Override
     public Set<Class<?>> classes() {
-        // TODO: filter for cloud visibility here?
-        return Stream.concat(systemRestResources.stream(), pluginRestResources.values().stream().flatMap(Set::stream))
+        return Stream.concat(
+                        systemRestResources.stream(),
+                        pluginRestResources.values().stream().flatMap(Set::stream)
+                )
+                .filter(cls -> !isCloud || cls.isAnnotationPresent(PublicCloudAPI.class))
                 .collect(Collectors.toSet());
     }
 
