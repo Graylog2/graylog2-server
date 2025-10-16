@@ -31,6 +31,7 @@ export type ModalHandler = {
 export type EntityActionModalProps<T, M> = React.PropsWithRef<{
   entity: T;
   entityType: string;
+  onClose?: () => void;
 }> & {
   ref: React.LegacyRef<M>;
 };
