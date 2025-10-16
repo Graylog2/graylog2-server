@@ -114,12 +114,12 @@ const StyledAceEditor = styled(AceEditor)<Props>(
       }
 
       .ace_invalid {
-        color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
-        background-color: ${$scTheme.colors.brand.primary};
+        color: ${$scTheme.utils.readableColor($scTheme.colors.variant.danger)};
+        background-color: ${$scTheme.colors.variant.danger};
       }
 
       .ace_invalid.ace_deprecated {
-        color: ${$scTheme.utils.readableColor($scTheme.colors.brand.primary)};
+        color: ${$scTheme.utils.readableColor($scTheme.colors.variant.danger)};
         background-color: ${$scTheme.colors.variant.dark.primary};
       }
 
@@ -151,7 +151,7 @@ const StyledAceEditor = styled(AceEditor)<Props>(
       .ace_meta.ace_tag,
       .ace_string.ace_regexp,
       .ace_variable {
-        color: ${$scTheme.colors.brand.primary};
+        color: ${$scTheme.colors.variant.danger};
       }
 
       .ace_comment {
