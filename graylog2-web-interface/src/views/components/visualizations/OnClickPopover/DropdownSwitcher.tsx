@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState, useEffect, useMemo, useContext } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import type {
   ClickPoint,
@@ -25,7 +25,7 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import ClickPointSelector from 'views/components/visualizations/OnClickPopover/ClickPointSelector';
 import ValueActionsDropdown from 'views/components/visualizations/OnClickPopover/ValueActionsDropdown';
 import { AdditionalContext } from 'views/logic/ActionContext';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
+import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
 
 type Props = {
   component: OnClickPopoverDropdown;
@@ -40,12 +40,6 @@ const defaultMetricMapper = (clickPoint: ClickPoint) => ({
   value: `${String(clickPoint.text ?? clickPoint.y)}`,
   metric: clickPoint.data.originalName ?? clickPoint.data.name,
 });
-
-const useQueryFieldTypes = () => {
-  const fieldTypes = useContext(FieldTypesContext);
-
-  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
-};
 
 const DropdownSwitcher = ({
   component: Component,
