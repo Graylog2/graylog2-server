@@ -38,6 +38,7 @@ import Spinner from '../common/Spinner';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
   ({ theme }) => css`
+    /* stylelint-disable-next-line nesting-selector-no-missing-scoping-root */
     &&.deflist {
       dd {
         padding-left: ${theme.spacings.md};
