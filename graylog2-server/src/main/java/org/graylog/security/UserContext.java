@@ -56,7 +56,7 @@ public class UserContext implements HasUser {
          * Create a UserContext from the currently accessible Shiro Subject available to the calling code depending on runtime environment.
          * This should only be called from within an existing Shiro context.
          * If a UserContext is needed from an environment where there is no existing context,
-         * the code can be run using: {@link UserContext#runAs(String username, Callable)}
+         * the code can be run using: {@link UserContext#runAs(String username, UserService userService, Callable)}
          *
          * @return a user context reflecting the currently executing user.
          * @throws UserContextMissingException
@@ -98,7 +98,7 @@ public class UserContext implements HasUser {
                 .authenticated(true)
                 .sessionCreationEnabled(false)
                 .buildSubject();
-        
+
         return subject.execute(wrapWithRequestHeader(callable));
 
     }
@@ -117,41 +117,6 @@ public class UserContext implements HasUser {
                 ThreadContext.remove(ShiroRequestHeadersBinder.REQUEST_HEADERS);
             }
         };
-    }
-
-
-    /**
-     * Build a temporary Shiro Subject and run the callable within that context
-     *
-     * @param userId The userId of the subject
-     * @param callable The callable to be executed
-     * @param <T>      The return type of the callable.
-     * @return whatever the callable returns.
-     */
-    public static <T> T runAs(String userId, Callable<T> callable) {
-        final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(userId, "runAs-context"))
-                .authenticated(true)
-                .sessionCreationEnabled(false)
-                .buildSubject();
-
-        return subject.execute(callable);
-    }
-
-    /**
-     * Build a temporary Shiro Subject and run the callable within that context
-     *
-     * @param userId The userId of the subject
-     * @param runnable The runnable to be executed
-     */
-    public static void runAs(String userId, Runnable runnable) {
-        final Subject subject = new Subject.Builder()
-                .principals(new SimplePrincipalCollection(userId, "runAs-context"))
-                .authenticated(true)
-                .sessionCreationEnabled(false)
-                .buildSubject();
-
-        subject.execute(runnable);
     }
 
     public UserContext(String userId, Subject subject, UserService userService) {
