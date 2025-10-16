@@ -306,7 +306,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @ApiResponses({
             @ApiResponse(code = 404, message = "The sidecar user could not be found.")
     })
-    public BasicUserResponse getBasicForwarderUser() {
+    public BasicUserResponse getBasicSidecarUser() {
 
         if (!isPermitted(USERS_READ, sidecarUserName)) {
             throw new ForbiddenException("Not allowed to view user " + sidecarUserName);
