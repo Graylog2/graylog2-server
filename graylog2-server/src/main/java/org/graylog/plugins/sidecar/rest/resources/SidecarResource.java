@@ -22,6 +22,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -156,9 +157,10 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                                         @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                         @Parameter(name = "sort",
                                                   description = "The field to sort the result on",
-                                                  required = true)
+                                                  required = true,
+                                                  schema = @Schema(allowableValues = {"title", "description", "name", "id"}))
                                         @DefaultValue(Sidecar.FIELD_NODE_NAME) @QueryParam("sort") String sort,
-                                        @Parameter(name = "order", description = "The sort direction")
+                                        @Parameter(name = "order", description = "The sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
                                         @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                         @Parameter(name = "only_active") @QueryParam("only_active") @DefaultValue("false") boolean onlyActive) {
         final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(query);

@@ -25,6 +25,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -291,9 +292,11 @@ public class UsersResource extends RestResource {
                                                       @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                       @Parameter(name = "sort",
                                                               description = "The field to sort the result on",
-                                                              required = true)
+                                                              required = true,
+                                                              schema = @Schema(allowableValues = {"username", "full_name", "email"}))
                                                       @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
-                                                      @Parameter(name = "order", description = "The sort direction")
+                                                      @Parameter(name = "order", description = "The sort direction",
+                                                              schema = @Schema(allowableValues = {"asc", "desc"}))
                                                       @DefaultValue("asc") @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;
@@ -728,7 +731,8 @@ public class UsersResource extends RestResource {
     public Response updateAccountStatus(
             @Parameter(name = "userId", description = "The id of the user whose status to change.", required = true)
             @PathParam("userId") @NotBlank String userId,
-            @Parameter(name = "newStatus", description = "The account status to be set", required = true)
+            @Parameter(name = "newStatus", description = "The account status to be set", required = true,
+                      schema = @Schema(allowableValues = {"enabled", "disabled", "deleted"}))
             @PathParam("newStatus") @NotBlank String newStatusString,
             @Context UserContext userContext) throws ValidationException {
 

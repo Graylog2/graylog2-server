@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
@@ -193,9 +194,11 @@ public class AuthServiceBackendsResource extends RestResource {
             @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @Parameter(name = "sort", description = "The field to sort the result on", required = true)
+            @Parameter(name = "sort", description = "The field to sort the result on", required = true,
+                      schema = @Schema(allowableValues = {"username", "full_name", "email"}))
             @DefaultValue(UserOverviewDTO.FIELD_FULL_NAME) @QueryParam("sort") String sort,
-            @Parameter(name = "order", description = "The sort direction")
+            @Parameter(name = "order", description = "The sort direction",
+                      schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue("asc") @QueryParam("order") SortOrder order,
             @Parameter(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId
     ) {

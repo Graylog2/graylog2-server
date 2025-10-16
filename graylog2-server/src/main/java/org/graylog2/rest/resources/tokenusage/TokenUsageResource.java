@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
@@ -108,9 +109,11 @@ public class TokenUsageResource extends RestResource {
                                                     @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                     @Parameter(name = "sort",
                                                               description = "The field to sort the result on",
-                                                              required = true)
-                                                        @DefaultValue(AccessTokenEntity.FIELD_NAME) @QueryParam("sort") String sort,
-                                                    @Parameter(name = "order", description = "The sort direction")
+                                                              required = true,
+                                                              schema = @Schema(allowableValues = {"id", "username", "name", "created_at", "last_access", "expires_at"}))
+                                                    @DefaultValue(AccessTokenEntity.FIELD_NAME) @QueryParam("sort") String sort,
+                                                    @Parameter(name = "order", description = "The sort direction",
+                                                              schema = @Schema(allowableValues = {"asc", "desc"}))
                                                     @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         LOG.debug("Incoming request to list token usages{}, on page {} with {} items per page.", query.isEmpty() ? "" : " matching " + query, page, perPage);
         final SearchQuery searchQuery;

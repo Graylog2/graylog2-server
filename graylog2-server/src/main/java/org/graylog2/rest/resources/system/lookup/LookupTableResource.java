@@ -27,6 +27,7 @@ import com.google.common.collect.Multimap;
 import com.mongodb.MongoException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -252,9 +253,11 @@ public class LookupTableResource extends RestResource {
                                   @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                   @Parameter(name = "sort",
                                             description = "The field to sort the result on",
-                                            required = true)
+                                            required = true,
+                                            schema = @Schema(allowableValues = {"title", "description", "name"}))
                                   @DefaultValue(LookupTableDto.FIELD_TITLE) @QueryParam("sort") String sort,
-                                  @Parameter(name = "order", description = "The sort direction")
+                                  @Parameter(name = "order", description = "The sort direction",
+                                            schema = @Schema(allowableValues = {"asc", "desc"}))
                                   @DefaultValue("desc") @QueryParam("order") SortOrder order,
                                   @Parameter(name = "query") @QueryParam("query") String query,
                                   @Parameter(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
@@ -473,9 +476,11 @@ public class LookupTableResource extends RestResource {
                                     @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                     @Parameter(name = "sort",
                                               description = "The field to sort the result on",
-                                              required = true)
+                                              required = true,
+                                              schema = @Schema(allowableValues = {"title", "description", "name"}))
                                     @DefaultValue(DataAdapterDto.FIELD_TITLE) @QueryParam("sort") String sort,
-                                    @Parameter(name = "order", description = "The sort direction")
+                                    @Parameter(name = "order", description = "The sort direction",
+                                              schema = @Schema(allowableValues = {"asc", "desc"}))
                                     @DefaultValue("desc") @QueryParam("order") SortOrder order,
                                     @Parameter(name = "query") @QueryParam("query") String query) {
 
@@ -687,9 +692,11 @@ public class LookupTableResource extends RestResource {
                              @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                              @Parameter(name = "sort",
                                        description = "The field to sort the result on",
-                                       required = true)
+                                       required = true,
+                                       schema = @Schema(allowableValues = {"title", "description", "name"}))
                              @DefaultValue(CacheDto.FIELD_TITLE) @QueryParam("sort") String sort,
-                             @Parameter(name = "order", description = "The sort direction")
+                             @Parameter(name = "order", description = "The sort direction",
+                                       schema = @Schema(allowableValues = {"asc", "desc"}))
                              @DefaultValue("desc") @QueryParam("order") SortOrder order,
                              @Parameter(name = "query") @QueryParam("query") String query) {
         if (!CACHE_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {

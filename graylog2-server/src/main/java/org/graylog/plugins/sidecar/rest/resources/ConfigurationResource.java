@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -131,9 +132,10 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
                                                         @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                         @Parameter(name = "sort",
                                                                   description = "The field to sort the result on",
-                                                                  required = true)
+                                                                  required = true,
+                                                                  schema = @Schema(allowableValues = {"name", "id", "collector_id"}))
                                                         @DefaultValue(Configuration.FIELD_NAME) @QueryParam("sort") String sort,
-                                                        @Parameter(name = "order", description = "The sort direction")
+                                                        @Parameter(name = "order", description = "The sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
                                                         @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Configuration> configurations = this.configurationService.findPaginated(searchQuery, page, perPage, sort, order);

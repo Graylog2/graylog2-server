@@ -100,7 +100,9 @@ public class ScriptingApiResource extends RestResource implements PluginRestReso
                                         @Parameter(name = "timerange", description = "Timeframe to search in. See method description.", required = true) @QueryParam("timerange") String timerangeKeyword,
                                         @Parameter(name = "fields", description = "Fields from the message to show as columns in result") @QueryParam("fields") List<String> fields,
                                         @Parameter(name = "sort", description = "Field to sort on") @QueryParam("sort") String sort,
-                                        @Parameter(name = "sortOrder", description = "Sort order - asc/desc") @QueryParam("sortOrder") SortSpec.Direction sortOrder,
+                                        @Parameter(name = "sortOrder", description = "Sort order - asc/desc",
+                                                  schema = @Schema(allowableValues = {"asc", "desc"}))
+                                        @QueryParam("sortOrder") SortSpec.Direction sortOrder,
                                         @Parameter(name = "from", description = "For paging results. Starting from result") @QueryParam("from") int from,
                                         @Parameter(name = "size", description = "Page size") @QueryParam("size") int size,
                                         @Context SearchUser searchUser) {

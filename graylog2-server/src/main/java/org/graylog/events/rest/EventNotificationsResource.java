@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -141,9 +142,11 @@ public class EventNotificationsResource extends RestResource implements PluginRe
                                                      @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                      @Parameter(name = "sort",
                                                                description = "The field to sort the result on",
-                                                               required = true)
+                                                               required = true,
+                                                               schema = @Schema(allowableValues = {"title", "description", "type"}))
                                                      @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                     @Parameter(name = "order", description = "The sort direction")
+                                                     @Parameter(name = "order", description = "The sort direction",
+                                                                schema = @Schema(allowableValues = {"asc", "desc"}))
                                                      @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         if ("type".equals(sort)) {

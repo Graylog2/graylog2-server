@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
@@ -90,8 +91,12 @@ public class SavedSearchesResource extends RestResource {
                                                   @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                   @Parameter(name = "sort",
                                                             description = "The field to sort the result on",
-                                                            required = true) @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
-                                                  @Parameter(name = "order", description = "The sort direction") @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                            required = true,
+                                                            schema = @Schema(allowableValues = {"id", "title", "created_at", "last_updated_at", "owner", "description", "summary"}))
+                                                  @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                  @Parameter(name = "order", description = "The sort direction",
+                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                  @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                                   @Parameter(name = "query") @QueryParam("query") String query,
                                                   @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
                                                   @Context SearchUser searchUser) {

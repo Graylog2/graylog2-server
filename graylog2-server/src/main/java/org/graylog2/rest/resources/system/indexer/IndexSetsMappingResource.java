@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.indexer;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -84,9 +85,11 @@ public class IndexSetsMappingResource extends RestResource {
                                                                       @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                       @Parameter(name = "sort",
                                                                                 description = "The field to sort the result on",
-                                                                                required = true)
+                                                                                required = true,
+                                                                                schema = @Schema(allowableValues = {"field_name"}))
                                                                       @DefaultValue(IndexSetFieldType.DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                                      @Parameter(name = "order", description = "The sort direction")
+                                                                      @Parameter(name = "order", description = "The sort direction",
+                                                                                schema = @Schema(allowableValues = {"asc", "desc"}))
                                                                       @DefaultValue("asc") @QueryParam("order") String order,
                                                                       @Context SearchUser searchUser) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
@@ -132,9 +135,11 @@ public class IndexSetsMappingResource extends RestResource {
                                                                          @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                                                          @Parameter(name = "sort",
                                                                                    description = "The field to sort the result on",
-                                                                                   required = true)
+                                                                                   required = true,
+                                                                                   schema = @Schema(allowableValues = {"index_set_id", "index_set_title"}))
                                                                          @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                                         @Parameter(name = "order", description = "The sort direction")
+                                                                         @Parameter(name = "order", description = "The sort direction",
+                                                                                   schema = @Schema(allowableValues = {"asc", "desc"}))
                                                                          @DefaultValue("asc") @QueryParam("order") String order,
                                                                          @Context SearchUser searchUser) {
         final Set<String> streamsIds = normalizeStreamIds(request.streamsIds(), searchUser);

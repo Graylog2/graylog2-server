@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.indexer;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -88,9 +89,11 @@ public class IndexFieldTypeProfileResource extends RestResource {
                                                                      @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
                                                                      @Parameter(name = "sort",
                                                                                description = "The field to sort the result on",
-                                                                               required = true)
+                                                                               required = true,
+                                                                               schema = @Schema(allowableValues = {"id", "name", "description"}))
                                                                      @DefaultValue(IndexFieldTypeProfile.NAME_FIELD_NAME) @QueryParam("sort") String sort,
-                                                                     @Parameter(name = "order", description = "The sort direction")
+                                                                     @Parameter(name = "order", description = "The sort direction",
+                                                                               schema = @Schema(allowableValues = {"asc", "desc"}))
                                                                      @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.MAPPING_PROFILES_READ);
         return profileService.getPaginated(query, filters, page, perPage, sort, order);

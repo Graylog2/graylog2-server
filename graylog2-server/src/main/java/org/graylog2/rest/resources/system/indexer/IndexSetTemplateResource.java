@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.indexer;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -113,9 +114,11 @@ public class IndexSetTemplateResource extends RestResource {
                                                               @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
                                                               @Parameter(name = "sort",
                                                                         description = "The field to sort the result on",
-                                                                        required = true)
+                                                                        required = true,
+                                                                        schema = @Schema(allowableValues = {"id", "title", "description"}))
                                                               @DefaultValue(IndexSetTemplate.TITLE_FIELD_NAME) @QueryParam("sort") String sort,
-                                                              @Parameter(name = "order", description = "The sort direction")
+                                                              @Parameter(name = "order", description = "The sort direction",
+                                                                        schema = @Schema(allowableValues = {"asc", "desc"}))
                                                               @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
         return toPaginatedResponse(templateService.getPaginated(query, filters, page, perPage, sort, order));

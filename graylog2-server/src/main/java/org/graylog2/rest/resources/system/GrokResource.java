@@ -123,10 +123,12 @@ public class GrokResource extends RestResource {
                                                   @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                   @Parameter(name = "sort",
                                                             description = "The field to sort the result on",
-                                                            required = true)
+                                                            required = true,
+                                                            schema = @Schema(allowableValues = {"id", "name"}))
                                                   @DefaultValue(GrokPattern.FIELD_NAME) @QueryParam("sort") String sort,
-                                                  @Parameter(name = "order", description = "The sort direction")
-                                                      @DefaultValue("asc") @QueryParam("order") SortOrder order) {
+                                                  @Parameter(name = "order", description = "The sort direction",
+                                                            schema = @Schema(allowableValues = {"asc", "desc"}))
+                                                  @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         checkPermission(RestPermissions.INPUTS_READ);
 
         SearchQuery searchQuery;

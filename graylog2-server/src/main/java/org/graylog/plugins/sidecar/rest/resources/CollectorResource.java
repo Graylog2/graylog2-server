@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -186,9 +187,10 @@ public class CollectorResource extends RestResource implements PluginRestResourc
                                                 @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                 @Parameter(name = "sort",
                                                           description = "The field to sort the result on",
-                                                          required = true)
+                                                          required = true,
+                                                          schema = @Schema(allowableValues = {"name", "id", "collector_id"}))
                                                 @DefaultValue(Collector.FIELD_NAME) @QueryParam("sort") String sort,
-                                                @Parameter(name = "order", description = "The sort direction")
+                                                @Parameter(name = "order", description = "The sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
                                                 @DefaultValue("asc") @QueryParam("order") SortOrder order) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);
         final PaginatedList<Collector> collectors = this.collectorService.findPaginated(searchQuery, page, perPage, sort, order);

@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DefaultValue;
@@ -87,9 +88,11 @@ public class DatanodeResource extends RestResource {
                                                    @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
                                                    @Parameter(name = "sort",
                                                              description = "The field to sort the result on",
-                                                             required = true)
+                                                             required = true,
+                                                             schema = @Schema(allowableValues = {"hostname", "data_node_status", "transport_address", "cert_valid_until", "datanode_version"}))
                                                    @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                   @Parameter(name = "order", description = "The sort direction")
+                                                   @Parameter(name = "order", description = "The sort direction",
+                                                             schema = @Schema(allowableValues = {"asc", "desc"}))
                                                    @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
     ) {

@@ -193,9 +193,11 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
                                                         @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
                                                         @Parameter(name = "sort",
                                                                   description = "The field to sort the result on",
-                                                                  required = true)
+                                                                  required = true,
+                                                                  schema = @Schema(allowableValues = {"title", "description", "priority", "status"}))
                                                         @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                                        @Parameter(name = "order", description = "The sort direction")
+                                                        @Parameter(name = "order", description = "The sort direction",
+                                                                   schema = @Schema(allowableValues = {"asc", "desc"}))
                                                         @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         SearchQuery searchQuery;

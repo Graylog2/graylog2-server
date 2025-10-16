@@ -258,9 +258,11 @@ public class StreamResource extends RestResource {
                                                @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
                                                @Parameter(name = "sort",
                                                          description = "The field to sort the result on",
-                                                         required = true)
+                                                         required = true,
+                                                         schema = @Schema(allowableValues = {"id", "title", "description", "created_at"}))
                                                @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                               @Parameter(name = "order", description = "The sort direction")
+                                               @Parameter(name = "order", description = "The sort direction",
+                                                         schema = @Schema(allowableValues = {"asc", "desc"}))
                                                @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         final Predicate<StreamImpl> permissionFilter = stream -> isPermitted(RestPermissions.STREAMS_READ, stream.id());

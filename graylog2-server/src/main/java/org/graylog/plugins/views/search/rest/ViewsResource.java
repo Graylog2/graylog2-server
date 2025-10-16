@@ -158,8 +158,12 @@ public class ViewsResource extends RestResource implements PluginRestResource {
                                             @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                             @Parameter(name = "sort",
                                                       description = "The field to sort the result on",
-                                                      required = true) @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
-                                            @Parameter(name = "order", description = "The sort direction") @DefaultValue("asc") @QueryParam("order") SortOrder order,
+                                                      required = true,
+                                                      schema = @Schema(allowableValues = {"id", "title", "created_at", "last_updated_at", "owner", "description", "summary"}))
+                                            @DefaultValue(ViewDTO.FIELD_TITLE) @QueryParam("sort") String sortField,
+                                            @Parameter(name = "order", description = "The sort direction",
+                                                      schema = @Schema(allowableValues = {"asc", "desc"}))
+                                            @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                             @Parameter(name = "query") @QueryParam("query") String query,
                                             @Context SearchUser searchUser) {
 
