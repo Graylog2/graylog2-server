@@ -75,11 +75,7 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
   return (
     <>
       {isCloud ? (
-        <KeySecret 
-          awsKey={awsAccessKey} 
-          awsSecret={awsSecretKey} 
-          onChange={onChange}
-        />
+        <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
       ) : (
         <>
           <Input
@@ -100,19 +96,12 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret 
-                awsKey={awsAccessKey} 
-                awsSecret={awsSecretKey} 
-                onChange={onChange}
-              />
+              <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} />
             )}
           </AuthWrapper>
         </>
       )}
-      <ARN 
-        awsARN={awsAssumeRoleARN} 
-        onChange={onChange}
-      />
+      <ARN awsARN={awsAssumeRoleARN} onChange={onChange} />
     </>
   );
 };

@@ -27,7 +27,7 @@ import type { QueryString } from 'views/logic/queries/types';
 export default (
   streamId?: string | string[],
   streamCategory?: string | string[],
-  // eslint-disable-next-line default-param-last
+
   id: QueryId | undefined = generateId(),
   timeRange?: TimeRange,
   queryString?: QueryString,
