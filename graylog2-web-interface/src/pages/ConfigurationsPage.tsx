@@ -163,18 +163,18 @@ const ConfigurationsPage = () => {
           },
         },
         {
-          name: 'Plugins',
-          SectionComponent: PluginsConfig,
-          showCaret: true,
-          catchAll: true,
-        },
-        {
           name: 'MCP',
           SectionComponent: ConfigurationSection,
           props: {
             ConfigurationComponent: McpConfig,
             title: 'MCP',
           },
+        },
+        {
+          name: 'Plugins',
+          SectionComponent: PluginsConfig,
+          showCaret: true,
+          catchAll: true,
         },
       ].filter(({ hide }) => !hide),
     [currentUser?.permissions],
