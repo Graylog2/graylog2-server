@@ -139,9 +139,7 @@ const ViewEventDefinitionPage = () => {
               </IfPermitted>
               {!isSystemEventDefinition(eventDefinition) && (
                 <IfPermitted permissions="eventdefinitions:create">
-                  <Button onClick={() => setShowDialog(true)}>
-                    Duplicate Event Definition
-                  </Button>
+                  <Button onClick={() => setShowDialog(true)}>Duplicate Event Definition</Button>
                 </IfPermitted>
               )}
             </ButtonToolbar>

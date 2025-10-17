@@ -37,7 +37,7 @@ const HasOwnership = ({ children, id = undefined, type, hideChildren = false }: 
   }
 
   if (hideChildren) {
-    return null
+    return null;
   }
 
   if (currentUser) {

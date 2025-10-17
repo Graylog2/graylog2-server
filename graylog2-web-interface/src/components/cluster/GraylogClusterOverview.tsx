@@ -45,7 +45,7 @@ const ClusterInfo = () => {
   if (!nodes?.clusterId) {
     return <Spinner />;
   }
-  
+
   const { clusterId, nodeCount } = nodes;
 
   return (
