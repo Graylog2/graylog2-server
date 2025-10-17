@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
@@ -50,7 +49,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -95,7 +93,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
-import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
@@ -110,7 +107,6 @@ import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -469,26 +465,47 @@ public class UsersResource extends RestResource {
     }
 
     private void setUserRoles(@Nullable List<String> roles, User user) {
-        if (roles != null) {
-            try {
-                final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
-                List<String> unknownRoles = new ArrayList<>();
-                roles.forEach(roleName -> {
-                    checkPermission(RestPermissions.ROLES_ASSIGN, roleName);
-                    if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
-                        unknownRoles.add(roleName);
-                    }
-                });
-                if (!unknownRoles.isEmpty()) {
-                    throw new BadRequestException(
-                            String.format(Locale.ENGLISH, "Invalid role names: %s", StringUtils.join(unknownRoles, ", "))
-                    );
-                }
-                final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
-                user.setRoleIds(Sets.newHashSet(roleIds));
-            } catch (org.graylog2.database.NotFoundException e) {
-                throw new InternalServerErrorException(e);
+        if (roles == null) {
+            return;
+        }
+
+        try {
+            final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+            final Map<String, String> idToNameMap = nameMap.values().stream()
+                    .collect(Collectors.toMap(Role::getId, r -> r.getName().toLowerCase(Locale.US)));
+
+            final Set<String> normalizedRoles = roles.stream()
+                    .map(r -> r.toLowerCase(Locale.US))
+                    .collect(Collectors.toSet());
+
+            final List<String> unknownRoles = normalizedRoles.stream()
+                    .filter(r -> !nameMap.containsKey(r)).toList();
+
+            if (!unknownRoles.isEmpty()) {
+                throw new BadRequestException(
+                        String.format(Locale.ENGLISH, "Invalid role names: %s", String.join(", ", unknownRoles))
+                );
             }
+
+            final Set<String> currentRoleNames = user.getRoleIds().stream()
+                    .map(idToNameMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            final Set<String> changedRoles = Sets.symmetricDifference(normalizedRoles, currentRoleNames);
+
+            for (String changedRole : changedRoles) {
+                checkPermission(RestPermissions.ROLES_ASSIGN, nameMap.get(changedRole).getName());
+            }
+
+            final Set<String> roleIds = normalizedRoles.stream()
+                    .map(nameMap::get)
+                    .map(Role::getId)
+                    .collect(Collectors.toSet());
+
+            user.setRoleIds(roleIds);
+
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new InternalServerErrorException(e);
         }
     }
 
