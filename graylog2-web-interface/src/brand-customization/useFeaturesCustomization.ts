@@ -14,20 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-
 import AppConfig from 'util/AppConfig';
 
 const useFeaturesCustomization = () => {
   const featureToggles = AppConfig?.branding?.()?.features;
 
-  return useMemo(
-    () => ({
-      aiInvestigationReport: featureToggles?.ai_investigation_report,
-      widgetSummary: featureToggles?.widget_summary,
-    }),
-    [featureToggles?.ai_investigation_report, featureToggles?.widget_summary],
-  );
+  return {
+    aiInvestigationReport: featureToggles?.ai_investigation_report,
+    widgetSummary: featureToggles?.widget_summary,
+  };
 };
 
 export default useFeaturesCustomization;

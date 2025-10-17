@@ -14,18 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-
 import useFeaturesCustomization from './useFeaturesCustomization';
+
 const useFeatureCustomization = (feature: keyof ReturnType<typeof useFeaturesCustomization>) => {
   const featuresCustomization = useFeaturesCustomization();
 
-  return useMemo(
-    () => ({
-      enabled: featuresCustomization?.[feature]?.enabled !== false,
-    }),
-    [featuresCustomization, feature],
-  );
+  return {
+    enabled: featuresCustomization?.[feature]?.enabled !== false,
+  };
 };
 
 export default useFeatureCustomization;
