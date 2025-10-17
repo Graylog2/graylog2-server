@@ -57,7 +57,9 @@ const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: O
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
     const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-    const splitXValues: Array<string | number> = `${String(clickPoint.x)}`.split(keySeparator).filter((v) => !!v);
+    const splitXValues: Array<string | number> = rowPivotsToFields?.length
+      ? `${String(clickPoint.x)}`.split(keySeparator)
+      : [];
 
     return {
       rowPivotValues: splitXValues.map((labelValue, i) => {
