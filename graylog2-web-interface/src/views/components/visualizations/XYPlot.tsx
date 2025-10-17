@@ -122,6 +122,7 @@ const XYPlot = ({
     layout.xaxis = merge(layout.xaxis, {
       range: [normalizedFrom, normalizedTo],
       type: 'date',
+      fixedrange: !isTimestampChart(config),
     });
   } else {
     layout.xaxis = merge(layout.xaxis, {
