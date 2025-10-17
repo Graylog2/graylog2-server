@@ -40,8 +40,6 @@ public class OutputsMetricsSupplier implements TelemetryMetricSupplier {
         //Converting the result of "countByType" to Map<String, Object>:
         final Map<String, Object> countByType = new HashMap<>(outputService.countByType());
 
-        return countByType.isEmpty()
-                ? Optional.empty()
-                : Optional.of(TelemetryEvent.of(countByType));
+        return Optional.of(TelemetryEvent.of(countByType));
     }
 }

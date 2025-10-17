@@ -52,6 +52,7 @@ public class TelemetrySubmissionPeriodical extends Periodical {
                 .stream()
                 .map(entry -> entry(entry.getKey(), entry.getValue().get()))
                 .flatMap(entry -> entry.getValue().map(metrics -> entry(entry.getKey(), metrics)).stream())
+                .filter(e -> !e.getValue().metrics().isEmpty())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         try {
             if (!telemetryMetrics.isEmpty()) {
