@@ -14,10 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type ValidationState = 'error' | 'success' | 'warning';
-export type TimeUnit = 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
+package org.graylog2.rest.models.users.responses;
 
-export type MarkdownConfigType = {
-  allow_all_image_sources: boolean;
-  allowed_image_sources: string;
-};
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.shared.fields.IdField;
+
+import javax.annotation.Nullable;
+
+public interface BasicUserFields extends IdField {
+
+    @JsonProperty("username")
+    String username();
+
+    @JsonProperty("full_name")
+    @Nullable
+    String fullName();
+
+    @JsonProperty("read_only")
+    boolean readOnly();
+
+    @JsonProperty("service_account")
+    boolean isServiceAccount();
+
+}
