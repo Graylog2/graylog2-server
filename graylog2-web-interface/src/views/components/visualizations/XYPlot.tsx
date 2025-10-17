@@ -27,6 +27,7 @@ import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYV
 import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import assertUnreachable from 'logic/assertUnreachable';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
+import { TIMESTAMP_FIELD } from 'views/Constants';
 
 import GenericPlot from './GenericPlot';
 import type { ChartConfig, PlotLayout } from './GenericPlot';
@@ -77,6 +78,9 @@ const defaultSetColor = (chart: ChartConfig, colors: ColorMapper) => ({
   line: { color: colors.get(chart.originalName ?? chart.name) },
 });
 
+const isTimestampChart = (config: AggregationWidgetConfig) =>
+  config.isTimeline && config.rowPivots[0].fields.length === 1 && config.rowPivots[0].fields[0] === TIMESTAMP_FIELD;
+
 const XYPlot = ({
   axisType = DEFAULT_AXIS_TYPE,
   config,
@@ -104,7 +108,7 @@ const XYPlot = ({
   const dispatch = useViewsDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const _onZoom = useCallback(
-    config.isTimeline
+    isTimestampChart(config)
       ? (from: string, to: string) =>
           onZoom ? onZoom(from, to, userTimezone) : dispatch(OnZoom(from, to, userTimezone))
       : () => true,
@@ -118,6 +122,7 @@ const XYPlot = ({
     layout.xaxis = merge(layout.xaxis, {
       range: [normalizedFrom, normalizedTo],
       type: 'date',
+      fixedrange: !isTimestampChart(config),
     });
   } else {
     layout.xaxis = merge(layout.xaxis, {
