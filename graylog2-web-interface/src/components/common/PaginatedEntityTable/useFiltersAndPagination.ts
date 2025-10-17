@@ -69,9 +69,6 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
 
   const setPagination = React.useCallback(
     ({ page, pageSize }: { page?: number; pageSize?: number }) => {
-      console.log('page', page);
-      console.log('pageSize', pageSize);
-
       setFetchOptions({
         ...fetchOptions,
         page,
