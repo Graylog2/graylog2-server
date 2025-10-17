@@ -29,11 +29,11 @@ public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec
 
     @Override
     public BucketSpec apply(final Grouping grouping) {
-        if(grouping.interval() != null && grouping.interval() instanceof TimeUnitInterval timeUnitInterval) {
+        if(grouping.interval() != null) {
             return Time.builder()
                     .field(grouping.requestedField().name())
                     .type(Time.NAME)
-                    .interval(timeUnitInterval)
+                    .interval(grouping.interval())
                     .build();
         } else {
             return Values.builder()
