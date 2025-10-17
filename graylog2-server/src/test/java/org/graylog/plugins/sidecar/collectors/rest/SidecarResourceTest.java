@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.collectors.rest;
 
 import com.google.common.collect.Lists;
 import org.graylog.plugins.sidecar.collectors.rest.resources.RestResourceBaseTest;
+import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
 import org.graylog.plugins.sidecar.filter.ActiveSidecarFilter;
 import org.graylog.plugins.sidecar.mapper.SidecarStatusMapper;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
@@ -30,6 +31,7 @@ import org.graylog.plugins.sidecar.services.EtagService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.shared.users.UserManagementService;
 import org.joda.time.Period;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -76,6 +78,9 @@ public class SidecarResourceTest extends RestResourceBaseTest {
     @Mock
     private SidecarConfiguration sidecarConfiguration;
 
+    @Mock
+    UserManagementService userManagementService;
+
     @Before
     public void setUp() throws Exception {
         this.sidecars = getDummyCollectorList();
@@ -87,7 +92,9 @@ public class SidecarResourceTest extends RestResourceBaseTest {
                 actionService,
                 clusterConfigService,
                 statusMapper,
-                etagService);
+                etagService,
+                userManagementService,
+                new SidecarPluginConfiguration());
     }
 
     @Test(expected = NotFoundException.class)

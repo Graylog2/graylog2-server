@@ -146,6 +146,7 @@ const ConfigurationsPage = () => {
         },
         {
           name: 'Users',
+          hide: !isPermitted(currentUser.permissions, ['users:edit', 'users:tokencreate']),
           SectionComponent: ConfigurationSection,
           props: {
             ConfigurationComponent: UserConfig,
