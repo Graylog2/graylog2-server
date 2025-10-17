@@ -47,7 +47,8 @@ class OutputsMetricsSupplierTest {
     void emptyServiceResponseReturnsEmptyOptional() {
         when(outputService.countByType()).thenReturn(Collections.emptyMap());
 
-        assertThat(testee.get()).isEmpty();
+        assertThat(testee.get()).isNotEmpty()
+                .contains(TelemetryEvent.of(Map.of()));
 
         verify(outputService).countByType();
         verifyNoMoreInteractions(outputService);
