@@ -23,19 +23,20 @@ const Title = styled.div(
   ({ theme }) => css`
     display: flex;
     gap: ${theme.spacings.xs};
-    color: ${theme.colors.gray[60]};
     align-items: center;
-    font-size: ${theme.fonts.size.small};
     min-height: 25px; // as icon button
   `,
 );
 
-const StyledIconButton = styled(IconButton)`
-  position: absolute;
-  left: 0;
-`;
+const StyledIconButton = styled(IconButton)(
+  ({ theme }) => css`
+    position: absolute;
+    left: 0;
+    color: ${theme.colors.text.primary};
+  `,
+);
 
-const StyledLabel = styled.b(
+const StyledLabel = styled.span(
   ({ theme }) => css`
     margin-left: ${theme.spacings.sm};
   `,
