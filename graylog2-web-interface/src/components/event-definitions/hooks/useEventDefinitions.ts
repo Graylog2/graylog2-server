@@ -21,6 +21,7 @@ import type { EventDefinition } from 'components/event-definitions/event-definit
 import { EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 import { defaultOnError } from 'util/conditional/onError';
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 type Options = {
   enabled: boolean;
@@ -31,11 +32,15 @@ export const fetchEventDefinitions = (searchParams: SearchParams): Promise<Event
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
     filters: FiltersForQueryParams(searchParams.filters),
-  }).then(({ elements, pagination, attributes }) => ({
-    list: elements,
-    pagination,
-    attributes,
-  }));
+  }).then(({ elements, pagination, attributes }) => {
+    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+    return {
+      list: elements,
+      pagination,
+      attributes,
+    };
+  });
 
 export const fetchEventDefinition = (eventDefinitionId: string): Promise<any> =>
   EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
