@@ -123,7 +123,7 @@ const XYPlot = ({
     layout.xaxis = merge(layout.xaxis, {
       fixedrange: true,
       /* disable plotly sorting by setting the type of the xaxis to category */
-      type: config.sort.length > 0 ? 'category' : undefined,
+      type: layout.xaxis?.type ?? (config.sort.length > 0 ? 'category' : undefined),
     });
   }
 

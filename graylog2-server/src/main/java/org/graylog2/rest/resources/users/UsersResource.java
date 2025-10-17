@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -60,6 +61,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.UserContext;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -74,6 +76,7 @@ import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
+import org.graylog2.rest.models.users.responses.BasicUserResponse;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
 import org.graylog2.rest.models.users.responses.TokenSummary;
@@ -144,6 +147,8 @@ import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS_COD
 @Api(value = "Users", description = "User accounts", tags = {CLOUD_VISIBLE})
 public class UsersResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
+    private static final int USERNAME_PERMISSION_PARTS_LENGTH = 3;
+    private static final String USER_PERMISSION_DOMAIN = "users";
 
     private final UserManagementService userManagementService;
     private final PaginatedUserService paginatedUserService;
@@ -239,6 +244,28 @@ public class UsersResource extends RestResource {
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
 
         return toUserResponse(user, isSelf || canEditUserPermissions, Optional.of(AllUserSessions.create(sessionService)));
+    }
+
+    @GET
+    @Path("/basic/id/{userId}")
+    @ApiOperation(value = "Get basic user data by userId")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "The user could not be found.")
+    })
+    public BasicUserResponse getBasicUserById(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+                                              @PathParam("userId") String userId) {
+
+        final User user = loadUserById(userId);
+        if (!isPermitted(USERS_READ, user.getName())) {
+            throw new ForbiddenException("Not allowed to view userId " + userId);
+        }
+        return BasicUserResponse.builder()
+                .id(user.getId())
+                .username(user.getName())
+                .fullName(user.getFullName())
+                .readOnly(user.isReadOnly())
+                .isServiceAccount(user.isServiceAccount())
+                .build();
     }
 
     /**
@@ -856,7 +883,7 @@ public class UsersResource extends RestResource {
         List<WildcardPermission> wildcardPermissions;
         List<GRNPermission> grnPermissions;
         if (includePermissions) {
-            wildcardPermissions = userManagementService.getWildcardPermissionsForUser(user);
+            wildcardPermissions = addUserIdPermissions(userManagementService.getWildcardPermissionsForUser(user), user);
             grnPermissions = userManagementService.getGRNPermissionsForUser(user);
         } else {
             wildcardPermissions = List.of();
@@ -926,6 +953,37 @@ public class UsersResource extends RestResource {
                             .roles(adminRoles)
                             .build();
                 });
+    }
+
+    /**
+     * This method duplicates username-based user permissions with userId variants
+     * (users:<action>:<userId>) so the UI can work when only the userId is known.
+     * Do NOT add these id-based variants for backend authorization; server-side
+     * permission checks must continue to use the original username form.
+     */
+    private List<WildcardPermission> addUserIdPermissions(List<WildcardPermission> permissions, User user) {
+        ImmutableSet.Builder<WildcardPermission> builder = ImmutableSet.builder();
+        final Map<String, String> userIdCache = new HashMap<>();
+        if (user != null) {
+            userIdCache.put(user.getName(), user.getId());
+        }
+        for (WildcardPermission permission : permissions) {
+            String[] parts = permission.toString().split(":");
+            boolean hasUsername = parts.length == USERNAME_PERMISSION_PARTS_LENGTH && USER_PERMISSION_DOMAIN.equals(parts[0]);
+            if (hasUsername) {
+                String username = parts[parts.length-1];
+                String userId = userIdCache.computeIfAbsent(username, name -> {
+                    final User loadedUser = userManagementService.load(name);
+                    return loadedUser != null ? loadedUser.getId() : null;
+                });
+                if (userId != null) {
+                    parts[2] = userId;
+                    builder.add(new CaseSensitiveWildcardPermission(String.join(":", parts)));
+                }
+            }
+
+        }
+        return builder.addAll(permissions).build().asList();
     }
 
     public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {

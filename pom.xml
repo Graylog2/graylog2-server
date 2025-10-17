@@ -114,7 +114,7 @@
         <bouncycastle.version>1.82</bouncycastle.version>
         <caffeine.version>3.2.2</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
-        <classgraph.version>4.8.181</classgraph.version>
+        <classgraph.version>4.8.184</classgraph.version>
         <commons-codec.version>1.19.0</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
@@ -164,11 +164,11 @@
         <mongodb-driver.version>5.6.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.6.Final</netty.version>
+        <netty.version>4.2.7.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
-        <okhttp.version>5.2.0</okhttp.version>
+        <okhttp.version>5.2.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.54.1</opentelemetry.version>
+        <opentelemetry.version>1.55.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.20.1</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -197,6 +197,8 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.4.1</poi.version>
+        <mcp-bom.version>0.14.1</mcp-bom.version>
+        <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
         <apacheds-server.version>2.0.0.AM27</apacheds-server.version>
@@ -452,7 +454,7 @@
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>1.12.0</version>
+                <version>1.12.1</version>
             </dependency>
             <!-- Explicitly manage commons-compress to fix CVE-2023-42503. We are using this only as a transitive
                  dependency in plugins. Remove once its usages are updated and the fixed version is pulled in
@@ -573,6 +575,29 @@
                 <artifactId>mina-core</artifactId>
                 <version>2.2.4</version>
             </dependency>
+
+            <dependency>
+                <groupId>io.modelcontextprotocol.sdk</groupId>
+                <artifactId>mcp-bom</artifactId>
+                <type>pom</type>
+                <version>${mcp-bom.version}</version>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-generator</artifactId>
+                <version>${json-schema-generator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-module-jackson</artifactId>
+                <version>${json-schema-generator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.victools</groupId>
+                <artifactId>jsonschema-module-jakarta-validation</artifactId>
+                <version>${json-schema-generator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -644,7 +669,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.27.0</version>
+                    <version>3.28.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -669,7 +694,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.6.0</version>
+                    <version>4.9.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>

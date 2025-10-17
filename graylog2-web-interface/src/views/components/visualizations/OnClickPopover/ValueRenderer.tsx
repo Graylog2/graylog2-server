@@ -17,6 +17,10 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
+import TypeSpecificValue from 'views/components/TypeSpecificValue';
+import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
+
 const ValueBox = styled.span<{ $bgColor: string | number }>(
   ({ theme, $bgColor }) => css`
     background-color: ${$bgColor ?? 'inherit'};
@@ -34,11 +38,18 @@ const Container = styled.span(
   `,
 );
 
-const ValueRenderer = ({ value, label, traceColor }) => (
-  <Container>
-    <ValueBox $bgColor={traceColor}>{value}</ValueBox>
-    <span>{label}</span>
-  </Container>
-);
+const ValueRenderer = ({ value, field, traceColor }) => {
+  const types = useQueryFieldTypes();
+  const fieldType = fieldTypeFor(field, types);
+
+  return (
+    <Container>
+      <ValueBox $bgColor={traceColor}>
+        <TypeSpecificValue field={field} value={value} type={fieldType} />
+      </ValueBox>
+      <span>{field}</span>
+    </Container>
+  );
+};
 
 export default ValueRenderer;
