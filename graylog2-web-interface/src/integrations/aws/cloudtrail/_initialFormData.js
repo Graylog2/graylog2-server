@@ -14,15 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.aws.json;
+const DEFAULT_SETTINGS = {
+  /*
+  fieldId: { // Same ID as supplied to <Input />
+    value: '',
+    defaultValue: '', // Update StepReview.jsx & relevant step(s) if you need to output
+  }
+  */
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+  /* Default Advanced Settings */
+  awsCloudTrailThrottleEnabled: {
+    value: true, // We want to default to true on render, but never compare the default
+  },
+  overrideSource: {
+    value: '',
+  },
+  pollingInterval: {
+    value: 1,
+  },
+  sqsMessageBatchSize: {
+    value: 5,
+  },
+};
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SQSMessage {
-    @JsonProperty("Message")
-    public String message;
-    @JsonProperty("MessageId")
-    public String messageId;
-}
+export default DEFAULT_SETTINGS;

@@ -23,11 +23,11 @@ import { AWS_AUTH_TYPES } from './constants';
 describe('formDataAdapter', () => {
   const testGenericInputCreateRequest = (formData) => {
     let awsAccessKey = 'key';
-    let awsAccessSecret = 'secret';
+    let awsSecretKey = 'secret';
 
     if (formData.awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret) {
       awsAccessKey = 'awsAccessKey';
-      awsAccessSecret = 'awsSecretKey';
+      awsSecretKey = 'awsSecretKey';
     }
 
     // Mapping keys taken from /api/system/inputs/types/org.graylog.integrations.aws.inputs.AWSInput
@@ -37,7 +37,7 @@ describe('formDataAdapter', () => {
       aws_flow_log_prefix: 'awsCloudWatchAddFlowLogPrefix',
       aws_message_type: 'awsCloudWatchKinesisInputType',
       aws_region: 'awsCloudWatchAwsRegion',
-      aws_secret_key: awsAccessSecret,
+      aws_secret_key: awsSecretKey,
       cloudwatch_endpoint: 'awsEndpointCloudWatch',
       dynamodb_endpoint: 'awsEndpointDynamoDB',
       iam_endpoint: 'awsEndpointIAM',
@@ -69,16 +69,16 @@ describe('formDataAdapter', () => {
 
   const testAWSRequest = (formData, options = {}) => {
     let awsAccessKey = 'key';
-    let awsAccessSecret = 'secret';
+    let awsSecretKey = 'secret';
 
     if (formData.awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret) {
       awsAccessKey = 'awsAccessKey';
-      awsAccessSecret = 'awsSecretKey';
+      awsSecretKey = 'awsSecretKey';
     }
 
     const mappings = {
       aws_access_key_id: awsAccessKey,
-      aws_secret_access_key: awsAccessSecret,
+      aws_secret_access_key: awsSecretKey,
       assume_role_arn: 'awsAssumeRoleARN',
       cloudwatch_endpoint: 'awsEndpointCloudWatch',
       dynamodb_endpoint: 'awsEndpointDynamoDB',
