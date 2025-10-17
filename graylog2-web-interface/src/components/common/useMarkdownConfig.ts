@@ -14,26 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+import useClusterConfig from 'hooks/useClusterConfig';
+import type { MarkdownConfigType } from 'components/common/types';
 
-import CountBadge from './CountBadge';
+const CONFIG_CLASS = 'org.graylog2.configuration.MarkdownConfiguration';
 
-type Props = {
-  count: number;
-  listing: React.ReactNode;
-};
-
-const Listing = styled.div`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-`;
-
-const ListingWithCount = ({ count, listing }: Props) => (
-  <Listing title={String(listing)}>
-    <CountBadge count={count} /> {listing}
-  </Listing>
-);
-
-export default ListingWithCount;
+const useMarkdownConfig = () => useClusterConfig<MarkdownConfigType>(CONFIG_CLASS);
+export default useMarkdownConfig;

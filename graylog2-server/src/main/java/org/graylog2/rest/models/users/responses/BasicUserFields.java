@@ -14,26 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled from 'styled-components';
+package org.graylog2.rest.models.users.responses;
 
-import CountBadge from './CountBadge';
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.shared.fields.IdField;
 
-type Props = {
-  count: number;
-  listing: React.ReactNode;
-};
+import javax.annotation.Nullable;
 
-const Listing = styled.div`
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-`;
+public interface BasicUserFields extends IdField {
 
-const ListingWithCount = ({ count, listing }: Props) => (
-  <Listing title={String(listing)}>
-    <CountBadge count={count} /> {listing}
-  </Listing>
-);
+    @JsonProperty("username")
+    String username();
 
-export default ListingWithCount;
+    @JsonProperty("full_name")
+    @Nullable
+    String fullName();
+
+    @JsonProperty("read_only")
+    boolean readOnly();
+
+    @JsonProperty("service_account")
+    boolean isServiceAccount();
+
+}
