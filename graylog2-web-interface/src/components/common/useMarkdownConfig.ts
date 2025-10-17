@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export type ValidationState = 'error' | 'success' | 'warning';
-export type TimeUnit = 'NANOSECONDS' | 'MICROSECONDS' | 'MILLISECONDS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
+import useClusterConfig from 'hooks/useClusterConfig';
+import type { MarkdownConfigType } from 'components/common/types';
 
-export type MarkdownConfigType = {
-  allow_all_image_sources: boolean;
-  allowed_image_sources: string;
-};
+const CONFIG_CLASS = 'org.graylog2.configuration.MarkdownConfiguration';
+
+const useMarkdownConfig = () => useClusterConfig<MarkdownConfigType>(CONFIG_CLASS);
+export default useMarkdownConfig;
