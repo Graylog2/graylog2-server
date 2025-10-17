@@ -19,6 +19,7 @@ package org.graylog2.inputs;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -35,6 +36,9 @@ public class InputsMetricsSupplierTest {
     @Mock
     private InputService inputService;
 
+    @InjectMocks
+    private InputsMetricsSupplier supplier;
+
     @Test
     public void shouldReturnCountsByType() {
         final Map<String, Long> counts = Map.of(
@@ -43,7 +47,6 @@ public class InputsMetricsSupplierTest {
         );
         when(inputService.totalCountByType()).thenReturn(counts);
 
-        InputsMetricsSupplier supplier = new InputsMetricsSupplier(inputService);
         Optional<TelemetryEvent> event = supplier.get();
 
         assertTrue(event.isPresent());
@@ -54,7 +57,6 @@ public class InputsMetricsSupplierTest {
     public void shouldReturnEmptyMetricsWhenNoInputs() {
         when(inputService.totalCountByType()).thenReturn(Collections.emptyMap());
 
-        InputsMetricsSupplier supplier = new InputsMetricsSupplier(inputService);
         Optional<TelemetryEvent> event = supplier.get();
 
         assertTrue(event.isPresent());
