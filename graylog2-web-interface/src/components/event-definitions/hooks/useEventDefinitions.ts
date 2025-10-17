@@ -27,20 +27,19 @@ type Options = {
   enabled: boolean;
 };
 
-export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> =>
-  EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+export const fetchEventDefinitions = (searchParams: SearchParams): Promise<EventDefinitionResult> => {
+  CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+  return EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
     filters: FiltersForQueryParams(searchParams.filters),
-  }).then(({ elements, pagination, attributes }) => {
-    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
-
-    return {
-      list: elements,
-      pagination,
-      attributes,
-    };
-  });
+  }).then(({ elements, pagination, attributes }) => ({
+    list: elements,
+    pagination,
+    attributes,
+  }));
+};
 
 export const fetchEventDefinition = (eventDefinitionId: string): Promise<any> =>
   EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
