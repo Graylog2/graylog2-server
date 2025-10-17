@@ -17,6 +17,7 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
 import jakarta.validation.Valid;
@@ -24,20 +25,28 @@ import jakarta.validation.constraints.NotBlank;
 
 //no column/row choice, assuming API does not care about visualization, and we can ignore it
 public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
-                       @JsonProperty("limit") int limit) {
+                       @JsonProperty("limit") int limit,
+                       @JsonProperty("interval") Interval interval) {
 
     public Grouping(String fieldName) {
         this(fieldName, Values.DEFAULT_LIMIT);
     }
 
     public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
-                    @JsonProperty("limit") int limit) {
+                    @JsonProperty("limit") int limit,
+                    @JsonProperty("interval") Interval interval) {
         this.fieldName = fieldName;
         if (limit <= 0) {
             this.limit = Values.DEFAULT_LIMIT;
         } else {
             this.limit = limit;
         }
+        this.interval = interval;
+    }
+
+    public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
+                    @JsonProperty("limit") int limit) {
+        this(fieldName, limit, null);
     }
 
     @Deprecated

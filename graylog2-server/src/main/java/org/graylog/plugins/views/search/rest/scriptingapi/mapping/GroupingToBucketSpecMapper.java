@@ -18,6 +18,9 @@ package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time;
+import org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
 import java.util.function.Function;
@@ -26,10 +29,18 @@ public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec
 
     @Override
     public BucketSpec apply(final Grouping grouping) {
-        return Values.builder()
-                .field(grouping.requestedField().name())
-                .type(Values.NAME)
-                .limit(grouping.limit())
-                .build();
+        if(grouping.interval() != null && grouping.interval() instanceof TimeUnitInterval timeUnitInterval) {
+            return Time.builder()
+                    .field(grouping.requestedField().name())
+                    .type(Time.NAME)
+                    .interval(timeUnitInterval)
+                    .build();
+        } else {
+            return Values.builder()
+                        .field(grouping.requestedField().name())
+                        .type(Values.NAME)
+                        .limit(grouping.limit())
+                        .build();
+        }
     }
 }
