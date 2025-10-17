@@ -26,6 +26,7 @@ import org.graylog.security.certutil.ca.CA;
 import org.graylog.security.certutil.ca.CAKeyPair;
 import org.graylog.security.certutil.ca.PemCaReader;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
+import org.graylog.security.certutil.ca.exceptions.CaDecodeException;
 import org.graylog.security.certutil.ca.exceptions.KeyStoreStorageException;
 import org.graylog2.Configuration;
 import org.graylog2.bootstrap.preflight.web.resources.model.CAType;
@@ -205,9 +206,18 @@ class CaPersistenceService {
         return Optional.ofNullable(clusterConfigService.get(EncryptedCaKeystore.class))
                 .map(EncryptedCaKeystore::keystore)
                 .map(encryptionService::decrypt)
-                .map(Base64.getDecoder()::decode)
+                .map(this::tryDecode)
                 .map(this::parseKEystoreFromString)
                 .map(ks -> new CaKeystoreWithPassword(ks, passwordSecret));
+    }
+
+    private byte[] tryDecode(String val) {
+        try {
+            return Base64.getDecoder().decode(val);
+        } catch (IllegalArgumentException e) {
+            final String message = "Failed to decode CA keystore. This can happen when your password_secret has been recently changed and is not matching encrypted entries in the database.";
+            throw new CaDecodeException(message, e);
+        }
     }
 
     @Nonnull
