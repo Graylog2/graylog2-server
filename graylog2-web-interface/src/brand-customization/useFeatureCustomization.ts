@@ -14,15 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import useFeaturesCustomization from './useFeaturesCustomization';
 
-import useFeaturesCustomization from 'brand-customization/useFeaturesCustomization';
-
-const useInvestigationReportingByAICustomization = () => {
-  const { aiInvestigationReport } = useFeaturesCustomization();
+const useFeatureCustomization = (feature: keyof ReturnType<typeof useFeaturesCustomization>) => {
+  const featuresCustomization = useFeaturesCustomization();
 
   return {
-    enabled: aiInvestigationReport?.enabled !== false,
+    enabled: featuresCustomization?.[feature]?.enabled !== false,
   };
 };
 
-export default useInvestigationReportingByAICustomization;
+export default useFeatureCustomization;
