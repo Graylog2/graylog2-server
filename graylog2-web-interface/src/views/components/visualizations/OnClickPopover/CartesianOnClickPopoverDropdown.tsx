@@ -24,6 +24,7 @@ import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/
 import getHoverSwatchColor from 'views/components/visualizations/utils/getHoverSwatchColor';
 import useUserDateTime from 'hooks/useUserDateTime';
 import { adjustFormat, toUTCFromTz, isValidDate } from 'util/DateTime';
+import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
 
 const DivContainer = styled.div(
   ({ theme }) => css`
@@ -33,7 +34,13 @@ const DivContainer = styled.div(
   `,
 );
 
-const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
+const CartesianOnClickPopoverDropdown = ({
+  clickPoint,
+  config,
+  setFieldData,
+  setStep,
+  showBackButton = false,
+}: OnClickPopoverDropdownProps) => {
   const traceColor = getHoverSwatchColor(clickPoint);
   const { userTimezone } = useUserDateTime();
   const convertToOriginalValue = useCallback(
@@ -85,8 +92,11 @@ const CartesianOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: O
     };
   }, [clickPoint, config, convertToOriginalValue, traceColor]);
 
+  const onBackToTraces = useCallback(() => setStep('traces'), [setStep]);
+
   return (
-    <Popover.Dropdown>
+    <Popover.Dropdown
+      title={<PopoverTitle onBackClick={showBackButton && onBackToTraces}>Related values</PopoverTitle>}>
       <DivContainer>
         <OnClickPopoverValueGroups
           columnPivotValues={columnPivotValues}
