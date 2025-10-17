@@ -255,7 +255,7 @@ public class RolesResource extends RestResource {
                               @ApiParam(name = "username") @PathParam("username") String username,
                               @ApiParam(name = "JSON Body", value = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) throws NotFoundException {
         checkPermission(RestPermissions.USERS_EDIT, username);
-        checkPermission(RestPermissions.ROLES_EDIT, rolename);
+        checkPermission(RestPermissions.ROLES_ASSIGN, rolename);
 
         final User user = userService.load(username);
         if (user == null) {
@@ -285,7 +285,7 @@ public class RolesResource extends RestResource {
     public Response removeMember(@ApiParam(name = "rolename") @PathParam("rolename") String rolename,
                                  @ApiParam(name = "username") @PathParam("username") String username) throws NotFoundException {
         checkPermission(RestPermissions.USERS_EDIT, username);
-        checkPermission(RestPermissions.ROLES_EDIT, rolename);
+        checkPermission(RestPermissions.ROLES_ASSIGN, rolename);
 
         final User user = userService.load(username);
         if (user == null) {

@@ -474,7 +474,7 @@ public class UsersResource extends RestResource {
                 final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
                 List<String> unknownRoles = new ArrayList<>();
                 roles.forEach(roleName -> {
-                    checkPermission(RestPermissions.ROLES_EDIT, roleName);
+                    checkPermission(RestPermissions.ROLES_ASSIGN, roleName);
                     if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
                         unknownRoles.add(roleName);
                     }

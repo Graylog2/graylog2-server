@@ -141,6 +141,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String ROLES_DELETE = "roles:delete";
     public static final String ROLES_EDIT = "roles:edit";
     public static final String ROLES_READ = "roles:read";
+    public static final String ROLES_ASSIGN = "roles:assign";
     public static final String SEARCHES_ABSOLUTE = "searches:absolute";
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
@@ -333,7 +334,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(USERS_LIST, ""))
             .add(create(USERS_PASSWORDCHANGE, ""))
             .add(create(USERS_PERMISSIONSEDIT, ""))
-            .add(create(USERS_ROLESEDIT, ""))
+            .add(create(USERS_ROLESEDIT, "").withManageCapabilityFor(GRNTypes.USER))
             .add(create(USERS_TOKENCREATE, ""))
             .add(create(USERS_TOKENLIST, ""))
             .add(create(USERS_TOKENREMOVE, ""))
