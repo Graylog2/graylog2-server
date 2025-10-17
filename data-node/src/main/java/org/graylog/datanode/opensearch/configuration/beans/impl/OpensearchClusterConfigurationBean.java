@@ -91,7 +91,7 @@ public class OpensearchClusterConfigurationBean implements DatanodeConfiguration
 
         return DatanodeConfigurationPart.builder()
                 .properties(properties.build())
-                .withConfigFile(new TextConfigFile(UNICAST_HOSTS_FILE, String.join(",", seedHosts)))
+                .withConfigFile(new TextConfigFile(UNICAST_HOSTS_FILE, String.join("\n", seedHosts)))
                 .build();
     }
 
