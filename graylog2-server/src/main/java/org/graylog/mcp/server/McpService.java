@@ -162,11 +162,9 @@ public class McpService {
                     var builder = McpSchema.Tool.builder()
                             .name(tool.name())
                             .title(tool.title())
-                            .description(tool.description())
-                            .inputSchema(tool.inputSchema());
-                    if (tool.outputSchema().isPresent()) {
-                        builder.outputSchema(tool.outputSchema().get());
-                    }
+                            .description(tool.description());
+                    tool.inputSchema().ifPresent(builder::inputSchema);
+                    tool.outputSchema().ifPresent(builder::outputSchema);
                     return builder.build();
                 }).toList();
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_LIST), auditContext);
