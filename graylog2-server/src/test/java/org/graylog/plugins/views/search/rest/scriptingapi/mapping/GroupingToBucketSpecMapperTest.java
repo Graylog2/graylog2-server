@@ -39,13 +39,13 @@ class GroupingToBucketSpecMapperTest {
 
     @Test
     void throwsNullPointerExceptionOnNullGrouping() {
-        assertThrows(NullPointerException.class, () -> toTest.apply(null));
+        assertThrows(NullPointerException.class, () -> toTest.apply(null, null));
     }
 
     @Test
     void buildsBucketSpecCorrectly() {
         Grouping grouping = new Grouping("source", 3);
-        final BucketSpec bucketSpec = toTest.apply(grouping);
+        final BucketSpec bucketSpec = toTest.apply(grouping, null);
 
         assertThat(bucketSpec)
                 .isNotNull()
@@ -58,7 +58,7 @@ class GroupingToBucketSpecMapperTest {
     @Test
     void usesDefaultLimitIfWrongLimitProvided() {
         Grouping grouping = new Grouping("source", -42);
-        final BucketSpec bucketSpec = toTest.apply(grouping);
+        final BucketSpec bucketSpec = toTest.apply(grouping, null);
 
         assertThat(bucketSpec)
                 .isNotNull()
