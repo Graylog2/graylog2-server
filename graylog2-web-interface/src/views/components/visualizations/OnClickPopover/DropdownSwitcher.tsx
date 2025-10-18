@@ -20,6 +20,7 @@ import type {
   ClickPoint,
   OnClickPopoverDropdown,
   FieldData,
+  Step,
 } from 'views/components/visualizations/OnClickPopover/Types';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import ClickPointSelector from 'views/components/visualizations/OnClickPopover/ClickPointSelector';
@@ -49,22 +50,27 @@ const DropdownSwitcher = ({
   metricMapper = defaultMetricMapper,
   onPopoverClose,
 }: Props) => {
+  const [step, setStep] = useState<Step>(null);
   const [selectedClickPoint, setSelectedClickPoint] = useState<ClickPoint>();
-  const [showValuesComponent, setShowValuesComponent] = useState<boolean>();
   const [fieldData, setFieldData] = useState<FieldData>(null);
   const types = useQueryFieldTypes();
 
   const onSelect = (pt: ClickPoint) => {
-    setShowValuesComponent(true);
     setSelectedClickPoint(pt);
+    setStep('values');
   };
+
+  const hasPointsInRadius = useMemo(() => {
+    const len = clickPointsInRadius?.length;
+
+    return !!len && len > 1;
+  }, [clickPointsInRadius]);
 
   useEffect(() => {
     setSelectedClickPoint(clickPoint);
-    const len = clickPointsInRadius?.length;
-    setShowValuesComponent(!len || len === 1);
+    setStep(!hasPointsInRadius ? 'values' : 'traces');
     setFieldData(null);
-  }, [clickPoint, clickPointsInRadius]);
+  }, [clickPoint, clickPointsInRadius, hasPointsInRadius]);
 
   const additionalContextValue = useMemo(
     () => ({
@@ -74,25 +80,46 @@ const DropdownSwitcher = ({
     [fieldData?.contexts?.valuePath, types],
   );
 
-  if (!selectedClickPoint) return null;
+  const onValueSelect = (data: FieldData) => {
+    setStep('actions');
+    setFieldData(data);
+  };
 
   const onActionRun = () => {
     onPopoverClose();
     setFieldData(null);
+    setStep(null);
   };
 
-  if (fieldData)
+  if (!selectedClickPoint) return null;
+
+  if (step === 'traces')
+    return (
+      <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
+    );
+  if (step === 'values')
+    return (
+      <Component
+        clickPoint={selectedClickPoint}
+        config={config}
+        setFieldData={onValueSelect}
+        showBackButton={hasPointsInRadius}
+        setStep={setStep}
+      />
+    );
+  if (step === 'actions')
     return (
       <AdditionalContext.Provider value={additionalContextValue}>
-        <ValueActionsDropdown field={fieldData.field} value={fieldData.value} onActionRun={onActionRun} />
+        <ValueActionsDropdown
+          setStep={setStep}
+          field={fieldData.field}
+          value={fieldData.value}
+          onActionRun={onActionRun}
+        />
       </AdditionalContext.Provider>
     );
 
-  return showValuesComponent ? (
-    <Component clickPoint={selectedClickPoint} config={config} setFieldData={setFieldData} />
-  ) : (
-    <ClickPointSelector clickPointsInRadius={clickPointsInRadius} metricMapper={metricMapper} onSelect={onSelect} />
-  );
+  return null;
 };
 
 export default DropdownSwitcher;

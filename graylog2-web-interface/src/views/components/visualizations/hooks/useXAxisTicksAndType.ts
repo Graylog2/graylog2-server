@@ -17,20 +17,32 @@
 import { useMemo } from 'react';
 import flatMap from 'lodash/flatMap';
 import compact from 'lodash/compact';
+import type { LayoutAxis } from 'plotly.js';
 
 import useMapKeys from 'views/components/visualizations/useMapKeys';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import { keySeparator, humanSeparator } from 'views/Constants';
+import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
+import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
 
-const useXAxisTicks = (config: AggregationWidgetConfig, chartData: Array<ChartDefinition>) => {
+const useXAxisTicksAndType = (config: AggregationWidgetConfig, chartData: Array<ChartDefinition>) => {
   const mapKeys = useMapKeys();
+  const fieldTypes = useQueryFieldTypes();
 
-  return useMemo(() => {
+  return useMemo<Partial<LayoutAxis>>(() => {
     if (config.isTimeline) return {};
     const tickvals = compact(flatMap(chartData, 'x'));
-
     const rowPivotFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
+
+    const isCategoryType =
+      rowPivotFields.length === 1 &&
+      (!fieldTypeFor(rowPivotFields[0], fieldTypes).isNumeric() ||
+        tickvals.some((v) => {
+          const convertedValue = Number(v);
+
+          return Number.isNaN(convertedValue) || !Number.isInteger(convertedValue);
+        }));
 
     return {
       tickvals,
@@ -40,8 +52,9 @@ const useXAxisTicks = (config: AggregationWidgetConfig, chartData: Array<ChartDe
           .map((l, i) => mapKeys(l, rowPivotFields[i]))
           .join(humanSeparator),
       ),
+      type: isCategoryType ? 'category' : undefined,
     };
-  }, [chartData, config.isTimeline, config?.rowPivots, mapKeys]);
+  }, [chartData, config.isTimeline, config?.rowPivots, fieldTypes, mapKeys]);
 };
 
-export default useXAxisTicks;
+export default useXAxisTicksAndType;

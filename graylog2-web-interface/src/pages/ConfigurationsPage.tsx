@@ -36,6 +36,7 @@ import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
+import MarkdownConfig from 'components/configurations/MarkdownConfig';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -150,14 +151,16 @@ const ConfigurationsPage = () => {
           SectionComponent: ConfigurationSection,
           props: {
             ConfigurationComponent: UserConfig,
-            title: 'Index Set Defaults',
+            title: 'Users',
           },
         },
         {
-          name: 'Plugins',
-          SectionComponent: PluginsConfig,
-          showCaret: true,
-          catchAll: true,
+          name: 'Markdown',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: MarkdownConfig,
+            title: 'Markdown',
+          },
         },
         {
           name: 'MCP',
@@ -166,6 +169,12 @@ const ConfigurationsPage = () => {
             ConfigurationComponent: McpConfig,
             title: 'MCP',
           },
+        },
+        {
+          name: 'Plugins',
+          SectionComponent: PluginsConfig,
+          showCaret: true,
+          catchAll: true,
         },
       ].filter(({ hide }) => !hide),
     [currentUser?.permissions],
