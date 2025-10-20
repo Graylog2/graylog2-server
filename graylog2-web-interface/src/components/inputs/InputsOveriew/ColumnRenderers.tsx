@@ -50,7 +50,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
         </ExpandedSectionToggleWrapper>
       ),
     },
-    state: {
+    desired_state: {
       renderCell: (_state: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>
           <InputStateBadge input={input} inputStates={inputStates} />

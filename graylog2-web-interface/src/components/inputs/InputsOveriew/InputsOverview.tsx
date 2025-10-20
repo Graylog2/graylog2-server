@@ -58,7 +58,6 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
   });
   const columnRenderers = useMemo(() => customColumnRenderers({ inputTypes, inputStates }), [inputTypes, inputStates]);
 
-  const fetchEntities = (options: SearchParams) => fetchInputs(options);
 
   return (
     <div>
@@ -74,7 +73,7 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
         queryHelpComponent={<QueryHelper entityName={entityName} />}
         entityActions={entityActions}
         tableLayout={tableLayout}
-        fetchEntities={fetchEntities}
+        fetchEntities={fetchInputs}
         expandedSectionsRenderer={expandedSections}
         keyFn={keyFn}
         actionsCellWidth={300}
