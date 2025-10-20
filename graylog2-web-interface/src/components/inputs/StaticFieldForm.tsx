@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 import type { Input as InputType } from 'components/messageloaders/Types';
 import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
-import { useQueryClient } from '@tanstack/react-query';
 import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
 
 type Props = {
@@ -77,7 +77,6 @@ const StaticFieldForm = ({ input, setShowModal }: Props) => {
         required
         pattern="[A-Za-z0-9_]*"
         title="Should consist only of alphanumeric characters and underscores."
-        autoFocus
       />
       <Input
         value={fieldValue}

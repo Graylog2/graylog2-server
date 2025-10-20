@@ -17,6 +17,7 @@
 
 import type { InputStates } from 'hooks/useInputsStates';
 
+// eslint-disable-next-line import/prefer-default-export
 export const mockInputStates: InputStates = {
   input1: {
     node1: {
