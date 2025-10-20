@@ -52,7 +52,7 @@ const entityName = 'input';
 
 const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }: Props) => {
   const { data: inputStates } = useInputsStates();
-  const {  tableLayout, additionalAttributes } = getInputsTableElements();
+  const { tableLayout, additionalAttributes } = getInputsTableElements();
   const { entityActions, expandedSections } = useTableElements({
     inputTypes,
     inputTypeDescriptions,
