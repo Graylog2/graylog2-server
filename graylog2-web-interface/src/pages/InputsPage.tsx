@@ -26,7 +26,6 @@ import useProductName from 'brand-customization/useProductName';
 import { InputsOverview } from 'components/inputs/InputsOveriew';
 import useInputTypes from 'hooks/useInputTypes';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
-import InputsPageNavigation from 'components/inputs/InputsPageNavigation';
 import InputsNotifications from 'components/inputs/InputsNotifications';
 
 const isCloud = AppConfig.isCloud();
@@ -43,7 +42,6 @@ const InputsPage = () => {
   return (
     <DocumentTitle title="Inputs">
       <InputsNotifications />
-      <InputsPageNavigation />
       <PageHeader
         title="Inputs"
         documentationLink={{
