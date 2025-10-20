@@ -20,7 +20,6 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import useProductName from 'brand-customization/useProductName';
 import { InputsOverview } from 'components/inputs/InputsOveriew';
@@ -57,7 +56,7 @@ const InputsPage = () => {
             </p>
             <p>
               If you are missing an input type on this page&apos;s list of available inputs, you can start the input on
-              a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
+                a <Link to='system/forwarders'>Forwarder</Link>.
             </p>
           </>
         ) : (

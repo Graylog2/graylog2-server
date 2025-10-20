@@ -31,8 +31,8 @@ const getInputsTableElements = () => {
       'address',
       'port',
     ],
+    defaultColumnOrder:  ['title', 'type', 'direction', 'desired_state', 'traffic', 'node_id', 'address', 'port'],
   };
-  const columnsOrder = ['title', 'type', 'direction', 'desired_state', 'traffic', 'node_id', 'address', 'port'];
   const additionalAttributes = [
     { id: 'traffic', title: 'Traffic' },
     { id: 'address', title: 'Address' },
@@ -41,7 +41,6 @@ const getInputsTableElements = () => {
 
   return {
     tableLayout,
-    columnsOrder,
     additionalAttributes,
   };
 };
