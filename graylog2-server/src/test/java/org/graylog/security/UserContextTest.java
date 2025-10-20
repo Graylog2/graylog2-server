@@ -16,25 +16,24 @@
  */
 package org.graylog.security;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import jakarta.ws.rs.core.MultivaluedMap;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.mgt.DefaultSecurityManager;
-import org.apache.shiro.mgt.DefaultSessionStorageEvaluator;
-import org.apache.shiro.mgt.DefaultSubjectDAO;
-import org.apache.shiro.subject.Subject;
-import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.apache.shiro.mgt.SecurityManager;
+import org.apache.shiro.util.ThreadContext;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.PasswordAlgorithmFactory;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.security.Permissions;
+import org.graylog2.security.SecurityTestUtils;
+import org.graylog2.shared.rest.RequestIdFilter;
+import org.graylog2.shared.security.ShiroRequestHeadersBinder;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.users.UserImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -55,34 +54,46 @@ class UserContextTest {
 
     @Test
     void runAs() {
-        // Simulate what we do in the DefaultSecurityManagerProvider
-        DefaultSecurityManager sm = new DefaultSecurityManager();
-        SecurityUtils.setSecurityManager(sm);
-        final DefaultSubjectDAO subjectDAO = new DefaultSubjectDAO();
-        final DefaultSessionStorageEvaluator sessionStorageEvaluator = new DefaultSessionStorageEvaluator() {
-            @Override
-            public boolean isSessionStorageEnabled(Subject subject) {
-                // save to session if we already have a session. do not create on just for saving the subject
-                return subject.getSession(false) != null;
-            }
-        };
-        sessionStorageEvaluator.setSessionStorageEnabled(false);
-        subjectDAO.setSessionStorageEvaluator(sessionStorageEvaluator);
-        sm.setSubjectDAO(subjectDAO);
 
-        final User user = new UserImpl(mock(PasswordAlgorithmFactory.class), mock(Permissions.class),
-                mock(ClusterConfigService.class), new ObjectMapperProvider().get(), ImmutableMap.of());
-        when(userService.load(anyString())).thenReturn(user);
-        when(userService.loadById(anyString())).thenReturn(user);
+        final String userName = "user";
+        final String roleName = "role";
+        final Set<String> permissions = ImmutableSet.of("permission1", "permission2");
+        String password = "test_password";
 
-        final String USERID = "123456";
-        UserContext.<Void>runAs(USERID, () -> {
+        SecurityTestUtils.TestRealm realm = new SecurityTestUtils.TestRealm();
+        realm.addRole(roleName, permissions);
+        realm.addUser(userName, password, roleName);
+
+        SecurityManager securityManager = new DefaultSecurityManager(realm);
+        SecurityUtils.setSecurityManager(securityManager);
+
+        final User user = mock(User.class);
+        when(user.getId()).thenReturn(userName);
+        when(userService.load(userName)).thenReturn(user);
+        when(userService.loadById(userName)).thenReturn(user);
+
+        UserContext.<Void>runAs(userName, userService, () -> {
 
             final UserContext userContext = new UserContext.Factory(userService).create();
-            assertThat(userContext.getUserId()).isEqualTo(USERID);
+            // test user context basics
+            assertThat(userContext.getUserId()).isEqualTo(userName);
             assertThat(userContext.getUser()).isEqualTo(user);
+
+            // test permission check
+            assertThat(userContext.isPermitted("permission1")).isTrue();
+            assertThat(userContext.isPermitted("permission2")).isTrue();
+            assertThat(userContext.isPermitted("permission3")).isFalse();
+
+            // test request header fix
+            Object requestHeaders = ThreadContext.get(ShiroRequestHeadersBinder.REQUEST_HEADERS);
+            assertThat(requestHeaders).isNotNull();
+            assertThat(requestHeaders).isInstanceOf(MultivaluedMap.class);
+            assertThat((MultivaluedMap<String, String>) requestHeaders).containsKey(RequestIdFilter.X_REQUEST_ID);
 
             return null;
         });
+
+        assertThat(ThreadContext.get(ShiroRequestHeadersBinder.REQUEST_HEADERS)).isNull();
+
     }
 }
