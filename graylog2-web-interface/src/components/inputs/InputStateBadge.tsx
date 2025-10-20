@@ -26,7 +26,7 @@ import type { InputStates } from 'hooks/useInputsStates';
 
 type Props = {
   input: InputSummary;
-  inputStates: InputStates;
+  inputStates?: InputStates;
 };
 
 const comparator = new InputStateComparator();
@@ -55,7 +55,7 @@ const getLabelClassForState = (sortedStates, input: InputSummary, nodes: { [node
 const getTextForState = (sortedStates, input: InputSummary) =>
   input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state;
 
-const InputStateBadge = ({ input, inputStates }: Props) => {
+const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
   const { nodes } = useStore(NodesStore);
 
   const isLoading = !(inputStates && nodes);
