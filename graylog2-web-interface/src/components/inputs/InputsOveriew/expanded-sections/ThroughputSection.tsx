@@ -22,17 +22,13 @@ import { Button } from 'components/bootstrap';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { useStore } from 'stores/connect';
-
-import NetworkIOStats from './NetworkIOStats';
-import Connections from './Connections';
-import NodeMetricsDetails from './NodesMetricsDetails';
-
 import {
-  calculateInputMetrics,
-  formatCount,
-  getInputConnectionMetrics,
   getMetricNamesForInput,
-} from '../../helpers/InputThroughputUtils';
+  calculateInputMetrics,
+  getInputConnectionMetrics,
+  formatCount,
+} from 'components/inputs/helpers/InputThroughputUtils';
+import { NetworkIOStats, Connections, NodesMetricsDetails } from 'components/inputs/InputsOveriew';
 
 type Props = {
   input: InputSummary;
@@ -98,7 +94,7 @@ const ThroughputSection = ({ input }: Props) => {
         </Button>
       )}
       <br />
-      {!isNaN(writtenBytes1Sec) && showDetails && <NodeMetricsDetails input={input} metrics={metrics} />}
+      {!isNaN(writtenBytes1Sec) && showDetails && <NodesMetricsDetails input={input} metrics={metrics} />}
     </span>
   );
 };

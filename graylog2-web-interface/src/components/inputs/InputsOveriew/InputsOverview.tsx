@@ -77,7 +77,7 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
         fetchEntities={fetchEntities}
         expandedSectionsRenderer={expandedSections}
         keyFn={keyFn}
-        actionsCellWidth={400}
+        actionsCellWidth={300}
         bulkSelection={undefined}
         entityAttributesAreCamelCase={false}
         filterValueRenderers={{}}

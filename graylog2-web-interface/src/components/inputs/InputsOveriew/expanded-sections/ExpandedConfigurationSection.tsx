@@ -22,8 +22,7 @@ import type { InputSummary } from 'hooks/usePaginatedInputs';
 import InputStaticFields from 'components/inputs/InputStaticFields';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import SectionGrid from 'components/common/Section/SectionGrid';
-
-import ThroughputSection from './ThroughputSection';
+import { ThroughputSection } from 'components/inputs/InputsOveriew';
 
 type Props = {
   input: InputSummary;

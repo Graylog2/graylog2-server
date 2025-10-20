@@ -19,8 +19,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SystemInputStates } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
-import { InputSummary } from './usePaginatedInputs';
-import { INPUT_STATES_QUERY_KEY } from './useInputsStates';
+import { InputSummary } from 'hooks/usePaginatedInputs';
+import { INPUT_STATES_QUERY_KEY } from 'hooks/useInputsStates';
 
 type PROPS = {
   inputId: string;

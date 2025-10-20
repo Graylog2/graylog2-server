@@ -42,7 +42,8 @@ const inputsMeticNames = [
 
 export const prefixMetric = (input: InputSummary, metric: string) => `${input.type}.${input.id}.${metric}`;
 
-export const getMetricNamesForInput = (input: InputSummary) => inputsMeticNames.map((metric) => prefixMetric(input, metric));
+export const getMetricNamesForInput = (input: InputSummary) =>
+  inputsMeticNames.map((metric) => prefixMetric(input, metric));
 
 export const calculateInputMetrics = (input: InputSummary, metrics: Record<string, any>) => {
   const result: Record<string, number> = {};

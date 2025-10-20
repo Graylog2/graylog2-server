@@ -20,14 +20,14 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputStates } from 'hooks/useInputsStates';
-
-import TitleCell from './cells/TitleCell';
-import TypeCell from './cells/TypeCell';
-import NodeCell from './cells/NodeCell';
-import ThroughputCell from './cells/ThroughputCell';
-import ExpandedSectionToggleWrapper from './ExpandedSectionToggleWrapper';
-
-import InputStateBadge from '../InputStateBadge';
+import {
+  TitleCell,
+  TypeCell,
+  NodeCell,
+  ThroughputCell,
+  ExpandedSectionToggleWrapper,
+} from 'components/inputs/InputsOveriew';
+import { InputStateBadge } from 'components/inputs';
 
 type Props = {
   inputTypes: InputTypesSummary;

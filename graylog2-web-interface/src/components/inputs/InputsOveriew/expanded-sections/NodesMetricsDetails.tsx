@@ -23,9 +23,7 @@ import {
   formatCount,
 } from 'components/inputs/helpers/InputThroughputUtils';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-
-import NetworkIOStats from './NetworkIOStats';
-import Connections from './Connections';
+import { Connections, NetworkIOStats } from 'components/inputs/InputsOveriew';
 
 const NodeMetricsDetails = ({ input, metrics }: { metrics: Record<string, any>; input: InputSummary }) => {
   const calculatedMetricsByNode = calculateInputMetricsByNode(input, metrics);

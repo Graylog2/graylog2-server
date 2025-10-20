@@ -20,9 +20,7 @@ import type { Input } from 'components/messageloaders/Types';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-
-import InputsActions from './InputsActions';
-import ExpandedConfigurationSection from './expanded-sections/ExpandedConfigurationSection';
+import { ExpandedConfigurationSection, InputsActions } from 'components/inputs/InputsOveriew';
 
 const useTableElements = ({
   inputTypeDescriptions,
@@ -49,6 +47,7 @@ const useTableElements = ({
     ),
     [inputTypeDescriptions],
   );
+
   const expandedSections = useMemo(
     () => ({
       configuration: {

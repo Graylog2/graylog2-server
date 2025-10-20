@@ -17,8 +17,7 @@
 import * as React from 'react';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
-
-import InputStateBadge from '../../InputStateBadge';
+import InputStateBadge from 'components/inputs/InputStateBadge';
 
 type Props = {
   input: InputSummary;

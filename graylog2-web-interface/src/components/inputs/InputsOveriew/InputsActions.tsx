@@ -37,8 +37,7 @@ import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import useInputsStates from 'hooks/useInputsStates';
 import useInputMutations from 'hooks/useInputMutations';
-
-import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from '../InputSetupWizard';
+import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
 
 type Props = {
   input: Input;
