@@ -101,6 +101,7 @@ public class UsersResourceTest {
     private static final String TOKEN_NAME = "tokenName";
 
     private static final String ADMIN_OBJECT_ID = new ObjectId().toHexString();
+    public static final String ALLOWED_ROLE_LOWER_CASE = TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US);
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -152,7 +153,8 @@ public class UsersResourceTest {
         Role role = mock(Role.class);
         when(role.getId()).thenReturn(new ObjectId().toHexString());
         when(role.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
-        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), role));
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, role));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
 
@@ -167,21 +169,45 @@ public class UsersResourceTest {
 
     @Test
     public void failOnUnallowedRoleAssignment() throws NotFoundException {
-        String forbiddenRole = "ADMIN";
         Role readerRole = mock(Role.class);
         when(readerRole.getId()).thenReturn(new ObjectId().toHexString());
-        when(readerRole.getName()).thenReturn(forbiddenRole);
+        when(readerRole.getName()).thenReturn(ALLOWED_ROLE_LOWER_CASE);
+
+        String forbiddenRole = "ADMIN";
         Role adminRole = mock(Role.class);
         when(adminRole.getId()).thenReturn(new ObjectId().toHexString());
         when(adminRole.getName()).thenReturn("admin");
 
-        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), readerRole, "admin", adminRole));
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
-        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
-
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
+        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
+    }
+
+    @Test
+    public void failOnUnallowedRoleUnAssignment() throws NotFoundException {
+        Role readerRole = mock(Role.class);
+        ObjectId readerRoleId = new ObjectId();
+        when(readerRole.getId()).thenReturn(readerRoleId.toHexString());
+        when(readerRole.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+
+        Role adminRole = mock(Role.class);
+        ObjectId adminRoleId = new ObjectId();
+        when(adminRole.getId()).thenReturn(adminRoleId.toHexString());
+        when(adminRole.getName()).thenReturn("ADMIN");
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
+
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of(UserImpl.ROLES, List.of(readerRoleId, adminRoleId))));
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        when(userService.loadById("creator")).thenReturn(creator);
+        when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD)));
         Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
     }
 
