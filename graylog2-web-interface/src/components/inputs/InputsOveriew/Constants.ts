@@ -32,16 +32,7 @@ const getInputsTableElements = () => {
       'port',
     ],
   };
-  const columnsOrder = [
-    'title',
-    'type',
-    'direction',
-    'desired_state',
-    'traffic',
-    'node_id',
-    'address',
-    'port',
-  ];
+  const columnsOrder = ['title', 'type', 'direction', 'desired_state', 'traffic', 'node_id', 'address', 'port'];
   const additionalAttributes = [
     { id: 'traffic', title: 'Traffic' },
     { id: 'address', title: 'Address' },

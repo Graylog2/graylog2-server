@@ -80,9 +80,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     },
     port: {
       renderCell: (_port: string, input: InputSummary) => (
-        <ExpandedSectionToggleWrapper id={input.id}>
-          {input.attributes?.port || 'N/A'}
-        </ExpandedSectionToggleWrapper>
+        <ExpandedSectionToggleWrapper id={input.id}>{input.attributes?.port || 'N/A'}</ExpandedSectionToggleWrapper>
       ),
     },
   },

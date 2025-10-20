@@ -17,9 +17,13 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Button, Table, Row, Col, ButtonToolbar } from 'components/bootstrap';
-import { ConfirmDialog, Icon } from 'components/common';
+import { Button, Table, ButtonToolbar } from 'components/bootstrap';
+import { ConfirmDialog, Icon, IfPermitted } from 'components/common';
 import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
+import { StaticFieldForm } from 'components/inputs';
+import SectionGrid from 'components/common/Section/SectionGrid';
+import { useQueryClient } from '@tanstack/react-query';
+import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
 
 const StyledWrapper = styled.div`
   margin-top: ${(props) => props.theme.spacings.md};
@@ -33,18 +37,26 @@ const StyledTd = styled.td`
   width: ${(props) => props.theme.spacings.md};
 `;
 
+const StyledSpan = styled.span`
+  display: flex;
+  justify-content: flex-end;
+`;
+
 type InputStaticFieldsProps = {
   input: any;
 };
 
 const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [showStaticFieldForm, setShowStaticFieldForm] = useState(false);
   const [fieldToDelete, setFieldToDelete] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
   const handleDeleteStaticField = () => {
     InputStaticFieldsStore.destroy(input, fieldToDelete).finally(() => {
       setFieldToDelete(null);
       setShowConfirmDelete(false);
+      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
     });
   };
   const onDeleteStaticField = (fieldName: string) => {
@@ -89,14 +101,25 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
 
   return (
     <StyledWrapper>
-      <h4>Static fields</h4>
-      <Row>
-        <Col md={4}>
-          <StyledTable condensed striped hover>
-            <tbody>{formatStaticFields(input.static_fields)}</tbody>
-          </StyledTable>
-        </Col>
-      </Row>
+      <SectionGrid>
+        <h4>Static fields</h4>
+        <StyledSpan>
+          <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+            <Button
+              bsStyle="primary"
+              bsSize="xs"
+              key={`add-static-field-${input.id}`}
+              onClick={() => {
+                setShowStaticFieldForm(true);
+              }}>
+              Add static field
+            </Button>
+          </IfPermitted>
+        </StyledSpan>
+      </SectionGrid>
+      <StyledTable condensed striped hover>
+        <tbody>{formatStaticFields(input.static_fields)}</tbody>
+      </StyledTable>
       {showConfirmDelete && (
         <ConfirmDialog
           title="Delete static field"
@@ -106,6 +129,7 @@ const InputStaticFields = ({ input }: InputStaticFieldsProps) => {
           {`Are you sure you want to remove static field '${fieldToDelete}' from '${input.title}'?`}
         </ConfirmDialog>
       )}
+      {showStaticFieldForm && <StaticFieldForm input={input} setShowModal={setShowStaticFieldForm} />}
     </StyledWrapper>
   );
 };

@@ -39,7 +39,7 @@ jest.mock('logic/telemetry/useSendTelemetry', () => ({
   __esModule: true,
   default: jest.fn(),
 }));
-jest.mock('routing/useLocation',  () => ({
+jest.mock('routing/useLocation', () => ({
   __esModule: true,
   default: jest.fn(),
 }));
@@ -67,9 +67,7 @@ jest.mock('components/inputs', () => ({
       <button onClick={() => setShowModal(false)}>Close</button>
     </div>
   ),
-  InputStateControl: ({ openWizard }: any) => (
-    <button onClick={openWizard}>Set up input</button>
-  ),
+  InputStateControl: ({ openWizard }: any) => <button onClick={openWizard}>Set up input</button>,
   CreateInputControl: mockComponent('CreateInputControl'),
   InputsList: mockComponent('InputsList'),
   default: {},
@@ -77,7 +75,7 @@ jest.mock('components/inputs', () => ({
 
 jest.mock('components/inputs/InputSetupWizard', () => ({
   __esModule: true,
-  InputSetupWizard:  () => (
+  InputSetupWizard: () => (
     <div>
       <div>InputSetupWizard</div>
     </div>
@@ -93,7 +91,6 @@ const baseInput = {
   node: undefined,
   attributes: { foo: 'bar' },
 };
-
 
 const inputTypeDescriptions = {
   'org.graylog2.inputs.gelf.udp.GELFUDPInput': {
@@ -128,7 +125,6 @@ const renderSUT = (input = baseInput, extraProps = {}) => {
 
 const openMoreActions = async () => userEvent.click(await screen.findByRole('button', { name: /more/i }));
 
-
 describe('InputsActions', () => {
   const updateInputMock = jest.fn(() => Promise.resolve());
   const deleteInputMock = jest.fn(() => Promise.resolve());
@@ -138,7 +134,8 @@ describe('InputsActions', () => {
     asMock(useInputsStates).mockReturnValue({
       data: mockInputStates,
       isLoading: false,
-      refetch: jest.fn() });
+      refetch: jest.fn(),
+    });
     asMock(useLocation).mockImplementation(() => ({
       pathname: '/inputs',
       search: '',
@@ -159,13 +156,12 @@ describe('InputsActions', () => {
     expect(screen.getByText('Received messages')).toBeInTheDocument();
   });
 
-
   it('opens wizard via InputStateControl button', async () => {
     const setupInput = {
       ...baseInput,
       id: 'input3',
       title: 'Input 3',
-      type: "org.graylog.plugins.beats.Beats2Input",
+      type: 'org.graylog.plugins.beats.Beats2Input',
       global: false,
       node: 'node2',
     };
@@ -188,7 +184,7 @@ describe('InputsActions', () => {
       ...baseInput,
       id: 'input3',
       title: 'Input 3',
-      type: "org.graylog2.inputs.gelf.udp.GELFUDPInput",
+      type: 'org.graylog2.inputs.gelf.udp.GELFUDPInput',
       global: false,
       node: 'node2',
     };
@@ -349,9 +345,7 @@ describe('InputsActions', () => {
 
     userEvent.click(screen.getByText('Delete input'));
 
-    expect(
-      screen.getByText('Do you really want to delete input Input 3?'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Do you really want to delete input Input 3?')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
@@ -359,9 +353,7 @@ describe('InputsActions', () => {
   });
 
   describe('Setup mode actions', () => {
-    const { isInputInSetupMode, isInputRunning } = jest.requireMock(
-      'components/inputs/helpers/inputState',
-    );
+    const { isInputInSetupMode, isInputRunning } = jest.requireMock('components/inputs/helpers/inputState');
 
     it('shows Enter Setup mode when not running and not in setup mode', async () => {
       asMock(isInputInSetupMode).mockReturnValue(false);
@@ -429,4 +421,4 @@ describe('InputsActions', () => {
       expect(screen.queryByText('Enter Setup mode')).not.toBeInTheDocument();
     });
   });
- });
+});

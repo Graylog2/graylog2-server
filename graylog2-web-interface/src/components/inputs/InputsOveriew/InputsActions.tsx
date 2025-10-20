@@ -134,10 +134,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
     setShowConfirmDeleteDialog(false);
   };
   const definition = inputTypeDescriptions[input.type];
-  const queryField =
-    input.type === FORWARDER_SERVICE_INPUT
-      ? GL2_FORWARDER_INPUT
-      : GL2_SOURCE_INPUT;
+  const queryField = input.type === FORWARDER_SERVICE_INPUT ? GL2_FORWARDER_INPUT : GL2_SOURCE_INPUT;
 
   return (
     <ButtonToolbar>
