@@ -14,11 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as CreateInputControl } from './CreateInputControl';
-export { default as InputDropdown } from './InputDropdown';
-export { default as InputForm } from './InputForm';
-export { default as InputStateBadge } from './InputStateBadge';
-export { default as InputStateControl } from './InputStateControl';
-export { default as InputStaticFields } from './InputStaticFields';
-export { default as NodeOrGlobalSelect } from './NodeOrGlobalSelect';
-export { default as StaticFieldForm } from './StaticFieldForm';
+import * as React from 'react';
+
+import { formatCount } from 'components/inputs/helpers/InputThroughputUtils';
+
+const Connections = ({ openConnections, totalConnections }: { openConnections: number; totalConnections: number }) => (
+  <span>
+    Active connections: <span className="active">{formatCount(openConnections)} </span>(
+    <span className="total">{formatCount(totalConnections)}</span> total)
+    <br />
+  </span>
+);
+
+export default Connections;

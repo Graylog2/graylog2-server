@@ -21,25 +21,35 @@ import { ConfigurationWell } from 'components/configurationforms';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import InputStaticFields from 'components/inputs/InputStaticFields';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
+import SectionGrid from 'components/common/Section/SectionGrid';
+
+import ThroughputSection from './ThroughputSection';
 
 type Props = {
   input: InputSummary;
   inputTypeDescriptions: InputTypeDescriptionsResponse;
 };
 
-const ExpandedTitleSection = ({ input, inputTypeDescriptions }: Props) => {
+const ExpandedConfigurationSection = ({ input, inputTypeDescriptions }: Props) => {
   const definition = inputTypeDescriptions[input.type] as any;
 
   return (
-    <div>
-      <span>
-        {' '}
-        {input.name} &nbsp; ({input.id})
-      </span>
-      <ConfigurationWell id={input.id} configuration={input.attributes} typeDefinition={definition} />
-      <InputStaticFields input={input} />
-    </div>
+    <SectionGrid>
+      <div>
+        <span>
+          {' '}
+          {input.name} &nbsp; ({input.id})
+        </span>
+        <ConfigurationWell id={input.id} configuration={input.attributes} typeDefinition={definition} />
+        <InputStaticFields input={input} />
+      </div>
+      <div>
+        <span>Throughput / Metrics</span>
+        <br />
+        <ThroughputSection input={input} />
+      </div>
+    </SectionGrid>
   );
 };
 
-export default ExpandedTitleSection;
+export default ExpandedConfigurationSection;

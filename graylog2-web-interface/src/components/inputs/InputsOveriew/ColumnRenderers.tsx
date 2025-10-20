@@ -25,6 +25,7 @@ import TitleCell from './cells/TitleCell';
 import TypeCell from './cells/TypeCell';
 import NodeCell from './cells/NodeCell';
 import ThroughputCell from './cells/ThroughputCell';
+import ExpandedSectionToggleWrapper from './ExpandedSectionToggleWrapper';
 
 import InputStateBadge from '../InputStateBadge';
 
@@ -36,19 +37,39 @@ type Props = {
 const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRenderers<InputSummary> => ({
   attributes: {
     title: {
-      renderCell: (_title: string, input: InputSummary) => <TitleCell input={input} />,
+      renderCell: (_title: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>
+          <TitleCell input={input} />
+        </ExpandedSectionToggleWrapper>
+      ),
     },
     type: {
-      renderCell: (type: string) => <TypeCell type={type} inputTypes={inputTypes} />,
+      renderCell: (type: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>
+          <TypeCell type={type} inputTypes={inputTypes} />
+        </ExpandedSectionToggleWrapper>
+      ),
     },
     state: {
-      renderCell: (_state: string, input: InputSummary) => <InputStateBadge input={input} inputStates={inputStates} />,
+      renderCell: (_state: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>
+          <InputStateBadge input={input} inputStates={inputStates} />
+        </ExpandedSectionToggleWrapper>
+      ),
     },
     node: {
-      renderCell: (_type: string, input: InputSummary) => <NodeCell input={input} />,
+      renderCell: (_type: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>
+          <NodeCell input={input} />,
+        </ExpandedSectionToggleWrapper>
+      ),
     },
     traffic: {
-      renderCell: (_traffic: string, input: InputSummary) => <ThroughputCell input={input} />,
+      renderCell: (_traffic: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>
+          <ThroughputCell input={input} />,
+        </ExpandedSectionToggleWrapper>
+      ),
     },
   },
 });

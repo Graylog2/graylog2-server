@@ -15,36 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useCallback } from 'react';
-import styled from 'styled-components';
 
-import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
+import { LinkContainer } from 'components/common/router';
+import { Button } from 'components/bootstrap';
+import Routes from 'routing/Routes';
 
 type Props = {
   input: InputSummary;
 };
 
-const StyledSpan = styled.span`
-  cursor: pointer;
-`;
-
-const TitleCell = ({ input }: Props) => {
-  const spanRef = useRef();
-  const { toggleSection, expandedSections } = useExpandedSections();
-
-  const toggleTrafficSection = useCallback(() => toggleSection(input.id, 'title'), [input.id, toggleSection]);
-
-  const throughputSectionIsOpen = expandedSections?.[input.id]?.includes('title');
-
-  return (
-    <StyledSpan
-      title={`${throughputSectionIsOpen ? 'Hide' : 'Show'} configuration details`}
-      ref={spanRef}
-      onClick={toggleTrafficSection}>
-      {input.title}
-    </StyledSpan>
+const TitleCell = ({ input }: Props) => (
+    <span>
+      <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
+        <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
+          {input.title}
+        </Button>
+      </LinkContainer>
+    </span>
   );
-};
 
 export default TitleCell;

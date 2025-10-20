@@ -1,4 +1,15 @@
 import numeral from 'numeral';
+import { InputSummary } from 'hooks/usePaginatedInputs';
+
+export type InputConnectionMetrics = {
+  openConnections: number | undefined;
+  totalConnections: number | undefined;
+  emptyMessages: number | undefined;
+  writtenBytes1Sec: number | undefined;
+  writtenBytesTotal: number | undefined;
+  readBytes1Sec: number | undefined;
+  readBytesTotal: number | undefined;
+};
 
 export const getValueFromMetric = (metric) => {
   if (metric === null || metric === undefined) {
@@ -28,15 +39,15 @@ const inputsMeticNames = [
   'read_bytes_total',
 ];
 
-export const prefixMetric = (input: { type: string; id: string }, metric: string) => {
+export const prefixMetric = (input: InputSummary, metric: string) => {
   return `${input.type}.${input.id}.${metric}`;
 };
 
-export const getMetricNamesForInput = (input: { type: string; id: string }) => {
+export const getMetricNamesForInput = (input: InputSummary) => {
   return inputsMeticNames.map((metric) => prefixMetric(input, metric));
 };
 
-export const calculateInputMetrics = (input: { type: string; id: string }, metrics: Record<string, any>) => {
+export const calculateInputMetrics = (input: InputSummary, metrics: Record<string, any>) => {
   const result: Record<string, number> = {};
   const metricNames = getMetricNamesForInput(input);
 
@@ -57,4 +68,50 @@ export const calculateInputMetrics = (input: { type: string; id: string }, metri
   });
 
   return result;
+};
+
+export const calculateInputMetricsByNode = (
+  input: InputSummary,
+  metrics: Record<string, Record<string, any>>,
+): Record<string, Record<string, number>> => {
+  const metricNames = getMetricNamesForInput(input);
+  const result: Record<string, Record<string, number>> = {};
+
+  for (const [nodeId, nodeMetrics] of Object.entries(metrics)) {
+    const perNode: Record<string, number> = {};
+
+    for (const metricName of metricNames) {
+      const rawMetric = nodeMetrics[metricName];
+      if (!rawMetric) {
+        continue;
+      }
+
+      const value = getValueFromMetric(rawMetric);
+      if (typeof value === 'number' && !isNaN(value)) {
+        perNode[metricName] = value;
+      }
+    }
+
+    if (Object.keys(perNode).length > 0) {
+      result[nodeId] = perNode;
+    }
+  }
+
+  return result;
+};
+
+export const getInputConnectionMetrics = (
+  input: InputSummary,
+  calculatedMetrics: Record<string, number>,
+): InputConnectionMetrics => {
+  const resolve = (name: string) => calculatedMetrics[prefixMetric(input, name)];
+  return {
+    openConnections: resolve('open_connections'),
+    totalConnections: resolve('total_connections'),
+    emptyMessages: resolve('emptyMessages'),
+    writtenBytes1Sec: resolve('written_bytes_1sec'),
+    writtenBytesTotal: resolve('written_bytes_total'),
+    readBytes1Sec: resolve('read_bytes_1sec'),
+    readBytesTotal: resolve('read_bytes_total'),
+  };
 };

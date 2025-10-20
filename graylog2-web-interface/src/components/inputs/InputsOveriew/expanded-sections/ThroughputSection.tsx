@@ -14,37 +14,38 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import { useEffect, useState } from 'react';
 
-import React, { useEffect } from 'react';
-
-import NumberUtils from 'util/NumberUtils';
-import { Icon, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
+import { Button } from 'components/bootstrap';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { useStore } from 'stores/connect';
 
+import NetworkIOStats from './NetworkIOStats';
+import Connections from './Connections';
+import NodeMetricsDetails from './NodesMetricsDetails';
+
 import {
   calculateInputMetrics,
   formatCount,
+  getInputConnectionMetrics,
   getMetricNamesForInput,
-  prefixMetric,
 } from '../../helpers/InputThroughputUtils';
 
 type Props = {
   input: InputSummary;
 };
 
-const Connections = ({ openConnections, totalConnections }: { openConnections: number; totalConnections: number }) => (
-  <span>
-    Active connections: <span className="active">{formatCount(openConnections)} </span>(
-    <span className="total">{formatCount(totalConnections)}</span> total)
-    <br />
-  </span>
-);
-
-const ExpandedThroughputSection = ({ input }: Props) => {
+const ThroughputSection = ({ input }: Props) => {
   const metrics = useStore(MetricsStore, (store) => store.metrics);
   const metricNames = getMetricNamesForInput(input);
+  const [showDetails, setShowDetails] = useState(false);
+
+  const toggleShowDetails = () => {
+    setShowDetails(!showDetails);
+  };
 
   useEffect(() => {
     metricNames.map((metricName) => MetricsActions.addGlobal(metricName));
@@ -59,38 +60,27 @@ const ExpandedThroughputSection = ({ input }: Props) => {
   }
 
   const calculatedMetrics = calculateInputMetrics(input, metrics);
-  const openConnections = calculatedMetrics[prefixMetric(input, 'open_connections')];
-  const totalConnections = calculatedMetrics[prefixMetric(input, 'total_connections')];
-  const emptyMessages = calculatedMetrics[prefixMetric(input, 'emptyMessages')];
-  const writtenBytes1Sec = calculatedMetrics[prefixMetric(input, 'written_bytes_1sec')];
-  const writtenBytesTotal = calculatedMetrics[prefixMetric(input, 'written_bytes_total')];
-  const readBytes1Sec = calculatedMetrics[prefixMetric(input, 'read_bytes_1sec')];
-  const readBytesTotal = calculatedMetrics[prefixMetric(input, 'read_bytes_total')];
+
+  const {
+    openConnections,
+    totalConnections,
+    emptyMessages,
+    writtenBytes1Sec,
+    writtenBytesTotal,
+    readBytes1Sec,
+    readBytesTotal,
+  } = getInputConnectionMetrics(input, calculatedMetrics);
 
   return (
     <span>
       {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <i>No metrics available for this input</i>}
       {!isNaN(writtenBytes1Sec) && (
-        <span>
-          <span>Network IO: </span>
-          <span>
-            <Icon name="arrow_drop_down" />
-            <span>{NumberUtils.formatBytes(readBytes1Sec)} </span>
-
-            <Icon name="arrow_drop_up" />
-            <span>{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
-          </span>
-
-          <span>
-            <span> (total: </span>
-            <Icon name="arrow_drop_down" />
-            <span>{NumberUtils.formatBytes(readBytesTotal)} </span>
-
-            <Icon name="arrow_drop_up" />
-            <span>{NumberUtils.formatBytes(writtenBytesTotal)}</span>
-            <span> )</span>
-          </span>
-        </span>
+        <NetworkIOStats
+          readBytes1Sec={readBytes1Sec}
+          writtenBytes1Sec={writtenBytes1Sec}
+          readBytesTotal={readBytesTotal}
+          writtenBytesTotal={writtenBytesTotal}
+        />
       )}
       <br />
       {!isNaN(openConnections) && !isNaN(totalConnections) && (
@@ -102,8 +92,15 @@ const ExpandedThroughputSection = ({ input }: Props) => {
           <br />
         </span>
       )}
+      {!isNaN(writtenBytes1Sec) && input.global && (
+        <Button bsStyle="link" onClick={toggleShowDetails}>
+          {showDetails ? 'Hide' : 'Show'} details
+        </Button>
+      )}
+      <br />
+      {!isNaN(writtenBytes1Sec) && showDetails && <NodeMetricsDetails input={input} metrics={metrics} />}
     </span>
   );
 };
 
-export default ExpandedThroughputSection;
+export default ThroughputSection;

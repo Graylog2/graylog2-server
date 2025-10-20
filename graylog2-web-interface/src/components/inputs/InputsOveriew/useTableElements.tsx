@@ -21,9 +21,8 @@ import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 
-import ExpandedThroughputSection from './expanded-sections/ExpandedThroughputSection';
 import InputsActions from './InputsActions';
-import ExpandedTitleSection from './expanded-sections/ExpandedTitleSection';
+import ExpandedConfigurationSection from './expanded-sections/ExpandedConfigurationSection';
 
 const useTableElements = ({
   inputTypeDescriptions,
@@ -44,28 +43,20 @@ const useTableElements = ({
     [inputTypes, inputTypeDescriptions],
   );
 
-  const renderExpandedThroughput = useCallback(
-    (input: InputSummary) => <ExpandedThroughputSection input={input} />,
-    [],
-  );
-  const renderExpandedInputDetails = useCallback(
-    (input: InputSummary) => <ExpandedTitleSection input={input} inputTypeDescriptions={inputTypeDescriptions} />,
+  const renderExpandedConfigurationDetails = useCallback(
+    (input: InputSummary) => (
+      <ExpandedConfigurationSection input={input} inputTypeDescriptions={inputTypeDescriptions} />
+    ),
     [inputTypeDescriptions],
   );
-  const renderExpandedRulesActions = useCallback((_input: Input) => <>x</>, []);
   const expandedSections = useMemo(
     () => ({
-      traffic: {
-        title: 'Throughput',
-        content: renderExpandedThroughput,
-        actions: renderExpandedRulesActions,
-      },
-      title: {
+      configuration: {
         title: 'Configuration',
-        content: renderExpandedInputDetails,
+        content: renderExpandedConfigurationDetails,
       },
     }),
-    [renderExpandedThroughput, renderExpandedRulesActions, renderExpandedInputDetails],
+    [renderExpandedConfigurationDetails],
   );
 
   return {
