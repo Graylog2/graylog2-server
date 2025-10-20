@@ -85,19 +85,17 @@ const InputsNotifications = () => {
         {hasFailedInputs && (
           <StyledAlert bsStyle="danger" title="Some inputs are in failed state.">
             One or more inputs are currently failed state. Failed or failing inputs will not receive traffic until
-            fixed. Click here to filter the table to show only failed inputs.
+            fixed.
           </StyledAlert>
         )}
         {hasSetupInputs && (
           <StyledAlert bsStyle="warning" title="Some inputs are in setup mode.">
-            One or more inputs are currently in setup mode. Inputs will not receive traffic until started. Click here to
-            filter the table to show only inputs in Setup mode.
+            One or more inputs are currently in setup mode. Inputs will not receive traffic until started.
           </StyledAlert>
         )}
         {hasStoppedInputs && (
           <StyledAlert bsStyle="warning" title="Some inputs are stopped.">
-            One or more inputs are currently stopped. Stopped Inputs will not receive traffic until started. Click here
-            to filter the table to show only stopped Inputs.
+            One or more inputs are currently stopped. Stopped Inputs will not receive traffic until started.
           </StyledAlert>
         )}
       </Col>
