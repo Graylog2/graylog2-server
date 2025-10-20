@@ -182,9 +182,10 @@ public class AuthzRolesResource extends RestResource {
     @Path("{roleId}")
     @Produces(MediaType.APPLICATION_JSON)
     public AuthzRoleDTO get(@ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
-        checkPermission(RestPermissions.ROLES_READ, roleId);
-        return authzRolesService.get(roleId).orElseThrow(
+        AuthzRoleDTO authzRoleDTO = authzRolesService.get(roleId).orElseThrow(
                 () -> new NotFoundException("Could not find role with id: " + roleId));
+        checkPermission(RestPermissions.ROLES_READ, authzRoleDTO.name());
+        return authzRoleDTO;
     }
 
     @GET
