@@ -53,6 +53,7 @@ const hasInputInState = (inputStates: InputStates, targetStates: InputState | Ar
       }
     }
   }
+
   return false;
 };
 
