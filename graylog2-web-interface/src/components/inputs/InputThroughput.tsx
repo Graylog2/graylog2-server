@@ -23,8 +23,8 @@ import NumberUtils from 'util/NumberUtils';
 import { Icon, LinkToNode, Spinner } from 'components/common';
 import type { ClusterMetric } from 'stores/metrics/MetricsStore';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
-import type { Input } from 'components/messageloaders/Types';
 import connect from 'stores/connect';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 const InputIO = styled.span(
   ({ theme }) => css`
@@ -109,7 +109,7 @@ const NetworkStats = ({ writtenBytes1Sec, writtenBytesTotal, readBytes1Sec, read
 );
 
 type Props = {
-  input: Input;
+  input: InputSummary;
   metrics: ClusterMetric;
 };
 type State = {

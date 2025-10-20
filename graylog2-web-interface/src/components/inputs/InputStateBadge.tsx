@@ -19,46 +19,44 @@ import React from 'react';
 import { OverlayTrigger, LinkToNode, Spinner } from 'components/common';
 import { Label } from 'components/bootstrap';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import type { InputStates } from 'stores/inputs/InputStatesStore';
-import { NodesStore } from 'stores/nodes/NodesStore';
-import type { Input } from 'components/messageloaders/Types';
+import { type NodeInfo, NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
+import { InputSummary } from 'hooks/usePaginatedInputs';
+import { InputStates } from 'hooks/useInputsStates';
 
 type Props = {
-  input: Input;
+  input: InputSummary;
+  inputStates?: InputStates;
 };
 
 const comparator = new InputStateComparator();
 
-const InputStateBadge = ({ input }: Props) => {
-  const { inputStates } = useStore(InputStatesStore) as { inputStates: InputStates };
-  const { nodes } = useStore(NodesStore);
+const getLabelClassForState = (sortedStates, input: InputSummary, nodes: { [nodeId: string]: NodeInfo }) => {
+  const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => numberOfNodes + state.count, 0);
 
-  const _labelClassForState = (sortedStates) => {
-    const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => numberOfNodes + state.count, 0);
+  if (input.global && nodesWithKnownState !== Object.keys(nodes).length) {
+    return 'warning';
+  }
 
-    if (input.global && nodesWithKnownState !== Object.keys(nodes).length) {
+  const { state } = sortedStates[0];
+
+  switch (state) {
+    case 'RUNNING':
+      return 'success';
+    case 'FAILED':
+    case 'STOPPED':
+      return 'danger';
+    case 'STARTING':
+      return 'info';
+    default:
       return 'warning';
-    }
+  }
+};
+const getTextForState = (sortedStates, input: InputSummary) =>
+  input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state;
 
-    const { state } = sortedStates[0];
-
-    switch (state) {
-      case 'RUNNING':
-        return 'success';
-      case 'FAILED':
-      case 'STOPPED':
-        return 'danger';
-      case 'STARTING':
-        return 'info';
-      default:
-        return 'warning';
-    }
-  };
-
-  const _textForState = (sortedStates) =>
-    input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state;
+const InputStateBadge = ({ input, inputStates }: Props) => {
+  const { nodes } = useStore(NodesStore);
 
   const isLoading = !(inputStates && nodes);
 
@@ -106,11 +104,11 @@ const InputStateBadge = ({ input }: Props) => {
         rootClose
         title={`Input States for ${input.title}`}>
         <Label
-          bsStyle={_labelClassForState(sorted)}
+          bsStyle={getLabelClassForState(sorted, input, nodes)}
           title="Click to show details"
           bsSize="xsmall"
           style={{ cursor: 'pointer' }}>
-          {_textForState(sorted)}
+          {getTextForState(sorted, input)}
         </Label>
       </OverlayTrigger>
     );

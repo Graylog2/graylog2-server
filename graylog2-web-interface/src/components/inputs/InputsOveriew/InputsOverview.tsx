@@ -1,0 +1,85 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useMemo } from 'react';
+
+import type { NodeInfo } from 'stores/nodes/NodesStore';
+import { keyFn, fetchInputs } from 'hooks/usePaginatedInputs';
+import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
+import QueryHelper from 'components/common/QueryHelper';
+import type { SearchParams } from 'stores/PaginationTypes';
+import CreateInputControl from 'components/inputs/CreateInputControl';
+import customColumnRenderers from 'components/inputs/InputsOveriew/ColumnRenderers';
+import getInputsTableElements from 'components/inputs/InputsOveriew/Constants';
+import type { InputTypesSummary } from 'hooks/useInputTypes';
+import useTableElements from './useTableElements';
+import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
+import useInputsStates from 'hooks/useInputsStates';
+
+type Input = {
+  id: string;
+  title: string;
+  type: string;
+  node: string;
+  global: boolean;
+  creator_user_id?: string;
+  created_at?: string;
+};
+
+type Props = {
+  node?: NodeInfo;
+  inputTypes: InputTypesSummary;
+  inputTypeDescriptions: InputTypeDescriptionsResponse;
+};
+
+const entityName = 'input';
+
+const InputsOverview = ({ node, inputTypeDescriptions, inputTypes }: Props) => {
+  const { data: inputStates } = useInputsStates();
+  const { columnsOrder, tableLayout, additionalAttributes } = getInputsTableElements();
+  const { entityActions, expandedSections } = useTableElements({
+    inputTypes,
+    inputTypeDescriptions,
+  });
+  const columnRenderers = useMemo(() => customColumnRenderers({ inputTypes, inputStates }), [inputTypes, inputStates]);
+
+  const fetchEntities = (options: SearchParams) => fetchInputs(options);
+
+  return (
+    <div>
+      {!node && <CreateInputControl />}
+      <PaginatedEntityTable<Input>
+        humanName="inputs"
+        columnsOrder={columnsOrder}
+        additionalAttributes={additionalAttributes}
+        queryHelpComponent={<QueryHelper entityName={entityName} />}
+        entityActions={entityActions}
+        tableLayout={tableLayout}
+        fetchEntities={fetchEntities}
+        expandedSectionsRenderer={expandedSections}
+        keyFn={keyFn}
+        actionsCellWidth={400}
+        bulkSelection={undefined}
+        entityAttributesAreCamelCase={false}
+        filterValueRenderers={{}}
+        columnRenderers={columnRenderers}
+      />
+    </div>
+  );
+};
+
+export default InputsOverview;
