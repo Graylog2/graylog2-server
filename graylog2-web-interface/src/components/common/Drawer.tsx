@@ -22,15 +22,6 @@ import styled, { css } from 'styled-components';
 
 const StyledDrawer = styled(MantineDrawer)(
   ({ theme }) => css`
-    @keyframes changeWidth {
-      from {
-        flex-basis: var(--drawer-size);
-      }
-      to {
-        flex-basis: calc(var(--drawer-size) * 2);
-      }
-    }
-
     .mantine-Drawer-content,
     .mantine-Drawer-header {
       background-color: ${theme.colors.global.contentBackground};
@@ -41,9 +32,7 @@ const StyledDrawer = styled(MantineDrawer)(
       flex-direction: column;
 
       &.double {
-        animation-name: changeWidth;
-        animation-duration: 0.3s;
-        animation-fill-mode: forwards;
+        flex-basis: calc(var(--drawer-size) * 2);
       }
     }
 
