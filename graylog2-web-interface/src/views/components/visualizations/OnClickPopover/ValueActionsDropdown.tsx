@@ -16,7 +16,7 @@
  */
 import React, { useContext, useMemo } from 'react';
 
-import type { FieldData } from 'views/components/visualizations/OnClickPopover/Types';
+import type { FieldData, Step } from 'views/components/visualizations/OnClickPopover/Types';
 import useCurrentQueryId from 'views/logic/queries/useCurrentQueryId';
 import { ActionContext } from 'views/logic/ActionContext';
 import fieldTypeFor from 'views/logic/fieldtypes/FieldTypeFor';
@@ -27,10 +27,16 @@ import { Menu } from 'components/bootstrap';
 import Popover from 'components/common/Popover';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 import { humanSeparator } from 'views/Constants';
+import PopoverTitle from 'views/components/visualizations/OnClickPopover/PopoverTitle';
 
-type Props = { onActionRun: () => void; value: FieldData['value']; field: FieldData['field'] };
+type Props = {
+  onActionRun: () => void;
+  value: FieldData['value'];
+  field: FieldData['field'];
+  setStep: React.Dispatch<React.SetStateAction<Step>>;
+};
 
-const ValueActionsDropdown = ({ value, field, onActionRun }: Props) => {
+const ValueActionsDropdown = ({ value, field, onActionRun, setStep }: Props) => {
   const queryId = useCurrentQueryId();
   const actionContext = useContext(ActionContext);
   const { overflowingComponents, setOverflowingComponents } = useOverflowingComponents();
@@ -43,15 +49,12 @@ const ValueActionsDropdown = ({ value, field, onActionRun }: Props) => {
 
   const showMultipleValueHeader = hasMultipleValueForActions(actionContext);
 
+  const onBackToValueSelect = () => setStep('values');
+
   return (
-    <Popover.Dropdown>
-      <Menu opened>
-        <ActionDropdown
-          handlerArgs={handlerArgs}
-          type="value"
-          onMenuToggle={onActionRun}
-          overflowingComponents={overflowingComponents}
-          setOverflowingComponents={setOverflowingComponents}>
+    <Popover.Dropdown
+      title={
+        <PopoverTitle onBackClick={onBackToValueSelect}>
           {showMultipleValueHeader ? (
             actionContext?.valuePath.map((o) => Object.values(o)[0]).join(humanSeparator)
           ) : (
@@ -59,7 +62,16 @@ const ValueActionsDropdown = ({ value, field, onActionRun }: Props) => {
               {field} = <TypeSpecificValue field={field} value={value} type={handlerArgs?.type} truncate />
             </>
           )}
-        </ActionDropdown>
+        </PopoverTitle>
+      }>
+      <Menu opened>
+        <ActionDropdown
+          handlerArgs={handlerArgs}
+          type="value"
+          onMenuToggle={onActionRun}
+          overflowingComponents={overflowingComponents}
+          setOverflowingComponents={setOverflowingComponents}
+        />
       </Menu>
     </Popover.Dropdown>
   );
