@@ -14,8 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { Button, Table, Row, Col, ButtonToolbar } from 'components/bootstrap';

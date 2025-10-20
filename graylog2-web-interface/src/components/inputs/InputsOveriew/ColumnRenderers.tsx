@@ -60,14 +60,14 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
     node: {
       renderCell: (_type: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>
-          <NodeCell input={input} />,
+          <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
     },
     traffic: {
       renderCell: (_traffic: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>
-          <ThroughputCell input={input} />,
+          <ThroughputCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
     },

@@ -1,5 +1,6 @@
 import numeral from 'numeral';
-import { InputSummary } from 'hooks/usePaginatedInputs';
+
+import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 export type InputConnectionMetrics = {
   openConnections: number | undefined;
@@ -39,13 +40,9 @@ const inputsMeticNames = [
   'read_bytes_total',
 ];
 
-export const prefixMetric = (input: InputSummary, metric: string) => {
-  return `${input.type}.${input.id}.${metric}`;
-};
+export const prefixMetric = (input: InputSummary, metric: string) => `${input.type}.${input.id}.${metric}`;
 
-export const getMetricNamesForInput = (input: InputSummary) => {
-  return inputsMeticNames.map((metric) => prefixMetric(input, metric));
-};
+export const getMetricNamesForInput = (input: InputSummary) => inputsMeticNames.map((metric) => prefixMetric(input, metric));
 
 export const calculateInputMetrics = (input: InputSummary, metrics: Record<string, any>) => {
   const result: Record<string, number> = {};
@@ -105,6 +102,7 @@ export const getInputConnectionMetrics = (
   calculatedMetrics: Record<string, number>,
 ): InputConnectionMetrics => {
   const resolve = (name: string) => calculatedMetrics[prefixMetric(input, name)];
+
   return {
     openConnections: resolve('open_connections'),
     totalConnections: resolve('total_connections'),

@@ -20,9 +20,9 @@ import { render, screen } from 'wrappedTestingLibrary';
 import { asMock } from 'helpers/mocking';
 import type { InputState } from 'hooks/useInputsStates';
 import useInputsStates from 'hooks/useInputsStates';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 import InputsDotBadge from './InputsDotBadge';
-import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 jest.mock('hooks/useInputsStates');
 

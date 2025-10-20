@@ -26,13 +26,13 @@ type Props = {
 };
 
 const TitleCell = ({ input }: Props) => (
-    <span>
-      <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
-        <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
-          {input.title}
-        </Button>
-      </LinkContainer>
-    </span>
-  );
+  <span>
+    <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
+      <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
+        {input.title}
+      </Button>
+    </LinkContainer>
+  </span>
+);
 
 export default TitleCell;

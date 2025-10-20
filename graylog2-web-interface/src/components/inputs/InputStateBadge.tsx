@@ -21,12 +21,12 @@ import { Label } from 'components/bootstrap';
 import InputStateComparator from 'logic/inputs/InputStateComparator';
 import { type NodeInfo, NodesStore } from 'stores/nodes/NodesStore';
 import { useStore } from 'stores/connect';
-import { InputSummary } from 'hooks/usePaginatedInputs';
-import { InputStates } from 'hooks/useInputsStates';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
+import type { InputStates } from 'hooks/useInputsStates';
 
 type Props = {
   input: InputSummary;
-  inputStates?: InputStates;
+  inputStates: InputStates;
 };
 
 const comparator = new InputStateComparator();
@@ -89,7 +89,7 @@ const InputStateBadge = ({ input, inputStates }: Props) => {
   if (sorted.length > 0) {
     const popOverText = sorted.map((state) =>
       sortedInputStates[state.state].map((node) => (
-        <small>
+        <small key={`${input.id}-state-${state.state}-node-${node}`}>
           <LinkToNode nodeId={node} />: {state.state}
           <br />
         </small>
@@ -98,16 +98,12 @@ const InputStateBadge = ({ input, inputStates }: Props) => {
 
     return (
       <OverlayTrigger
-        trigger="click"
+        trigger="hover"
         placement="bottom"
         overlay={popOverText}
         rootClose
         title={`Input States for ${input.title}`}>
-        <Label
-          bsStyle={getLabelClassForState(sorted, input, nodes)}
-          title="Click to show details"
-          bsSize="xsmall"
-          style={{ cursor: 'pointer' }}>
+        <Label bsStyle={getLabelClassForState(sorted, input, nodes)} bsSize="xsmall" style={{ cursor: 'pointer' }}>
           {getTextForState(sorted, input)}
         </Label>
       </OverlayTrigger>
