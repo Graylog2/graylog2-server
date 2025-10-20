@@ -17,12 +17,13 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemInputsTypes } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 type InputType = {
   requested_configuration: {
     [key: string]: {
-      [key: string]: Object;
+      [key: string]: object;
     };
   };
   link_to_docs: string;
