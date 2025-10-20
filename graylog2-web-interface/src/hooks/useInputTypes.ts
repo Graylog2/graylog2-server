@@ -17,6 +17,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemInputsTypes } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 type Options = {

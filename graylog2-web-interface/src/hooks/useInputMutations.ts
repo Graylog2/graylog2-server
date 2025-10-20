@@ -19,17 +19,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SystemInputs } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
+
 import { KEY_PREFIX } from './usePaginatedInputs';
 
-const createInput = async ({ input }): Promise<{ id: string }> => {
-  return SystemInputs.create(input);
-};
-const updateInput = async ({ input, inputId }): Promise<{ id: string }> => {
-  return SystemInputs.update(input, inputId);
-};
-const deleteInput = async ({ inputId }): Promise<void> => {
-  return SystemInputs.terminate(inputId);
-};
+const createInput = async ({ input }): Promise<{ id: string }> => SystemInputs.create(input);
+const updateInput = async ({ input, inputId }): Promise<{ id: string }> => SystemInputs.update(input, inputId);
+const deleteInput = async ({ inputId }): Promise<void> => SystemInputs.terminate(inputId);
 
 const useInputMutations = () => {
   const queryClient = useQueryClient();
