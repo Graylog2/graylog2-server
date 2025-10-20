@@ -1,4 +1,4 @@
-import numeral from "numeral";
+import numeral from 'numeral';
 
 export const getValueFromMetric = (metric) => {
   if (metric === null || metric === undefined) {
@@ -17,7 +17,16 @@ export const getValueFromMetric = (metric) => {
   }
 };
 export const formatCount = (count: number) => numeral(count).format('0,0');
-const inputsMeticNames = ['incomingMessages', 'emptyMessages', 'open_connections', 'total_connections', 'written_bytes_1sec', 'written_bytes_total', 'read_bytes_1sec', 'read_bytes_total'];
+const inputsMeticNames = [
+  'incomingMessages',
+  'emptyMessages',
+  'open_connections',
+  'total_connections',
+  'written_bytes_1sec',
+  'written_bytes_total',
+  'read_bytes_1sec',
+  'read_bytes_total',
+];
 
 export const prefixMetric = (input: { type: string; id: string }, metric: string) => {
   return `${input.type}.${input.id}.${metric}`;

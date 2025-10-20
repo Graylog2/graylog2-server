@@ -18,13 +18,15 @@ import * as React from 'react';
 
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
+import type { InputTypesSummary } from 'hooks/useInputTypes';
+import type { InputStates } from 'hooks/useInputsStates';
+
 import TitleCell from './cells/TitleCell';
 import TypeCell from './cells/TypeCell';
-import type { InputTypesSummary } from 'hooks/useInputTypes';
 import NodeCell from './cells/NodeCell';
 import ThroughputCell from './cells/ThroughputCell';
+
 import InputStateBadge from '../InputStateBadge';
-import { InputStates } from 'hooks/useInputsStates';
 
 type Props = {
   inputTypes: InputTypesSummary;

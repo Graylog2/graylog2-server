@@ -23,8 +23,8 @@ type Props = {
   inputTypes?: InputTypesSummary;
 };
 
-const TypeCell = ({ type, inputTypes }: Props) => {
-  const typeName = inputTypes?.types[type];
+const TypeCell = ({ type, inputTypes = undefined }: Props) => {
+  const typeName = inputTypes && inputTypes?.types[type];
 
   return <>{typeName || type}</>;
 };

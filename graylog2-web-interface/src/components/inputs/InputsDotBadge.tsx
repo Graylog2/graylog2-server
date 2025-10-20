@@ -24,12 +24,10 @@ const InputsDotBadge = ({ text }: { text: string }) => {
 
   if (isLoading) {
     return null;
-  };
+  }
 
-  const hasFailedOrSetupInputs = Object.values(data).some(inputStateByNode  =>
-    Object.values(inputStateByNode).some(
-      node => ['FAILED', 'FAILING', 'SETUP'].includes(node.state),
-    )
+  const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
+    Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
   );
 
   return (

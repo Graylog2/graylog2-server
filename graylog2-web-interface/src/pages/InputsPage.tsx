@@ -59,7 +59,6 @@ const InputsPage = () => {
             </span>
           )}
         </PageHeader>
-        {/* <InputsList /> */}
         <Row className="content">
           <Col md={12}>
             <InputsOverview inputTypeDescriptions={inputTypeDescriptions} inputTypes={inputTypes} />

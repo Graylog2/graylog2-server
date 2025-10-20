@@ -17,14 +17,13 @@
 import * as React from 'react';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
+
 import InputStateBadge from '../../InputStateBadge';
 
 type Props = {
   input: InputSummary;
 };
 
-const StateCell = ({ input }: Props) => {
-  return <InputStateBadge input={input} />;
-};
+const StateCell = ({ input }: Props) => <InputStateBadge input={input} />;
 
 export default StateCell;

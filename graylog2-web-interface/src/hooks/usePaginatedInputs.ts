@@ -48,10 +48,17 @@ export const KEY_PREFIX = ['inputs', 'overview'];
 export const keyFn = (searchParams: SearchParams) => [...KEY_PREFIX, searchParams];
 
 export const fetchInputs = (searchParams: SearchParams) =>
-  SystemInputs.getPage(searchParams.sort.attributeId as any, searchParams.page, searchParams.pageSize, searchParams.query, FiltersForQueryParams(searchParams.filters), searchParams?.sort.direction).then((response) => ({
-      list: response.elements,
-      attributes: response.attributes,
-      pagination: { total: response.total },
+  SystemInputs.getPage(
+    searchParams.sort.attributeId as any,
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.query,
+    FiltersForQueryParams(searchParams.filters),
+    searchParams?.sort.direction,
+  ).then((response) => ({
+    list: response.elements,
+    attributes: response.attributes,
+    pagination: { total: response.total },
   }));
 
 type Options = {

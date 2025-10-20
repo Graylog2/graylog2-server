@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 
 import NumberUtils from 'util/NumberUtils';
 import { Icon, Spinner } from 'components/common';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { useStore } from 'stores/connect';
+
 import {
   calculateInputMetrics,
   formatCount,
@@ -68,43 +68,41 @@ const ExpandedThroughputSection = ({ input }: Props) => {
   const readBytesTotal = calculatedMetrics[prefixMetric(input, 'read_bytes_total')];
 
   return (
-    <>
-      <span>
-        {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <i>No metrics available for this input</i>}
-        {!isNaN(writtenBytes1Sec) && (
+    <span>
+      {isNaN(writtenBytes1Sec) && isNaN(openConnections) && <i>No metrics available for this input</i>}
+      {!isNaN(writtenBytes1Sec) && (
+        <span>
+          <span>Network IO: </span>
           <span>
-            <span>Network IO: </span>
-            <span>
-              <Icon name="arrow_drop_down" />
-              <span>{NumberUtils.formatBytes(readBytes1Sec)} </span>
+            <Icon name="arrow_drop_down" />
+            <span>{NumberUtils.formatBytes(readBytes1Sec)} </span>
 
-              <Icon name="arrow_drop_up" />
-              <span>{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
-            </span>
-
-            <span>
-              <span> (total: </span>
-              <Icon name="arrow_drop_down" />
-              <span>{NumberUtils.formatBytes(readBytesTotal)} </span>
-
-              <Icon name="arrow_drop_up" />
-              <span>{NumberUtils.formatBytes(writtenBytesTotal)}</span>
-              <span> )</span>
-            </span>
+            <Icon name="arrow_drop_up" />
+            <span>{NumberUtils.formatBytes(writtenBytes1Sec)}</span>
           </span>
-        )}
-        <br />
-        {!isNaN(openConnections) && !isNaN(totalConnections) && (
-          <Connections openConnections={openConnections} totalConnections={totalConnections} />
-        )}
-        {!isNaN(emptyMessages) && (
+
           <span>
-            Empty messages discarded: {formatCount(emptyMessages)}
-            <br />
+            <span> (total: </span>
+            <Icon name="arrow_drop_down" />
+            <span>{NumberUtils.formatBytes(readBytesTotal)} </span>
+
+            <Icon name="arrow_drop_up" />
+            <span>{NumberUtils.formatBytes(writtenBytesTotal)}</span>
+            <span> )</span>
           </span>
-        )}
-      </span>
-    </>
+        </span>
+      )}
+      <br />
+      {!isNaN(openConnections) && !isNaN(totalConnections) && (
+        <Connections openConnections={openConnections} totalConnections={totalConnections} />
+      )}
+      {!isNaN(emptyMessages) && (
+        <span>
+          Empty messages discarded: {formatCount(emptyMessages)}
+          <br />
+        </span>
+      )}
+    </span>
   );
 };
 

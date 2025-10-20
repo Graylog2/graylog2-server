@@ -67,24 +67,27 @@ describe('<InputsDotBadge />', () => {
     expect(textEl).not.toHaveAttribute('title', 'Some inputs are in failed state or in setup mode.');
   });
 
-  describe.each(['FAILED', 'FAILING', 'SETUP'])('renders badge when an input state is %s', (problemState: InputState) => {
-    it(`shows badge (dot) with tooltip for state ${problemState}`, () => {
-      asMock(useInputsStates).mockReturnValue({
-        refetch: jest.fn(),
-        isLoading: false,
-        data: {
-           input1: {
-             nodeA: { state: 'RUNNING', id: '1', detailed_message: null, message_input: {} as InputSummary },
-             nodeB: { state: problemState, id: '2', detailed_message: 'Error', message_input: {} as InputSummary },
-           },
-        },
+  describe.each(['FAILED', 'FAILING', 'SETUP'])(
+    'renders badge when an input state is %s',
+    (problemState: InputState) => {
+      it(`shows badge (dot) with tooltip for state ${problemState}`, () => {
+        asMock(useInputsStates).mockReturnValue({
+          refetch: jest.fn(),
+          isLoading: false,
+          data: {
+            input1: {
+              nodeA: { state: 'RUNNING', id: '1', detailed_message: null, message_input: {} as InputSummary },
+              nodeB: { state: problemState, id: '2', detailed_message: 'Error', message_input: {} as InputSummary },
+            },
+          },
+        });
+
+        render(<InputsDotBadge text={TEXT} />);
+
+        const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
+        expect(badge).toBeInTheDocument();
+        expect(badge).toHaveTextContent(TEXT);
       });
-
-      render(<InputsDotBadge text={TEXT} />);
-
-      const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveTextContent(TEXT);
-    });
-  });
+    },
+  );
 });
