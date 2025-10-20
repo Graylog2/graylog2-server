@@ -171,7 +171,7 @@ public class UsersResourceTest {
     public void failOnUnallowedRoleAssignment() throws NotFoundException {
         Role readerRole = mock(Role.class);
         when(readerRole.getId()).thenReturn(new ObjectId().toHexString());
-        when(readerRole.getName()).thenReturn(ALLOWED_ROLE_LOWER_CASE);
+        when(readerRole.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
 
         String forbiddenRole = "ADMIN";
         Role adminRole = mock(Role.class);
@@ -183,7 +183,7 @@ public class UsersResourceTest {
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
-        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
+        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <admin>"));
     }
 
     @Test
