@@ -26,6 +26,9 @@ import { BootstrapModalForm, Button, Input } from 'components/bootstrap';
 import { IfPermitted } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
+import { DocumentationLink } from 'components/support';
+import DocsHelper from 'util/DocsHelper';
+import BetaBadge from 'components/common/BetaBadge';
 
 type McpConfigState = {
   enable_remote_access: boolean;
@@ -70,8 +73,15 @@ const McpConfig = () => {
 
   return (
     <div>
-      <h2>MCP Server Configuration</h2>
-
+      <h2>
+        MCP Server Configuration <BetaBadge />
+      </h2>
+      <p>
+        Activate MCP (Model Context Protocol) to enable LLM-powered communication and automation with your cluster. See
+        the{' '}
+        <DocumentationLink text="MCP connection documentation" page={DocsHelper.PAGES.MCP_SERVER} displayIcon={false} />{' '}
+        for client setup instructions.
+      </p>
       <dl className="deflist">
         <dt>Remote MCP access</dt>
         <dd>{viewConfig.enable_remote_access ? 'Enabled' : 'Disabled'}</dd>

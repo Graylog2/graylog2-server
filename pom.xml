@@ -30,7 +30,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <version>7.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
@@ -164,7 +164,7 @@
         <mongodb-driver.version>5.6.1</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.6.Final</netty.version>
+        <netty.version>4.2.7.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.2.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
@@ -197,7 +197,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.4.1</poi.version>
-        <mcp-bom.version>0.11.2</mcp-bom.version>
+        <mcp-bom.version>0.14.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -454,7 +454,7 @@
             <dependency>
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
-                <version>1.12.0</version>
+                <version>1.12.1</version>
             </dependency>
             <!-- Explicitly manage commons-compress to fix CVE-2023-42503. We are using this only as a transitive
                  dependency in plugins. Remove once its usages are updated and the fixed version is pulled in
@@ -694,7 +694,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>4.9.6.0</version>
+                    <version>4.9.7.0</version>
                 </plugin>
                 <plugin>
                     <groupId>de.thetaphi</groupId>
