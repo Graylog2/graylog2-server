@@ -27,7 +27,7 @@ import { InputsStore, InputsActions } from 'stores/inputs/InputsStore';
 const INPUT_STATES = {
   FAILED: 'FAILED',
   FAILING: 'FAILING',
-  SETUP: 'SETUP'
+  SETUP: 'SETUP',
 } as const;
 const StyledAlert = styled(Alert)(
   ({ theme }) => css`
@@ -69,9 +69,9 @@ const InputsNotifications = () => {
     if (isLoading || !inputs || !inputStates) return null;
 
     return {
-      hasStoppedInputs: inputs.some(input => !inputStates[input.id]),
+      hasStoppedInputs: inputs.some((input) => !inputStates[input.id]),
       hasFailedInputs: hasInputInState(inputStates, [INPUT_STATES.FAILED, INPUT_STATES.FAILING]),
-      hasSetupInputs: hasInputInState(inputStates, INPUT_STATES.SETUP)
+      hasSetupInputs: hasInputInState(inputStates, INPUT_STATES.SETUP),
     };
   }, [inputs, inputStates, isLoading]);
 
@@ -79,32 +79,25 @@ const InputsNotifications = () => {
 
   const { hasStoppedInputs, hasFailedInputs, hasSetupInputs } = notifications;
 
-
   return (
     <Row className="content">
       <Col md={12}>
         {hasFailedInputs && (
-          <StyledAlert
-            bsStyle="danger"
-            title="Some inputs are in failed state."
-          >
-             One or more inputs are currently failed state. Failed or failing inputs will not receive traffic until fixed. Click here to filter the table to show only failed inputs.
+          <StyledAlert bsStyle="danger" title="Some inputs are in failed state.">
+            One or more inputs are currently failed state. Failed or failing inputs will not receive traffic until
+            fixed. Click here to filter the table to show only failed inputs.
           </StyledAlert>
         )}
-        { hasSetupInputs && (
-          <StyledAlert
-            bsStyle="warning"
-            title="Some inputs are in setup mode."
-          >
-            One or more inputs are currently in setup mode. Inputs will not receive traffic until started. Click here to filter the table to show only inputs in Setup mode.
+        {hasSetupInputs && (
+          <StyledAlert bsStyle="warning" title="Some inputs are in setup mode.">
+            One or more inputs are currently in setup mode. Inputs will not receive traffic until started. Click here to
+            filter the table to show only inputs in Setup mode.
           </StyledAlert>
         )}
-        { hasStoppedInputs && (
-          <StyledAlert
-            bsStyle="warning"
-            title="Some inputs are stopped."
-          >
-            One or more inputs are currently stopped. Stopped Inputs will not receive traffic until started. Click here to filter the table to show only stopped Inputs.
+        {hasStoppedInputs && (
+          <StyledAlert bsStyle="warning" title="Some inputs are stopped.">
+            One or more inputs are currently stopped. Stopped Inputs will not receive traffic until started. Click here
+            to filter the table to show only stopped Inputs.
           </StyledAlert>
         )}
       </Col>

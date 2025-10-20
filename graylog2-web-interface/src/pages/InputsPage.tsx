@@ -21,10 +21,12 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import DocsHelper from 'util/DocsHelper';
 import useProductName from 'brand-customization/useProductName';
 import { InputsOverview } from 'components/inputs/InputsOveriew';
 import useInputTypes from 'hooks/useInputTypes';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
+import InputsPageNavigation from 'components/inputs/InputsPageNavigation';
 import InputsNotifications from 'components/inputs/InputsNotifications';
 
 const isCloud = AppConfig.isCloud();
@@ -41,7 +43,13 @@ const InputsPage = () => {
   return (
     <DocumentTitle title="Inputs">
       <InputsNotifications />
-      <PageHeader title="Inputs">
+      <InputsPageNavigation />
+      <PageHeader
+        title="Inputs"
+        documentationLink={{
+          title: 'Inputs documentation',
+          path: DocsHelper.PAGES.INPUTS,
+        }}>
         {isCloud ? (
           <>
             <p>
