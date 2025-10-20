@@ -29,6 +29,8 @@ import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescripti
 import useInputsStates from 'hooks/useInputsStates';
 import useTableElements from 'components/inputs/InputsOveriew/useTableElements';
 import { IfPermitted } from 'components/common';
+import { SearchParams } from 'stores/PaginationTypes';
+import * as Immutable from 'immutable';
 
 type Input = {
   id: string;
@@ -56,7 +58,13 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
     inputTypeDescriptions,
   });
   const columnRenderers = useMemo(() => customColumnRenderers({ inputTypes, inputStates }), [inputTypes, inputStates]);
+  const fetchEntities = (options: SearchParams) => {
+    if (node) {
+      options.filters = Immutable.OrderedMap(options.filters).set('node_id', [node.node_id]);
+    }
 
+    return fetchInputs(options);
+  };
 
   return (
     <div>
@@ -73,6 +81,7 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
         entityActions={entityActions}
         tableLayout={tableLayout}
         fetchEntities={fetchInputs}
+        fetchEntities={fetchEntities}
         expandedSectionsRenderer={expandedSections}
         keyFn={keyFn}
         actionsCellWidth={300}
