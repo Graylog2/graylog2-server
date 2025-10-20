@@ -39,7 +39,6 @@ const getLabelClassForState = (sortedStates, input: InputSummary, nodes: { [node
   }
 
   const { state } = sortedStates[0];
-
   switch (state) {
     case 'RUNNING':
       return 'success';
@@ -52,6 +51,7 @@ const getLabelClassForState = (sortedStates, input: InputSummary, nodes: { [node
       return 'warning';
   }
 };
+
 const getTextForState = (sortedStates, input: InputSummary) =>
   input.global ? sortedStates.map((state) => `${state.count} ${state.state}`).join(', ') : sortedStates[0].state;
 
@@ -110,6 +110,7 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
     );
   }
 
+    console.log(input.global, input.node);
   const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
   return (

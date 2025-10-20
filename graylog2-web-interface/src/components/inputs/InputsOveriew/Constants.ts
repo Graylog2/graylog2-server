@@ -16,7 +16,7 @@
  */
 import type { Sort } from 'stores/PaginationTypes';
 
-const useInputsTableElements = () => {
+const getInputsTableElements = () => {
   const tableLayout = {
     entityTableId: 'inputs',
     defaultPageSize: 20,
@@ -27,10 +27,7 @@ const useInputsTableElements = () => {
       'direction',
       'desired_state',
       'traffic',
-      'location',
-      'running_on',
-      'node',
-      'forwarder_input_profile',
+      'node_id',
       'address',
       'port',
     ],
@@ -41,15 +38,14 @@ const useInputsTableElements = () => {
     'direction',
     'desired_state',
     'traffic',
-    'location',
-    'running_on',
-    'node',
-    'forwarder_input_profile',
+    'node_id',
     'address',
     'port',
   ];
   const additionalAttributes = [
     { id: 'traffic', title: 'Traffic' },
+    { id: 'address', title: 'Address' },
+    { id: 'port', title: 'Port' },
   ];
 
   return {
@@ -59,4 +55,4 @@ const useInputsTableElements = () => {
   };
 };
 
-export default useInputsTableElements;
+export default getInputsTableElements;
