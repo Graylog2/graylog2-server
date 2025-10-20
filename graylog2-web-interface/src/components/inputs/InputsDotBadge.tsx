@@ -1,23 +1,7 @@
 import * as React from 'react';
-import styled from 'styled-components';
 
 import useInputsStates from 'hooks/useInputsStates';
-const Badge = styled.span`
-  position: relative;
-
-  &::after {
-    display: 'block';
-    content: ' ';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-
-    background-color: ${({ theme }) => theme.colors.brand.primary};
-    border-radius: 50%;
-    top: 0;
-    right: -12px;
-  }
-`;
+import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
 
 const InputsDotBadge = ({ text }: { text: string }) => {
   const { data, isLoading } = useInputsStates();
@@ -30,11 +14,13 @@ const InputsDotBadge = ({ text }: { text: string }) => {
     ['FAILED', 'FAILING', 'SETUP'].includes(inputState.state),
   );
 
-  if (!hasFailedOrSetupInputs) {
-    return <span>{text}</span>;
-  }
-
-  return <Badge title="Some inputs are in failed state or in setup mode.">{text}</Badge>;
+  return (
+    <MenuItemDotBadge
+      text={text}
+      title="There are inputs that require your attention"
+      showDot={hasFailedOrSetupInputs || false}
+    />
+  );
 };
 
 export default InputsDotBadge;
