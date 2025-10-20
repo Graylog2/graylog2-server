@@ -17,8 +17,10 @@
 package org.graylog.scheduler;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
+import org.graylog.scheduler.capabilities.JobDefinitionTypeCapability;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
@@ -45,5 +47,6 @@ public class JobSchedulerModule extends PluginModule {
 
         addInitializer(JobSchedulerService.class);
         addAuditEventTypes(JobSchedulerAuditEventTypes.class);
+        Multibinder.newSetBinder(binder(), JobDefinitionTypeCapability.class);
     }
 }

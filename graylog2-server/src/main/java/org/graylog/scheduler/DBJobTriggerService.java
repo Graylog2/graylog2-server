@@ -67,6 +67,7 @@ import static com.mongodb.client.model.Filters.lte;
 import static com.mongodb.client.model.Filters.ne;
 import static com.mongodb.client.model.Filters.not;
 import static com.mongodb.client.model.Filters.or;
+import static com.mongodb.client.model.Filters.nin;
 import static com.mongodb.client.model.Sorts.ascending;
 import static com.mongodb.client.model.Sorts.descending;
 import static com.mongodb.client.model.Updates.combine;
@@ -356,8 +357,10 @@ public class DBJobTriggerService {
         final DateTime now = clock.nowUTC();
 
         // exclude triggers which require a constraint that is not satisfied by this node
-        final var constraintsQuery = not(
-                elemMatch(FIELD_CONSTRAINTS, new Document("$nin", schedulerCapabilitiesService.getNodeCapabilities()))
+        // AND exclude triggers with job definition types that cannot currently be executed by this node.
+        final var constraintsQuery = and(
+                not(elemMatch(FIELD_CONSTRAINTS, new Document("$nin", schedulerCapabilitiesService.getNodeCapabilities()))),
+                nin(FIELD_JOB_DEFINITION_TYPE, schedulerCapabilitiesService.notCapableToRunJobDefinitionTypes())
         );
 
         final var filter = or(and(
