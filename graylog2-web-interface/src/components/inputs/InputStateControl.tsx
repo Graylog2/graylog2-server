@@ -77,7 +77,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
 
   if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
     return (
-      <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
+      <Button bsStyle='warning' bsSize="xsmall" onClick={setupInput}>
         Set-up Input
       </Button>
     );
@@ -85,7 +85,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
 
   if (isInputRunning(inputStates, input.id)) {
     return (
-      <Button bsStyle="danger" bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
+      <Button bsSize="xsmall" onClick={stopInput} disabled={isLoading}>
         {isLoading ? 'Stopping...' : 'Stop input'}
       </Button>
     );
