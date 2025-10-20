@@ -26,6 +26,7 @@ import org.graylog2.shared.rest.resources.csp.CSPResponseFilter;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeAll;
 
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static io.restassured.RestAssured.given;
@@ -40,7 +41,7 @@ public class FiltersIT {
     @BeforeAll
     static void beforeAll(GraylogApis graylogApis) {
         api = graylogApis;
-        cspResources = new CSPResources();
+        cspResources = new CSPResources(Set.of());
         defaultCSPPattern = Pattern.compile(Pattern.quote(DEFAULT_CONNECT_SRC + cspResources.cspString(CSP.DEFAULT))
                 .replaceAll("\\{nonce}", "\\\\E[a-zA-Z0-9-]+\\\\Q"));
     }
