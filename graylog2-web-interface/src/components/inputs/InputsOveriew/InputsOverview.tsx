@@ -26,9 +26,10 @@ import CreateInputControl from 'components/inputs/CreateInputControl';
 import customColumnRenderers from 'components/inputs/InputsOveriew/ColumnRenderers';
 import getInputsTableElements from 'components/inputs/InputsOveriew/Constants';
 import type { InputTypesSummary } from 'hooks/useInputTypes';
-import useTableElements from './useTableElements';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import useInputsStates from 'hooks/useInputsStates';
+import useTableElements from 'components/inputs/InputsOveriew/useTableElements';
+import { IfPermitted } from 'components/common';
 
 type Input = {
   id: string;
@@ -48,7 +49,7 @@ type Props = {
 
 const entityName = 'input';
 
-const InputsOverview = ({ node, inputTypeDescriptions, inputTypes }: Props) => {
+const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }: Props) => {
   const { data: inputStates } = useInputsStates();
   const { columnsOrder, tableLayout, additionalAttributes } = getInputsTableElements();
   const { entityActions, expandedSections } = useTableElements({
@@ -61,7 +62,11 @@ const InputsOverview = ({ node, inputTypeDescriptions, inputTypes }: Props) => {
 
   return (
     <div>
-      {!node && <CreateInputControl />}
+      {!node && (
+        <IfPermitted permissions="inputs:create">
+          <CreateInputControl />
+        </IfPermitted>
+      )}
       <PaginatedEntityTable<Input>
         humanName="inputs"
         columnsOrder={columnsOrder}

@@ -29,7 +29,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import useFeature from 'hooks/useFeature';
-import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from '../InputSetupWizard';
 import type { ConfiguredInput, Input } from 'components/messageloaders/Types';
 import InputStatesStore from 'stores/inputs/InputStatesStore';
 import { LinkContainer } from 'components/common/router';
@@ -38,6 +37,8 @@ import type { InputTypesSummary } from 'hooks/useInputTypes';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import useInputsStates from 'hooks/useInputsStates';
 import useInputMutations from 'hooks/useInputMutations';
+
+import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from '../InputSetupWizard';
 
 type Props = {
   input: Input;
@@ -64,10 +65,10 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
   const [showWizard, setShowWizard] = useState<boolean>(false);
   const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates();
   const { updateInput, deleteInput } = useInputMutations();
-
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+
   const openWizard = () => {
     setShowWizard(true);
   };
@@ -152,28 +153,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
           </Button>
         </LinkContainer>
       </IfPermitted>
-      <HideOnCloud>
-        <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
-          <LinkContainer
-            key={`manage-extractors-${input.id}`}
-            to={
-              input.global
-                ? Routes.global_input_extractors(input.id)
-                : Routes.local_input_extractors(currentNode?.node?.node_id, input.id)
-            }>
-            <Button
-              bsSize="xsmall"
-              onClick={() => {
-                sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
-                  app_action_value: 'manage-extractors',
-                });
-              }}>
-              Manage extractors
-            </Button>
-          </LinkContainer>
-        </IfPermitted>
-      </HideOnCloud>
+
       <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
         {!isLoadingInputStates && (
           <InputStateControl
@@ -189,7 +169,27 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
           <MenuItem key={`edit-input-${input.id}`} onSelect={editInput} disabled={definition === undefined}>
             Edit input
           </MenuItem>
-
+          <HideOnCloud>
+            <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+              <LinkContainer
+                key={`manage-extractors-${input.id}`}
+                to={
+                  input.global
+                    ? Routes.global_input_extractors(input.id)
+                    : Routes.local_input_extractors(currentNode?.node?.node_id, input.id)
+                }>
+                <MenuItem
+                  onClick={() => {
+                    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.MANAGE_EXTRACTORS_CLICKED, {
+                      app_pathname: getPathnameWithoutId(pathname),
+                      app_action_value: 'manage-extractors',
+                    });
+                  }}>
+                  Manage extractors
+                </MenuItem>
+              </LinkContainer>
+            </IfPermitted>
+          </HideOnCloud>
           <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
             <MenuItem
               key={`input-diagnosis-${input.id}`}

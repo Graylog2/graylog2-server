@@ -16,12 +16,13 @@
  */
 import React, { useCallback, useMemo } from 'react';
 
-import InputsActions from './InputsActions';
 import type { Input } from 'components/messageloaders/Types';
-import { InputTypesSummary } from 'hooks/useInputTypes';
-import { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
+import type { InputTypesSummary } from 'hooks/useInputTypes';
+import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
+
 import ExpandedThroughputSection from './expanded-sections/ExpandedThroughputSection';
-import { InputSummary } from 'hooks/usePaginatedInputs';
+import InputsActions from './InputsActions';
 import ExpandedTitleSection from './expanded-sections/ExpandedTitleSection';
 
 const useTableElements = ({
@@ -40,11 +41,17 @@ const useTableElements = ({
         currentNode={null}
       />
     ),
-    [],
+    [inputTypes, inputTypeDescriptions],
   );
 
-  const renderExpandedThroughput = useCallback((input: InputSummary) => <ExpandedThroughputSection input={input} />, []);
-  const renderExpandedInputDetails = useCallback((input: InputSummary) => <ExpandedTitleSection input={input} inputTypeDescriptions={inputTypeDescriptions} />, [inputTypeDescriptions]);
+  const renderExpandedThroughput = useCallback(
+    (input: InputSummary) => <ExpandedThroughputSection input={input} />,
+    [],
+  );
+  const renderExpandedInputDetails = useCallback(
+    (input: InputSummary) => <ExpandedTitleSection input={input} inputTypeDescriptions={inputTypeDescriptions} />,
+    [inputTypeDescriptions],
+  );
   const renderExpandedRulesActions = useCallback((_input: Input) => <>x</>, []);
   const expandedSections = useMemo(
     () => ({
@@ -58,7 +65,7 @@ const useTableElements = ({
         content: renderExpandedInputDetails,
       },
     }),
-    [renderExpandedThroughput, renderExpandedRulesActions],
+    [renderExpandedThroughput, renderExpandedRulesActions, renderExpandedInputDetails],
   );
 
   return {

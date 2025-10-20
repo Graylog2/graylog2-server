@@ -16,10 +16,11 @@
  */
 
 import React from 'react';
+
 import { ConfigurationWell } from 'components/configurationforms';
-import { InputSummary } from 'hooks/usePaginatedInputs';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
 import InputStaticFields from 'components/inputs/InputStaticFields';
-import { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
+import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 
 type Props = {
   input: InputSummary;
@@ -31,7 +32,10 @@ const ExpandedTitleSection = ({ input, inputTypeDescriptions }: Props) => {
 
   return (
     <div>
-      <span> {input.name} &nbsp; ({input.id})</span>
+      <span>
+        {' '}
+        {input.name} &nbsp; ({input.id})
+      </span>
       <ConfigurationWell id={input.id} configuration={input.attributes} typeDefinition={definition} />
       <InputStaticFields input={input} />
     </div>
