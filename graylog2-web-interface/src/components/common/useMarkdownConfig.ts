@@ -14,15 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from 'util/AppConfig';
+import useClusterConfig from 'hooks/useClusterConfig';
+import type { MarkdownConfigType } from 'components/common/types';
 
-const useFeaturesCustomization = () => {
-  const featureToggles = AppConfig?.branding?.()?.features;
+const CONFIG_CLASS = 'org.graylog2.configuration.MarkdownConfiguration';
 
-  return {
-    aiInvestigationReport: featureToggles?.ai_investigation_report,
-    widgetSummary: featureToggles?.widget_summary,
-  };
-};
-
-export default useFeaturesCustomization;
+const useMarkdownConfig = () => useClusterConfig<MarkdownConfigType>(CONFIG_CLASS);
+export default useMarkdownConfig;

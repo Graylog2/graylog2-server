@@ -72,6 +72,7 @@ const defaultPages = {
   DATA_TIERING: 'setting_up_graylog/data_tiering.htm',
   DATA_TIERING_WARM_TIER_SETUP: 'setting_up_graylog/data_tiering.htm#PrepareYourEnvironmentforaWarmTier',
   SERVER_UNAVAILABLE: 'https://www.graylog.org/community-support',
+  MCP_SERVER: 'setting_up_graylog/graylog_mcp.htm',
 } as const;
 
 type Pages = Record<keyof typeof defaultPages, string>;

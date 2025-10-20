@@ -14,15 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import AppConfig from 'util/AppConfig';
+package org.graylog2.configuration;
 
-const useFeaturesCustomization = () => {
-  const featureToggles = AppConfig?.branding?.()?.features;
-
-  return {
-    aiInvestigationReport: featureToggles?.ai_investigation_report,
-    widgetSummary: featureToggles?.widget_summary,
-  };
-};
-
-export default useFeaturesCustomization;
+public record MarkdownConfiguration(boolean allowAllImageSources, String allowedImageSources) {}
