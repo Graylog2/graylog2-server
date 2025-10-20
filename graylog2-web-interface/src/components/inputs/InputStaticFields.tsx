@@ -16,13 +16,13 @@
  */
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { Button, Table, ButtonToolbar } from 'components/bootstrap';
 import { ConfirmDialog, Icon, IfPermitted } from 'components/common';
 import { InputStaticFieldsStore } from 'stores/inputs/InputStaticFieldsStore';
 import { StaticFieldForm } from 'components/inputs';
 import SectionGrid from 'components/common/Section/SectionGrid';
-import { useQueryClient } from '@tanstack/react-query';
 import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
 
 const StyledWrapper = styled.div`

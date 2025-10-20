@@ -110,7 +110,6 @@ const InputStateBadge = ({ input, inputStates = undefined }: Props) => {
     );
   }
 
-    console.log(input.global, input.node);
   const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
 
   return (

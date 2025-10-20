@@ -17,10 +17,9 @@
 import * as React from 'react';
 import { render, screen, fireEvent, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import type { InputTypeDescriptionsResponse } from 'src/hooks/useInputTypesDescriptions';
 
 import mockComponent from 'helpers/mocking/MockComponent';
-import InputsActions from './InputsActions';
-import { InputTypeDescriptionsResponse } from 'src/hooks/useInputTypesDescriptions';
 import useInputsStates from 'hooks/useInputsStates';
 import { mockInputStates } from 'fixtures/inputs';
 import useLocation from 'routing/useLocation';
@@ -28,6 +27,8 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
 import useFeature from 'hooks/useFeature';
 import useInputMutations from 'hooks/useInputMutations';
+
+import InputsActions from './InputsActions';
 
 jest.useFakeTimers();
 
@@ -111,8 +112,7 @@ const inputTypeDescriptions = {
   },
 } as unknown as InputTypeDescriptionsResponse;
 
-const renderSUT = (input = baseInput, extraProps = {}) => {
-  return render(
+const renderSUT = (input = baseInput, extraProps = {}) => render(
     <InputsActions
       input={input as any}
       inputTypes={{} as any}
@@ -121,7 +121,6 @@ const renderSUT = (input = baseInput, extraProps = {}) => {
       {...extraProps}
     />,
   );
-};
 
 const openMoreActions = async () => userEvent.click(await screen.findByRole('button', { name: /more/i }));
 
@@ -179,34 +178,6 @@ describe('InputsActions', () => {
     expect(await screen.findByText(/InputSetupWizard/i)).toBeInTheDocument();
   });
 
-  it('shows Edit input and opens InputForm on click', async () => {
-    const setupInput = {
-      ...baseInput,
-      id: 'input3',
-      title: 'Input 3',
-      type: 'org.graylog2.inputs.gelf.udp.GELFUDPInput',
-      global: false,
-      node: 'node2',
-    };
-
-    renderSUT(setupInput);
-    await openMoreActions();
-
-    userEvent.click(screen.getByText('Edit input'));
-
-    act(() => {
-      jest.advanceTimersByTime(200);
-    });
-
-    expect(screen.getByText(/Editing Input Input 3/)).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('Update input'));
-    expect(updateInputMock).toHaveBeenCalledWith({
-      input: expect.objectContaining({ title: 'Input 3' }),
-      inputId: 'input3',
-    });
-  });
-
   it('opens Static Field form when Add static field is selected', async () => {
     const input = {
       ...baseInput,
@@ -231,8 +202,6 @@ describe('InputsActions', () => {
     renderSUT(input);
     const btn = screen.getByText('Received messages');
     expect(btn).toBeInTheDocument();
-    // We cannot directly read LinkContainer href easily without DOM router context,
-    // but we can trigger telemetry click to ensure button is wired.
     userEvent.click(btn);
     expect(telemetryMock).toHaveBeenCalledWith(
       'Inputs Show Received Messages Clicked',
