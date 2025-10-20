@@ -44,7 +44,7 @@ const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, plugin
   const dataTieringPlugin = pluginStore
     .exports('dataTiering')
     .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
-  const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
+  const dataTieringType = values.type || dataTieringPlugin?.type || DATA_TIERING_TYPE.HOT_ONLY;
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
     const hotWarmDefaults = { ...DATA_TIERING_HOT_ONLY_DEFAULTS, ...DATA_TIERING_HOT_WARM_DEFAULTS, ...values };
