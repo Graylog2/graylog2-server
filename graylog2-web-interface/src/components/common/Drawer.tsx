@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import ReactDom from 'react-dom';
 import { Drawer as MantineDrawer } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import styled, { css } from 'styled-components';
@@ -135,7 +136,7 @@ const Drawer = ({
     setTimeout(() => props.onClose?.(), 200);
   };
 
-  return (
+  return ReactDom.createPortal(
     <StyledDrawer
       opened={opened}
       offset={15}
@@ -151,7 +152,8 @@ const Drawer = ({
       {...getDrawerPropsByLevel({ parentSize, level, parentPosition })}
       {...props}
       onClose={handleClose}
-    />
+    />,
+    document.body,
   );
 };
 
