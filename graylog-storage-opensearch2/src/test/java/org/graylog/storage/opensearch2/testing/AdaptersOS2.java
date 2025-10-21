@@ -27,6 +27,7 @@ import org.graylog.storage.opensearch2.IndicesAdapterOS2;
 import org.graylog.storage.opensearch2.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch2.MessagesAdapterOS2;
 import org.graylog.storage.opensearch2.NodeAdapterOS2;
+import org.graylog.storage.opensearch2.OfficialOpensearchClient;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.PlainJsonApi;
 import org.graylog.storage.opensearch2.Scroll;
@@ -57,19 +58,21 @@ import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 public class AdaptersOS2 implements Adapters {
 
     private final OpenSearchClient client;
+    private final OfficialOpensearchClient officialClient;
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
-    public AdaptersOS2(OpenSearchClient client, List<String> featureFlags) {
+    public AdaptersOS2(OpenSearchClient client, OfficialOpensearchClient officialClient, List<String> featureFlags) {
         this.client = client;
+        this.officialClient = officialClient;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
     }
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterOS2(client);
+        return new CountsAdapterOS2(officialClient);
     }
 
     @Override

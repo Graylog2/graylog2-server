@@ -39,7 +39,7 @@ public abstract class BasicIndexTemplateProvider<T extends IndexMappingTemplate>
 
     private boolean isProperSearchVersion(@Nonnull SearchVersion searchVersion) {
         return searchVersion.satisfies(ELASTICSEARCH, "^7.0.0")
-                || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0")
+                || searchVersion.satisfies(OPENSEARCH, "^1.0.0 | ^2.0.0 | ^3.0.0")
                 || searchVersion.satisfies(DATANODE, "^5.2.0");
     }
 

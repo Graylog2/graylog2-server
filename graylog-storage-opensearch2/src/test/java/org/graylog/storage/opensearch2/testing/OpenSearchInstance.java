@@ -33,6 +33,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
+import org.graylog.storage.opensearch2.OfficialOpensearchClientProvider;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestClientProvider;
 import org.graylog.testing.containermatrix.SearchServer;
@@ -91,7 +92,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient, featureFlags);
+        final OfficialOpensearchClientProvider officialOpensearchClientProvider = new OfficialOpensearchClientProvider(ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())), IndexerJwtAuthToken.disabled());
+        adapters = new AdaptersOS2(openSearchClient, officialOpensearchClientProvider.get(), featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         if (isFirstContainerStart) {
             afterContainerCreated();

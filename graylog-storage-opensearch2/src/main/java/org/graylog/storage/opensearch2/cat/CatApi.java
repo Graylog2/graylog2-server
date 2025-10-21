@@ -20,11 +20,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import org.graylog.storage.opensearch2.OpenSearchClient;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-
-import jakarta.inject.Inject;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.indices.ShardsInfo;
 
@@ -37,6 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class CatApi {
     private final ObjectMapper objectMapper;
     private final OpenSearchClient client;

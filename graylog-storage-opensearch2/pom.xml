@@ -63,6 +63,17 @@
         </dependency>
         <dependency>
             <groupId>org.graylog.shaded</groupId>
+            <artifactId>opensearch3-java-client</artifactId>
+            <version>${opensearch3.shaded.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.graylog.shaded</groupId>
             <artifactId>opensearch2-rest-client-sniffer</artifactId>
             <version>${opensearch.shaded.version}</version>
             <exclusions>
@@ -138,6 +149,11 @@
             <artifactId>junit-vintage-engine</artifactId>
             <version>${junit-jupiter.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+            <version>5.2.1</version>
         </dependency>
     </dependencies>
 

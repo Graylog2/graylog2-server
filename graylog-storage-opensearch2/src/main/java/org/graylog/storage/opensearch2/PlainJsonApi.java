@@ -23,6 +23,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 
 import jakarta.inject.Inject;
 
+@Deprecated
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;
     private final OpenSearchClient client;

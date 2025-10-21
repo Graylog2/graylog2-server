@@ -35,6 +35,7 @@ import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 public class OpenSearch2Plugin implements Plugin {
     public static final Set<SearchVersion> SUPPORTED_OS_VERSIONS = ImmutableSet.of(
             SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.of(2, 0, 0)),
+            SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.of(3, 0, 0)),
             SearchVersion.create(SearchVersion.Distribution.DATANODE, Version.of(5, 0, 0))
     );
 

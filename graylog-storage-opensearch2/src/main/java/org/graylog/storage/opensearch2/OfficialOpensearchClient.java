@@ -14,3 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.storage.opensearch2;
+
+import org.graylog.shaded.opensearch3.org.opensearch.client.opensearch.OpenSearchAsyncClient;
+import org.graylog.shaded.opensearch3.org.opensearch.client.opensearch.OpenSearchClient;
+
+public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
+}
