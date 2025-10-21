@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
+import io.modelcontextprotocol.spec.McpSchema;
 import org.graylog.mcp.tools.PermissionHelper;
 
 import java.util.Map;
@@ -38,8 +39,8 @@ public abstract class Tool<P, O> {
     private final String name;
     private final String title;
     private final String description;
-    private final String inputSchema;
-    private final String outputSchema;
+    private final McpSchema.JsonSchema inputSchema;
+    private final Map<String, Object> outputSchema;
 
     protected Tool(
             ObjectMapper objectMapper,
@@ -59,12 +60,17 @@ public abstract class Tool<P, O> {
         SchemaGenerator generator = schemaGeneratorProvider.get();
 
         // we can precompute the schema for our parameters, it's statically known
-        this.inputSchema = generator.generateSchema(parameterType.getType()).toString();
+        final var inputSchemaNode = generator.generateSchema(parameterType.getType());
+        if (inputSchemaNode.isEmpty()) {
+            this.inputSchema = null;
+        } else {
+            this.inputSchema = objectMapper.convertValue(inputSchemaNode, McpSchema.JsonSchema.class);
+        }
         // if our tool produces anything other than a String, we want to create a JSON schema for it
         if (String.class.equals(outputType.getType())) {
             this.outputSchema = null;
         } else {
-            this.outputSchema = generator.generateSchema(outputType.getType()).toString();
+            this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
         }
     }
 
@@ -88,12 +94,12 @@ public abstract class Tool<P, O> {
     }
 
     @JsonProperty
-    public String inputSchema() {
-        return inputSchema;
+    public Optional<McpSchema.JsonSchema> inputSchema() {
+        return Optional.ofNullable(inputSchema);
     }
 
     @JsonProperty
-    public Optional<String> outputSchema() {
+    public Optional<Map<String, Object>> outputSchema() {
         return Optional.ofNullable(outputSchema);
     }
 
