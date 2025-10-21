@@ -91,6 +91,22 @@ const bindings = {
         title: 'Index Set Defaults',
       },
     },
+    {
+      name: 'Markdown',
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: MarkdownConfig,
+        title: 'Markdown',
+      },
+    },
+    {
+      name: 'MCP',
+      SectionComponent: ConfigurationSection,
+      props: {
+        ConfigurationComponent: McpConfig,
+        title: 'MCP',
+      },
+    },
   ],
 };
 

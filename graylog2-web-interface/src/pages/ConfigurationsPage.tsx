@@ -24,6 +24,7 @@ import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';
 import PluginsConfig from 'components/configurations/PluginsConfig';
+import McpConfig from 'components/configurations/McpConfig';
 import 'components/maps/configurations';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';

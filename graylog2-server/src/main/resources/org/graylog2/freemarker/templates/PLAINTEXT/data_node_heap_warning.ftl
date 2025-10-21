@@ -3,9 +3,10 @@
 </#if>
 
 <#if _description>
-    There are data node nodes in the cluster which could potentially run with a higher configured heap size for better performance.
+    There are Data Nodes in the cluster which could potentially run with a higher configured heap size for better performance.
     Data node ${hostname} only has ${heapSize} Java Heap assigned, out of a total of ${totalMemory} RAM.
-    Currently, there is ${availableMemory} free memory available on the node. We recommend to make an additional half of this available to the Java Heap.
-    Note: For production performance, it is recommended to configure this node to use ${recommendedMemory} Java Heap (50% of RAM).
-    The Java Heap can be configured using the opensearch_heap configuration parameter in the node's configuration file (datanode.conf).
+    We recommend to assign half of memory to Java Heap. For this production performance, it is recommended to configure this node to use ${recommendedMemory} of Java Heap (50% of Ram).
+    The Data Node service is a wrapper for an Opensearch service, and its the Opensearch service which requires the configuration change.
+    The configuration that should be updated is the opensearch_heap property, <#if recommendedMemorySetting?has_content> set to ${recommendedMemorySetting} value,</#if> which can be found in the (datanode.conf) file on each Data Node.
+    Note that the Data Node service will need to be restarted for configuration changes to take effect.
 </#if>

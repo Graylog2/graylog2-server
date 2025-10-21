@@ -36,6 +36,8 @@ import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypeProvider;
+import org.graylog.mcp.server.ResourceProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -501,6 +503,34 @@ public abstract class PluginModule extends Graylog2Module {
 
             dbEntitiesBinder().addBinding().toInstance(entitiesClass);
         }
+    }
+
+    protected MapBinder<String, Tool<?, ?>> mcpToolBinder() {
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<Tool<?, ?>>() {});
+    }
+
+    protected void addMcpTool(String name, Class<? extends Tool<?, ?>> toolClass) {
+        mcpToolBinder().addBinding(name).to(toolClass);
+    }
+
+    protected MapBinder<GRNType, ResourceProvider> mcpResourceBinder() {
+        return MapBinder.newMapBinder(binder(), GRNType.class, ResourceProvider.class);
+    }
+
+    protected void addMcpResource(GRNType grnType, Class<? extends ResourceProvider> resourceClass) {
+        mcpResourceBinder().addBinding(grnType).to(resourceClass);
+    }
+
+    protected Multibinder<com.github.victools.jsonschema.generator.Module> schemaModuleBinder() {
+        return Multibinder.newSetBinder(
+                binder(),
+                com.github.victools.jsonschema.generator.Module.class,
+                org.graylog.mcp.server.McpSchemaModule.class
+        );
+    }
+
+    protected void addSchemaModule(Class<? extends com.github.victools.jsonschema.generator.Module> moduleClass) {
+        schemaModuleBinder().addBinding().to(moduleClass);
     }
 
     protected Multibinder<QuickJumpProvider> quickJumpProviderBinder() {
