@@ -305,6 +305,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(ROLES_DELETE, ""))
             .add(create(ROLES_EDIT, ""))
             .add(create(ROLES_READ, ""))
+            .add(create(ROLES_ASSIGN, ""))
             .add(create(SEARCHES_ABSOLUTE, ""))
             .add(create(SEARCHES_KEYWORD, ""))
             .add(create(SEARCHES_RELATIVE, ""))
