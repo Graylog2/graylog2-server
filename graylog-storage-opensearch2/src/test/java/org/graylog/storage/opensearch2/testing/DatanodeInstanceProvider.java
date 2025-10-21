@@ -20,12 +20,10 @@ import org.graylog.testing.completebackend.SearchServerBuilder;
 import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
 import org.graylog2.storage.SearchVersion;
 
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
-
 public class DatanodeInstanceProvider implements SearchServerInterfaceProvider {
     @Override
-    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if(version.satisfies(DATANODE, "^5.1.0")) {
+    public SearchServerBuilder<?> getBuilderFor(final SearchVersion version) {
+        if (version.isDataNode()) {
             return new DatanodeInstanceBuilder(version);
         }
         return null;

@@ -14,16 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.testing.completebackend.conditions;
 
-public class MavenProjectDirProviderWithFrontend extends DefaultMavenProjectDirProvider {
-    @Override
-    public String getUniqueId() {
-        return "with_frontend";
-    }
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    @Override
-    public boolean includeFrontend() {
-        return true;
-    }
+/**
+ * The annotated test method or class only runs if the given MongoDB requirements apply.
+ */
+@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Documented
+public @interface EnabledIfMongoDB {
+    /**
+     * Required MongoDB version. Can be a semantic versioning range. (e.g., ">=6.0")
+     */
+    String version();
 }
