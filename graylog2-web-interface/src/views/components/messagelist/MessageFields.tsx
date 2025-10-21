@@ -20,15 +20,9 @@ import styled, { css } from 'styled-components';
 import { MessageDetailsDefinitionList } from 'components/common';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-
-import type { Message } from './Types';
-
-type Props = {
-  message: Message;
-  fields: FieldTypeMappingsList;
-};
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { MessageFieldsComponentProps } from 'views/types';
 
 const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
@@ -42,17 +36,35 @@ const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   `,
 );
 
-const MessageFields = ({ message, fields }: Props) => {
+const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
   const formattedFields = message.formatted_fields;
   const renderedFields = Object.keys(formattedFields)
     .sort()
     .map((key) => {
       const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
 
-      return <MessageField fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />;
+      return <MessageField key={key} fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />;
     });
 
   return <MessageDetailsDL className="message-details-fields">{renderedFields}</MessageDetailsDL>;
+};
+
+const usePluggableMessageFieldsComponent = (): React.ComponentType<MessageFieldsComponentProps> => {
+  const pluggableMessageFields = usePluginEntities('views.components.widgets.messageTable.messageFields');
+
+  const pluggableItems = pluggableMessageFields.filter((messageFields) =>
+    messageFields.useCondition ? !!messageFields.useCondition() : true,
+  );
+
+  if (pluggableItems.length) return pluggableItems[0].component;
+
+  return DefaultMessageFields;
+};
+
+const MessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
+  const PluggableMessageFieldsComponent = usePluggableMessageFieldsComponent();
+
+  return <PluggableMessageFieldsComponent message={message} fields={fields} />;
 };
 
 export default MessageFields;

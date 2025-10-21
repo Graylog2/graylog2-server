@@ -73,6 +73,14 @@ const usePluggableMessageActions = (id: string, index: string) => {
     .map(({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />);
 };
 
+const usePluggableMessageConfigurationActions = (id: string, index: string) => {
+  const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.configurationActions');
+
+  return pluggableMenuActions
+    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
+    .map(({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />);
+};
+
 type Props = {
   index: string;
   id: string;
@@ -103,6 +111,7 @@ const MessageActions = ({
   searchConfig,
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
+  const pluggableConfigurationActions = usePluggableMessageConfigurationActions(id, index);
 
   if (disabled) {
     return <ButtonGroup />;
@@ -135,6 +144,7 @@ const MessageActions = ({
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id)}
+      {pluggableConfigurationActions}
     </ButtonGroup>
   );
 };
