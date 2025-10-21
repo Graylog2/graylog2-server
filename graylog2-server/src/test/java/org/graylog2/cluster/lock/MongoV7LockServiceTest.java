@@ -14,20 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.testing;
+package org.graylog2.cluster.lock;
 
-import org.graylog.testing.completebackend.SearchServerBuilder;
-import org.graylog.testing.completebackend.SearchServerInterfaceProvider;
-import org.graylog2.storage.SearchVersion;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBVersion;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
-import static org.graylog2.storage.SearchVersion.Distribution.DATANODE;
-
-public class DatanodeDevInstanceProvider implements SearchServerInterfaceProvider {
-    @Override
-    public SearchServerBuilder getBuilderFor(final SearchVersion version) {
-        if(version.satisfies(DATANODE, "^5.2.0")) {
-            return new DatanodeDevInstanceBuilder(version);
-        }
-        return null;
-    }
+public class MongoV7LockServiceTest extends MongoLockServiceTest {
+    @RegisterExtension
+    static MongoDBExtension mongodbExtension = MongoDBExtension.create(MongoDBVersion.of("7.0"));
 }
