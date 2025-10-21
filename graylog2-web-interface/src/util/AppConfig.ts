@@ -28,6 +28,7 @@ export type BrandingResource = { enabled?: boolean; url?: string | undefined };
 export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support' | 'contact_us' | 'marketplace';
 
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
+type FeatureToggle = { enabled?: boolean };
 
 export type Branding = {
   product_name?: string;
@@ -55,7 +56,8 @@ export type Branding = {
   footer?: { enabled: boolean };
   resources?: BrandingResources;
   features?: {
-    ai_investigation_report?: { enabled?: boolean };
+    ai_investigation_report?: FeatureToggle;
+    widget_summary?: FeatureToggle;
   };
 };
 
@@ -144,7 +146,7 @@ const AppConfig = {
     return appConfig()?.branding;
   },
 
-  globalInputsOnly():boolean {
+  globalInputsOnly(): boolean {
     return appConfig().globalInputsOnly;
   },
 };
