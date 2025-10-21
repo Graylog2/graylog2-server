@@ -14,20 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.containermatrix;
+package org.graylog.testing.completebackend;
 
-public enum MongodbServer {
-    MONGO7("7.0");
-
-    public static final MongodbServer DEFAULT_VERSION = MONGO7;
-
-    private final String version;
-
-    MongodbServer(String version) {
-        this.version = version;
+public class OpenServerProduct implements GraylogServerProduct {
+    @Override
+    public String name() {
+        return "Open Server";
     }
 
-    public String getVersion() {
-        return version;
+    @Override
+    public MavenProjectDirProvider mavenProjectDirProvider() {
+        return new DefaultMavenProjectDirProvider();
+    }
+
+    @Override
+    public PluginJarsProvider pluginJarsProvider() {
+        return new DefaultPluginJarsProvider();
     }
 }
