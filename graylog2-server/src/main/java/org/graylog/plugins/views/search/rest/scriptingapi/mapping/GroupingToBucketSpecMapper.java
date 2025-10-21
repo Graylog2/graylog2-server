@@ -29,17 +29,23 @@ public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec
 
     @Override
     public BucketSpec apply(final Grouping grouping) {
-        if(grouping.interval() != null) {
+        if(grouping.scaling().isPresent()) {
             return Time.builder()
                     .field(grouping.requestedField().name())
                     .type(Time.NAME)
-                    .interval(grouping.interval())
+                    .interval(AutoInterval.create(grouping.scaling().get()))
+                    .build();
+        } else if(grouping.timeunit().isPresent()) {
+            return Time.builder()
+                    .field(grouping.requestedField().name())
+                    .type(Time.NAME)
+                    .interval(TimeUnitInterval.Builder.builder().timeunit(grouping.timeunit().get()).build())
                     .build();
         } else {
             return Values.builder()
                         .field(grouping.requestedField().name())
                         .type(Values.NAME)
-                        .limit(grouping.limit())
+                        .limit(grouping.limit().orElse(Values.DEFAULT_LIMIT))
                         .build();
         }
     }
