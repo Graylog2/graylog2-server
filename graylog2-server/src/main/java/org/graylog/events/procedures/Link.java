@@ -25,9 +25,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
-import static org.graylog2.shared.utilities.StringUtils.f;
+import java.net.URISyntaxException;
 
 /**
  * Redirects the frontend to a link.
@@ -66,21 +67,21 @@ public class Link extends Action {
 
         @JsonIgnore
         @Override
-        public String toText(EventDto event) {
-            return getLink();
+        public URIBuilder getLink(EventDto event) {
+            try {
+                return new URIBuilder(link());
+            } catch (URISyntaxException e) {
+                return null;
+            }
         }
 
         @JsonIgnore
         @Override
-        public String toHtml(EventDto event) {
-            return f("""
-                    <td><a href="%s" target="_blank">Follow Link</a></td>
-                    """, getLink());
-        }
-
-        @JsonIgnore
-        private String getLink() {
-            return link();
+        public String validate() {
+            if (link() == null || link().isEmpty()) {
+                return "Link cannot be empty";
+            }
+            return null;
         }
 
         @AutoValue.Builder

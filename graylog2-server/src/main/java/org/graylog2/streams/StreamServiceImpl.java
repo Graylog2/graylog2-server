@@ -475,8 +475,8 @@ public class StreamServiceImpl implements StreamService {
     @Override
     public String save(Stream stream) throws ValidationException {
         final StreamImpl streamImpl = (StreamImpl) stream;
-        scopedMongoUtils.upsert(streamImpl.toDTO());
-
+        final StreamDTO upserted = scopedMongoUtils.upsert(streamImpl.toDTO());
+        clusterEventBus.post(StreamsChangedEvent.create(upserted.id()));
         return streamImpl.id();
     }
 

@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -30,18 +29,17 @@ import java.time.Duration;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class SystemJobSummary {
-    @JsonProperty
+    @JsonProperty("id")
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("description")
     public abstract String description();
 
-    @JsonProperty
+    @JsonProperty("name")
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty("info")
     public abstract String info();
 
     @JsonProperty("node_id")

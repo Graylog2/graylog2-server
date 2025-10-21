@@ -59,23 +59,10 @@ jest.mock('util/UserNotification', () => ({
 }));
 
 describe('App', () => {
-  let windowLocation;
-
   useWindowConfirmMock();
-
-  beforeAll(() => {
-    Object.defineProperty(window, 'location', {
-      configurable: true,
-      value: { reload: jest.fn() },
-    });
-  });
 
   beforeEach(() => {
     asMock(fetch).mockReturnValue(Promise.resolve());
-  });
-
-  afterAll(() => {
-    Object.defineProperty(window, 'location', { configurable: true, value: windowLocation });
   });
 
   it('should render', async () => {

@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.Min;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.rest.ValidationResult;
@@ -30,7 +29,6 @@ import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ClosingRetentionStrategyConfig implements RetentionStrategyConfig {
     private static final int DEFAULT_MAX_NUMBER_OF_INDICES = 20;
 

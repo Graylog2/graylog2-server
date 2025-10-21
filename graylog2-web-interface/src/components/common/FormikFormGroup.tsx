@@ -39,7 +39,7 @@ type Props = React.PropsWithChildren<{
   maxLength?: number;
   required?: boolean;
   bsSize?: 'large' | 'small' | 'xsmall';
-  validate?: (arg: any) => string | undefined;
+  validate?: (arg: any) => string | undefined | Promise<string | undefined>;
   rows?: number;
   autoFocus?: boolean;
 }>;

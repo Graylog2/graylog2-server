@@ -18,6 +18,7 @@ package org.graylog.events.procedures;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
 @JsonTypeInfo(
@@ -33,9 +34,9 @@ public interface ActionConfig {
     @JsonProperty(TYPE_FIELD)
     String type();
 
-    String toText(EventDto event);
+    URIBuilder getLink(EventDto event);
 
-    String toHtml(EventDto event);
+    String validate();
 
     class FallbackConfig implements ActionConfig {
         @Override
@@ -44,12 +45,12 @@ public interface ActionConfig {
         }
 
         @Override
-        public String toText(EventDto event) {
+        public String validate() {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public String toHtml(EventDto event) {
+        public URIBuilder getLink(EventDto event) {
             throw new UnsupportedOperationException();
         }
     }

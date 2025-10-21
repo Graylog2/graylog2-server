@@ -57,6 +57,7 @@ const Title = styled.div(
     width: 100%;
   `,
 );
+
 type Props = Pick<
   React.ComponentProps<typeof MantineDrawer>,
   | 'opened'
@@ -72,19 +73,25 @@ type Props = Pick<
   | 'overlayProps'
   | 'styles'
   | 'transitionProps'
->;
-const Drawer = ({ title, ...props }: Props) => (
+  | 'lockScroll'
+> & {
+  double?: boolean;
+};
+
+const Drawer = ({ title, double = false, lockScroll = false, ...props }: Props) => (
   <StyledDrawer
     offset={15}
     padding="lg"
     radius={5}
     zIndex={1032}
+    lockScroll={lockScroll}
     title={
       <TitleWrapper>
         <Title>{title}</Title>
       </TitleWrapper>
     }
     {...props}
+    size={double ? 1260 : props.size}
   />
 );
 

@@ -110,6 +110,23 @@ class SingleFilterParserTest {
     }
 
     @Test
+    void parsesFilterExpressionCorrectlyForAllTimeRange() {
+        final List<EntityAttribute> entityAttributes = List.of(EntityAttribute.builder()
+                .id("created_at")
+                .title("Creation Date")
+                .type(SearchQueryField.Type.DATE)
+                .filterable(true)
+                .build());
+
+        assertEquals(
+                new RangeFilter("created_at", null, null),
+
+                toTest.parseSingleExpression("created_at:" + RANGE_VALUES_SEPARATOR,
+                        entityAttributes
+                ));
+    }
+
+    @Test
     void parsesFilterExpressionCorrectlyForDateRanges() {
         final String fromString = "2012-12-12 12:12:12";
         final String toString = "2022-12-12 12:12:12";

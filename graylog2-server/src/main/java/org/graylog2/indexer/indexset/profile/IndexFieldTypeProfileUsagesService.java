@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_PROFILE_ID;
+import static org.graylog2.indexer.indexset.fields.FieldTypeProfileField.FIELD_PROFILE_ID;
 
 /**
  * Service returning usages of profiles - documents in Mongo that reference profiles.

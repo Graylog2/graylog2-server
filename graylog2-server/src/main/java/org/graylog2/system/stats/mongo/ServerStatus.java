@@ -19,7 +19,6 @@ package org.graylog2.system.stats.mongo;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -29,42 +28,41 @@ import javax.annotation.Nullable;
  */
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ServerStatus {
-    @JsonProperty
+    @JsonProperty("host")
     public abstract String host();
 
-    @JsonProperty
+    @JsonProperty("version")
     public abstract String version();
 
-    @JsonProperty
+    @JsonProperty("process")
     public abstract String process();
 
-    @JsonProperty
+    @JsonProperty("pid")
     public abstract long pid();
 
-    @JsonProperty
+    @JsonProperty("uptime")
     public abstract int uptime();
 
-    @JsonProperty
+    @JsonProperty("uptime_millis")
     public abstract long uptimeMillis();
 
-    @JsonProperty
+    @JsonProperty("uptime_estimate")
     public abstract int uptimeEstimate();
 
-    @JsonProperty
+    @JsonProperty("local_time")
     public abstract DateTime localTime();
 
-    @JsonProperty
+    @JsonProperty("connections")
     public abstract Connections connections();
 
-    @JsonProperty
+    @JsonProperty("network")
     public abstract Network network();
 
-    @JsonProperty
+    @JsonProperty("memory")
     public abstract Memory memory();
 
-    @JsonProperty
+    @JsonProperty("storage_engine")
     public abstract StorageEngine storageEngine();
 
     public static ServerStatus create(String host,
@@ -85,15 +83,14 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Connections {
-        @JsonProperty
+        @JsonProperty("current")
         public abstract int current();
 
-        @JsonProperty
+        @JsonProperty("available")
         public abstract int available();
 
-        @JsonProperty
+        @JsonProperty("total_created")
         @Nullable
         public abstract Long totalCreated();
 
@@ -106,15 +103,14 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Network {
-        @JsonProperty
+        @JsonProperty("bytes_in")
         public abstract int bytesIn();
 
-        @JsonProperty
+        @JsonProperty("bytes_out")
         public abstract int bytesOut();
 
-        @JsonProperty
+        @JsonProperty("num_requests")
         public abstract int numRequests();
 
         public static Network create(int bytesIn,
@@ -126,24 +122,23 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class Memory {
-        @JsonProperty
+        @JsonProperty("bits")
         public abstract int bits();
 
-        @JsonProperty
+        @JsonProperty("resident")
         public abstract int resident();
 
-        @JsonProperty
+        @JsonProperty("virtual")
         public abstract int virtual();
 
-        @JsonProperty
+        @JsonProperty("supported")
         public abstract boolean supported();
 
-        @JsonProperty
+        @JsonProperty("mapped")
         public abstract int mapped();
 
-        @JsonProperty
+        @JsonProperty("mapped_with_journal")
         public abstract int mappedWithJournal();
 
         public static Memory create(int bits,
@@ -158,11 +153,10 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     public abstract static class StorageEngine {
         public static final StorageEngine DEFAULT = create("mmapv1");
 
-        @JsonProperty
+        @JsonProperty("name")
         public abstract String name();
 
         public static StorageEngine create(String name) {

@@ -26,19 +26,15 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableList;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
+import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template;
-import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.opensearch2.RestClientProvider;
-import org.graylog.testing.containermatrix.SearchServer;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -65,12 +61,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import static java.util.Objects.isNull;
-
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
-
-    public static final SearchServer OPENSEARCH_VERSION = SearchServer.DEFAULT_OPENSEARCH_VERSION;
 
     private OpenSearchClient openSearchClient;
     private Client client;
@@ -78,12 +70,12 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private Adapters adapters;
     private List<String> featureFlags;
 
-    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        this(version, hostname, network, heapSize, featureFlags, Map.of());
+    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
+        this(cachedInstance, version, hostname, network, heapSize, featureFlags, Map.of());
     }
 
-    public OpenSearchInstance(final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
-        super(version, hostname, network, heapSize, env);
+    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+        super(cachedInstance, version, hostname, network, heapSize, env);
         this.featureFlags = featureFlags;
     }
 
@@ -145,18 +137,19 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.9.0")) {
             fixNumberOfReplicaForMlPlugin();
         }
-        if (version().isOpenSearch()) {
+        if (version().satisfies(SearchVersion.Distribution.OPENSEARCH, "2.19.3")) {
             fixDefaultNumberOfReplicasForIsmConfigs();
         }
     }
 
     private void fixDefaultNumberOfReplicasForIsmConfigs() {
-        PutComposableIndexTemplateRequest request = new PutComposableIndexTemplateRequest();
-        request.name("ism-zero-replica-template");
-        request.indexTemplate(new ComposableIndexTemplate(List.of(".opendistro-ism-config"),
-                new Template(Settings.builder().put("number_of_replicas", 0).build(), null, null),
-                null, Long.MAX_VALUE, null, null));
-        openSearchClient().execute((client, requestOptions) -> client.indices().putIndexTemplate(request, requestOptions));
+        // changes default number of replicas for some system managed indices in 2.19
+        // (see http://github.com/opensearch-project/OpenSearch/issues/9438)
+        openSearchClient().execute((client, requestOptions) -> {
+            final ClusterUpdateSettingsRequest req = new ClusterUpdateSettingsRequest();
+            req.persistentSettings(Map.of("cluster.default_number_of_replicas", "0"));
+            return client.cluster().putSettings(req, requestOptions);
+        });
     }
 
     /**
@@ -201,11 +194,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     @Override
-    public SearchServer searchServer() {
-        return OPENSEARCH_VERSION;
-    }
-
-    @Override
     public Client client() {
         return this.client;
     }
@@ -222,8 +210,6 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
         var container = new OpenSearchContainer(DockerImageName.parse(image))
-                // Avoids reuse warning on Jenkins (we don't want reuse in our CI environment)
-                .withReuse(isNull(System.getenv("CI")))
                 .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")

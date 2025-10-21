@@ -41,7 +41,7 @@ type AWSAuthenticationTypesProps = {
 const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
   const { clearField, formData } = useContext(FormDataContext);
 
-  const { awsAuthenticationType, awsCloudWatchAwsSecret, awsCloudWatchAwsKey, awsCloudWatchAssumeARN } = formData;
+  const { awsAuthenticationType, awsAccessKey, awsSecretKey, awsAssumeRoleARN } = formData;
 
   let defaultAuthTypeValue;
 
@@ -64,16 +64,22 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
     setCurrenType(e.target.value);
     onChange({ target: { name: 'awsAuthenticationType', value: e.target.value } });
 
-    if (isType(AWS_AUTH_TYPES.automatic)) {
-      clearField('awsCloudWatchAwsKey');
-      clearField('awsCloudWatchAwsSecret');
+    if (e.target.value === AWS_AUTH_TYPES.automatic) {
+      clearField('awsAccessKey');
+      clearField('awsSecretKey');
     }
   };
 
+  const isCloud = AppConfig.isCloud();
+
   return (
     <>
-      {AppConfig.isCloud() ? (
-        <KeySecret awsKey={awsCloudWatchAwsKey} awsSecret={awsCloudWatchAwsSecret} onChange={onChange} />
+      {isCloud ? (
+        <KeySecret 
+          awsKey={awsAccessKey} 
+          awsSecret={awsSecretKey} 
+          onChange={onChange}
+        />
       ) : (
         <>
           <Input
@@ -94,12 +100,19 @@ const AWSAuthenticationTypes = ({ onChange }: AWSAuthenticationTypesProps) => {
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret awsKey={awsCloudWatchAwsKey} awsSecret={awsCloudWatchAwsSecret} onChange={onChange} />
+              <KeySecret 
+                awsKey={awsAccessKey} 
+                awsSecret={awsSecretKey} 
+                onChange={onChange}
+              />
             )}
           </AuthWrapper>
         </>
       )}
-      <ARN awsARN={awsCloudWatchAssumeARN} onChange={onChange} />
+      <ARN 
+        awsARN={awsAssumeRoleARN} 
+        onChange={onChange}
+      />
     </>
   );
 };
