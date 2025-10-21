@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import ReactDom from 'react-dom';
 import { Drawer as MantineDrawer } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 import styled, { css } from 'styled-components';
 
 const StyledDrawer = styled(MantineDrawer)(
@@ -28,6 +30,10 @@ const StyledDrawer = styled(MantineDrawer)(
     .mantine-Drawer-content {
       display: flex;
       flex-direction: column;
+
+      &.double {
+        flex-basis: calc(var(--drawer-size) * 2);
+      }
     }
 
     .mantine-Drawer-body {
@@ -55,12 +61,29 @@ const Title = styled.div(
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+    line-height: 1.2;
   `,
 );
 
+export const getDrawerPropsByLevel = ({
+  parentSize,
+  level = 0,
+  parentPosition = 'right',
+}: {
+  parentSize: string;
+  level?: number;
+  parentPosition?: 'left' | 'right' | 'top' | 'bottom';
+}) => ({
+  position: parentPosition,
+  withOverlay: level === 0,
+  styles: parentPosition
+    ? { inner: { [parentPosition]: `calc((var(--drawer-size-${parentSize}) + 0.8rem) * ${level})` } }
+    : undefined,
+  overlayProps: { zIndex: `103${level}` },
+});
+
 type Props = Pick<
   React.ComponentProps<typeof MantineDrawer>,
-  | 'opened'
   | 'onClose'
   | 'position'
   | 'size'
@@ -73,26 +96,54 @@ type Props = Pick<
   | 'overlayProps'
   | 'styles'
   | 'transitionProps'
+  | 'styles'
   | 'lockScroll'
 > & {
+  opened?: boolean;
   double?: boolean;
+  parentSize?: string;
+  level?: number;
+  parentPosition?: 'left' | 'right' | 'top' | 'bottom';
 };
 
-const Drawer = ({ title, double = false, lockScroll = false, ...props }: Props) => (
-  <StyledDrawer
-    offset={15}
-    padding="lg"
-    radius={5}
-    zIndex={1032}
-    lockScroll={lockScroll}
-    title={
-      <TitleWrapper>
-        <Title>{title}</Title>
-      </TitleWrapper>
-    }
-    {...props}
-    size={double ? 1260 : props.size}
-  />
-);
+const Drawer = ({
+  title,
+  double = false,
+  parentSize = undefined,
+  level = 0,
+  parentPosition = 'right',
+  ...props
+}: Props) => {
+  const [opened, { open, close }] = useDisclosure(false);
+
+  React.useLayoutEffect(() => {
+    setTimeout(() => open(), 80);
+  }, [open, close, props.onClose]);
+
+  const handleClose = () => {
+    close();
+    setTimeout(() => props.onClose?.(), 200);
+  };
+
+  return ReactDom.createPortal(
+    <StyledDrawer
+      opened={opened}
+      offset={15}
+      padding="lg"
+      radius={5}
+      zIndex={1032}
+      classNames={{ content: double ? 'double' : '' }}
+      title={
+        <TitleWrapper>
+          <Title>{title}</Title>
+        </TitleWrapper>
+      }
+      {...getDrawerPropsByLevel({ parentSize, level, parentPosition })}
+      {...props}
+      onClose={handleClose}
+    />,
+    document.body,
+  );
+};
 
 export default Drawer;
