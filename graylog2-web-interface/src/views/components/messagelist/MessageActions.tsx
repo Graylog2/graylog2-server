@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import type * as Immutable from 'immutable';
+import JSONbig from 'json-bigint';
 
 import { LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -132,7 +133,7 @@ const MessageActions = ({
       {pluggableActions}
 
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
-      <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
+      <ClipboardButton title="Copy message" bsSize="small" text={JSONbig.stringify(fields, null, 2)} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id)}
     </ButtonGroup>
