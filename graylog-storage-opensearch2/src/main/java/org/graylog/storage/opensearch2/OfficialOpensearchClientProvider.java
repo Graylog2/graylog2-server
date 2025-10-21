@@ -28,10 +28,10 @@ import org.apache.hc.core5.http.HttpRequestInterceptor;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
-import org.graylog.shaded.opensearch3.org.opensearch.client.opensearch.OpenSearchAsyncClient;
-import org.graylog.shaded.opensearch3.org.opensearch.client.opensearch.OpenSearchClient;
-import org.graylog.shaded.opensearch3.org.opensearch.client.transport.OpenSearchTransport;
-import org.graylog.shaded.opensearch3.org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
+import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.transport.OpenSearchTransport;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 

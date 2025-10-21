@@ -62,16 +62,11 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.graylog.shaded</groupId>
-            <artifactId>opensearch3-java-client</artifactId>
-            <version>${opensearch3.shaded.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.opensearch.client</groupId>
+            <artifactId>opensearch-java</artifactId>
+            <version>${opensearch3.client.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.graylog.shaded</groupId>
             <artifactId>opensearch2-rest-client-sniffer</artifactId>

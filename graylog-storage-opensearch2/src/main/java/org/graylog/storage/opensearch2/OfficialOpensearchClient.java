@@ -16,8 +16,8 @@
  */
 package org.graylog.storage.opensearch2;
 
-import org.graylog.shaded.opensearch3.org.opensearch.client.opensearch.OpenSearchAsyncClient;
-import org.graylog.shaded.opensearch3.org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch.OpenSearchAsyncClient;
+import org.opensearch.client.opensearch.OpenSearchClient;
 
 public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
 }
