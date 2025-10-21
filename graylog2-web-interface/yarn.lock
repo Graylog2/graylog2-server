@@ -7262,7 +7262,7 @@ escodegen@^2.1.0:
     eslint-plugin-react "7.37.5"
     eslint-plugin-react-hooks "5.2.0"
     eslint-plugin-testing-library "7.12.0"
-    eslint-plugin-testing-library "7.13.1"
+    eslint-plugin-testing-library "7.13.3"
     typescript-eslint "^8.44.1"
 
 eslint-config-prettier@10.1.5:
@@ -7414,10 +7414,10 @@ eslint-plugin-react@7.37.5:
     string.prototype.matchall "^4.0.12"
     string.prototype.repeat "^1.0.0"
 
-eslint-plugin-testing-library@7.13.1:
-  version "7.13.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.13.1.tgz#fa1841555e6e3f8833b373b5896d28fb56242ade"
-  integrity sha512-y56YvbFc3Tm4zNHjaZsbXLo15JHlPkvonOwqX9avACi/TrvknT8cMyJ6T5KJq0ExrlJjH8gIPE6wCloohMYPIQ==
+eslint-plugin-testing-library@7.13.3:
+  version "7.13.3"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-testing-library/-/eslint-plugin-testing-library-7.13.3.tgz#6edaca5609098e8869fd75afc48d7aa5ebfd0bc4"
+  integrity sha512-STwyXN7GnHulgsfdXVd5iC8fFCJVRQj2AcKtMmQOsA8G4oMnSCOX1p3MjbrDQ9fmwVf5wZy6vboTOTFobWuxOA==
   dependencies:
     "@typescript-eslint/scope-manager" "^8.15.0"
     "@typescript-eslint/utils" "^8.15.0"

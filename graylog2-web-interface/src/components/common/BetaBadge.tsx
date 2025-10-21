@@ -14,15 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-import useFeaturesCustomization from 'brand-customization/useFeaturesCustomization';
+import Badge from 'components/bootstrap/Badge';
 
-const useInvestigationReportingByAICustomization = () => {
-  const { aiInvestigationReport } = useFeaturesCustomization();
+const StyledBadge = styled(Badge)(
+  ({ theme }) => css`
+    background-color: ${theme.colors.variant.light.danger};
+  `,
+);
 
-  return {
-    enabled: aiInvestigationReport?.enabled !== false,
-  };
-};
+const BetaBadge = () => <StyledBadge>Beta</StyledBadge>;
 
-export default useInvestigationReportingByAICustomization;
+export default BetaBadge;
