@@ -65,7 +65,7 @@ const Group = ({
         <ListGroupItem
           onClick={() => setFieldData({ value, field, contexts: null })}
           key={`${keyPrefix}-${value}-${field}`}>
-          <ValueRenderer value={text} label={field} traceColor={traceColor} />
+          <ValueRenderer value={text} field={field} traceColor={traceColor} />
         </ListGroupItem>
       ))}
     </>
@@ -92,7 +92,7 @@ const GroupingActions = ({ columnPivotValues, rowPivotValues, setFieldData, metr
         })
       }>
       <ValueRenderer
-        label=""
+        field=""
         value={valuePath.map((o) => Object.values(o)[0]).join(humanSeparator)}
         traceColor={metricValue.traceColor}
       />
@@ -107,9 +107,13 @@ const OnClickPopoverValueGroups = ({ metricValue, rowPivotValues, columnPivotVal
 
   return (
     <StyledListGroup>
-      <Label>Metric</Label>
-      {metricValue && <Group group={[metricValue]} keyPrefix="metricValue" setFieldData={setFieldData} />}
-      <Label>Groupings</Label>
+      {metricValue && (
+        <>
+          <Label>Metric</Label>
+          <Group group={[metricValue]} keyPrefix="metricValue" setFieldData={setFieldData} />
+        </>
+      )}
+      {!!(showMultipleAction || rowPivotValues?.length || columnPivotValues?.length) && <Label>Groupings</Label>}
       {showMultipleAction && (
         <GroupingActions
           columnPivotValues={columnPivotValues}
