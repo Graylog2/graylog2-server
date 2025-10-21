@@ -26,7 +26,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 import java.util.function.Function;
 
 public class GroupingToBucketSpecMapper implements Function<Grouping, BucketSpec> {
-
     @Override
     public BucketSpec apply(final Grouping grouping) {
         if(grouping.scaling().isPresent()) {

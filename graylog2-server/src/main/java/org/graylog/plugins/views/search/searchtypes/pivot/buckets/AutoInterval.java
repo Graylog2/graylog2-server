@@ -32,7 +32,7 @@ import java.util.Optional;
 @AutoValue
 @JsonTypeName(AutoInterval.type)
 public abstract class AutoInterval implements Interval {
-    private static final double CK_DEFAULT_SCALINGFACTOR = 1.0;
+    public static final double DEFAULT_SCALINGFACTOR = 1.0;
     private static final String FIELD_SCALING = "scaling";
     public static final String type = "auto";
 
@@ -87,7 +87,7 @@ public abstract class AutoInterval implements Interval {
     }
 
     public static AutoInterval create() {
-        return create(type, CK_DEFAULT_SCALINGFACTOR);
+        return create(type, DEFAULT_SCALINGFACTOR);
     }
 
     public static AutoInterval create(double scalingFactor) {
@@ -96,6 +96,6 @@ public abstract class AutoInterval implements Interval {
 
     @JsonCreator
     public static AutoInterval create(@JsonProperty(TYPE_FIELD) String type, @JsonProperty(FIELD_SCALING) @Nullable Double scalingFactor) {
-        return create(Optional.ofNullable(scalingFactor).orElse(CK_DEFAULT_SCALINGFACTOR));
+        return create(Optional.ofNullable(scalingFactor).orElse(DEFAULT_SCALINGFACTOR));
     }
 }
