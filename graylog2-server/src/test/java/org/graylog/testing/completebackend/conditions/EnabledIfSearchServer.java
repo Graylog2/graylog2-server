@@ -14,19 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.containermatrix.annotations;
+package org.graylog.testing.completebackend.conditions;
 
-import org.junit.jupiter.api.Tag;
-import org.junit.platform.commons.annotation.Testable;
+import org.graylog2.storage.SearchVersion;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * The annotated test method or class only runs if the given search server requirements apply. This annotation can
+ * be repeated to allow multiple search server versions.
+ */
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-@Testable
-@Tag("full-backend-test")
-public @interface ContainerMatrixTest {
+@Documented
+@Repeatable(RepeatedEnabledIfSearchServerContainer.class)
+public @interface EnabledIfSearchServer {
+    /**
+     * Required search server distribution.
+     */
+    SearchVersion.Distribution distribution() default SearchVersion.Distribution.OPENSEARCH;
+
+    /**
+     * Required search server version. Can be a semantic versioning range. (e.g., ">=6.0")
+     */
+    String version() default "";
 }

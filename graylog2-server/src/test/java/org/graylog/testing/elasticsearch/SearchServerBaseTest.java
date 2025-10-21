@@ -25,35 +25,25 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * This class can be used as base class for Elasticsearch integration tests.
+ * This class can be used as base class for search server integration tests.
  * <p>
  * Check the {@link #importFixture(String)} method if you need to load fixture data from JSON files.
  */
-public abstract class ContainerMatrixElasticsearchBaseTest {
-    private final SearchServerInstance elasticsearch;
-
-    public ContainerMatrixElasticsearchBaseTest(SearchServerInstance elasticsearch) {
-        this.elasticsearch = elasticsearch;
-    }
+public abstract class SearchServerBaseTest {
+    private static SearchServerInstance searchServer;
 
     protected SearchServerInstance searchServer() {
-        return this.elasticsearch;
-    }
-
-    // override this in derived classes to skip import if the default template. See old ElasticsearchBaseTest + IndicesGetAllMessageFieldsIT
-    protected boolean skipTemplates() {
-        return false;
+        return searchServer;
     }
 
     @BeforeAll
-    public void before() {
-        if (!skipTemplates()) {
-            addGraylogDefaultIndexTemplate();
-        }
+    public static void before(SearchServerInstance searchServerInstance) {
+        searchServer = searchServerInstance;
+        addGraylogDefaultIndexTemplate();
     }
 
-    private void addGraylogDefaultIndexTemplate() {
-        addIndexTemplates(getGraylogDefaultMessageTemplates(searchServer().version()));
+    private static void addGraylogDefaultIndexTemplate() {
+        addIndexTemplates(getGraylogDefaultMessageTemplates(searchServer.version()));
     }
 
     private static Map<String, Template> getGraylogDefaultMessageTemplates(SearchVersion version) {
@@ -63,21 +53,21 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
         return Collections.singletonMap("graylog-test-internal", template);
     }
 
-    private void addIndexTemplates(Map<String, Template> templates) {
+    private static void addIndexTemplates(Map<String, Template> templates) {
         for (var template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            searchServer().client().putTemplate(templateName, template.getValue());
+            searchServer.client().putTemplate(templateName, template.getValue());
         }
     }
 
     /**
-     * Returns a custom Elasticsearch client with a bunch of utility methods.
+     * Returns a custom search server client with a bunch of utility methods.
      *
      * @return the client
      */
     protected Client client() {
-        return searchServer().client();
+        return searchServer.client();
     }
 
     /**
@@ -89,6 +79,6 @@ public abstract class ContainerMatrixElasticsearchBaseTest {
      * @param resourcePath the fixture resource path
      */
     protected void importFixture(String resourcePath) {
-        searchServer().importFixtureResource(resourcePath, getClass());
+        searchServer.importFixtureResource(resourcePath, getClass());
     }
 }
