@@ -94,14 +94,22 @@ const CreateMenuItem = ({
   const { setWidgetEditing } = useContext(WidgetFocusContext);
 
   const createHandlerFor = () => {
-    if (isCreatorFunc(creator)) {
-      return () => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')], {
+    const telemetry = () =>
+      sendTelemetry(
+        TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')] ??
+          `Search Widget ${creator.title} Created`,
+        {
           app_section: 'search-sidebar',
           event_details: {
             widgetType: creator.type,
+            widgetTitle: creator.title,
           },
-        });
+        },
+      );
+
+    if (isCreatorFunc(creator)) {
+      return () => {
+        telemetry();
 
         onClick();
 
@@ -115,6 +123,8 @@ const CreateMenuItem = ({
       const CreatorComponent = creator.component;
 
       return () => {
+        telemetry();
+
         const id = generateId();
 
         const onClose = () => {

@@ -119,7 +119,9 @@ const EditActions = ({
         </LinkContainer>
       </IfPermitted>
       <MoreActions>
-        <EditTokensAction user={user} wrapperComponent={MenuItem} />
+        <IfPermitted permissions={[`users:tokenlist:${username}`]}>
+          <EditTokensAction user={user} wrapperComponent={MenuItem} />
+        </IfPermitted>
         <IfPermitted permissions={[`users:edit:${username}`]}>
           {showEnableDisable && (
             <MenuItem

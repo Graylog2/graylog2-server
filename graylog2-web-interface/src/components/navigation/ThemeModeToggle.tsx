@@ -32,7 +32,7 @@ const ThemeModeToggleWrap = styled.div`
 const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(
   ({ theme, $currentMode }) => css`
     opacity: ${$currentMode ? '1' : '0.5'};
-    color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
+    color: ${$currentMode ? theme.colors.variant.danger : theme.colors.variant.darkest.default};
   `,
 );
 

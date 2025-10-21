@@ -99,7 +99,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
           className="table-hover"
           customFilter={<SharedEntitiesFilter onSearch={_handleSearch} onFilter={_handleFilter} />}
           dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
-          filterKeys={tableHeaders}
+          filterKeys={[]}
           noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
           headers={tableHeaders}
           id="shared-entities"

@@ -84,7 +84,7 @@ const useExternalActions = (type: Props['type'], handlerArgs: Props['handlerArgs
 };
 
 type Props = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
   type: 'field' | 'value';
   handlerArgs: ActionHandlerArguments;
   setOverflowingComponents: (newComponents: ActionComponents) => void;
@@ -93,7 +93,7 @@ type Props = {
 };
 
 const ActionDropdown = ({
-  children,
+  children = null,
   type,
   handlerArgs,
   setOverflowingComponents,
@@ -105,11 +105,14 @@ const ActionDropdown = ({
 
   return (
     <>
-      <StyledListItem>
-        <DropdownHeader>{children}</DropdownHeader>
-      </StyledListItem>
-
-      <MenuItem divider />
+      {children && (
+        <>
+          <StyledListItem>
+            <DropdownHeader>{children}</DropdownHeader>
+          </StyledListItem>
+          <MenuItem divider />
+        </>
+      )}
       <MenuItem header>Actions</MenuItem>
       {internalActions.map((action) => (
         <ActionMenuItem

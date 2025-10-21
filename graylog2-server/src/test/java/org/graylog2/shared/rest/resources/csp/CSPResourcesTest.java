@@ -19,6 +19,8 @@ package org.graylog2.shared.rest.resources.csp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CSPResourcesTest {
@@ -26,7 +28,7 @@ class CSPResourcesTest {
 
     @BeforeEach
     void setup() {
-        cspResources = new CSPResources("/org/graylog2/security/cspTest.config");
+        cspResources = new CSPResources("/org/graylog2/security/cspTest.config", Set.of());
     }
 
     @Test
