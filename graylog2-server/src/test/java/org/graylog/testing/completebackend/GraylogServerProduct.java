@@ -14,12 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.junit.jupiter.engine.discovery.predicates;
+package org.graylog.testing.completebackend;
 
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
+public interface GraylogServerProduct {
+    String name();
 
-public class IsContainerMatrixTest extends IsTestableMethod {
-    public IsContainerMatrixTest() {
-        super(ContainerMatrixTest.class, true);
-    }
+    MavenProjectDirProvider mavenProjectDirProvider();
+
+    PluginJarsProvider pluginJarsProvider();
 }
