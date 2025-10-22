@@ -24,6 +24,7 @@ import { ControlLabel, FormGroup, HelpBlock, Input } from 'components/bootstrap'
 import { getValueFromInput } from 'util/FormsUtils';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 // TODO: Default body template should come from the server
 const DEFAULT_BODY_TEMPLATE = `--- [Event Definition] ---------------------------
@@ -110,6 +111,93 @@ const EventProcedureCheckbox = ({ checked, onChange }) => {
   );
 };
 
+const EmailTemplatesRunner = ({
+  config,
+  onChange,
+  resetKey,
+}: {
+  config: any;
+  onChange: (next: any) => void;
+  resetKey?: string | number | undefined;
+}) => {
+  const {
+    data: { valid: validCustomizationLicense } = { valid: false },
+  } = usePluggableLicenseCheck('/license/enterprise/customization');
+
+  const entities = usePluginEntities('customization.emailTemplates') ?? [];
+  const providingEntity = React.useMemo(
+    () => entities.find((e: any) => typeof e?.hooks?.useEmailTemplate === 'function'),
+    [entities],
+  );
+
+  const noopUseEmailTemplate = React.useCallback(() => ({ templateConfig: undefined }), []);
+  const useEmailTemplateHook =
+    (providingEntity?.hooks?.useEmailTemplate ?? noopUseEmailTemplate) as () => {
+      templateConfig?: {
+        override_defaults?: boolean;
+        text_body?: string | null;
+        html_body?: string | null;
+      };
+    };
+
+  const { templateConfig } = useEmailTemplateHook() || {};
+
+  const key = String(resetKey ?? 'default');
+
+  // Re-apply when any of these change
+  const sig =
+    validCustomizationLicense && templateConfig
+      ? `${key}|${templateConfig.override_defaults ? '1' : '0'}|${templateConfig.text_body ?? ''}|${templateConfig.html_body ?? ''}`
+      : `${key}|no-license-or-config`;
+
+  const lastSigRef = React.useRef<string>('init');
+
+  React.useEffect(() => {
+    if (!validCustomizationLicense || !templateConfig) return;
+
+    if (lastSigRef.current === sig) return;
+
+    const { override_defaults, text_body, html_body } = templateConfig;
+
+    let next = config;
+    let changed = false;
+
+    if (override_defaults === true) {
+      const nextCfg = { ...config };
+
+      if (typeof text_body === 'string' && text_body.length > 0 && text_body !== config.body_template) {
+        nextCfg.body_template = text_body;
+        changed = true;
+      }
+      if (typeof html_body === 'string' && html_body.length > 0 && html_body !== config.html_body_template) {
+        nextCfg.html_body_template = html_body;
+        changed = true;
+      }
+
+      if (changed) next = nextCfg;
+    } else {
+      const nextCfg = { ...config };
+
+      if ((config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE) {
+        nextCfg.body_template = DEFAULT_BODY_TEMPLATE;
+        changed = true;
+      }
+      if ((config.html_body_template ?? '') !== DEFAULT_HTML_BODY_TEMPLATE) {
+        nextCfg.html_body_template = DEFAULT_HTML_BODY_TEMPLATE;
+        changed = true;
+      }
+
+      if (changed) next = nextCfg;
+    }
+
+    if (changed) onChange(next);
+
+    lastSigRef.current = sig;
+  }, [sig, validCustomizationLicense, templateConfig, config, onChange]);
+
+  return null;
+};
+
 type EmailNotificationFormProps = {
   config: any;
   validation: any;
@@ -154,6 +242,7 @@ class EmailNotificationForm extends React.Component<
     bcc_emails_lut_key: null,
     include_event_procedure: false,
   };
+  _appliedTemplateOnce = false;
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
@@ -558,10 +647,15 @@ class EmailNotificationForm extends React.Component<
   };
 
   render() {
-    const { config, validation } = this.props;
+    const { config, validation, onChange } = this.props;
 
     return (
       <>
+        <EmailTemplatesRunner
+          config={config}
+          onChange={onChange}
+          resetKey={config?.type || config?.id}
+        />
         <Input
           id="notification-subject"
           name="subject"
