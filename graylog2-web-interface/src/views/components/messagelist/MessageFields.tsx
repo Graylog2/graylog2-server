@@ -24,7 +24,7 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { MessageFieldsComponentProps } from 'views/types';
 
-const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
+export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
     color: ${theme.colors.text.primary};
 

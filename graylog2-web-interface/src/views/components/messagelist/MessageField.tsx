@@ -35,6 +35,7 @@ type Props = {
   fieldType: FieldType;
   message: Message;
   value: any;
+  fieldTextRenderer?: React.ComponentType<{ fieldName: string }>;
 };
 
 const DecoratedField = styled.small(
@@ -50,7 +51,15 @@ const DefinitionDescription = styled.dd(
 `,
 );
 
-const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
+const DefaultFieldTextRenderer = ({ fieldName }) => fieldName;
+
+const MessageField = ({
+  fieldName,
+  fieldType,
+  message,
+  value,
+  fieldTextRenderer: FieldTextRenderer = DefaultFieldTextRenderer,
+}: Props) => {
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
   const activeQuery = useActiveQueryId();
 
@@ -78,7 +87,7 @@ const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
     <>
       <dt data-testid={`message-field-name-${fieldName}`}>
         <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
-          {fieldName}
+          <FieldTextRenderer fieldName={fieldName} />
         </Field>
       </dt>
       <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
