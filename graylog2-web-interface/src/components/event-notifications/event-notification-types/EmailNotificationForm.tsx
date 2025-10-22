@@ -114,7 +114,7 @@ const EventProcedureCheckbox = ({ checked, onChange }) => {
 const EmailTemplatesRunner = ({
   config,
   onChange,
-  resetKey,
+  resetKey = undefined,
 }: {
   config: any;
   onChange: (next: any) => void;
@@ -124,9 +124,9 @@ const EmailTemplatesRunner = ({
     data: { valid: validCustomizationLicense } = { valid: false },
   } = usePluggableLicenseCheck('/license/enterprise/customization');
 
-  const entities = usePluginEntities('customization.emailTemplates') ?? [];
+  const entities = usePluginEntities('customization.emailTemplates');
   const providingEntity = React.useMemo(
-    () => entities.find((e: any) => typeof e?.hooks?.useEmailTemplate === 'function'),
+    () => (entities ?? []).find((e: any) => typeof e?.hooks?.useEmailTemplate === 'function'),
     [entities],
   );
 
@@ -242,7 +242,6 @@ class EmailNotificationForm extends React.Component<
     bcc_emails_lut_key: null,
     include_event_procedure: false,
   };
-  _appliedTemplateOnce = false;
 
   propagateChange = (key, value) => {
     const { config, onChange } = this.props;
