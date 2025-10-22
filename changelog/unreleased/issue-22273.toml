@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix visual issue where the date picker showed the wrong active month based on the selected date due to a time zone problem."
+
+pulls = ["23918"]
+issues = ["22273"]
