@@ -20,36 +20,35 @@ import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class CustomizationConfigIT {
-    private static final Logger LOG = LoggerFactory.getLogger(CustomizationConfigIT.class);
-    private final GraylogApis apis;
+    private static GraylogApis apis;
 
-    public CustomizationConfigIT(GraylogApis graylogApis) {
-        this.apis = graylogApis;
+    @BeforeAll
+    void setup(GraylogApis graylogApis) {
+        apis = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void worksWithoutCustomizationConfig() {
         assertThat(getFromConfigJs("branding")).isEqualTo(null);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void invalidCustomizationConfigDoesNotBreakEndpoint() {
         importFixture("invalid-customization-config.json");
 
         assertThat(getFromConfigJs("branding")).isEqualTo(null);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void returnsCustomizationConfig() {
         importFixture("valid-customization-config.json");
 

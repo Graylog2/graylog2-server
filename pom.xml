@@ -208,12 +208,12 @@
         <equalsverifier.version>4.2</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.13.2</junit.version>
-        <junit-jupiter.version>5.12.2</junit-jupiter.version>
+        <junit-jupiter.version>6.0.0</junit-jupiter.version>
         <mockito.version>5.20.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
-        <testcontainers.opensearch.version>3.0.2</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
         <graalvm.version>25.0.0</graalvm.version>
 
         <!-- Nodejs dependencies -->
