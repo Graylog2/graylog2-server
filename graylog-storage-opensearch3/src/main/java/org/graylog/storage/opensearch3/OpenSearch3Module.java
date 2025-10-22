@@ -55,11 +55,11 @@ import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
 
-public class OpenSearch2Module extends VersionAwareModule {
+public class OpenSearch3Module extends VersionAwareModule {
     private final SearchVersion supportedVersion;
     private final boolean useComposableIndexTemplates;
 
-    public OpenSearch2Module(final SearchVersion supportedVersion, boolean useComposableIndexTemplates) {
+    public OpenSearch3Module(final SearchVersion supportedVersion, boolean useComposableIndexTemplates) {
         this.supportedVersion = supportedVersion;
         this.useComposableIndexTemplates = useComposableIndexTemplates;
     }

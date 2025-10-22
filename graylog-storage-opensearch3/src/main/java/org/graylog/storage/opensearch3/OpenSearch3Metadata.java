@@ -24,15 +24,15 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.Set;
 
-public class OpenSearch2Metadata implements PluginMetaData {
+public class OpenSearch3Metadata implements PluginMetaData {
     @Override
     public String getUniqueId() {
-        return OpenSearch2Plugin.class.getCanonicalName();
+        return OpenSearch3Plugin.class.getCanonicalName();
     }
 
     @Override
     public String getName() {
-        return "OpenSearch 2 Support";
+        return "OpenSearch 3 Support";
     }
 
     @Override
@@ -52,7 +52,7 @@ public class OpenSearch2Metadata implements PluginMetaData {
 
     @Override
     public String getDescription() {
-        return "Support for OpenSearch 2";
+        return "Support for OpenSearch 3";
     }
 
     @Override
