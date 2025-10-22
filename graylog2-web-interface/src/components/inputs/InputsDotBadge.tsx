@@ -18,7 +18,7 @@ const InputsDotBadge = ({ text }: { text: string }) => {
     <MenuItemDotBadge
       text={text}
       title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs || false}
+      showDot={hasFailedOrSetupInputs}
     />
   );
 };
