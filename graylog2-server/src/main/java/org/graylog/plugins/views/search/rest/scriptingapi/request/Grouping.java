@@ -41,7 +41,7 @@ public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
                     @JsonProperty("timeunit") Optional<String> timeunit,
                     @JsonProperty("scaling") Optional<Double> scaling) {
         this.fieldName = fieldName;
-        this.limit = limit.map(l -> l <= 0 ? Values.DEFAULT_LIMIT : l);
+        this.limit = limit.map(lim -> lim <= 0 ? Values.DEFAULT_LIMIT : lim);
         this.timeunit = timeunit;
         this.scaling = scaling;
 
