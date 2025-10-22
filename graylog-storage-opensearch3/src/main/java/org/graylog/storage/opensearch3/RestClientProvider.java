@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 
+ @Deprecated
 @Singleton
 public class RestClientProvider implements Provider<RestHighLevelClient> {
     private final Supplier<RestHighLevelClient> clientSupplier;
