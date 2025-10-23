@@ -45,6 +45,7 @@ public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
         this.timeunit = timeunit;
         this.scaling = scaling;
 
+        // only one of the three following parameters are allowed to be present
         final AtomicInteger attrCounter = new AtomicInteger();
         limit.ifPresent(l -> attrCounter.getAndIncrement());
         timeunit.ifPresent(t -> attrCounter.getAndIncrement());
