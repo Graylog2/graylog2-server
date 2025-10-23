@@ -682,12 +682,58 @@ class MarkdownBuilderTest {
     @Test
     void testCodeBlockPreservesLiteralContent() {
         // Code blocks should preserve content literally (except triple backticks)
-        String code = "int x = 5 * 3;\nSystem.out.println(\"Hello\");";
+        String code = "int x = 5 * 3;\nString s = \"pipe|asterisk*underscore_hash#\";\nSystem.out.println(\"Hello\");";
         String result = builder.codeBlock(code, "java").toString();
 
-        // Content should not be escaped (should preserve * and other chars)
+        // Content should not be escaped - all markdown special chars preserved
         assertThat(result).contains("int x = 5 * 3;");
+        assertThat(result).contains("pipe|asterisk*underscore_hash#");
         assertThat(result).contains("System.out.println");
+
+        // Verify these chars are NOT escaped
+        assertThat(result).doesNotContain("\\|");
+        assertThat(result).doesNotContain("\\*");
+        assertThat(result).doesNotContain("\\_");
+        assertThat(result).doesNotContain("\\#");
+    }
+
+    @Test
+    void testOpenCodeBlockPreservesLiteralContent() {
+        // Test that content added between openCodeBlock/closeCodeBlock is not escaped
+        builder.openCodeBlock("yaml");
+        builder.unsafeRaw("key: value|with*special_chars#here");
+        builder.unsafeRaw("\nanother: line_with*markdown|syntax");
+        builder.closeCodeBlock();
+
+        String result = builder.toString();
+
+        // Content should not be escaped
+        assertThat(result).contains("```yaml");
+        assertThat(result).contains("key: value|with*special_chars#here");
+        assertThat(result).contains("another: line_with*markdown|syntax");
+
+        // Verify no escaping occurred
+        assertThat(result).doesNotContain("\\|");
+        assertThat(result).doesNotContain("\\*");
+        assertThat(result).doesNotContain("\\_");
+        assertThat(result).doesNotContain("\\#");
+    }
+
+    @Test
+    void testCodeBlockDoesNotEscapeButOtherMethodsDo() {
+        // Verify that code blocks don't escape, but regular methods do
+        builder.openCodeBlock("text");
+        builder.unsafeRaw("text*with*asterisks");
+        builder.closeCodeBlock();
+        builder.paragraph("text*with*asterisks");
+
+        String result = builder.toString();
+
+        // Inside code block: not escaped
+        assertThat(result).containsPattern("```text\\s+text\\*with\\*asterisks");
+
+        // In paragraph: escaped
+        assertThat(result).contains("text\\*with\\*asterisks");
     }
 
     @Test

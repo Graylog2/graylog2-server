@@ -157,6 +157,17 @@ public class MarkdownBuilder {
         }
     }
 
+    /**
+     * Instance method that escapes markdown based on current builder state.
+     * If a code block is open, no escaping is performed.
+     */
+    private String escapeMarkdownInstance(String text, MdContext context) {
+        if (isCodeBlockOpen) {
+            return orEmpty(text);
+        }
+        return escapeMarkdown(text, context);
+    }
+
     public static String bold(String text) {
         return "**" + escapeMarkdown(orEmpty(text), MdContext.PARAGRAPH) + "**";
     }
@@ -196,7 +207,7 @@ public class MarkdownBuilder {
     private MarkdownBuilder heading(int level, String text) {
         sb.append("#".repeat(Math.min(6, Math.max(level, 1))))
                 .append(" ")
-                .append(escapeMarkdown(orEmpty(text), MdContext.HEADING))
+                .append(escapeMarkdownInstance(orEmpty(text), MdContext.HEADING))
                 .append("\n\n");
         return this;
     }
@@ -226,7 +237,7 @@ public class MarkdownBuilder {
     }
 
     public MarkdownBuilder paragraph(String text) {
-        sb.append(escapeMarkdown(orEmpty(text), MdContext.PARAGRAPH)).append("\n\n");
+        sb.append(escapeMarkdownInstance(orEmpty(text), MdContext.PARAGRAPH)).append("\n\n");
         return this;
     }
 
@@ -264,7 +275,7 @@ public class MarkdownBuilder {
         }
         String[] lines = text.split("\n");
         for (String line : lines) {
-            sb.append("> ").append(escapeMarkdown(orEmpty(line), MdContext.HEADING)).append("\n");
+            sb.append("> ").append(escapeMarkdownInstance(orEmpty(line), MdContext.HEADING)).append("\n");
         }
         sb.append("\n");
         return this;
@@ -276,7 +287,7 @@ public class MarkdownBuilder {
         }
         int i = 0;
         for (String item : items) {
-            sb.append(++i).append(". ").append(escapeMarkdown(orEmpty(item), MdContext.HEADING)).append("\n");
+            sb.append(++i).append(". ").append(escapeMarkdownInstance(orEmpty(item), MdContext.HEADING)).append("\n");
         }
         sb.append("\n");
         return this;
@@ -290,7 +301,7 @@ public class MarkdownBuilder {
     }
 
     public MarkdownBuilder unorderedListItem(String item) {
-        sb.append("- ").append(escapeMarkdown(orEmpty(item), MdContext.HEADING)).append("\n");
+        sb.append("- ").append(escapeMarkdownInstance(orEmpty(item), MdContext.HEADING)).append("\n");
         return this;
     }
 
@@ -305,8 +316,8 @@ public class MarkdownBuilder {
 
     public MarkdownBuilder unorderedListKVItem(String key, String value) {
         sb.append("- ")
-                .append(bold(escapeMarkdown(key, MdContext.HEADING)))
-                .append(": ").append(escapeMarkdown(orEmpty(value))).append("\n");
+                .append(bold(escapeMarkdownInstance(key, MdContext.HEADING)))
+                .append(": ").append(escapeMarkdownInstance(value, null)).append("\n");
         return this;
     }
 
@@ -364,7 +375,7 @@ public class MarkdownBuilder {
         // Escape each cell to prevent pipes from breaking table structure
         List<String> escapedItems = new java.util.ArrayList<>();
         for (String item : rowItems) {
-            escapedItems.add(escapeMarkdown(item, MdContext.TABLE_CELL));
+            escapedItems.add(escapeMarkdownInstance(item, MdContext.TABLE_CELL));
         }
         sb.append("| ").append(String.join(" | ", escapedItems)).append(" |\n");
         return this;
@@ -449,7 +460,7 @@ public class MarkdownBuilder {
     }
 
     public MarkdownBuilder raw(String content) {
-        sb.append(escapeMarkdown(content, MdContext.PARAGRAPH));
+        sb.append(escapeMarkdownInstance(content, MdContext.PARAGRAPH));
         return this;
     }
 
