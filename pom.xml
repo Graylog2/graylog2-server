@@ -214,7 +214,7 @@
         <system-rules.version>1.19.0</system-rules.version>
         <testcontainers.version>1.21.3</testcontainers.version>
         <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
-        <graalvm.version>25.0.0</graalvm.version>
+        <graalvm.version>25.0.1</graalvm.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v20.19.5</nodejs.version>
