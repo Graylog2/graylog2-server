@@ -82,9 +82,8 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
             return new ExportTabularResultResponse(List.of(), List.of());
         }
 
-        final var first = m.messages().get(0);
-
-        final var header = first.message().keySet().stream().toList();
+        // In case there was no field list specified, iterating over all messages for the header to make sure that we collect all headers from all messages
+        final var header = m.fields() != null ? m.fields() : m.messages().stream().flatMap(s -> s.message().keySet().stream()).collect(Collectors.toSet()).stream().toList();
         final var rows = m.messages()
                             .stream()
                             .map(message ->
