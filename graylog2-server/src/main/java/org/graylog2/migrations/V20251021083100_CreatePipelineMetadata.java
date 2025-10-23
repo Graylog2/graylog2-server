@@ -23,7 +23,11 @@ import com.mongodb.client.model.InsertOneModel;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.ast.RuleAstBaseListener;
+import org.graylog.plugins.pipelineprocessor.ast.RuleAstWalker;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
+import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.db.PipelineMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -40,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -113,6 +118,9 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
             Set<Stage> stages = functions.get(pipeline.id()).stages();
 
             List<String> ruleList = new ArrayList<>();
+            List<String> functionList = new ArrayList<>();
+            List<String> deprecatedFunctionList = new ArrayList<>();
+
             if (stages != null) {
                 stages.forEach(stage -> {
                     final List<Rule> rules = stage.getRules();
@@ -120,18 +128,48 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
                         rules.forEach(rule -> {
                             if (rule != null) {
                                 ruleList.add(rule.id());
+                                analyzeFunctions(rule, functionList, deprecatedFunctionList);
                             }
                         });
                     }
                 });
             }
-            builder.rules(ruleList);
-
-
+            builder.rules(ruleList).functions(functionList).deprecatedFunctions(deprecatedFunctionList);
             records.add(new InsertOneModel<>(builder.build()));
         });
+
         if (!records.isEmpty()) {
+            LOG.info("Inserting {} pipeline metadata records.", records.size());
             collection.bulkWrite(records);
+        }
+    }
+
+    private void analyzeFunctions(Rule rule, List<String> functionList, List<String> deprecatedFunctionList) {
+        MetaDataListener ruleListener = new MetaDataListener();
+        new RuleAstWalker().walk(ruleListener, rule);
+        functionList.addAll(ruleListener.getFunctions());
+        deprecatedFunctionList.addAll(ruleListener.getDeprecatedFunctions());
+    }
+
+    static class MetaDataListener extends RuleAstBaseListener {
+        private final Set<String> functions = new HashSet<>();
+        private final Set<String> deprecatedFunctions = new HashSet<>();
+
+        @Override
+        public void enterFunctionCall(FunctionExpression expr) {
+            final FunctionDescriptor<?> descriptor = expr.getFunction().descriptor();
+            functions.add(descriptor.name());
+            if (Boolean.TRUE.equals(descriptor.deprecated())) {
+                deprecatedFunctions.add(descriptor.name());
+            }
+        }
+
+        public Set<String> getFunctions() {
+            return functions;
+        }
+
+        public Set<String> getDeprecatedFunctions() {
+            return deprecatedFunctions;
         }
     }
 }
