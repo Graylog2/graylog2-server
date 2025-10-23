@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
@@ -25,9 +26,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
 
-import jakarta.inject.Inject;
-
-import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -51,7 +49,7 @@ public class AggregationSpecToPivotMapper implements Function<AggregationRequest
     public Pivot apply(final AggregationRequestSpec aggregationSpec) {
         final List<BucketSpec> groups = aggregationSpec.groupings()
                 .stream()
-                .map(rowGroupCreator)
+                .map(gr -> rowGroupCreator.apply(gr, aggregationSpec.timerange()))
                 .collect(Collectors.toList());
 
         final List<ImmutablePair<Metric, SeriesSpec>> series = aggregationSpec.metrics()
