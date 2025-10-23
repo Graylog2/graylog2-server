@@ -63,7 +63,8 @@ const getThresholdShapes = ({
         ? formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev, 0)
         : value;
 
-      const axisStartPosition = getYAxisPosition(mapperAxisNumber[curSeries.function] ?? 0);
+      const seriesName = curSeries.config.name || curSeries.function;
+      const axisStartPosition = getYAxisPosition(mapperAxisNumber[seriesName] ?? 1);
 
       const shape: Partial<Shape> = {
         type: 'line',
