@@ -7,27 +7,21 @@ OpenRewrite is configured in `graylog-parent` (`graylog2-server/pom.xml`) and in
 Note: `com.example.MyCustomRecipe` is an example placeholder, that refers to the `rewrite.yml.exmaple` recipe. It's good practice to combine
 multiple recipes in the `rewrite.yml` at the top of the repository, because that ensures the parse trees are shared, which is more efficient.
 
-### From graylog2-server
+### From graylog-project
 ```bash
-cd /path/to/graylog2-server
+cd /path/to/graylog-project-checkout
 
 # Dry run - see what would change
+./mvnw -Popenrewrite
 ./mvnw -Popenrewrite rewrite:dryRun \
+  -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' \
   -Drewrite.activeRecipes=com.example.MyCustomRecipe
 
 # Review changes in target/rewrite/rewrite.patch
 
 # Apply changes
 ./mvnw -Popenrewrite rewrite:run \
-  -Drewrite.activeRecipes=com.example.MyCustomRecipe
-```
-
-### From graylog-plugin-enterprise
-```bash
-cd /path/to/graylog-plugin-enterprise
-
-# Use mvnw from graylog2-server (inherits parent POM config)
-../graylog2-server/mvnw -Popenrewrite rewrite:dryRun \
+  -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' \
   -Drewrite.activeRecipes=com.example.MyCustomRecipe
 ```
 
@@ -35,46 +29,36 @@ cd /path/to/graylog-plugin-enterprise
 
 - **Plugin Configuration:** `graylog2-server/pom.xml` in `<pluginManagement>` (lines ~739-782)
 - **Profile:** `graylog2-server/pom.xml` in `<profiles>` (lines ~1343-1353)
-- **Recipe Definitions:** `rewrite.yml` in repository root
+- **Recipe Definitions:** `rewrite.yml` in graylog-project root or reference using `-Drewrite.configLocation=/path/to/your/file`
 - **Recipe Dependencies:** Pre-loaded in parent POM (rewrite-java, rewrite-joda, rewrite-testing-frameworks, rewrite-migrate-java, rewrite-static-analysis)
 
 All modules in both repositories inherit this configuration automatically.
+
+You need to exclude the `e2e-test`, `graylog-project` and `runner` modules if you use graylog-project, those do not inherit from `graylog-parent`.
 
 ## Common Recipes
 
 All recipe dependencies are pre-configured. Just specify the recipe name:
 
-| Task | Command |
-|------|---------|
-| **Joda-Time → java.time** | `./mvnw -Popenrewrite rewrite:run -Drewrite.activeRecipes=org.openrewrite.java.joda.time.NoJodaTime` |
-| **JUnit 4 → 5** | `./mvnw -Popenrewrite rewrite:run -Drewrite.activeRecipes=org.openrewrite.java.testing.junit5.JUnit4to5Migration` |
-| **Remove unused imports** | `./mvnw -Popenrewrite rewrite:run -Drewrite.activeRecipes=org.openrewrite.java.RemoveUnusedImports` |
-| **Static analysis fixes** | `./mvnw -Popenrewrite rewrite:run -Drewrite.activeRecipes=org.openrewrite.staticanalysis.CommonStaticAnalysis` |
-| **Custom recipes** | `./mvnw -Popenrewrite rewrite:run -Drewrite.activeRecipes=com.example.MyCustomRecipe` |
+| Task                      | Command                                                                                                                                                                                                          |
+|---------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Joda-Time → java.time** | `./mvnw -Popenrewrite rewrite:run -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' -Drewrite.activeRecipes=org.openrewrite.java.joda.time.NoJodaTime`              |
+| **JUnit 4 → 5**           | `./mvnw -Popenrewrite rewrite:run -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' -Drewrite.activeRecipes=org.openrewrite.java.testing.junit5.JUnit4to5Migration` |
+| **Remove unused imports** | `./mvnw -Popenrewrite rewrite:run -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' -Drewrite.activeRecipes=org.openrewrite.java.RemoveUnusedImports`               |
+| **Static analysis fixes** | `./mvnw -Popenrewrite rewrite:run -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' -Drewrite.activeRecipes=org.openrewrite.staticanalysis.CommonStaticAnalysis`    |
+| **Custom recipes**        | `./mvnw -Popenrewrite rewrite:run -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' -Drewrite.activeRecipes=com.example.MyCustomRecipe`                             |
 
 ## Usage Patterns
 
 ### Discover Available Recipes
 ```bash
-./mvnw -Popenrewrite rewrite:discover | grep -i <search-term>
-```
-
-### Run on Specific Modules
-```bash
-# Single module
-./mvnw -Popenrewrite rewrite:run \
-  -pl graylog2-server \
-  -Drewrite.activeRecipes=com.example.MyCustomRecipe
-
-# Multiple modules
-./mvnw -Popenrewrite rewrite:run \
-  -pl graylog2-server,full-backend-tests \
-  -Drewrite.activeRecipes=com.example.MyCustomRecipe
+./mvnw -Popenrewrite rewrite:discover -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' | grep -i <search-term>
 ```
 
 ### Exclude Problematic Files
 ```bash
 ./mvnw -Popenrewrite rewrite:run \
+  -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' \
   -Drewrite.activeRecipes=com.example.MyCustomRecipe \
   -Drewrite.exclusions='**/ProblemFile.java,**/AnotherFile.java'
 ```
@@ -82,6 +66,7 @@ All recipe dependencies are pre-configured. Just specify the recipe name:
 ### Multiple Recipes
 ```bash
 ./mvnw -Popenrewrite rewrite:run \
+  -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' \
   -Drewrite.activeRecipes=org.openrewrite.java.RemoveUnusedImports,org.openrewrite.java.format.AutoFormat
 ```
 
@@ -119,6 +104,8 @@ recipeList:
 ```
 
 For Java-based custom recipes, create a separate Maven module and add it as a dependency in the parent POM's OpenRewrite plugin configuration.
+Consider placing the `rewrite.yml` in `graylog-project` if you run that. In which case the default location picks it up automatically and you
+save yourself a length `-Drewrite.configLocation` property.
 
 ## Troubleshooting
 
@@ -148,6 +135,7 @@ Groovy files (Jenkins pipelines) are automatically excluded via `plainTextMasks`
 Add exclusions for problematic files and report bugs to OpenRewrite:
 ```bash
 ./mvnw -Popenrewrite rewrite:run \
+  -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' \
   -Drewrite.activeRecipes=com.example.MyCustomRecipe \
   -Drewrite.exclusions='**/ProblemFile.java'
 ```
@@ -162,9 +150,9 @@ Add exclusions for problematic files and report bugs to OpenRewrite:
 Example workflow:
 ```bash
 git checkout -b feature/joda-time-migration
-./mvnw -Popenrewrite rewrite:dryRun -Drewrite.activeRecipes=org.openrewrite.java.joda.time.NoJodaTime
+./mvnw -Popenrewrite rewrite:dryRun -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner' -Drewrite.activeRecipes=org.openrewrite.java.joda.time.NoJodaTime
 # Review changes in target/rewrite/rewrite.patch
-./mvnw -Popenrewrite rewrite:run -Drewrite.activeRecipes=org.openrewrite.java.joda.time.NoJodaTime
+./mvnw -Popenrewrite rewrite:run -Dskip.web.build -pl '!org.graylog:e2e-tests,!org.graylog:graylog-project,!org.graylog:runner'-Drewrite.activeRecipes=org.openrewrite.java.joda.time.NoJodaTime
 git diff  # Review changes
 git commit -am "Migrate from Joda-Time to java.time"
 ```
@@ -177,7 +165,7 @@ Configuration is in `graylog-parent` (`graylog2-server/pom.xml`) because:
 - Proper Maven inheritance via `<pluginManagement>` propagates to all child modules
 - Supports cross-repository usage (graylog2-server and graylog-plugin-enterprise)
 
-The `graylog-project-internal` POM is just an aggregator for coordinating builds, not a parent.
+The `graylog-project` POM is just an aggregator for coordinating builds, not a parent.
 
 ## Resources
 
