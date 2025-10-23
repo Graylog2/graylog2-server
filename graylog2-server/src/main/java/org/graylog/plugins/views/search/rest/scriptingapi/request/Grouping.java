@@ -51,7 +51,7 @@ public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
         timeunit.ifPresent(t -> attrCounter.getAndIncrement());
         scaling.ifPresent(s -> attrCounter.getAndIncrement());
         if(attrCounter.get() > 1) {
-            throw new ValidationException("Only one attribute of 'limit', 'timeunit' or 'scaling' can be specified");
+            throw new ValidationException("Only one attribute out of 'limit', 'timeunit' or 'scaling' can be specified");
         }
     }
 

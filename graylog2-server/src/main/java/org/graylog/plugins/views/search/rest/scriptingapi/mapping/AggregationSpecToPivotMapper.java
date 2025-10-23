@@ -88,7 +88,7 @@ public class AggregationSpecToPivotMapper implements BiFunction<AggregationReque
     }
 
     private boolean noBucketingParameterSetOn(Grouping grouping) {
-        return !(grouping.timeunit().isPresent() && grouping.scaling().isPresent());
+        return grouping.timeunit().isEmpty() && grouping.scaling().isEmpty();
     }
 
     @Override
