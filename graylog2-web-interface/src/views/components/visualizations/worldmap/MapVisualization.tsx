@@ -174,7 +174,7 @@ const MapVisualization = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewport.center, viewport.zoom]);
 
-  const _handleRenderComplete = useCallback(() => {
+  useEffect(() => {
     if (_areTilesReady && _isMapReady) {
       onRenderComplete();
     }
@@ -182,13 +182,11 @@ const MapVisualization = ({
 
   const _handleMapReady = useCallback(() => {
     setIsMapReady(true);
-    _handleRenderComplete();
-  }, [_handleRenderComplete]);
+  }, []);
 
   const _handleTilesReady = useCallback(() => {
     setAreTilesReady(true);
-    _handleRenderComplete();
-  }, [_handleRenderComplete]);
+  }, []);
 
   const _onChange = useCallback(
     (newViewport: Viewport) => {
