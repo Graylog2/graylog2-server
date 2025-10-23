@@ -21,7 +21,6 @@ env:
     --update-snapshots
     --no-transfer-progress
   MAVEN_OPTS: >
-    -Dspotbugs.skip
     -DtrimStackTrace=false
     -Djansi.force=true
     -Dmaven.wagon.http.retryHandler.class=standard
@@ -48,7 +47,7 @@ jobs:
           distribution: "temurin"
 
       - name: "Build with Maven"
-        run: "./mvnw -Pedantic clean -DskipTests package javadoc:javadoc"
+        run: "./mvnw -Pedantic clean -Dspotbugs.skip -DskipTests package javadoc:javadoc"
 
   frontend-tests:
     name: "Frontend Tests"
@@ -64,7 +63,7 @@ jobs:
           distribution: "temurin"
 
       - name: "Build with Maven"
-        run: "./mvnw -Pedantic -Dmaven.test.skip -Dskip.datanode -Dcyclonedx.skip clean test"
+        run: "./mvnw -Pedantic -Dspotbugs.skip -Dmaven.test.skip -Dskip.datanode -Dcyclonedx.skip clean test"
 
   backend-tests:
     name: "Backend Tests"
@@ -80,7 +79,7 @@ jobs:
           distribution: "temurin"
 
       - name: "Build with Maven"
-        run: "./mvnw -Pedantic -Dskip.web.build -Dassembly.skipAssembly -Dcyclonedx.skip clean verify -DexcludedGroups=full-backend-test"
+        run: "./mvnw -Pedantic -Dspotbugs.skip -Dskip.web.build -Dassembly.skipAssembly -Dcyclonedx.skip clean verify -DexcludedGroups=full-backend-test"
 
   full-backend-tests:
     name: "Full Backend Tests"
@@ -130,6 +129,7 @@ jobs:
         run: >
           ./mvnw
           -Pedantic
+          -Dspotbugs.skip
           -Dskip.web.tests
           -Dcyclonedx.skip
           -Dskip.artifact.assembly
