@@ -15,9 +15,7 @@
             <useProjectArtifact>true</useProjectArtifact>
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <includes>
-                <include>org.graylog:graylog-storage-opensearch2</include>
-                <include>org.graylog.shaded:opensearch2-rest-high-level-client</include>
-                <include>org.graylog.shaded:opensearch2-rest-client-sniffer</include>
+                <include>org.graylog:graylog-storage-opensearch3</include>
             </includes>
         </dependencySet>
     </dependencySets>
