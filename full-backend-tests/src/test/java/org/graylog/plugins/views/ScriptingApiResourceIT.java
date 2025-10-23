@@ -29,6 +29,9 @@ import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -45,6 +48,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,6 +56,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
+import static org.hamcrest.Matchers.is;
 
 @GraylogBackendConfiguration(serverLifecycle = CLASS)
 public class ScriptingApiResourceIT {
@@ -85,17 +90,17 @@ public class ScriptingApiResourceIT {
         api.gelf()
                 .createGelfHttpInput(12201)
                 .postMessage("""
-                        {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1, "_target_stream": "stream1"}
+                        {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1, "_target_stream": "stream1", "date_field": "2025-10-20T12:00:10.123Z"}
                         """)
                 .postMessage("""
-                        {"short_message":"search-sync-test-2", "host":"example.org", "facility":"another-test", "_level":2, "_target_stream": "stream2"}
+                        {"short_message":"search-sync-test-2", "host":"example.org", "facility":"another-test", "_level":2, "_target_stream": "stream2", "date_field": "2025-10-20T12:10:42.123Z"}
                         """)
                 .postMessage("""
-                        {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
+                        {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2", "date_field": "2025-10-21T12:01:30.123Z"}
                         """);
 
         api.search().waitForMessages("search-sync-test", "search-sync-test-2", "search-sync-test-3");
-        api.fieldTypes().waitForFieldTypeDefinitions("source", "facility", "level");
+        api.fieldTypes().waitForFieldTypeDefinitions("source", "facility", "level", "date_field");
     }
 
     @FullBackendTest
@@ -923,6 +928,183 @@ public class ScriptingApiResourceIT {
 
         assertThat(response.size()).isEqualTo(percentageMetricExpectedResult.size());
         assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
+    }
+
+    @FullBackendTest
+    void testTimestampGroupingBy1Hour() {
+        api.waitFor(() -> {
+            var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
+            return fieldTypes.stream().anyMatch(type -> type.name().equals("date_field") && type.type().equals(FieldTypeMapper.DATE_TYPE));
+        }, "'date_field' should exist as a date type field in graylog so that bucketing works");
+
+        final var req = """
+                        {
+                          "timerange": {
+                            "type": "relative",
+                            "range": 0
+                           },
+                           "group_by": [
+                             {
+                               "field": "date_field",
+                               "timeunit": "1h"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                        """;
+
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(req)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expectedResult = """
+                                            ┌────────────────────────┬───────────────────────┐
+                                            │grouping: date_field    │metric: count()        │
+                                            ├────────────────────────┼───────────────────────┤
+                                            │2025-10-20T12:00:00.000Z│1                      │
+                                            │2025-10-20T13:00:00.000Z│1                      │
+                                            │2025-10-20T14:00:00.000Z│0                      │
+                                            │2025-10-20T15:00:00.000Z│0                      │
+                                            │2025-10-20T16:00:00.000Z│0                      │
+                                            │2025-10-20T17:00:00.000Z│0                      │
+                                            │2025-10-20T18:00:00.000Z│0                      │
+                                            │2025-10-20T19:00:00.000Z│0                      │
+                                            │2025-10-20T20:00:00.000Z│0                      │
+                                            │2025-10-20T21:00:00.000Z│0                      │
+                                            │2025-10-20T22:00:00.000Z│0                      │
+                                            │2025-10-20T23:00:00.000Z│0                      │
+                                            │2025-10-21T00:00:00.000Z│0                      │
+                                            │2025-10-21T01:00:00.000Z│0                      │
+                                            │2025-10-21T02:00:00.000Z│0                      │
+                                            │2025-10-21T03:00:00.000Z│0                      │
+                                            │2025-10-21T04:00:00.000Z│0                      │
+                                            │2025-10-21T05:00:00.000Z│0                      │
+                                            │2025-10-21T06:00:00.000Z│0                      │
+                                            │2025-10-21T07:00:00.000Z│0                      │
+                                            │2025-10-21T08:00:00.000Z│0                      │
+                                            │2025-10-21T09:00:00.000Z│0                      │
+                                            │2025-10-21T10:00:00.000Z│0                      │
+                                            │2025-10-21T11:00:00.000Z│0                      │
+                                            │2025-10-21T12:00:00.000Z│1                      │
+                                            └────────────────────────┴───────────────────────┘
+                                            """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response)).isTrue();
+    }
+
+    @FullBackendTest
+    void testTimestampGroupingBy1Day() {
+        api.waitFor(() -> {
+            var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
+            return fieldTypes.stream().anyMatch(type -> type.name().equals("date_field") && type.type().equals(FieldTypeMapper.DATE_TYPE));
+        }, "'date_field' should exist as a date type field in graylog so that bucketing works");
+
+        final var req = """
+                        {
+                          "timerange": {
+                            "type": "relative",
+                            "range": 0
+                           },
+                           "group_by": [
+                             {
+                               "field": "date_field",
+                               "timeunit": "1d"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                        """;
+
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(req)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expectedResult = """
+                                            ┌────────────────────────┬───────────────────────┐
+                                            │grouping: date_field    │metric: count()        │
+                                            ├────────────────────────┼───────────────────────┤
+                                            │2025-10-20T00:00:00.000Z│2                      │
+                                            │2025-10-21T00:00:00.000Z│1                      │
+                                            └────────────────────────┴───────────────────────┘
+                                            """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response)).isTrue();
+    }
+
+    @FullBackendTest
+    void testTimestampGroupingByScaling() {
+        api.waitFor(() -> {
+            var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
+            return fieldTypes.stream().anyMatch(type -> type.name().equals("date_field") && type.type().equals(FieldTypeMapper.DATE_TYPE));
+        }, "'date_field' should exist as a date type field in graylog so that bucketing works");
+
+        final var req = """
+                        {
+                          "timerange": {
+                            "type": "relative",
+                            "range": 0
+                           },
+                           "group_by": [
+                             {
+                               "field": "date_field",
+                               "scaling": 3.0
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                        """;
+
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(req)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expectedResult = """
+                                            ┌────────────────────────┬───────────────────────┐
+                                            │grouping: date_field    │metric: count()        │
+                                            ├────────────────────────┼───────────────────────┤
+                                            │2025-10-20T12:00:00.000Z│2                      │
+                                            │2025-10-21T00:00:00.000Z│0                      │
+                                            │2025-10-21T12:00:00.000Z│1                      │
+                                            └────────────────────────┴───────────────────────┘
+                                            """.strip().lines().toList();
+
+        assertThat(response.size()).isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response)).isTrue();
     }
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
