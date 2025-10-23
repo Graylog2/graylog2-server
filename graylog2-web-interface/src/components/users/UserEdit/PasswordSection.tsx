@@ -141,7 +141,7 @@ const PasswordSection = ({ user: { id } }: Props) => {
             <Row className="no-bm">
               <Col xs={12}>
                 <div className="pull-right">
-                  <Button bsStyle="success" disabled={isSubmitting || !isValid} title="Change Password" type="submit">
+                  <Button bsStyle="primary" disabled={isSubmitting || !isValid} title="Change Password" type="submit">
                     Change Password
                   </Button>
                 </div>

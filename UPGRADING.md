@@ -17,9 +17,14 @@ Graylog now requires at least Mongo DB version 7.0. Earlier versions are no long
 In general, MongoDB upgrades must be done from one minor release to the next, going to the latest bug fix version 
 in that release. Please refer to the Mongo DB upgrade documentation for details:
 - [Upgrade tutorial](https://www.mongodb.com/docs/manual/tutorial/upgrade-revision/#std-label-upgrade-to-latest-revision/)
-- [6.0](https://www.mongodb.com/docs/manual/release-notes/6.0-upgrade/)
+- [6.0](https://www.mongodb.com/docs/v6.0/release-notes/6.0/#upgrade-procedures)
 - [7.0](https://www.mongodb.com/docs/manual/release-notes/7.0-upgrade/)
 - [8.0](https://www.mongodb.com/docs/manual/release-notes/8.0-upgrade/)
+
+Graylog users who cannot upgrade to MongoDB >= 7.0 prior to upgrading Graylog to 7.0.x can disable Graylog's preflight 
+check via its configuration setting (`skip_preflight_checks = true`) to let Graylog start regardless of the used MongoDB 
+version. This approach is not recommended though, as Graylog might start using MongoDB 7.0 features over the course of 
+the Graylog 7.x series.
 
 ### Kafka Inputs
 
@@ -104,7 +109,8 @@ names of data lake related metrics change accordingly.
     - Event procedure
     - Event step
     - Content Pack installation
-  - Teams
+    - Teams
+    - Illuminate Pack installation
 
   <br> For example, the request payload to create a stream might now look like this:
 
@@ -131,11 +137,42 @@ names of data lake related metrics change accordingly.
 
 The following REST API changes have been made.
 
-| Endpoint                                                      | Description                                                                                                                                        |
-|---------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
-| `GET /system/urlallowlist`                                    | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                  |
-| `PUT /system/urlallowlist`                                    | Renamed from `PUT /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:write`                                  |
-| `POST /system/urlallowlist/check`                             | Renamed from `POST /system/urlwhitelist/check`                                                                                                     |
-| `POST /system/urlallowlist/generate_regex`                    | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                            |
-| All `/api/plugins/org.graylog.plugins.datalake/data_lake/...` | Renamed from `/api/plugins/org.graylog.plugins.datawarehouse/data_warehouse/...`. The corresponding permissions are also renamed to `data_lake...` |
-| `GET /<endpoint>`                                             | description                                                                                                                                        |
+| Endpoint                                                                    | Description                                                                                                                                        |
+|-----------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| `GET /system/urlallowlist`                                                  | Renamed from `GET /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:read`.                                  |
+| `PUT /system/urlallowlist`                                                  | Renamed from `PUT /system/urlwhitelist`. The corresponding REST API permission is renamed to `urlallowlist:write`                                  |
+| `POST /system/urlallowlist/check`                                           | Renamed from `POST /system/urlwhitelist/check`                                                                                                     |
+| `POST /system/urlallowlist/generate_regex`                                  | Renamed from `POST /system/urlwhitelist/generate_regex`                                                                                            |
+| All `/api/plugins/org.graylog.plugins.datalake/data_lake/...`               | Renamed from `/api/plugins/org.graylog.plugins.datawarehouse/data_warehouse/...`. The corresponding permissions are also renamed to `data_lake...` |
+| All `/api/plugins/org.graylog.plugins.securityapp.asset/assets/history/...` | Removed all endpoints. Contents of underlying `asset_history` MongoDB collection migrated to `Asset History` Index set and Stream               |
+| `GET /<endpoint>`                                                           | description                                                                                                                                        |
+
+
+## Deprecation of old Search Backends
+
+### Deprecation of Elasticsearch
+
+Graylog introduced support for OpenSearch as its new search backend in 2022. To simplify the installation and management
+of OpenSearch, the Graylog Data Node component was later developed. Today, Data Node or a self-managed OpenSearch
+deployment are the preferred search backend options for running Graylog.
+
+Starting with Graylog 7.0, the use of Elasticsearch as a search backend is deprecated.
+
+Graylog users are encouraged to migrate to Data Node or self-managed OpenSearch, as Elasticsearch support will be 
+removed entirely in Graylog 8.0.
+
+### Deprecation of OpenSearch 1.x
+
+According to the official OpenSearch Maintenance Policy, the OpenSearch 1.x maintenance window ended in May 2025. As a 
+result, OpenSearch 1.x will no longer receive back-port fixes or features.
+
+Therefore, starting with Graylog 7.0, the use of OpenSearch 1.x is deprecated. Support for OpenSearch 1.x will be 
+removed in Graylog 8.0.
+
+Graylog users are encouraged to use Graylog Data Node or a supported, self-managed version of OpenSearch. See Graylog's 
+Compatibility Matrix for details on supported OpenSearch versions.
+
+Links:
+- [OpenSearch Release Schedule and Maintenance Policy](https://opensearch.org/releases/)
+- [Graylog Data Node](https://go2docs.graylog.org/current/downloading_and_installing_graylog/install_graylog_data_node.htm)
+- [Graylog Compatibility Matrix](https://go2docs.graylog.org/current/downloading_and_installing_graylog/compatibility_matrix.htm)

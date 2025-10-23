@@ -48,7 +48,7 @@ import formatValueWithUnitLabel from 'views/components/visualizations/utils/form
 
 type DefaultAxisKey = 'withoutUnit';
 
-const getYAxisPosition = (axisCount: number) => {
+export const getYAxisPosition = (axisCount: number) => {
   const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
 
   if (axisCount % 2 === 0) {
@@ -124,7 +124,7 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   };
 };
 
-const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
+export const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
   switch (unitTypeKey) {
     case 'percent':
       return {
@@ -281,6 +281,7 @@ export const generateLayouts = ({
       const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
 
       if (!res[unitType]) {
+        // eslint-disable-next-line no-param-reassign
         res[unitType] = [value.y];
       } else {
         res[unitType].push(value.y);
@@ -318,16 +319,16 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>;
 export const getHoverTemplateSettings = ({
   convertedValues,
   unit,
-  name,
+  name = undefined,
 }: {
   convertedValues: Array<any>;
   unit: FieldUnit;
-  name: string;
+  name?: string;
 }): { text: Array<string>; hovertemplate: string; meta: string } | {} => {
   if (unit?.unitType === 'time' || unit?.unitType === 'size') {
     return {
       text: getHoverTexts({ convertedValues, unit }),
-      hovertemplate: '%{text}<br><extra>%{meta}</extra>',
+      hovertemplate: `%{text}<br>${name ? '<extra>%{meta}</extra>' : '<extra></extra>'}`,
       meta: name,
     };
   }

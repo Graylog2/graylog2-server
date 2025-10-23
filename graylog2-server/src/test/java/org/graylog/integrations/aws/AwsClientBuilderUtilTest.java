@@ -60,7 +60,7 @@ public class AwsClientBuilderUtilTest {
 
     @Before
     public void setUp() throws Exception {
-        awsClientBuilderUtil = new AWSClientBuilderUtil(encryptedValueService, mock(Configuration.class));
+        awsClientBuilderUtil = new AWSClientBuilderUtil(AWSAuthFactory::new, encryptedValueService, mock(Configuration.class));
     }
 
     // Test Cases

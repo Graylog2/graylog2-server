@@ -32,12 +32,14 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
       keySeparator,
     );
     const metric: string = config.series.length === 1 ? config.series[0].function : (splitNames.pop() as string);
+    const columnValues = splitNames.filter((value) => value !== metric);
 
     const columnPivotsToFields = config?.columnPivots?.flatMap((pivot) => pivot.fields) ?? [];
 
     const rowPivotsToFields = config?.rowPivots?.flatMap((pivot) => pivot.fields) ?? [];
-    const splitXValues: Array<string | number> =
-      clickPoint.data.originalLabels?.[clickPoint.pointNumber].split(keySeparator);
+    const splitXValues: Array<string | number> = rowPivotsToFields?.length
+      ? clickPoint.data.originalLabels?.[clickPoint.pointNumber].split(keySeparator)
+      : [];
 
     return {
       rowPivotValues: splitXValues.map((value, i) => ({
@@ -46,7 +48,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
         text: String(value),
         traceColor,
       })),
-      columnPivotValues: splitNames.map((value, i) => ({
+      columnPivotValues: columnValues.map((value, i) => ({
         value,
         field: columnPivotsToFields[i],
         text: String(value),
@@ -74,6 +76,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
         columnPivotValues={columnPivotValues}
         metricValue={metricValue}
         setFieldData={setFieldData}
+        config={config}
       />
     </Popover.Dropdown>
   );

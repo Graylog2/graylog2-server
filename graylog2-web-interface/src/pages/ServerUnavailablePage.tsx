@@ -26,6 +26,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import LoginChrome from 'components/login/LoginChrome';
 import useProductName from 'brand-customization/useProductName';
 import type { ServerError } from 'stores/sessions/ServerAvailabilityStore';
+import DocsHelper from 'util/DocsHelper';
 
 const StyledIcon = styled(Icon)`
   margin-left: 6px;
@@ -126,7 +127,7 @@ const ServerUnavailablePage = ({ server = undefined }: Props) => {
               <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
               <p>
                 Do you need a hand?{' '}
-                <a href="https://www.graylog.org/community-support" rel="noopener noreferrer" target="_blank">
+                <a href={DocsHelper.PAGES.SERVER_UNAVAILABLE} rel="noopener noreferrer" target="_blank">
                   We can help you
                 </a>
                 .

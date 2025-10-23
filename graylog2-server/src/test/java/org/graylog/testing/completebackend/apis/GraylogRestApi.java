@@ -32,7 +32,16 @@ public interface GraylogRestApi {
     }
 
     default void waitFor(Producer<Boolean> predicate, String timeoutErrorMessage, Duration timeout) {
-        waitForObject(() -> Optional.ofNullable(predicate.call()).filter(result -> result), timeoutErrorMessage, timeout);
+        waitForObject(
+                () -> {
+                    try {
+                        return Optional.ofNullable(predicate.call()).filter(result -> result);
+                    } catch (Exception | AssertionError e) {
+                        return Optional.empty();
+                    }
+                },
+                timeoutErrorMessage, timeout
+        );
     }
 
     default <T> T waitForObject(Producer<Optional<T>> predicate, String timeoutErrorMessage, Duration timeout) {
@@ -43,7 +52,7 @@ public interface GraylogRestApi {
                 if (result != null && result.isPresent()) {
                     return result.get();
                 }
-            } catch (Exception e) {
+            } catch (Exception | AssertionError e) {
                 // ignore and retry
             }
             msPassed += SLEEP_MS;

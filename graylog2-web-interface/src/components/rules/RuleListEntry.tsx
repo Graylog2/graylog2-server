@@ -117,7 +117,7 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
         </MetricContainer>
       </td>
       <LimitedTd>
-        <CountBadge>{pipelinesLength}</CountBadge> {_showPipelines(usingPipelines)}
+        <CountBadge count={pipelinesLength} /> {_showPipelines(usingPipelines)}
       </LimitedTd>
       <td className="actions">{actions}</td>
     </tr>

@@ -82,14 +82,16 @@ const SavedSearchForm = ({
           {pluggableSaveViewControls?.map(
             ({ component: Component, id }) => Component && <Component key={id} disabledViewCreation={disableSaveAs} />,
           )}
-          <EntityCreateShareFormGroup
-            description="Search for a User or Team to add as collaborator on this search."
-            entityType="search"
-            entityTitle=""
-            entityId={isCreateNew ? null : viewId}
-            dependenciesGRN={selectedStreamGRN}
-            onSetEntityShare={(payload) => setSharePayload(payload)}
-          />
+          {!disableSaveAs && (
+            <EntityCreateShareFormGroup
+              description="Search for a User or Team to add as collaborator on this search."
+              entityType="search"
+              entityTitle=""
+              entityId={isCreateNew ? null : viewId}
+              dependenciesGRN={selectedStreamGRN}
+              onSetEntityShare={(payload) => setSharePayload(payload)}
+            />
+          )}
           <ButtonToolbar>
             {!isCreateNew && (
               <Button

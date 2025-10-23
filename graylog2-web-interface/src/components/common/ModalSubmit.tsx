@@ -25,6 +25,18 @@ import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 import ModalButtonToolbar from 'components/common/ModalButtonToolbar';
 
+const buttonTitle = (isSubmitting: boolean, submitText: React.ReactNode, submitLoadingText: string) => {
+  if (isSubmitting && typeof submitLoadingText === 'string') {
+    return submitLoadingText;
+  }
+
+  if (!isSubmitting && typeof submitText === 'string') {
+    return submitText;
+  }
+
+  return undefined;
+};
+
 type WithCancelProps = {
   displayCancel?: true;
   disabledCancel?: boolean;
@@ -82,8 +94,12 @@ const ModalSubmit = ({ ...props }: Props) => {
     submitIcon,
   } = props;
 
-  const title = typeof submitButtonText === 'string' ? submitButtonText : undefined;
   const submittingAsync = isWithAsyncSubmit(props) && props.isSubmitting;
+  const title = buttonTitle(
+    submittingAsync,
+    submitButtonText,
+    'submitLoadingText' in props ? props.submitLoadingText : undefined,
+  );
   const confirmRef = useRef<HTMLButtonElement>();
   useEffect(() => {
     if (autoFocus && !disabledSubmit && confirmRef.current) {
@@ -109,7 +125,7 @@ const ModalSubmit = ({ ...props }: Props) => {
       )}
       <Button
         ref={confirmRef}
-        bsStyle="success"
+        bsStyle="primary"
         bsSize={bsSize}
         disabled={disabledSubmit || submittingAsync}
         form={formId}

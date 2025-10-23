@@ -18,6 +18,7 @@ package org.graylog.datanode.opensearch;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -191,4 +192,12 @@ public class OpensearchProcessImplTest {
         return i * 1024 * 1024 * 1024L;
     }
 
+    @Test
+    public void recommendedMemorySettingValue() {
+        Assertions.assertThat(OpensearchProcessImpl.recommendedMemorySetting("7 GB"))
+                .isEqualTo("7g");
+
+        Assertions.assertThat(OpensearchProcessImpl.recommendedMemorySetting("512 MB"))
+                .isEqualTo("512m");
+    }
 }
