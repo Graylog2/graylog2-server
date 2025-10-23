@@ -736,6 +736,50 @@
                     <artifactId>protobuf-maven-plugin</artifactId>
                     <version>${protobuf-maven-plugin.version}</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.openrewrite.maven</groupId>
+                    <artifactId>rewrite-maven-plugin</artifactId>
+                    <version>6.22.1</version>
+                    <configuration>
+                        <configLocation>${maven.multiModuleProjectDirectory}/rewrite.yml</configLocation>
+                        <exclusions>
+                            <exclusion>**/target/**</exclusion>
+                            <exclusion>**/build/**</exclusion>
+                            <exclusion>**/node_modules/**</exclusion>
+                            <exclusion>**/*.groovy</exclusion>
+                        </exclusions>
+                        <plainTextMasks>
+                            <plainTextMask>**/*.groovy</plainTextMask>
+                        </plainTextMasks>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.openrewrite</groupId>
+                            <artifactId>rewrite-java</artifactId>
+                            <version>8.64.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.openrewrite.recipe</groupId>
+                            <artifactId>rewrite-testing-frameworks</artifactId>
+                            <version>3.19.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.openrewrite.recipe</groupId>
+                            <artifactId>rewrite-migrate-java</artifactId>
+                            <version>3.19.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.openrewrite.recipe</groupId>
+                            <artifactId>rewrite-static-analysis</artifactId>
+                            <version>2.19.0</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.openrewrite.recipe</groupId>
+                            <artifactId>rewrite-joda</artifactId>
+                            <version>0.2.1</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -1292,6 +1336,17 @@
                         <altDeploymentRepository>local::file://${local.repo.path}</altDeploymentRepository>
                         <deployAtEnd>true</deployAtEnd>
                       </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>openrewrite</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.openrewrite.maven</groupId>
+                        <artifactId>rewrite-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
