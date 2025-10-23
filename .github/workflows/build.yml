@@ -94,24 +94,6 @@ jobs:
             search-server-version: "2.19.3"
             mongodb-version: "8.0"
 
-          # Oldest supported OpenSearch 1.x and MongoDB versions
-          - search-server-distribution: "OpenSearch"
-            search-server-version: "1.1.0"
-            mongodb-version: "7.0"
-
-          # Oldest supported OpenSearch 2.x and MongoDB versions
-          # Java 17.0.(1|2|3|4) has issues with newer kernels. Should we run
-          # into build issues on runners with newer kernels, we have to switch
-          # to OpenSearch 2.4.1. That's the first version with Java 17.0.5.
-          - search-server-distribution: "OpenSearch"
-            search-server-version: "2.0.1"
-            mongodb-version: "7.0"
-
-          # Elasticsearch (can be removed once we stop supporting it)
-          - search-server-distribution: "Elasticsearch"
-            search-server-version: "7.10.2"
-            mongodb-version: "7.0"
-
           # Data Node
           - search-server-distribution: "DataNode"
             mongodb-version: "7.0"
