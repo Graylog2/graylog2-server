@@ -1,32 +1,141 @@
-name: Build the repository
+name: "Open Build"
 
-on: 
+on:
   pull_request:
 
 # Cancel running build when new ref gets pushed.
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: true
 
+defaults:
+  run:
+    shell: "bash"
+
+
+env:
+  MAVEN_ARGS: >
+    --show-version
+    --batch-mode
+    --fail-fast
+    --update-snapshots
+    --no-transfer-progress
+  MAVEN_OPTS: >
+    -Dspotbugs.skip
+    -DtrimStackTrace=false
+    -Djansi.force=true
+    -Dmaven.wagon.http.retryHandler.class=standard
+    -Dmaven.wagon.http.retryHandler.count=3
+    -Dmaven.wagon.http.pool=false
+    -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+    -Dhttp.keepAlive=false
+  JAVA_OPTS: "-Xmx6g"
+  TIMEOUT_MULTIPLIER: "2.0"
+  GRAYLOG_IT_PROXIED_REQUESTS_TIMEOUT: "30s"
+
 jobs:
-  build:
-    runs-on: ubuntu-latest-4-cores-public
-    strategy:
-      matrix:
-        java-version: [ 21 ]
+  build-artifacts:
+    name: "Artifacts"
+    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up JDK ${{ matrix.java-version }}
-        uses: actions/setup-java@v3
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
         with:
-          java-version: ${{ matrix.java-version }}
-          distribution: temurin
-      - name: License check
-        run: ./mvnw -B --fail-fast license:check
-      - name: Build with Maven
-        run: ./mvnw -B --fail-fast -Pedantic -Dspotbugs.skip -Dmaven.wagon.http.retryHandler.class=standard -Dmaven.wagon.http.retryHandler.count=3 -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 verify javadoc:javadoc
-        env:
-          JAVA_OPTS: -Xmx6G
-          TIMEOUT_MULTIPLIER: 2.0
+          java-version: "21"
+          distribution: "temurin"
 
+      - name: "Build with Maven"
+        run: "./mvnw -Pedantic clean -DskipTests package javadoc:javadoc"
 
+  frontend-tests:
+    name: "Frontend Tests"
+    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: "Build with Maven"
+        run: "./mvnw -Pedantic -Dmaven.test.skip -Dskip.datanode -Dcyclonedx.skip clean test"
+
+  backend-tests:
+    name: "Backend Tests"
+    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: "Build with Maven"
+        run: "./mvnw -Pedantic -Dskip.web.build -Dassembly.skipAssembly -Dcyclonedx.skip clean verify -DexcludedGroups=full-backend-test"
+
+  full-backend-tests:
+    name: "Full Backend Tests"
+    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          # Latest OpenSearch and MongoDB
+          - search-server-distribution: "OpenSearch"
+            search-server-version: "2.19.3"
+            mongodb-version: "8.0"
+
+          # Oldest supported OpenSearch 1.x and MongoDB versions
+          - search-server-distribution: "OpenSearch"
+            search-server-version: "1.1.0"
+            mongodb-version: "7.0"
+
+          # Oldest supported OpenSearch 2.x and MongoDB versions
+          # Java 17.0.(1|2|3|4) has issues with newer kernels. Should we run
+          # into build issues on runners with newer kernels, we have to switch
+          # to OpenSearch 2.4.1. That's the first version with Java 17.0.5.
+          - search-server-distribution: "OpenSearch"
+            search-server-version: "2.0.1"
+            mongodb-version: "7.0"
+
+          # Elasticsearch (can be removed once we stop supporting it)
+          - search-server-distribution: "Elasticsearch"
+            search-server-version: "7.10.2"
+            mongodb-version: "7.0"
+
+          # Data Node
+          - search-server-distribution: "DataNode"
+            mongodb-version: "7.0"
+
+    steps:
+      - uses: "actions/checkout@v5"
+
+      - name: "Set up JDK"
+        uses: "actions/setup-java@v5"
+        with:
+          java-version: "21"
+          distribution: "temurin"
+
+      - name: "Build with Maven"
+        run: >
+          ./mvnw
+          -Pedantic
+          -Dskip.web.tests
+          -Dcyclonedx.skip
+          -Dskip.artifact.assembly
+          clean
+          verify
+          -Dgroups=full-backend-test
+          -Dtest.integration.search-server.distribution=${{ matrix.service.search-server-distribution || '' }}
+          -Dtest.integration.search-server.version=${{ matrix.service.search-server-version || '' }}
+          -Dtest.integration.mongodb.version=${{ matrix.service.mongodb-version || '' }}
