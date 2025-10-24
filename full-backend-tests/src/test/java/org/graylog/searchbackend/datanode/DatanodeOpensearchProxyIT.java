@@ -16,7 +16,6 @@
  */
 package org.graylog.searchbackend.datanode;
 
-import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -31,7 +30,6 @@ import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 import static java.time.Duration.ofSeconds;
 import static org.awaitility.Awaitility.waitAtMost;
