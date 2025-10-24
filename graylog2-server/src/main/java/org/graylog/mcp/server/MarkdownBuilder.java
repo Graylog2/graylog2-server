@@ -190,7 +190,8 @@ public class MarkdownBuilder {
             return null;
         }
         try (var stream = (keys == null || keys.isEmpty()) ? items.entrySet().stream() : keys.stream()
-                .filter(items::containsKey).map(k -> new AbstractMap.SimpleEntry<>(k, items.get(k)))) {
+//                .filter(items::containsKey)
+                .map(k -> new AbstractMap.SimpleEntry<>(k, items.getOrDefault(k, null)))) {
             return stream.collect(Collectors.toMap(
                     Map.Entry::getKey,
                     e -> orEmpty(e.getValue()).trim().replace("\n", " "),
