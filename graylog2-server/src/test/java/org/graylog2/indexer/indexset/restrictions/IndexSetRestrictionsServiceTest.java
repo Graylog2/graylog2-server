@@ -44,7 +44,7 @@ import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.creat
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toCreationRequest;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toUpdateRequest;
 import static org.graylog2.shared.utilities.StringUtils.f;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

@@ -22,26 +22,26 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public abstract class AlertConditionTest {
     protected static final String alertConditionTitle = "Alert Condition for Testing";
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
     protected Stream stream;
     @Mock
@@ -51,23 +51,23 @@ public abstract class AlertConditionTest {
     protected final String STREAM_CREATOR = "MOCKUSER";
     protected final String CONDITION_ID = "CONDITIONMOCKID";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(stream.getId()).thenReturn(STREAM_ID);
     }
 
     protected void assertTriggered(AlertCondition alertCondition, AlertCondition.CheckResult result) {
-        assertTrue("AlertCondition should be triggered, but it's not!", result.isTriggered());
-        assertNotNull("Timestamp of returned check result should not be null!", result.getTriggeredAt());
-        assertEquals("AlertCondition of result is not the same we created!", result.getTriggeredCondition(), alertCondition);
+        assertTrue(result.isTriggered(), "AlertCondition should be triggered, but it's not!");
+        assertNotNull(result.getTriggeredAt(), "Timestamp of returned check result should not be null!");
+        assertEquals(result.getTriggeredCondition(), alertCondition, "AlertCondition of result is not the same we created!");
         long difference = Tools.nowUTC().getMillis() - result.getTriggeredAt().getMillis();
-        assertTrue("AlertCondition should be triggered about now", difference < 1000);
+        assertTrue(difference < 1000, "AlertCondition should be triggered about now");
     }
 
     protected void assertNotTriggered(AlertCondition.CheckResult result) {
-        assertFalse("AlertCondition should not be triggered, but it is!", result.isTriggered());
-        assertNull("No timestamp should be supplied if condition did not trigger", result.getTriggeredAt());
-        assertNull("No triggered alert condition should be supplied if condition did not trigger", result.getTriggeredCondition());
+        assertFalse(result.isTriggered(), "AlertCondition should not be triggered, but it is!");
+        assertNull(result.getTriggeredAt(), "No timestamp should be supplied if condition did not trigger");
+        assertNull(result.getTriggeredCondition(), "No triggered alert condition should be supplied if condition did not trigger");
     }
 
     protected Map<String, Object> getParametersMap(Integer grace, Integer time, Number threshold) {

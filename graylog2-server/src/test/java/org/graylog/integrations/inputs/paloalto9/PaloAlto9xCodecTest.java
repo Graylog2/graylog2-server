@@ -30,12 +30,14 @@ import org.graylog2.plugin.inputs.failure.InputProcessingException;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.nio.charset.StandardCharsets;
 
@@ -50,13 +52,14 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class PaloAlto9xCodecTest {
     private static final String TEST_SOURCE = "Test Source";
     private static final DateTime TEST_DATE_TIME = DateTime.now(DateTimeZone.UTC);
     private static final String TEST_RAW_MESSAGE = "Foo,Bar,Baz,This,That,GLOBALPROTECT";
     private static final ImmutableList<String> TEST_FIELD_LIST = ImmutableList.of("Foo", "Bar", "Baz", "Three", "Four", "GLOBALPROTECT");
-    private static final ImmutableMap<String,Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
+    private static final ImmutableMap<String, Object> TEST_FIELD_MAP = ImmutableMap.of("field_one", "value_one",
             "field_two", "value_two",
             "field_three", Long.valueOf(3L));
 
@@ -66,15 +69,18 @@ public class PaloAlto9xCodecTest {
     PaloAlto9xCodec cut;
 
     // Mock Objects
-    @Mock Configuration mockConfig;
-    @Mock PaloAltoParser mockRawParser;
-    @Mock PaloAlto9xParser mockPaloParser;
+    @Mock
+    Configuration mockConfig;
+    @Mock
+    PaloAltoParser mockRawParser;
+    @Mock
+    PaloAlto9xParser mockPaloParser;
 
     // Test Objects
     RawMessage in;
     Message out;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.cut = new PaloAlto9xCodec(mockConfig, mockRawParser, mockPaloParser, messageFactory);
     }

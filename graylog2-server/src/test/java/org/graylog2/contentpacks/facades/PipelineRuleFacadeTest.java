@@ -45,9 +45,9 @@ import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -67,7 +67,7 @@ public class PipelineRuleFacadeTest {
     private PipelineRuleFacade facade;
     private EntityScopeService entityScopeService;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new DeletableSystemScope()));

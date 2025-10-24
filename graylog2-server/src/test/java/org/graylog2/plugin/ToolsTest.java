@@ -21,7 +21,7 @@ import com.google.common.io.Resources;
 import com.google.common.net.InetAddresses;
 import org.graylog2.inputs.TestHelper;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -37,10 +37,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ToolsTest {
 
@@ -143,9 +144,10 @@ public class ToolsTest {
         assertThat(Tools.decompressGzip(testData, 1024)).hasSize(1024);
     }
 
-    @Test(expected = EOFException.class)
+    @Test
     public void testDecompressGzipEmptyInput() throws IOException {
-        Tools.decompressGzip(new byte[0]);
+        assertThrows(EOFException.class, () ->
+            Tools.decompressGzip(new byte[0]));
     }
 
     /**

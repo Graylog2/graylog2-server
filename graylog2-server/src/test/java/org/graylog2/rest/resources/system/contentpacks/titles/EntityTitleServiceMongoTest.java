@@ -27,9 +27,9 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdenti
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.streams.StreamImpl;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -44,7 +44,7 @@ public class EntityTitleServiceMongoTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         DbEntitiesCatalog entitiesCatalog = new DbEntitiesCatalog(
                 List.of(

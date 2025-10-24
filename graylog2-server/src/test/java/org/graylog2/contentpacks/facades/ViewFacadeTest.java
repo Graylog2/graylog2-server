@@ -82,9 +82,9 @@ import org.graylog2.streams.StreamMock;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
@@ -132,7 +132,7 @@ public class ViewFacadeTest {
     private UserService userService;
     private EntityRegistrar entityRegistrar;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));

@@ -27,10 +27,9 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.net.InetSocketAddress;
@@ -50,7 +49,6 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(Parameterized.class)
 public class CEFCodecFixturesTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -89,7 +87,6 @@ public class CEFCodecFixturesTest {
         }
     }
 
-    @Parameterized.Parameters(name = "[{1}] {2}")
     public static Collection<Object[]> data() throws Exception {
         final ObjectMapper mapper = new ObjectMapper()
                 .enable(JsonParser.Feature.ALLOW_COMMENTS)
@@ -113,12 +110,12 @@ public class CEFCodecFixturesTest {
         return fixtures;
     }
 
-    private final Fixture fixture;
-    private final RawMessage rawMessage;
+    private Fixture fixture;
+    private RawMessage rawMessage;
     private Message message;
 
     @SuppressWarnings("unused")
-    public CEFCodecFixturesTest(Fixture fixture, String fileName, String description) {
+    public void initCEFCodecFixturesTest(Fixture fixture, String fileName, String description) {
         this.fixture = fixture;
 
         final byte[] bytes = fixture.testString.getBytes(StandardCharsets.UTF_8);
@@ -126,7 +123,7 @@ public class CEFCodecFixturesTest {
         this.rawMessage = new RawMessage(bytes, remoteAddress);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final CEFCodec codec = new CEFCodec(new Configuration(fixture.codecConfiguration), messageFactory);
 
@@ -134,15 +131,19 @@ public class CEFCodecFixturesTest {
         assertThat(message).isNotNull();
     }
 
-    @Test
-    public void timestamp() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void timestamp(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         if (fixture.expectedTimestamp != null) {
             assertThat(message.getTimestamp().toDate()).isEqualTo(fixture.expectedTimestamp);
         }
     }
 
-    @Test
-    public void source() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void source(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         if (fixture.expectedSource != null) {
             assertThat(message.getSource()).isEqualTo(fixture.expectedSource);
         }
@@ -154,38 +155,52 @@ public class CEFCodecFixturesTest {
         }
     }
 
-    @Test
-    public void deviceVendor() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void deviceVendor(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         containsEntry("device_vendor", fixture.deviceVendor);
     }
 
-    @Test
-    public void deviceProduct() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void deviceProduct(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         containsEntry("device_product", fixture.deviceProduct);
     }
 
-    @Test
-    public void deviceVersion() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void deviceVersion(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         containsEntry("device_version", fixture.deviceVersion);
     }
 
-    @Test
-    public void deviceEventClassId() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void deviceEventClassId(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         containsEntry("event_class_id", fixture.deviceEventClassId);
     }
 
-    @Test
-    public void name() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void name(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         containsEntry("name", fixture.name);
     }
 
-    @Test
-    public void severity() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void severity(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         containsEntry("severity", fixture.severity);
     }
 
-    @Test
-    public void extensions() throws Exception {
+    @MethodSource("data")
+    @ParameterizedTest(name = "[{1}] {2}")
+    public void extensions(Fixture fixture, String fileName, String description) throws Exception {
+        initCEFCodecFixturesTest(fixture, fileName, description);
         final Map<String, Object> extensions = fixture.extensions;
         if (!extensions.isEmpty()) {
             for (Map.Entry<String, Object> extension : extensions.entrySet()) {

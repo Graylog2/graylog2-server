@@ -22,8 +22,8 @@ import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.json.JSONException;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
@@ -157,7 +157,7 @@ public class ValueReferenceTest {
     }
 
     @Test
-    @Ignore("FIXME: Jackson automatically deserializes floating point numbers as double")
+    @Disabled("FIXME: Jackson automatically deserializes floating point numbers as double")
     public void deserializeFloat() throws IOException {
         assertThat(objectMapper.readValue("{\"@type\":\"float\",\"@value\":1.0}", ValueReference.class)).isEqualTo(ValueReference.of(1.0f));
         assertThat(objectMapper.readValue("{\"@type\":\"float\",\"@value\":42.4}", ValueReference.class)).isEqualTo(ValueReference.of(42.4f));

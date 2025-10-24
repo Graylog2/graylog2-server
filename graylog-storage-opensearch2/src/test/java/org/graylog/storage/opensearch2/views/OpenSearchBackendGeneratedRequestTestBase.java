@@ -43,13 +43,14 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,9 +61,9 @@ import java.util.stream.Collectors;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendGeneratedRequestTestBase extends OpensearchMockedClientTestBase {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     OpenSearchBackend openSearchBackend;
 
@@ -74,7 +75,7 @@ public class OpenSearchBackendGeneratedRequestTestBase extends OpensearchMockedC
     @Captor
     protected ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
 
-    @Before
+    @BeforeEach
     public void setUpSUT() {
         this.elasticSearchTypeHandlers = new HashMap<>();
         final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers = Collections.emptyMap();

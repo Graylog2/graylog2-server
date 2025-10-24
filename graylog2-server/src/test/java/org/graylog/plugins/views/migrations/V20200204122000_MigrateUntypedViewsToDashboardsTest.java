@@ -31,14 +31,16 @@ import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
@@ -61,14 +63,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     private static final String COLLECTION_VIEWS = "views";
     private static final String COLLECTION_SEARCHES = "searches";
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -79,7 +81,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     private MongoCollection<Document> viewsCollection;
     private MongoCollection<Document> searchesCollection;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.viewsCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_VIEWS));
         this.searchesCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_SEARCHES));
@@ -230,7 +232,7 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
         try {
             final URL resource = this.getClass().getResource(filename);
             if (resource == null) {
-                Assert.fail("Unable to find resource file for test: " + filename);
+                Assertions.fail("Unable to find resource file for test: " + filename);
             }
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);

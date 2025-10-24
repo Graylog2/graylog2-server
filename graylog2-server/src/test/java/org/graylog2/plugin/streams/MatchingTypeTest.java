@@ -16,9 +16,10 @@
  */
 package org.graylog2.plugin.streams;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class MatchingTypeTest {
 
@@ -30,8 +31,9 @@ public class MatchingTypeTest {
         assertEquals(Stream.MatchingType.DEFAULT, Stream.MatchingType.valueOfOrDefault(""));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testValueOfOrDefaultThrowsExceptionForUnknownEnumName() {
-        Stream.MatchingType.valueOfOrDefault("FOO");
+        assertThrows(IllegalArgumentException.class, () ->
+            Stream.MatchingType.valueOfOrDefault("FOO"));
     }
 }

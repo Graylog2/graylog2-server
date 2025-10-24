@@ -36,9 +36,9 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +81,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
@@ -90,7 +90,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 failureSubmissionService);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         client().cleanUp();
     }

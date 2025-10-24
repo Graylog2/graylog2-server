@@ -30,9 +30,9 @@ import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.security.encryption.EncryptedValueService;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.security.KeyStore;
@@ -59,7 +59,7 @@ public class CertificateExchangeImplTest {
 
     private KeyPair ca;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         EncryptedValueService encryptedValueService = new EncryptedValueService(encryptionPassword);
         certificateExchange = new CertificateExchangeImpl(mongodb.mongoConnection(), encryptedValueService);

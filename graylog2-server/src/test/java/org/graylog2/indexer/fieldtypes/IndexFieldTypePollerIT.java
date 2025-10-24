@@ -37,8 +37,8 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         return searchServer().adapters().indexFieldTypePollerAdapter(configuration);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final Node node = mock(Node.class);
         final Indices indices = new Indices(

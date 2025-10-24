@@ -20,11 +20,9 @@ import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import org.graylog2.plugin.Tools;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
 import java.io.File;
@@ -40,50 +38,50 @@ import static java.nio.file.StandardOpenOption.WRITE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.configuration.ConfigurationHelper.initConfig;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("deprecation")
 public class ConfigurationTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private Map<String, String> validProperties;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         validProperties = new HashMap<>();
     }
 
     @Test
-    public void testPasswordSecretIsTooShort() throws ValidationException, RepositoryException {
+    public void testPasswordSecretIsTooShort() {
         validProperties.put("password_secret", "too short");
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("The minimum length for \"password_secret\" is 16 characters.");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        initConfig(new Configuration(), validProperties);
+            initConfig(new Configuration(), validProperties));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("The minimum length for \"password_secret\" is 16 characters."));
     }
 
     @Test
-    public void testPasswordSecretIsEmpty() throws ValidationException, RepositoryException {
+    public void testPasswordSecretIsEmpty() {
         validProperties.put("password_secret", "");
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Parameter password_secret should not be blank");
+        Throwable exception = assertThrows(ValidationException.class, () ->
 
-        initConfig(new Configuration(), validProperties);
+            initConfig(new Configuration(), validProperties));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Parameter password_secret should not be blank"));
     }
 
     @Test
-    public void testPasswordSecretIsNull() throws ValidationException, RepositoryException {
+    public void testPasswordSecretIsNull() {
         validProperties.put("password_secret", null);
 
-        expectedException.expect(ParameterException.class);
-        expectedException.expectMessage("Required parameter \"password_secret\" not found.");
+        Throwable exception = assertThrows(ParameterException.class, () ->
 
-        initConfig(new Configuration(), validProperties);
+            initConfig(new Configuration(), validProperties));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Required parameter \"password_secret\" not found."));
     }
 
     @Test
@@ -97,8 +95,8 @@ public class ConfigurationTest {
 
     @Test
     public void testNodeIdFilePermissions() throws IOException {
-        final File nonEmptyNodeIdFile = temporaryFolder.newFile("non-empty-node-id");
-        final File emptyNodeIdFile = temporaryFolder.newFile("empty-node-id");
+        final File nonEmptyNodeIdFile = newFile(temporaryFolder, "non-empty-node-id");
+        final File emptyNodeIdFile = newFile(temporaryFolder, "empty-node-id");
 
         // create a node-id file and write some id
         Files.write(nonEmptyNodeIdFile.toPath(), "test-node-id".getBytes(StandardCharsets.UTF_8), WRITE, TRUNCATE_EXISTING);
@@ -109,25 +107,25 @@ public class ConfigurationTest {
         assertThat(validateWithPermissions(parentNotDirectory, "rw-------")).isFalse();
 
         // file missing and parent directory doesn't exist is not ok
-        final File directoryNotExist = temporaryFolder.newFolder("not-readable");
+        final File directoryNotExist = newFolder(temporaryFolder, "not-readable");
         assertThat(directoryNotExist.delete()).isTrue();
         final File parentNotExist = new File(directoryNotExist, "node-id");
         assertThat(validateWithPermissions(parentNotExist, "rw-------")).isFalse();
 
         // file missing and parent directory not readable is not ok
-        final File directoryNotReadable = temporaryFolder.newFolder("not-readable");
+        final File directoryNotReadable = newFolder(temporaryFolder, "not-readable");
         assertThat(directoryNotReadable.setReadable(false)).isTrue();
         final File parentNotReadable = new File(directoryNotReadable, "node-id");
         assertThat(validateWithPermissions(parentNotReadable, "rw-------")).isFalse();
 
         // file missing and parent directory not writable is not ok
-        final File directoryNotWritable = temporaryFolder.newFolder("not-writable");
+        final File directoryNotWritable = newFolder(temporaryFolder, "not-writable");
         assertThat(directoryNotWritable.setWritable(false)).isTrue();
         final File parentNotWritable = new File(directoryNotWritable, "node-id");
         assertThat(validateWithPermissions(parentNotWritable, "rw-------")).isFalse();
 
         // file missing and parent directory readable and writable is ok
-        final File parentDirectory = temporaryFolder.newFolder();
+        final File parentDirectory = newFolder(temporaryFolder, "junit");
         assertThat(parentDirectory.setReadable(true)).isTrue();
         assertThat(parentDirectory.setWritable(true)).isTrue();
         final File parentOk = new File(parentDirectory, "node-id");
@@ -348,6 +346,21 @@ public class ConfigurationTest {
             return false;
         }
         return true;
+    }
+
+    private static File newFile(File parent, String child) throws IOException {
+        File result = new File(parent, child);
+        result.createNewFile();
+        return result;
+    }
+
+    private static File newFolder(File root, String... subDirs) throws IOException {
+        String subFolder = String.join("/", subDirs);
+        File result = new File(root, subFolder);
+        if (!result.mkdirs()) {
+            throw new IOException("Couldn't create folders " + root);
+        }
+        return result;
     }
 
 }

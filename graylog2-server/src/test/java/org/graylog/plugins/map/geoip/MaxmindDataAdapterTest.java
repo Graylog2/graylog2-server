@@ -24,9 +24,10 @@ import org.graylog.plugins.map.ConditionalRunner;
 import org.graylog.plugins.map.ResourceExistsCondition;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -69,7 +70,7 @@ public class MaxmindDataAdapterTest {
             this.databaseType = databaseType;
         }
 
-        @Before
+        @BeforeEach
         public void setUp() throws Exception {
             final MaxmindDataAdapter.Config config = MaxmindDataAdapter.Config.builder()
                     .checkInterval(1L)
@@ -83,7 +84,7 @@ public class MaxmindDataAdapterTest {
             adapter.doStart();
         }
 
-        @After
+        @AfterEach
         public void tearDown() throws Exception {
             adapter.doStop();
         }
@@ -126,9 +127,10 @@ public class MaxmindDataAdapterTest {
         }
     }
 
+    @Nested
     @RunWith(ConditionalRunner.class)
     @ResourceExistsCondition(GEO_LITE2_CITY_MMDB)
-    public static class CityDatabaseTest extends Base {
+    public class CityDatabaseTest extends Base {
         public CityDatabaseTest() {
             super(DatabaseType.MAXMIND_CITY);
         }
@@ -177,9 +179,10 @@ public class MaxmindDataAdapterTest {
         }
     }
 
+    @Nested
     @RunWith(ConditionalRunner.class)
     @ResourceExistsCondition(GEO_LITE2_COUNTRY_MMDB)
-    public static class CountryDatabaseTest extends Base {
+    public class CountryDatabaseTest extends Base {
         public CountryDatabaseTest() {
             super(DatabaseType.MAXMIND_COUNTRY);
         }
@@ -214,9 +217,10 @@ public class MaxmindDataAdapterTest {
         }
     }
 
+    @Nested
     @RunWith(ConditionalRunner.class)
     @ResourceExistsCondition(GEO_LITE2_ASN_MMDB)
-    public static class AsnDatabaseTest extends Base {
+    public class AsnDatabaseTest extends Base {
         public AsnDatabaseTest() {
             super(DatabaseType.MAXMIND_ASN);
         }
@@ -241,9 +245,10 @@ public class MaxmindDataAdapterTest {
         }
     }
 
+    @Nested
     @RunWith(ConditionalRunner.class)
     @ResourceExistsCondition(IPINFO_STANDARD_LOCATION_MMDB)
-    public static class IPinfoStandardLocationDatabaseTest extends Base {
+    public class IPinfoStandardLocationDatabaseTest extends Base {
         public IPinfoStandardLocationDatabaseTest() {
             super(DatabaseType.IPINFO_STANDARD_LOCATION);
         }
@@ -269,9 +274,10 @@ public class MaxmindDataAdapterTest {
         }
     }
 
+    @Nested
     @RunWith(ConditionalRunner.class)
     @ResourceExistsCondition(IPINFO_ASN_MMDB)
-    public static class IPinfoASNDatabaseTest extends Base {
+    public class IPinfoASNDatabaseTest extends Base {
         public IPinfoASNDatabaseTest() {
             super(DatabaseType.IPINFO_ASN);
         }

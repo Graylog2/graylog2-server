@@ -24,17 +24,17 @@ import com.google.common.collect.Lists;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.jooq.lambda.Seq;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import static com.google.common.collect.ImmutableSortedSet.of;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class StageIteratorTest {
 
@@ -89,9 +89,9 @@ public class StageIteratorTest {
 
         assertEquals(2, stages.length);
         assertEquals(1, stages[0].size());
-        assertEquals("last set of stages are on stage 0", 0, Iterables.getOnlyElement(stages[0]).stage());
+        assertEquals(0, Iterables.getOnlyElement(stages[0]).stage(), "last set of stages are on stage 0");
         assertEquals(1, stages[1].size());
-        assertEquals("last set of stages are on stage 1", 10, Iterables.getOnlyElement(stages[1]).stage());
+        assertEquals(10, Iterables.getOnlyElement(stages[1]).stage(), "last set of stages are on stage 1");
     }
 
 
@@ -148,15 +148,15 @@ public class StageIteratorTest {
 
         final List<List<Stage>> stageSets = Lists.newArrayList(iterator);
 
-        assertEquals("5 different stages to execute", 5, stageSets.size());
+        assertEquals(5, stageSets.size(), "5 different stages to execute");
 
         for (List<Stage> stageSet : stageSets) {
-            assertEquals("Each stage set should only contain stages with the same number",
-                         1,
-                         Seq.seq(stageSet).groupBy(Stage::stage).keySet().size());
+            assertEquals(1,
+                         Seq.seq(stageSet).groupBy(Stage::stage).keySet().size(),
+                         "Each stage set should only contain stages with the same number");
         }
-        assertArrayEquals("Stages must be sorted numerically",
-                          new int[] {-1, 0, 4, 10, 11},
-                          stageSets.stream().flatMap(Collection::stream).mapToInt(Stage::stage).distinct().toArray());
+        assertArrayEquals(new int[] {-1, 0, 4, 10, 11},
+                          stageSets.stream().flatMap(Collection::stream).mapToInt(Stage::stage).distinct().toArray(),
+                          "Stages must be sorted numerically");
     }
 }

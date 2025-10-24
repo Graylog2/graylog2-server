@@ -27,9 +27,9 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPatternsDeletedEvent;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +48,7 @@ public class V2018070614390000_EnforceUniqueGrokPatternsTest {
     private ClusterEventBus clusterEventBus;
     private TestSubscriber subscriber;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         collection = mongodb.mongoConnection().getMongoDatabase().getCollection("grok_patterns");
         subscriber = new TestSubscriber();

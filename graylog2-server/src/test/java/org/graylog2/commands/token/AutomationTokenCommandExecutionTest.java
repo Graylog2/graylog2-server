@@ -27,25 +27,26 @@ import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.PaginatedAccessTokenEntityService;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.commands.token.AutomationTokenCommandExecution.TOKEN_ID;
 import static org.mockito.Mockito.doReturn;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AutomationTokenCommandExecutionTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
@@ -59,7 +60,7 @@ public class AutomationTokenCommandExecutionTest {
     private AccessTokenService accessTokenService;
     private AutomationTokenCommandExecution tokenCommandExecution;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         doReturn("password-secret").when(configuration)
                 .getPasswordSecret();

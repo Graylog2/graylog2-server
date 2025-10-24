@@ -31,13 +31,15 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.users.UserConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
@@ -46,21 +48,20 @@ import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AccessTokenServiceImplTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
@@ -73,7 +74,7 @@ public class AccessTokenServiceImplTest {
 
     private AccessTokenService accessTokenService;
 
-    @Before
+    @BeforeEach
     public void setupService() {
         // Simple cipher which reverses the cleartext. DB fixtures need to contain the reversed (i.e. encrypted token)
         final AccessTokenCipher accessTokenCipher = mock(AccessTokenCipher.class);
@@ -83,7 +84,7 @@ public class AccessTokenServiceImplTest {
         this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         mongodb.mongoConnection().getMongoDatabase().drop();
     }
@@ -91,7 +92,7 @@ public class AccessTokenServiceImplTest {
     @Test
     public void testLoadNoToken() {
         final AccessToken accessToken = accessTokenService.load("foobar");
-        assertNull("No token should have been returned", accessToken);
+        assertNull(accessToken, "No token should have been returned");
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
@@ -99,7 +100,7 @@ public class AccessTokenServiceImplTest {
     @MongoDBFixtures("accessTokensSingleToken.json")
     public void testLoadSingleToken() {
         final AccessToken accessToken = accessTokenService.load("foobar");
-        assertNotNull("Matching token should have been returned", accessToken);
+        assertNotNull(accessToken, "Matching token should have been returned");
         assertEquals("foobar", accessToken.getToken());
         assertEquals("web", accessToken.getName());
         assertEquals("admin", accessToken.getUserName());
@@ -112,7 +113,7 @@ public class AccessTokenServiceImplTest {
     public void testLoadAll() {
         final List<AccessToken> tokens = accessTokenService.loadAll("admin");
 
-        assertNotNull("Should have returned token list", tokens);
+        assertNotNull(tokens, "Should have returned token list");
         assertEquals(2, tokens.size());
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
@@ -150,13 +151,13 @@ public class AccessTokenServiceImplTest {
         final AccessToken token = accessTokenService.create(username, tokenname, PeriodDuration.of(Duration.ofDays(ttlInDays)));
 
         assertEquals(1, accessTokenService.loadAll(username).size());
-        assertNotNull("Should have returned token", token);
-        assertEquals("Username before and after saving should be equal", username, token.getUserName());
-        assertEquals("Token before and after saving should be equal", tokenname, token.getName());
-        assertNotNull("Token should not be null", token.getToken());
-        assertNotNull("\"CreatedAt\" should not be null", token.getCreatedAt());
-        assertNotNull("\"ExpiresAt\" should not be null", token.getExpiresAt());
-        assertEquals("Expiration-timestamp should be " + ttlInDays + " days after creation-timestamp", token.getCreatedAt().plusDays(ttlInDays), token.getExpiresAt());
+        assertNotNull(token, "Should have returned token");
+        assertEquals(username, token.getUserName(), "Username before and after saving should be equal");
+        assertEquals(tokenname, token.getName(), "Token before and after saving should be equal");
+        assertNotNull(token.getToken(), "Token should not be null");
+        assertNotNull(token.getCreatedAt(), "\"CreatedAt\" should not be null");
+        assertNotNull(token.getExpiresAt(), "\"ExpiresAt\" should not be null");
+        assertEquals(token.getCreatedAt().plusDays(ttlInDays), token.getExpiresAt(), "Expiration-timestamp should be " + ttlInDays + " days after creation-timestamp");
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);
     }
 
@@ -170,12 +171,12 @@ public class AccessTokenServiceImplTest {
 
         final List<AccessToken> accessTokens = accessTokenService.loadAll(username);
         assertEquals(1, accessTokens.size());
-        assertNotNull("Should have returned token", token);
-        assertEquals("Username before and after saving should be equal", username, token.getUserName());
-        assertEquals("Token before and after saving should be equal", tokenname, token.getName());
-        assertNotNull("Token should not be null", token.getToken());
-        assertNotNull("\"CreatedAt\" should not be null", token.getCreatedAt());
-        assertNotNull("\"ExpiresAt\" should not be null", token.getExpiresAt());
+        assertNotNull(token, "Should have returned token");
+        assertEquals(username, token.getUserName(), "Username before and after saving should be equal");
+        assertEquals(tokenname, token.getName(), "Token before and after saving should be equal");
+        assertNotNull(token.getToken(), "Token should not be null");
+        assertNotNull(token.getCreatedAt(), "\"CreatedAt\" should not be null");
+        assertNotNull(token.getExpiresAt(), "\"ExpiresAt\" should not be null");
         //Comparing the period between the creation and expiration of the token: It should be 1 year, 1 month, 1 day, 1 hour, 1 minute and 1 second, as defined above:
         org.joda.time.Period validDuring = new org.joda.time.Period(token.getCreatedAt(), token.getExpiresAt());
         assertEquals(1, validDuring.getYears());
@@ -199,10 +200,10 @@ public class AccessTokenServiceImplTest {
         final AccessToken token = accessTokenService.create(username, tokenname);
 
         assertEquals(1, accessTokenService.loadAll(username).size());
-        assertNotNull("Should have returned token", token);
-        assertEquals("Username before and after saving should be equal", username, token.getUserName());
-        assertEquals("Token before and after saving should be equal", tokenname, token.getName());
-        assertNotNull("Token should not be null", token.getToken());
+        assertNotNull(token, "Should have returned token");
+        assertEquals(username, token.getUserName(), "Username before and after saving should be equal");
+        assertEquals(tokenname, token.getName(), "Token before and after saving should be equal");
+        assertNotNull(token.getToken(), "Token should not be null");
 
         verify(configService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
         verifyNoMoreInteractions(paginatedAccessTokenEntityService, configService);

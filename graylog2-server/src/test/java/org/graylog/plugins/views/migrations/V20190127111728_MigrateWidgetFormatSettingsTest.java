@@ -24,12 +24,14 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.List;
 import java.util.Set;
@@ -37,18 +39,18 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20190127111728_MigrateWidgetFormatSettingsTest {
     @Rule
     public final MongoDBInstance mongoDB = MongoDBInstance.createForClass();
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private V20190127111728_MigrateWidgetFormatSettings migration;
 
     @Mock
     private ClusterConfigService clusterConfigService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         migration = new V20190127111728_MigrateWidgetFormatSettings(mongoDB.mongoConnection(), clusterConfigService);
     }

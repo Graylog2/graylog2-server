@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.plugins;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -29,14 +29,17 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ChainingClassLoaderTest {
-    @Test(expected = ClassNotFoundException.class)
+    @Test
     public void loadThrowsClassNotFoundExceptionIfClassDoesNotExist() throws Exception {
-        final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(getClass().getClassLoader());
-        chainingClassLoader.loadClass("ThisClassHopeFullyDoesNotExist" + Instant.now().toEpochMilli());
+        assertThrows(ClassNotFoundException.class, () -> {
+            final ChainingClassLoader chainingClassLoader = new ChainingClassLoader(getClass().getClassLoader());
+            chainingClassLoader.loadClass("ThisClassHopeFullyDoesNotExist" + Instant.now().toEpochMilli());
+        });
     }
 
     @Test
