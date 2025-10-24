@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.inputs;
+package org.graylog2.telemetry.suppliers;
 
 import jakarta.inject.Inject;
+import org.graylog2.inputs.InputService;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class InputsMetricsSupplier implements TelemetryMetricSupplier {
     private final InputService inputService;
@@ -35,6 +38,17 @@ public class InputsMetricsSupplier implements TelemetryMetricSupplier {
     @Override
     public Optional<TelemetryEvent> get() {
         Map<String, Object> metrics = new HashMap<>(inputService.totalCountByType());
-        return Optional.of(TelemetryEvent.of(metrics));
+        return Optional.of(TelemetryEvent.of(format(metrics)));
+    }
+
+    private Map<String, Object> format(Map<String, Object> map) {
+        return map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        e -> TypeFormatter.format(e.getKey()),
+                        Map.Entry::getValue,
+                        (v1, v2) -> v2,
+                        LinkedHashMap::new
+                ));
     }
 }

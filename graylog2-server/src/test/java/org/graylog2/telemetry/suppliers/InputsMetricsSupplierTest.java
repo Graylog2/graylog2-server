@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.inputs;
+package org.graylog2.telemetry.suppliers;
 
+import org.graylog2.inputs.InputService;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,14 +44,18 @@ public class InputsMetricsSupplierTest {
     public void shouldReturnCountsByType() {
         final Map<String, Long> counts = Map.of(
                 "org.graylog.plugins.beats.Beats2Input", 2L,
-                "org.graylog.plugins.forwarder.input.ForwarderServiceInput", 3L
+                "org.graylog2.inputs.gelf.tcp.GELFTCPInput", 3L
         );
         when(inputService.totalCountByType()).thenReturn(counts);
 
         Optional<TelemetryEvent> event = supplier.get();
 
+        final Map<String, Long> expectedCounts = Map.of(
+                "beats_2_input", 2L,
+                "gelftcp_input", 3L
+        );
         assertTrue(event.isPresent());
-        assertEquals(counts, event.get().metrics());
+        assertEquals(expectedCounts, event.get().metrics());
     }
 
     @Test
