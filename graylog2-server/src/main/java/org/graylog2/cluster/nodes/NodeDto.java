@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public abstract class NodeDto implements Node, MongoEntity {
+    public static final String FIELD_NODE_ID = "node_id";
+    public static final String FIELD_HOSTNAME = "hostname";
 
     @Override
     public String id() {
@@ -40,7 +42,7 @@ public abstract class NodeDto implements Node, MongoEntity {
     @JsonProperty("id")
     public abstract String getId();
 
-    @JsonProperty("node_id")
+    @JsonProperty(FIELD_NODE_ID)
     public String getNodeId() {
         return getId();
     }
@@ -52,7 +54,7 @@ public abstract class NodeDto implements Node, MongoEntity {
     @Nullable
     public abstract DateTime getLastSeen();
 
-    @JsonProperty("hostname")
+    @JsonProperty(FIELD_HOSTNAME)
     @Nullable
     public abstract String getHostname();
 

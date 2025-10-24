@@ -20,15 +20,15 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import ProcessingTimelineComponent from 'components/pipelines/ProcessingTimelineComponent';
 import DocsHelper from 'util/DocsHelper';
-import CreatePipelineButton from 'components/pipelines/CreatePipelineButton';
 import PipelinesPageNavigation from 'components/pipelines/PipelinesPageNavigation';
+import CreateButton from 'components/common/CreateButton';
 
 const PipelinesOverviewPage = () => (
   <DocumentTitle title="Pipelines">
     <PipelinesPageNavigation />
     <PageHeader
       title="Pipelines overview"
-      actions={<CreatePipelineButton />}
+      actions={<CreateButton entityKey="Pipeline" />}
       documentationLink={{
         title: 'Pipelines documentation',
         path: DocsHelper.PAGES.PIPELINES,

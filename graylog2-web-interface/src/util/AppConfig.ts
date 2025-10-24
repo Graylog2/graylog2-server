@@ -50,6 +50,7 @@ export type Branding = {
     user_menu?: { icon: string };
     scratchpad?: { icon: string };
     help?: { icon: string };
+    search?: { icon: string };
   };
   help_url?: string;
   help_pages?: { [key: string]: string };

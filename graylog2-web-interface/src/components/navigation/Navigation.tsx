@@ -19,14 +19,13 @@ import * as React from 'react';
 import useLocation from 'routing/useLocation';
 import { LinkContainer } from 'components/common/router';
 import AppConfig from 'util/AppConfig';
-import { Navbar, Nav, NavItem } from 'components/bootstrap';
+import { Navbar, Nav } from 'components/bootstrap';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import Routes from 'routing/Routes';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
-import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
-import NavIcon from 'components/navigation/NavIcon';
+import { FEATURE_FLAG } from 'components/quick-jump/Constants';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -36,13 +35,14 @@ import InactiveNavItem from './InactiveNavItem';
 import ScratchpadToggle from './ScratchpadToggle';
 import StyledNavbar from './Navigation.styles';
 
+import { QuickJumpModalContainer } from '../quick-jump';
+
 type Props = {
   pathname: string;
 };
 
 const Navigation = React.memo(({ pathname }: Props) => {
   const pluginItems = usePluginEntities('navigationItems');
-  const { activePerspective } = useActivePerspective();
 
   return (
     <StyledNavbar fluid fixedTop collapseOnSelect>
@@ -62,6 +62,8 @@ const Navigation = React.memo(({ pathname }: Props) => {
         <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">
+          {AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}
+
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (
@@ -79,12 +81,6 @@ const Navigation = React.memo(({ pathname }: Props) => {
           <ScratchpadToggle />
 
           <HelpMenu />
-
-          <LinkContainer relativeActive to={activePerspective.welcomeRoute}>
-            <NavItem id="welcome-nav-link">
-              <NavIcon type="home" title="Welcome" />
-            </NavItem>
-          </LinkContainer>
 
           <UserMenu />
         </Nav>

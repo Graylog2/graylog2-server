@@ -72,7 +72,7 @@ describe('<EditEventDefinitionPage />', () => {
       (entityKey) =>
         ({
           'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
-          'alerts.pageNavigation': [],
+          'pageNavigation': [],
         })[entityKey],
     );
   });

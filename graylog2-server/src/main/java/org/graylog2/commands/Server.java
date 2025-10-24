@@ -99,6 +99,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.quickjump.QuickJumpModule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.ClusterConfigValidatorModule;
 import org.graylog2.shared.UI;
@@ -216,7 +217,8 @@ public class Server extends ServerBootstrap {
                 new CaModule(),
                 new TelemetryModule(),
                 new DataNodeModule(),
-                new McpServerModule()
+                new McpServerModule(),
+                new QuickJumpModule(featureFlags)
         );
 
         modules.add(new FieldTypeManagementModule());

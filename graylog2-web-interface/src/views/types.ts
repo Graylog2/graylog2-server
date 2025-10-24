@@ -222,6 +222,18 @@ export interface SystemConfiguration {
   readPermission?: string; // the '?' should be removed once all plugins have a permission config set to enforce it for future plugins right from the beginning
 }
 
+export interface CoreSystemConfiguration {
+  name: string;
+  SectionComponent: React.ComponentType;
+  permissions?: Array<string>;
+  showCaret?: boolean;
+  catchAll?: boolean;
+  props?: {
+    ConfigurationComponent: React.ComponentType;
+    title: string;
+  };
+}
+
 export type GenericResult = {
   type: string;
   effective_timerange: AbsoluteTimeRange;
@@ -582,6 +594,7 @@ declare module 'graylog-web-plugin/plugin' {
     }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
+    coreSystemConfigurations?: Array<CoreSystemConfiguration>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;

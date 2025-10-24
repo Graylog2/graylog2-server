@@ -14,22 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
-import { Row } from 'components/bootstrap';
-
-const NAV_ITEMS = [
-  { description: 'Lookup Tables', path: Routes.SYSTEM.LOOKUPTABLES.OVERVIEW, exactPathMatch: true },
-  { description: 'Caches', path: Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW },
-  { description: 'Data Adapters', path: Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW },
-];
-
-const LUTPageNavigation = () => (
-  <Row>
-    <PageNavigation items={NAV_ITEMS} />
-  </Row>
-);
-
-export default LUTPageNavigation;
+export const PAGE_TYPE = 'page' as const;
+export const LINK_TYPE = 'link' as const;
+export const ACTION_TYPE = 'action' as const;
+export const ENTITY_TYPE = 'entity' as const;
+export const PAGE_WEIGHT = 0.99;
+export const BASE_SCORE = 100;
+export const LAST_OPENED_ITEMS_LOOKBACK = 50;
+export const FEATURE_FLAG = 'quick_jump' as const;

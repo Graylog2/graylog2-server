@@ -20,7 +20,13 @@ import { createContext, useState, useMemo } from 'react';
 import Store from 'logic/local-storage/Store';
 import useHotkey from 'hooks/useHotkey';
 
-export const ScratchpadContext = createContext(undefined);
+type ScratchPadContextType = {
+  isScratchpadVisible: boolean;
+  localStorageItem: string;
+  setScratchpadVisibility: (opened: boolean) => void;
+  toggleScratchpadVisibility: () => void;
+};
+export const ScratchpadContext = createContext<ScratchPadContextType>(undefined);
 
 type Props = {
   children: React.ReactNode;

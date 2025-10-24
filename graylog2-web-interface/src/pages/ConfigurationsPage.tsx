@@ -15,34 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 import styled from 'styled-components';
 import { Navigate, Routes, Route, useResolvedPath } from 'react-router-dom';
 import URI from 'urijs';
+import type { CoreSystemConfiguration } from 'src/views/types';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import ConfigletRow from 'pages/configurations/ConfigletRow';
 import { Col, Nav, NavItem } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Icon } from 'components/common';
-import SearchesConfig from 'components/configurations/SearchesConfig';
-import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
-import SidecarConfig from 'components/configurations/SidecarConfig';
-import EventsConfig from 'components/configurations/EventsConfig';
-import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
-import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
-import McpConfig from 'components/configurations/McpConfig';
 import 'components/maps/configurations';
-import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
-import MarkdownConfig from 'components/configurations/MarkdownConfig';
-
-import ConfigurationSection from './configurations/ConfigurationSection';
-import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
-
-import DecoratorsConfig from '../components/configurations/DecoratorsConfig';
-import UserConfig from '../components/configurations/UserConfig';
+import usePluginEntities from 'hooks/usePluginEntities';
+import usePermissions from 'hooks/usePermissions';
 
 const SubNavIconClosed = styled(Icon)`
   margin-left: 5px;
@@ -76,109 +62,18 @@ const SectionLink = ({ name, showCaret }: SectionLinkProps) => {
 };
 
 const ConfigurationsPage = () => {
-  const currentUser = useCurrentUser();
+  const coreSystemConfigurations = usePluginEntities('coreSystemConfigurations');
+  const { isPermitted } = usePermissions();
 
-  const configurationSections: Array<{
-    name: string;
-    hide?: boolean;
-    SectionComponent: React.ComponentType<ConfigurationSectionProps | {}>;
-    props?: ConfigurationSectionProps;
-    showCaret?: boolean;
-    catchAll?: boolean;
-  }> = useMemo(
-    () =>
-      [
-        {
-          name: 'Search',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: SearchesConfig,
-            title: 'Search',
-          },
-        },
-        {
-          name: 'Message Processors',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: MessageProcessorsConfig,
-            title: 'Message Processors',
-          },
-        },
-        {
-          name: 'Sidecars',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: SidecarConfig,
-            title: 'Sidecars',
-          },
-        },
-        {
-          name: 'Events',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: EventsConfig,
-            title: 'Events',
-          },
-        },
-        {
-          name: 'URL Allowlist',
-          hide: !isPermitted(currentUser.permissions, ['urlallowlist:read']),
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: UrlAllowListConfig,
-            title: 'URL allowlist',
-          },
-        },
-        {
-          name: 'Decorators',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: DecoratorsConfig,
-            title: 'Decorators',
-          },
-        },
-        {
-          name: 'Permissions',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: PermissionsConfig,
-            title: 'Permissions',
-          },
-        },
-        {
-          name: 'Users',
-          hide: !isPermitted(currentUser.permissions, ['users:edit', 'users:tokencreate']),
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: UserConfig,
-            title: 'Users',
-          },
-        },
-        {
-          name: 'Markdown',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: MarkdownConfig,
-            title: 'Markdown',
-          },
-        },
-        {
-          name: 'MCP',
-          SectionComponent: ConfigurationSection,
-          props: {
-            ConfigurationComponent: McpConfig,
-            title: 'MCP',
-          },
-        },
-        {
-          name: 'Plugins',
-          SectionComponent: PluginsConfig,
-          showCaret: true,
-          catchAll: true,
-        },
-      ].filter(({ hide }) => !hide),
-    [currentUser?.permissions],
-  );
+  const configurationSections = [
+    ...coreSystemConfigurations,
+    {
+      name: 'Plugins',
+      SectionComponent: PluginsConfig,
+      showCaret: true,
+      catchAll: true,
+    } as CoreSystemConfiguration,
+  ].filter(({ permissions }) => (permissions ? isPermitted(permissions) : true));
 
   return (
     <DocumentTitle title="Configurations">

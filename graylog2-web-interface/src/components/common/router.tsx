@@ -43,6 +43,7 @@ type ChildrenProps = {
   href: string;
   disabled: boolean;
 };
+
 type Props = {
   children: React.ReactElement<ChildrenProps, React.ComponentType>;
   onClick?: () => unknown;
@@ -69,6 +70,7 @@ const LinkContainer = ({ children, onClick = undefined, to: toProp, relativeActi
     () => _setActiveClassName(pathname, to, className, displayName, relativeActive),
     [pathname, to, className, displayName, relativeActive],
   );
+
   const handleClick = useLinkClickHandler(to);
   const _onClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
