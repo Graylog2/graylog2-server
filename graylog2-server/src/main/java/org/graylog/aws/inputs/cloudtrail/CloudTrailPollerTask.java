@@ -104,7 +104,7 @@ public class CloudTrailPollerTask implements Runnable {
                 }
             } catch (Exception e) {
                 final String msg = f(
-                        "Could not read CloudTrail log file for <%s>. Skipping.", notification.getS3Bucket(),
+                        "Could not read CloudTrail log file for <%s>. Skipping.",
                         ExceptionUtils.getRootCauseMessage(e));
                 failureRecorder.setFailing(getClass(), msg, e);
             }
