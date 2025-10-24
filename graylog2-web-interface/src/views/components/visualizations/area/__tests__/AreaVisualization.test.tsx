@@ -40,6 +40,7 @@ jest.mock('util/AppConfig', () => ({
   rootTimeZone: jest.fn(() => 'America/Chicago'),
   gl2ServerUrl: jest.fn(() => undefined),
   isCloud: jest.fn(() => false),
+  isFeatureEnabled: () => true,
 }));
 
 // eslint-disable-next-line react/require-default-props
