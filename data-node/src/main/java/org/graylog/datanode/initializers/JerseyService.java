@@ -34,10 +34,11 @@ import jakarta.ws.rs.container.DynamicFeature;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.ext.ContextResolver;
 import jakarta.ws.rs.ext.ExceptionMapper;
+import nl.altindag.ssl.SSLFactory;
+import nl.altindag.ssl.util.SSLFactoryUtils;
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
-import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
@@ -55,19 +56,20 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.security.JwtSecretProvider;
 import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
-import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
+import java.io.IOException;
 import java.net.URI;
-import java.security.KeyStore;
+import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
@@ -92,6 +94,7 @@ public class JerseyService extends AbstractIdleService {
 
     private HttpServer apiHttpServer = null;
     private final ExecutorService executorService;
+    private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
 
     private final JwtSecretProvider jwtSecretProvider;
 
@@ -295,21 +298,38 @@ public class JerseyService extends AbstractIdleService {
             throw new IllegalArgumentException("Unreadable to read private key");
         }
 
-        final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
         final char[] password = firstNonNull(keystoreInformation.password(), new char[]{});
 
         try {
-            final KeyStore keyStore = keystoreInformation.loadKeystore();
-            sslContextConfigurator.setKeyStorePass(password);
-            sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
+            SSLFactory baseSslFactory = SSLFactory.builder()
+                    .withDummyIdentityMaterial()
+                    .withSwappableIdentityMaterial()
+                    .build();
 
-            final SSLContext sslContext = sslContextConfigurator.createSSLContext(true);
-            final SSLEngineConfigurator sslEngineConfigurator = new SSLEngineConfigurator(sslContext, false, false, false);
+            Runnable sslUpdater = createSslUpdater(keystoreInformation, password, baseSslFactory);
+            sslUpdater.run();
+            scheduledExecutorService.scheduleAtFixedRate(sslUpdater, 1, 1, TimeUnit.HOURS);
+
+            final SSLEngineConfigurator sslEngineConfigurator = new SSLEngineConfigurator(baseSslFactory.getSslContext(), false, false, false);
             sslEngineConfigurator.setEnabledProtocols(tlsConfiguration.getEnabledTlsProtocols().toArray(new String[0]));
             return sslEngineConfigurator;
         } catch (Exception e) {
             throw new RuntimeException("Could not read keystore: " + e.getMessage(), e);
         }
+    }
+
+    private static Runnable createSslUpdater(KeystoreInformation keystoreInformation, char[] password, SSLFactory baseSslFactory) {
+        return () -> {
+            try {
+                SSLFactory updatedSslFactory = SSLFactory.builder()
+                        .withIdentityMaterial(keystoreInformation.loadKeystore(), password)
+                        .build();
+
+                SSLFactoryUtils.reload(baseSslFactory, updatedSslFactory);
+            } catch (IOException | GeneralSecurityException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     private ExecutorService instrumentedExecutor(final String executorName,
