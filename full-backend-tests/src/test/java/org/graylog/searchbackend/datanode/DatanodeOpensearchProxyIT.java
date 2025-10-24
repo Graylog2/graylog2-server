@@ -32,6 +32,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import static java.time.Duration.ofSeconds;
+import static org.awaitility.Awaitility.waitAtMost;
+
 @ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")})
 public class DatanodeOpensearchProxyIT {
 
@@ -44,15 +47,19 @@ public class DatanodeOpensearchProxyIT {
 
     @ContainerMatrixTest
     void testProxyPlaintextGet() throws ExecutionException, RetryException {
-        final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cat/indices", 200);
-        final String responseBody = response.extract().body().asString();
-        Assertions.assertThat(responseBody).contains("graylog_0").contains("gl-system-events_0");
+        waitAtMost(ofSeconds(30)).untilAsserted(() -> {
+            final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cat/indices", 200);
+            final String responseBody = response.extract().body().asString();
+            Assertions.assertThat(responseBody).contains("graylog_0").contains("gl-system-events_0");
+        });
     }
 
     @ContainerMatrixTest
     void testProxyJsonGet() {
-        final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_mapping", 200);
-        response.assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
+        waitAtMost(ofSeconds(30)).untilAsserted(() -> {
+            final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_mapping", 200);
+            response.assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
+        });
     }
 
     @ContainerMatrixTest
