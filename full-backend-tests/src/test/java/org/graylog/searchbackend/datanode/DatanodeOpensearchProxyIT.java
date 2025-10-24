@@ -66,6 +66,7 @@ public class DatanodeOpensearchProxyIT {
                 return false;
             }
             return true;
+        }
     }
 
     @ContainerMatrixTest
