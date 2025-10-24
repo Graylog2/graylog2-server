@@ -30,7 +30,6 @@ import org.graylog.testing.completebackend.apis.Users;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
@@ -56,7 +55,6 @@ import static org.assertj.core.api.Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
 
 @GraylogBackendConfiguration(serverLifecycle = CLASS)
 public class ScriptingApiResourceIT {
@@ -1000,8 +998,12 @@ public class ScriptingApiResourceIT {
                                             └────────────────────────┴───────────────────────┘
                                             """.strip().lines().toList();
 
-        assertThat(response.size()).isEqualTo(expectedResult.size());
-        assertThat(expectedResult.containsAll(response)).isTrue();
+        assertThat(response.size())
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response))
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isTrue();
     }
 
     @FullBackendTest
@@ -1051,8 +1053,12 @@ public class ScriptingApiResourceIT {
                                             └────────────────────────┴───────────────────────┘
                                             """.strip().lines().toList();
 
-        assertThat(response.size()).isEqualTo(expectedResult.size());
-        assertThat(expectedResult.containsAll(response)).isTrue();
+        assertThat(response.size())
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response))
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isTrue();
     }
 
     @FullBackendTest
@@ -1103,8 +1109,12 @@ public class ScriptingApiResourceIT {
                                             └────────────────────────┴───────────────────────┘
                                             """.strip().lines().toList();
 
-        assertThat(response.size()).isEqualTo(expectedResult.size());
-        assertThat(expectedResult.containsAll(response)).isTrue();
+        assertThat(response.size())
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response))
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isTrue();
     }
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {
