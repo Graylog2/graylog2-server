@@ -77,7 +77,6 @@ const executeSubmitHandler = async <T>(
 ): Promise<T> => {
   let updatedEntity = currentEntity;
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const submitHandler of submitHandlers) {
     // eslint-disable-next-line no-await-in-loop,no-loop-func
     const entityWithPluginData = await submitHandler(values, dispatch, updatedEntity).catch((e) => {
