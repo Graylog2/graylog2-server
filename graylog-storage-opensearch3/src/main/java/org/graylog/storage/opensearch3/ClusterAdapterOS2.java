@@ -21,19 +21,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Strings;
-import com.google.common.collect.Lists;
-import com.google.common.primitives.Ints;
-import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterGetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
-import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
-import org.graylog.storage.opensearch3.cat.CatApi;
-import org.graylog.storage.opensearch3.cat.IndexSummaryResponse;
-import org.graylog.storage.opensearch3.cat.NodeResponse;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.PendingTasksStats;
@@ -42,24 +31,43 @@ import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettingsFactory;
 import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
 import org.graylog2.indexer.cluster.health.NodeFileDescriptorStats;
+import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
-import org.graylog2.system.stats.elasticsearch.NodeInfo;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
+import org.opensearch.client.opensearch.cat.aliases.AliasesRecord;
+import org.opensearch.client.opensearch.cat.allocation.AllocationRecord;
+import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
+import org.opensearch.client.opensearch.cat.nodes.NodesRecord;
+import org.opensearch.client.opensearch.cluster.GetClusterSettingsRequest;
+import org.opensearch.client.opensearch.cluster.GetClusterSettingsResponse;
+import org.opensearch.client.opensearch.cluster.HealthRequest;
+import org.opensearch.client.opensearch.cluster.HealthResponse;
+import org.opensearch.client.opensearch.cluster.OpenSearchClusterClient;
+import org.opensearch.client.opensearch.cluster.PendingTasksResponse;
+import org.opensearch.client.opensearch.cluster.pending_tasks.PendingTask;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.opensearch.nodes.NodesInfoRequest;
+import org.opensearch.client.opensearch.nodes.NodesInfoResponse;
+import org.opensearch.client.opensearch.nodes.OpenSearchNodesClient;
+import org.opensearch.client.opensearch.nodes.info.NodeInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,139 +76,156 @@ import java.util.stream.StreamSupport;
 
 public class ClusterAdapterOS2 implements ClusterAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterOS2.class);
-    private final OpenSearchClient client;
     private final Duration requestTimeout;
-    private final CatApi catApi;
+    private final OfficialOpensearchClient opensearchClient;
     private final PlainJsonApi jsonApi;
+    private final OpenSearchCatClient catClient;
+    private final OpenSearchClusterClient clusterClient;
+    private final OpenSearchNodesClient nodesClient;
 
     @Inject
-    public ClusterAdapterOS2(OpenSearchClient client,
+    public ClusterAdapterOS2(OfficialOpensearchClient opensearchClient,
                              @Named("elasticsearch_socket_timeout") Duration requestTimeout,
-                             CatApi catApi,
                              PlainJsonApi jsonApi) {
-        this.client = client;
         this.requestTimeout = requestTimeout;
-        this.catApi = catApi;
         this.jsonApi = jsonApi;
+        this.opensearchClient = opensearchClient;
+        this.catClient = opensearchClient.sync().cat();
+        this.clusterClient = opensearchClient.sync().cluster();
+        this.nodesClient = opensearchClient.sync().nodes();
+
     }
 
     @Override
     public Optional<HealthStatus> health() {
-        return clusterHealth().map(response -> healthStatusFrom(response.getStatus()));
+        return clusterHealth().map(this::healthStatusFrom);
     }
 
-    private HealthStatus healthStatusFrom(ClusterHealthStatus status) {
-        switch (status) {
-            case RED:
-                return HealthStatus.Red;
-            case YELLOW:
-                return HealthStatus.Yellow;
-            case GREEN:
-                return HealthStatus.Green;
-        }
+    private HealthStatus healthStatusFrom(HealthResponse response) {
+        return switch (response.status()) {
+            case Red -> HealthStatus.Red;
+            case Yellow -> HealthStatus.Yellow;
+            case Green -> HealthStatus.Green;
+        };
 
-        throw new IllegalStateException("Invalid health status received: " + status);
     }
 
     @Override
     public Set<NodeFileDescriptorStats> fileDescriptorStats() {
-        final List<NodeResponse> result = nodes();
+        final List<NodesRecord> result = nodes();
         return result.stream()
-                .map(node -> NodeFileDescriptorStats.create(node.name(), node.ip(), node.host(), node.fileDescriptorMax()))
+                .map(node -> {
+                    assert node.fileDescMax() != null; // checked beforehand in nodes()
+                    return NodeFileDescriptorStats.create(node.name(), node.ip(), node.name(), Long.valueOf(node.fileDescMax()));
+                })
                 .collect(Collectors.toSet());
     }
 
-    private List<NodeResponse> nodes() {
-        final List<NodeResponse> allNodes = catApi.nodes();
-        final List<NodeResponse> nodesWithDiskStatistics = allNodes.stream().filter(NodeResponse::hasDiskStatistics).collect(Collectors.toList());
+    private List<NodesRecord> nodes() {
+        List<NodesRecord> allNodes = opensearchClient.execute(() ->
+                        catClient.nodes().valueBody(),
+                "Unable to retrieve nodes list"
+        );
+        List<NodesRecord> nodesWithDiskStatistics = allNodes.stream().filter(this::hasDiskStatistics).toList();
         if (allNodes.size() != nodesWithDiskStatistics.size()) {
-            final List<NodeResponse> nodesWithMissingDiskStatistics = allNodes.stream().filter(nr -> !nr.hasDiskStatistics()).collect(Collectors.toList());
+            final List<NodesRecord> nodesWithMissingDiskStatistics = allNodes.stream()
+                    .filter(nr -> !this.hasDiskStatistics(nr)).toList();
             LOG.info("_cat/nodes API has returned " + nodesWithMissingDiskStatistics.size() + " nodes without disk statistics:");
             nodesWithMissingDiskStatistics.forEach(node -> LOG.info(node.toString()));
         }
         return nodesWithDiskStatistics;
     }
 
+    private boolean hasDiskStatistics(NodesRecord nodesRecord) {
+        return nodesRecord.diskUsed() != null &&
+                nodesRecord.diskTotal() != null &&
+                nodesRecord.diskUsedPercent() != null &&
+                nodesRecord.fileDescMax() != null;
+    }
+
+
     @Override
     public ClusterShardAllocation clusterShardAllocation() {
-        final ClusterGetSettingsRequest settingsRequest = new ClusterGetSettingsRequest();
-        settingsRequest.includeDefaults(true);
-        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(settingsRequest, requestOptions));
+        GetClusterSettingsResponse settings = getClusterSettings();
         int maxShardsPerNode = Integer.MAX_VALUE;
         try {
-            maxShardsPerNode = Integer.parseInt(response.getSetting("cluster.max_shards_per_node"));
+            maxShardsPerNode = Integer.parseInt(getSetting("cluster.max_shards_per_node", settings));
         } catch (Exception e) {
             LOG.warn("Could not retrieve max_shards_per_node setting from cluster settings. Threshold warnings disabled.", e);
         }
-        return new ClusterShardAllocation(maxShardsPerNode, catApi.getNodeShardAllocations());
+
+        List<NodeShardAllocation> nodeShardAllocations = opensearchClient.execute(() ->
+                        catClient.allocation().valueBody().stream().map(this::toNodeShardAllocation).toList(),
+                "Unable to retrieve node shard allocation"
+        );
+        return new ClusterShardAllocation(maxShardsPerNode, nodeShardAllocations);
+
+    }
+
+    private NodeShardAllocation toNodeShardAllocation(AllocationRecord allocationRecord) {
+        int shards;
+        try {
+            shards = (allocationRecord.shards() != null) ? Integer.parseInt(allocationRecord.shards()) : 0;
+        } catch (NumberFormatException e) {
+            LOG.error("Could not retrieve shards from allocation record for node {}.", allocationRecord.node(), e);
+            shards = 0;
+        }
+        return new NodeShardAllocation(allocationRecord.node(), shards);
     }
 
     @Override
     public Set<NodeDiskUsageStats> diskUsageStats() {
-        final List<NodeResponse> result = nodes();
+        final List<NodesRecord> result = nodes();
         return result.stream()
-                .map(node -> NodeDiskUsageStats.create(node.name(), node.role(), node.ip(), node.host(), node.diskUsed(), node.diskTotal(), node.diskUsedPercent()))
+                .map(node -> {
+                    assert node.diskUsedPercent() != null; // checked beforehand in nodes()
+                    return NodeDiskUsageStats.create(node.name(), node.nodeRole(), node.ip(), node.name(), node.diskUsed(), node.diskTotal(), Double.valueOf(node.diskUsedPercent()));
+                })
                 .collect(Collectors.toSet());
     }
 
     @Override
     public ClusterAllocationDiskSettings clusterAllocationDiskSettings() {
-        final ClusterGetSettingsRequest request = new ClusterGetSettingsRequest();
-        request.includeDefaults(true);
-
-        final ClusterGetSettingsResponse response = client.execute((c, requestOptions) -> c.cluster().getSettings(request, requestOptions));
+        GetClusterSettingsResponse settings = getClusterSettings();
         return ClusterAllocationDiskSettingsFactory.create(
-                Boolean.parseBoolean(response.getSetting("cluster.routing.allocation.disk.threshold_enabled")),
-                response.getSetting("cluster.routing.allocation.disk.watermark.low"),
-                response.getSetting("cluster.routing.allocation.disk.watermark.high"),
-                response.getSetting("cluster.routing.allocation.disk.watermark.flood_stage")
+                Boolean.parseBoolean(getSetting("cluster.routing.allocation.disk.threshold_enabled", settings)),
+                getSetting("cluster.routing.allocation.disk.watermark.low", settings),
+                getSetting("cluster.routing.allocation.disk.watermark.high", settings),
+                getSetting("cluster.routing.allocation.disk.watermark.flood_stage", settings)
         );
     }
 
     @Override
     public Optional<String> nodeIdToName(String nodeId) {
         return nodeById(nodeId)
-                .map(jsonNode -> jsonNode.get("name").asText());
+                .map(NodeInfo::name);
     }
 
     @Override
     public Optional<String> nodeIdToHostName(String nodeId) {
         return nodeById(nodeId)
-                .map(jsonNode -> jsonNode.path("host"))
-                .filter(host -> !host.isMissingNode())
-                .map(JsonNode::asText);
+                .map(NodeInfo::host);
     }
 
-    private Optional<JsonNode> nodeById(String nodeId) {
+    private Optional<NodeInfo> nodeById(String nodeId) {
         if (Strings.isNullOrEmpty(nodeId)) {
             return Optional.empty();
         }
-        final Request request = new Request("GET", "/_nodes/" + nodeId);
-        return Optional.of(jsonApi.perform(request, "Unable to retrieve node information for node id " + nodeId))
-                .map(jsonNode -> jsonNode.path("nodes").path(nodeId))
-                .filter(node -> !node.isMissingNode());
+        NodesInfoResponse info = opensearchClient.execute(() -> nodesClient.info(NodesInfoRequest.builder()
+                .nodeId(nodeId)
+                .build()
+        ), "Unable to retrieve node information for node id");
+        return Optional.ofNullable(info.nodes().get(nodeId));
     }
 
     @Override
     public boolean isConnected() {
-        final ClusterHealthRequest request = new ClusterHealthRequest()
-                .timeout(new TimeValue(requestTimeout.getQuantity(), requestTimeout.getUnit()))
-                .local(true);
-        try {
-            final ClusterHealthResponse result = client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions));
-            return result.getNumberOfDataNodes() > 0;
-        } catch (OpenSearchException e) {
-            LOG.error("Check for connectivity failed with exception '{}' - enable debug level for this class to see the stack trace.", e.toString());
-            if (LOG.isDebugEnabled()) {
-                LOG.error(e.getMessage(), e);
-            }
-            return false;
-        }
+        return clusterHealth().map(HealthResponse::numberOfDataNodes).map(dataNodes -> dataNodes > 0).orElse(false);
     }
 
     @Override
     public Optional<String> clusterName() {
-        return clusterHealth().map(ClusterHealthResponse::getClusterName);
+        return clusterHealth().map(HealthResponse::clusterName);
     }
 
     @Override
@@ -209,32 +234,26 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
                 .map(this::clusterHealthFrom);
     }
 
-    private ClusterHealth clusterHealthFrom(ClusterHealthResponse response) {
-        return ClusterHealth.create(response.getStatus().toString().toLowerCase(Locale.ENGLISH),
+    private ClusterHealth clusterHealthFrom(HealthResponse response) {
+        return ClusterHealth.create(response.status().toString().toLowerCase(Locale.ENGLISH),
                 ClusterHealth.ShardStatus.create(
-                        response.getActiveShards(),
-                        response.getInitializingShards(),
-                        response.getRelocatingShards(),
-                        response.getUnassignedShards()
+                        response.activeShards(),
+                        response.initializingShards(),
+                        response.relocatingShards(),
+                        response.unassignedShards()
                 )
         );
     }
 
     @Override
     public PendingTasksStats pendingTasks() {
-        final Request request = new Request("GET", "/_cluster/pending_tasks");
+        PendingTasksResponse pendingTasks = opensearchClient.execute(
+                clusterClient::pendingTasks,
+                "Unable to retrieve pending tasks"
+        );
 
-        final JsonNode response = jsonApi.perform(request, "Couldn't read Elasticsearch pending cluster tasks");
-
-        final JsonNode pendingClusterTasks = response.path("tasks");
-        final int pendingTasksSize = pendingClusterTasks.size();
-        final List<Long> pendingTasksTimeInQueue = Lists.newArrayListWithCapacity(pendingTasksSize);
-        for (JsonNode jsonElement : pendingClusterTasks) {
-            if (jsonElement.has("time_in_queue_millis")) {
-                pendingTasksTimeInQueue.add(jsonElement.get("time_in_queue_millis").asLong());
-            }
-        }
-
+        final int pendingTasksSize = pendingTasks.tasks().size();
+        List<Long> pendingTasksTimeInQueue = pendingTasks.tasks().stream().map(PendingTask::timeInQueueMillis).toList();
         return PendingTasksStats.create(pendingTasksSize, pendingTasksTimeInQueue);
     }
 
@@ -276,25 +295,33 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
 
     @Override
     public JsonNode rawClusterStats() {
-        final Request request = new Request("GET", "/_cluster/stats/nodes/*");
+        Request request = Requests.builder()
+                .endpoint("/_cluster/stats/nodes/*")
+                .method("GET")
+                .build();
         return jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
     }
 
     @Override
-    public Map<String, NodeInfo> nodesInfo() {
-        final Request request = new Request("GET", "/_nodes");
-        final JsonNode nodesJson = jsonApi.perform(request, "Couldn't read Opensearch nodes data!");
+    public Map<String, org.graylog2.system.stats.elasticsearch.NodeInfo> nodesInfo() {
+        NodesInfoResponse info = opensearchClient.execute(() -> nodesClient.info(NodesInfoRequest.builder()
+                .build()
+        ), "Couldn't read Opensearch nodes data!");
 
-        return toStream(nodesJson.at("/nodes").fields())
-                .collect(Collectors.toMap(Map.Entry::getKey, o -> createNodeInfo(o.getValue())));
+        return info.nodes().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> createNodeInfo(entry.getValue())
+                ));
     }
 
-    private NodeInfo createNodeInfo(JsonNode nodesJson) {
-        return NodeInfo.builder()
-                .version(nodesJson.at("/version").asText())
-                .os(nodesJson.at("/os"))
-                .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
-                .jvmMemHeapMaxInBytes(nodesJson.at("/jvm/mem/heap_max_in_bytes").asLong())
+    private org.graylog2.system.stats.elasticsearch.NodeInfo createNodeInfo(NodeInfo nodeInfo) {
+        assert nodeInfo.jvm() != null;
+        return org.graylog2.system.stats.elasticsearch.NodeInfo.builder()
+                .version(nodeInfo.version())
+                .os(nodeInfo.os())
+                .roles(nodeInfo.roles().stream().map(Enum::name).toList())
+                .jvmMemHeapMaxInBytes(nodeInfo.jvm().mem().heapMaxInBytes())
                 .build();
     }
 
@@ -306,24 +333,27 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     public ShardStats shardStats() {
         return clusterHealth()
                 .map(response -> ShardStats.create(
-                        response.getNumberOfNodes(),
-                        response.getNumberOfDataNodes(),
-                        response.getActiveShards(),
-                        response.getRelocatingShards(),
-                        response.getActivePrimaryShards(),
-                        response.getInitializingShards(),
-                        response.getUnassignedShards(),
-                        response.isTimedOut()
+                        response.numberOfNodes(),
+                        response.numberOfDataNodes(),
+                        response.activeShards(),
+                        response.relocatingShards(),
+                        response.activePrimaryShards(),
+                        response.initializingShards(),
+                        response.unassignedShards(),
+                        response.timedOut()
                 ))
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve shard stats."));
     }
 
-    private Optional<ClusterHealthResponse> clusterHealth() {
+    private Optional<HealthResponse> clusterHealth() {
+        final Time timeout = new Time.Builder().time(requestTimeout.toSeconds() + "s").build();
         try {
-            final ClusterHealthRequest request = new ClusterHealthRequest()
-                    .timeout(TimeValue.timeValueSeconds(Ints.saturatedCast(requestTimeout.toSeconds())));
-            return Optional.of(client.execute((c, requestOptions) -> c.cluster().health(request, requestOptions)));
-        } catch (OpenSearchException e) {
+            HealthResponse health = clusterClient.health(HealthRequest.builder()
+                    .timeout(timeout)
+                    .build()
+            );
+            return Optional.of(health);
+        } catch (IOException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
             } else {
@@ -339,24 +369,50 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
             return Optional.of(HealthStatus.Green);
         }
 
-        final Map<String, String> aliasMapping = catApi.aliases();
+        final Map<String, String> aliasMapping;
+        aliasMapping = opensearchClient.execute(() -> catClient.aliases().valueBody()
+                        .stream()
+                        .filter(alias -> Objects.nonNull(alias.index()))
+                        .collect(Collectors.toMap(AliasesRecord::alias, AliasesRecord::index)),
+                "Unable to retrieve aliases"
+        );
+
         final Set<String> mappedIndices = indices
                 .stream()
                 .map(index -> aliasMapping.getOrDefault(index, index))
                 .collect(Collectors.toSet());
 
-        final Set<IndexSummaryResponse> indexSummaries = catApi.indices()
+        final Set<IndicesRecord> indexSummaries = opensearchClient.execute(() ->
+                        catClient.indices().valueBody()
                 .stream()
                 .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
-                .collect(Collectors.toSet());
+                                .collect(Collectors.toSet()),
+                "Unable to retrieve indices");
 
         if (indexSummaries.size() < mappedIndices.size()) {
             return Optional.empty();
         }
 
         return indexSummaries.stream()
-                .map(IndexSummaryResponse::health)
+                .map(IndicesRecord::health)
                 .map(HealthStatus::fromString)
                 .min(HealthStatus::compareTo);
+
+    }
+
+    private GetClusterSettingsResponse getClusterSettings() {
+        return opensearchClient.execute(() -> clusterClient.getSettings(
+                GetClusterSettingsRequest.builder()
+                        .includeDefaults(true)
+                        .build()
+        ), "Unable to retrieve cluster settings");
+    }
+
+    private static String getSetting(String setting, GetClusterSettingsResponse settings) {
+        JsonData value = settings.transient_().getOrDefault(setting,
+                settings.persistent().getOrDefault(setting,
+                        settings.defaults().get(setting)));
+
+        return (value == null) ? "" : value.toString();
     }
 }
