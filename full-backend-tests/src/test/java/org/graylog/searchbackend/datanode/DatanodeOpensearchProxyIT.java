@@ -46,20 +46,26 @@ public class DatanodeOpensearchProxyIT {
     }
 
     @ContainerMatrixTest
-    void testProxyPlaintextGet() throws ExecutionException, RetryException {
-        waitAtMost(ofSeconds(30)).untilAsserted(() -> {
+    void testProxyPlaintextGet() {
+        waitAtMost(ofSeconds(30)).until(() -> {
             final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cat/indices", 200);
             final String responseBody = response.extract().body().asString();
             Assertions.assertThat(responseBody).contains("graylog_0").contains("gl-system-events_0");
+            return responseBody.contains("graylog_0") && responseBody.contains("gl-system-events_0");
         });
     }
 
+
     @ContainerMatrixTest
     void testProxyJsonGet() {
-        waitAtMost(ofSeconds(30)).untilAsserted(() -> {
-            final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_mapping", 200);
-            response.assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
-        });
+        waitAtMost(ofSeconds(30)).until(() -> {
+            try {
+                final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_mapping", 200);
+                response.assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
+            } catch (AssertionError e) {
+                return false;
+            }
+            return true;
     }
 
     @ContainerMatrixTest
