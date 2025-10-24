@@ -35,7 +35,6 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesAdapter;
 import org.graylog2.indexer.searches.SearchesConfig;
-import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
@@ -81,31 +80,6 @@ public class SearchesAdapterOS2 implements SearchesAdapter {
         final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
 
         return CountResult.create(result.getHits().getTotalHits().value, result.getTook().getMillis());
-    }
-
-    @Override
-    public ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, TimeRange range, int limit, int offset, List<String> fields) {
-        return scroll(ChunkCommand.builder()
-                .indices(indexWildcards)
-                .sorting(sorting)
-                .filter(filter)
-                .query(query)
-                .range(range)
-                .limit(limit)
-                .offset(offset)
-                .fields(fields)
-                .build());
-    }
-
-    @Override
-    public ChunkedResult scroll(Set<String> indexWildcards, Sorting sorting, String filter, String query, int batchSize) {
-        return scroll(ChunkCommand.builder()
-                .indices(indexWildcards)
-                .sorting(sorting)
-                .filter(filter)
-                .query(query)
-                .batchSize(batchSize)
-                .build());
     }
 
     @Override
