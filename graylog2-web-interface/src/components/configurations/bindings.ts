@@ -23,6 +23,8 @@ import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import DecoratorsConfig from 'components/configurations/DecoratorsConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import UserConfig from 'components/configurations/UserConfig';
+import MarkdownConfig from 'components/configurations/MarkdownConfig';
+import McpConfig from 'components/configurations/McpConfig';
 
 const bindings = {
   coreSystemConfigurations: [
