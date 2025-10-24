@@ -99,7 +99,6 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.2.0</opensearch.client.version>
-        <opensearch.apache.httpclient5.version>5.5.1</opensearch.apache.httpclient5.version>
         <airline.version>3.2.0</airline.version>
         <amqp-client.version>5.27.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
@@ -218,6 +217,7 @@
         <testcontainers.version>1.21.3</testcontainers.version>
         <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
         <graalvm.version>25.0.1</graalvm.version>
+        <apache-httpclient5.version>5.5.1</apache-httpclient5.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v20.19.5</nodejs.version>
@@ -268,6 +268,13 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${apache-httpclient5.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>
