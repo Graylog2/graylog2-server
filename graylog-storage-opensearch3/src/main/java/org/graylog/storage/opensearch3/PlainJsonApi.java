@@ -39,6 +39,11 @@ public class PlainJsonApi {
         this.deprecatedClient = deprecatedClient;
     }
 
+    @Deprecated
+    public PlainJsonApi(ObjectMapper objectMapper, OpenSearchClient client) {
+        this(objectMapper, client, null);
+    }
+
     public JsonNode perform(Request request, String errorMessage) {
         try {
             Response response = client.sync().generic().execute(request);
