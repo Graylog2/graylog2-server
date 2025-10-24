@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.events;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import javax.annotation.Nullable;
 
 import java.util.Set;
 
@@ -25,13 +26,21 @@ import static java.util.Collections.emptySet;
 public record RulesChangedEvent(
         @JsonProperty("updated_rules") Set<Reference> updatedRules,
         @JsonProperty("deleted_rules") Set<Reference> deletedRules) {
-    public record Reference(String id, String title) {}
+    public record Reference(String id, String title, @Nullable String oldTitle) {
+        public Reference(String id, String title) {
+            this(id, title, null);
+        }
+    }
 
     public static RulesChangedEvent updatedRule(String id, String title) {
-        return new RulesChangedEvent(Set.of(new Reference(id, title)), emptySet());
+        return new RulesChangedEvent(Set.of(new Reference(id, title, null)), emptySet());
+    }
+
+    public static RulesChangedEvent updatedRule(String id, String title, String oldTitle) {
+        return new RulesChangedEvent(Set.of(new Reference(id, title, oldTitle)), emptySet());
     }
 
     public static RulesChangedEvent deletedRule(String id, String title) {
-        return new RulesChangedEvent(emptySet(), Set.of(new Reference(id, title)));
+        return new RulesChangedEvent(emptySet(), Set.of(new Reference(id, title, null)));
     }
 }
