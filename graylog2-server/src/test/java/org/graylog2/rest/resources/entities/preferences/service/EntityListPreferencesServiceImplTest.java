@@ -25,17 +25,17 @@ import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferen
 import org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.graylog2.rest.resources.entities.preferences.model.SortPreferences.SortOrder.ASC;
 import static org.graylog2.rest.resources.entities.preferences.model.SortPreferences.SortOrder.DESC;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EntityListPreferencesServiceImplTest {
 
@@ -54,7 +54,7 @@ public class EntityListPreferencesServiceImplTest {
 
     private EntityListPreferencesService toTest;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());

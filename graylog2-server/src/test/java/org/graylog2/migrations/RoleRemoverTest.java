@@ -25,16 +25,16 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserImpl;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RoleRemoverTest {
 
@@ -52,7 +52,7 @@ public class RoleRemoverTest {
 
     private MongoCollection<Document> usersCollection;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         final MongoConnection mongoConnection = mongodb.mongoConnection();
         mongodb.importFixture("roles_and_users.json", RoleRemoverTest.class);

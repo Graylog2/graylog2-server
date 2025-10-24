@@ -40,13 +40,15 @@ import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Set;
@@ -60,9 +62,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MigrationHelpersTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -78,7 +80,7 @@ public class MigrationHelpersTest {
 
     private MigrationHelpers migrationHelpers;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.migrationHelpers = new MigrationHelpers(roleService, userService, roleRemover);
     }

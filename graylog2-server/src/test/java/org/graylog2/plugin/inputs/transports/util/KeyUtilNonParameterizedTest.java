@@ -19,8 +19,8 @@ package org.graylog2.plugin.inputs.transports.util;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCSException;
 import org.graylog.testing.ResourceUtil;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,7 +34,7 @@ import java.security.Security;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class KeyUtilNonParameterizedTest {
-    @Before
+    @BeforeEach
     public void init() {
         Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
     }

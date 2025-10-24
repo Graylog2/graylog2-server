@@ -21,10 +21,10 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
@@ -40,14 +40,14 @@ public class MongoFieldTypeLookupTest {
     private IndexFieldTypesService dbService;
     private MongoFieldTypeLookup lookup;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
         this.dbService = new IndexFieldTypesService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
         this.lookup = new MongoFieldTypeLookup(dbService, new FieldTypeMapper());
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         mongodb.mongoConnection().getMongoDatabase().drop();
     }

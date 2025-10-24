@@ -16,7 +16,7 @@
  */
 package org.graylog2;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -24,8 +24,8 @@ import static org.junit.Assert.assertFalse;
 public class AssertNotEquals {
     public static <T> void assertNotEquals(String msg, T obj1, T obj2) {
         if (obj1 == null)
-            assertFalse(msg, obj1 == null && obj2 == null);
+            assertFalse(obj1 == null && obj2 == null, msg);
         else
-            assertFalse(msg, obj1.equals(obj2));
+            assertFalse(obj1.equals(obj2), msg);
     }
 }

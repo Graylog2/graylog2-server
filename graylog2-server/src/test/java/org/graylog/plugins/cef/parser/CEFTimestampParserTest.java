@@ -18,19 +18,16 @@ package org.graylog.plugins.cef.parser;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@RunWith(Parameterized.class)
 public class CEFTimestampParserTest {
-    @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"invalid", null, DateTimeZone.UTC, Locale.ROOT},
@@ -51,20 +48,22 @@ public class CEFTimestampParserTest {
         });
     }
 
-    private final String testString;
-    private final DateTime expectedDateTime;
-    private final DateTimeZone timeZone;
-    private final Locale locale;
+    private String testString;
+    private DateTime expectedDateTime;
+    private DateTimeZone timeZone;
+    private Locale locale;
 
-    public CEFTimestampParserTest(String testString, DateTime expectedDateTime, DateTimeZone timeZone, Locale locale) {
+    public void initCEFTimestampParserTest(String testString, DateTime expectedDateTime, DateTimeZone timeZone, Locale locale) {
         this.testString = testString;
         this.expectedDateTime = expectedDateTime;
         this.timeZone = timeZone;
         this.locale = locale;
     }
 
-    @Test
-    public void parseWithTimeZoneAndLocale() throws Exception {
-        assertEquals(testString, expectedDateTime, CEFTimestampParser.parse(testString, timeZone, locale));
+    @MethodSource("data")
+    @ParameterizedTest
+    public void parseWithTimeZoneAndLocale(String testString, DateTime expectedDateTime, DateTimeZone timeZone, Locale locale) throws Exception {
+        initCEFTimestampParserTest(testString, expectedDateTime, timeZone, locale);
+        assertEquals(expectedDateTime, CEFTimestampParser.parse(testString, timeZone, locale), testString);
     }
 }

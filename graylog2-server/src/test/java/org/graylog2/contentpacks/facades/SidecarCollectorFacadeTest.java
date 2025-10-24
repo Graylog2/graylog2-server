@@ -37,9 +37,9 @@ import org.graylog2.contentpacks.model.entities.SidecarCollectorEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Set;
@@ -54,7 +54,7 @@ public class SidecarCollectorFacadeTest {
     private CollectorService collectorService;
     private SidecarCollectorFacade facade;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         collectorService = new CollectorService(new MongoCollections(mapperProvider, mongodb.mongoConnection()));

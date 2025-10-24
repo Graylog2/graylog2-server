@@ -27,11 +27,12 @@ import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Map;
 import java.util.Set;
@@ -40,9 +41,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private Indices indices;
 
@@ -50,7 +51,7 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
         return searchServer().adapters().indicesAdapter();
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final Node node = new Node(mock(NodeAdapter.class));
         indices = new Indices(

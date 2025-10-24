@@ -34,10 +34,10 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -70,7 +70,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
         return this.elasticsearch;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
         backend = new ElasticsearchExportBackend(indexLookup, requestStrategy(), false, new IgnoreSearchFilters());
@@ -78,7 +78,7 @@ public class ElasticsearchExportBackendIT extends ElasticsearchBaseTest {
 
     }
 
-    @After
+    @AfterEach
     public void afterEach() {
         elasticsearch.cleanUp();
     }

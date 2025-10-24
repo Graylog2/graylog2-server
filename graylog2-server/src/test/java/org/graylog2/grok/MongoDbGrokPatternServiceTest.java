@@ -29,10 +29,10 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatcher;
 
 import java.util.ArrayList;
@@ -62,7 +62,7 @@ public class MongoDbGrokPatternServiceTest {
     private MongoDbGrokPatternService service;
     private ClusterEventBus clusterEventBus;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         clusterEventBus = spy(new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor()));
@@ -436,7 +436,7 @@ public class MongoDbGrokPatternServiceTest {
     }
 
     @Test
-    @Ignore("Disabled until MongoDbGrokPatternService#validate() has been fixed")
+    @Disabled("Disabled until MongoDbGrokPatternService#validate() has been fixed")
     public void validateInvalidGrokPattern() {
         assertThat(service.validate(GrokPattern.create("Test", "%{"))).isFalse();
         assertThat(service.validate(GrokPattern.create("Test", ""))).isFalse();

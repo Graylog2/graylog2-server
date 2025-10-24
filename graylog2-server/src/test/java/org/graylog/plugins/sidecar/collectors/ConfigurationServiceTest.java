@@ -29,19 +29,23 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ConfigurationServiceTest {
     private final String FILEBEAT_CONF_ID = "5b8fe5f97ad37b17a44e2a34";
 
@@ -50,9 +54,6 @@ public class ConfigurationServiceTest {
 
     @Mock
     private NodeDetails nodeDetails;
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
@@ -66,7 +67,7 @@ public class ConfigurationServiceTest {
         return Configuration.create(FILEBEAT_CONF_ID, "collId", "filebeat", "#ffffff", template, Set.of());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -99,11 +100,11 @@ public class ConfigurationServiceTest {
     public void testTemplateRenderUsingForbiddenFeatures() throws Exception {
         final String TEMPLATE = "<#assign ex=\"freemarker.template.utility.Execute\"?new()> ${ex(\"date\")}\n nodename: ${sidecar.nodeName}\n";
 
-        assertThrows("Template should not allow insecure features", RenderTemplateException.class, () -> {
+        assertThrows(RenderTemplateException.class, () -> {
             configuration = buildTestConfig(TEMPLATE);
             this.configurationService.save(configuration);
             this.configurationService.renderConfigurationForCollector(sidecar, configuration);
-        });
+        }, "Template should not allow insecure features");
     }
 
     @Test

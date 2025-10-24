@@ -24,15 +24,17 @@ import org.graylog2.migrations.Migration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.json.JSONException;
-import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.IOException;
@@ -53,11 +55,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -68,7 +70,7 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
 
     private Migration migration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.migration = new V20230629140000_RenameFieldTypeOfEventDefinitionSeries(
                 clusterConfigService,
@@ -145,7 +147,7 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
         try {
             final URL resource = this.getClass().getResource(filename);
             if (resource == null) {
-                Assert.fail("Unable to find resource file for test: " + filename);
+                Assertions.fail("Unable to find resource file for test: " + filename);
             }
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);

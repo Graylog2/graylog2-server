@@ -23,9 +23,9 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.model.ContentPack;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 
@@ -39,7 +39,7 @@ public class V20180718155800_AddContentPackIdAndRevTest {
 
     private V20180718155800_AddContentPackIdAndRev migration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         this.migration = new V20180718155800_AddContentPackIdAndRev(mongodb.mongoConnection());
     }

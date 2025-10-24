@@ -20,9 +20,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -39,7 +39,7 @@ public class MongoDBInstanceTestIT {
     private MongoCollection<Document> collection1;
     private MongoCollection<Document> collection2;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         collection1 = mongodb.mongoConnection().getMongoDatabase().getCollection("test_1");
         collection2 = mongodb.mongoConnection().getMongoDatabase().getCollection("test_2");

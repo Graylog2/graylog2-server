@@ -21,9 +21,9 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBInstance;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public class V20191204000000_RemoveLegacyViewsPermissionsTest {
 
     private V20191204000000_RemoveLegacyViewsPermissions migration;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         MongoDatabase mongoDatabase = mongodb.mongoConnection().getMongoDatabase();
         mongoDatabase.drop();

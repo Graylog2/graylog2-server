@@ -24,28 +24,29 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class DBEventProcessorStateServiceTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
     private MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
     private DBEventProcessorStateService stateService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         stateService = new DBEventProcessorStateService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
     }

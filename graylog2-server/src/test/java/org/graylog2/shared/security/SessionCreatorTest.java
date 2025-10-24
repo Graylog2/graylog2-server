@@ -36,9 +36,9 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -52,10 +52,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.anyMap;
 import static org.mockito.Mockito.anyString;
@@ -65,6 +65,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class SessionCreatorTest {
+    private AutoCloseable mocks;
     private static final long SESSION_TIMEOUT = Long.MAX_VALUE;
     private final ActorAwareUsernamePasswordToken validToken = new ActorAwareUsernamePasswordToken("username",
             "password");
@@ -82,9 +83,9 @@ public class SessionCreatorTest {
 
     private DefaultSecurityManager securityManager;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
 
         SimpleAccountRealm realm = new SimpleAccountRealm();
         realm.addAccount(validToken.getUsername(), String.valueOf(validToken.getPassword()));
@@ -97,8 +98,8 @@ public class SessionCreatorTest {
         SecurityUtils.setSecurityManager(securityManager);
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    public void tearDown() throws Exception {
         try {
             LifecycleUtils.destroy(SecurityUtils.getSecurityManager());
             SecurityUtils.setSecurityManager(null);
@@ -106,6 +107,7 @@ public class SessionCreatorTest {
         } catch (Exception e) {
             // OK, we don't care
         }
+        mocks.close();
     }
 
     @Test

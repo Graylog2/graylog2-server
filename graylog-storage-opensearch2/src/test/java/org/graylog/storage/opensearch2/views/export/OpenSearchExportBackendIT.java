@@ -34,11 +34,11 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -51,7 +51,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 
-@Ignore("Temporarily disabled because of flakiness")
+@Disabled("Temporarily disabled because of flakiness")
 public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
     private IndexLookup indexLookup;
@@ -71,14 +71,14 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
         return this.openSearchInstance;
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         indexLookup = mock(IndexLookup.class);
         backend = new OpenSearchExportBackend(indexLookup, requestStrategy(), false, new IgnoreSearchFilters());
         helper = new OpenSearchExportITHelper(indexLookup, backend);
     }
 
-    @After
+    @AfterEach
     public void afterEach() {
         openSearchInstance.cleanUp();
     }

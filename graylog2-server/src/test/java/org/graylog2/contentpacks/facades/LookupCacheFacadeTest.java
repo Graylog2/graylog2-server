@@ -44,9 +44,9 @@ import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.lookup.FallbackCacheConfig;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -67,7 +67,7 @@ public class LookupCacheFacadeTest {
     private DBCacheService cacheService;
     private Set<PluginMetaData> pluginMetaData;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());

@@ -31,10 +31,10 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
@@ -64,7 +64,7 @@ public class SearchesCleanUpJobWithDBServicesTest {
         }
     }
 
-    @Before
+    @BeforeEach
     public void setup(MongoJackObjectMapperProvider mapperProvider) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
@@ -83,8 +83,8 @@ public class SearchesCleanUpJobWithDBServicesTest {
                 new HashMap<>(), new HashSet<>());
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @AfterEach
+    public void cleanup() throws Exception {
         DateTimeUtils.setCurrentMillisSystem();
     }
 

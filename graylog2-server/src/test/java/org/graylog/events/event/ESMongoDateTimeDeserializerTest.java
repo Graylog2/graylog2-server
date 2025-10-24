@@ -25,9 +25,9 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -39,7 +39,7 @@ public class ESMongoDateTimeDeserializerTest {
 
     private MongoJackObjectMapperProvider mapperProvider;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         mapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
     }

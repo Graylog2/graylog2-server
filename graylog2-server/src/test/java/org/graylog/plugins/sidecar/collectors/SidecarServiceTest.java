@@ -38,35 +38,35 @@ import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
-import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import jakarta.validation.Validator;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anySet;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
 public class SidecarServiceTest {
     private static final String collectionName = "sidecars";
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
     private CollectorService collectorService;
 
@@ -84,7 +84,7 @@ public class SidecarServiceTest {
 
     private SidecarService sidecarService;
 
-    @Before
+    @BeforeEach
     public void setUp(MongoJackObjectMapperProvider mapperProvider,
                       Validator validator) throws Exception {
         this.sidecarService = new SidecarService(collectorService, configurationService,
@@ -300,9 +300,8 @@ public class SidecarServiceTest {
         sidecar = sidecarService.updateTaggedConfigurationAssignments(sidecar);
 
         assertThat(sidecar.assignments()).hasSize(1);
-        assertThat(sidecar.assignments()).satisfies(assignments -> {
-            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of("tag1"))).findAny()).isPresent();
-        });
+        assertThat(sidecar.assignments()).satisfies(assignments ->
+            assertThat(assignments.stream().filter(a -> a.assignedFromTags().equals(Set.of("tag1"))).findAny()).isPresent());
     }
 
     @Test
