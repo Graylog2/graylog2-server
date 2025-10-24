@@ -25,6 +25,7 @@
         <module>graylog-plugin-archetype</module>
         <module>graylog-storage-elasticsearch7</module>
         <module>graylog-storage-opensearch2</module>
+        <module>graylog-storage-opensearch3</module>
         <module>distribution</module>
     </modules>
 
@@ -97,6 +98,8 @@
 
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
+        <opensearch.client.version>3.2.0</opensearch.client.version>
+        <apache.httpclient5.version>5.2.1</apache.httpclient5.version>
         <airline.version>3.2.0</airline.version>
         <amqp-client.version>5.27.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
@@ -107,7 +110,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.0</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.35.1</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.36.1</aws-java-sdk-2.version>
         <aws-kinesis-client.version>2.6.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.4</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
@@ -126,7 +129,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.43.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.58.1</gcs.version>
+        <gcs.version>2.59.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.4.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
