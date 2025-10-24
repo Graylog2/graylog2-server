@@ -28,12 +28,15 @@ import static org.graylog.storage.opensearch3.OfficialOpensearchClient.mapExcept
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;
     private final OfficialOpensearchClient client;
+    private final OpenSearchClient deprecatedClient;
 
     @Inject
     public PlainJsonApi(ObjectMapper objectMapper,
+                        OpenSearchClient deprecatedClient,
                         OfficialOpensearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
+        this.deprecatedClient = deprecatedClient;
     }
 
     public JsonNode perform(Request request, String errorMessage) {
@@ -44,5 +47,14 @@ public class PlainJsonApi {
         } catch (Exception e) {
             throw mapException(e, errorMessage);
         }
+    }
+
+    @Deprecated
+    public JsonNode perform(org.graylog.shaded.opensearch2.org.opensearch.client.Request request, String errorMessage) {
+        return deprecatedClient.execute((c, requestOptions) -> {
+            request.setOptions(requestOptions);
+            org.graylog.shaded.opensearch2.org.opensearch.client.Response response = c.getLowLevelClient().performRequest(request);
+            return objectMapper.readTree(response.getEntity().getContent());
+        }, errorMessage);
     }
 }
