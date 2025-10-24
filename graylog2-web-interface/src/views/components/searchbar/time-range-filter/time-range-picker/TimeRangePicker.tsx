@@ -31,8 +31,6 @@ import validateTimeRange from 'views/components/TimeRangeValidation';
 import type { DateTime } from 'util/DateTime';
 import useUserDateTime from 'hooks/useUserDateTime';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 import type { RelativeTimeRangeClassified } from './types';
@@ -152,7 +150,6 @@ const TimeRangePicker = ({
 }: Props) => {
   const { formatTime, userTimezone } = useUserDateTime();
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
 
   const handleNoOverride = useCallback(() => {
     setCurrentTimeRange({});
@@ -163,11 +160,10 @@ const TimeRangePicker = ({
     toggleDropdownShow();
 
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_CANCELED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-time-range-cancel-button',
     });
-  }, [location.pathname, sendTelemetry, toggleDropdownShow]);
+  }, [sendTelemetry, toggleDropdownShow]);
 
   const onSubmit = useCallback(
     ({ timeRangeTabs, activeTab }: TimeRangePickerFormValues) => {
@@ -178,7 +174,6 @@ const TimeRangePicker = ({
       toggleDropdownShow();
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_UPDATED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'search-bar',
         app_action_value: 'search-time-range-confirm-button',
         event_details: {
@@ -186,7 +181,7 @@ const TimeRangePicker = ({
         },
       });
     },
-    [location.pathname, sendTelemetry, setCurrentTimeRange, toggleDropdownShow],
+    [sendTelemetry, setCurrentTimeRange, toggleDropdownShow],
   );
 
   const title = (

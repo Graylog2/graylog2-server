@@ -30,8 +30,6 @@ import useUserDateTime from 'hooks/useUserDateTime';
 import type { DateTime, DateTimeFormats } from 'util/DateTime';
 import { toDateObject } from 'util/DateTime';
 import { RELATIVE_CLASSIFIED_ALL_TIME_RANGE } from 'views/components/searchbar/time-range-filter/time-range-picker/RelativeTimeRangeClassifiedHelper';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { SelectCallback } from 'components/bootstrap/types';
 
@@ -131,7 +129,6 @@ const newTabTimeRange = ({
 
 const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
   const { formatTime, userTimezone } = useUserDateTime();
   const {
     setValues,
@@ -157,7 +154,6 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
       });
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PICKER_TAB_SELECTED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'search-bar',
         app_action_value: 'search-time-range',
         event_details: {
@@ -165,7 +161,7 @@ const TimeRangeTabs = ({ limitDuration, validTypes }: Props) => {
         },
       });
     },
-    [activeTab, defaultRanges, formatTime, location.pathname, sendTelemetry, setValues, timeRangeTabs, userTimezone],
+    [activeTab, defaultRanges, formatTime, sendTelemetry, setValues, timeRangeTabs, userTimezone],
   );
 
   const tabs = useMemo(

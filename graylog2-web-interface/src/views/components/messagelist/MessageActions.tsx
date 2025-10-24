@@ -26,17 +26,16 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 
-const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
-  const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
-
+const _getTestAgainstStreamButton = (
+  streams: Immutable.List<any>,
+  index: string,
+  id: string,
+  sendTelemetry: ReturnType<typeof useSendTelemetry>,
+) => {
   const sendEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-message-table',
       app_action_value: 'seach-message-table-test-against-stream',
     });
@@ -103,6 +102,7 @@ const MessageActions = ({
   searchConfig,
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
+  const sendTelemetry = useSendTelemetry();
 
   if (disabled) {
     return <ButtonGroup />;
@@ -134,7 +134,7 @@ const MessageActions = ({
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
       {surroundingSearchButton}
-      {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id)}
+      {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id, sendTelemetry)}
     </ButtonGroup>
   );
 };
