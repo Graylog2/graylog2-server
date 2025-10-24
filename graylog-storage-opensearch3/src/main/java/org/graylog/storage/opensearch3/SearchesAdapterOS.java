@@ -43,7 +43,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-public class SearchesAdapterOS2 implements SearchesAdapter {
+public class SearchesAdapterOS implements SearchesAdapter {
     private static final String AGG_CARDINALITY = "gl2_field_cardinality";
     private static final String AGG_EXTENDED_STATS = "gl2_extended_stats";
     private static final String AGG_VALUE_COUNT = "gl2_value_count";
@@ -54,10 +54,10 @@ public class SearchesAdapterOS2 implements SearchesAdapter {
     private final ResultMessageFactory resultMessageFactory;
 
     @Inject
-    public SearchesAdapterOS2(OpenSearchClient client,
-                              Scroll scroll,
-                              SearchRequestFactory searchRequestFactory,
-                              ResultMessageFactory resultMessageFactory) {
+    public SearchesAdapterOS(OpenSearchClient client,
+                             Scroll scroll,
+                             SearchRequestFactory searchRequestFactory,
+                             ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.scroll = scroll;
         this.searchRequestFactory = searchRequestFactory;
