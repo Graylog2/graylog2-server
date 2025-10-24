@@ -32,7 +32,7 @@ import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
-import org.graylog.storage.opensearch3.SearchesAdapterOS2;
+import org.graylog.storage.opensearch3.SearchesAdapterOS;
 import org.graylog.storage.opensearch3.SortOrderMapper;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
@@ -103,7 +103,7 @@ public class AdaptersOS2 implements Adapters {
         final boolean allowLeadingWildcardSearches = true;
 
         final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
-        return new SearchesAdapterOS2(client,
+        return new SearchesAdapterOS(client,
                 new Scroll(client,
                         scrollResultFactory,
                         searchRequestFactory),
