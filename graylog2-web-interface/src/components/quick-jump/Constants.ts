@@ -21,3 +21,4 @@ export const ENTITY_TYPE = 'entity' as const;
 export const PAGE_WEIGHT = 0.99;
 export const BASE_SCORE = 100;
 export const LAST_OPENED_ITEMS_LOOKBACK = 50;
+export const FEATURE_FLAG = 'quick_jump' as const;

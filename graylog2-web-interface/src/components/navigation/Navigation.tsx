@@ -25,6 +25,7 @@ import Routes from 'routing/Routes';
 import PerspectivesSwitcher from 'components/perspectives/PerspectivesSwitcher';
 import usePluginEntities from 'hooks/usePluginEntities';
 import MainNavbar from 'components/navigation/MainNavbar';
+import { FEATURE_FLAG } from 'components/quick-jump/Constants';
 
 import UserMenu from './UserMenu';
 import HelpMenu from './HelpMenu';
@@ -61,8 +62,8 @@ const Navigation = React.memo(({ pathname }: Props) => {
         <NotificationBadge />
 
         <Nav pullRight className="header-meta-nav">
-          <QuickJumpModalContainer />
-          
+          {AppConfig.isFeatureEnabled(FEATURE_FLAG) ? <QuickJumpModalContainer /> : null}
+
           {AppConfig.isCloud() ? (
             <GlobalThroughput disabled />
           ) : (

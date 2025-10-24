@@ -218,7 +218,7 @@ public class Server extends ServerBootstrap {
                 new TelemetryModule(),
                 new DataNodeModule(),
                 new McpServerModule(),
-                new QuickJumpModule()
+                new QuickJumpModule(featureFlags)
         );
 
         modules.add(new FieldTypeManagementModule());
