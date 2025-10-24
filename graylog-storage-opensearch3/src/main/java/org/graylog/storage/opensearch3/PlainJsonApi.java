@@ -18,28 +18,31 @@ package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-
 import jakarta.inject.Inject;
+import org.opensearch.client.opensearch.generic.Body;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Response;
 
-@Deprecated
+import static org.graylog.storage.opensearch3.OfficialOpensearchClient.mapException;
+
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient client;
 
     @Inject
     public PlainJsonApi(ObjectMapper objectMapper,
-                        OpenSearchClient client) {
+                        OfficialOpensearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
     }
 
     public JsonNode perform(Request request, String errorMessage) {
-        return client.execute((c, requestOptions) -> {
-            request.setOptions(requestOptions);
-            final Response response = c.getLowLevelClient().performRequest(request);
-            return objectMapper.readTree(response.getEntity().getContent());
-        }, errorMessage);
+        try {
+            Response response = client.sync().generic().execute(request);
+            String rawJson = response.getBody().map(Body::bodyAsString).orElse("");
+            return objectMapper.readTree(rawJson);
+        } catch (Exception e) {
+            throw mapException(e, errorMessage);
+        }
     }
 }
