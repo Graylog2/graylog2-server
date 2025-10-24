@@ -21,6 +21,7 @@ import get from 'lodash/get';
 import { Alert, Row } from 'components/bootstrap';
 import { emptyComparisonExpressionConfig } from 'logic/alerts/AggregationExpressionConfig';
 import validateExpression from 'logic/alerts/AggregationExpressionValidation';
+import type FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 
 import AggregationConditionExpression from './AggregationConditionExpression';
 import AggregationConditionsFormSummary from './AggregationConditionsFormSummary';
@@ -52,7 +53,7 @@ const StyledAlert = styled(Alert)`
 type AggregationConditionsFormProps = {
   eventDefinition: any;
   validation: any;
-  formattedFields: any[];
+  formattedFields: FieldTypeMapping[];
   aggregationFunctions: any[];
   onChange: (...args: any[]) => void;
 };
