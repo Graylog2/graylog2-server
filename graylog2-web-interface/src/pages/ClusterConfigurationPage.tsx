@@ -19,12 +19,13 @@ import React from 'react';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
 import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
-import ClusterConfigurationListView from 'components/cluster-configuration/ClusterConfigurationListView';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
 import type { SearchParams } from 'stores/PaginationTypes';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
+import GraylogNodesExpandable from 'components/cluster-configuration/GraylogNodesExpandable';
+import DataNodesExpandable from 'components/cluster-configuration/DataNodesExpandable';
 
 const ClusterConfigurationPage = () => {
   const clusterNodes = useClusterNodes();
@@ -51,8 +52,8 @@ const ClusterConfigurationPage = () => {
           <IndexerClusterHealth minimal />
         </HideOnCloud>
         <Row className="content">
-          <Col xs={6}>
-            <h2>Nodes</h2>
+          <Col md={12}>
+            <GraylogNodesExpandable clusterNodes={clusterNodes} />
           </Col>
           <Col md={12}>
             <TableFetchContextProvider
@@ -60,7 +61,7 @@ const ClusterConfigurationPage = () => {
               searchParams={searchParams}
               attributes={[]}
               entityTableId="cluster-configuration">
-              <ClusterConfigurationListView clusterNodes={clusterNodes} />
+              <DataNodesExpandable clusterNodes={clusterNodes} />
             </TableFetchContextProvider>
           </Col>
         </Row>
