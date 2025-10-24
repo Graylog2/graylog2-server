@@ -28,7 +28,7 @@ public record CountsAdapterOS(OfficialOpensearchClient client) implements Counts
     @Override
     public long totalCount(List<String> indices) {
         try {
-            return client.sync().count(r -> r.index(indices)).count();
+            return client.sync().count(requestBuilder -> requestBuilder.index(indices)).count();
         } catch (IOException e) {
             throw new RuntimeException("Fetching message count failed for indices " + indices, e);
         }
