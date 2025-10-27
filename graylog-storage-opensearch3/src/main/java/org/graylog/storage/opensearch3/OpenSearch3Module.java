@@ -67,7 +67,7 @@ public class OpenSearch3Module extends VersionAwareModule {
     @Override
     protected void configure() {
         bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverOS2.class);
-        bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
+        bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
