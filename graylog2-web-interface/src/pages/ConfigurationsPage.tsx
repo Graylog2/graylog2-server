@@ -31,10 +31,12 @@ import EventsConfig from 'components/configurations/EventsConfig';
 import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
+import McpConfig from 'components/configurations/McpConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
+import MarkdownConfig from 'components/configurations/MarkdownConfig';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -145,10 +147,27 @@ const ConfigurationsPage = () => {
         },
         {
           name: 'Users',
+          hide: !isPermitted(currentUser.permissions, ['users:edit', 'users:tokencreate']),
           SectionComponent: ConfigurationSection,
           props: {
             ConfigurationComponent: UserConfig,
-            title: 'Index Set Defaults',
+            title: 'Users',
+          },
+        },
+        {
+          name: 'Markdown',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: MarkdownConfig,
+            title: 'Markdown',
+          },
+        },
+        {
+          name: 'MCP',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: McpConfig,
+            title: 'MCP',
           },
         },
         {

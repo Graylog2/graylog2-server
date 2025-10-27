@@ -15,21 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import flatten from 'lodash/flatten';
-import type { Shape } from 'plotly.js';
+import type { Shape, Annotations } from 'plotly.js';
+import type { DefaultTheme } from 'styled-components';
 
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import { convertValueToBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import type { MappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { getYAxisPosition } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
-const getThresholdShapes = (
-  series: AggregationWidgetConfig['series'],
-  widgetUnits: UnitsConfig,
-  fieldNameToAxisNameMapper: MappersForYAxis['fieldNameToAxisNameMapper'],
-): Array<Partial<Shape>> => {
+type Props = {
+  series: AggregationWidgetConfig['series'];
+  widgetUnits: UnitsConfig;
+  fieldNameToAxisNameMapper: MappersForYAxis['fieldNameToAxisNameMapper'];
+  mapperAxisNumber: MappersForYAxis['mapperAxisNumber'];
+  theme: DefaultTheme;
+};
+
+type Result = {
+  shapes: Array<Partial<Shape>>;
+  annotations: Array<Partial<Annotations>>;
+};
+
+const getThresholdShapes = ({
+  series,
+  widgetUnits,
+  fieldNameToAxisNameMapper,
+  mapperAxisNumber,
+  theme,
+}: Props): Result => {
   const thresholds = series?.map((curSeries) => {
     const { field } = parseSeries(curSeries.function) ?? {};
     const seriesUnit = widgetUnits.getFieldUnit(field);
@@ -46,9 +63,12 @@ const getThresholdShapes = (
         ? formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev, 0)
         : value;
 
+      const seriesName = curSeries.config.name || curSeries.function;
+      const axisStartPosition = getYAxisPosition(mapperAxisNumber[seriesName] ?? 1);
+
       const shape: Partial<Shape> = {
         type: 'line',
-        x0: 0,
+        x0: axisStartPosition,
         x1: 1,
         y0: baseUnitValue,
         y1: baseUnitValue,
@@ -58,20 +78,40 @@ const getThresholdShapes = (
         line: {
           color,
         },
-        label: {
-          text: `${name} (${formattedValueWithUnitLabel})`,
-          textposition: 'top right',
-          font: {
-            color,
-          },
-        },
       };
 
-      return shape;
+      const bgColor = theme.utils.opacify(color, 0.6);
+      const contrastColor = theme.utils.readableColor(bgColor);
+      const isLeft = axisStartPosition < 0.5;
+
+      const annotation: Partial<Annotations> = {
+        x: axisStartPosition,
+        y: baseUnitValue,
+        xref: 'paper',
+        yref,
+        text: `${name} (${formattedValueWithUnitLabel})`,
+        showarrow: false,
+        xanchor: isLeft ? 'left' : 'right',
+        yanchor: 'bottom',
+        align: isLeft ? 'left' : 'right',
+        font: { color: contrastColor, size: 12 },
+        xshift: 0,
+        yshift: 0,
+        bgcolor: bgColor,
+        bordercolor: bgColor,
+        borderpad: 3,
+      };
+
+      return { shape, annotation };
     });
   });
 
-  return flatten(thresholds).filter((th) => !!th);
+  const res = flatten(thresholds).filter((threshold) => !!threshold?.shape);
+
+  return {
+    shapes: res.map(({ shape }) => shape),
+    annotations: res.map(({ annotation }) => annotation),
+  };
 };
 
 export default getThresholdShapes;

@@ -37,7 +37,7 @@ const EmptyContent = () => (
         </p>
         <IfPermitted permissions="eventdefinitions:create">
           <LinkContainer to={Routes.ALERTS.DEFINITIONS.CREATE}>
-            <Button bsStyle="success">Get Started!</Button>
+            <Button bsStyle="primary">Get Started!</Button>
           </LinkContainer>
         </IfPermitted>
       </EmptyEntity>

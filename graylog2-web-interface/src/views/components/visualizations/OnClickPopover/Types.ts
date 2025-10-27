@@ -40,12 +40,15 @@ export type Rel = { x: number; y: number };
 export type FieldData = {
   field: string;
   value: Datum;
+  contexts: { valuePath: Array<{ [key: string]: Datum }> } | null;
 };
 
 export type OnClickPopoverDropdownProps = {
   clickPoint: ClickPoint;
   config: AggregationWidgetConfig;
   setFieldData: React.Dispatch<React.SetStateAction<FieldData>>;
+  showBackButton?: boolean;
+  setStep: React.Dispatch<React.SetStateAction<Step>>;
 };
 
 export type OnClickPopoverDropdown = React.ComponentType<OnClickPopoverDropdownProps>;
@@ -57,3 +60,4 @@ export type ValueGroups = {
 };
 
 export type ValueGroupsProps = ValueGroups & { setFieldData: React.Dispatch<React.SetStateAction<FieldData>> };
+export type Step = 'traces' | 'values' | 'actions';

@@ -47,7 +47,12 @@ const dataTieringFormValuesWithDefaults = (values: DataTieringFormValues, plugin
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_WARM) {
-    const hotWarmDefaults = { ...DATA_TIERING_HOT_ONLY_DEFAULTS, ...DATA_TIERING_HOT_WARM_DEFAULTS, ...values };
+    const hotWarmDefaults = {
+      ...DATA_TIERING_HOT_ONLY_DEFAULTS,
+      ...DATA_TIERING_HOT_WARM_DEFAULTS,
+      ...values,
+      ...(values.type === DATA_TIERING_TYPE.HOT_ONLY ? { index_hot_lifetime_min: null } : {}),
+    };
 
     return hotWarmDefaults;
   }
@@ -117,7 +122,6 @@ const DataTieringConfiguration = <ValuesPrefix extends string | undefined>({
   const dataTieringPlugin = PluginStore.exports('dataTiering').find((plugin) => plugin.type === 'hot_warm');
 
   const { values } = useFormikContext<FormValues<ValuesPrefix>>();
-
   const sectionDisabled: boolean = immutableFields.includes('data_tiering');
 
   const formValue = (field: keyof DataTieringFormValues) => {

@@ -32,7 +32,7 @@ const Listing = styled.div`
 
 const ListingWithCount = ({ count, listing }: Props) => (
   <Listing title={String(listing)}>
-    <CountBadge>{count}</CountBadge> {listing}
+    <CountBadge count={count} /> {listing}
   </Listing>
 );
 
