@@ -30,6 +30,7 @@ type State = {
 };
 
 class SystemMessagesComponent extends React.Component<Props, State> {
+  // eslint-disable-next-line react/sort-comp
   private interval: NodeJS.Timeout;
 
   PER_PAGE = 30;
