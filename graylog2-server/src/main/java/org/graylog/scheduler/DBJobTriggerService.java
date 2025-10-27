@@ -86,7 +86,7 @@ public class DBJobTriggerService {
     public static final String COLLECTION_NAME = "scheduler_triggers";
     private static final String FIELD_ID = "_id";
     static final String FIELD_JOB_DEFINITION_ID = JobTriggerDto.FIELD_JOB_DEFINITION_ID;
-    private static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
+    public static final String FIELD_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
     private static final String FIELD_LAST_LOCK_OWNER = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_OWNER;
     private static final String FIELD_PROGRESS = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_PROGRESS;
     private static final String FIELD_LAST_LOCK_TIME = JobTriggerDto.FIELD_LOCK + "." + JobTriggerLock.FIELD_LAST_LOCK_TIME;
@@ -95,14 +95,14 @@ public class DBJobTriggerService {
     private static final String FIELD_END_TIME = JobTriggerDto.FIELD_END_TIME;
     private static final String FIELD_STATUS = JobTriggerDto.FIELD_STATUS;
     private static final String FIELD_SCHEDULE = JobTriggerDto.FIELD_SCHEDULE;
-    private static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
+    public static final String FIELD_DATA = JobTriggerDto.FIELD_DATA;
     private static final String FIELD_UPDATED_AT = JobTriggerDto.FIELD_UPDATED_AT;
     private static final String FIELD_CONCURRENCY_RESCHEDULE_COUNT = JobTriggerDto.FIELD_CONCURRENCY_RESCHEDULE_COUNT;
     private static final String FIELD_TRIGGERED_AT = JobTriggerDto.FIELD_TRIGGERED_AT;
     private static final String FIELD_CONSTRAINTS = JobTriggerDto.FIELD_CONSTRAINTS;
     private static final String FIELD_LAST_EXECUTION_DURATION = JobTriggerDto.FIELD_EXECUTION_DURATION;
     private static final String FIELD_IS_CANCELLED = JobTriggerDto.FIELD_IS_CANCELLED;
-    private static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
+    public static final String FIELD_JOB_DEFINITION_TYPE = JobTriggerDto.FIELD_JOB_DEFINITION_TYPE;
 
     private final String nodeId;
     private final JobSchedulerClock clock;
