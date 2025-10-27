@@ -99,12 +99,12 @@
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.2.0</opensearch.client.version>
-        <apache.httpclient5.version>5.2.1</apache.httpclient5.version>
         <airline.version>3.2.0</airline.version>
         <amqp-client.version>5.27.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
+        <apache-httpclient5.version>5.5.1</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
         <asm.version>9.9</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
@@ -268,6 +268,13 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.httpcomponents.client5</groupId>
+                <artifactId>httpclient5</artifactId>
+                <version>${apache-httpclient5.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpmime</artifactId>

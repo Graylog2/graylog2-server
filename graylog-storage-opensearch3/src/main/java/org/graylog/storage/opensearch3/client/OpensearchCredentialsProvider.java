@@ -18,38 +18,31 @@ package org.graylog.storage.opensearch3.client;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
-import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
-import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
-import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
-import org.graylog2.configuration.IndexerHosts;
-
-import javax.annotation.Nullable;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Provider;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.graylog2.configuration.IndexerHosts;
 
+import javax.annotation.Nullable;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * This credentials provider is used for opensearch 2 client and should be removed together with opensearch2 client.
- * @see OpensearchCredentialsProvider for opensearch3 replacement.
- */
-@Deprecated(forRemoval = true)
-public class OSCredentialsProvider implements Provider<CredentialsProvider> {
+public class OpensearchCredentialsProvider implements Provider<CredentialsProvider> {
     private final List<URI> openSearchHosts;
     private final String defaultUserForDiscoveredNodes;
     private final String defaultPasswordForDiscoveredNodes;
     private final boolean discoveryEnabled;
 
     @Inject
-    public OSCredentialsProvider(@IndexerHosts List<URI> openSearchHosts,
-                                 @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
-                                 @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
-                                 @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {
+    public OpensearchCredentialsProvider(@IndexerHosts List<URI> openSearchHosts,
+                                         @Named("elasticsearch_discovery_default_user") @Nullable String defaultUserForDiscoveredNodes,
+                                         @Named("elasticsearch_discovery_default_password") @Nullable String defaultPasswordForDiscoveredNodes,
+                                         @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled) {
         this.openSearchHosts = openSearchHosts;
         this.defaultUserForDiscoveredNodes = defaultUserForDiscoveredNodes;
         this.defaultPasswordForDiscoveredNodes = defaultPasswordForDiscoveredNodes;
@@ -58,7 +51,7 @@ public class OSCredentialsProvider implements Provider<CredentialsProvider> {
 
     @Override
     public CredentialsProvider get() {
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         openSearchHosts
                 .forEach(hostUri -> {
                     if (!Strings.isNullOrEmpty(hostUri.getUserInfo())) {
@@ -69,8 +62,8 @@ public class OSCredentialsProvider implements Provider<CredentialsProvider> {
                             final String username = splittedUserInfo.next();
                             final String password = splittedUserInfo.hasNext() ? splittedUserInfo.next() : null;
                             credentialsProvider.setCredentials(
-                                    new AuthScope(hostUri.getHost(), hostUri.getPort(), AuthScope.ANY_REALM, AuthScope.ANY_SCHEME),
-                                    new UsernamePasswordCredentials(username, password)
+                                    new AuthScope(hostUri.getHost(), hostUri.getPort()),
+                                    new UsernamePasswordCredentials(username, password.toCharArray())
                             );
                         }
                     }
@@ -78,11 +71,10 @@ public class OSCredentialsProvider implements Provider<CredentialsProvider> {
 
         if (discoveryEnabled && !Strings.isNullOrEmpty(defaultUserForDiscoveredNodes) && !Strings.isNullOrEmpty(defaultPasswordForDiscoveredNodes)) {
             credentialsProvider.setCredentials(
-                    new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthScope.ANY_SCHEME),
-                    new UsernamePasswordCredentials(defaultUserForDiscoveredNodes, defaultPasswordForDiscoveredNodes)
+                    new AuthScope(null, -1), // any host, any port
+                    new UsernamePasswordCredentials(defaultUserForDiscoveredNodes, defaultPasswordForDiscoveredNodes.toCharArray())
             );
         }
-
         return credentialsProvider;
     }
 }
