@@ -301,12 +301,12 @@ public class JerseyService extends AbstractIdleService {
         final char[] password = firstNonNull(keystoreInformation.password(), new char[]{});
 
         try {
-            SSLFactory baseSslFactory = SSLFactory.builder()
+            final SSLFactory baseSslFactory = SSLFactory.builder()
                     .withDummyIdentityMaterial()
                     .withSwappableIdentityMaterial()
                     .build();
 
-            Runnable sslUpdater = createSslUpdater(keystoreInformation, password, baseSslFactory);
+            final Runnable sslUpdater = createSslUpdater(keystoreInformation, password, baseSslFactory);
             sslUpdater.run();
             scheduledExecutorService.scheduleAtFixedRate(sslUpdater, 1, 1, TimeUnit.HOURS);
 
@@ -318,10 +318,10 @@ public class JerseyService extends AbstractIdleService {
         }
     }
 
-    private static Runnable createSslUpdater(KeystoreInformation keystoreInformation, char[] password, SSLFactory baseSslFactory) {
+    private Runnable createSslUpdater(final KeystoreInformation keystoreInformation, final char[] password, final SSLFactory baseSslFactory) {
         return () -> {
             try {
-                SSLFactory updatedSslFactory = SSLFactory.builder()
+                final SSLFactory updatedSslFactory = SSLFactory.builder()
                         .withIdentityMaterial(keystoreInformation.loadKeystore(), password)
                         .build();
 
