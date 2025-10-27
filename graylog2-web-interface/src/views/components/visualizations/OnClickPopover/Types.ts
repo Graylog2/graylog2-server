@@ -47,6 +47,8 @@ export type OnClickPopoverDropdownProps = {
   clickPoint: ClickPoint;
   config: AggregationWidgetConfig;
   setFieldData: React.Dispatch<React.SetStateAction<FieldData>>;
+  showBackButton?: boolean;
+  setStep: React.Dispatch<React.SetStateAction<Step>>;
 };
 
 export type OnClickPopoverDropdown = React.ComponentType<OnClickPopoverDropdownProps>;
@@ -58,3 +60,4 @@ export type ValueGroups = {
 };
 
 export type ValueGroupsProps = ValueGroups & { setFieldData: React.Dispatch<React.SetStateAction<FieldData>> };
+export type Step = 'traces' | 'values' | 'actions';

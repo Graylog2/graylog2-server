@@ -32,11 +32,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexR
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexResponse;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstanceBuilder;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.elasticsearch.IndexState;
+import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -49,7 +51,8 @@ import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-@ContainerMatrixTestsConfiguration(searchVersions = SearchServer.DATANODE_DEV)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 @Disabled("temporarily disabled")
 public class RemoteReindexingMigrationIT {
 
@@ -73,7 +76,7 @@ public class RemoteReindexingMigrationIT {
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testRemoteAsyncReindexing() throws ExecutionException, RetryException {
 
         final String indexName = createRandomSourceIndex();
@@ -113,7 +116,7 @@ public class RemoteReindexingMigrationIT {
         Assertions.assertThat(status).isEqualTo("FINISHED");
 
         Assertions.assertThat(getTargetIndexState(indexName))
-                        .isEqualTo(IndexState.CLOSE);
+                .isEqualTo(IndexState.CLOSE);
 
 
         openTargetIndex(indexName);
