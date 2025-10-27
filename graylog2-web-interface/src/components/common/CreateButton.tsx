@@ -34,7 +34,7 @@ const useEntityCreator = (entityKey: string) => {
 
   return useMemo(() => entityCreators.find((creator) => creator.id === entityKey), [entityCreators, entityKey]);
 };
-const CreateButton = ({ disabled, entityKey }: Props) => {
+const CreateButton = ({ disabled = false, entityKey }: Props) => {
   const entityCreator = useEntityCreator(entityKey);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
