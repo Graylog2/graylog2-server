@@ -23,6 +23,7 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { MessageFieldsComponentProps } from 'views/types';
+import useFeature from 'hooks/useFeature';
 
 export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
@@ -51,12 +52,13 @@ const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) 
 
 const usePluggableMessageFieldsComponent = (): React.ComponentType<MessageFieldsComponentProps> => {
   const pluggableMessageFields = usePluginEntities('views.components.widgets.messageTable.messageFields');
+  const featureEnabled = useFeature('message_table_favorite_fields');
 
   const pluggableItems = pluggableMessageFields.filter((messageFields) =>
     messageFields.useCondition ? !!messageFields.useCondition() : true,
   );
 
-  if (pluggableItems.length) return pluggableItems[0].component;
+  if (pluggableItems?.length && featureEnabled) return pluggableItems[0].component;
 
   return DefaultMessageFields;
 };

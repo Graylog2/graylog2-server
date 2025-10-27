@@ -29,6 +29,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
+import useFeature from 'hooks/useFeature';
 
 const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
   const sendTelemetry = useSendTelemetry();
@@ -74,7 +75,10 @@ const usePluggableMessageActions = (id: string, index: string) => {
 };
 
 const usePluggableMessageConfigurationActions = (id: string, index: string) => {
+  const featureEnabled = useFeature('message_table_favorite_fields');
   const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.configurationActions');
+
+  if (!featureEnabled) return null;
 
   return pluggableMenuActions
     .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
