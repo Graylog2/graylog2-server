@@ -40,6 +40,7 @@ import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.Time;
+import org.opensearch.client.opensearch.cat.NodesRequest;
 import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
 import org.opensearch.client.opensearch.cat.aliases.AliasesRecord;
 import org.opensearch.client.opensearch.cat.allocation.AllocationRecord;
@@ -58,6 +59,7 @@ import org.opensearch.client.opensearch.nodes.NodesInfoRequest;
 import org.opensearch.client.opensearch.nodes.NodesInfoResponse;
 import org.opensearch.client.opensearch.nodes.OpenSearchNodesClient;
 import org.opensearch.client.opensearch.nodes.info.NodeInfo;
+import org.opensearch.client.opensearch.nodes.info.NodesInfoMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,8 +76,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class ClusterAdapterOS2 implements ClusterAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterOS2.class);
+public class ClusterAdapterOS implements ClusterAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterAdapterOS.class);
     private final Duration requestTimeout;
     private final OfficialOpensearchClient opensearchClient;
     private final PlainJsonApi jsonApi;
@@ -84,9 +86,9 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
     private final OpenSearchNodesClient nodesClient;
 
     @Inject
-    public ClusterAdapterOS2(OfficialOpensearchClient opensearchClient,
-                             @Named("elasticsearch_socket_timeout") Duration requestTimeout,
-                             PlainJsonApi jsonApi) {
+    public ClusterAdapterOS(OfficialOpensearchClient opensearchClient,
+                            @Named("elasticsearch_socket_timeout") Duration requestTimeout,
+                            PlainJsonApi jsonApi) {
         this.requestTimeout = requestTimeout;
         this.jsonApi = jsonApi;
         this.opensearchClient = opensearchClient;
@@ -121,9 +123,13 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
                 .collect(Collectors.toSet());
     }
 
-    private List<NodesRecord> nodes() {
+    List<NodesRecord> nodes() {
         List<NodesRecord> allNodes = opensearchClient.execute(() ->
-                        catClient.nodes().valueBody(),
+                        catClient.nodes(NodesRequest.builder()
+                                .fullId(true)
+                                .headers("id", "name", "node.role", "ip", "version",
+                                        "file_desc.max", "disk.used", "disk.total", "disk.used_percent")
+                                .build()).valueBody(),
                 "Unable to retrieve nodes list"
         );
         List<NodesRecord> nodesWithDiskStatistics = allNodes.stream().filter(this::hasDiskStatistics).toList();
@@ -213,8 +219,9 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         }
         NodesInfoResponse info = opensearchClient.execute(() -> nodesClient.info(NodesInfoRequest.builder()
                 .nodeId(nodeId)
+                .metric(NodesInfoMetric.Os)
                 .build()
-        ), "Unable to retrieve node information for node id");
+        ), "Unable to retrieve node information for node id " + nodeId);
         return Optional.ofNullable(info.nodes().get(nodeId));
     }
 
@@ -404,6 +411,7 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
         return opensearchClient.execute(() -> clusterClient.getSettings(
                 GetClusterSettingsRequest.builder()
                         .includeDefaults(true)
+                        .flatSettings(true)
                         .build()
         ), "Unable to retrieve cluster settings");
     }
@@ -413,6 +421,6 @@ public class ClusterAdapterOS2 implements ClusterAdapter {
                 settings.persistent().getOrDefault(setting,
                         settings.defaults().get(setting)));
 
-        return (value == null) ? "" : value.toString();
+        return (value == null) ? "" : value.to(String.class);
     }
 }
