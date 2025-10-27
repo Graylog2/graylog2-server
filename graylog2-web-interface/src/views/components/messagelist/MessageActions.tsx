@@ -31,7 +31,15 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import useFeature from 'hooks/useFeature';
 
-const _getTestAgainstStreamButton = (streams: Immutable.List<any>, index: string, id: string) => {
+const TestAgainstStreamButton = ({
+  streams,
+  index,
+  id,
+}: {
+  streams: Immutable.List<any>;
+  index: string;
+  id: string;
+}) => {
   const sendTelemetry = useSendTelemetry();
   const location = useLocation();
 
@@ -147,7 +155,7 @@ const MessageActions = ({
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
       {surroundingSearchButton}
-      {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id)}
+      {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
       {pluggableConfigurationActions}
     </ButtonGroup>
   );
