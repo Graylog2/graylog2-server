@@ -44,7 +44,7 @@ public class PlainJsonApi {
         this(objectMapper, client, null);
     }
 
-    public JsonNode perform(Request request, String errorMessage) {
+    public JsonNode performRequest(Request request, String errorMessage) {
         try {
             Response response = client.sync().generic().execute(request);
             String rawJson = response.getBody().map(Body::bodyAsString).orElse("");

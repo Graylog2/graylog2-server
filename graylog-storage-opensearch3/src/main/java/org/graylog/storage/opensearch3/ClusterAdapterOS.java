@@ -306,7 +306,7 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .endpoint("/_cluster/stats/nodes/*")
                 .method("GET")
                 .build();
-        return jsonApi.perform(request, "Couldn't read Elasticsearch cluster stats");
+        return jsonApi.performRequest(request, "Couldn't read Elasticsearch cluster stats");
     }
 
     @Override
