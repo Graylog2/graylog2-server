@@ -36,6 +36,7 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch.cat.AliasesResponse;
 import org.opensearch.client.opensearch.cat.AllocationResponse;
 import org.opensearch.client.opensearch.cat.IndicesResponse;
+import org.opensearch.client.opensearch.cat.NodesRequest;
 import org.opensearch.client.opensearch.cat.NodesResponse;
 import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
 import org.opensearch.client.opensearch.cat.aliases.AliasesRecord;
@@ -143,7 +144,7 @@ class ClusterAdapterOSTest {
     @Test
     void testFileDescriptorStats() throws IOException {
         NodesResponse nodes = mock(NodesResponse.class);
-        when(catClient.nodes()).thenReturn(nodes);
+        when(catClient.nodes(any(NodesRequest.class))).thenReturn(nodes);
         when(nodes.valueBody()).thenReturn(List.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS));
         final Set<NodeFileDescriptorStats> nodeFileDescriptorStats = clusterAdapter.fileDescriptorStats();
 
@@ -166,7 +167,7 @@ class ClusterAdapterOSTest {
     @Test
     void testDiskUsageStats() throws IOException {
         NodesResponse nodes = mock(NodesResponse.class);
-        when(catClient.nodes()).thenReturn(nodes);
+        when(catClient.nodes(any(NodesRequest.class))).thenReturn(nodes);
         when(nodes.valueBody()).thenReturn(List.of(NODE_WITH_CORRECT_INFO, NODE_WITH_MISSING_DISK_STATISTICS));
         final Set<NodeDiskUsageStats> diskUsageStats = clusterAdapter.diskUsageStats();
 
