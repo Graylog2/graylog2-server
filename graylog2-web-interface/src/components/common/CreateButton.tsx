@@ -32,7 +32,15 @@ type Props = {
 const useEntityCreator = (entityKey: string) => {
   const entityCreators = usePluginEntities('entityCreators');
 
-  return useMemo(() => entityCreators.find((creator) => creator.id === entityKey), [entityCreators, entityKey]);
+  const entityCreator = useMemo(
+    () => entityCreators.find((creator) => creator.id === entityKey),
+    [entityCreators, entityKey],
+  );
+  if (!entityCreator) {
+    throw new Error(`Entity creator "${entityKey}" not found!`);
+  }
+
+  return entityCreator;
 };
 const CreateButton = ({ disabled = false, entityKey }: Props) => {
   const entityCreator = useEntityCreator(entityKey);

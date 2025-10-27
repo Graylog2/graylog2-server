@@ -66,6 +66,7 @@ jest.mock('components/event-definitions/event-definition-form/EventDefinitionSum
   mockComponent('EventDefinitionSummary'),
 );
 jest.mock('hooks/usePluginEntities');
+jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({ activePerspective: 'foo' }));
 
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {

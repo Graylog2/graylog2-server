@@ -123,9 +123,6 @@ export const usePluginEntityTypeGenerators = () => {
 const useShowRouteForEntity = (id: string, type: string) => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
-  if (!pluginEntityRoutesResolver?.length) {
-    return null;
-  }
 
   return getEntityRoute(id, type, pluginEntityRoutesResolver, entityTypeGenerators);
 };
