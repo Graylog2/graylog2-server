@@ -20,7 +20,7 @@ import defer from 'lodash/defer';
 
 import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from 'theme/constants';
 
-const useTheme = () => {
+const useThemeMode = () => {
   const theme = useSCTheme();
   const currentMode = theme.mode;
   const [loadingTheme, setLoadingTheme] = useState(false);
@@ -37,19 +37,13 @@ const useTheme = () => {
     defer(() => theme.changeMode(newMode));
   }, [currentMode, theme]);
 
-  const setTheme = useCallback(
-    (newMode: typeof COLOR_SCHEME_DARK | typeof COLOR_SCHEME_LIGHT) => theme.changeMode(newMode),
-    [theme],
-  );
-
   return useMemo(
     () => ({
       currentMode,
       toggleThemeMode,
       loadingTheme,
-      setTheme,
     }),
-    [currentMode, loadingTheme, setTheme, toggleThemeMode],
+    [currentMode, loadingTheme, toggleThemeMode],
   );
 };
-export default useTheme;
+export default useThemeMode;

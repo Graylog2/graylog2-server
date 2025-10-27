@@ -18,14 +18,14 @@ import { useCallback, useContext, useMemo } from 'react';
 
 import useLogout from 'hooks/useLogout';
 import useHotkeysContext from 'hooks/useHotkeysContext';
-import useTheme from 'theme/hooks/useTheme';
+import useThemeMode from 'theme/hooks/useThemeMode';
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
 const useActionArguments = () => {
   const logout = useLogout();
   const { setShowHotkeysModal } = useHotkeysContext();
   const showHotkeysModal = useCallback(() => setShowHotkeysModal(true), [setShowHotkeysModal]);
-  const { toggleThemeMode } = useTheme();
+  const { toggleThemeMode } = useThemeMode();
   const { toggleScratchpadVisibility: toggleScratchpad } = useContext(ScratchpadContext);
 
   return useMemo(

@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components';
 import { Icon } from 'components/common';
 import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from 'theme/constants';
 import Switch from 'components/common/Switch';
-import useTheme from 'theme/hooks/useTheme';
+import useThemeMode from 'theme/hooks/useThemeMode';
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
@@ -36,7 +36,7 @@ const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(
 );
 
 const ThemeModeToggle = () => {
-  const { currentMode, toggleThemeMode, loadingTheme } = useTheme();
+  const { currentMode, toggleThemeMode, loadingTheme } = useThemeMode();
   const loadingLightMode = currentMode === COLOR_SCHEME_DARK && loadingTheme;
   const loadingDarkMode = currentMode === COLOR_SCHEME_LIGHT && loadingTheme;
 
