@@ -19,12 +19,21 @@ package org.graylog.mcp.server;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.victools.jsonschema.generator.CustomDefinition;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
+import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
+import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.joda.time.DateTime;
 
 import java.util.Map;
 import java.util.Optional;
+
+import static com.github.victools.jsonschema.generator.OptionPreset.PLAIN_JSON;
+import static com.github.victools.jsonschema.generator.SchemaVersion.DRAFT_2020_12;
+import static com.github.victools.jsonschema.module.jackson.JacksonOption.RESPECT_JSONPROPERTY_REQUIRED;
 
 /**
  * The base class for MCP tools.
@@ -70,6 +79,24 @@ public abstract class Tool<P, O> {
         if (String.class.equals(outputType.getType())) {
             this.outputSchema = null;
         } else {
+            SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(DRAFT_2020_12, PLAIN_JSON);
+
+            // Add Jackson module to respect @JsonProperty annotations
+            configBuilder.with(new JacksonModule(RESPECT_JSONPROPERTY_REQUIRED));
+
+            // Configure DateTime to be treated as a string
+            configBuilder.forTypesInGeneral()
+                    .withCustomDefinitionProvider((javaType, context) -> {
+                        if (javaType.getErasedType() == DateTime.class) {
+                            ObjectNode customNode = context.getGeneratorConfig().createObjectNode();
+                            customNode.put("type", "string");
+                            customNode.put("format", "date-time");
+                            return new CustomDefinition(customNode);
+                        }
+                        return null;
+                    });
+
+            generator = new SchemaGenerator(configBuilder.build());
             this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
         }
     }
