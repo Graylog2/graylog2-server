@@ -17,6 +17,7 @@
 
 import type { PluginExports } from 'graylog-web-plugin/plugin';
 
+import InputsDotBadge from 'components/inputs/InputsDotBadge';
 import Routes from 'routing/Routes';
 import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMenuItems';
 import AppConfig from 'util/AppConfig';
@@ -46,6 +47,7 @@ const navigationBindings: PluginExports = {
     },
     {
       description: SYSTEM_DROPDOWN_TITLE,
+      BadgeComponent: InputsDotBadge,
       position: { last: true },
       children: filterCloudMenuItems(
         filterMenuItems(
@@ -61,7 +63,12 @@ const navigationBindings: PluginExports = {
               description: 'Cluster Configuration',
               permissions: ['clusterconfiguration:read'],
             },
-            { path: Routes.SYSTEM.INPUTS, description: 'Inputs', permissions: ['inputs:read'] },
+            {
+              path: Routes.SYSTEM.INPUTS,
+              description: 'Inputs',
+              permissions: ['inputs:read'],
+              BadgeComponent: InputsDotBadge,
+            },
             { path: Routes.SYSTEM.OUTPUTS, description: 'Outputs', permissions: ['outputs:read'] },
             { path: Routes.SYSTEM.INDICES.LIST, description: 'Indices', permissions: ['indices:read'] },
             { path: Routes.SYSTEM.LOGGING, description: 'Logging', permissions: ['loggers:read'] },
