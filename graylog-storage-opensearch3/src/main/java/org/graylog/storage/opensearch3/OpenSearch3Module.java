@@ -67,7 +67,7 @@ public class OpenSearch3Module extends VersionAwareModule {
     @Override
     protected void configure() {
         bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverOS2.class);
-        bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
+        bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
@@ -83,7 +83,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS2.class);
-        bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS2.class);
+        bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS.class);
         bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
                 .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2.class);
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
