@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { Table, Label } from 'components/bootstrap';
-import { Section, Spinner } from 'components/common';
+import { Label } from 'components/bootstrap';
+import { EntityDataTable, Section, Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import JournalState from 'components/nodes/JournalState';
+import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
 
-import type { ClusterNodes } from './useClusterNodes';
+import useClusterNodes from './useClusterNodes';
+import type { GraylogNode } from './useClusterNodes';
 import ClusterStatusLabel from './ClusterStatusLabel';
 import ClusterActions from './ClusterActions';
 import JvmHeapUsageText from './JvmHeapUsageText';
@@ -34,82 +36,135 @@ const SecondaryText = styled.div`
   }
 `;
 
-const NodeInfoTH = styled.th`
-  width: 51%;
-`;
-
-const StyledTable = styled(Table)`
-  table-layout: fixed;
-  width: 100%;
-
-  th,
-  td {
-    white-space: normal !important;
-    overflow-wrap: anywhere;
-    word-break: break-word;
-  }
-`;
-
 const RoleLabel = styled(Label)`
   display: inline-flex;
   justify-content: center;
   gap: 4px;
 `;
 
-type Props = {
-  clusterNodes: ClusterNodes;
+const NodePrimary = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+`;
+
+const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
+
+type GraylogNodeEntity = {
+  id: string;
+  node: string;
+  type: string;
+  role: string;
+  state: GraylogNode;
+  nodeInfo: GraylogNode;
 };
 
 const getRoleLabels = (roles: string) =>
-  roles.split(',').map((role) => (
-    <span key={role}>
-      <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
-    </span>
-  ));
+  roles
+    .split(',')
+    .map((role) => role.trim())
+    .filter(Boolean)
+    .map((role) => (
+      <span key={role}>
+        <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
+      </span>
+    ));
 
-const GraylogNodesExpandable = ({ clusterNodes }: Props) => (
-  <Section
-    title="Graylog Nodes"
-    collapsible
-  >
-    <StyledTable>
-      <thead>
-        <tr>
-          <NodeInfoTH>Node</NodeInfoTH>
-          <th>Type</th>
-          <th>Role</th>
-          <th>State</th>
-          <th className="text-right">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {clusterNodes.graylogNodes.map((graylogNode) => (
-          <tr key={graylogNode.nodeName}>
-            <td>
-              <div>
-                <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(graylogNode.nodeInfo.node_id)}>{graylogNode.nodeName}</Link>
-              </div>
-              <SecondaryText>
-                <JournalState nodeId={graylogNode.nodeInfo.node_id} />
-              </SecondaryText>
-              <SecondaryText>
-                <JvmHeapUsageText nodeId={graylogNode.nodeInfo.node_id} />
-              </SecondaryText>
-            </td>
-            <td>{graylogNode.type}</td>
-            <td>{getRoleLabels(graylogNode.role)}</td>
-            <td>
-              <ClusterStatusLabel node={graylogNode.nodeInfo} />
-            </td>
-            <td align="right">
-              <ClusterActions node={graylogNode.nodeInfo} />
-            </td>
-          </tr>
-        ))}
-      </tbody>
+const GraylogNodesExpandable = () => {
+  const clusterNodes = useClusterNodes({ includeDataNodes: false });
+  const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
+  const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
+
+  const columnDefinitions = useMemo<Array<Column>>(
+    () => [
+      { id: 'node', title: 'Node' },
+      { id: 'type', title: 'Type' },
+      { id: 'role', title: 'Role' },
+      { id: 'state', title: 'State' },
+    ],
+    [],
+  );
+
+  const columnRenderers = useMemo<ColumnRenderers<GraylogNodeEntity>>(
+    () => ({
+      attributes: {
+        node: {
+          renderCell: (_value, entity) => {
+            const nodeId = entity.nodeInfo.node_id;
+
+            return (
+              <NodePrimary>
+                {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{entity.node}</Link> : entity.node}
+                {nodeId && (
+                  <>
+                    <SecondaryText>
+                      <JournalState nodeId={nodeId} />
+                    </SecondaryText>
+                    <SecondaryText>
+                      <JvmHeapUsageText nodeId={nodeId} />
+                    </SecondaryText>
+                  </>
+                )}
+              </NodePrimary>
+            );
+          },
+        },
+        role: {
+          renderCell: (_value, entity) => getRoleLabels(entity.role),
+        },
+        state: {
+          renderCell: (_value, entity) => <ClusterStatusLabel node={entity.nodeInfo} />,
+        },
+      },
+    }),
+    [],
+  );
+
+  const graylogNodeEntities = useMemo<ReadonlyArray<GraylogNodeEntity>>(
+    () =>
+      clusterNodes.graylogNodes.map((graylogNode) => ({
+        id: graylogNode.nodeInfo.node_id ?? graylogNode.nodeName,
+        node: graylogNode.nodeName,
+        type: graylogNode.type,
+        role: graylogNode.role,
+        state: graylogNode.nodeInfo,
+        nodeInfo: graylogNode.nodeInfo,
+      })),
+    [clusterNodes.graylogNodes],
+  );
+
+  const handleColumnsChange = useCallback((newColumns: Array<string>) => {
+    if (!newColumns.length) {
+      return;
+    }
+
+    setVisibleColumns(newColumns);
+  }, []);
+
+  const handleSortChange = useCallback(() => {}, []);
+
+  const renderActions = useCallback(
+    (entity: GraylogNodeEntity) => <ClusterActions node={entity.nodeInfo} />,
+    [],
+  );
+
+  return (
+    <Section title="Graylog Nodes" collapsible>
       {clusterNodes.isLoading && <Spinner />}
-    </StyledTable>
-  </Section>
-);
+      <EntityDataTable<GraylogNodeEntity>
+        entities={graylogNodeEntities}
+        visibleColumns={visibleColumns}
+        columnsOrder={columnsOrder}
+        onColumnsChange={handleColumnsChange}
+        onSortChange={handleSortChange}
+        entityAttributesAreCamelCase
+        entityActions={renderActions}
+        columnDefinitions={columnDefinitions}
+        columnRenderers={columnRenderers}
+        actionsCellWidth={160}
+      />
+    </Section>
+  );
+};
 
 export default GraylogNodesExpandable;

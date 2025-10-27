@@ -21,6 +21,7 @@ import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { SystemOverview } from 'stores/cluster/types';
 import type { DataNode } from 'components/datanode/Types';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
+import type { SearchParams } from 'stores/PaginationTypes';
 
 export type GraylogNode = NodeInfo & SystemOverview;
 
@@ -38,7 +39,18 @@ export type ClusterNodes = {
   isLoading: boolean;
 };
 
-const useClusterNodes = (): ClusterNodes => {
+type UseClusterNodesOptions = {
+  includeDataNodes?: boolean;
+};
+
+const DATA_NODES_SEARCH_PARAMS: SearchParams = {
+  query: '',
+  page: 1,
+  pageSize: 0,
+  sort: { attributeId: 'hostname', direction: 'asc' },
+};
+
+const useClusterNodes = ({ includeDataNodes = true }: UseClusterNodesOptions = {}): ClusterNodes => {
   const { nodes: _graylogNodes } = useStore(NodesStore);
   const { clusterOverview: systemInfo } = useStore(ClusterOverviewStore);
   const graylogNodes = Object.values(_graylogNodes || {}).map((graylogNode) => ({
@@ -55,19 +67,21 @@ const useClusterNodes = (): ClusterNodes => {
     data: _dataNodes,
     refetch: refetchDatanodes,
     isInitialLoading: isDatanodeLoading,
-  } = useDataNodes({ query: '', page: 1, pageSize: 0, sort: { attributeId: 'hostname', direction: 'asc' } });
-  const dataNodes = (_dataNodes?.list || []).map((dataNode) => ({
-    nodeName: dataNode?.hostname,
-    type: 'Data Node - OpenSearch',
-    role: (dataNode?.opensearch_roles || []).join(','),
-    nodeInfo: dataNode,
-  }));
+  } = useDataNodes(DATA_NODES_SEARCH_PARAMS, { enabled: includeDataNodes }, includeDataNodes ? undefined : false);
+  const dataNodes = includeDataNodes
+    ? (_dataNodes?.list || []).map((dataNode) => ({
+        nodeName: dataNode?.hostname,
+        type: 'Data Node - OpenSearch',
+        role: (dataNode?.opensearch_roles || []).join(','),
+        nodeInfo: dataNode,
+      }))
+    : [];
 
   return {
     graylogNodes,
     dataNodes,
-    refetchDatanodes,
-    isLoading: isDatanodeLoading || !_graylogNodes || !systemInfo,
+    refetchDatanodes: includeDataNodes ? () => { refetchDatanodes(); } : () => {},
+    isLoading: (includeDataNodes && isDatanodeLoading) || !_graylogNodes || !systemInfo,
   };
 };
 

@@ -18,9 +18,6 @@ import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
-import useClusterNodes from 'components/cluster-configuration/useClusterNodes';
-import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
-import type { SearchParams } from 'stores/PaginationTypes';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
@@ -28,14 +25,6 @@ import GraylogNodesExpandable from 'components/cluster-configuration/GraylogNode
 import DataNodesExpandable from 'components/cluster-configuration/DataNodesExpandable';
 
 const ClusterConfigurationPage = () => {
-  const clusterNodes = useClusterNodes();
-  const searchParams: SearchParams = {
-    query: '',
-    page: 1,
-    pageSize: 0,
-    sort: { attributeId: 'hostname', direction: 'asc' },
-  };
-
   return (
     <DocumentTitle title="Cluster Configuration">
       <ClusterConfigurationPageNavigation />
@@ -53,16 +42,10 @@ const ClusterConfigurationPage = () => {
         </HideOnCloud>
         <Row className="content">
           <Col md={12}>
-            <GraylogNodesExpandable clusterNodes={clusterNodes} />
+            <GraylogNodesExpandable />
           </Col>
           <Col md={12}>
-            <TableFetchContextProvider
-              refetch={clusterNodes.refetchDatanodes}
-              searchParams={searchParams}
-              attributes={[]}
-              entityTableId="cluster-configuration">
-              <DataNodesExpandable clusterNodes={clusterNodes} />
-            </TableFetchContextProvider>
+            <DataNodesExpandable />
           </Col>
         </Row>
       </div>
