@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
@@ -25,7 +24,6 @@ import org.graylog2.indexer.cluster.health.NodeRole;
 import org.graylog2.indexer.cluster.health.NodeShardAllocation;
 import org.graylog2.indexer.cluster.health.SIUnitParser;
 import org.graylog2.indexer.indices.HealthStatus;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -79,7 +77,6 @@ class ClusterAdapterOSTest {
     private OpenSearchClusterClient clusterClient;
     @Mock
     private OpenSearchNodesClient nodesClient;
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private ClusterAdapterOS clusterAdapter;
 
