@@ -21,7 +21,6 @@ import { useCallback, useState, useContext, useRef } from 'react';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -52,6 +51,7 @@ import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
 import { createGRN } from 'logic/permissions/GRN';
 import useSelectedStreamsGRN from 'views/hooks/useSelectedStreamsGRN';
+import { createView, deleteView } from 'views/api/views';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -173,7 +173,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView, entityShare, view.id)
+      createView(newView, entityShare, view.id)
         .then((createdView) => {
           toggleFormModal();
 
@@ -190,7 +190,7 @@ const SearchActionsMenu = () => {
 
   const deleteSavedSearch = useCallback(
     (deletedView: View) =>
-      ViewManagementActions.delete(deletedView)
+      deleteView(deletedView)
         .then(() =>
           UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'),
         )

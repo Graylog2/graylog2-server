@@ -33,9 +33,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexResponse;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClientProvider;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.RestClientProvider;
-import org.graylog.storage.opensearch3.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -65,7 +66,9 @@ import java.util.concurrent.TimeUnit;
 public class OpenSearchInstance extends TestableSearchServerInstance {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
 
+    @Deprecated
     private OpenSearchClient openSearchClient;
+    private OfficialOpensearchClient officialOpensearchClient;
     private Client client;
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
@@ -85,14 +88,27 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         super.init();
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
+        this.officialOpensearchClient = buildOfficialClient();
         this.client = new ClientOS2(this.openSearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient, featureFlags);
+        adapters = new AdaptersOS2(openSearchClient, officialOpensearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         if (isFirstContainerStart) {
             afterContainerCreated();
         }
         return this;
+    }
+
+    private OfficialOpensearchClient buildOfficialClient() {
+        return new OfficialOpensearchClientProvider(
+                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                IndexerJwtAuthToken.disabled(),
+                createCredentialsProvider() // no credentials!
+        ).get();
+    }
+
+    private static org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider createCredentialsProvider() {
+        return new org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider();
     }
 
     private RestHighLevelClient buildRestClient() {
@@ -204,8 +220,13 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return this.fixtureImporter;
     }
 
+    @Deprecated
     public OpenSearchClient openSearchClient() {
         return this.openSearchClient;
+    }
+
+    public OfficialOpensearchClient getOfficialOpensearchClient() {
+        return officialOpensearchClient;
     }
 
     @Override
