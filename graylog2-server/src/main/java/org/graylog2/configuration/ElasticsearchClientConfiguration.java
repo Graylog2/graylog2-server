@@ -47,7 +47,7 @@ public class ElasticsearchClientConfiguration {
     /**
      * Not used anywhere!
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     @Parameter(value = "elasticsearch_idle_timeout")
     private Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
 
