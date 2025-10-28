@@ -16,18 +16,20 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.EnumUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.get.GetAliasesRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.flush.FlushRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.forcemerge.ForceMergeRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
@@ -42,21 +44,12 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptio
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
-import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentFactory;
-import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentHelper;
-import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
-import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
-import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.Filter;
@@ -66,7 +59,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
-import org.graylog.storage.opensearch3.cat.CatApi;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -88,6 +80,23 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.ExpandWildcard;
+import org.opensearch.client.opensearch.cat.IndicesRequest;
+import org.opensearch.client.opensearch.cat.IndicesResponse;
+import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
+import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
+import org.opensearch.client.opensearch.core.ReindexResponse;
+import org.opensearch.client.opensearch.core.reindex.Destination;
+import org.opensearch.client.opensearch.core.reindex.Source;
+import org.opensearch.client.opensearch.indices.CreateIndexRequest;
+import org.opensearch.client.opensearch.indices.GetAliasRequest;
+import org.opensearch.client.opensearch.indices.GetAliasResponse;
+import org.opensearch.client.opensearch.indices.GetIndexRequest;
+import org.opensearch.client.opensearch.indices.GetIndexResponse;
+import org.opensearch.client.opensearch.indices.GetIndicesSettingsResponse;
+import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
+import org.opensearch.client.opensearch.indices.PutMappingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +104,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -107,18 +115,23 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.graylog.storage.opensearch3.OpenSearchClient.withTimeout;
 
 public class IndicesAdapterOS implements IndicesAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS.class);
+    private final OfficialOpensearchClient c;
     private final OpenSearchClient client;
     private final StatsApi statsApi;
     private final ClusterStatsApi clusterStatsApi;
-    private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
     private final IndexStatisticsBuilder indexStatisticsBuilder;
     private final ObjectMapper objectMapper;
+
+    private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
+    private final OpenSearchIndicesClient indicesClient;
+    private final OpenSearchCatClient catClient;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
@@ -127,53 +140,58 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Inject
     public IndicesAdapterOS(OpenSearchClient client,
+                            OfficialOpensearchClient c,
                             StatsApi statsApi,
                             ClusterStatsApi clusterStatsApi,
-                            CatApi catApi,
                             ClusterStateApi clusterStateApi,
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
                             ObjectMapper objectMapper) {
         this.client = client;
+        this.c = c;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;
-        this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
         this.indexTemplateAdapter = indexTemplateAdapter;
         this.indexStatisticsBuilder = indexStatisticsBuilder;
         this.objectMapper = objectMapper;
+        this.openSearchClient = c.sync();
+        this.indicesClient = openSearchClient.indices();
+        this.catClient = openSearchClient.cat();
     }
 
     @Override
     public void move(String source, String target, Consumer<IndexMoveResult> resultCallback) {
-        final ReindexRequest request = new ReindexRequest();
-        request.setSourceIndices(source);
-        request.setDestIndex(target);
-
-        final BulkByScrollResponse result = client.execute((c, requestOptions) -> c.reindex(request, requestOptions));
+        ReindexResponse result = c.execute(() -> openSearchClient.reindex(
+                        org.opensearch.client.opensearch.core.ReindexRequest.builder()
+                                .source(Source.builder().index(source).build())
+                                .dest(Destination.builder().index(target).build())
+                                .build()),
+                "Error moving index " + source + " to " + target);
 
         final IndexMoveResult indexMoveResult = IndexMoveResult.create(
-                Math.toIntExact(result.getTotal()),
-                result.getTook().millis(),
-                !result.getBulkFailures().isEmpty()
+                Math.toIntExact(getIfNull(result.total(), 0L)),
+                getIfNull(result.took(), 0L),
+                !result.failures().isEmpty()
         );
         resultCallback.accept(indexMoveResult);
     }
 
     @Override
     public void delete(String index) {
-        final DeleteIndexRequest request = new DeleteIndexRequest(index);
-
-        client.execute((c, requestOptions) -> c.indices().delete(request, requestOptions));
+        c.execute(() -> indicesClient.delete(
+                        org.opensearch.client.opensearch.indices.DeleteIndexRequest.builder()
+                                .index(index)
+                                .build()),
+                "Error removing index " + index);
     }
 
     @Override
     public Set<String> resolveAlias(String alias) {
-        final GetAliasesRequest request = new GetAliasesRequest()
-                .aliases(alias);
-        final GetAliasesResponse result = client.execute((c, requestOptions) -> c.indices().getAlias(request, requestOptions));
-
-        return result.getAliases().keySet();
+        GetAliasResponse result = c.execute(() -> indicesClient.getAlias(GetAliasRequest.builder()
+                .index(alias)
+                .build()), "Error resolving alias " + alias);
+        return result.result().keySet();
     }
 
     @Override
@@ -189,16 +207,33 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private CreateIndexRequest createIndexRequest(String index,
                                                   IndexSettings indexSettings,
                                                   @Nullable Map<String, Object> mapping) {
-        CreateIndexRequest request = new CreateIndexRequest(index).settings(indexSettings.map());
+
+        CreateIndexRequest.Builder builder = new CreateIndexRequest.Builder()
+                .index(index)
+                .settings(createIndexSettings(indexSettings));
         if (mapping != null) {
-            request = request.mapping(mapping);
+            // TODO: This sucks
+//            builder.mappings(TypeMapping.of(m -> m.properties(mapping)));
         }
-        return request;
+        return builder.build();
     }
 
+    private org.opensearch.client.opensearch.indices.IndexSettings createIndexSettings(IndexSettings indexSettings) {
+
+        Map<String, JsonData> jsonSettings = indexSettings.map().entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> JsonData.of(entry.getValue())
+                ));
+
+        org.opensearch.client.opensearch.indices.IndexSettings.Builder builder = org.opensearch.client.opensearch.indices.IndexSettings.builder();
+        builder.customSettings(jsonSettings);
+        return builder.build();
+    }
+
+
     private void executeCreateIndexRequest(String index, CreateIndexRequest request) {
-        client.execute((c, requestOptions) -> c.indices().create(request, requestOptions),
-                "Unable to create index " + index);
+        c.execute(() -> indicesClient.create(request), "Unable to create index " + index);
     }
 
     @Override
@@ -206,15 +241,16 @@ public class IndicesAdapterOS implements IndicesAdapter {
                                    @Nonnull String mappingType,
                                    @Nonnull Map<String, Object> mapping) {
 
-        final PutMappingRequest request = new PutMappingRequest(indexName)
-                .source(mapping);
+        // TODO: This sucks
+        PutMappingRequest request = PutMappingRequest.of(b -> b);
 
-        client.execute((c, requestOptions) -> c.indices().putMapping(request, requestOptions),
+        c.execute(() -> indicesClient.putMapping(request),
                 "Unable to update index mapping " + indexName);
     }
 
     @Override
     public Map<String, Object> getIndexMapping(@Nonnull String index) {
+
         final GetMappingsRequest request = new GetMappingsRequest()
                 .indices(index)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
@@ -226,21 +262,16 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
 
-        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                .indices(index)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
-
-        return client.execute((c, requestOptions) -> {
-            final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            final Settings settings = settingsResponse.getIndexToSettings().get(index);
-            final XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
-            xContentBuilder.startObject();
-            settings.toXContent(xContentBuilder, ToXContent.EMPTY_PARAMS);
-            xContentBuilder.endObject();
-            final BytesReference bytes = BytesReference.bytes(xContentBuilder);
-
-            return XContentHelper.convertToMap(bytes, true, xContentBuilder.contentType()).v2();
+        return c.execute(() -> {
+            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b.index(index)
+                    .ignoreUnavailable(true)
+                    .allowNoIndices(true)
+                    .expandWildcards(ExpandWildcard.Open)
+                    .flatSettings(true)
+            );
+            return objectMapper.readValue(result.toJsonString(), new TypeReference<>() {});
         }, "Couldn't read settings of index " + index);
+
     }
 
 
@@ -405,8 +436,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Set<String> closedIndices(Collection<String> indices) {
-        return catApi.indices(indices, Collections.singleton("close"),
-                "Unable to retrieve list of closed indices for " + indices);
+        return c.execute(() -> {
+            GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
+                    .index(indices.stream().toList())
+                    .expandWildcards(ExpandWildcard.Closed)
+                    .ignoreUnavailable(true)));
+            return result.result().keySet();
+        }, "Unable to retrieve list of closed indices for " + indices);
     }
 
     @Override
@@ -459,7 +495,14 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public List<ShardsInfo> getShardsInfo(String indexName) {
-        return catApi.getShardsInfo(indexName);
+        return c.execute(() -> catClient.shards().valueBody().stream()
+                .map(shardsRecord -> new ShardsInfo(
+                        shardsRecord.index(), Integer.parseInt(getIfNull(shardsRecord.shard(), "0")),
+                        ShardsInfo.ShardType.fromString(getIfNull(shardsRecord.prirep(), "UNKNOWN")),
+                        EnumUtils.getEnumIgnoreCase(ShardsInfo.State.class, shardsRecord.state(), ShardsInfo.State.UNKNOWN),
+                        Long.parseLong(getIfNull(shardsRecord.docs(), "0")), shardsRecord.store(),
+                        shardsRecord.ip(), shardsRecord.node())
+                ).toList(), "Error getting shards information for " + indexName);
     }
 
 
@@ -496,7 +539,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
-        return catApi.indices(indexWildcard, status, "Couldn't get index list for index set <" + indexSetId + ">");
+        return c.execute(() -> {
+            GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
+                    .index(indexWildcard)
+                    .expandWildcards(status.stream().map(ExpandWildcard::valueOf).collect(Collectors.toList()))
+                    .ignoreUnavailable(true)));
+            return result.result().keySet();
+        }, "Couldn't get index list for index set <" + indexSetId + ">");
     }
 
     @Override
@@ -637,9 +686,14 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     private Optional<State> indexState(String index) {
-        final Optional<String> result = catApi.indexState(index, "Unable to retrieve index stats for " + index);
-
-        return result.map((State::parse));
+        return c.execute(() -> {
+            IndicesResponse indices = catClient.indices(IndicesRequest.of(b -> b.index(index).headers("index", "status")));
+            return indices.valueBody().stream()
+                    .map(IndicesRecord::status)
+                    .filter(Objects::nonNull)
+                    .map(State::parse)
+                    .findFirst();
+        }, "Unable to retrieve index stats for " + index);
     }
 
     enum State {
