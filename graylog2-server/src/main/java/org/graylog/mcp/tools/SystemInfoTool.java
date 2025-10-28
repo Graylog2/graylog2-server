@@ -19,16 +19,19 @@ package org.graylog.mcp.tools;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.graylog.mcp.server.OutputBuilder;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.web.customization.CustomizationConfig;
 
+import java.util.List;
 import java.util.Locale;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -44,10 +47,12 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
     public SystemInfoTool(ObjectMapper objectMapper,
                           SchemaGeneratorProvider schemaGeneratorProvider,
                           ServerStatus serverStatus,
+                          ClusterConfigService clusterConfigService,
                           CustomizationConfig customizationConfig,
                           LeaderElectionService leaderElectionService) {
         super(objectMapper,
                 schemaGeneratorProvider,
+                clusterConfigService,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -82,6 +87,46 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
                     System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"),
                     leaderElectionService.isLeader()
             );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected String applyAsText(PermissionHelper permissionHelper, SystemInfoTool.Parameters unused) {
+        try {
+            permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
+
+            OutputBuilder output = new OutputBuilder();
+            output.h1(f("%s System Information", customizationConfig.productName()));
+            return output.unorderedListKVItem(SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
+                    ServerVersion.CODENAME,
+                    serverStatus.getNodeId().toString(),
+                    serverStatus.getClusterId(),
+                    ServerVersion.VERSION.toString(),
+                    Tools.getISO8601String(serverStatus.getStartedAt()),
+                    serverStatus.isProcessing(),
+                    Tools.getLocalCanonicalHostname(),
+                    serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH),
+                    serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH),
+                    serverStatus.getTimezone().getID(),
+                    System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"),
+                    leaderElectionService.isLeader()
+            ), List.of(
+                    "facility",
+                    "codename",
+                    "node_id",
+                    "cluster_id",
+                    "version",
+                    "started_at",
+                    "is_processing",
+                    "hostname",
+                    "lifecycle",
+                    "lb_status",
+                    "timezone",
+                    "operating_system",
+                    "is_leader"
+            )).toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

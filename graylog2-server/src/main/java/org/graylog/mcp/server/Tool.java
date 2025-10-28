@@ -17,11 +17,15 @@
 package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import io.modelcontextprotocol.spec.McpSchema;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
@@ -41,10 +45,12 @@ public abstract class Tool<P, O> {
     private final String description;
     private final McpSchema.JsonSchema inputSchema;
     private final Map<String, Object> outputSchema;
+    private final ClusterConfigService clusterConfigService;
 
     protected Tool(
             ObjectMapper objectMapper,
             SchemaGeneratorProvider schemaGeneratorProvider,
+            ClusterConfigService clusterConfigService,
             TypeReference<P> parameterType,
             TypeReference<O> outputType,
             String name,
@@ -55,6 +61,7 @@ public abstract class Tool<P, O> {
         this.name = name;
         this.title = title;
         this.description = description;
+        this.clusterConfigService = clusterConfigService;
 
         // Get the schema generator with all contributed modules
         SchemaGenerator generator = schemaGeneratorProvider.get();
@@ -72,6 +79,11 @@ public abstract class Tool<P, O> {
         } else {
             this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
         }
+    }
+
+    protected boolean isStructuredOutputSet() {
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES
+        ).useStructuredOutput();
     }
 
     protected ObjectMapper getObjectMapper() {
@@ -100,7 +112,7 @@ public abstract class Tool<P, O> {
 
     @JsonProperty
     public Optional<Map<String, Object>> outputSchema() {
-        return Optional.ofNullable(outputSchema);
+        return isStructuredOutputSet() ? Optional.ofNullable(outputSchema) : Optional.empty();
     }
 
     /**
@@ -110,10 +122,25 @@ public abstract class Tool<P, O> {
      * @param parameterMap raw parameter map
      * @return the return value of the tool call
      */
-    public O apply(PermissionHelper permissionHelper, Map<String, Object> parameterMap) {
+    public ToolResult<O> apply(PermissionHelper permissionHelper, Map<String, Object> parameterMap) {
         final P p = objectMapper.convertValue(parameterMap, parameterType);
-        return apply(permissionHelper, p);
+        if (!isStructuredOutputSet()) {
+            return new ToolResult.Text<>(applyAsText(permissionHelper, p));
+        }
+        return new ToolResult.Data<>(apply(permissionHelper, p));
     }
 
     protected abstract O apply(PermissionHelper permissionHelper, P parameters);
+
+    protected String applyAsText(PermissionHelper permissionHelper, P parameters) {
+        throw new UnsupportedOperationException("Text output not implemented");
+    }
+
+    public sealed interface ToolResult<T> {
+        record Text<T>(@JsonValue String value) implements ToolResult<T> {
+            @Override
+            public @NotNull String toString() { return value != null ? value : "(empty)"; }
+        }
+        record Data<T>(@JsonValue T value) implements ToolResult<T> {}
+    }
 }
