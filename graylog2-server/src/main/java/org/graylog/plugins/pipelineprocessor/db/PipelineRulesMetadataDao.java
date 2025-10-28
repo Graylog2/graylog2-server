@@ -27,9 +27,9 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-@JsonDeserialize(builder = AutoValue_PipelineMetadataDao.Builder.class)
+@JsonDeserialize(builder = AutoValue_PipelineRulesMetadataDao.Builder.class)
 @AutoValue
-public abstract class PipelineMetadataDao implements BuildableMongoEntity<PipelineMetadataDao, PipelineMetadataDao.Builder> {
+public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<PipelineRulesMetadataDao, PipelineRulesMetadataDao.Builder> {
     private static final String FIELD_ID = "id";
     public static final String FIELD_PIPELINE_ID = "pipeline_id";
     private static final String FIELD_RULES = "rules";
@@ -60,7 +60,7 @@ public abstract class PipelineMetadataDao implements BuildableMongoEntity<Pipeli
     public abstract List<String> deprecatedFunctions();
 
     public static Builder builder() {
-        return new AutoValue_PipelineMetadataDao.Builder()
+        return new AutoValue_PipelineRulesMetadataDao.Builder()
                 .pipelineId("")
                 .rules(new ArrayList<>())
                 .streams(new ArrayList<>())
@@ -69,7 +69,7 @@ public abstract class PipelineMetadataDao implements BuildableMongoEntity<Pipeli
     }
 
     @AutoValue.Builder
-    public abstract static class Builder implements BuildableMongoEntity.Builder<PipelineMetadataDao, Builder> {
+    public abstract static class Builder implements BuildableMongoEntity.Builder<PipelineRulesMetadataDao, Builder> {
         @Id
         @ObjectId
         @JsonProperty(FIELD_ID)

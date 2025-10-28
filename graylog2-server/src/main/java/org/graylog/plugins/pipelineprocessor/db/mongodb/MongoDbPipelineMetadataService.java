@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import jakarta.inject.Inject;
-import org.graylog.plugins.pipelineprocessor.db.PipelineMetadataDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 
@@ -32,21 +32,22 @@ import static com.mongodb.client.model.Filters.eq;
  * Persists information on pipeline and rules to avoid parsing these repeatedly
  */
 public class MongoDbPipelineMetadataService {
-    public static final String COLLECTION_NAME = "pipeline_processor_rules_meta";
-    private final MongoCollection<PipelineMetadataDao> collection;
+    public static final String RULES_COLLECTION_NAME = "pipeline_processor_rules_meta";
+    public static final String INPUTS_COLLECTION_NAME = "pipeline_processor_inputs_meta";
+    private final MongoCollection<PipelineRulesMetadataDao> collection;
 
     @Inject
     public MongoDbPipelineMetadataService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.collection(COLLECTION_NAME, PipelineMetadataDao.class);
-        collection.createIndex(Indexes.ascending(PipelineMetadataDao.FIELD_PIPELINE_ID), new IndexOptions().unique(true));
+        this.collection = mongoCollections.collection(RULES_COLLECTION_NAME, PipelineRulesMetadataDao.class);
+        collection.createIndex(Indexes.ascending(PipelineRulesMetadataDao.FIELD_PIPELINE_ID), new IndexOptions().unique(true));
     }
 
-    public ImmutableList<PipelineMetadataDao> getAll() {
+    public ImmutableList<PipelineRulesMetadataDao> getAll() {
         return ImmutableList.copyOf(collection.find());
     }
 
-    public Optional<PipelineMetadataDao> getByPipelineId(final String pipelineId) {
-        return Optional.ofNullable(collection.find(eq(PipelineMetadataDao.FIELD_PIPELINE_ID, pipelineId)).first());
+    public Optional<PipelineRulesMetadataDao> getByPipelineId(final String pipelineId) {
+        return Optional.ofNullable(collection.find(eq(PipelineRulesMetadataDao.FIELD_PIPELINE_ID, pipelineId)).first());
     }
 
 }
