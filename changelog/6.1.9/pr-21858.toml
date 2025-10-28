@@ -1,0 +1,5 @@
+type = "f"
+message = "Improved validation and handling of uploaded certficate authorities."
+
+issues = ["21832"]
+pulls = ["21858"]

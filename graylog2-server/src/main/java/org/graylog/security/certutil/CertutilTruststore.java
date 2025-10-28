@@ -95,7 +95,7 @@ public class CertutilTruststore implements CliCommand {
 
     }
 
-    private static String certificateInfo(X509Certificate cert) {
+    public static String certificateInfo(X509Certificate cert) {
         return String.format(Locale.ROOT, "Subject: %s, issuer: %s, not before: %s, not after: %s", cert.getSubjectX500Principal(), cert.getIssuerX500Principal(), cert.getNotBefore(), cert.getNotAfter());
     }
 }

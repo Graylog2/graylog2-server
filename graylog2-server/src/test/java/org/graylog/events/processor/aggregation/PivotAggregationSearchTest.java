@@ -21,14 +21,23 @@ import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Assertions;
 import org.graylog.events.EventsConfigurationTestProvider;
 import org.graylog.events.processor.EventDefinition;
+import org.graylog.events.processor.EventProcessorException;
 import org.graylog.events.search.MoreSearch;
+import org.graylog.plugins.views.search.ParameterProvider;
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.QueryResult;
+import org.graylog.plugins.views.search.Search;
+import org.graylog.plugins.views.search.SearchJob;
+import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.ValueParameter;
 import org.graylog.plugins.views.search.db.SearchJobService;
 import org.graylog.plugins.views.search.elasticsearch.QueryStringDecorators;
 import org.graylog.plugins.views.search.engine.PositionTrackingQuery;
 import org.graylog.plugins.views.search.engine.QueryEngine;
+import org.graylog.plugins.views.search.engine.normalization.SearchNormalization;
 import org.graylog.plugins.views.search.rest.PermittedStreams;
+import org.graylog.plugins.views.search.searchfilters.model.InlineQueryStringSearchFilter;
+import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -47,17 +56,32 @@ import org.joda.time.Duration;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 public class PivotAggregationSearchTest {
+    private static final List<UsedSearchFilter> SEARCH_FILTERS =
+            List.of(InlineQueryStringSearchFilter.builder().title("title").description("desc").queryString("host:localhost").build());
+    private static final String TEST_USER = "test";
+    private static final long WINDOW_LENGTH = 30000;
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -71,6 +95,8 @@ public class PivotAggregationSearchTest {
     private MoreSearch moreSearch;
     @Mock
     private NotificationService notificationService;
+    @Mock
+    private SearchNormalization searchNormalization;
 
     private final PermittedStreams permittedStreams = new PermittedStreams(Stream::of, (categories) -> Stream.of());
 
@@ -107,7 +133,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                searchNormalization
         );
 
         final String toString = timerange.getTo().toString();
@@ -208,7 +235,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                searchNormalization
         );
 
         final PivotResult pivotResult = PivotResult.builder()
@@ -287,7 +315,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                searchNormalization
         );
 
         final PivotResult pivotResult = PivotResult.builder()
@@ -353,7 +382,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 permittedStreams,
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                searchNormalization
         );
 
         final PivotResult pivotResult = PivotResult.builder()
@@ -470,6 +500,7 @@ public class PivotAggregationSearchTest {
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount, seriesCard))
                 .conditions(null)
+                .filters(SEARCH_FILTERS)
                 .searchWithinMs(WINDOW_LENGTH)
                 .executeEveryMs(WINDOW_LENGTH)
                 .build();
@@ -497,15 +528,16 @@ public class PivotAggregationSearchTest {
                     } else {
                         throw new IllegalArgumentException("Unexpected query decoration request!");
                     }
-                }))
+                })),
+                searchNormalization
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThat(query.query().queryString()).isEqualTo("source:example.org");
+        Assertions.assertThat(query.filters().size()).isEqualTo(1);
     }
 
     @Test
     public void testAdditionalSearchTypes() {
-        final long WINDOW_LENGTH = 30000;
         final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
         var seriesCount = Count.builder().field("source").build();
         var seriesCard = Cardinality.builder().field("source").build();
@@ -516,6 +548,7 @@ public class PivotAggregationSearchTest {
                 .groupBy(Collections.emptyList())
                 .series(ImmutableList.of(seriesCount, seriesCard))
                 .conditions(null)
+                .filters(SEARCH_FILTERS)
                 .searchWithinMs(WINDOW_LENGTH)
                 .executeEveryMs(WINDOW_LENGTH)
                 .build();
@@ -542,7 +575,8 @@ public class PivotAggregationSearchTest {
                 moreSearch,
                 new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
                 notificationService,
-                new QueryStringDecorators(Optional.empty())
+                new QueryStringDecorators(Optional.empty()),
+                searchNormalization
         );
         final Query query = pivotAggregationSearch.getAggregationQuery(parameters, WINDOW_LENGTH, WINDOW_LENGTH);
         Assertions.assertThatCollection(query.searchTypes()).contains(
@@ -552,6 +586,66 @@ public class PivotAggregationSearchTest {
                         .rollup(false)
                         .series(Count.builder().build())
                         .build());
+        Assertions.assertThat(query.filters().size()).isEqualTo(1);
+    }
 
+    @Test
+    public void testPrepareSearch() throws EventProcessorException {
+        final AbsoluteRange timerange = AbsoluteRange.create(DateTime.now(DateTimeZone.UTC).minusSeconds(3600), DateTime.now(DateTimeZone.UTC));
+        var seriesCount = Count.builder().field("source").build();
+        var seriesCard = Cardinality.builder().field("source").build();
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
+                .query("")
+                .queryParameters(ImmutableSet.of())
+                .streams(Collections.emptySet())
+                .groupBy(Collections.emptyList())
+                .series(ImmutableList.of(seriesCount, seriesCard))
+                .conditions(null)
+                .filters(SEARCH_FILTERS)
+                .searchWithinMs(WINDOW_LENGTH)
+                .executeEveryMs(WINDOW_LENGTH)
+                .build();
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .streams(Collections.emptySet())
+                .timerange(timerange)
+                .batchSize(500)
+                .build();
+
+        final PivotAggregationSearch pivotAggregationSearch = new PivotAggregationSearch(
+                config,
+                parameters,
+                new AggregationSearch.User("test", DateTimeZone.UTC),
+                eventDefinition,
+                List.of(Pivot.builder()
+                        .id("risk-asset-1")
+                        .rowGroups(Values.builder().limit(10).field("Field").build())
+                        .rollup(false)
+                        .series(Count.builder().build())
+                        .build()),
+                searchJobService,
+                queryEngine,
+                EventsConfigurationTestProvider.create(),
+                moreSearch,
+                new PermittedStreams(() -> Stream.of("00001"), (categories) -> Stream.of()),
+                notificationService,
+                new QueryStringDecorators(Optional.empty()),
+                searchNormalization
+        );
+        when(searchNormalization.postValidation(isA(Query.class), isA(ParameterProvider.class))).thenAnswer(invocation -> {
+            return invocation.getArgument(0); // Return same query received.
+        });
+        final SearchJob job = new SearchJob("job", mock(Search.class), TEST_USER, "test-node-id");
+        final QueryResult queryResult = QueryResult.builder()
+                .searchTypes(Collections.singletonMap("searchType", mock(SearchType.Result.class)))
+                .query(mock(Query.class))
+                .build();
+        job.addQueryResultFuture(TEST_USER, CompletableFuture.completedFuture(queryResult));
+        job.seal();
+        when(searchJobService.create(any(), eq(TEST_USER), eq(0))).thenReturn(job);
+        when(queryEngine.execute(any(), anySet(), any())).thenReturn(job).thenReturn(job);
+        pivotAggregationSearch.getSearchJob(parameters,
+                new AggregationSearch.User(TEST_USER, DateTimeZone.UTC), WINDOW_LENGTH, WINDOW_LENGTH);
+        Mockito.verify(searchNormalization, times(1)).postValidation(isA(Query.class), any());
+        Mockito.verify(queryEngine, times(1)).execute(isA(SearchJob.class), argThat(Set::isEmpty), eq(DateTimeZone.UTC));
     }
 }

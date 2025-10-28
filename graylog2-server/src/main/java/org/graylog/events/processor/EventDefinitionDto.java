@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -45,6 +46,7 @@ import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.ValidationResult;
+import org.graylog2.security.html.HTMLSanitizerConverter;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -95,6 +97,7 @@ public abstract class EventDefinitionDto extends ScopedEntity implements EventDe
     @Nullable
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_REMEDIATION_STEPS)
+    @JsonSerialize(converter = HTMLSanitizerConverter.class)
     public abstract String remediationSteps();
 
     @Override

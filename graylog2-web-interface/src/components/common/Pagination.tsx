@@ -24,15 +24,16 @@ import styled, { css } from 'styled-components';
 import Icon from './Icon';
 
 type Props = {
-  currentPage: number,
-  totalPages: number,
-  boundaryPagesRange?: number,
-  siblingPagesRange?: number,
-  hideEllipsis?: boolean,
-  hidePreviousAndNextPageLinks?: boolean,
-  hideFirstAndLastPageLinks?: boolean,
-  disabled?: boolean,
-  onChange: (nextPage: number) => void,
+  currentPage: number;
+  totalPages: number;
+  boundaryPagesRange?: number;
+  siblingPagesRange?: number;
+  hideEllipsis?: boolean;
+  hidePreviousAndNextPageLinks?: boolean;
+  hideFirstAndLastPageLinks?: boolean;
+  disabled?: boolean;
+  onChange?: (nextPage: number) => void;
+  warnIfPageOutOfBounds?: boolean;
 };
 
 const StyledBootstrapPagination = styled(BootstrapPagination)(({ theme }) => css`
@@ -185,14 +186,17 @@ const Pagination = ({
   hideFirstAndLastPageLinks,
   disabled,
   onChange,
+  warnIfPageOutOfBounds = true,
 }: Props) => {
   if (totalPages <= 1) {
     return null;
   }
 
   if (currentPage > totalPages) {
-    // eslint-disable-next-line no-console
-    console.warn('Graylog Pagination: `currentPage` prop should not be larger than `totalPages` prop.');
+    if (warnIfPageOutOfBounds) {
+      // eslint-disable-next-line no-console
+      console.warn('Graylog Pagination: `currentPage` prop should not be larger than `totalPages` prop.');
+    }
 
     return null;
   }

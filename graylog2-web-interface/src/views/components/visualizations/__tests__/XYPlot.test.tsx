@@ -163,4 +163,19 @@ describe('XYPlot', () => {
       legend: { y: -0.14 },
     }));
   });
+
+  it('maps axis type correctly', async () => {
+    const plotLayout = {
+      yaxis: {
+        side: 'left' as const,
+      },
+    };
+
+    const wrapper = mount(<SimpleXYPlot plotLayout={plotLayout} axisType="logarithmic" />);
+    const genericPlot = wrapper.find('GenericPlot');
+
+    expect(genericPlot).toHaveProp('layout', expect.objectContaining({
+      yaxis: expect.objectContaining({ type: 'log', side: 'left' }), // ensure plotLayout is merged correctly
+    }));
+  });
 });

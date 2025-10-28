@@ -20,9 +20,10 @@ import styled, { css } from 'styled-components';
 
 import { Alert, Col, Row, Button } from 'components/bootstrap';
 import { IfPermitted, Spinner, Icon } from 'components/common';
-import EditOutputButton from 'components/outputs/EditOutputButton';
 import { ConfigurationWell } from 'components/configurationforms';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
+
+import EditOutputButton from './EditOutputButton';
 
 const NodeRow = styled.div(({ theme }) => css`
   border-bottom: 1px solid ${theme.colors.gray[80]};

@@ -19,8 +19,9 @@ import ReactDom from 'react-dom';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import { Icon, SourceCodeEditor } from 'components/common';
+import { Icon } from 'components/common';
 
+import MDBaseEditor from './BaseEditor';
 import Preview from './Preview';
 
 const Backdrop = styled.div`
@@ -71,22 +72,17 @@ const Row = styled.div`
   }
 `;
 
-const EditorWrapper = styled.div`
-  .ace_editor {
-    border: 1px solid ${({ theme }) => theme.colors.input.border} !important;
-  }
-`;
-
 type Props = {
-  value: string;
-  readOnly?: boolean;
-  show: boolean;
-  onChange: (newValue: string) => void;
-  onClose: () => void;
-  onDone?: (newValue?: string) => void;
-}
+  value: string,
+  readOnly?: boolean,
+  show: boolean,
+  onChange: (newValue: string) => void,
+  onClose: () => void,
+  onDone?: (newValue?: string) => void,
+  helpBlock?: React.ReactNode,
+};
 
-function EditorModal({ value, readOnly, onChange, show, onClose, onDone }: Props) {
+function EditorModal({ value, readOnly, onChange, show, onClose, onDone, helpBlock }: Props) {
   const [height, setHeight] = React.useState<number>(0);
   const [localValue, setLocalValue] = React.useState<string>(value);
 
@@ -115,21 +111,17 @@ function EditorModal({ value, readOnly, onChange, show, onClose, onDone }: Props
             <h2 style={{ marginBottom: '1rem' }}>Markdown Editor</h2>
             <CloseIcon name="close" onClick={() => onClose()} />
           </Row>
+          {helpBlock && <Row>{helpBlock}</Row>}
           <Row id="editor-body">
             {height > 0 && (
               <>
-                <EditorWrapper style={{ width: '50%' }}>
-                  {/* @ts-ignore */}
-                  <SourceCodeEditor id="md-editor"
-                                    mode="markdown"
-                                    theme="light"
-                                    toolbar={false}
-                                    resizable={false}
-                                    readOnly={readOnly}
-                                    height={height}
-                                    value={localValue}
-                                    onChange={handleOnChange} />
-                </EditorWrapper>
+                <div style={{ width: '50%' }}>
+                  <MDBaseEditor onChange={handleOnChange}
+                                value={localValue}
+                                readOnly={readOnly}
+                                height={height}
+                                onBlur={handleOnChange} />
+                </div>
                 <div style={{ width: '50%' }}>
                   <Preview show value={localValue} height={height} />
                 </div>
@@ -143,7 +135,7 @@ function EditorModal({ value, readOnly, onChange, show, onClose, onDone }: Props
         </Content>
       </Backdrop>
     ) : null
-  ), [show, height, localValue, readOnly, onClose, handleOnDone, handleOnChange]);
+  ), [show, height, localValue, readOnly, onClose, handleOnDone, handleOnChange, helpBlock]);
 
   return <>{ReactDom.createPortal(Component, document.body)}</>;
 }
@@ -151,6 +143,7 @@ function EditorModal({ value, readOnly, onChange, show, onClose, onDone }: Props
 EditorModal.defaultProps = {
   readOnly: false,
   onDone: undefined,
+  helpBlock: undefined,
 };
 
 export default EditorModal;

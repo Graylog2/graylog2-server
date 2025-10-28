@@ -97,6 +97,20 @@ public class ScopedEntityMongoUtils<T extends ScopedEntity> {
         return collection.deleteOne(idEq(id)).getDeletedCount();
     }
 
+    /**
+     * Updates an existing entity without checking for mutability. Do not call this method for API requests for the user
+     * interface.
+     *
+     * @param entity ScopedEntity to be updated
+     * @return the newly updated entity
+     */
+    public T forceUpdate(T entity) {
+        Objects.requireNonNull(entity.id());
+        ensureValidScope(entity);
+        collection.replaceOne(idEq(Objects.requireNonNull(entity.id())), entity);
+        return entity;
+    }
+
     public final boolean isMutable(T scopedEntity) {
         Objects.requireNonNull(scopedEntity, "Entity must not be null");
 

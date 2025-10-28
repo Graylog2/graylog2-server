@@ -19,18 +19,24 @@ package org.graylog.security.certutil.ca;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JceOpenSSLPKCS8DecryptorProviderBuilder;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.pkcs.PKCS8EncryptedPrivateKeyInfo;
 import org.bouncycastle.pkcs.PKCSException;
+import org.graylog.security.certutil.CertutilTruststore;
 import org.graylog.security.certutil.ca.exceptions.CACreationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.PrivateKey;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -38,6 +44,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class PemCaReader {
+
+    private static final Logger LOG = LoggerFactory.getLogger(PemCaReader.class);
+
     private static List<Object> readPemObjects(PEMParser pemParser) throws IOException {
         final var results = new ArrayList<>();
         while (true) {
@@ -50,20 +59,19 @@ public class PemCaReader {
         }
     }
 
-    public record CA(List<Certificate> certificates, PrivateKey privateKey) {}
-
     // TODO: secure against errors, tests
     public static CA readCA(final String pemFileContent, final String keyPassword) throws CACreationException {
         try (var bundleReader = new StringReader(pemFileContent)) {
             PEMParser pemParser = new PEMParser(bundleReader);
             JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
 
-            var certificates = new ArrayList<Certificate>();
+            var certificates = new ArrayList<X509Certificate>();
             PrivateKey privateKey = null;
 
             var pemObjects = readPemObjects(pemParser);
             for (var pemObject : pemObjects) {
                 if (pemObject instanceof X509Certificate cert) {
+                    LOG.info("Parsed certificate: {}", CertutilTruststore.certificateInfo(cert));
                     certificates.add(cert);
                 } else if (pemObject instanceof X509CertificateHolder cert) {
                     certificates.add(new JcaX509CertificateConverter().getCertificate(cert));
@@ -73,10 +81,18 @@ public class PemCaReader {
                     }
                     var decryptorBuilder = new JceOpenSSLPKCS8DecryptorProviderBuilder().setProvider("BC");
                     var keyDecryptorBuilder = decryptorBuilder.build(keyPassword.toCharArray());
-
                     var privateKeyInfo = encryptedPrivateKey.decryptPrivateKeyInfo(keyDecryptorBuilder);
                     privateKey = converter.getPrivateKey(privateKeyInfo);
                 } else if (pemObject instanceof PrivateKeyInfo privateKeyInfo) {
+                    privateKey = converter.getPrivateKey(privateKeyInfo);
+                } else if (pemObject instanceof PEMKeyPair pemKeyPair) {
+                    privateKey = converter.getPrivateKey(pemKeyPair.getPrivateKeyInfo());
+                } else if (pemObject instanceof PEMEncryptedKeyPair pemEncryptedKeyPair) {
+                    if (keyPassword == null || keyPassword.isBlank()) {
+                        throw new CACreationException("Private key is encrypted, but no password was supplied!");
+                    }
+                    PEMDecryptorProvider decryptorProvider = new JcePEMDecryptorProviderBuilder().setProvider("BC").build(keyPassword.toCharArray());
+                    final PrivateKeyInfo privateKeyInfo = pemEncryptedKeyPair.decryptKeyPair(decryptorProvider).getPrivateKeyInfo();
                     privateKey = converter.getPrivateKey(privateKeyInfo);
                 }
             }
@@ -88,6 +104,7 @@ public class PemCaReader {
                 throw new CACreationException("No certificate supplied in CA bundle!");
             }
 
+            LOG.info("Certificate bundle contains {} certificates", certificates.size());
             return new CA(certificates, privateKey);
         } catch (PKCSException e) {
             throw new CACreationException("Error while decrypting private key. Wrong password?", e);

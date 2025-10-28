@@ -24,11 +24,11 @@ import java.util.concurrent.ExecutionException;
 /**
  * This is only used for reuse of a wait strategy
  */
-public class IndexBlockRetryAttempt implements Attempt<Void> {
+public class GenericRetryAttempt implements Attempt<Void> {
 
     private final long number;
 
-    public IndexBlockRetryAttempt(long number) {
+    public GenericRetryAttempt(long number) {
         this.number = number;
     }
 

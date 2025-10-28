@@ -37,14 +37,15 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
   static defaultConfig = {
     webhook_url: '',
     /* eslint-disable no-template-curly-in-string */
-    adaptive_card: '{\n'
+    adaptive_card:
+      '{\n'
       + '  "type": "message",\n'
       + '  "attachments": [\n'
       + '    {\n'
       + '      "contentType": "application/vnd.microsoft.card.adaptive",\n'
       + '      "content": {\n'
       + '        "type": "AdaptiveCard",\n'
-      + '        "version": "1.6",\n'
+      + '        "version": "1.5",\n'
       + '        "msTeams": { "width": "full" },\n'
       + '        "body": [\n'
       + '          {\n'

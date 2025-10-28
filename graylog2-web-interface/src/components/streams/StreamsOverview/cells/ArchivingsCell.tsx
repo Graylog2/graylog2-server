@@ -16,10 +16,9 @@
  */
 
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 
 import type { Stream } from 'stores/streams/StreamsStore';
-import { Icon, Tooltip } from 'components/common';
+import { StatusIcon, Tooltip } from 'components/common';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { ARCHIVE_RETENTION_STRATEGY } from 'stores/indices/IndicesStore';
 
@@ -27,11 +26,6 @@ type Props = {
   stream: Stream,
   indexSets: Array<IndexSet>,
 }
-
-const Wrapper = styled.div<{ $enabled: boolean }>(({ theme, $enabled }) => css`
-  color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
-  width: fit-content;
-`);
 
 const ArchivingsCell = ({ stream, indexSets }: Props) => {
   if (stream.is_default || !stream.is_editable) {
@@ -44,9 +38,7 @@ const ArchivingsCell = ({ stream, indexSets }: Props) => {
 
   return (
     <Tooltip withArrow position="right" label={`Archiving is ${archivingEnabled ? 'enabled' : 'disabled'}`}>
-      <Wrapper $enabled={archivingEnabled}>
-        <Icon name={archivingEnabled ? 'check_circle' : 'cancel'} />
-      </Wrapper>
+      <StatusIcon active={archivingEnabled} />
     </Tooltip>
   );
 };

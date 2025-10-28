@@ -56,7 +56,8 @@ public interface IndicesAdapter {
 
     Map<String, Object> getIndexMapping(@Nonnull String index);
 
-    Map<String, Object> getFlattenIndexSettings(@Nonnull String index);
+    Map<String, Object> getStructuredIndexSettings(@Nonnull String index);
+
 
     /**
      * Updates the metadata field (_meta) of an index mapping

@@ -37,7 +37,7 @@ const PipelinesCell = ({ stream }: Props) => {
   const pipelinesCount = data?.length || 0;
 
   return (
-    <StreamCountBadge $disabled={pipelinesCount === 0} ref={buttonRef} title="Connected pipelines">
+    <StreamCountBadge disabled={pipelinesCount === 0} ref={buttonRef} title="Connected pipelines">
       {pipelinesCount}
     </StreamCountBadge>
   );

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
@@ -34,21 +35,21 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
   const queryId = useActiveQueryId();
   const dispatch = useAppDispatch();
 
-  const assetsList = React.useMemo(() => pluggableAssetListComponent.map(
+  const assetsList = React.useMemo(() => pluggableAssetListComponent?.map(
     ({ component: PluggableAssetListItem }) => (
-      <PluggableAssetListItem identifiers={associated_assets} addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)} />
+      <PluggableAssetListItem assetIds={associated_assets} direction="col" addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)} />
     ),
   ), [pluggableAssetListComponent, associated_assets, dispatch, queryId, fieldType]);
 
-  if (associated_assets.length === 0) {
+  if (associated_assets?.length === 0) {
     return null;
   }
 
   return (
     <div>
       <dt>Associated Assets</dt>
-      {assetsList.map((assetElement) => (
-        <div key={assetElement.props.identifiers[0]}>
+      {assetsList?.map((assetElement) => (
+        <div key={uuidv4()}>
           {assetElement}
         </div>
       ))}

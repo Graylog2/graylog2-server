@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed issue causing markdown content to erroneously escape quote characters."
+
+issues = ["Graylog2/graylog-plugin-enterprise#11124"]
+pulls = ["22970"]

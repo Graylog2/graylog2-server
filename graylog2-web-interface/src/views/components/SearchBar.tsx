@@ -33,7 +33,7 @@ import StreamsFilter from 'views/components/searchbar/StreamsFilter';
 import RefreshControls from 'views/components/searchbar/RefreshControls';
 import ScrollToHint from 'views/components/common/ScrollToHint';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
+import ViewsQueryValidation from 'views/components/searchbar/queryvalidation/ViewsQueryValidation';
 import type { FilterType, QueryId } from 'views/logic/queries/Query';
 import type Query from 'views/logic/queries/Query';
 import {
@@ -273,7 +273,7 @@ const SearchBar = ({ onSubmit = defaultProps.onSubmit }: Props) => {
                               )}
                             </Field>
 
-                            <QueryValidation />
+                            <ViewsQueryValidation />
                             <QueryHistoryButton editorRef={editorRef} />
                           </SearchInputAndValidationContainer>
                         </SearchButtonAndQuery>

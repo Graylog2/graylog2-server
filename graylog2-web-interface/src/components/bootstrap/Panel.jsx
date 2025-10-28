@@ -37,24 +37,18 @@ const PanelFooter = styled(BootstrapPanel.Footer)(({ theme }) => css`
 `);
 
 const panelVariantStyles = css(({ bsStyle = 'default', theme }) => {
-  const backgroundColor = theme.colors.variant.lighter[bsStyle];
-  const borderColor = theme.colors.variant.dark[bsStyle];
+  const backgroundColor = theme.colors.variant.lightest[bsStyle];
+  const borderColor = theme.colors.variant.lighter[bsStyle];
 
   return css`
     border-color: ${borderColor};
 
     > ${PanelHeading} {
-      color: ${theme.utils.readableColor(backgroundColor)};
       background-color: ${backgroundColor};
       border-color: ${borderColor};
 
       + .panel-collapse > .panel-body {
         border-top-color: ${borderColor};
-      }
-
-      .badge {
-        color: ${backgroundColor};
-        background-color: ${theme.colors.variant[bsStyle]};
       }
     }
 
@@ -67,13 +61,12 @@ const panelVariantStyles = css(({ bsStyle = 'default', theme }) => {
 });
 
 const StyledPanel = styled(BootstrapPanel)(({ theme }) => css`
-  background-color: ${theme.utils.colorLevel(theme.colors.global.background, -4)};
+  background-color: ${theme.colors.global.contentBackground};
 
-  > ${PanelHeading} {
-    .panel-title,
-    .panel-title h3 {
-      font-size: ${theme.fonts.size.large};
-    }
+  .panel-heading,
+  .panel-heading h3 {
+    color: ${theme.colors.text.primary};
+    font-size: ${theme.fonts.size.large};
   }
 
   .panel-group {

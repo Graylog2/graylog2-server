@@ -297,7 +297,7 @@ describe('FieldValueCompletion', () => {
       });
 
       const expectedCorrections = [
-        { name: 'POST', value: 'POST', caption: 'POST ⭢ PSOT', score: 300, meta: '300 hits' },
+        { name: 'POST', value: 'POST', caption: 'PSOT ⭢ POST', score: 300, meta: '300 hits' },
       ];
 
       expect(suggestions).toEqual(expectedCorrections);

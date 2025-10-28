@@ -21,10 +21,8 @@ import { Form, Formik } from 'formik';
 
 import QueryValidation from 'views/components/searchbar/queryvalidation/QueryValidation';
 import FormWarningsContext from 'contexts/FormWarningsContext';
-import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
+import type { QueryValidationState, ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
 import { validationError, validationErrorExplanation } from 'fixtures/queryValidationState';
-import usePluginEntities from 'hooks/usePluginEntities';
-import asMock from 'helpers/mocking/AsMock';
 
 jest.mock('hooks/usePluginEntities');
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
@@ -34,6 +32,7 @@ type SUTProps = {
   error?: QueryValidationState,
   // eslint-disable-next-line react/require-default-props
   warning?: QueryValidationState,
+  validationExplanations?: ValidationExplanations;
 }
 
 describe('QueryValidation', () => {
@@ -44,11 +43,15 @@ describe('QueryValidation', () => {
     userEvent.click(validationExplanationTrigger);
   };
 
-  const SUT = ({ error, warning }: SUTProps) => (
-    <Formik onSubmit={() => {}} initialValues={{}} initialErrors={error ? { queryString: error } : {}} enableReinitialize>
+  const SUT = ({ error = undefined, warning = undefined, validationExplanations = undefined }: SUTProps) => (
+    <Formik
+      onSubmit={() => {}}
+      initialValues={{}}
+      initialErrors={error ? { queryString: error } : {}}
+      enableReinitialize>
       <Form>
         <FormWarningsContext.Provider value={{ warnings: warning ? { queryString: warning } : {}, setFieldWarning: () => {} }}>
-          <QueryValidation />
+          <QueryValidation validationExplanations={validationExplanations} />
         </FormWarningsContext.Provider>
       </Form>
     </Formik>
@@ -89,16 +92,16 @@ describe('QueryValidation', () => {
     await screen.findByTitle('Query error documentation');
   });
 
-  it('renders pluggable validation explanation', async () => {
+  it('renders custom validation explanation', async () => {
     const ExampleComponent = ({ validationState }: { validationState: QueryValidationState }) => (
-      <>Plugable validation explanation for {validationState.explanations.map(({ errorTitle }) => errorTitle).join()}</>
+      <>Custom validation explanation for {validationState.explanations.map(({ errorTitle }) => errorTitle).join()}</>
     );
-    asMock(usePluginEntities).mockImplementation((entityKey) => (entityKey === 'views.elements.validationErrorExplanation' ? [ExampleComponent] : []));
-    render(<SUT error={validationError} />);
+
+    render(<SUT error={validationError} validationExplanations={[ExampleComponent]} />);
 
     await openExplanation();
 
-    await screen.findByText('Plugable validation explanation for Parse Exception');
+    await screen.findByText('Custom validation explanation for Parse Exception');
   });
 
   it('only displays current validation explanation', async () => {

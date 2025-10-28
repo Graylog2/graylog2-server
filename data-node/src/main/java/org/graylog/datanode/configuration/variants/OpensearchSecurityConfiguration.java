@@ -22,10 +22,10 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
-import org.graylog.datanode.configuration.TruststoreCreator;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
 import org.graylog2.security.JwtSecret;
+import org.graylog2.security.TruststoreCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,8 +89,8 @@ public class OpensearchSecurityConfiguration {
             final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
 
             this.truststore = TruststoreCreator.newDefaultJvm()
-                    .addRootCert("datanode-transport-chain-CA-root", transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
-                    .addRootCert("datanode-http-chain-CA-root", httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addFromKeystore(transportCertificate, CertConstants.DATANODE_KEY_ALIAS)
+                    .addFromKeystore(httpCertificate, CertConstants.DATANODE_KEY_ALIAS)
                     .addCertificates(trustedCertificates)
                     .persist(trustStorePath, truststorePassword.toCharArray());
 

@@ -1,0 +1,5 @@
+type="a"
+message="Add support for date formatting in JMTE templates for custom notification bodies."
+
+pulls = ["22632"]
+issues = ["22296"]

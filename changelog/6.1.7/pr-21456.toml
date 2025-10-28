@@ -1,0 +1,5 @@
+type = "added"
+message = "Added escape character handling to the key_value pipeline function."
+
+pulls = ["21456", "21556"]
+issues = ["graylog-plugin-enterprise#9552"]

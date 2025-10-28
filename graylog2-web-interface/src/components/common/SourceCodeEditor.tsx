@@ -50,6 +50,14 @@ const SourceCodeContainer = styled.div<ContainerProps>(({ $resizable, theme }) =
       .ace_active-line {
         background: ${theme.colors.variant.lightest.default};
       }
+
+      .ace_comment {
+        color: ${theme.colors.text.secondary};
+      }
+
+      .ace_selection {
+        background: Highlight;
+      }
     }
 
     .ace_gutter-active-line {

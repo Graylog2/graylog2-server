@@ -20,6 +20,10 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
+import org.bouncycastle.openssl.PEMEncryptor;
+import org.bouncycastle.openssl.jcajce.JcaMiscPEMGenerator;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
@@ -31,6 +35,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.io.FileWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.time.Duration;
@@ -81,6 +87,36 @@ class DatanodeKeystoreTest {
         datanodeKeystore.replaceCertificatesInKeystore(certChain);
 
         Assertions.assertThat(this.receivedEvents).hasSize(1);
+
+        Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
+    }
+
+    @Test
+    void testIntermediateCA(@TempDir Path tempDir) throws Exception {
+
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", this.eventBus);
+        datanodeKeystore.create(generateKeyPair());
+
+
+        final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final KeyPair intermediate = CertificateGenerator.generate(CertRequest.signed("intermediate", rootCa)
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final KeyPair server = CertificateGenerator.generate(CertRequest.signed("server", intermediate)
+                .isCA(true)
+                .validity(Duration.ofDays(365)));
+
+        final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest("my-hostname", List.of("second-hostname"));
+
+        final CsrSigner signer = new CsrSigner();
+        final X509Certificate datanodeCert = signer.sign(server.privateKey(), server.certificate(), csr, 30);
+        final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(server.certificate(), intermediate.certificate(), rootCa.certificate()));
+
+        datanodeKeystore.replaceCertificatesInKeystore(certChain);
 
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
     }

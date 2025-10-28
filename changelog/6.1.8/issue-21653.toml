@@ -1,0 +1,5 @@
+type = "f"
+message = "Show helpful error/explanation on message permalink page when index/message is missing."
+
+pulls = ["21663"]
+issues = ["21653"]

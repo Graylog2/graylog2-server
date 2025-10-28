@@ -47,6 +47,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRe
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentFactory;
+import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentHelper;
+import org.graylog.shaded.opensearch2.org.opensearch.core.common.bytes.BytesReference;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.ToXContent;
+import org.graylog.shaded.opensearch2.org.opensearch.core.xcontent.XContentBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.BulkByScrollResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.index.reindex.ReindexRequest;
@@ -108,6 +113,11 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
+
+    // this is the maximum amount of bytes that the index list is supposed to fill in a request,
+    // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
+    // and filter after wards
+    private final int MAX_INDICES_URL_LENGTH = 3000;
 
     @Inject
     public IndicesAdapterOS2(OpenSearchClient client,
@@ -204,7 +214,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public Map<String, Object> getFlattenIndexSettings(@Nonnull String index) {
+    public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
 
         final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
                 .indices(index)
@@ -212,10 +222,14 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            Settings settings = settingsResponse.getIndexToSettings().get(index);
-            ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-            settings.keySet().forEach(k -> Optional.ofNullable(settings.get(k)).ifPresent(v -> builder.put(k, v)));
-            return builder.build();
+            final Settings settings = settingsResponse.getIndexToSettings().get(index);
+            final XContentBuilder xContentBuilder = XContentFactory.jsonBuilder();
+            xContentBuilder.startObject();
+            settings.toXContent(xContentBuilder, ToXContent.EMPTY_PARAMS);
+            xContentBuilder.endObject();
+            final BytesReference bytes = BytesReference.bytes(xContentBuilder);
+
+            return XContentHelper.convertToMap(bytes, true, xContentBuilder.contentType()).v2();
         }, "Couldn't read settings of index " + index);
     }
 
@@ -431,19 +445,23 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
         return catApi.getShardsInfo(indexName);
     }
 
+
     @Override
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
         if (indices == null || indices.isEmpty()) {
             throw new IllegalArgumentException("Expecting list of indices with at least one index present.");
         }
-        final GetSettingsRequest getSettingsRequest = new GetSettingsRequest()
-                .indices(indices.toArray(new String[]{}))
+
+        final GetSettingsRequest request = new GetSettingsRequest()
                 .indicesOptions(IndicesOptions.fromOptions(false, true, true, true))
-                .names(new String[]{});
+                .names("index.blocks.read", "index.blocks.write", "index.blocks.metadata", "index.blocks.read_only", "index.blocks.read_only_allow_delete");
+
+        final var maxLengthExceeded = String.join(",", indices).length() > MAX_INDICES_URL_LENGTH;
+        final GetSettingsRequest getSettingsRequest = maxLengthExceeded ? request : request.indices(indices.toArray(new String[]{}));
 
         return client.execute((c, requestOptions) -> {
             final GetSettingsResponse settingsResponse = c.indices().getSettings(getSettingsRequest, requestOptions);
-            return BlockSettingsParser.parseBlockSettings(settingsResponse);
+            return BlockSettingsParser.parseBlockSettings(settingsResponse, maxLengthExceeded ? Optional.of(indices) : Optional.empty());
         });
     }
 

@@ -227,7 +227,7 @@ public class Indices {
     }
 
     public boolean create(String indexName, IndexSet indexSet) {
-        return create(indexName, indexSet, null, null );
+        return create(indexName, indexSet, null, null);
     }
 
     public boolean create(String indexName,
@@ -248,6 +248,10 @@ public class Indices {
 
             indicesAdapter.create(indexName, settings, mappings);
         } catch (Exception e) {
+            if ((indexSettings != null || indexMapping != null)) {
+                LOG.info("Couldn't create index {}. Error: {}. Fall back to default settings/mappings and retry.", indexName, e.getMessage(), e);
+                return create(indexName, indexSet, null, null);
+            }
             LOG.warn("Couldn't create index {}. Error: {}", indexName, e.getMessage(), e);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
             return false;
@@ -259,7 +263,7 @@ public class Indices {
     private Optional<IndexMappingTemplate> indexMapping(IndexSet indexSet) {
         try {
             return Optional.of(indexMappingFactory.createIndexMapping(indexSet.getConfig()));
-        }catch (IgnoreIndexTemplate e){
+        } catch (IgnoreIndexTemplate e) {
             return Optional.empty();
         }
     }
@@ -448,6 +452,6 @@ public class Indices {
     }
 
     public Map<String, Object> indexSettings(String index) {
-        return IndexSettingsHelper.getAsStructuredMap(indicesAdapter.getFlattenIndexSettings(index));
+        return indicesAdapter.getStructuredIndexSettings(index);
     }
 }

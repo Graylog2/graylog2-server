@@ -16,7 +16,6 @@
  */
 import { useMemo } from 'react';
 import * as Immutable from 'immutable';
-import uniq from 'lodash/uniq';
 
 import View from 'views/logic/views/View';
 import type { AbsoluteTimeRange, ElasticsearchQueryString, RelativeTimeRangeStartOnly } from 'views/logic/queries/Query';
@@ -76,9 +75,8 @@ const createViewPosition = ({ index, SUMMARY_ROW_DELTA }) => {
   return new WidgetPosition(col, row, AGGREGATION_WIDGET_HEIGHT, 6);
 };
 
-const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
-  const uniqPivotFields = uniq([field, ...groupBy].filter((v) => !!v));
-  const rowPivots = uniqPivotFields.length ? [pivotForField(uniqPivotFields, new FieldType('value', [], []))] : [];
+const createViewWidget = ({ groupBy, fnSeries, expr }: { groupBy: Array<string>; fnSeries: string; expr: string }) => {
+  const rowPivots = groupBy.length ? [pivotForField(groupBy, new FieldType('value', [], []))] : [];
   const fnSeriesForFunc = Series.forFunction(fnSeries);
   const direction = ['>', '>=', '=='].includes(expr) ? Direction.Descending : Direction.Ascending;
   const sort = [new SortConfig(SortConfig.SERIES_TYPE, fnSeries, direction)];
@@ -87,21 +85,21 @@ const createViewWidget = ({ field, groupBy, fnSeries, expr }) => {
 };
 
 const getSummaryAggregation = ({ aggregations, groupBy }) => {
-  const { summaryFnSeries, summaryRowPivots, summaryTitle } = aggregations.reduce((res, { field, value, expr, fnSeries }) => {
+  const { summaryFnSeries, summaryTitle } = aggregations.reduce((res, { value, expr, fnSeries }) => {
     const concatTitle = `${fnSeries} ${expr} ${value}`;
     res.summaryFnSeries.push(fnSeries);
-    if (field) res.summaryRowPivots.push(field);
+
     res.summaryTitle = `${res.summaryTitle} ${concatTitle}`;
 
     return res;
   }, {
     summaryFnSeries: [],
-    summaryRowPivots: [],
+
     summaryTitle: 'Summary: ',
   });
 
   const summaryWidget = getAggregationWidget({
-    rowPivots: [pivotForField(uniq([...summaryRowPivots, ...groupBy]), new FieldType('value', [], []))],
+    rowPivots: [pivotForField(groupBy, new FieldType('value', [], []))],
     fnSeries: summaryFnSeries.map((s) => Series.forFunction(s)),
   });
 
@@ -128,8 +126,8 @@ export const WidgetsGenerator = async ({ streams, streamCategories, aggregations
   const messageTable = allMessagesTable(undefined, allDecorators);
   const needsSummaryAggregations = aggregations.length > 1;
   const SUMMARY_ROW_DELTA = needsSummaryAggregations ? AGGREGATION_WIDGET_HEIGHT : 0;
-  const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce((res, { field, value, expr, fnSeries }, index) => {
-    const widget = createViewWidget({ fnSeries, field, groupBy, expr });
+  const { aggregationWidgets, aggregationTitles, aggregationPositions } = aggregations.reduce((res, { value, expr, fnSeries }, index) => {
+    const widget = createViewWidget({ fnSeries, groupBy, expr });
     res.aggregationWidgets.push(widget);
     res.aggregationTitles[widget.id] = `${fnSeries} ${expr} ${value}`;
     res.aggregationPositions[widget.id] = createViewPosition({ index, SUMMARY_ROW_DELTA });

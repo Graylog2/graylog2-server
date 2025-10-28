@@ -29,7 +29,7 @@ public class InMemoryKeystoreInformation implements KeystoreInformation {
     }
 
     @Override
-    public KeyStore loadKeystore() throws Exception {
+    public KeyStore loadKeystore() {
         return keyStore;
     }
 

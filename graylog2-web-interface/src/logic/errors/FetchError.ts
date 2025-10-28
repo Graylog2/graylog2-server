@@ -35,11 +35,14 @@ export default class FetchError extends Error {
 
   status: Additional['status'];
 
+  details: string;
+
   constructor(message: string, status: number, additional: any) {
     super(message);
     this.name = 'FetchError';
 
     const details = isString(additional) ? additional : (additional?.message ?? 'Not available');
+    this.details = details;
     this.message = `There was an error fetching a resource: ${message}. Additional information: ${details}`;
 
     this.responseMessage = additional?.message ?? undefined;
