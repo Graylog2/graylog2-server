@@ -150,8 +150,7 @@ const DataNodesExpandable = () => {
   );
 
   return (
-    <Section title="Data Nodes" collapsible>
-      {isInitialLoading && <Spinner />}
+    <Section title="Data Nodes" collapsible headerLeftSection={isInitialLoading && <Spinner />}>
       <TableWrapper>
         <EntityDataTable<DataNodeEntity>
           entities={dataNodeEntities}

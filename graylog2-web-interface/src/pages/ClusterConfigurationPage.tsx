@@ -15,23 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
 import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
-import GraylogNodesExpandable from 'components/cluster-configuration/GraylogNodesExpandable';
-import DataNodesExpandable from 'components/cluster-configuration/DataNodesExpandable';
-
-const SectionCol = styled(Col)`
-  margin-bottom: 15px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
+import ClusterConfigurationNodes from 'components/cluster-configuration/ClusterConfigurationNodes';
 
 const ClusterConfigurationPage = () => (
   <DocumentTitle title="Cluster Configuration">
@@ -48,14 +37,7 @@ const ClusterConfigurationPage = () => (
       <HideOnCloud>
         <IndexerClusterHealth minimal />
       </HideOnCloud>
-      <Row className="content">
-        <SectionCol md={12}>
-          <GraylogNodesExpandable />
-        </SectionCol>
-        <SectionCol md={12}>
-          <DataNodesExpandable />
-        </SectionCol>
-      </Row>
+      <ClusterConfigurationNodes />
     </div>
   </DocumentTitle>
 );

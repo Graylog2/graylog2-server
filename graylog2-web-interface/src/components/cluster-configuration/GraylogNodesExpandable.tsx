@@ -150,8 +150,7 @@ const GraylogNodesExpandable = () => {
   const renderActions = useCallback((entity: GraylogNodeEntity) => <GraylogNodeActions node={entity.nodeInfo} />, []);
 
   return (
-    <Section title="Graylog Nodes" collapsible>
-      {isLoading && <Spinner />}
+    <Section title="Graylog Nodes" collapsible headerLeftSection={isLoading && <Spinner />}>
       <TableWrapper>
         <EntityDataTable<GraylogNodeEntity>
           entities={graylogNodeEntities}
