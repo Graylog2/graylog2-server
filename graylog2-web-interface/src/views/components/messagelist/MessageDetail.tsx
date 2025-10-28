@@ -146,7 +146,7 @@ const MessageDetail = ({
 
   return (
     <AdditionalContext.Provider value={additionalContext}>
-      <MessageDetailProviders message={message}>
+      <MessageDetailProviders message={message} messageFields={messageFields}>
         <>
           <Row className="row-sm">
             <Col md={12}>

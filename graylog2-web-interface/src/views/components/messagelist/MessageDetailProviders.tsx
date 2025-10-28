@@ -18,15 +18,17 @@ import * as React from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 
 import usePluginEntities from 'hooks/usePluginEntities';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
 import type { Message } from './Types';
 
 type Props = {
   children: React.ReactElement;
   message: Message;
+  messageFields?: FieldTypeMappingsList;
 };
 
-const MessageDetailProviders = ({ children, message }: Props) => {
+const MessageDetailProviders = ({ children, message, messageFields }: Props) => {
   const contextProviders = usePluginEntities('views.components.widgets.messageDetails.contextProviders');
 
   if (!contextProviders || contextProviders?.length === 0) {
@@ -36,7 +38,9 @@ const MessageDetailProviders = ({ children, message }: Props) => {
   return contextProviders.reduce(
     (nestedChildren, MessageDetailContextProvider) => (
       <ErrorBoundary FallbackComponent={() => nestedChildren}>
-        <MessageDetailContextProvider message={message}>{nestedChildren}</MessageDetailContextProvider>
+        <MessageDetailContextProvider message={message} messageFields={messageFields}>
+          {nestedChildren}
+        </MessageDetailContextProvider>
       </ErrorBoundary>
     ),
     children,
