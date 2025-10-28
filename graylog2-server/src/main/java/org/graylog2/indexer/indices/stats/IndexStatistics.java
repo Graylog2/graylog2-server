@@ -45,7 +45,7 @@ public abstract class IndexStatistics {
         return new AutoValue_IndexStatistics(index, primaryShards, allShards, routing);
     }
 
-    //TODO: needs unit tests
+    @Deprecated //TODO: needs unit tests, but is also a candidate for removal when older storage modules get removed
     public static IndexStatistics create(String index, JsonNode indexStats) {
         final JsonNode primaries = indexStats.path("primaries");
         final JsonNode total = indexStats.path("total");
