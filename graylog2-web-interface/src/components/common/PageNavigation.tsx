@@ -76,7 +76,7 @@ const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Prop
 
   const formatedItems = sortNavigationItems<PageNavItem>(availableItems);
 
-  if (formatedItems.length <= 1) {
+  if (formatedItems.length === 0) {
     return null;
   }
 
