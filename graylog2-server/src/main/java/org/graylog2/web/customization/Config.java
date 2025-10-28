@@ -70,7 +70,8 @@ public record Config(
     public record Footer(Optional<Boolean> enabled) {}
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
-    public record Features(@JsonProperty("ai_investigation_report") Optional<FeaturesItem> aiInvestigationReport) {}
+    public record Features(@JsonProperty("ai_investigation_report") Optional<FeaturesItem> aiInvestigationReport,
+                           @JsonProperty("widget_summary") Optional<FeaturesItem> widgetSummary) {}
 
     @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record FeaturesItem(Optional<Boolean> enabled) {}
