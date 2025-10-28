@@ -37,7 +37,6 @@ import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OfficialOpensearchClientProvider;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.RestClientProvider;
-import org.graylog.storage.opensearch3.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -101,7 +100,15 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     private OfficialOpensearchClient buildOfficialClient() {
-        return new OfficialOpensearchClientProvider(ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())), IndexerJwtAuthToken.disabled()).get();
+        return new OfficialOpensearchClientProvider(
+                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                IndexerJwtAuthToken.disabled(),
+                createCredentialsProvider() // no credentials!
+        ).get();
+    }
+
+    private static org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider createCredentialsProvider() {
+        return new org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider();
     }
 
     private RestHighLevelClient buildRestClient() {
