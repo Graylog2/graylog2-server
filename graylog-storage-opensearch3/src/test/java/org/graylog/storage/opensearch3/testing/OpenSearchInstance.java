@@ -86,6 +86,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public OpenSearchInstance init() {
         super.init();
+
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
         this.officialOpensearchClient = buildOfficialClient();
@@ -103,7 +104,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return new OfficialOpensearchClientProvider(
                 ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
                 IndexerJwtAuthToken.disabled(),
-                createCredentialsProvider() // no credentials!
+                createCredentialsProvider(), // no credentials!
+                getElasticsearchClientConfiguration()
         ).get();
     }
 
@@ -111,17 +113,10 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return new org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider();
     }
 
+    @Deprecated
     private RestHighLevelClient buildRestClient() {
 
-        final ElasticsearchClientConfiguration config = buildconfig(Map.of(
-                "elasticsearch_connect_timeout", "60s",
-                "elasticsearch_socket_timeout", "60s",
-                "elasticsearch_idle_timeout", "60s",
-                "elasticsearch_max_total_connections", "1",
-                "elasticsearch_max_total_connections_per_route", "1",
-                "elasticsearch_max_retries", "1",
-                "elasticsearch_use_expect_continue", "false"
-        ));
+        final ElasticsearchClientConfiguration config = getElasticsearchClientConfiguration();
 
         return new RestClientProvider(
                 new GracefulShutdownService(),
@@ -133,6 +128,16 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 Collections.emptySet(),
                 Collections.emptySet())
                 .get();
+    }
+
+    private ElasticsearchClientConfiguration getElasticsearchClientConfiguration() {
+        return buildconfig(Map.of(
+                "elasticsearch_connect_timeout", "60s",
+                "elasticsearch_socket_timeout", "60s",
+                "elasticsearch_max_total_connections", "1",
+                "elasticsearch_max_total_connections_per_route", "1",
+                "elasticsearch_use_expect_continue", "false"
+        ));
     }
 
     private ElasticsearchClientConfiguration buildconfig(Map<String, String> properties) {

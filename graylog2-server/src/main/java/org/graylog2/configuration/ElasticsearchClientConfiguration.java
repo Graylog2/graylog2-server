@@ -44,6 +44,10 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_socket_timeout", validators = {PositiveDurationValidator.class})
     private Duration elasticsearchSocketTimeout = Duration.seconds(60);
 
+    /**
+     * Not used anywhere!
+     */
+    @Deprecated
     @Parameter(value = "elasticsearch_idle_timeout")
     private Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
 
@@ -73,6 +77,10 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_max_total_connections_per_route", validators = {PositiveIntegerValidator.class})
     private int elasticsearchMaxTotalConnectionsPerRoute = 20;
 
+    /**
+     * Not used anywhere
+     */
+    @Deprecated
     @Parameter(value = "elasticsearch_max_retries", validators = {PositiveIntegerValidator.class})
     private int elasticsearchMaxRetries = 2;
 
@@ -146,6 +154,7 @@ public class ElasticsearchClientConfiguration {
         return elasticsearchSocketTimeout;
     }
 
+    @Deprecated
     public Duration elasticsearchIdleTimeout() {
         return elasticsearchIdleTimeout;
     }
@@ -174,6 +183,7 @@ public class ElasticsearchClientConfiguration {
         return elasticsearchMaxTotalConnectionsPerRoute;
     }
 
+    @Deprecated(forRemoval = true)
     public int elasticsearchMaxRetries() {
         return elasticsearchMaxRetries;
     }
