@@ -28,23 +28,6 @@ import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/Perspectiv
 import useActivePerspective from 'components/perspectives/hooks/useActivePerspective';
 import NavTabs from 'components/common/NavTabs';
 
-const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
-  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
-
-const usePageNavigationItems = (page: string) => {
-  const { activePerspective } = useActivePerspective();
-  const allPageNavigationItems = usePluginEntities('pageNavigation');
-
-  const perspectiveNavItems = allPageNavigationItems.filter((group) =>
-    matchesPerspective(activePerspective.id, group.perspective),
-  );
-
-  return useMemo(
-    () => mergeNavigationItems(perspectiveNavItems).find((item) => item.description === page)?.children ?? [],
-    [perspectiveNavItems, page],
-  );
-};
-
 type PageNavItem = {
   description: string;
   path: string;
@@ -54,17 +37,34 @@ type PageNavItem = {
   position?: PluginNavigation['position'];
 };
 
-type Props = {
-  // key of the group in the plugin system
-  page?: string;
+const matchesPerspective = (activePerspective: string, itemPerspective: string) =>
+  activePerspective === DEFAULT_PERSPECTIVE ? !itemPerspective : itemPerspective === activePerspective;
+
+const usePageNavigationItems = (page: string, items: Array<PageNavItem>) => {
+  const { activePerspective } = useActivePerspective();
+  const allPageNavigationItems = usePluginEntities('pageNavigation');
+
+  return useMemo(() => {
+    if (items) {
+      return items;
+    }
+    const perspectiveNavItems = allPageNavigationItems.filter((group) =>
+      matchesPerspective(activePerspective.id, group.perspective),
+    );
+
+    return mergeNavigationItems(perspectiveNavItems).find((item) => item.description === page)?.children ?? [];
+  }, [items, allPageNavigationItems, activePerspective.id, page]);
 };
+
+// Please provide items by via the plugin system instead of the items prop where possible.
+type Props = { page?: string; items?: Array<PageNavItem> };
 
 /**
  * Simple tab navigation to allow navigating to subareas of a page.
  */
-const PageNavigation = ({ page = undefined }: Props) => {
+const PageNavigation = ({ page = undefined, items: itemsProp = undefined }: Props) => {
   const currentUser = useCurrentUser();
-  const items = usePageNavigationItems(page);
+  const items = usePageNavigationItems(page, itemsProp);
 
   const availableItems = items.filter(
     (item) =>
