@@ -23,7 +23,14 @@ import jakarta.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
-public record CountsAdapterOS(OfficialOpensearchClient client) implements CountsAdapter {
+public class CountsAdapterOS implements CountsAdapter {
+
+    private final OfficialOpensearchClient client;
+
+    @Inject
+    public CountsAdapterOS(OfficialOpensearchClient client) {
+        this.client = client;
+    }
 
     @Override
     public long totalCount(List<String> indices) {
