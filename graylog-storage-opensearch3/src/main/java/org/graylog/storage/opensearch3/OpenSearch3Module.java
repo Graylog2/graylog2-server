@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS2;
+import org.graylog.storage.opensearch3.client.OpensearchCredentialsProvider;
 import org.graylog.storage.opensearch3.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch3.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
@@ -67,7 +68,7 @@ public class OpenSearch3Module extends VersionAwareModule {
     @Override
     protected void configure() {
         bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverOS2.class);
-        bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS2.class);
+        bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS2.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS2.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
@@ -83,7 +84,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
         bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS2.class);
-        bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS2.class);
+        bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS.class);
         bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
                 .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2.class);
         bindForSupportedVersion(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
@@ -99,6 +100,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
+        bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
 
         Multibinder<SnifferBuilder> snifferBuilders = Multibinder.newSetBinder(binder(), SnifferBuilder.class);
