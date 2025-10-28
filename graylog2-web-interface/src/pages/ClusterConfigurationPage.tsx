@@ -24,33 +24,31 @@ import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 import GraylogNodesExpandable from 'components/cluster-configuration/GraylogNodesExpandable';
 import DataNodesExpandable from 'components/cluster-configuration/DataNodesExpandable';
 
-const ClusterConfigurationPage = () => {
-  return (
-    <DocumentTitle title="Cluster Configuration">
-      <ClusterConfigurationPageNavigation />
-      <div>
-        <PageHeader title="Cluster Configuration">
-          <span>
-            This page provides a real-time overview of the nodes in your cluster. You can pause message processing at
-            any time. The process buffers will not accept any new messages until you resume it. If the message journal
-            is enabled for a node, which it is by default, incoming messages will be persisted to disk, even when
-            processing is disabled.
-          </span>
-        </PageHeader>
-        <HideOnCloud>
-          <IndexerClusterHealth minimal />
-        </HideOnCloud>
-        <Row className="content">
-          <Col md={12}>
-            <GraylogNodesExpandable />
-          </Col>
-          <Col md={12}>
-            <DataNodesExpandable />
-          </Col>
-        </Row>
-      </div>
-    </DocumentTitle>
-  );
-};
+const ClusterConfigurationPage = () => (
+  <DocumentTitle title="Cluster Configuration">
+    <ClusterConfigurationPageNavigation />
+    <div>
+      <PageHeader title="Cluster Configuration">
+        <span>
+          This page provides a real-time overview of the nodes in your cluster. You can pause message processing at
+          any time. The process buffers will not accept any new messages until you resume it. If the message journal
+          is enabled for a node, which it is by default, incoming messages will be persisted to disk, even when
+          processing is disabled.
+        </span>
+      </PageHeader>
+      <HideOnCloud>
+        <IndexerClusterHealth minimal />
+      </HideOnCloud>
+      <Row className="content">
+        <Col md={12}>
+          <GraylogNodesExpandable />
+        </Col>
+        <Col md={12}>
+          <DataNodesExpandable />
+        </Col>
+      </Row>
+    </div>
+  </DocumentTitle>
+);
 
 export default ClusterConfigurationPage;

@@ -68,8 +68,6 @@ const DataNodesExpandable = () => {
     refetch,
     isInitialLoading,
   } = useDataNodes(searchParams);
-  const dataNodes = dataNodesResponse?.list || [];
-
   const columnDefinitions = useMemo<Array<Column>>(
     () => [
       { id: 'node', title: 'Node' },
@@ -106,8 +104,10 @@ const DataNodesExpandable = () => {
   );
 
   const dataNodeEntities = useMemo(
-    () =>
-      dataNodes.map((dataNode, index) => {
+    () => {
+      const dataNodes = dataNodesResponse?.list || [];
+
+      return dataNodes.map((dataNode, index) => {
         const roles = dataNode?.opensearch_roles?.map((currentRole) => currentRole.trim()).filter(Boolean) ?? [];
         const nodeName = dataNode?.hostname ?? dataNode?.node_id ?? dataNode?.cluster_address ?? dataNode?.rest_api_address;
         const nodeId =
@@ -126,8 +126,9 @@ const DataNodesExpandable = () => {
           state: dataNode,
           nodeInfo: dataNode,
         };
-      }),
-    [dataNodes],
+      });
+    },
+    [dataNodesResponse],
   );
 
   const handleColumnsChange = useCallback((newColumns: Array<string>) => {

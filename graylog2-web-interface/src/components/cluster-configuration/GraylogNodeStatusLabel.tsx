@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
 
-import type { GraylogNode } from './useClusterNodes';
+import type { GraylogNode } from './useGraylogNodes';
 
 const StatusLabel = styled(Label)`
   display: inline-flex;
@@ -31,7 +31,7 @@ type Props = {
   node: GraylogNode;
 };
 
-const ClusterStatusLabel = ({ node }: Props) => {
+const GraylogNodeStatusLabel = ({ node }: Props) => {
   const lifecycleStatus = node?.lifecycle?.toUpperCase();
   const loadBalancersStatus = `Load Balancers ${node?.lb_status?.toUpperCase()}`;
   const messageProcessingStatus = `Message Processing ${node?.is_processing ? 'ENABLED' : 'DISABLED'}`;
@@ -62,4 +62,4 @@ const ClusterStatusLabel = ({ node }: Props) => {
   );
 };
 
-export default ClusterStatusLabel;
+export default GraylogNodeStatusLabel;

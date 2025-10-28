@@ -24,10 +24,10 @@ import Routes from 'routing/Routes';
 import JournalState from 'components/nodes/JournalState';
 import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
 
-import useClusterNodes from './useClusterNodes';
-import type { GraylogNode } from './useClusterNodes';
-import ClusterStatusLabel from './ClusterStatusLabel';
-import ClusterActions from './ClusterActions';
+import useGraylogNodes from './useGraylogNodes';
+import type { GraylogNode } from './useGraylogNodes';
+import GraylogNodeStatusLabel from './GraylogNodeStatusLabel';
+import GraylogNodeActions from './GraylogNodeActions';
 import JvmHeapUsageText from './JvmHeapUsageText';
 
 const SecondaryText = styled.div`
@@ -71,7 +71,7 @@ const getRoleLabels = (roles: string) =>
     ));
 
 const GraylogNodesExpandable = () => {
-  const clusterNodes = useClusterNodes({ includeDataNodes: false });
+  const { nodes: graylogNodes, isLoading } = useGraylogNodes();
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
 
@@ -113,7 +113,7 @@ const GraylogNodesExpandable = () => {
           renderCell: (_value, entity) => getRoleLabels(entity.role),
         },
         state: {
-          renderCell: (_value, entity) => <ClusterStatusLabel node={entity.nodeInfo} />,
+          renderCell: (_value, entity) => <GraylogNodeStatusLabel node={entity.nodeInfo} />,
         },
       },
     }),
@@ -122,7 +122,7 @@ const GraylogNodesExpandable = () => {
 
   const graylogNodeEntities = useMemo<ReadonlyArray<GraylogNodeEntity>>(
     () =>
-      clusterNodes.graylogNodes.map((graylogNode) => ({
+      graylogNodes.map((graylogNode) => ({
         id: graylogNode.nodeInfo.node_id ?? graylogNode.nodeName,
         node: graylogNode.nodeName,
         type: graylogNode.type,
@@ -130,7 +130,7 @@ const GraylogNodesExpandable = () => {
         state: graylogNode.nodeInfo,
         nodeInfo: graylogNode.nodeInfo,
       })),
-    [clusterNodes.graylogNodes],
+    [graylogNodes],
   );
 
   const handleColumnsChange = useCallback((newColumns: Array<string>) => {
@@ -143,14 +143,11 @@ const GraylogNodesExpandable = () => {
 
   const handleSortChange = useCallback(() => {}, []);
 
-  const renderActions = useCallback(
-    (entity: GraylogNodeEntity) => <ClusterActions node={entity.nodeInfo} />,
-    [],
-  );
+  const renderActions = useCallback((entity: GraylogNodeEntity) => <GraylogNodeActions node={entity.nodeInfo} />, []);
 
   return (
     <Section title="Graylog Nodes" collapsible>
-      {clusterNodes.isLoading && <Spinner />}
+      {isLoading && <Spinner />}
       <EntityDataTable<GraylogNodeEntity>
         entities={graylogNodeEntities}
         visibleColumns={visibleColumns}
