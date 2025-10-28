@@ -20,12 +20,10 @@ import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
@@ -42,6 +40,7 @@ import fetchSearch from 'views/logic/views/fetchSearch';
 import useWidgetResults from 'views/components/useWidgetResults';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import { getView, updateView } from 'views/api/views';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -56,6 +55,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/slices/createSearch');
 jest.mock('views/hooks/useViewType');
 jest.mock('views/logic/views/fetchSearch');
+jest.mock('views/api/views');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
@@ -234,8 +234,8 @@ describe('<WidgetActionsMenu />', () => {
         refetch: () => {},
       });
 
-      ViewManagementActions.get = mockAction(jest.fn(async () => Promise.resolve(dashboard1.toJSON())));
-      ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
+      asMock(getView).mockResolvedValue(dashboard1.toJSON());
+      asMock(updateView).mockImplementation(async (view) => view);
       asMock(fetchSearch).mockResolvedValue(searchDB1.toJSON());
 
       asMock(CopyWidgetToDashboard).mockImplementation(() =>
@@ -263,11 +263,11 @@ describe('<WidgetActionsMenu />', () => {
 
     it('should get dashboard from backend', async () => {
       await renderAndClick();
-      await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(getView).toHaveBeenCalledTimes(1));
 
       await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
-      expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
+      expect(getView).toHaveBeenCalledWith('view-1');
     });
 
     it('should get corresponding search to dashboard', async () => {
@@ -286,9 +286,9 @@ describe('<WidgetActionsMenu />', () => {
 
     it('should update dashboard with new search and widget', async () => {
       await renderAndClick();
-      await waitFor(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(updateView).toHaveBeenCalledTimes(1));
 
-      expect(ViewManagementActions.update).toHaveBeenCalledWith(
+      expect(updateView).toHaveBeenCalledWith(
         View.builder().search(Search.builder().id('search-id').build()).id('new-id').type(View.Type.Dashboard).build(),
       );
     });
