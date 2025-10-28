@@ -76,11 +76,11 @@ public class IndexStatisticsBuilder {
 
     private <T> TimeAndTotalStats createTimeAndTotalStats(final T stats,
                                                           final Function<T, Long> totalMapper,
-                                                          final Function<T, Long> totalTimeInMillisMappar
+                                                          final Function<T, Long> totalTimeInMillisMapper
     ) {
         return TimeAndTotalStats.create(
                 stats != null ? totalMapper.apply(stats) : 0L,
-                stats != null ? totalTimeInMillisMappar.apply(stats) / 1000L : 0L
+                stats != null ? totalTimeInMillisMapper.apply(stats) / 1000L : 0L
         );
     }
 
