@@ -23,6 +23,7 @@ import com.mongodb.DBObject;
 import org.apache.commons.lang3.EnumUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
@@ -32,6 +33,7 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.jetbrains.annotations.Nullable;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -45,7 +47,7 @@ import static org.graylog2.shared.security.RestPermissions.INPUTS_READ;
 
 @DbEntity(collection = "inputs",
           readPermission = INPUTS_READ)
-public class InputImpl extends PersistedImpl implements Input {
+public class InputImpl extends PersistedImpl implements Input, MongoEntity {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
     public static final String FIELD_ID = "_id";
@@ -181,5 +183,11 @@ public class InputImpl extends PersistedImpl implements Input {
     @Override
     public void setDesiredState(IOState.Type desiredState) {
         fields.put(MessageInput.FIELD_DESIRED_STATE, desiredState.toString());
+    }
+
+    @Nullable
+    @Override
+    public String id() {
+        return id.toHexString();
     }
 }
