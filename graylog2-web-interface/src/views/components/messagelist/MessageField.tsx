@@ -35,7 +35,6 @@ type Props = {
   fieldType: FieldType;
   message: Message;
   value: any;
-  fieldTextRenderer?: React.ComponentType<{ fieldName: string }>;
 };
 
 const DecoratedField = styled.small(
@@ -51,29 +50,36 @@ const DefinitionDescription = styled.dd(
 `,
 );
 
-const DefaultFieldTextRenderer = ({ fieldName }) => fieldName;
+type MessageFieldNamePros = {
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+};
 
-const MessageField = ({
-  fieldName,
-  fieldType,
-  message,
-  value,
-  fieldTextRenderer: FieldTextRenderer = DefaultFieldTextRenderer,
-}: Props) => {
-  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
+type MessageFieldValueProps = {
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+  value: any;
+};
+
+export const MessageFieldName = ({ fieldName, fieldType, message }: MessageFieldNamePros) => {
   const activeQuery = useActiveQueryId();
-
-  const {
-    decoration_stats: decorationStats = {
-      added_fields: {},
-      changed_fields: {},
-      removed_fields: {},
-    },
-  } = message;
-
   const isDecoratedField =
-    decorationStats &&
-    (decorationStats.added_fields[fieldName] !== undefined || decorationStats.changed_fields[fieldName] !== undefined);
+    message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
+
+  return (
+    <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
+      {fieldName}
+    </Field>
+  );
+};
+
+export const MessageFieldValue = ({ message, fieldName, fieldType, value }: MessageFieldValueProps) => {
+  const isDecoratedField =
+    message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
+
+  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
 
   const ValueContext = isDecoratedField
     ? ({ children }) => (
@@ -84,24 +90,26 @@ const MessageField = ({
     : ({ children }) => children;
 
   return (
-    <>
-      <dt data-testid={`message-field-name-${fieldName}`}>
-        <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
-          <FieldTextRenderer fieldName={fieldName} />
-        </Field>
-      </dt>
-      <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
-        <ValueContext>
-          <Value
-            field={fieldName}
-            value={innerValue}
-            type={isDecoratedField ? FieldType.Decorated : fieldType}
-            render={DecoratedValue}
-          />
-        </ValueContext>
-      </DefinitionDescription>
-    </>
+    <ValueContext>
+      <Value
+        field={fieldName}
+        value={innerValue}
+        type={isDecoratedField ? FieldType.Decorated : fieldType}
+        render={DecoratedValue}
+      />
+    </ValueContext>
   );
 };
+
+const MessageField = ({ fieldName, fieldType, message, value }: Props) => (
+  <>
+    <dt data-testid={`message-field-name-${fieldName}`}>
+      <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
+    </dt>
+    <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
+      <MessageFieldValue value={value} fieldName={fieldName} fieldType={fieldType} message={message} />
+    </DefinitionDescription>
+  </>
+);
 
 export default MessageField;

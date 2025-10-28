@@ -37,7 +37,7 @@ export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   `,
 );
 
-const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
+export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
   const formattedFields = message.formatted_fields;
   const renderedFields = Object.keys(formattedFields)
     .sort()
