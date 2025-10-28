@@ -26,6 +26,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
+import org.joda.time.format.DateTimeFormat;
 
 import java.util.List;
 import java.util.Locale;
@@ -86,36 +87,30 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
         try {
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-            OutputBuilder output = new OutputBuilder();
-            output.h1(f("%s System Information", getProductName()));
-            return output.unorderedListKVItem(SystemOverviewResponse.create(f("%s Server", getProductName()),
-                    ServerVersion.CODENAME,
-                    serverStatus.getNodeId().toString(),
-                    serverStatus.getClusterId(),
-                    ServerVersion.VERSION.toString(),
-                    Tools.getISO8601String(serverStatus.getStartedAt()),
-                    serverStatus.isProcessing(),
-                    Tools.getLocalCanonicalHostname(),
-                    serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH),
-                    serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH),
-                    serverStatus.getTimezone().getID(),
-                    System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"),
-                    leaderElectionService.isLeader()
-            ), List.of(
-                    "facility",
-                    "codename",
-                    "node_id",
-                    "cluster_id",
-                    "version",
-                    "started_at",
-                    "is_processing",
-                    "hostname",
-                    "lifecycle",
-                    "lb_status",
-                    "timezone",
-                    "operating_system",
-                    "is_leader"
-            )).toString();
+            return new OutputBuilder()
+                    .h1(f("%s System Information", getProductName()))
+                    .h2(f("%s Server (%s)", getProductName(), ServerVersion.CODENAME))
+                    .paragraph("node_id: " + serverStatus.getNodeId().toString())
+                    .paragraph("cluster_id: " + serverStatus.getClusterId())
+                    .paragraph("version:" + ServerVersion.VERSION.toString())
+                    .paragraph(f("The node is %s and %s at the moment. Its load balancer status is %s",
+                            OutputBuilder.bold(serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH)),
+                            OutputBuilder.bold(serverStatus.isProcessing() ? "processing" : "not processing"),
+                            OutputBuilder.bold(serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH))
+                    ))
+                    .paragraph(f("It was started at %s, on %s %s, %s time.",
+                            DateTimeFormat.forPattern("HH:mm:ss").print(serverStatus.getStartedAt()),
+                            DateTimeFormat.forPattern("MMMM").print(serverStatus.getStartedAt()),
+                            serverStatus.getStartedAt().getDayOfMonth(),
+                            serverStatus.getTimezone().toString()
+                            ))
+                    .paragraph(f("The node host is %s, running on %s %s",
+                            OutputBuilder.bold(Tools.getLocalCanonicalHostname()),
+                            System.getProperty("os.name", "unknown"),
+                            System.getProperty("os.version", "unknown")
+                    ))
+                    .paragraph("The node is " + (!leaderElectionService.isLeader() ? "NOT" : "") + "a leader node.")
+                    .toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

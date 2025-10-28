@@ -26,7 +26,7 @@ import com.google.auto.value.AutoValue;
 public abstract class McpConfiguration {
     public static final McpConfiguration DEFAULT_VALUES = create(
             false,
-            false
+            true
     );
 
     @JsonProperty("enable_remote_access")

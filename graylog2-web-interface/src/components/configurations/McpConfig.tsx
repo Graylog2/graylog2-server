@@ -23,7 +23,6 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { BootstrapModalForm, Button, Input } from 'components/bootstrap';
-// import { BootstrapModalForm, Button, Input, Table } from 'components/bootstrap';
 import { IfPermitted, Select } from 'components/common';
 import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
@@ -78,12 +77,6 @@ const McpConfig = () => {
     { value: "json", label: "(JSON) Structured Content" },
   ];
 
-  // const tools = [
-  //   {name: "list_foo", ouputFormat: null, isEnabled: true},
-  //   {name: "list_bar", ouputFormat: null, isEnabled: false},
-  //   {name: "get_baz", ouputFormat: "(Overridden) JSON", isEnabled: true},
-  // ];
-
   if (!viewConfig) {
     return <Spinner />;
   }
@@ -110,33 +103,6 @@ const McpConfig = () => {
         <dt>Tool output format</dt>
         <dd>{viewConfig.use_structured_output ? 'JSON Structured Content' : 'Markdown'}</dd>
       </dl>
-
-      {/*<br/>*/}
-      {/*<h2>Available Tools</h2>*/}
-      {/*<br/>*/}
-      {/*<p>The following MCP Tools are available for use by MCP clients. Execution is restricted to <b>enabled</b> tools only.</p>*/}
-
-      {/*<Table striped bordered condensed className="top-margin">*/}
-      {/*  <thead>*/}
-      {/*  <tr>*/}
-      {/*    <th>Name</th>*/}
-      {/*    /!*<th>Input Params</th>*!/*/}
-      {/*    <th>Tool Output Format</th>*/}
-      {/*    <th>Status</th>*/}
-      {/*  </tr>*/}
-      {/*  </thead>*/}
-      {/*  <tbody>*/}
-      {/*  {tools.map((tool) => (*/}
-      {/*    <tr key={tool.name}>*/}
-      {/*      <td>{tool.name}</td>*/}
-      {/*      /!*<td>not supported yet</td>*!/*/}
-      {/*      <td>{tool.ouputFormat ?? (modalConfig.use_structured_output ? "JSON" : "Markdown")}</td>*/}
-      {/*      <td>{tool.isEnabled ? "🟢 enabled" : "🔴 disabled"}</td>*/}
-      {/*    </tr>*/}
-      {/*  ))}*/}
-      {/*  </tbody>*/}
-      {/*</Table>*/}
-      {/*<br/>*/}
 
       <IfPermitted permissions="clusterconfigentry:edit">
         <Button bsStyle="info" bsSize="xs" onClick={openModal}>
