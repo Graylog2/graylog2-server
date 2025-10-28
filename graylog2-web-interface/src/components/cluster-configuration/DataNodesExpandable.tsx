@@ -34,6 +34,10 @@ const RoleLabel = styled(Label)`
   gap: 4px;
 `;
 
+const TableWrapper = styled.div`
+  margin-top: ${({ theme }) => theme.spacings.xs};
+`;
+
 const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
 
 type DataNodeEntity = {
@@ -148,17 +152,19 @@ const DataNodesExpandable = () => {
   return (
     <Section title="Data Nodes" collapsible>
       {isInitialLoading && <Spinner />}
-      <EntityDataTable<DataNodeEntity>
-        entities={dataNodeEntities}
-        visibleColumns={visibleColumns}
-        columnsOrder={columnsOrder}
-        onColumnsChange={handleColumnsChange}
-        onSortChange={handleSortChange}
-        entityAttributesAreCamelCase
-        entityActions={renderActions}
-        columnDefinitions={columnDefinitions}
-        columnRenderers={columnRenderers}
-      />
+      <TableWrapper>
+        <EntityDataTable<DataNodeEntity>
+          entities={dataNodeEntities}
+          visibleColumns={visibleColumns}
+          columnsOrder={columnsOrder}
+          onColumnsChange={handleColumnsChange}
+          onSortChange={handleSortChange}
+          entityAttributesAreCamelCase
+          entityActions={renderActions}
+          columnDefinitions={columnDefinitions}
+          columnRenderers={columnRenderers}
+        />
+      </TableWrapper>
     </Section>
   );
 };

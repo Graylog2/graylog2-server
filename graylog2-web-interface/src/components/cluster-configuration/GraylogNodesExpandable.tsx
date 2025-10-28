@@ -48,6 +48,10 @@ const NodePrimary = styled.div`
   gap: 2px;
 `;
 
+const TableWrapper = styled.div`
+  margin-top: ${({ theme }) => theme.spacings.xs};
+`;
+
 const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
 
 type GraylogNodeEntity = {
@@ -148,18 +152,20 @@ const GraylogNodesExpandable = () => {
   return (
     <Section title="Graylog Nodes" collapsible>
       {isLoading && <Spinner />}
-      <EntityDataTable<GraylogNodeEntity>
-        entities={graylogNodeEntities}
-        visibleColumns={visibleColumns}
-        columnsOrder={columnsOrder}
-        onColumnsChange={handleColumnsChange}
-        onSortChange={handleSortChange}
-        entityAttributesAreCamelCase
-        entityActions={renderActions}
-        columnDefinitions={columnDefinitions}
-        columnRenderers={columnRenderers}
-        actionsCellWidth={160}
-      />
+      <TableWrapper>
+        <EntityDataTable<GraylogNodeEntity>
+          entities={graylogNodeEntities}
+          visibleColumns={visibleColumns}
+          columnsOrder={columnsOrder}
+          onColumnsChange={handleColumnsChange}
+          onSortChange={handleSortChange}
+          entityAttributesAreCamelCase
+          entityActions={renderActions}
+          columnDefinitions={columnDefinitions}
+          columnRenderers={columnRenderers}
+          actionsCellWidth={160}
+        />
+      </TableWrapper>
     </Section>
   );
 };
