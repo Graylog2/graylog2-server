@@ -53,8 +53,8 @@ import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -82,7 +82,6 @@ import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -107,12 +106,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class EventDefinitionFacadeTest {
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
     private static final String REMEDIATION_STEPS = "remediation";
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ObjectMapper objectMapper;
 
@@ -147,7 +145,7 @@ public class EventDefinitionFacadeTest {
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 AggregationEventProcessorConfig.class,
@@ -160,7 +158,6 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityRegistrar, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
         eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock, clusterEventBus, entitySourceService);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();

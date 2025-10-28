@@ -17,8 +17,9 @@
 package org.graylog2.inputs;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
@@ -33,7 +34,6 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,10 +60,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class InputServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
 
     @Mock
@@ -82,11 +81,11 @@ public class InputServiceImplTest {
 
     @BeforeEach
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         clusterEventBus = new ClusterEventBus("inputs-test", Executors.newSingleThreadExecutor());
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
         inputService = new InputServiceImpl(
-                mongodb.mongoConnection(),
+                mongoCollections.mongoConnection(),
                 extractorFactory,
                 converterFactory,
                 messageInputFactory,

@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.mongodb;
 
+import com.google.common.io.Resources;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -27,6 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
@@ -160,4 +165,20 @@ public class MongoDBTestService implements AutoCloseable {
     private static String uriWithHostAndPort(String hostname, int port) {
         return String.format(Locale.US, "mongodb://%s:%d/%s", hostname, port, DEFAULT_DATABASE_NAME);
     }
+
+
+    public void importFixtures(List<URL> fixtureResources) {
+        if (!fixtureResources.isEmpty()) {
+            new MongoDBFixtureImporter(fixtureResources).importResources(mongoDatabase());
+        }
+    }
+
+    public void importFixture(String resourceName, Class<?> testClass) {
+        if (!Paths.get(resourceName).isAbsolute()) {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(testClass, resourceName))).importResources(mongoDatabase());
+        } else {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(resourceName))).importResources(mongoDatabase());
+        }
+    }
+
 }

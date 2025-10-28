@@ -29,9 +29,11 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -47,7 +49,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,10 +72,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class UserServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MongoConnection mongoConnection;
     private Configuration configuration;
@@ -95,8 +95,8 @@ public class UserServiceImplTest {
     private ClusterConfigService configService;
 
     @BeforeEach
-    public void setUp() {
-        this.mongoConnection = mongodb.mongoConnection();
+    public void setUp(MongoCollections mongoCollections) {
+        this.mongoConnection = mongoCollections.connection();
         this.configuration = new Configuration();
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
         this.userFactory = new UserImplFactory(configuration, permissions, configService);
@@ -294,6 +294,7 @@ public class UserServiceImplTest {
         assertThat(userService.count()).isEqualTo(5L);
     }
 
+    @ExtendWith(MongoDBExtension.class)
     public static class UserImplFactory implements UserImpl.Factory {
         private final Configuration configuration;
         private final Permissions permissions;

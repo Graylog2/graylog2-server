@@ -24,14 +24,14 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.graylog.plugins.views.migrations.V20200204122000_MigrateUntypedViewsToDashboards.V20200204122000_MigrateUntypedViewsToDashboards;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.json.JSONException;
-import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,13 +64,11 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     private static final String COLLECTION_VIEWS = "views";
     private static final String COLLECTION_SEARCHES = "searches";
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -82,9 +80,9 @@ public class V20200204122000_MigrateUntypedViewsToDashboardsTest {
     private MongoCollection<Document> searchesCollection;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        this.viewsCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_VIEWS));
-        this.searchesCollection = spy(mongodb.mongoConnection().getMongoDatabase().getCollection(COLLECTION_SEARCHES));
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.viewsCollection = spy(mongoCollections.mongoConnection().getMongoDatabase().getCollection(COLLECTION_VIEWS));
+        this.searchesCollection = spy(mongoCollections.mongoConnection().getMongoDatabase().getCollection(COLLECTION_SEARCHES));
         final MongoConnection mongoConnection = mock(MongoConnection.class);
         when(mongoConnection.getMongoDatabase()).thenReturn(mock(MongoDatabase.class));
         when(mongoConnection.getMongoDatabase().getCollection(COLLECTION_VIEWS)).thenReturn(viewsCollection);

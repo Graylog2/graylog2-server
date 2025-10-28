@@ -24,12 +24,11 @@ import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.ConfigurationVariableService;
 import org.graylog.plugins.sidecar.template.RenderTemplateException;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,6 +44,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class ConfigurationServiceTest {
     private final String FILEBEAT_CONF_ID = "5b8fe5f97ad37b17a44e2a34";
@@ -54,9 +54,6 @@ public class ConfigurationServiceTest {
 
     @Mock
     private NodeDetails nodeDetails;
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ConfigurationService configurationService;
     private ConfigurationVariableService configurationVariableService;
@@ -68,7 +65,7 @@ public class ConfigurationServiceTest {
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         when(nodeDetails.operatingSystem()).thenReturn("DummyOS");
@@ -77,11 +74,11 @@ public class ConfigurationServiceTest {
         when(sidecar.nodeName()).thenReturn("mockymock");
         when(sidecar.nodeDetails()).thenReturn(nodeDetails);
 
-        this.configurationVariableService = new ConfigurationVariableService(
-                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
+        this.configurationVariableService = new ConfigurationVariableService(mongoCollections);
         this.configurationService = new ConfigurationService(
-                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()),
-                configurationVariableService, new SecureFreemarkerConfigProvider());
+                mongoCollections,
+                configurationVariableService,
+                new SecureFreemarkerConfigProvider());
     }
 
     @Test

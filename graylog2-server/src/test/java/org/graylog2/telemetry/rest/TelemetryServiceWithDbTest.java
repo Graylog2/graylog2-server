@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.collections4.IteratorUtils;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.nodes.NodeService;
@@ -40,7 +40,6 @@ import org.graylog2.telemetry.cluster.TelemetryClusterService;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,11 +63,9 @@ import static org.graylog2.telemetry.rest.TelemetryTestHelper.mockTrafficData;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class TelemetryServiceWithDbTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     TrafficCounterService trafficCounterService;
@@ -97,13 +94,13 @@ public class TelemetryServiceWithDbTest {
     TelemetryService telemetryService;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp(MongoCollections mongoCollections) {
         MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
         TelemetryClusterService telemetryClusterService = new TelemetryClusterService(
                 serverStatus,
                 clusterConfigService,
                 leaderElectionService,
-                new DBTelemetryClusterInfo(Duration.ZERO, mongodb.mongoConnection()));
+                new DBTelemetryClusterInfo(Duration.ZERO, mongoCollections.mongoConnection()));
 
         telemetryService = new TelemetryService(
                 true,
@@ -113,7 +110,7 @@ public class TelemetryServiceWithDbTest {
                 elasticClusterAdapter,
                 elasticsearchVersion,
                 new TelemetryResponseFactory(new ObjectMapperProvider().get()),
-                new DBTelemetryUserSettingsService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection())),
+                new DBTelemetryUserSettingsService(mongoCollections),
                 eventBus,
                 telemetryClusterService,
                 "unknown",

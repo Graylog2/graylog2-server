@@ -16,18 +16,14 @@
  */
 package org.graylog2.streams;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.outputs.events.OutputChangedEvent;
 import org.graylog2.plugin.streams.Output;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,10 +40,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class OutputServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private StreamService streamService;
@@ -57,11 +52,9 @@ public class OutputServiceImplTest {
     private OutputServiceImpl outputService;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         outputService = new OutputServiceImpl(
-                new MongoCollections(mapperProvider, mongodb.mongoConnection()),
+                mongoCollections,
                 streamService,
                 clusterEventBus);
     }

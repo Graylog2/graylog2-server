@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.indexset.profile;
 
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
@@ -36,9 +36,9 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.joda.time.Duration;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -52,10 +52,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+@ExtendWith(MongoDBExtension.class)
 public class IndexFieldTypeProfileServiceTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private IndexFieldTypeProfileService toTest;
 
@@ -64,10 +62,9 @@ public class IndexFieldTypeProfileServiceTest {
     private MongoIndexSetService mongoIndexSetService;
 
     @BeforeEach
-    public void setUp() {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+    public void setUp(MongoCollections mongoCollections) {
+        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope()));
         mongoIndexSetService = new MongoIndexSetService(mongoCollections,
                 mock(StreamService.class),

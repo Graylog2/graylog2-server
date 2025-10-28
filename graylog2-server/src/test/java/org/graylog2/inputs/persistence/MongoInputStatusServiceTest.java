@@ -16,17 +16,13 @@
  */
 package org.graylog2.inputs.persistence;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,10 +41,9 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class MongoInputStatusServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     // Code Under Test
     private MongoInputStatusService cut;
@@ -59,12 +54,8 @@ public class MongoInputStatusServiceTest {
     private InputService inputService;
 
     @BeforeEach
-    public void setUp() {
-        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-
-        cut = new MongoInputStatusService(
-                new MongoCollections(mapperProvider, mongodb.mongoConnection()), inputService, mockEventBus);
+    public void setUp(MongoCollections mongoCollections) {
+        cut = new MongoInputStatusService(mongoCollections, inputService, mockEventBus);
     }
 
     @Test

@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Graph;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -46,7 +46,6 @@ import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.OutputServiceImpl;
 import org.graylog2.streams.StreamService;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,10 +68,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class OutputFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -85,9 +83,9 @@ public class OutputFacadeTest {
     private Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         outputService = new OutputServiceImpl(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()),
+                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongoCollections.mongoConnection()),
                 streamService,
                 new ClusterEventBus());
         pluginMetaData = new HashSet<>();

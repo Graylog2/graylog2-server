@@ -21,12 +21,11 @@ import com.fasterxml.jackson.databind.jsontype.NamedType;
 import org.graylog.events.TestEventProcessorConfig;
 import org.graylog.events.TestEventProcessorParameters;
 import org.graylog.events.processor.EventProcessorExecutionJob;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,23 +40,20 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class DBJobDefinitionServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private DBJobDefinitionService service;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorParameters.class, TestEventProcessorParameters.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(EventProcessorExecutionJob.Config.class, EventProcessorExecutionJob.TYPE_NAME));
 
-        this.service = new DBJobDefinitionService(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()),
-                new MongoJackObjectMapperProvider(objectMapper));
+        this.service = new DBJobDefinitionService(mongoCollections, new MongoJackObjectMapperProvider(objectMapper));
     }
 
     @Test

@@ -21,13 +21,14 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.UserImpl;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
@@ -36,15 +37,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(MongoDBExtension.class)
 public class RoleRemoverTest {
 
     private static final String ADMIN_ROLE = "77777ef17ad37b64ee87eb57";
     private static final String FTM_MANAGER_ROLE = "77777ef17ad37b64ee87ebdd";
     private static final String TEST_ADMIN_USER_WITH_BOTH_ROLES = "test-admin-user-with-both-roles";
     private static final String TEST_USER_WITH_FTM_MANAGER_ROLE_ONLY = "test-user-with-field-type-manager-role-only";
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private RoleRemover toTest;
 
@@ -53,9 +52,9 @@ public class RoleRemoverTest {
     private MongoCollection<Document> usersCollection;
 
     @BeforeEach
-    public void setUp() {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        mongodb.importFixture("roles_and_users.json", RoleRemoverTest.class);
+    public void setUp(MongoDBTestService testService) throws Exception {
+        final MongoConnection mongoConnection = testService.mongoConnection();
+        testService.importFixture("roles_and_users.json", RoleRemoverTest.class);
         final MongoDatabase mongoDatabase = mongoConnection.getMongoDatabase();
         rolesCollection = mongoDatabase.getCollection(RoleServiceImpl.ROLES_COLLECTION_NAME);
         usersCollection = mongoDatabase.getCollection(UserImpl.COLLECTION_NAME);

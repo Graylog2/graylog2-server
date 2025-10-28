@@ -20,8 +20,8 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
@@ -30,7 +30,6 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,10 +53,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class ViewServiceUsesViewRequirementsTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -69,12 +67,13 @@ public class ViewServiceUsesViewRequirementsTest {
     private ViewRequirements.Factory viewRequirementsFactory;
 
     private ViewService viewService;
+    private MongoCollections mongoCollections;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
         final var mapper = new ObjectMapperProvider();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(mapper.get());
-        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         this.viewService = new ViewService(
                 clusterConfigService,
                 viewRequirementsFactory,
@@ -88,7 +87,7 @@ public class ViewServiceUsesViewRequirementsTest {
 
     @AfterEach
     public void tearDown() {
-        mongodb.mongoConnection().getMongoDatabase().drop();
+        mongoCollections.mongoConnection().getMongoDatabase().drop();
     }
 
     @Test

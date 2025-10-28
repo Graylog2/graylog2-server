@@ -20,15 +20,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,10 +40,9 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class ClusterEventCleanupPeriodicalTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -53,14 +50,12 @@ public class ClusterEventCleanupPeriodicalTest {
     private ClusterEventCleanupPeriodical clusterEventCleanupPeriodical;
 
     @BeforeEach
-    public void setUpService() throws Exception {
+    public void setUpService(MongoCollections mongoCollections) throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
 
-        this.mongoConnection = mongodb.mongoConnection();
+        this.mongoConnection = mongoCollections.mongoConnection();
 
-        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(new MongoCollections(
-                new MongoJackObjectMapperProvider(objectMapper),
-                mongodb.mongoConnection()));
+        this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(mongoCollections);
     }
 
     @AfterEach

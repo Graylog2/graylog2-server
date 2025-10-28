@@ -49,8 +49,8 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDT
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -82,9 +82,9 @@ import org.graylog2.streams.StreamMock;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.Map;
@@ -95,9 +95,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MongoDBExtension.class)
 public class ViewFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -133,7 +132,7 @@ public class ViewFacadeTest {
     private EntityRegistrar entityRegistrar;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp(MongoCollections mongoCollections) {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
@@ -147,9 +146,8 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(MessageList.class);
         objectMapper.registerSubtypes(Pivot.class);
         objectMapper.registerSubtypes(EventList.class);
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
         searchDbService = new TestSearchDBService(mongoConnection, mapper);
         viewService = new TestViewService(null, mongoCollections);
         viewSummaryService = new TestViewSummaryService(mongoCollections);

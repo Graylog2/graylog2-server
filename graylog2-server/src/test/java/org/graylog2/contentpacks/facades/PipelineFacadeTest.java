@@ -34,8 +34,8 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamCon
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.contentpacks.EntityDescriptorIds;
@@ -58,7 +58,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,10 +81,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class PipelineFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -103,13 +101,10 @@ public class PipelineFacadeTest {
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() {
+    public void setUp(MongoCollections mongoCollections) {
         entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope()));
 
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
-
-        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper),
-                mongodb.mongoConnection());
         pipelineService = new MongoDbPipelineService(
                 mongoCollections, entityScopeService, clusterEventBus, mock(MongoDbRuleService.class), mock(PipelineStreamConnectionsService.class));
         connectionsService = new MongoDbPipelineStreamConnectionsService(mongoCollections, clusterEventBus);

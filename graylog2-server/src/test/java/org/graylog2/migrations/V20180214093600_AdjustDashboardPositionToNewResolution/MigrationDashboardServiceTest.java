@@ -16,10 +16,10 @@
  */
 package org.graylog2.migrations.V20180214093600_AdjustDashboardPositionToNewResolution;
 
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.SuppressForbidden;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,17 +32,16 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class MigrationDashboardServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private MigrationDashboardService dashboardService;
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUpService() {
-        dashboardService = new MigrationDashboardService(mongodb.mongoConnection());
+    public void setUpService(MongoCollections mongoCollections) {
+        dashboardService = new MigrationDashboardService(mongoCollections.mongoConnection());
     }
 
     @Test

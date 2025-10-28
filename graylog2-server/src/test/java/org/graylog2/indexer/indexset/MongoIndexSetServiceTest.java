@@ -20,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
 import com.mongodb.client.model.Filters;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
@@ -44,7 +44,6 @@ import org.graylog2.security.SafeClasses;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.streams.StreamService;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,10 +67,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class MongoIndexSetServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -85,13 +83,12 @@ public class MongoIndexSetServiceTest {
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
     @BeforeEach
-    public void setUp() {
+    public void setUp(MongoCollections mongoCollections) {
         clusterEventBus = new ClusterEventBus();
-        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongodb.mongoConnection(),
+        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongoCollections.mongoConnection(),
                 nodeId, new RestrictedChainingClassLoader(
                 new ChainingClassLoader(getClass().getClassLoader()), SafeClasses.allGraylogInternal()),
                 clusterEventBus);
-        MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope(), new NonDeletableSystemScope()));
         indexSetService = new MongoIndexSetService(mongoCollections, streamService, clusterConfigService, clusterEventBus, entityScopeService);
     }
@@ -393,6 +390,7 @@ public class MongoIndexSetServiceTest {
         assertThat(subscriber.getEvents()).isEmpty();
     }
 
+    @ExtendWith(MongoDBExtension.class)
     private static class IndexSetCreatedSubscriber {
         private final List<IndexSetCreatedEvent> events = new CopyOnWriteArrayList<>();
 
@@ -406,6 +404,7 @@ public class MongoIndexSetServiceTest {
         }
     }
 
+    @ExtendWith(MongoDBExtension.class)
     private static class IndexSetDeletedSubscriber {
         private final List<IndexSetDeletedEvent> events = new CopyOnWriteArrayList<>();
 

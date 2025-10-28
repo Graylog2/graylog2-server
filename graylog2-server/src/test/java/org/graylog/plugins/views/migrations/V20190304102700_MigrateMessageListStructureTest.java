@@ -21,11 +21,12 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,19 +41,19 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class V20190304102700_MigrateMessageListStructureTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private Migration migration;
     @Mock
     private ClusterConfigService clusterConfigService;
+    private MongoConnection mongoConnection;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        migration = new V20190304102700_MigrateMessageListStructure(mongodb.mongoConnection(), clusterConfigService);
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        mongoConnection = mongoCollections.connection();
+        migration = new V20190304102700_MigrateMessageListStructure(mongoConnection, clusterConfigService);
     }
 
     @Test
@@ -66,7 +67,7 @@ public class V20190304102700_MigrateMessageListStructureTest {
     public void testMigratingViewStructure() {
         final BasicDBObject dbQuery1 = new BasicDBObject();
         dbQuery1.put("_id", new ObjectId("58458e442f857c314491344e"));
-        final MongoCollection<Document> collection = mongodb.mongoConnection()
+        final MongoCollection<Document> collection = mongoConnection
                 .getMongoDatabase()
                 .getCollection("views");
 

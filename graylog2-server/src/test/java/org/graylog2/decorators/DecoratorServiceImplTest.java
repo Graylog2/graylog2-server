@@ -16,32 +16,30 @@
  */
 package org.graylog2.decorators;
 
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@ExtendWith(MongoDBExtension.class)
 public class DecoratorServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private DecoratorServiceImpl decoratorService;
 
     @BeforeEach
-    public void setUp() {
-        final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider();
-        final MongoJackObjectMapperProvider provider = new MongoJackObjectMapperProvider(objectMapperProvider.get());
-        decoratorService = new DecoratorServiceImpl(new MongoCollections(provider, mongodb.mongoConnection()));
+    public void setUp(MongoCollections mongoCollections) {
+        decoratorService = new DecoratorServiceImpl(mongoCollections);
     }
 
     @Test

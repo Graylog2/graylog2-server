@@ -19,6 +19,7 @@ package org.graylog2.indexer.ranges;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.assertj.jodatime.api.Assertions;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.audit.NullAuditEventSender;
@@ -37,7 +38,6 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -56,10 +56,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class MongoIndexRangeServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -72,10 +71,10 @@ public class MongoIndexRangeServiceTest {
     private MongoIndexRangeService indexRangeService;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         localEventBus = new EventBus("local-event-bus");
         indexRangeService = new MongoIndexRangeService(
-                new MongoCollections(objectMapperProvider, mongodb.mongoConnection()), indices, indexSetRegistry,
+                mongoCollections, indices, indexSetRegistry,
                 new NullAuditEventSender(), new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), localEventBus);
     }
 

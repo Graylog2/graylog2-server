@@ -50,6 +50,7 @@ import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -65,7 +66,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,13 +89,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class LegacyAlertConditionMigratorTest {
     private static final int CHECK_INTERVAL = 60;
     public static final Set<EntityScope> ENTITY_SCOPES = Collections.singleton(new DefaultEntityScope());
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private LegacyAlertConditionMigrator migrator;
 
@@ -112,7 +110,7 @@ public class LegacyAlertConditionMigratorTest {
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
         objectMapper.registerSubtypes(new NamedType(AggregationEventProcessorConfig.class, AggregationEventProcessorConfig.TYPE_NAME));
@@ -133,10 +131,9 @@ public class LegacyAlertConditionMigratorTest {
         objectMapper.registerSubtypes(new NamedType(Sum.class, Sum.NAME));
 
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
-        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(new MongoCollections(mongoJackObjectMapperProvider, mongoConnection), mongoJackObjectMapperProvider);
-        final MongoCollections mongoCollections = new MongoCollections(mongoJackObjectMapperProvider, mongoConnection);
+        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoCollections, mongoJackObjectMapperProvider);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoCollections, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), clock, schedulerCapabilitiesService, Duration.minutes(5));
         notificationService = new DBNotificationService(mongoCollections, mock(EntityRegistrar.class));
         this.eventDefinitionService = new DBEventDefinitionService(mongoCollections, mock(DBEventProcessorStateService.class), mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());

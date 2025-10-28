@@ -23,8 +23,11 @@ import com.mongodb.ServerAddress;
 import com.mongodb.WriteError;
 import org.bson.BsonDocument;
 import org.graylog.testing.TestUserService;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
@@ -40,7 +43,6 @@ import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 import org.graylog2.users.UserServiceImpl;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -63,11 +65,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class MigrationHelpersTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     public UserService userService;
@@ -79,9 +79,11 @@ public class MigrationHelpersTest {
     public ClusterConfigService configService;
 
     private MigrationHelpers migrationHelpers;
+    private MongoConnection mongoConnection;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoConnection = mongoCollections.connection();
         this.migrationHelpers = new MigrationHelpers(roleService, userService, roleRemover);
     }
 
@@ -288,7 +290,7 @@ public class MigrationHelpersTest {
     @MongoDBFixtures("duplicated-users.json")
     public void ensureUserWithDuplicates() throws ValidationException {
 
-        final TestUserService testUserService = new TestUserService(mongodb.mongoConnection(), configService);
+        final TestUserService testUserService = new TestUserService(mongoConnection, configService);
         migrationHelpers = new MigrationHelpers(roleService, testUserService, roleRemover);
 
         assertThat(testUserService.loadAll()).hasSize(2);

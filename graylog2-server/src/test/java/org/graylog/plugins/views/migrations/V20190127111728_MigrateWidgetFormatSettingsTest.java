@@ -21,10 +21,10 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,19 +40,20 @@ import java.util.stream.Collectors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class V20190127111728_MigrateWidgetFormatSettingsTest {
-    @Rule
-    public final MongoDBInstance mongoDB = MongoDBInstance.createForClass();
 
     private V20190127111728_MigrateWidgetFormatSettings migration;
 
     @Mock
     private ClusterConfigService clusterConfigService;
+    private MongoCollections mongoCollections;
 
     @BeforeEach
-    public void setUp() {
-        migration = new V20190127111728_MigrateWidgetFormatSettings(mongoDB.mongoConnection(), clusterConfigService);
+    public void setUp(MongoCollections mongoCollections) {
+        this.mongoCollections = mongoCollections;
+        migration = new V20190127111728_MigrateWidgetFormatSettings(this.mongoCollections.mongoConnection(), clusterConfigService);
     }
 
     @Test
@@ -60,7 +61,7 @@ public class V20190127111728_MigrateWidgetFormatSettingsTest {
     public void testMigrationWithOneChartColorMapping() {
         final BasicDBObject dbQuery1 = new BasicDBObject();
         dbQuery1.put("_id", new ObjectId("5e2ee372b22d7970576b2eb3"));
-        final MongoCollection<Document> collection = mongoDB.mongoConnection()
+        final MongoCollection<Document> collection = mongoCollections.mongoConnection()
                 .getMongoDatabase()
                 .getCollection("views");
         migration.upgrade();
@@ -90,7 +91,7 @@ public class V20190127111728_MigrateWidgetFormatSettingsTest {
     public void testMigrationWithoutChartColorMapping() {
         final BasicDBObject dbQuery1 = new BasicDBObject();
         dbQuery1.put("_id", new ObjectId("5e2ee372b22d7970576b2eb3"));
-        final MongoCollection<Document> collection = mongoDB.mongoConnection()
+        final MongoCollection<Document> collection = mongoCollections.mongoConnection()
                 .getMongoDatabase()
                 .getCollection("views");
         migration.upgrade();
@@ -115,7 +116,7 @@ public class V20190127111728_MigrateWidgetFormatSettingsTest {
     public void testMigrationWithMultipleChartColorMapping() {
         final BasicDBObject dbQuery1 = new BasicDBObject();
         dbQuery1.put("_id", new ObjectId("5e2ee372b22d7970576b2eb3"));
-        final MongoCollection<Document> collection = mongoDB.mongoConnection()
+        final MongoCollection<Document> collection = mongoCollections.mongoConnection()
                 .getMongoDatabase()
                 .getCollection("views");
         migration.upgrade();

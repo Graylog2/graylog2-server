@@ -29,8 +29,8 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
@@ -38,7 +38,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,13 +65,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class DBJobTriggerServiceTest {
     private static final String NODE_ID = "node-1";
     private static final Duration EXPIRATION_DURATION = Duration.minutes(5);
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
@@ -85,7 +82,8 @@ public class DBJobTriggerServiceTest {
     private MongoCollections mongoCollections;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.mongoCollections = mongoCollections;
         lenient().when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
 
         ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -94,7 +92,6 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
         mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         this.dbJobTriggerService = serviceWithClock(clock);
     }
 

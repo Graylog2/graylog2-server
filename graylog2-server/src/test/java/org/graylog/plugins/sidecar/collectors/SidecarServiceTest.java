@@ -17,6 +17,7 @@
 package org.graylog.plugins.sidecar.collectors;
 
 import com.mongodb.client.MongoCollection;
+import jakarta.validation.Validator;
 import org.bson.Document;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
@@ -27,9 +28,8 @@ import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.notifications.NotificationService;
@@ -38,7 +38,6 @@ import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +46,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import jakarta.validation.Validator;
 
 import java.util.List;
 import java.util.Set;
@@ -62,6 +60,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
@@ -79,16 +78,14 @@ public class SidecarServiceTest {
     @Mock
     private NotificationSystemEventPublisher publisher;
 
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
     private SidecarService sidecarService;
+    private MongoCollections mongoCollections;
 
     @BeforeEach
-    public void setUp(MongoJackObjectMapperProvider mapperProvider,
-                      Validator validator) throws Exception {
+    public void setUp(MongoCollections mongoCollections, Validator validator) throws Exception {
+        this.mongoCollections = mongoCollections;
         this.sidecarService = new SidecarService(collectorService, configurationService,
-                new MongoCollections(mapperProvider, mongodb.mongoConnection()), notificationService, publisher,
+                mongoCollections, notificationService, publisher,
                 validator);
     }
 
@@ -128,7 +125,7 @@ public class SidecarServiceTest {
         );
 
         final Sidecar result = this.sidecarService.save(sidecar);
-        MongoCollection<Document> collection = mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName);
+        MongoCollection<Document> collection = mongoCollections.mongoConnection().getMongoDatabase().getCollection(collectionName);
         Document document = collection.find().first();
         Document nodeDetails = document.get("node_details", Document.class);
 
@@ -185,7 +182,7 @@ public class SidecarServiceTest {
 
         final int result = this.sidecarService.delete(sidecar.id());
         assertEquals(1, result);
-        assertEquals(2, mongodb.mongoConnection().getMongoDatabase().getCollection(collectionName).countDocuments());
+        assertEquals(2, mongoCollections.mongoConnection().getMongoDatabase().getCollection(collectionName).countDocuments());
     }
 
     @Test

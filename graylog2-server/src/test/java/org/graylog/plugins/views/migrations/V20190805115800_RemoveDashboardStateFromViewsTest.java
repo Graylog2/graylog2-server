@@ -18,11 +18,11 @@ package org.graylog.plugins.views.migrations;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -36,17 +36,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class V20190805115800_RemoveDashboardStateFromViewsTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     @Mock
     private ClusterConfigService clusterConfigService;
 
     @Test
     @MongoDBFixtures("V20190805115800_RemoveDashboardStateFromViewsTest.json")
-    public void removesDashboardStateFromExistingViews() {
-        final Migration migration = new V20190805115800_RemoveDashboardStateFromViews(clusterConfigService, mongodb.mongoConnection());
+    public void removesDashboardStateFromExistingViews(MongoCollections mongoCollections) throws Exception {
+        final Migration migration = new V20190805115800_RemoveDashboardStateFromViews(clusterConfigService, mongoCollections.mongoConnection());
 
         migration.upgrade();
 
@@ -54,7 +53,7 @@ public class V20190805115800_RemoveDashboardStateFromViewsTest {
         verify(clusterConfigService, times(1)).write(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().modifiedViewsCount()).isEqualTo(4);
 
-        MongoCollection<Document> collection = mongodb.mongoConnection().getMongoDatabase().getCollection("views");
+        MongoCollection<Document> collection = mongoCollections.mongoConnection().getMongoDatabase().getCollection("views");
         assertThat(collection.countDocuments()).isEqualTo(4);
     }
 }

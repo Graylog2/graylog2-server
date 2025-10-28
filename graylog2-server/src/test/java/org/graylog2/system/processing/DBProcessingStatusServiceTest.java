@@ -19,6 +19,7 @@ package org.graylog2.system.processing;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.events.JobSchedulerTestClock;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -32,7 +33,6 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,12 +47,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class DBProcessingStatusServiceTest {
     private static final String NODE_ID = "abc-123";
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
@@ -64,13 +62,13 @@ public class DBProcessingStatusServiceTest {
     private Duration updateThreshold;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         clock = spy(new JobSchedulerTestClock(DateTime.parse("2019-01-01T00:00:00.000Z")));
         updateThreshold = spy(Duration.minutes(1));
-        dbService = new DBProcessingStatusService(new MongoCollections(mapperProvider, mongodb.mongoConnection()),
+        dbService = new DBProcessingStatusService(mongoCollections,
                 nodeId, clock, updateThreshold, 1, baseConfiguration);
     }
 

@@ -19,6 +19,7 @@ package org.graylog2.contentstream;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentstream.db.DBContentStreamUserSettingsService;
@@ -27,7 +28,6 @@ import org.graylog2.contentstream.rest.ContentStreamSettings;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -42,10 +42,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class ContentStreamServiceWithDbTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     EventBus eventBus;
@@ -62,11 +61,9 @@ public class ContentStreamServiceWithDbTest {
     ContentStreamService contentStreamService;
 
     @BeforeEach
-    public void setUp() {
-        MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
+    public void setUp(MongoCollections mongoCollections) {
         contentStreamService = new ContentStreamService(
-                new DBContentStreamUserSettingsService(
-                        new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection())),
+                new DBContentStreamUserSettingsService(mongoCollections),
                 contentStreamFeedTags,
                 eventBus
         );

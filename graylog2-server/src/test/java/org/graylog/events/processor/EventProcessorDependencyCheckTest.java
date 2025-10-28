@@ -17,6 +17,7 @@
 package org.graylog.events.processor;
 
 import com.google.common.collect.ImmutableSet;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
@@ -26,7 +27,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.processing.DBProcessingStatusService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,10 +40,9 @@ import static org.graylog2.system.processing.DBProcessingStatusService.Processin
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class EventProcessorDependencyCheckTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private DBProcessingStatusService dbProcessingStatusService;
@@ -53,8 +52,8 @@ public class EventProcessorDependencyCheckTest {
     private EventProcessorDependencyCheck dependencyCheck;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        stateService = new DBEventProcessorStateService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        stateService = new DBEventProcessorStateService(mongoCollections);
         dependencyCheck = new EventProcessorDependencyCheck(stateService, dbProcessingStatusService);
     }
 

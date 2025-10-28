@@ -20,9 +20,8 @@ import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.testing.inject.TestPasswordSecretModule;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
@@ -31,10 +30,10 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
 import org.jukito.JukitoRunner;
 import org.jukito.UseModules;
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
@@ -49,11 +48,10 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+@ExtendWith(MongoDBExtension.class)
 @RunWith(JukitoRunner.class)
 @UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
 public class SearchesCleanUpJobWithDBServicesTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private SearchesCleanUpJob searchesCleanUpJob;
     private SearchDbService searchDbService;
@@ -65,16 +63,14 @@ public class SearchesCleanUpJobWithDBServicesTest {
     }
 
     @BeforeEach
-    public void setup(MongoJackObjectMapperProvider mapperProvider) {
+    public void setup(MongoCollections mongoCollections) {
         DateTimeUtils.setCurrentMillisFixed(DateTime.parse("2018-07-03T13:37:42.000Z").getMillis());
 
 
-        final ViewSummaryService viewService = new TestViewService(
-                new MongoCollections(mapperProvider, mongodb.mongoConnection())
-        );
+        final ViewSummaryService viewService = new TestViewService(mongoCollections);
         this.searchDbService = spy(
                 new SearchDbService(
-                        new MongoCollections(mapperProvider, mongodb.mongoConnection()),
+                        mongoCollections,
                         dto -> new SearchRequirements(Collections.emptySet(), dto),
                         new IgnoreSearchFilters()
                 )

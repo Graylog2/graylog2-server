@@ -22,16 +22,16 @@ import com.mongodb.client.model.Filters;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.users.UserConfiguration;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,10 +58,9 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class AccessTokenServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
@@ -73,20 +72,22 @@ public class AccessTokenServiceImplTest {
     private Configuration configuration;
 
     private AccessTokenService accessTokenService;
+    private MongoCollections mongoCollections;
 
     @BeforeEach
-    public void setupService() {
+    public void setupService(MongoCollections mongoCollections) {
+        this.mongoCollections = mongoCollections;
         // Simple cipher which reverses the cleartext. DB fixtures need to contain the reversed (i.e. encrypted token)
         final AccessTokenCipher accessTokenCipher = mock(AccessTokenCipher.class);
         when(accessTokenCipher.encrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
         when(accessTokenCipher.decrypt(anyString())).then(inv -> StringUtils.reverse(inv.getArgument(0)));
 
-        this.accessTokenService = new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
+        this.accessTokenService = new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, accessTokenCipher, configService, configuration);
     }
 
     @AfterEach
     public void tearDown() {
-        mongodb.mongoConnection().getMongoDatabase().drop();
+        mongoCollections.mongoConnection().getMongoDatabase().drop();
     }
 
     @Test
@@ -226,7 +227,7 @@ public class AccessTokenServiceImplTest {
         assertThat(token.getToken()).isNotBlank();
 
         // Need to access the collection on a lower level to get access to the encrypted token and the token_type
-        final MongoCollection<Document> collection = mongodb.mongoConnection().getMongoDatabase().getCollection("access_tokens");
+        final MongoCollection<Document> collection = mongoCollections.mongoConnection().getMongoDatabase().getCollection("access_tokens");
 
         assertThat(collection.find(Filters.eq("_id", new ObjectId(token.getId()))).first())
                 .as("check that token %s/%s exists", token.getId(), token.getName())

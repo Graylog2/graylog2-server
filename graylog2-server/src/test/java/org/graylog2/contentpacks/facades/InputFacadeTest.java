@@ -24,8 +24,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
 import org.apache.commons.collections.map.HashedMap;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -42,6 +42,7 @@ import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.references.ReferenceMapUtils;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
 import org.graylog2.contentpacks.model.entities.references.ValueType;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.events.ClusterEventBus;
@@ -73,7 +74,6 @@ import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -100,10 +100,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class InputFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -131,7 +130,7 @@ public class InputFacadeTest {
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final MetricRegistry metricRegistry = new MetricRegistry();
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final GrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
@@ -142,7 +141,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        inputService = new InputServiceImpl(mongodb.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
+        inputService = new InputServiceImpl(mongoCollections.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();

@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.entities.preferences.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
@@ -25,9 +25,9 @@ import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferen
 import org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
@@ -37,10 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(MongoDBExtension.class)
 public class EntityListPreferencesServiceImplTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final StoredEntityListPreferencesId existingId = StoredEntityListPreferencesId.builder()
             .entityListId("list")
@@ -55,8 +53,8 @@ public class EntityListPreferencesServiceImplTest {
     private EntityListPreferencesService toTest;
 
     @BeforeEach
-    public void setUp() {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+    public void setUp(MongoCollections mongoCollections) {
+        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
         this.toTest = new EntityListPreferencesServiceImpl(new MongoCollections(objectMapperProvider, mongoConnection));
     }

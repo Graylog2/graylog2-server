@@ -18,13 +18,14 @@ package org.graylog.events.migrations;
 
 import com.mongodb.client.MongoCollection;
 import org.bson.Document;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.migrations.Migration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.json.JSONException;
-import org.junit.Rule;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,10 +57,9 @@ import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -71,13 +71,14 @@ public class V20230629140000_RenameFieldTypeOfEventDefinitionSeriesTest {
     private Migration migration;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp(MongoCollections mongoCollections) {
+        final MongoConnection connection = mongoCollections.connection();
         this.migration = new V20230629140000_RenameFieldTypeOfEventDefinitionSeries(
                 clusterConfigService,
-                mongodb.mongoConnection(),
+                connection,
                 notificationService
         );
-        this.eventDefinitionsCollection = mongodb.mongoConnection().getMongoDatabase().getCollection("event_definitions");
+        this.eventDefinitionsCollection = connection.getMongoDatabase().getCollection("event_definitions");
     }
 
     @Test

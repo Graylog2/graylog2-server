@@ -27,8 +27,9 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.WriteConcern;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -40,7 +41,6 @@ import org.graylog2.system.debug.DebugEvent;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,10 +63,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class ClusterEventPeriodicalTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -81,15 +80,15 @@ public class ClusterEventPeriodicalTest {
     private MongoJackObjectMapperProvider objectMapperProvider;
 
     @BeforeEach
-    public void setUpService() throws Exception {
+    public void setUpService(MongoCollections mongoCollections) throws Exception {
         DateTimeUtils.setCurrentMillisFixed(TIME.getMillis());
 
-        this.mongoConnection = mongodb.mongoConnection();
+        this.mongoConnection = mongoCollections.connection();
         this.objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
         this.clusterEventPeriodical = new ClusterEventPeriodical(
                 objectMapperProvider,
-                mongodb.mongoConnection(),
+                mongoConnection,
                 nodeId,
                 new RestrictedChainingClassLoader(new ChainingClassLoader(getClass().getClassLoader()),
                         new SafeClasses(Set.of(
@@ -350,12 +349,14 @@ public class ClusterEventPeriodicalTest {
 
     private static volatile String constructorArgument;
 
+    @ExtendWith(MongoDBExtension.class)
     public static class Unsafe {
         public Unsafe(String param) {
             constructorArgument = param;
         }
     }
 
+    @ExtendWith(MongoDBExtension.class)
     public static class Safe {
         public Safe(String param) {
             constructorArgument = param;
@@ -400,6 +401,7 @@ public class ClusterEventPeriodicalTest {
         assertThat(constructorArgument).isNull();
     }
 
+    @ExtendWith(MongoDBExtension.class)
     public static class SimpleEventHandler {
         final AtomicInteger invocations = new AtomicInteger();
 

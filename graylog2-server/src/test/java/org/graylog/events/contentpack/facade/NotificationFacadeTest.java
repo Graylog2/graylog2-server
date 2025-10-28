@@ -35,8 +35,8 @@ import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -56,7 +56,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.users.UserImpl;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,11 +73,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
 public class NotificationFacadeTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ObjectMapper objectMapper;
 
@@ -106,7 +103,7 @@ public class NotificationFacadeTest {
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 EmailEventNotificationConfig.class,
@@ -118,7 +115,6 @@ public class NotificationFacadeTest {
 
         jobDefinitionService = mock(DBJobDefinitionService.class);
         stateService = mock(DBEventProcessorStateService.class);
-        MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
         eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, mock(EntityRegistrar.class), null, new IgnoreSearchFilters());
 
         notificationService = new DBNotificationService(mongoCollections, mock(EntityRegistrar.class));
