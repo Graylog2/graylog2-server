@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
-import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -40,13 +38,11 @@ public class ListFieldsTool extends Tool<ListFieldsTool.Parameters, ListFieldsTo
     private final MappedFieldTypesService mappedFieldTypesService;
 
     @Inject
-    protected ListFieldsTool(final ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider, MappedFieldTypesService mappedFieldTypesService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
-              new TypeReference<>() {},
-              new TypeReference<>() {},
-              NAME,
+    protected ListFieldsTool(final ToolContext toolContext, MappedFieldTypesService mappedFieldTypesService) {
+        super(toolContext,
+                new TypeReference<>() {},
+                new TypeReference<>() {},
+                NAME,
               "List available fields",
               """
                       Retrieve the available field names and metadata about them, for example their datatype and capabilities.

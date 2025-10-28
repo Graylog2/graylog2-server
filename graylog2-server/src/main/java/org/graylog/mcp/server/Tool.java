@@ -22,9 +22,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import io.modelcontextprotocol.spec.McpSchema;
+import jakarta.inject.Inject;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -37,34 +39,45 @@ import java.util.Optional;
  * @param <O> Output type
  */
 public abstract class Tool<P, O> {
+    public record ToolContext(
+            ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider,
+            CustomizationConfig  customizationConfig,
+            ClusterConfigService clusterConfigService
+    ) {
+        @Inject
+        public ToolContext {}
+    }
 
     private final ObjectMapper objectMapper;
+    private final ClusterConfigService clusterConfigService;
+    private final String productName;
+
     private final TypeReference<P> parameterType;
     private final String name;
     private final String title;
     private final String description;
     private final McpSchema.JsonSchema inputSchema;
     private final Map<String, Object> outputSchema;
-    private final ClusterConfigService clusterConfigService;
 
     protected Tool(
-            ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider,
-            ClusterConfigService clusterConfigService,
+            ToolContext context,
             TypeReference<P> parameterType,
             TypeReference<O> outputType,
             String name,
             String title,
             String description) {
-        this.objectMapper = objectMapper;
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
-        this.clusterConfigService = clusterConfigService;
+
+        this.objectMapper = context.objectMapper();
+        this.clusterConfigService = context.clusterConfigService();
+        this.productName = context.customizationConfig().productName();
 
         // Get the schema generator with all contributed modules
-        SchemaGenerator generator = schemaGeneratorProvider.get();
+        SchemaGenerator generator = context.schemaGeneratorProvider().get();
 
         // we can precompute the schema for our parameters, it's statically known
         final var inputSchemaNode = generator.generateSchema(parameterType.getType());
@@ -89,6 +102,8 @@ public abstract class Tool<P, O> {
     protected ObjectMapper getObjectMapper() {
         return objectMapper;
     }
+
+    public String getProductName() { return productName; }
 
     @JsonProperty
     public String name() {
@@ -141,6 +156,11 @@ public abstract class Tool<P, O> {
             @Override
             public @NotNull String toString() { return value != null ? value : "(empty)"; }
         }
-        record Data<T>(@JsonValue T value) implements ToolResult<T> {}
+        record Data<T>(@JsonValue T value) implements ToolResult<T> {
+            @Override
+            public @NotNull String toString() {
+                return value != null && !value.toString().isBlank() ? value.toString() : "{}";
+            }
+        }
     }
 }

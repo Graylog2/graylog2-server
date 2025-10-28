@@ -17,19 +17,15 @@
 package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.OutputBuilder;
-import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.List;
 import java.util.Locale;
@@ -40,29 +36,22 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
     public static String NAME = "get_system_status";
 
     private final ServerStatus serverStatus;
-    private final CustomizationConfig customizationConfig;
     private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public SystemInfoTool(ObjectMapper objectMapper,
-                          SchemaGeneratorProvider schemaGeneratorProvider,
+    public SystemInfoTool(final ToolContext toolContext,
                           ServerStatus serverStatus,
-                          ClusterConfigService clusterConfigService,
-                          CustomizationConfig customizationConfig,
                           LeaderElectionService leaderElectionService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
-                clusterConfigService,
+        super(toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("Get %s System Information", customizationConfig.productName()),
+                f("Get %s System Information", toolContext.customizationConfig().productName()),
                 """
                         Returns system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(toolContext.customizationConfig().productName()));
         this.serverStatus = serverStatus;
-        this.customizationConfig = customizationConfig;
         this.leaderElectionService = leaderElectionService;
     }
 
@@ -73,7 +62,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
 
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-            return SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
+            return SystemOverviewResponse.create(f("%s Server", getProductName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
                     serverStatus.getClusterId(),
@@ -98,8 +87,8 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
             OutputBuilder output = new OutputBuilder();
-            output.h1(f("%s System Information", customizationConfig.productName()));
-            return output.unorderedListKVItem(SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
+            output.h1(f("%s System Information", getProductName()));
+            return output.unorderedListKVItem(SystemOverviewResponse.create(f("%s Server", getProductName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
                     serverStatus.getClusterId(),
