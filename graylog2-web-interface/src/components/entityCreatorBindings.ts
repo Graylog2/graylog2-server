@@ -47,7 +47,7 @@ const entityCreatorBindings: PluginExports = {
         section: 'dashboard',
         actionValue: 'dashboard-create-button',
       },
-      permissions: 'dashboard:create',
+      permissions: 'dashboards:create',
     },
     {
       id: 'Stream',
