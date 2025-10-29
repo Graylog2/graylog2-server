@@ -19,7 +19,9 @@ package org.graylog.storage.opensearch3;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import jakarta.annotation.Nonnull;
+import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.apache.hc.client5.http.auth.CredentialsProvider;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
@@ -63,8 +65,12 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
 
     private final Supplier<OfficialOpensearchClient> clientCache;
 
-    public OfficialOpensearchClientProvider(@IndexerHosts List<URI> hosts, IndexerJwtAuthToken indexerJwtAuthToken) {
-        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken));
+    @Inject
+    public OfficialOpensearchClientProvider(
+            @IndexerHosts List<URI> hosts,
+            IndexerJwtAuthToken indexerJwtAuthToken,
+            CredentialsProvider credentialsProvider) {
+        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider));
     }
 
     @Override
@@ -73,13 +79,9 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     }
 
     @Nonnull
-    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken) {
+    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider) {
 
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
-
-        //  final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        // Only for demo purposes. Don't specify your credentials in code.
-        //  credentialsProvider.setCredentials(new AuthScope(host), new UsernamePasswordCredentials("admin", "admin".toCharArray()));
 
         final SSLContext sslcontext;
         try {
@@ -109,7 +111,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
             }
 
             return httpClientBuilder
-                    //.setDefaultCredentialsProvider(credentialsProvider)
+                    .setDefaultCredentialsProvider(credentialsProvider)
                     .setConnectionManager(connectionManager);
         });
 

@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.engine.QuerySuggestionsService;
 import org.graylog.shaded.opensearch2.org.apache.http.client.CredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS2;
+import org.graylog.storage.opensearch3.client.OpensearchCredentialsProvider;
 import org.graylog.storage.opensearch3.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch3.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
@@ -99,6 +100,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
         bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
+        bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
 
         Multibinder<SnifferBuilder> snifferBuilders = Multibinder.newSetBinder(binder(), SnifferBuilder.class);
