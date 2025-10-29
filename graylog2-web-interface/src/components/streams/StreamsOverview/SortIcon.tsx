@@ -42,16 +42,17 @@ const SORT_ORDER_NAMES = {
 const SortIcon = ({
   onChange,
   activeSort,
-  column,
+  header,
 }: {
   onChange: (newSort: Sort) => void;
-  column: Column;
+  header: any;
   activeSort: Sort | undefined;
 }) => {
-  const columnSortIsActive = activeSort?.attributeId === column.id;
+  // todo use tanstack query to maintain active sort
+  const columnSortIsActive = activeSort?.attributeId === header.id;
   const nextSortDirection =
     !columnSortIsActive || activeSort.direction === SORT_DIRECTIONS.DESC ? SORT_DIRECTIONS.ASC : SORT_DIRECTIONS.DESC;
-  const title = `Sort ${column.title.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`;
+  const title = `Sort ${header.column.columnDef.header} ${SORT_ORDER_NAMES[nextSortDirection]}`;
 
   const _onChange = () => {
     onChange({ attributeId: column.id, direction: nextSortDirection });

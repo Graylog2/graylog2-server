@@ -19,6 +19,8 @@ import styled, { css } from 'styled-components';
 import { useMemo, useRef, useCallback } from 'react';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
+import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table';
+import camelCase from 'lodash/camelCase';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -38,7 +40,14 @@ import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import TableRow from './TableRow';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
-import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute, ExpandedSectionRenderer } from './types';
+import type {
+  ColumnRenderers,
+  ColumnRender,
+  Column,
+  EntityBase,
+  ColumnRenderersByAttribute,
+  ExpandedSectionRenderer,
+} from './types';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -93,6 +102,7 @@ const filterAccessibleColumns = (columns: Array<Column>, userPermissions: Immuta
     return true;
   });
 
+// todo use tanstack query logic instead
 const filterVisibleColumns = (columnDefinitions: Array<Column>, visibleColumns: Array<string>) =>
   visibleColumns.map((columnId) => columnDefinitions.find(({ id }) => id === columnId)).filter((column) => !!column);
 
@@ -255,6 +265,34 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const selectableData = useMemo(() => entities.filter(_isEntitySelectable), [entities, _isEntitySelectable]);
 
+  const columnHelper = createColumnHelper<Entity>();
+
+  const _columns = useMemo(
+    () =>
+      columns.map((col: ColumnRender<Entity, Meta>) =>
+        columnHelper.accessor(col.id, {
+          cell: (info) =>
+            columnRenderersByAttribute[col.id].renderCell(info.cell.getValue(), info.row.original, col, meta),
+          accessorKey: entityAttributesAreCamelCase ? camelCase(col.id) : col.id,
+          header: (info) =>
+            columnRenderersByAttribute[col.id]?.renderHeader
+              ? columnRenderersByAttribute[col.id].renderHeader(info)
+              : col.title,
+          size: columnsWidths[col.id],
+        }),
+      ),
+    [columnHelper, columnRenderersByAttribute, columns, columnsWidths, entityAttributesAreCamelCase, meta],
+  );
+
+  const table = useReactTable({
+    data: entities,
+    columns: _columns,
+    getCoreRowModel: getCoreRowModel(),
+    initialState: {
+      columnOrder: columnsOrder,
+    },
+  });
+
   return (
     <MetaDataProvider<Meta> meta={meta}>
       <SelectedEntitiesProvider<Entity>
@@ -281,6 +319,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           <ScrollContainer id="scroll-container" ref={tableRef}>
             <StyledTable striped condensed hover>
               <TableHead
+                table={table}
                 columns={columns}
                 columnsOrder={columnsOrder}
                 actionsColWidth={actionsColWidth}
@@ -292,12 +331,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 activeSort={activeSort}
                 displayActionsCol={displayActionsCol}
               />
-              {entities.map((entity, index) => (
-                <tbody key={`table-row-${entity.id}`} data-testid={`table-row-${entity.id}`}>
+              {/*{entities.map((entity, index) => (*/}
+              {table.getRowModel().rows.map((row, index) => (
+                <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
                   <TableRow<Entity, Meta>
-                    entity={entity}
+                    row={row}
                     index={index}
-                    entityAttributesAreCamelCase={entityAttributesAreCamelCase}
                     actionsRef={actionsRef}
                     columnRenderersByAttribute={columnRenderersByAttribute}
                     actions={entityActions}
@@ -306,11 +345,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     displayActions={displayActionsCol}
                     columns={columns}
                   />
-                  <ExpandedSections
-                    key={`expanded-sections-${entity.id}`}
-                    expandedSectionsRenderer={expandedSectionsRenderer}
-                    entity={entity}
-                  />
+                  {/*<ExpandedSections*/}
+                  {/*  key={`expanded-sections-${row.id}`}*/}
+                  {/*  expandedSectionsRenderer={expandedSectionsRenderer}*/}
+                  {/*  row={row}*/}
+                  {/*/>*/}
                 </tbody>
               ))}
             </StyledTable>

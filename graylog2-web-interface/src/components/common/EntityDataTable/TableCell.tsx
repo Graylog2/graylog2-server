@@ -16,36 +16,23 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import camelCase from 'lodash/camelCase';
+import type { Cell } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 
-import useMetaDataContext from 'components/common/EntityDataTable/hooks/useMetaDataContext';
-
-import type { Column, ColumnRenderer, EntityBase } from './types';
+import type { EntityBase } from './types';
 
 const Td = styled.td`
   word-break: break-word;
 `;
 
-const TableCell = <Entity extends EntityBase, Meta>({
-  column,
-  columnRenderer,
-  entity,
-  entityAttributesAreCamelCase,
-}: {
-  column: Column;
-  columnRenderer: ColumnRenderer<Entity, Meta> | undefined;
-  entity: Entity;
-  entityAttributesAreCamelCase: boolean;
-}) => {
-  const { meta } = useMetaDataContext<Meta>();
-  const attributeKey = entityAttributesAreCamelCase ? camelCase(column.id) : column.id;
-  const attributeValue = entity[attributeKey];
-  const content =
-    typeof columnRenderer?.renderCell === 'function'
-      ? columnRenderer.renderCell(attributeValue, entity, column, meta)
-      : attributeValue;
+const TableCell = <Entity extends EntityBase, Meta>({ cell }: { cell: Cell<Entity, undefined> }) => (
+  // const { meta } = useMetaDataContext<Meta>();
+  // const attributeValue = entity[attributeKey];
+  // const content =
+  //   typeof columnRenderer?.renderCell === 'function'
+  //     ? columnRenderer.renderCell(attributeValue, entity, column, meta)
+  //     : attributeValue;
 
-  return <Td>{content}</Td>;
-};
-
+  <Td>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+);
 export default TableCell;

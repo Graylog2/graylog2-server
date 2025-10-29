@@ -17,6 +17,7 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useMemo } from 'react';
+import { flexRender } from '@tanstack/react-table';
 
 import SortIcon from 'components/streams/StreamsOverview/SortIcon';
 import type { Sort } from 'stores/PaginationTypes';
@@ -38,31 +39,25 @@ export const Th = styled.th<{ $width: number | undefined }>(
 );
 
 const TableHeader = <Entity extends EntityBase>({
+  header,
   activeSort,
-  column,
-  columnRenderer,
   onSortChange,
-  colWidth,
 }: {
   activeSort: Sort;
-  column: Column;
-  columnRenderer: ColumnRenderer<Entity> | undefined;
   onSortChange: (newSort: Sort) => void;
-  colWidth: number;
-}) => {
-  const content = useMemo(
-    () => (typeof columnRenderer?.renderHeader === 'function' ? columnRenderer.renderHeader(column) : column.title),
-    [column, columnRenderer],
-  );
+  header: any;
+}) => (
+  // const content = useMemo(
+  //   () => (typeof columnRenderer?.renderHeader === 'function' ? columnRenderer.renderHeader(column) : column.title),
+  //   [column, columnRenderer],
+  // );
 
-  return (
-    <Th $width={colWidth}>
-      {content}
-
-      {column.sortable && <SortIcon onChange={onSortChange} column={column} activeSort={activeSort} />}
-    </Th>
-  );
-};
+  <Th $width={header.getSize()} colSpan={header.colSpan}>
+    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+    {header.column.getCanSort() && <SortIcon onChange={onSortChange} header={header} activeSort={activeSort} />}
+    {/*{header.column.getCanResize() && <div>Resize handle</div>}*/}
+  </Th>
+);
 
 const ActionsHead = styled(Th)<{ $width: number | undefined }>(
   ({ $width }) => css`
@@ -77,50 +72,39 @@ const TableHead = <Entity extends EntityBase>({
   columns,
   columnsOrder,
   columnRenderersByAttribute,
-  columnsWidths,
   data,
   displayActionsCol,
   displayBulkSelectCol,
   onSortChange,
+  table,
 }: {
   actionsColWidth: number | undefined;
   activeSort: Sort;
   columns: Array<Column>;
-  columnsWidths: { [columnId: string]: number };
   columnsOrder: Array<string>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   data: Readonly<Array<Entity>>;
   displayActionsCol: boolean;
   displayBulkSelectCol: boolean;
   onSortChange: (newSort: Sort) => void;
-}) => {
-  const sortedColumns = useMemo(
-    () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
-    [columns, columnsOrder],
-  );
+  table: any;
+}) => (
+  // Todo can we include this in the tanstack table logic?
+  // const sortedColumns = useMemo(
+  //   () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
+  //   [columns, columnsOrder],
+  // );
 
-  return (
-    <Thead>
-      <tr>
-        {displayBulkSelectCol && <BulkSelectHead data={data} />}
-        {sortedColumns.map((column) => {
-          const columnRenderer = columnRenderersByAttribute[column.id];
-
-          return (
-            <TableHeader<Entity>
-              columnRenderer={columnRenderer}
-              column={column}
-              colWidth={columnsWidths[column.id]}
-              onSortChange={onSortChange}
-              activeSort={activeSort}
-              key={column.title}
-            />
-          );
-        })}
+  <Thead>
+    {table.getHeaderGroups().map((headerGroup) => (
+      <tr key={headerGroup.id}>
+        {/*{displayBulkSelectCol && <BulkSelectHead data={data} />}*/}
+        {headerGroup.headers.map((header) => (
+          <TableHeader<Entity> header={header} onSortChange={onSortChange} activeSort={activeSort} key={header.id} />
+        ))}
         {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
       </tr>
-    </Thead>
-  );
-};
-
+    ))}
+  </Thead>
+);
 export default TableHead;
