@@ -16,8 +16,10 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
 import jakarta.inject.Inject;
@@ -368,7 +370,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public long numberOfMessages(String index) {
+    public long numberOfMessages(final String index) {
         return statsApi.numberOfMessagesInIndex(index);
     }
 
@@ -409,7 +411,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Set<IndexStatistics> indicesStats(final Collection<String> indices) {
-        return statsApi.indexStatsWithShardLevel(indices).entrySet()
+        return statsApi.indicesStatsWithShardLevel(indices).entrySet()
                 .stream()
                 .map(entry -> {
                     final String index = entry.getKey();
@@ -434,8 +436,20 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
-        final Map<String, IndicesStats> stringIndicesStatsMap = statsApi.indexStatsWithDocsAndStore(indices);
-        return objectMapper.convertValue(stringIndicesStatsMap, JsonNode.class);
+
+        try {
+            final Map<String, IndicesStats> stringIndicesStatsMap = statsApi.indicesStatsWithDocsAndStore(indices);
+            ObjectNode node = objectMapper.createObjectNode();
+            for (Map.Entry<String, IndicesStats> entry : stringIndicesStatsMap.entrySet()) {
+                final JsonNode statsNode = objectMapper.readTree(entry.getValue().toJsonString());
+                node.set(entry.getKey(), statsNode);
+            }
+            return node;
+        } catch (JsonProcessingException e) {
+            LOG.error("Unable to convert indices stats to JSON", e);
+            return null;
+        }
+
     }
 
     @Override
@@ -487,7 +501,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Optional<Long> storeSizeInBytes(String index) {
-        return Optional.of(statsApi.storeSizes(index));
+        return statsApi.storeSizes(index);
     }
 
     @Override
