@@ -101,7 +101,7 @@ public class CloudTrailDriver {
         configuration.put(CloudTrailInput.CK_AWS_SQS_REGION, request.sqsRegion());
         configuration.put(CloudTrailInput.CK_AWS_S3_REGION, request.s3Region());
         configuration.put(CloudTrailInput.CK_ASSUME_ROLE_ARN, request.assumeRoleArn());
-        configuration.put(CloudTrailInput.CK_CLOUDTRAIL_QUEUE_NAME, request.sqsQueueName());
+        configuration.put(CloudTrailInput.CK_AWS_SQS_QUEUE_NAME, request.sqsQueueName());
         configuration.put(CloudTrailInput.CK_POLLING_INTERVAL, request.pollingInterval());
         configuration.put(CloudTrailInput.CK_OVERRIDE_SOURCE, request.overrideSource());
         configuration.put(CloudTrailInput.CK_SQS_MESSAGE_BATCH_SIZE, request.sqsMessageBatchSize());

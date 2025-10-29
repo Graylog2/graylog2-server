@@ -56,8 +56,8 @@ import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_ASSUME_ROLE_A
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_ACCESS_KEY;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SECRET_KEY;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_QUEUE_NAME;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
-import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_CLOUDTRAIL_QUEUE_NAME;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_LEGACY_AWS_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_POLLING_INTERVAL;
 
@@ -113,8 +113,8 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
 
         LOG.debug("Using SQS region: {}, S3 region: {}", sqsRegionName, s3RegionName);
 
-        final String sqsQueueName = input.getConfiguration().getString(CK_CLOUDTRAIL_QUEUE_NAME);
-        long pollingInterval = input.getConfiguration().getInt(CK_POLLING_INTERVAL,5);
+        final String sqsQueueName = input.getConfiguration().getString(CK_AWS_SQS_QUEUE_NAME);
+        long pollingInterval = input.getConfiguration().getInt(CK_POLLING_INTERVAL,1);
 
         // Use SQS region for authentication
         final AWSRequest awsRequest = AWSRequestImpl.builder()

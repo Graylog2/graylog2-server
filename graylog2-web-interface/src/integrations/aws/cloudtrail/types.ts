@@ -23,7 +23,7 @@ export type AWSCloudTrailGenericInputCreateRequest = {
   configuration: {
     polling_interval: number;
     throttling_allowed: boolean;
-    cloudtrail_queue_name: string;
+    aws_sqs_queue_name: string;
     aws_access_key: string;
     aws_secret_key: string;
     aws_sqs_region: string;
@@ -38,7 +38,7 @@ export type AWSCloudTrailInputCreateRequest = {
   name: string;
   enable_throttling: boolean;
   polling_interval: number;
-  cloudtrail_queue_name: string;
+  aws_sqs_queue_name: string;
   aws_access_key: string;
   aws_secret_key: string;
   aws_sqs_region: string;

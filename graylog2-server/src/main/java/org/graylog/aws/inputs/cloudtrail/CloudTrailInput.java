@@ -42,7 +42,7 @@ public class CloudTrailInput extends MessageInput {
     public static final String TYPE = "org.graylog.aws.inputs.cloudtrail.CloudTrailInput";
     public static final String CK_AWS_ACCESS_KEY = "aws_access_key";
     public static final String CK_AWS_SECRET_KEY = "aws_secret_key";
-    public static final String CK_CLOUDTRAIL_QUEUE_NAME = "cloudtrail_queue_name";
+    public static final String CK_AWS_SQS_QUEUE_NAME = "aws_sqs_queue_name";
     public static final String CK_LEGACY_AWS_REGION = "aws_region";
     public static final String CK_AWS_SQS_REGION = "aws_sqs_region";
     public static final String CK_AWS_S3_REGION = "aws_s3_region";
@@ -142,8 +142,8 @@ public class CloudTrailInput extends MessageInput {
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
             r.addField(new TextField(
-                    CK_CLOUDTRAIL_QUEUE_NAME,
-                    "CloudTrail SQS Queue name",
+                    CK_AWS_SQS_QUEUE_NAME,
+                    "AWS SQS Queue name",
                     "",
                     "The name of the SQS Queue created by CloudTrail (cross account access)",
                     ConfigurationField.Optional.OPTIONAL

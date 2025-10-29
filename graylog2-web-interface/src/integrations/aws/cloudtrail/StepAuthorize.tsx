@@ -58,7 +58,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
     fetch('POST', qualifyUrl(ApiRoutes.INTEGRATIONS.AWSCloudTrail.CHECK_CREDENTIALS), {
       aws_access_key: formData?.awsAccessKey?.value || '',
       aws_secret_key: formData?.awsSecretKey?.value || '',
-      cloudtrail_queue_name: formData?.awsCloudTrailSqsQueueName?.value || '',
+      aws_sqs_queue_name: formData?.awsCloudTrailSqsQueueName?.value || '',
       aws_sqs_region: formData?.awsCloudTrailSqsRegion?.value || '',
       aws_s3_region: formData?.awsCloudTrailS3Region?.value || '',
       assume_role_arn: formData?.awsAssumeRoleARN?.value || '',

@@ -29,7 +29,7 @@ import javax.annotation.Nullable;
 public interface CloudTrailRequest {
     String AWS_ACCESS_ID = "aws_access_key";
     String AWS_SECRET_KEY = "aws_secret_key";
-    String AWS_CLOUDTRAIL_QUEUE_NAME = "cloudtrail_queue_name";
+    String AWS_SQS_QUEUE_NAME = "aws_sqs_queue_name";
     String AWS_SQS_REGION = "aws_sqs_region";
     String AWS_S3_REGION = "aws_s3_region";
     String ASSUME_ROLE_ARN = "assume_role_arn";
@@ -43,7 +43,7 @@ public interface CloudTrailRequest {
     EncryptedValue secretAccessKey();
 
     @Nullable
-    @JsonProperty(AWS_CLOUDTRAIL_QUEUE_NAME)
+    @JsonProperty(AWS_SQS_QUEUE_NAME)
     String sqsQueueName();
 
     @Nullable
@@ -66,7 +66,7 @@ public interface CloudTrailRequest {
         @JsonProperty(AWS_SECRET_KEY)
         SELF secretAccessKey(EncryptedValue secretAccessKey);
 
-        @JsonProperty(AWS_CLOUDTRAIL_QUEUE_NAME)
+        @JsonProperty(AWS_SQS_QUEUE_NAME)
         SELF sqsQueueName(String sqsQueueName);
 
         @JsonProperty(AWS_SQS_REGION)

@@ -40,7 +40,6 @@ import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_ACCESS_KE
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_LEGACY_AWS_REGION;
-import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_POLLING_INTERVAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -85,7 +84,7 @@ public class CloudTrailTransportTest {
     // Test Cases
     @Test
     public void doLaunch_schedulesPollerTask_whenConfigurationIsValid() throws Exception {
-        givenGoodConfiguration(5);
+        givenGoodConfiguration();
         givenGoodExecutorService();
 
         whenDoLaunchIsCalled();
@@ -94,12 +93,12 @@ public class CloudTrailTransportTest {
 
     @Test
     public void doStop_terminatesPollerTask_whenTaskIsRunning() throws Exception {
-        givenGoodConfiguration(1);
+        givenGoodConfiguration();
         givenGoodExecutorService();
 
         whenDoLaunchIsCalled();
 
-        thenTaskSubmittedToExecutor(1L);
+        thenTaskSubmittedToExecutor(0L);
 
         whenDoStopIsCalled();
 
@@ -114,16 +113,13 @@ public class CloudTrailTransportTest {
     }
 
     // GIVENs
-    private void givenGoodConfiguration(int pollingInterval) {
+    private void givenGoodConfiguration() {
         given(mockConfiguration.getString(eq(CK_AWS_ACCESS_KEY))).willReturn(TEST_USER_NAME);
         given(mockConfiguration.getString(eq(CK_ASSUME_ROLE_ARN))).willReturn(TEST_ARN);
-        // Mock new region fields for current configuration
         given(mockConfiguration.getString(eq(CK_AWS_SQS_REGION), any())).willReturn(TEST_REGION);
         given(mockConfiguration.getString(eq(CK_AWS_S3_REGION), any())).willReturn(TEST_REGION);
-        // Mock legacy region field for backward compatibility
         given(mockConfiguration.getString(eq(CK_LEGACY_AWS_REGION), any())).willReturn(TEST_REGION);
 
-        given(mockConfiguration.getInt(eq(CK_POLLING_INTERVAL))).willReturn(pollingInterval);
         given(mockCloudTrailInput.getConfiguration()).willReturn(mockConfiguration);
     }
 
