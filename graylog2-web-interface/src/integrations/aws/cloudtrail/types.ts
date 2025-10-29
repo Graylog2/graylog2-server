@@ -26,7 +26,8 @@ export type AWSCloudTrailGenericInputCreateRequest = {
     cloudtrail_queue_name: string;
     aws_access_key: string;
     aws_secret_key: string;
-    aws_region: string;
+    aws_sqs_region: string;
+    aws_s3_region: string;
     assume_role_arn: string;
     override_source?: string;
     sqs_message_batch_size: number;
@@ -40,7 +41,8 @@ export type AWSCloudTrailInputCreateRequest = {
   cloudtrail_queue_name: string;
   aws_access_key: string;
   aws_secret_key: string;
-  aws_region: string;
+  aws_sqs_region: string;
+  aws_s3_region: string;
   assume_role_arn: string;
   override_source?: string;
   sqs_message_batch_size: number;

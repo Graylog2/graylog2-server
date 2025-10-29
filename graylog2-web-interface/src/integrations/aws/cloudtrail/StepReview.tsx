@@ -123,8 +123,12 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
             </li>
           )}
           <li>
-            <strong>Subscriber Region </strong>
-            <span>{formData.awsCloudTrailRegion.value}</span>
+            <strong>SQS Region </strong>
+            <span>{formData.awsCloudTrailSqsRegion.value}</span>
+          </li>
+          <li>
+            <strong>S3 Region </strong>
+            <span>{formData.awsCloudTrailS3Region.value}</span>
           </li>
           {formData.assumeRoleArn?.value && (
             <li>

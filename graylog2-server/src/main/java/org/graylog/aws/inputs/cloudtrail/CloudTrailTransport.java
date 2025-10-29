@@ -16,6 +16,7 @@
  */
 package org.graylog.aws.inputs.cloudtrail;
 
+import com.amazonaws.regions.Regions;
 import com.codahale.metrics.MetricSet;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -54,13 +55,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_ASSUME_ROLE_ARN;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_ACCESS_KEY;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SECRET_KEY;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_CLOUDTRAIL_QUEUE_NAME;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_LEGACY_AWS_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_POLLING_INTERVAL;
 
 public class CloudTrailTransport extends ThrottleableTransport2 {
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailTransport.class);
     public static final String NAME = "AWSCloudTrail";
+    private static final Regions DEFAULT_REGION = Regions.US_EAST_1;
     private final LocalMetricRegistry localRegistry;
     private final ScheduledExecutorService executorService;
     private final SQSClientFactory sqsClientFactory;
@@ -100,18 +104,30 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
         final String awsAccessKey = input.getConfiguration().getString(CK_AWS_ACCESS_KEY);
         final EncryptedValue secretAccessKey = input.getConfiguration().getEncryptedValue(CK_AWS_SECRET_KEY);
         final String assumeRoleArn = input.getConfiguration().getString(CK_ASSUME_ROLE_ARN);
-        final String awsRegion = input.getConfiguration().getString(CK_AWS_SQS_REGION);
+
+        // Backward compatibility: Check for legacy aws_region field first, then fall back to default
+        final String legacyRegionName = input.getConfiguration().getString(CK_LEGACY_AWS_REGION, DEFAULT_REGION.getName());
+        // Use specific region if provided, otherwise fall back to legacy region
+        final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, legacyRegionName);
+        final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, legacyRegionName);
+
+        LOG.debug("Using SQS region: {}, S3 region: {}", sqsRegionName, s3RegionName);
+
         final String sqsQueueName = input.getConfiguration().getString(CK_CLOUDTRAIL_QUEUE_NAME);
         long pollingInterval = input.getConfiguration().getInt(CK_POLLING_INTERVAL);
+
+        // Use SQS region for authentication
         final AWSRequest awsRequest = AWSRequestImpl.builder()
-                .region(awsRegion)
+                .region(sqsRegionName)
                 .awsAccessKeyId(awsAccessKey)
                 .awsSecretAccessKey(secretAccessKey)
                 .assumeRoleArn(assumeRoleArn).build();
         final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
-        SQSClient sqsClient = sqsClientFactory.create(sqsQueueName, awsRegion, credentialsProvider, inputFailureRecorder);
-        CloudTrailS3Client cloudTrailS3Client;
-        cloudTrailS3Client = cloudTrailClientFactory.getS3Client(awsRegion, credentialsProvider, inputFailureRecorder);
+
+        // Create SQS client with SQS region
+        SQSClient sqsClient = sqsClientFactory.create(sqsQueueName, sqsRegionName, credentialsProvider, inputFailureRecorder);
+        // Create S3 client with S3 region
+        CloudTrailS3Client cloudTrailS3Client = cloudTrailClientFactory.getS3Client(s3RegionName, credentialsProvider, inputFailureRecorder);
         LOG.debug("Constructing poller task");
 
         CloudTrailPollerTask pollerTask = new CloudTrailPollerTask(input,

@@ -59,7 +59,8 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       aws_access_key: formData?.awsAccessKey?.value || '',
       aws_secret_key: formData?.awsSecretKey?.value || '',
       cloudtrail_queue_name: formData?.awsCloudTrailSqsQueueName?.value || '',
-      aws_region: formData?.awsCloudTrailRegion?.value || '',
+      aws_sqs_region: formData?.awsCloudTrailSqsRegion?.value || '',
+      aws_s3_region: formData?.awsCloudTrailS3Region?.value || '',
       assume_role_arn: formData?.awsAssumeRoleARN?.value || '',
     })
       .then((result: any) => {
@@ -90,7 +91,8 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   const isFormValid = formValidation.isFormValid(
     ['awsCloudTrailName',
       ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsAccessKey', 'awsSecretKey'] : []),
-      'awsCloudTrailRegion',
+      'awsCloudTrailSqsRegion',
+      'awsCloudTrailS3Region',
       'awsCloudTrailSqsQueueName'],
     formData,
   );
@@ -122,13 +124,24 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
 
       <ValidatedInput
         type="select"
-        id="awsCloudTrailRegion"
+        id="awsCloudTrailSqsRegion"
         onChange={onChange}
-        fieldData={formData.awsCloudTrailRegion}
-        help="CloudTrail region where the sqs queue is created."
+        fieldData={formData.awsCloudTrailSqsRegion}
+        help="AWS region where the SQS queue is located."
         required
-        label="CloudTrail Region">
-        {renderOptions(regions, 'Choose your account region', false)}
+        label="AWS SQS Region">
+        {renderOptions(regions, 'Choose SQS region', false)}
+      </ValidatedInput>
+
+      <ValidatedInput
+        type="select"
+        id="awsCloudTrailS3Region"
+        onChange={onChange}
+        fieldData={formData.awsCloudTrailS3Region}
+        help="AWS region where the S3 bucket is located."
+        required
+        label="AWS S3 Region">
+        {renderOptions(regions, 'Choose S3 region', false)}
       </ValidatedInput>
 
       <ValidatedInput

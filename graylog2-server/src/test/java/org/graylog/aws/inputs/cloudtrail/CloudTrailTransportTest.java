@@ -37,7 +37,9 @@ import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_ASSUME_ROLE_ARN;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_ACCESS_KEY;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_S3_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_AWS_SQS_REGION;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_LEGACY_AWS_REGION;
 import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_POLLING_INTERVAL;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -115,7 +117,11 @@ public class CloudTrailTransportTest {
     private void givenGoodConfiguration(int pollingInterval) {
         given(mockConfiguration.getString(eq(CK_AWS_ACCESS_KEY))).willReturn(TEST_USER_NAME);
         given(mockConfiguration.getString(eq(CK_ASSUME_ROLE_ARN))).willReturn(TEST_ARN);
-        given(mockConfiguration.getString(eq(CK_AWS_SQS_REGION))).willReturn(TEST_REGION);
+        // Mock new region fields for current configuration
+        given(mockConfiguration.getString(eq(CK_AWS_SQS_REGION), any())).willReturn(TEST_REGION);
+        given(mockConfiguration.getString(eq(CK_AWS_S3_REGION), any())).willReturn(TEST_REGION);
+        // Mock legacy region field for backward compatibility
+        given(mockConfiguration.getString(eq(CK_LEGACY_AWS_REGION), any())).willReturn(TEST_REGION);
 
         given(mockConfiguration.getInt(eq(CK_POLLING_INTERVAL))).willReturn(pollingInterval);
         given(mockCloudTrailInput.getConfiguration()).willReturn(mockConfiguration);

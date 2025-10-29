@@ -30,7 +30,8 @@ public interface CloudTrailRequest {
     String AWS_ACCESS_ID = "aws_access_key";
     String AWS_SECRET_KEY = "aws_secret_key";
     String AWS_CLOUDTRAIL_QUEUE_NAME = "cloudtrail_queue_name";
-    String AWS_REGION = "aws_region";
+    String AWS_SQS_REGION = "aws_sqs_region";
+    String AWS_S3_REGION = "aws_s3_region";
     String ASSUME_ROLE_ARN = "assume_role_arn";
 
     @Nullable
@@ -46,8 +47,12 @@ public interface CloudTrailRequest {
     String sqsQueueName();
 
     @Nullable
-    @JsonProperty(AWS_REGION)
+    @JsonProperty(AWS_SQS_REGION)
     String sqsRegion();
+
+    @Nullable
+    @JsonProperty(AWS_S3_REGION)
+    String s3Region();
 
     @Nullable
     @JsonProperty(ASSUME_ROLE_ARN)
@@ -64,8 +69,11 @@ public interface CloudTrailRequest {
         @JsonProperty(AWS_CLOUDTRAIL_QUEUE_NAME)
         SELF sqsQueueName(String sqsQueueName);
 
-        @JsonProperty(AWS_REGION)
+        @JsonProperty(AWS_SQS_REGION)
         SELF sqsRegion(String sqsRegion);
+
+        @JsonProperty(AWS_S3_REGION)
+        SELF s3Region(String s3Region);
 
         @JsonProperty(ASSUME_ROLE_ARN)
         SELF assumeRoleArn(String assumeRoleArn);
