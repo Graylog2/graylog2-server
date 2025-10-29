@@ -19,7 +19,7 @@ import { useMemo, useRef, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
-import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table';
+import { useReactTable, createColumnHelper, getCoreRowModel, flexRender } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { Table, ButtonGroup } from 'components/bootstrap';
@@ -36,17 +36,18 @@ import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
 import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
-import TableRow from './TableRow';
+import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import type {
   ColumnRenderers,
-  ColumnRender,
+  ColumnRenderer,
   Column,
   EntityBase,
   ColumnRenderersByAttribute,
   ExpandedSectionRenderer,
 } from './types';
 import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
+import ButtonToolbar from '../../bootstrap/ButtonToolbar';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -86,6 +87,10 @@ const LayoutConfigRow = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
+`;
+
+const Td = styled.td`
+  word-break: break-word;
 `;
 
 const filterAccessibleColumns = (columns: Array<Column>, userPermissions: Immutable.List<string>) =>
@@ -263,7 +268,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const selectableData = useMemo(() => entities.filter(_isEntitySelectable), [entities, _isEntitySelectable]);
-  console.log({ displayBulkSelectCol });
   const columnHelper = createColumnHelper<Entity>();
 
   const _columns = useMemo(
@@ -289,7 +293,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
             }),
           ]
         : []),
-      ...columns.map((col: ColumnRender<Entity, Meta>) =>
+      ...columns.map((col) =>
         columnHelper.accessor(col.id, {
           cell: (info) =>
             columnRenderersByAttribute[col.id].renderCell(info.cell.getValue(), info.row.original, col, meta),
@@ -302,6 +306,16 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           enableSorting: col.sortable ?? false,
         }),
       ),
+      ...(displayActionsCol
+        ? [
+            columnHelper.display({
+              id: 'actions',
+              size: actionsColWidth,
+              header: 'Actions',
+              cell: ({ row }) => <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>,
+            }),
+          ]
+        : []),
     ],
     [columnHelper, columnRenderersByAttribute, columns, columnsWidths, entityAttributesAreCamelCase, meta],
   );
@@ -349,30 +363,14 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           </ActionsRow>
           <ScrollContainer id="scroll-container" ref={tableRef}>
             <StyledTable striped condensed hover>
-              <TableHead
-                table={table}
-                columns={columns}
-                columnsOrder={columnsOrder}
-                actionsColWidth={actionsColWidth}
-                data={selectableData}
-                columnRenderersByAttribute={columnRenderersByAttribute}
-                displayBulkSelectCol={displayBulkSelectCol}
-                displayActionsCol={displayActionsCol}
-              />
-              {/*{entities.map((entity, index) => (*/}
-              {table.getRowModel().rows.map((row, index) => (
+              <TableHead table={table} />
+              {table.getRowModel().rows.map((row) => (
                 <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                  <TableRow<Entity, Meta>
-                    row={row}
-                    index={index}
-                    actionsRef={actionsRef}
-                    columnRenderersByAttribute={columnRenderersByAttribute}
-                    actions={entityActions}
-                    displaySelect={displayBulkSelectCol}
-                    isEntitySelectable={_isEntitySelectable}
-                    displayActions={displayActionsCol}
-                    columns={columns}
-                  />
+                  <tr>
+                    {row.getVisibleCells().map((cell) => (
+                      <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+                    ))}
+                  </tr>
                   <ExpandedSections
                     key={`expanded-sections-${row.id}`}
                     expandedSectionsRenderer={expandedSectionsRenderer}

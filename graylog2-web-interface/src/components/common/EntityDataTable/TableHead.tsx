@@ -16,11 +16,11 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { Table, Header } from '@tanstack/react-table';
+import type { Table } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
-import type { Column, EntityBase } from './types';
+import type { EntityBase } from './types';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -35,39 +35,17 @@ export const Th = styled.th<{ $width: number | undefined }>(
   `,
 );
 
-const TableHeader = <Entity extends EntityBase>({ header }: { header: Header<Entity> }) => (
-  <Th $width={header.getSize()} colSpan={header.colSpan}>
-    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-    {header.column.getCanSort() && <SortIcon header={header} />}
-    {/*{header.column.getCanResize() && <div>Resize handle</div>}*/}
-  </Th>
-);
-
-const ActionsHead = styled(Th)<{ $width: number | undefined }>(
-  ({ $width }) => css`
-    text-align: right;
-    width: ${$width ? `${$width}px` : 'auto'};
-  `,
-);
-
-const TableHead = <Entity extends EntityBase>({
-  actionsColWidth,
-  displayActionsCol,
-  table,
-}: {
-  actionsColWidth: number | undefined;
-  columns: Array<Column>;
-  columnsOrder: Array<string>;
-  displayActionsCol: boolean;
-  table: Table<Entity>;
-}) => (
+const TableHead = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => (
   <Thead>
     {table.getHeaderGroups().map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeader<Entity> header={header} key={header.id} />
+          <Th $width={header.getSize()} colSpan={header.colSpan} key={header.id}>
+            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+            {header.column.getCanSort() && <SortIcon header={header} />}
+            {/*{header.column.getCanResize() && <div>Resize handle</div>}*/}
+          </Th>
         ))}
-        {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
       </tr>
     ))}
   </Thead>
