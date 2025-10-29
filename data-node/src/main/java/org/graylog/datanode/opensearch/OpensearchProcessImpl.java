@@ -241,14 +241,21 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         float memoryRatio = (float) freeMemory / heapBytes;
         if (memoryRatio > MEMORY_RATIO_THRESHOLD) {
             LOG.warn("There appears to be about {} times more available memory than the heap size configured for this data node.", memoryRatio);
+            final String recommendedMemory = FileUtils.byteCountToDisplaySize(memory.getTotal() / 2);
             clusterEventBus.post(new DataNodeNotficationEvent(nodeId.getNodeId(), Notification.Type.DATA_NODE_HEAP_WARNING,
                     Map.of("hostname", configuration.getHostname(),
                             "memoryRatio", f("%.1f", memoryRatio),
                             "totalMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()),
                             "availableMemory", FileUtils.byteCountToDisplaySize(memory.getAvailable()),
-                            "recommendedMemory", FileUtils.byteCountToDisplaySize(memory.getTotal()/2),
+                            "recommendedMemory", recommendedMemory,
+                            "recommendedMemorySetting", recommendedMemorySetting(recommendedMemory),
                             "heapSize", FileUtils.byteCountToDisplaySize(heapBytes))));
         }
+    }
+
+    protected static String recommendedMemorySetting(String recommendedMemory) {
+        // opensearch values need to be in different format, same as java heap config values. Example: 7GB => 7g, 512MB => 512m
+        return recommendedMemory.replace("B", "").replace(" ", "").toLowerCase(Locale.ROOT);
     }
 
     protected GlobalMemory getGlobalMemory() {

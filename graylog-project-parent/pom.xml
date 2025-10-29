@@ -27,7 +27,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-parent</artifactId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>graylog-project-parent</artifactId>
@@ -593,7 +593,7 @@
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.6.14</version>
+                                    <version>7.6.15</version>
                                 </plugin>
                             </plugins>
                         </configuration>

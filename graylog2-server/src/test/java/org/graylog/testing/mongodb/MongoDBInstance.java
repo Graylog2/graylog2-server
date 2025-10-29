@@ -18,7 +18,6 @@ package org.graylog.testing.mongodb;
 
 import com.google.common.io.Resources;
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.database.MongoConnection;
 import org.junit.rules.ExternalResource;
 import org.junit.runner.Description;
@@ -32,7 +31,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -55,6 +53,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     private static final ConcurrentMap<String, MongoDBTestService> CACHED_SERVICE = new ConcurrentHashMap<>();
 
     private final Lifecycle lifecycle;
+    private final MongoDBVersion version;
     private final MongoDBTestService service;
 
     private MongoDBFixtureImporter fixtureImporter;
@@ -73,43 +72,38 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     }
 
     public static MongoDBInstance createWithDefaults(Network network, Lifecycle lifecycle, final boolean closeNetwork) {
-        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongodbServer.DEFAULT_VERSION, network, closeNetwork);
+        return new MongoDBInstance(DEFAULT_INSTANCE_NAME, lifecycle, MongoDBVersion.DEFAULT, network, closeNetwork, true);
     }
 
-    private static MongoDBInstance createWithNameAndVersion(Network network, Lifecycle lifecycle, String name, MongodbServer version) {
-        return new MongoDBInstance(name, lifecycle, version, network, false);
-    }
-
-    public static MongoDBInstance createStarted(Network network, Lifecycle lifecycle, MongodbServer version) {
-        final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, DEFAULT_INSTANCE_NAME, version);
+    public static MongoDBInstance createUncachedStarted(Network network, MongoDBVersion version) {
+        final MongoDBInstance mongoDb = new MongoDBInstance(DEFAULT_INSTANCE_NAME, Lifecycle.CLASS, version, network, false, false);
         mongoDb.start();
         return mongoDb;
     }
 
-    public static MongoDBInstance createStartedWithUniqueName(Network network, Lifecycle lifecycle, MongodbServer version) {
-        final MongoDBInstance mongoDb = createWithNameAndVersion(network, lifecycle, UUID.randomUUID().toString(), version);
-        mongoDb.start();
-        return mongoDb;
-    }
-
-    private MongoDBInstance(String instanceName, Lifecycle lifecycle, MongodbServer version, Network network, final boolean closeNetwork) {
+    private MongoDBInstance(String instanceName, Lifecycle lifecycle, MongoDBVersion version, Network network, final boolean closeNetwork, final boolean cached) {
         this.lifecycle = lifecycle;
+        this.version = version;
         this.closeNetwork = closeNetwork;
         this.network = Optional.of(network);
 
-        switch (lifecycle) {
-            case VM:
-                this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
-                break;
-            case CLASS:
-                this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
-                break;
-            default:
-                throw new IllegalArgumentException("Support for lifecycle " + lifecycle.toString() + " not implemented yet");
+        if (cached) {
+            switch (lifecycle) {
+                case VM:
+                    this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
+                    break;
+                case CLASS:
+                    this.service = CACHED_SERVICE.computeIfAbsent(instanceName, k -> createContainer(version, network));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Support for lifecycle " + lifecycle.toString() + " not implemented yet");
+            }
+        } else {
+            this.service = createContainer(version, network);
         }
     }
 
-    private MongoDBTestService createContainer(MongodbServer version, Network network) {
+    private MongoDBTestService createContainer(MongoDBVersion version, Network network) {
         return MongoDBTestService.create(version, network);
     }
 
@@ -173,7 +167,7 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
     public void close() {
         try {
             service.close();
-            if(closeNetwork) {
+            if (closeNetwork) {
                 network.ifPresent(Network::close);
             }
         } catch (Exception e) {
@@ -193,5 +187,13 @@ public class MongoDBInstance extends ExternalResource implements AutoCloseable {
         } else {
             new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(resourceName))).importResources(service.mongoDatabase());
         }
+    }
+
+    public String version() {
+        return version.version();
+    }
+
+    public String instanceId() {
+        return service.instanceId();
     }
 }

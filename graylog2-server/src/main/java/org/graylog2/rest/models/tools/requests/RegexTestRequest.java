@@ -20,16 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class RegexTestRequest {
-    @JsonProperty
+    @JsonProperty("string")
     public abstract String string();
 
-    @JsonProperty
+    @JsonProperty("regex")
     public abstract String regex();
 
     @JsonCreator

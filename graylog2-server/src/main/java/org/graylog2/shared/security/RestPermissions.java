@@ -95,6 +95,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDEXSETS_DELETE = "indexsets:delete";
     public static final String INDEXSETS_EDIT = "indexsets:edit";
     public static final String INDEXSETS_READ = "indexsets:read";
+    public static final String INDEXSETS_FIELD_RESTRICTIONS_EDIT = "indexsets_field_restrictions:edit";
     public static final String INDICES_CHANGESTATE = "indices:changestate";
     public static final String INDICES_DELETE = "indices:delete";
     public static final String INDICES_FAILURES = "indices:failures";
@@ -118,6 +119,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String LOGGERS_READ = "loggers:read";
     public static final String LOGGERS_READSUBSYSTEM = "loggers:readsubsystem";
     public static final String LOGGERSMESSAGES_READ = "loggersmessages:read";
+    public static final String MCP_SERVER_ACCESS = "mcp_server:access";
     public static final String MESSAGECOUNT_READ = "messagecount:read";
     public static final String MESSAGES_ANALYZE = "messages:analyze";
     public static final String MESSAGES_READ = "messages:read";
@@ -139,6 +141,7 @@ public class RestPermissions implements PluginPermissions {
     public static final String ROLES_DELETE = "roles:delete";
     public static final String ROLES_EDIT = "roles:edit";
     public static final String ROLES_READ = "roles:read";
+    public static final String ROLES_ASSIGN = "roles:assign";
     public static final String SEARCHES_ABSOLUTE = "searches:absolute";
     public static final String SEARCHES_KEYWORD = "searches:keyword";
     public static final String SEARCHES_RELATIVE = "searches:relative";
@@ -180,8 +183,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDEX_SET_TEMPLATES_DELETE = "indexset_templates:delete";
     public static final String INDEX_SET_TEMPLATES_EDIT = "indexset_templates:edit";
     public static final String INDEX_SET_TEMPLATES_READ = "indexset_templates:read";
-    public static final String URL_WHITELIST_READ = "urlwhitelist:read";
-    public static final String URL_WHITELIST_WRITE = "urlwhitelist:write";
+    public static final String URL_ALLOWLIST_READ = "urlallowlist:read";
+    public static final String URL_ALLOWLIST_WRITE = "urlallowlist:write";
     public static final String USERS_CREATE = "users:create";
     public static final String USERS_EDIT = "users:edit";
     public static final String USERS_READ = "users:read";
@@ -282,6 +285,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(LOGGERS_READ, ""))
             .add(create(LOGGERS_READSUBSYSTEM, ""))
             .add(create(LOGGERSMESSAGES_READ, ""))
+            .add(create(MCP_SERVER_ACCESS, ""))
             .add(create(MESSAGECOUNT_READ, ""))
             .add(create(MESSAGES_ANALYZE, ""))
             .add(create(MESSAGES_READ, ""))
@@ -301,6 +305,7 @@ public class RestPermissions implements PluginPermissions {
             .add(create(ROLES_DELETE, ""))
             .add(create(ROLES_EDIT, ""))
             .add(create(ROLES_READ, ""))
+            .add(create(ROLES_ASSIGN, ""))
             .add(create(SEARCHES_ABSOLUTE, ""))
             .add(create(SEARCHES_KEYWORD, ""))
             .add(create(SEARCHES_RELATIVE, ""))
@@ -322,15 +327,15 @@ public class RestPermissions implements PluginPermissions {
             .add(create(THREADS_DUMP, ""))
             .add(create(PROCESSBUFFER_DUMP, ""))
             .add(create(THROUGHPUT_READ, ""))
-            .add(create(URL_WHITELIST_READ, ""))
-            .add(create(URL_WHITELIST_WRITE, ""))
+            .add(create(URL_ALLOWLIST_READ, ""))
+            .add(create(URL_ALLOWLIST_WRITE, ""))
             .add(create(USERS_CREATE, ""))
             .add(create(USERS_EDIT, "").withManageCapabilityFor(GRNTypes.USER))
             .add(create(USERS_READ, "").withViewCapabilityFor(GRNTypes.USER))
             .add(create(USERS_LIST, ""))
             .add(create(USERS_PASSWORDCHANGE, ""))
             .add(create(USERS_PERMISSIONSEDIT, ""))
-            .add(create(USERS_ROLESEDIT, ""))
+            .add(create(USERS_ROLESEDIT, "").withManageCapabilityFor(GRNTypes.USER))
             .add(create(USERS_TOKENCREATE, ""))
             .add(create(USERS_TOKENLIST, ""))
             .add(create(USERS_TOKENREMOVE, ""))
@@ -388,6 +393,9 @@ public class RestPermissions implements PluginPermissions {
             )),
             BuiltinRole.create("API Browser Reader", "Allows viewing the API browser page", ImmutableSet.of(
                     RestPermissions.API_BROWSER_READ
+            )),
+            BuiltinRole.create("MCP Server Access", "Allows access to the built-in MCP server (built-in)", ImmutableSet.of(
+                    RestPermissions.MCP_SERVER_ACCESS
             ))
     ).build();
 

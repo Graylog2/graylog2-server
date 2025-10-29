@@ -129,8 +129,6 @@ const BarVisualization = makeVisualization(
 
     const { eventChartData, shapes } = useEvents(config, data.events);
 
-    // const layout = shapes ? { ..._layout, shapes } : _layout;
-
     const chartData = useMemo(() => {
       const chartDataResult = eventChartData ? [..._chartDataResult, eventChartData] : _chartDataResult;
 
@@ -140,17 +138,17 @@ const BarVisualization = makeVisualization(
     const getChartLayoutSettingsWithCustomUnits = useChartLayoutSettingsWithCustomUnits({ config, chartData, barmode });
 
     const layout = useMemo<Partial<Layout>>(() => {
-      const _layouts: Partial<Layout> = {};
+      const _layouts: Partial<Layout> = getChartLayoutSettingsWithCustomUnits();
 
       if (shapes) {
-        _layouts.shapes = shapes;
+        _layouts.shapes = [...(_layouts.shapes ?? []), ...shapes];
       }
 
       if (barmode) {
         _layouts.barmode = barmode;
       }
 
-      return { ..._layouts, ...getChartLayoutSettingsWithCustomUnits() };
+      return _layouts;
     }, [shapes, barmode, getChartLayoutSettingsWithCustomUnits]);
 
     const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('bar', config);

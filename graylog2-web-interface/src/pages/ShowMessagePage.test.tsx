@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import { PluginManifest } from 'graylog-web-plugin/plugin';
 
 import { Messages } from '@graylog/server-api';
 
@@ -28,6 +28,7 @@ import { InputsActions } from 'stores/inputs/InputsStore';
 import StreamsContext from 'contexts/StreamsContext';
 import FetchError from 'logic/errors/FetchError';
 import suppressConsole from 'helpers/suppressConsole';
+import { usePlugin } from 'views/test/testPlugins';
 
 import ShowMessagePage from './ShowMessagePage';
 import { message, event, input } from './ShowMessagePage.fixtures';
@@ -88,10 +89,7 @@ describe('ShowMessagePage', () => {
   );
 
   useViewsPlugin();
-
-  beforeAll(() => PluginStore.register(testForwarderPlugin));
-
-  afterAll(() => PluginStore.unregister(testForwarderPlugin));
+  usePlugin(testForwarderPlugin);
 
   it('triggers a node list refresh on mount', async () => {
     mockGetInput.mockImplementation(() => Promise.resolve(input));
@@ -105,6 +103,16 @@ describe('ShowMessagePage', () => {
     asMock(InputsActions.get).mockResolvedValue(input);
 
     render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" />);
+
+    await screen.findByText(/Deprecated field/);
+    await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);
+    await screen.findByText(/"index": "graylog_5"/);
+  });
+
+  it('renders for generic message if streams are (yet) missing', async () => {
+    asMock(InputsActions.get).mockResolvedValue(input);
+
+    render(<SimpleShowMessagePage index="graylog_5" messageId="20f683d2-a874-11e9-8a11-0242ac130004" streams={null} />);
 
     await screen.findByText(/Deprecated field/);
     await screen.findByText(/"id": "20f683d2-a874-11e9-8a11-0242ac130004"/);

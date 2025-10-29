@@ -24,6 +24,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
+import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfigurationParams;
@@ -58,6 +59,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
+                new HdfsRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -96,6 +98,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeDirectories(tempDir),
                 config,
                 gcsRepositoryConfiguration,
+                new HdfsRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -107,6 +110,31 @@ class SearchableSnapshotsConfigurationBeanTest {
                 .hasSize(1)
                 .map(OpensearchKeystoreItem::key)
                 .contains("gcs.client.default.credentials_file");
+
+        Assertions.assertThat(configurationPart.properties())
+                .containsEntry("node.search.cache.size", "10gb");
+    }
+
+    @Test
+    void testHadoopDistributedFileStorage(@TempDir Path tempDir) throws ValidationException, RepositoryException {
+        final HdfsRepositoryConfiguration hdfsConfiguration = hdfsConfiguration(Map.of(
+                "hdfs_repository_enabled", "true"
+        ));
+
+        final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
+                datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                )),
+                datanodeDirectories(tempDir),
+                new S3RepositoryConfiguration(),
+                new GCSRepositoryConfiguration(),
+                hdfsConfiguration,
+                () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
+
+        final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
+
+        Assertions.assertThat(configurationPart.nodeRoles())
+                .contains(OpensearchNodeRole.SEARCH);
 
         Assertions.assertThat(configurationPart.properties())
                 .containsEntry("node.search.cache.size", "10gb");
@@ -132,6 +160,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
+                new HdfsRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -160,6 +189,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
+                new HdfsRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -190,6 +220,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
+                new HdfsRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 8L * 1024 * 1024 * 1024));
 
         // 10GB cache requested on 8GB of free space, needs to throw an exception!
@@ -214,6 +245,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
+                new HdfsRepositoryConfiguration(),
                 () -> new OpensearchUsableSpace(tempDir, 20L * 1024 * 1024 * 1024));
 
         final DatanodeConfigurationPart configurationPart = bean.buildConfigurationPart(emptyBuildParams(tempDir));
@@ -234,6 +266,12 @@ class SearchableSnapshotsConfigurationBeanTest {
 
     private S3RepositoryConfiguration s3Configuration(Map<String, String> properties) throws RepositoryException, ValidationException {
         final S3RepositoryConfiguration configuration = new S3RepositoryConfiguration();
+        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        return configuration;
+    }
+
+    private HdfsRepositoryConfiguration hdfsConfiguration(Map<String, String> properties) throws RepositoryException, ValidationException {
+        final HdfsRepositoryConfiguration configuration = new HdfsRepositoryConfiguration();
         new JadConfig(new InMemoryRepository(properties), configuration).process();
         return configuration;
     }

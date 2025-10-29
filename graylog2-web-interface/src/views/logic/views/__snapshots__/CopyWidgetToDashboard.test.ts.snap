@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`copyWidgetToDashboard should copy a widget to a dashboard 1`] = `
 {
@@ -14,35 +14,35 @@ exports[`copyWidgetToDashboard should copy a widget to a dashboard 1`] = `
         "highlighting": [],
       },
       "positions": Immutable.Map {
-        "dead-beef": {
-          "col": 1,
-          "height": 4,
-          "row": 1,
-          "width": 4,
-        },
         "546b13fe-eae7-4fb8-abb9-e0e3a907c3e6": {
           "col": 1,
           "height": 3,
-          "row": 9,
+          "row": 5,
           "width": "Infinity",
         },
         "32889f0b-fe5a-4f18-baa0-773869d49af3": {
           "col": 1,
           "height": 6,
-          "row": 14,
+          "row": 10,
           "width": "Infinity",
         },
         "8532ff94-2881-42b4-b26d-080d09305e95": {
           "col": 1,
           "height": 2,
-          "row": 12,
+          "row": 8,
           "width": "Infinity",
         },
         "a8058a41-34ea-4846-83d0-1acc2fbc1d7f": {
           "col": 1,
           "height": 4,
-          "row": 5,
+          "row": 1,
           "width": "Infinity",
+        },
+        "dead-beef": {
+          "col": 1,
+          "height": 4,
+          "row": 17,
+          "width": 4,
         },
       },
       "selected_fields": [

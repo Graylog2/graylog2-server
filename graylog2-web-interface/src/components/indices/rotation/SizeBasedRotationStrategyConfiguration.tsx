@@ -24,11 +24,13 @@ import NumberUtils from 'util/NumberUtils';
 type SizeBasedRotationStrategyConfigurationProps = {
   config: any;
   updateConfig: (...args: any[]) => void;
+  disabled?: boolean;
 };
 
 const SizeBasedRotationStrategyConfiguration = ({
   config,
   updateConfig,
+  disabled = false,
 }: SizeBasedRotationStrategyConfigurationProps) => {
   const { max_size } = config;
   const [maxSize, setMaxSize] = useState(max_size);
@@ -47,6 +49,7 @@ const SizeBasedRotationStrategyConfiguration = ({
   return (
     <div>
       <Input
+        disabled={disabled}
         type="number"
         id="max-size"
         label="Max size per index (in bytes)"

@@ -28,13 +28,15 @@ import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 import SidecarConfig from 'components/configurations/SidecarConfig';
 import EventsConfig from 'components/configurations/EventsConfig';
-import UrlWhiteListConfig from 'components/configurations/UrlWhiteListConfig';
+import UrlAllowListConfig from 'components/configurations/UrlAllowListConfig';
 import PermissionsConfig from 'components/configurations/PermissionsConfig';
 import PluginsConfig from 'components/configurations/PluginsConfig';
+import McpConfig from 'components/configurations/McpConfig';
 import 'components/maps/configurations';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { LinkContainer } from 'components/common/router';
 import useLocation from 'routing/useLocation';
+import MarkdownConfig from 'components/configurations/MarkdownConfig';
 
 import ConfigurationSection from './configurations/ConfigurationSection';
 import type { ConfigurationSectionProps } from './configurations/ConfigurationSection';
@@ -119,12 +121,12 @@ const ConfigurationsPage = () => {
           },
         },
         {
-          name: 'URL Whitelist',
-          hide: !isPermitted(currentUser.permissions, ['urlwhitelist:read']),
+          name: 'URL Allowlist',
+          hide: !isPermitted(currentUser.permissions, ['urlallowlist:read']),
           SectionComponent: ConfigurationSection,
           props: {
-            ConfigurationComponent: UrlWhiteListConfig,
-            title: 'URL Whitelist',
+            ConfigurationComponent: UrlAllowListConfig,
+            title: 'URL allowlist',
           },
         },
         {
@@ -145,10 +147,27 @@ const ConfigurationsPage = () => {
         },
         {
           name: 'Users',
+          hide: !isPermitted(currentUser.permissions, ['users:edit', 'users:tokencreate']),
           SectionComponent: ConfigurationSection,
           props: {
             ConfigurationComponent: UserConfig,
-            title: 'Index Set Defaults',
+            title: 'Users',
+          },
+        },
+        {
+          name: 'Markdown',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: MarkdownConfig,
+            title: 'Markdown',
+          },
+        },
+        {
+          name: 'MCP',
+          SectionComponent: ConfigurationSection,
+          props: {
+            ConfigurationComponent: McpConfig,
+            title: 'MCP',
           },
         },
         {

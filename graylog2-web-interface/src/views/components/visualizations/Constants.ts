@@ -22,3 +22,4 @@ export const TIME_AXIS_LABELS_QUANTITY = 4;
 export const NO_FIELD_NAME_SERIES = 'no_field_name_series';
 
 export const UNIT_FEATURE_FLAG = 'configurable_value_units';
+export const CANDIDATE_PICK_RADIUS = 10;

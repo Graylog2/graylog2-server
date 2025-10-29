@@ -34,6 +34,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
@@ -69,7 +70,8 @@ class ViewOwnershipToGrantsMigrationTest {
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
-               @Mock ViewSummaryService viewSummaryService) {
+               @Mock ViewSummaryService viewSummaryService,
+               @Mock EntitySourceService entitySourceService) {
 
         this.userService = userService;
         this.grantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
@@ -77,7 +79,7 @@ class ViewOwnershipToGrantsMigrationTest {
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         final EntityRegistrar entityRegistrar = new EntityRegistrar(grantService, grnRegistry,
                 () -> Set.of(new EntityOwnershipRegistrationHandler(grantService, grnRegistry)));
-        final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, viewSummaryService, mongoCollections);
+        final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, viewSummaryService, entitySourceService, mongoCollections);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -139,8 +141,9 @@ class ViewOwnershipToGrantsMigrationTest {
         public TestViewService(ClusterConfigService clusterConfigService,
                                EntityRegistrar entityRegistrar,
                                ViewSummaryService viewSummaryService,
+                               EntitySourceService entitySourceService,
                                MongoCollections mongoCollections) {
-            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, mongoCollections);
+            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, entitySourceService, mongoCollections);
         }
     }
 }

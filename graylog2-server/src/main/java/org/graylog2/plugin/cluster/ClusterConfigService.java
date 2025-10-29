@@ -52,7 +52,7 @@ public interface ClusterConfigService {
      * @return An instance of the raw persisted Java class or {@code null} if it couldn't be retrieved.
      */
     ClusterConfig getRaw(Class<?> key);
-
+    
     /**
      * Retrieve Java class of a certain type from the cluster configuration or return a default value
      * in case that failed.

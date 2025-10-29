@@ -17,12 +17,13 @@
 import type { SyntheticEvent } from 'react';
 import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
 import camelCase from 'lodash/camelCase';
 
 import { getValueFromInput } from 'util/FormsUtils';
 import { Input, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup } from 'components/bootstrap';
-import { TimezoneSelect, URLWhiteListInput, SourceCodeEditor } from 'components/common';
+import { TimezoneSelect, URLAllowListInput, SourceCodeEditor } from 'components/common';
 import type { SelectCallback } from 'components/bootstrap/types';
 import DocsHelper from 'util/DocsHelper';
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -207,7 +208,7 @@ class TeamsNotificationV2Form extends React.Component<TeamsNotificationFormV2Typ
 
     return (
       <>
-        <URLWhiteListInput
+        <URLAllowListInput
           label="Webhook URL"
           onChange={this.handleWebhookUrlChange}
           validationState={validation.errors.webhook_url ? 'error' : null}

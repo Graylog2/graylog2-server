@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.graylog</groupId>
         <artifactId>graylog-project-parent</artifactId>
-        <version>7.0.0-SNAPSHOT</version>
+        <version>7.1.0-SNAPSHOT</version>
         <relativePath>../graylog-project-parent</relativePath>
     </parent>
 
@@ -732,6 +732,12 @@
             <groupId>software.amazon.kinesis</groupId>
             <artifactId>amazon-kinesis-client</artifactId>
             <version>${aws-kinesis-client.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!-- end of additional integrations dependencies -->
 
@@ -766,11 +772,6 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.graylog.autovalue</groupId>
-            <artifactId>auto-value-javabean</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>info.leadinglight</groupId>
             <artifactId>jdot</artifactId>
         </dependency>
@@ -801,6 +802,26 @@
         <dependency>
             <groupId>io.grpc</groupId>
             <artifactId>grpc-services</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.modelcontextprotocol.sdk</groupId>
+            <artifactId>mcp-json-jackson2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-generator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-jackson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.victools</groupId>
+            <artifactId>jsonschema-module-jakarta-validation</artifactId>
         </dependency>
 
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
@@ -981,7 +1002,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.5.1</version>
+                    <version>3.6.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>

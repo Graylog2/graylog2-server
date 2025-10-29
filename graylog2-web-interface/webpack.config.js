@@ -19,7 +19,7 @@ const path = require('path');
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
 const supportedBrowsers = require('./supportedBrowsers');
 const core = require('./webpack/core');
@@ -34,7 +34,7 @@ process.env.BABEL_ENV = TARGET;
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 const coreConfig = core.config(TARGET, APP_PATH, ROOT_PATH, ROOT_PATH, supportedBrowsers);
 
-const webpackConfig = merge.smart(coreConfig, {
+const webpackConfig = merge(coreConfig, {
   name: 'app',
   dependencies: ['vendor'],
   entry: {

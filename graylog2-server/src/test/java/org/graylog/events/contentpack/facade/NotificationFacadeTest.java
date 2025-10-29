@@ -168,7 +168,7 @@ public class NotificationFacadeTest {
         when(jobDefinitionService.save(any(JobDefinitionDto.class))).thenReturn(jobDefinitionDto);
         final UserImpl kmerzUser = new UserImpl(
                 mock(PasswordAlgorithmFactory.class), new Permissions(ImmutableSet.of()),
-                mock(ClusterConfigService.class), ImmutableMap.of("username", "kmerz"));
+                mock(ClusterConfigService.class), objectMapper, ImmutableMap.of("username", "kmerz"));
         when(userService.load("kmerz")).thenReturn(kmerzUser);
 
         final NativeEntity<NotificationDto> nativeEntity = facade.createNativeEntity(
