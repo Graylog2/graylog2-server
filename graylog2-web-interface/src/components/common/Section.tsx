@@ -20,9 +20,7 @@ import { Collapse } from '@mantine/core';
 
 import useDisclosure from 'util/hooks/useDisclosure';
 
-import Icon from './Icon';
-
-import { Button } from '../bootstrap';
+import IconButton from './IconButton';
 
 const Container = styled.div<{ $collapsible: boolean; $opened: boolean }>(
   ({ $collapsible, $opened, theme }) => css`
@@ -85,7 +83,7 @@ const Section = ({
   defaultClosed = false,
   onCollapse = () => {},
   disableCollapseButton = false,
-  collapseButtonPosition = 'right',
+  collapseButtonPosition = 'left',
   children = null,
 }: Props) => {
   const [opened, { toggle }] = useDisclosure(!defaultClosed);
@@ -99,22 +97,27 @@ const Section = ({
 
   const collapseButton =
     collapsible && (
-      <Button
-        bsSize="sm"
-        bsStyle={opened ? 'primary' : 'default'}
-        onClick={toggle}
+      <IconButton
         data-testid="collapseButton"
         title={`Toggle ${title.toLowerCase()} section`}
-        disabled={disableCollapseButton}>
-        <Icon size="sm" name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-      </Button>
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (!disableCollapseButton) {
+            onToggle();
+          }
+        }}
+        disabled={disableCollapseButton}
+        name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+        size="lg"
+      />
     );
 
   return (
     <Container $opened={opened} $collapsible={collapsible}>
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
-          {collapseButtonPosition === 'left' && collapseButton}
+          {collapseButtonPosition !== 'right' && collapseButton}
           {preHeaderSection && (
             <FlexWrapper
               onClick={(e) => {
@@ -143,7 +146,7 @@ const Section = ({
               {actions}
             </div>
           )}
-          {collapseButtonPosition !== 'left' && collapseButton}
+          {collapseButtonPosition === 'right' && collapseButton}
         </FlexWrapper>
       </Header>
       {!collapsible && children}
