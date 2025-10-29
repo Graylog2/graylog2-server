@@ -483,7 +483,9 @@ public class MarkdownBuilder {
 
     @Override
     public String toString() {
-        if (this.isCodeBlockOpen) closeCodeBlock();
+        if (this.isCodeBlockOpen) {
+            closeCodeBlock();
+        }
         return sb.toString().trim() + "\n";
     }
 }
