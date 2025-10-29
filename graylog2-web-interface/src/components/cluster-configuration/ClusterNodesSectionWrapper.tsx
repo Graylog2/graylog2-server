@@ -24,8 +24,34 @@ const Container = styled.div`
     border: none;
   }
 
-  table thead {
+  table thead,
+  table thead tr,
+  table thead th {
     background-color: transparent !important;
+  }
+
+  table tbody {
+    background-color: transparent;
+  }
+
+  table tbody tr {
+    background-color: transparent;
+  }
+
+  table tbody tr:first-of-type {
+    background-color: transparent;
+  }
+
+  table tbody:nth-of-type(odd) tr:first-of-type {
+    background-color: ${({ theme }) => theme.colors.table.row.background} !important;
+  }
+
+  table tbody:nth-of-type(even) tr:first-of-type {
+    background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped} !important;
+  }
+
+  table tbody tr:hover:first-of-type {
+    background-color: ${({ theme }) => theme.colors.table.row.backgroundHover} !important;
   }
 `;
 
