@@ -34,7 +34,7 @@ public class TelemetrySubmissionPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(TelemetrySubmissionPeriodical.class);
     private final TelemetryClient telemetryClient;
     private final Map<String, TelemetryMetricSupplier> metricsProviders;
-    private static final Duration runPeriod = Duration.minutes(1);
+    private static final Duration runPeriod = Duration.days(1);
     private final boolean isEnabled;
 
     @Inject
