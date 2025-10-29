@@ -42,7 +42,7 @@ import {
   useSendWidgetEditTelemetry,
   useSendWidgetEditCancelTelemetry,
   useSendWidgetConfigUpdateTelemetry,
-} from 'views/components/widgets/telemety';
+} from 'views/components/widgets/telemetry';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
