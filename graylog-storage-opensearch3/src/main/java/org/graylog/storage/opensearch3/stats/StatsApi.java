@@ -25,6 +25,7 @@ import org.opensearch.client.opensearch.indices.IndicesStatsResponse;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStatsMetric;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -85,11 +86,14 @@ public class StatsApi {
                 .index(indices.stream().toList())
                 .metric(metrics);
         if (withShardLevel) {
-//            request.addParameter("level", "shards");
-//            request.addParameter("ignore_unavailable", "true");
+//            request.addParameter("ignore_unavailable", "true"); //TODO "ignore_unavailable" has no equivalent?
             builder = builder.level(Level.Shards);
         }
-        return client.sync().indices().stats(builder.build());
+        try {
+            return client.sync().indices().stats(builder.build());
+        } catch (IOException e) {
+            throw new RuntimeException(e); //TODO: wait for Matthias's mapper to be merged
+        }
     }
 
 
