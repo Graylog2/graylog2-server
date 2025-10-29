@@ -17,10 +17,7 @@
 
 import * as React from 'react';
 import styled from 'styled-components';
-
-import type { Column } from 'components/common/EntityDataTable';
 import CommonSortIcon from 'components/common/SortIcon';
-import type { Sort } from 'stores/PaginationTypes';
 
 const StyledCommonSortIcon = styled(CommonSortIcon)`
   display: inline-block;
@@ -39,30 +36,14 @@ const SORT_ORDER_NAMES = {
   desc: 'descending',
 };
 
-const SortIcon = ({
-  onChange,
-  activeSort,
-  header,
-}: {
-  onChange: (newSort: Sort) => void;
-  header: any;
-  activeSort: Sort | undefined;
-}) => {
-  // todo use tanstack query to maintain active sort
-  const columnSortIsActive = activeSort?.attributeId === header.id;
-  const nextSortDirection =
-    !columnSortIsActive || activeSort.direction === SORT_DIRECTIONS.DESC ? SORT_DIRECTIONS.ASC : SORT_DIRECTIONS.DESC;
-  const title = `Sort ${header.column.columnDef.header} ${SORT_ORDER_NAMES[nextSortDirection]}`;
-
-  const _onChange = () => {
-    onChange({ attributeId: column.id, direction: nextSortDirection });
-  };
+const SortIcon = ({ header }: { header: any }) => {
+  const nextSortDirection = header.column.getNextSortingOrder();
 
   return (
     <StyledCommonSortIcon
-      activeDirection={columnSortIsActive ? activeSort.direction : undefined}
-      onChange={_onChange}
-      title={title}
+      activeDirection={header.column.getIsSorted()}
+      onChange={() => header.column.toggleSorting()}
+      title={`Sort ${header.column.columnDef.header()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
       ascId={SORT_DIRECTIONS.ASC}
       descId={SORT_DIRECTIONS.DESC}
     />

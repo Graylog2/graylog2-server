@@ -279,6 +279,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               ? columnRenderersByAttribute[col.id].renderHeader(info)
               : col.title,
           size: columnsWidths[col.id],
+          enableSorting: col.sortable ?? false,
         }),
       ),
     [columnHelper, columnRenderersByAttribute, columns, columnsWidths, entityAttributesAreCamelCase, meta],
@@ -288,8 +289,17 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     data: entities,
     columns: _columns,
     getCoreRowModel: getCoreRowModel(),
+    manualSorting: true,
+    enableSortingRemoval: false,
     initialState: {
       columnOrder: columnsOrder,
+    },
+    state: {
+      sorting: activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : [],
+    },
+    onSortingChange: (newSortFn) => {
+      const newSort = newSortFn();
+      onSortChange({ attributeId: newSort[0].id, direction: newSort[0].desc ? 'desc' : 'asc' });
     },
   });
 
@@ -326,9 +336,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 columnsWidths={columnsWidths}
                 data={selectableData}
                 columnRenderersByAttribute={columnRenderersByAttribute}
-                onSortChange={onSortChange}
                 displayBulkSelectCol={displayBulkSelectCol}
-                activeSort={activeSort}
                 displayActionsCol={displayActionsCol}
               />
               {/*{entities.map((entity, index) => (*/}
