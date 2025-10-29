@@ -18,7 +18,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import { EntityDataTable, Section, Spinner } from 'components/common';
+import { EntityDataTable, Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import Routes from 'routing/Routes';
@@ -28,14 +28,12 @@ import type { DataNode } from 'components/datanode/Types';
 import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import type { SearchParams } from 'stores/PaginationTypes';
 
+import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
+
 const RoleLabel = styled(Label)`
   display: inline-flex;
   justify-content: center;
   gap: 4px;
-`;
-
-const TableWrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacings.xs};
 `;
 
 const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
@@ -72,6 +70,7 @@ const DataNodesExpandable = () => {
     refetch,
     isInitialLoading,
   } = useDataNodes(searchParams);
+
   const columnDefinitions = useMemo<Array<Column>>(
     () => [
       { id: 'node', title: 'Node' },
@@ -150,21 +149,19 @@ const DataNodesExpandable = () => {
   );
 
   return (
-    <Section title="Data Nodes" collapsible headerLeftSection={isInitialLoading && <Spinner />}>
-      <TableWrapper>
-        <EntityDataTable<DataNodeEntity>
-          entities={dataNodeEntities}
-          visibleColumns={visibleColumns}
-          columnsOrder={columnsOrder}
-          onColumnsChange={handleColumnsChange}
-          onSortChange={handleSortChange}
-          entityAttributesAreCamelCase
-          entityActions={renderActions}
-          columnDefinitions={columnDefinitions}
-          columnRenderers={columnRenderers}
-        />
-      </TableWrapper>
-    </Section>
+    <ClusterNodesSectionWrapper title="Data Nodes" headerLeftSection={isInitialLoading && <Spinner />}>
+      <EntityDataTable<DataNodeEntity>
+        entities={dataNodeEntities}
+        visibleColumns={visibleColumns}
+        columnsOrder={columnsOrder}
+        onColumnsChange={handleColumnsChange}
+        onSortChange={handleSortChange}
+        entityAttributesAreCamelCase
+        entityActions={renderActions}
+        columnDefinitions={columnDefinitions}
+        columnRenderers={columnRenderers}
+      />
+    </ClusterNodesSectionWrapper>
   );
 };
 

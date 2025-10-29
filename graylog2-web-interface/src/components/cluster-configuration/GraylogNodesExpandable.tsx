@@ -18,7 +18,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import { EntityDataTable, Section, Spinner } from 'components/common';
+import { EntityDataTable, Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import JournalState from 'components/nodes/JournalState';
@@ -29,6 +29,7 @@ import type { GraylogNode } from './useGraylogNodes';
 import GraylogNodeStatusLabel from './GraylogNodeStatusLabel';
 import GraylogNodeActions from './GraylogNodeActions';
 import JvmHeapUsageText from './JvmHeapUsageText';
+import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
 
 const SecondaryText = styled.div`
   span {
@@ -46,10 +47,6 @@ const NodePrimary = styled.div`
   display: flex;
   flex-direction: column;
   gap: 2px;
-`;
-
-const TableWrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacings.xs};
 `;
 
 const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
@@ -149,23 +146,25 @@ const GraylogNodesExpandable = () => {
 
   const renderActions = useCallback((entity: GraylogNodeEntity) => <GraylogNodeActions node={entity.nodeInfo} />, []);
 
+  if (!graylogNodeEntities.length && !isLoading) {
+    return null;
+  }
+
   return (
-    <Section title="Graylog Nodes" collapsible headerLeftSection={isLoading && <Spinner />}>
-      <TableWrapper>
-        <EntityDataTable<GraylogNodeEntity>
-          entities={graylogNodeEntities}
-          visibleColumns={visibleColumns}
-          columnsOrder={columnsOrder}
-          onColumnsChange={handleColumnsChange}
-          onSortChange={handleSortChange}
-          entityAttributesAreCamelCase
-          entityActions={renderActions}
-          columnDefinitions={columnDefinitions}
-          columnRenderers={columnRenderers}
-          actionsCellWidth={160}
-        />
-      </TableWrapper>
-    </Section>
+    <ClusterNodesSectionWrapper title="Graylog Nodes" headerLeftSection={isLoading && <Spinner />}>
+      <EntityDataTable<GraylogNodeEntity>
+        entities={graylogNodeEntities}
+        visibleColumns={visibleColumns}
+        columnsOrder={columnsOrder}
+        onColumnsChange={handleColumnsChange}
+        onSortChange={handleSortChange}
+        entityAttributesAreCamelCase
+        entityActions={renderActions}
+        columnDefinitions={columnDefinitions}
+        columnRenderers={columnRenderers}
+        actionsCellWidth={160}
+      />
+    </ClusterNodesSectionWrapper>
   );
 };
 
