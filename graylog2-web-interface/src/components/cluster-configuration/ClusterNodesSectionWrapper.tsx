@@ -23,6 +23,10 @@ const Container = styled.div`
   > div {
     border: none;
   }
+
+  table thead {
+    background-color: transparent !important;
+  }
 `;
 
 const TableWrapper = styled.div`
