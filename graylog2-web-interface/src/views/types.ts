@@ -278,7 +278,6 @@ type MessageAugmentation = {
 
 type MessageDetailContextProviderProps = {
   message: Message;
-  messageFields?: FieldTypeMappingsList;
 };
 
 type DashboardActionComponentProps<T> = {
