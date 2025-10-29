@@ -153,7 +153,7 @@ public class CloudTrailInput extends MessageInput {
                     "Polling interval",
                     1,
                     "Determines how often Graylog will check for SQS notifications. The smallest allowable interval is 1 minute.",
-                    ConfigurationField.Optional.NOT_OPTIONAL));
+                    ConfigurationField.Optional.OPTIONAL));
             r.addField(new TextField(
                     CK_ASSUME_ROLE_ARN,
                     "AWS assume role ARN",

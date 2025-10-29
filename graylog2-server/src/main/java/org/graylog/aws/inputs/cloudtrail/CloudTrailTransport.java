@@ -114,7 +114,7 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
         LOG.debug("Using SQS region: {}, S3 region: {}", sqsRegionName, s3RegionName);
 
         final String sqsQueueName = input.getConfiguration().getString(CK_CLOUDTRAIL_QUEUE_NAME);
-        long pollingInterval = input.getConfiguration().getInt(CK_POLLING_INTERVAL);
+        long pollingInterval = input.getConfiguration().getInt(CK_POLLING_INTERVAL,5);
 
         // Use SQS region for authentication
         final AWSRequest awsRequest = AWSRequestImpl.builder()
