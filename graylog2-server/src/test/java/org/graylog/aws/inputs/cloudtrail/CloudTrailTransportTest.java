@@ -150,7 +150,7 @@ public class CloudTrailTransportTest {
         ArgumentCaptor<TimeUnit> timeUnitCaptor = ArgumentCaptor.forClass(TimeUnit.class);
 
         verify(sqsClientFactory, times(1)).create(any(), eq(TEST_REGION),
-                isA(AwsCredentialsProvider.class), eq(mockInputFailureRecorder));
+                isA(AwsCredentialsProvider.class), any(), eq(mockInputFailureRecorder));
         verify(mockExecutorService, times(1)).scheduleWithFixedDelay(taskCaptor.capture(),
                 initialDelayCaptor.capture(), intervalCaptor.capture(), timeUnitCaptor.capture());
 

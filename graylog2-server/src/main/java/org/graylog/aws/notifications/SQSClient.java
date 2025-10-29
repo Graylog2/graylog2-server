@@ -18,11 +18,14 @@ package org.graylog.aws.notifications;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import jakarta.annotation.Nullable;
 import org.graylog.aws.sqs.ObjectCreatedPutParseException;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
+import software.amazon.awssdk.http.apache.ProxyConfiguration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
@@ -31,6 +34,7 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
+import java.net.URI;
 import java.util.List;
 
 public class SQSClient {
@@ -42,10 +46,18 @@ public class SQSClient {
     private final InputFailureRecorder inputFailureRecorder;
 
     public SQSClient(String queueName, String region, AwsCredentialsProvider authProvider, ObjectMapper objectMapper,
-                     InputFailureRecorder inputFailureRecorder) {
+                     InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
         SqsClientBuilder clientBuilder = SqsClient.builder()
                 .region(Region.of(region))
                 .credentialsProvider(authProvider);
+        
+        if (proxyUri != null) {
+            clientBuilder.httpClientBuilder(ApacheHttpClient.builder()
+                    .proxyConfiguration(ProxyConfiguration.builder()
+                            .endpoint(proxyUri)
+                            .build()));
+        }
+        
         this.sqs = clientBuilder.build();
         this.queueName = queueName;
         this.objectMapper = objectMapper;

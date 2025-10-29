@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.assistedinject.Assisted;
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.aws.inputs.cloudtrail.external.CloudTrailClientFactory;
@@ -47,6 +48,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
+import java.net.URI;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -73,6 +75,7 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
     private final ObjectMapper objectMapper;
     private ScheduledFuture runningTask = null;
     private final AtomicBoolean interrupt;
+    private final URI httpProxyUri;
 
     @Inject
     public CloudTrailTransport(@Assisted Configuration configuration,
@@ -81,7 +84,8 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
                                CloudTrailClientFactory cloudTrailClientFactory,
                                SQSClientFactory sqsClientFactory,
                                AWSClientBuilderUtil awsUtils,
-                               @Named("daemonScheduler") ScheduledExecutorService executorService) {
+                               @Named("daemonScheduler") ScheduledExecutorService executorService,
+                               @Named("http_proxy_uri") @Nullable URI httpProxyUri) {
         super(eventBus, configuration);
         this.localRegistry = localRegistry;
         this.sqsClientFactory = sqsClientFactory;
@@ -90,6 +94,7 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
         this.interrupt = new AtomicBoolean(false);
         this.objectMapper = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         this.cloudTrailClientFactory = cloudTrailClientFactory;
+        this.httpProxyUri = httpProxyUri;
     }
 
     @Override
@@ -124,10 +129,10 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
                 .assumeRoleArn(assumeRoleArn).build();
         final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
 
-        // Create SQS client with SQS region
-        SQSClient sqsClient = sqsClientFactory.create(sqsQueueName, sqsRegionName, credentialsProvider, inputFailureRecorder);
-        // Create S3 client with S3 region
-        CloudTrailS3Client cloudTrailS3Client = cloudTrailClientFactory.getS3Client(s3RegionName, credentialsProvider, inputFailureRecorder);
+        // Create SQS client with SQS region and proxy
+        SQSClient sqsClient = sqsClientFactory.create(sqsQueueName, sqsRegionName, credentialsProvider, httpProxyUri, inputFailureRecorder);
+        // Create S3 client with S3 region and proxy
+        CloudTrailS3Client cloudTrailS3Client = cloudTrailClientFactory.getS3Client(s3RegionName, credentialsProvider, inputFailureRecorder, httpProxyUri);
         LOG.debug("Constructing poller task");
 
         CloudTrailPollerTask pollerTask = new CloudTrailPollerTask(input,

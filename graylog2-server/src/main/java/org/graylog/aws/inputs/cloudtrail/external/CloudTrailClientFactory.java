@@ -65,13 +65,13 @@ public class CloudTrailClientFactory {
     }
 
     public CloudTrailS3Client getS3Client(String awsRegion, AwsCredentialsProvider credentialsProvider,
-                                          InputFailureRecorder inputFailureRecorder) {
-        return getS3Client(null, awsRegion, credentialsProvider, inputFailureRecorder);
+                                          InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
+        return getS3Client(null, awsRegion, credentialsProvider, inputFailureRecorder, proxyUri);
     }
 
     @VisibleForTesting
     CloudTrailS3Client getS3Client(@Nullable URI endpoint, String awsRegion, AwsCredentialsProvider credentialsProvider,
-                                   InputFailureRecorder inputFailureRecorder) {
-        return new CloudTrailS3Client(endpoint, awsRegion, credentialsProvider, inputFailureRecorder);
+                                   InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
+        return new CloudTrailS3Client(endpoint, awsRegion, credentialsProvider, inputFailureRecorder, proxyUri);
     }
 }

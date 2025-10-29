@@ -16,17 +16,18 @@
  */
 package org.graylog.aws.inputs.cloudtrail.external;
 
+import jakarta.annotation.Nullable;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.Tools;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
+import software.amazon.awssdk.http.apache.ProxyConfiguration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URI;
 
@@ -38,11 +39,18 @@ public class CloudTrailS3Client {
     private final S3Client s3Client;
 
     public CloudTrailS3Client(@Nullable URI endpointOverride, String awsRegion, AwsCredentialsProvider credentialsProvider,
-                              InputFailureRecorder inputFailureRecorder) {
+                              InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
         this.inputFailureRecorder = inputFailureRecorder;
 
+        final ApacheHttpClient.Builder httpClientBuilder = ApacheHttpClient.builder();
+        if (proxyUri != null) {
+            httpClientBuilder.proxyConfiguration(ProxyConfiguration.builder()
+                    .endpoint(proxyUri)
+                    .build());
+        }
+
         final S3ClientBuilder clientBuilder = S3Client.builder()
-                .httpClientBuilder(ApacheHttpClient.builder())
+                .httpClientBuilder(httpClientBuilder)
                 .region(Region.of(awsRegion))
                 .credentialsProvider(credentialsProvider);
 
