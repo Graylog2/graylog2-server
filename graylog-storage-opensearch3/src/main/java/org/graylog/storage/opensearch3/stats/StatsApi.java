@@ -18,29 +18,26 @@ package org.graylog.storage.opensearch3.stats;
 
 import jakarta.inject.Inject;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.opensearch.client.opensearch._types.Level;
+import org.opensearch.client.opensearch._types.StoreStats;
 import org.opensearch.client.opensearch.indices.IndicesStatsRequest;
 import org.opensearch.client.opensearch.indices.IndicesStatsResponse;
+import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStatsMetric;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class StatsApi {
 
-    @Deprecated
-    private final OpenSearchClient oldClient;
     private final OfficialOpensearchClient client;
 
     @Inject
-    public StatsApi(final OpenSearchClient oldClient,
-                    final OfficialOpensearchClient client) {
-        this.oldClient = oldClient;
+    public StatsApi(final OfficialOpensearchClient client) {
         this.client = client;
     }
 
@@ -71,12 +68,13 @@ public class StatsApi {
 
     public long storeSizes(String index) {
         final IndicesStatsResponse stats = stats(Collections.singleton(index), List.of(IndicesStatsMetric.Store), false);
-        final long sizeInBytes = stats.indices()
-                .get(index)
-                .primaries()
-                .store()
-                .sizeInBytes();
-        return sizeInBytes;
+        return Optional.ofNullable(
+                        stats.indices()
+                                .get(index)
+                                .primaries()
+                                .store()
+                ).map(StoreStats::sizeInBytes)
+                .orElse(0L);
     }
 
     private IndicesStatsResponse stats(Collection<String> indices,
@@ -89,11 +87,9 @@ public class StatsApi {
 //            request.addParameter("ignore_unavailable", "true"); //TODO "ignore_unavailable" has no equivalent?
             builder = builder.level(Level.Shards);
         }
-        try {
-            return client.sync().indices().stats(builder.build());
-        } catch (IOException e) {
-            throw new RuntimeException(e); //TODO: wait for Matthias's mapper to be merged
-        }
+        final IndicesStatsRequest indicesStatsRequest = builder.build();
+        final OpenSearchIndicesClient indicesClient = client.sync().indices();
+        return client.execute(() -> indicesClient.stats(indicesStatsRequest), "Unable to retrieve stats for indices");
     }
 
 

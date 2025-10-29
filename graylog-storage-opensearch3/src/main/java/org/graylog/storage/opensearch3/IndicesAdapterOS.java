@@ -107,8 +107,8 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import static org.graylog.storage.opensearch3.OpenSearchClient.withTimeout;
 
-public class IndicesAdapterOS2 implements IndicesAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS2.class);
+public class IndicesAdapterOS implements IndicesAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(IndicesAdapterOS.class);
     private final OpenSearchClient client;
     private final StatsApi statsApi;
     private final ClusterStatsApi clusterStatsApi;
@@ -124,14 +124,14 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final int MAX_INDICES_URL_LENGTH = 3000;
 
     @Inject
-    public IndicesAdapterOS2(OpenSearchClient client,
-                             StatsApi statsApi,
-                             ClusterStatsApi clusterStatsApi,
-                             CatApi catApi,
-                             ClusterStateApi clusterStateApi,
-                             IndexTemplateAdapter indexTemplateAdapter,
-                             IndexStatisticsBuilder indexStatisticsBuilder,
-                             ObjectMapper objectMapper) {
+    public IndicesAdapterOS(OpenSearchClient client,
+                            StatsApi statsApi,
+                            ClusterStatsApi clusterStatsApi,
+                            CatApi catApi,
+                            ClusterStateApi clusterStateApi,
+                            IndexTemplateAdapter indexTemplateAdapter,
+                            IndexStatisticsBuilder indexStatisticsBuilder,
+                            ObjectMapper objectMapper) {
         this.client = client;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;

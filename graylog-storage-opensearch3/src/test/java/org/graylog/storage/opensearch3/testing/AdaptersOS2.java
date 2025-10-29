@@ -23,7 +23,7 @@ import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
 import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS2;
 import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
-import org.graylog.storage.opensearch3.IndicesAdapterOS2;
+import org.graylog.storage.opensearch3.IndicesAdapterOS;
 import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS2;
@@ -79,8 +79,8 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
-        return new IndicesAdapterOS2(client,
-                new org.graylog.storage.opensearch3.stats.StatsApi(client, officialOpensearchClient),
+        return new IndicesAdapterOS(client,
+                new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch3.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),
