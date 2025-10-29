@@ -27,7 +27,6 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -49,6 +48,8 @@ import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+// need to suppress because we use the test parameters in the test name format string
+@SuppressWarnings("unused")
 public class CEFCodecFixturesTest {
     private final MessageFactory messageFactory = new TestMessageFactory();
 
@@ -110,31 +111,28 @@ public class CEFCodecFixturesTest {
         return fixtures;
     }
 
-    private Fixture fixture;
-    private RawMessage rawMessage;
-    private Message message;
-
-    @SuppressWarnings("unused")
-    public void initCEFCodecFixturesTest(Fixture fixture, String fileName, String description) {
-        this.fixture = fixture;
-
+    /**
+     * JUnit does not support injecting parameters from parameterized tests into its lifecycle methods.
+     * Those are meant to set up things that are independent of actual tests, so we need to have a helper method.
+     *
+     * @param fixture the current fixture
+     * @return the parsed message
+     */
+    private Message initCEFCodecFixturesTest(Fixture fixture) {
         final byte[] bytes = fixture.testString.getBytes(StandardCharsets.UTF_8);
         final InetSocketAddress remoteAddress = fixture.remoteAddress == null ? null : new InetSocketAddress(fixture.remoteAddress, 0);
-        this.rawMessage = new RawMessage(bytes, remoteAddress);
-    }
-
-    @BeforeEach
-    public void setUp() {
+        final RawMessage rawMessage = new RawMessage(bytes, remoteAddress);
         final CEFCodec codec = new CEFCodec(new Configuration(fixture.codecConfiguration), messageFactory);
 
-        message = codec.decodeSafe(rawMessage).get();
-        assertThat(message).isNotNull();
+        var message = codec.decodeSafe(rawMessage);
+        assertThat(message).isPresent();
+        return message.get();
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void timestamp(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
+        var message = initCEFCodecFixturesTest(fixture);
         if (fixture.expectedTimestamp != null) {
             assertThat(message.getTimestamp().toDate()).isEqualTo(fixture.expectedTimestamp);
         }
@@ -143,13 +141,13 @@ public class CEFCodecFixturesTest {
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void source(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
+        var message = initCEFCodecFixturesTest(fixture);
         if (fixture.expectedSource != null) {
             assertThat(message.getSource()).isEqualTo(fixture.expectedSource);
         }
     }
 
-    private void containsEntry(String name, Object value) {
+    private void containsEntry(Message message, String name, Object value) {
         if (value != null) {
             assertThat(message.getFields()).containsEntry(name, value);
         }
@@ -158,49 +156,49 @@ public class CEFCodecFixturesTest {
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void deviceVendor(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
-        containsEntry("device_vendor", fixture.deviceVendor);
+        var message = initCEFCodecFixturesTest(fixture);
+        containsEntry(message, "device_vendor", fixture.deviceVendor);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void deviceProduct(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
-        containsEntry("device_product", fixture.deviceProduct);
+        var message = initCEFCodecFixturesTest(fixture);
+        containsEntry(message, "device_product", fixture.deviceProduct);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void deviceVersion(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
-        containsEntry("device_version", fixture.deviceVersion);
+        var message = initCEFCodecFixturesTest(fixture);
+        containsEntry(message, "device_version", fixture.deviceVersion);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void deviceEventClassId(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
-        containsEntry("event_class_id", fixture.deviceEventClassId);
+        var message = initCEFCodecFixturesTest(fixture);
+        containsEntry(message, "event_class_id", fixture.deviceEventClassId);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void name(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
-        containsEntry("name", fixture.name);
+        var message = initCEFCodecFixturesTest(fixture);
+        containsEntry(message, "name", fixture.name);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void severity(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
-        containsEntry("severity", fixture.severity);
+        var message = initCEFCodecFixturesTest(fixture);
+        containsEntry(message, "severity", fixture.severity);
     }
 
     @MethodSource("data")
     @ParameterizedTest(name = "[{1}] {2}")
     public void extensions(Fixture fixture, String fileName, String description) throws Exception {
-        initCEFCodecFixturesTest(fixture, fileName, description);
+        var message = initCEFCodecFixturesTest(fixture);
         final Map<String, Object> extensions = fixture.extensions;
         if (!extensions.isEmpty()) {
             for (Map.Entry<String, Object> extension : extensions.entrySet()) {
