@@ -21,9 +21,9 @@ import { MessageDetailsDefinitionList } from 'components/common';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import usePluginEntities from 'hooks/usePluginEntities';
-import type { MessageFieldsComponentProps } from 'views/types';
 import useFeature from 'hooks/useFeature';
+import MessageFieldsViewMode from 'views/components/messagelist/MessageFields/MessageFieldsViewMode';
+import type { MessageFieldsComponentProps } from 'views/components/messagelist/MessageFields/types';
 
 export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
@@ -50,23 +50,18 @@ export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponent
   return <MessageDetailsDL className="message-details-fields">{renderedFields}</MessageDetailsDL>;
 };
 
-const usePluggableMessageFieldsComponent = (): React.ComponentType<MessageFieldsComponentProps> => {
-  const pluggableMessageFields = usePluginEntities('views.components.widgets.messageTable.messageFields');
+const useMessageFieldsComponent = (): React.ComponentType<MessageFieldsComponentProps> => {
   const featureEnabled = useFeature('message_table_favorite_fields');
 
-  const pluggableItems = pluggableMessageFields.filter((messageFields) =>
-    messageFields.useCondition ? !!messageFields.useCondition() : true,
-  );
-
-  if (pluggableItems?.length && featureEnabled) return pluggableItems[0].component;
+  if (featureEnabled) return MessageFieldsViewMode;
 
   return DefaultMessageFields;
 };
 
 const MessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
-  const PluggableMessageFieldsComponent = usePluggableMessageFieldsComponent();
+  const MessageFieldsComponent = useMessageFieldsComponent();
 
-  return <PluggableMessageFieldsComponent message={message} fields={fields} />;
+  return <MessageFieldsComponent message={message} fields={fields} />;
 };
 
 export default MessageFields;

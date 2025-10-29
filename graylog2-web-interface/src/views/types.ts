@@ -571,11 +571,6 @@ type MarkdownAugmentation = {
   component: React.ComponentType<{ value: string }>;
 };
 
-export type MessageFieldsComponentProps = {
-  message: Message;
-  fields: FieldTypeMappingsList;
-};
-
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -604,15 +599,6 @@ declare module 'graylog-web-plugin/plugin' {
     >;
     'views.components.widgets.messageTable.contextProviders'?: Array<React.ComponentType<React.PropsWithChildren<{}>>>;
     'views.components.widgets.messageTable.messageActions'?: Array<{
-      component: React.ComponentType<MessageActionComponentProps>;
-      key: string;
-      useCondition: () => boolean;
-    }>;
-    'views.components.widgets.messageTable.messageFields'?: Array<{
-      component: React.ComponentType<MessageFieldsComponentProps>;
-      useCondition: () => boolean;
-    }>;
-    'views.components.widgets.messageTable.configurationActions'?: Array<{
       component: React.ComponentType<MessageActionComponentProps>;
       key: string;
       useCondition: () => boolean;

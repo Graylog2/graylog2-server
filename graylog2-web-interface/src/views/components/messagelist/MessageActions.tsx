@@ -29,7 +29,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
-import useFeature from 'hooks/useFeature';
+import MessageEditFieldConfigurationAction from 'views/components/messagelist/MessageFields/MessageEditFieldConfigurationAction';
 
 const TestAgainstStreamButton = ({
   streams,
@@ -82,17 +82,6 @@ const usePluggableMessageActions = (id: string, index: string) => {
     .map(({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />);
 };
 
-const usePluggableMessageConfigurationActions = (id: string, index: string) => {
-  const featureEnabled = useFeature('message_table_favorite_fields');
-  const pluggableMenuActions = usePluginEntities('views.components.widgets.messageTable.configurationActions');
-
-  if (!featureEnabled) return null;
-
-  return pluggableMenuActions
-    .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
-    .map(({ component: PluggableMenuAction, key }) => <PluggableMenuAction key={key} id={id} index={index} />);
-};
-
 type Props = {
   index: string;
   id: string;
@@ -123,7 +112,6 @@ const MessageActions = ({
   searchConfig,
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
-  const pluggableConfigurationActions = usePluggableMessageConfigurationActions(id, index);
 
   if (disabled) {
     return <ButtonGroup />;
@@ -156,7 +144,7 @@ const MessageActions = ({
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
-      {pluggableConfigurationActions}
+      <MessageEditFieldConfigurationAction />
     </ButtonGroup>
   );
 };
