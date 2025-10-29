@@ -17,9 +17,9 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -67,6 +67,7 @@ import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cat.CatApi;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
+import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
 import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -84,6 +85,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,10 +95,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -113,6 +115,8 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     private final CatApi catApi;
     private final ClusterStateApi clusterStateApi;
     private final IndexTemplateAdapter indexTemplateAdapter;
+    private final IndexStatisticsBuilder indexStatisticsBuilder;
+    private final ObjectMapper objectMapper;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
@@ -125,13 +129,17 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
                              ClusterStatsApi clusterStatsApi,
                              CatApi catApi,
                              ClusterStateApi clusterStateApi,
-                             IndexTemplateAdapter indexTemplateAdapter) {
+                             IndexTemplateAdapter indexTemplateAdapter,
+                             IndexStatisticsBuilder indexStatisticsBuilder,
+                             ObjectMapper objectMapper) {
         this.client = client;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;
         this.catApi = catApi;
         this.clusterStateApi = clusterStateApi;
         this.indexTemplateAdapter = indexTemplateAdapter;
+        this.indexStatisticsBuilder = indexStatisticsBuilder;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -361,12 +369,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public long numberOfMessages(String index) {
-        final JsonNode result = statsApi.indexStats(index);
-        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
-        if (count.isMissingNode()) {
-            throw new RuntimeException("Unable to extract count from response.");
-        }
-        return count.asLong();
+        return statsApi.numberOfMessagesInIndex(index);
     }
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {
@@ -405,34 +408,34 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
     }
 
     @Override
-    public Set<IndexStatistics> indicesStats(Collection<String> indices) {
-        final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
-
-        final JsonNode allWithShardLevel = statsApi.indexStatsWithShardLevel(indices);
-        final Iterator<Map.Entry<String, JsonNode>> fields = allWithShardLevel.fields();
-        while (fields.hasNext()) {
-            final Map.Entry<String, JsonNode> entry = fields.next();
-            final String index = entry.getKey();
-            final JsonNode indexStats = entry.getValue();
-            if (indexStats.isObject()) {
-                result.add(IndexStatistics.create(index, indexStats));
-            }
-        }
-
-        return result.build();
+    public Set<IndexStatistics> indicesStats(final Collection<String> indices) {
+        return statsApi.indexStatsWithShardLevel(indices).entrySet()
+                .stream()
+                .map(entry -> {
+                    final String index = entry.getKey();
+                    final IndicesStats indexStats = entry.getValue();
+                    if (indexStats != null) {
+                        return indexStatisticsBuilder.build(index, indexStats);
+                    } else {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
     }
 
     @Override
-    public Optional<IndexStatistics> getIndexStats(String index) {
-        final JsonNode indexStats = statsApi.indexStatsWithShardLevel(index);
-        return indexStats.isMissingNode()
+    public Optional<IndexStatistics> getIndexStats(final String index) {
+        final IndicesStats indicesStats = statsApi.indexStatsWithShardLevel(index);
+        return indicesStats == null
                 ? Optional.empty()
-                : Optional.of(IndexStatistics.create(index, indexStats));
+                : Optional.of(indexStatisticsBuilder.build(index, indicesStats));
     }
 
     @Override
     public JsonNode getIndexStats(Collection<String> indices) {
-        return statsApi.indexStatsWithDocsAndStore(indices);
+        final Map<String, IndicesStats> stringIndicesStatsMap = statsApi.indexStatsWithDocsAndStore(indices);
+        return objectMapper.convertValue(stringIndicesStatsMap, JsonNode.class);
     }
 
     @Override
@@ -484,7 +487,7 @@ public class IndicesAdapterOS2 implements IndicesAdapter {
 
     @Override
     public Optional<Long> storeSizeInBytes(String index) {
-        return statsApi.storeSizes(index);
+        return Optional.of(statsApi.storeSizes(index));
     }
 
     @Override

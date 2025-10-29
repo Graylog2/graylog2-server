@@ -16,100 +16,81 @@
  */
 package org.graylog.storage.opensearch3.stats;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableSet;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-import org.graylog.storage.opensearch3.OpenSearchClient;
-
 import jakarta.inject.Inject;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog.storage.opensearch3.OpenSearchClient;
+import org.opensearch.client.opensearch._types.Level;
+import org.opensearch.client.opensearch.indices.IndicesStatsRequest;
+import org.opensearch.client.opensearch.indices.IndicesStatsResponse;
+import org.opensearch.client.opensearch.indices.stats.IndicesStats;
+import org.opensearch.client.opensearch.indices.stats.IndicesStatsMetric;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.List;
+import java.util.Map;
 
 public class StatsApi {
-    private final ObjectMapper objectMapper;
-    private final OpenSearchClient client;
+
+    @Deprecated
+    private final OpenSearchClient oldClient;
+    private final OfficialOpensearchClient client;
 
     @Inject
-    public StatsApi(ObjectMapper objectMapper,
-                    OpenSearchClient client) {
-        this.objectMapper = objectMapper;
+    public StatsApi(final OpenSearchClient oldClient,
+                    final OfficialOpensearchClient client) {
+        this.oldClient = oldClient;
         this.client = client;
     }
 
-    public JsonNode indexStats(String index) {
-        return stats(index);
+    public long numberOfMessagesInIndex(final String index) {
+        return stats(
+                Collections.singleton(index),
+                List.of(),
+                false
+        ).all()
+                .primaries()
+                .docs()
+                .count();
     }
 
-    public JsonNode indexStatsWithShardLevel(String index) {
-        return indexStatsWithShardLevel(Collections.singleton(index)).path(index);
+    public IndicesStats indexStatsWithShardLevel(final String index) {
+        return indexStatsWithShardLevel(Collections.singleton(index)).get(index);
     }
 
-    public JsonNode indexStatsWithShardLevel(Collection<String> indices) {
-        final JsonNode stats = stats(indices, request -> {
-            request.addParameter("level", "shards");
-            request.addParameter("ignore_unavailable", "true");
-        });
-
-        return stats.path("indices");
+    public Map<String, IndicesStats> indexStatsWithShardLevel(Collection<String> indices) {
+        final IndicesStatsResponse stats = stats(indices, List.of(), true);
+        return stats.indices();
     }
 
-    public JsonNode indexStatsWithDocsAndStore(Collection<String> indices) {
-        final JsonNode stats = stats(indices, ImmutableSet.of("store", "docs"));
-
-        return stats.path("indices");
+    public Map<String, IndicesStats> indexStatsWithDocsAndStore(Collection<String> indices) {
+        final IndicesStatsResponse stats = stats(indices, List.of(IndicesStatsMetric.Store, IndicesStatsMetric.Docs), false);
+        return stats.indices();
     }
 
-    public Optional<Long> storeSizes(String index) {
-        final JsonNode stats = stats(Collections.singleton(index), Collections.singleton("store"));
-        final JsonNode sizeInBytes = stats.path("indices")
-                .path(index)
-                .path("primaries")
-                .path("store")
-                .path("size_in_bytes");
-        return Optional.of(sizeInBytes).filter(JsonNode::isNumber).map(JsonNode::asLong);
+    public long storeSizes(String index) {
+        final IndicesStatsResponse stats = stats(Collections.singleton(index), List.of(IndicesStatsMetric.Store), false);
+        final long sizeInBytes = stats.indices()
+                .get(index)
+                .primaries()
+                .store()
+                .sizeInBytes();
+        return sizeInBytes;
     }
 
-    private JsonNode stats(String index) {
-        return stats(Collections.singleton(index), Collections.emptySet(), (request) -> {});
-    }
-
-    private JsonNode stats(Collection<String> indices,
-                           Collection<String> metrics) {
-        return stats(indices, metrics, (request) -> {});
-    }
-
-    private JsonNode stats(Collection<String> indices,
-                           Consumer<Request> fn) {
-        return stats(indices, Collections.emptySet(), fn);
-    }
-
-    private JsonNode stats(Collection<String> indices,
-                           Collection<String> metrics,
-                           Consumer<Request> prepareRequest) {
-        final StringBuilder endpoint = new StringBuilder();
-        if (!indices.isEmpty()) {
-            final String joinedIndices = String.join(",", indices);
-            endpoint.append("/");
-            endpoint.append(joinedIndices);
+    private IndicesStatsResponse stats(Collection<String> indices,
+                                       List<IndicesStatsMetric> metrics,
+                                       boolean withShardLevel) {
+        IndicesStatsRequest.Builder builder = IndicesStatsRequest.builder()
+                .index(indices.stream().toList())
+                .metric(metrics);
+        if (withShardLevel) {
+//            request.addParameter("level", "shards");
+//            request.addParameter("ignore_unavailable", "true");
+            builder = builder.level(Level.Shards);
         }
-        endpoint.append("/_stats");
-        if (!metrics.isEmpty()) {
-            final String joinedMetrics = String.join(",", metrics);
-            endpoint.append("/");
-            endpoint.append(joinedMetrics);
-        }
-
-        final Request request = new Request("GET", endpoint.toString());
-        prepareRequest.accept(request);
-        return client.execute((c, requestOptions) -> {
-            request.setOptions(requestOptions);
-            final Response response = c.getLowLevelClient().performRequest(request);
-            return objectMapper.readTree(response.getEntity().getContent());
-        }, "Unable to retrieve index stats for " + String.join(",", indices));
+        return client.sync().indices().stats(builder.build());
     }
+
+
 }
