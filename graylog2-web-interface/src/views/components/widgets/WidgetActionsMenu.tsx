@@ -24,7 +24,6 @@ import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadAsDashboard, loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -50,6 +49,7 @@ import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView
 import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
 import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 import type { ActionComponents } from 'views/components/actions/ActionHandler';
+import { getView, updateView as _updateView } from 'views/api/views';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
@@ -82,15 +82,15 @@ const _onCopyToDashboard = async (
     return;
   }
 
-  const dashboardJson = await ViewManagementActions.get(dashboardId);
+  const dashboardJson = await getView(dashboardId);
   const dashboard = View.fromJSON(dashboardJson);
   const search = await fetchSearch(dashboardJson.search_id).then((searchJson) => Search.fromJSON(searchJson));
   const newDashboard = CopyWidgetToDashboard(widgetId, view, dashboard.toBuilder().search(search).build());
 
-  if (newDashboard && newDashboard.search) {
+  if (newDashboard?.search) {
     const newSearch = await createSearch(newDashboard.search);
     const newDashboardWithSearch = newDashboard.toBuilder().search(newSearch).build();
-    await ViewManagementActions.update(newDashboardWithSearch);
+    await _updateView(newDashboardWithSearch);
 
     loadDashboard(history, newDashboardWithSearch.id);
   }
