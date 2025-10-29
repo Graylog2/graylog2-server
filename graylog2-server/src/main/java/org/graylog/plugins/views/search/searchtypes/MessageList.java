@@ -211,10 +211,6 @@ public abstract class MessageList implements SearchEngineSearchType {
         @JsonProperty
         public abstract List<ResultMessageSummary> messages();
 
-        @Nullable
-        @JsonProperty
-        public abstract List<String> fields();
-
         @JsonProperty
         public abstract Optional<DecorationStats> decorationStats();
 
@@ -231,8 +227,6 @@ public abstract class MessageList implements SearchEngineSearchType {
         public static Builder result(String searchTypeId) {
             return builder().id(searchTypeId);
         }
-
-        public abstract Builder toBuilder();
 
         @AutoValue.Builder
         public abstract static class Builder {
@@ -253,9 +247,6 @@ public abstract class MessageList implements SearchEngineSearchType {
 
             @JsonProperty
             public abstract Builder messages(List<ResultMessageSummary> messages);
-
-            @JsonProperty
-            public abstract Builder fields(@Nullable List<String> fields);
 
             @JsonProperty
             public abstract Builder totalResults(long totalResults);

@@ -77,13 +77,13 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
         return new ExportTabularResultResponse(header, dataRows);
     }
 
-    public static ExportTabularResultResponse fromMessageListResult(final MessageList.Result m) {
+    public static ExportTabularResultResponse fromMessageListResult(final List<String> fields, final MessageList.Result m) {
         if(m.messages().isEmpty()) {
             return new ExportTabularResultResponse(List.of(), List.of());
         }
 
-        // In case there was no field list specified, iterating over all messages for the header to make sure that we collect all headers from all messages
-        final var header = (m.fields() != null && !m.fields().isEmpty()) ? m.fields() : m.messages().stream().flatMap(s -> s.message().keySet().stream()).collect(Collectors.toSet()).stream().toList();
+        // iterating over all messages for the header to make sure that we collect all headers from all messages
+        final var header = (fields != null && !fields.isEmpty()) ? fields : m.messages().stream().flatMap(s -> s.message().keySet().stream()).collect(Collectors.toSet()).stream().toList();
         final var rows = m.messages()
                             .stream()
                             .map(message ->
