@@ -18,25 +18,27 @@ package org.graylog.testing.fullbackend;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, additionalConfigurationParameters = {
-        @ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_LEADER_ELECTION_MODE", value = "automatic")
-})
+@GraylogBackendConfiguration(
+        serverLifecycle = Lifecycle.CLASS,
+        env = @GraylogBackendConfiguration.Env(key = "GRAYLOG_LEADER_ELECTION_MODE", value = "automatic")
+)
 class AutomaticLeaderElectionStartupIT {
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public AutomaticLeaderElectionStartupIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void canReachApi() {
-        given()
-                .config(api.withGraylogBackendFailureConfig())
+        given().config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .when()
                 .get()
