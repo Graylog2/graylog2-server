@@ -491,6 +491,10 @@
             <artifactId>jukito</artifactId>
         </dependency>
         <dependency>
+            <groupId>name.falgout.jeffrey.testing.junit5</groupId>
+            <artifactId>guice-extension</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.mindrot</groupId>
             <artifactId>jbcrypt</artifactId>
         </dependency>

@@ -467,6 +467,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>name.falgout.jeffrey.testing.junit5</groupId>
+                <artifactId>guice-extension</artifactId>
+                <version>${guice-extension.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>nl.jqno.equalsverifier</groupId>
                 <artifactId>equalsverifier</artifactId>
                 <version>${equalsverifier.version}</version>

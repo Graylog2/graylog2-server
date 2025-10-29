@@ -18,6 +18,9 @@ package org.graylog.plugins.sidecar.collectors;
 
 import com.mongodb.client.MongoCollection;
 import jakarta.validation.Validator;
+import name.falgout.jeffrey.testing.junit.guice.GuiceExtension;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModule;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModules;
 import org.bson.Document;
 import org.graylog.plugins.sidecar.rest.models.Collector;
 import org.graylog.plugins.sidecar.rest.models.Configuration;
@@ -27,6 +30,7 @@ import org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment;
 import org.graylog.plugins.sidecar.services.CollectorService;
 import org.graylog.plugins.sidecar.services.ConfigurationService;
 import org.graylog.plugins.sidecar.services.SidecarService;
+import org.graylog.testing.inject.InputConfigurationModule;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -36,12 +40,9 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.notifications.NotificationSystemEventPublisher;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.ValidatorModule;
-import org.jukito.JukitoRunner;
-import org.jukito.UseModules;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -62,8 +63,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
-@RunWith(JukitoRunner.class)
-@UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
+@ExtendWith(GuiceExtension.class)
+@IncludeModules({
+        @IncludeModule(InputConfigurationModule.class),
+        @IncludeModule(ObjectMapperModule.class),
+        @IncludeModule(ValidatorModule.class),
+        @IncludeModule(TestPasswordSecretModule.class)
+})
 public class SidecarServiceTest {
     private static final String collectionName = "sidecars";
     @Mock
