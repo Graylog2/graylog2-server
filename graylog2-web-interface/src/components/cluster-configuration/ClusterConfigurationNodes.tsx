@@ -23,7 +23,7 @@ import GraylogNodesExpandable from './GraylogNodesExpandable';
 import DataNodesExpandable from './DataNodesExpandable';
 
 const SectionCol = styled(Col)`
-  margin-bottom: 15px;
+  margin-bottom: 12px;
 
   &:last-child {
     margin-bottom: 0;
@@ -31,7 +31,6 @@ const SectionCol = styled(Col)`
 `;
 
 const ControlsWrapper = styled.div`
-  margin-bottom: ${({ theme }) => theme.spacings.sm};
   display: flex;
   justify-content: flex-end;
 `;

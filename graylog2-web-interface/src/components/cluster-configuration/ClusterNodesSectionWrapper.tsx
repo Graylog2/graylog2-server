@@ -26,7 +26,7 @@ const Container = styled.div`
 `;
 
 const TableWrapper = styled.div`
-  margin-top: ${({ theme }) => theme.spacings.xs};
+  margin-top: calc(-1 * ${({ theme }) => theme.spacings.lg});
 `;
 
 type Props = React.PropsWithChildren<{
@@ -42,7 +42,11 @@ const ClusterNodesSectionWrapper = ({
   collapsible = true,
 }: Props) => (
   <Container>
-    <Section title={title} collapsible={collapsible} headerLeftSection={headerLeftSection}>
+    <Section
+      title={title}
+      collapsible={collapsible}
+      headerLeftSection={headerLeftSection}
+      collapseButtonPosition="left">
       <TableWrapper>{children}</TableWrapper>
     </Section>
   </Container>
