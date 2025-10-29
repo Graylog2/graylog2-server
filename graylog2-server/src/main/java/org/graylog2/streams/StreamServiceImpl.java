@@ -92,7 +92,7 @@ import static org.graylog2.streams.StreamImpl.FIELD_TITLE;
 
 public class StreamServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
-    private static final String COLLECTION_NAME = "streams";
+    public static final String COLLECTION_NAME = "streams";
     private final MongoCollection<StreamDTO> collection;
     private final MongoUtils<StreamDTO> mongoUtils;
     private final ScopedEntityMongoUtils<StreamDTO> scopedMongoUtils;
