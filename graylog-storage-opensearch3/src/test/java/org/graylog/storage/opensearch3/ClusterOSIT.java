@@ -18,19 +18,18 @@ package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
-import org.graylog.storage.opensearch3.cat.CatApi;
-import org.graylog.storage.opensearch3.cat.NodeResponse;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
+import org.opensearch.client.opensearch.cat.nodes.NodesRecord;
 
-import java.util.List;
-import java.util.Optional;
+public class ClusterOSIT extends ClusterIT {
 
-public class ClusterOS2IT extends ClusterIT {
+    ClusterAdapterOS clusterAdapterOS;
+
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
@@ -42,10 +41,10 @@ public class ClusterOS2IT extends ClusterIT {
     @Override
     protected ClusterAdapter clusterAdapter(Duration timeout) {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        return new ClusterAdapterOS2(openSearchInstance.openSearchClient(),
+        clusterAdapterOS = new ClusterAdapterOS(openSearchInstance.getOfficialOpensearchClient(),
                 timeout,
-                new CatApi(objectMapper, openSearchInstance.openSearchClient()),
-                new PlainJsonApi(objectMapper, openSearchInstance.openSearchClient()));
+                new PlainJsonApi(objectMapper, openSearchInstance.openSearchClient(), openSearchInstance.getOfficialOpensearchClient()));
+        return clusterAdapterOS;
     }
 
     @Override
@@ -53,9 +52,8 @@ public class ClusterOS2IT extends ClusterIT {
         return currentNode().id();
     }
 
-    private NodeResponse currentNode() {
-        final List<NodeResponse> nodes = catApi().nodes();
-        return nodes.get(0);
+    private NodesRecord currentNode() {
+        return clusterAdapterOS.nodes().getFirst();
     }
 
     @Override
@@ -65,11 +63,8 @@ public class ClusterOS2IT extends ClusterIT {
 
     @Override
     protected String currentHostnameOrIp() {
-        final NodeResponse currentNode = currentNode();
-        return Optional.ofNullable(currentNode.host()).orElse(currentNode.ip());
+        final NodesRecord currentNode = currentNode();
+        return clusterAdapterOS.nodeIdToHostName(currentNode.id()).orElse(currentNode.ip());
     }
 
-    private CatApi catApi() {
-        return new CatApi(new ObjectMapperProvider().get(), openSearchInstance.openSearchClient());
-    }
 }
