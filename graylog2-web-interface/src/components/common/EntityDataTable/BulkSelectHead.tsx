@@ -71,10 +71,7 @@ type Props<Entity extends EntityBase> = {
   getTitle?: (checkboxStatus: CheckboxStatus) => string;
 };
 
-export const BulkSelectHeadContent = <Entity extends EntityBase>({
-  data,
-  getTitle = getDefaultTitle,
-}: Props<Entity>) => {
+export const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = getTitle(checkboxStatus);
@@ -105,9 +102,4 @@ export const BulkSelectHeadContent = <Entity extends EntityBase>({
   );
 };
 
-const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => (
-  <Th $width={BULK_SELECT_COLUMN_WIDTH}>
-    <BulkSelectHeadContent<Entity> data={data} getTitle={getTitle} />
-  </Th>
-);
 export default BulkSelectHead;

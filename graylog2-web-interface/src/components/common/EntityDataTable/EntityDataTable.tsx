@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
 import { useMemo, useRef, useCallback } from 'react';
+import styled, { css } from 'styled-components';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
 import { useReactTable, createColumnHelper, getCoreRowModel } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
-
+import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -32,10 +32,8 @@ import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumns
 import useElementDimensions from 'hooks/useElementDimensions';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
-import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
-
 import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import TableRow from './TableRow';
@@ -48,6 +46,7 @@ import type {
   ColumnRenderersByAttribute,
   ExpandedSectionRenderer,
 } from './types';
+import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -183,7 +182,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Define default columns order. Column ids need to be snake case. */
   columnsOrder?: Array<string>;
   /** The table data. */
-  entities: Readonly<Array<Entity>>;
+  entities: Array<Entity>;
   /** Allows you to extend a row with additional information * */
   expandedSectionsRenderer?: {
     [sectionName: string]: ExpandedSectionRenderer<Entity>;
@@ -264,12 +263,33 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const selectableData = useMemo(() => entities.filter(_isEntitySelectable), [entities, _isEntitySelectable]);
-
+  console.log({ displayBulkSelectCol });
   const columnHelper = createColumnHelper<Entity>();
 
   const _columns = useMemo(
-    () =>
-      columns.map((col: ColumnRender<Entity, Meta>) =>
+    () => [
+      ...(displayBulkSelectCol
+        ? [
+            columnHelper.display({
+              id: 'bulk-select',
+              size: BULK_SELECT_COLUMN_WIDTH,
+              header: () => <BulkSelectHead data={entities} />,
+              cell: ({ row }) => {
+                const isSelected = row.getIsSelected();
+                return (
+                  <RowCheckbox
+                    onChange={row.getToggleSelectedHandler()}
+                    title={`${isSelected ? 'Deselect' : 'Select'} entity`}
+                    checked={isSelected}
+                    disabled={!row.getCanSelect()}
+                    aria-label={row.id}
+                  />
+                );
+              },
+            }),
+          ]
+        : []),
+      ...columns.map((col: ColumnRender<Entity, Meta>) =>
         columnHelper.accessor(col.id, {
           cell: (info) =>
             columnRenderersByAttribute[col.id].renderCell(info.cell.getValue(), info.row.original, col, meta),
@@ -282,6 +302,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           enableSorting: col.sortable ?? false,
         }),
       ),
+    ],
     [columnHelper, columnRenderersByAttribute, columns, columnsWidths, entityAttributesAreCamelCase, meta],
   );
 
@@ -292,7 +313,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     manualSorting: true,
     enableSortingRemoval: false,
     initialState: {
-      columnOrder: columnsOrder,
+      columnOrder: [...(displayBulkSelectCol ? ['bulk-select'] : []), ...columnsOrder],
     },
     state: {
       sorting: activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : [],
@@ -333,7 +354,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 columns={columns}
                 columnsOrder={columnsOrder}
                 actionsColWidth={actionsColWidth}
-                columnsWidths={columnsWidths}
                 data={selectableData}
                 columnRenderersByAttribute={columnRenderersByAttribute}
                 displayBulkSelectCol={displayBulkSelectCol}
@@ -353,11 +373,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     displayActions={displayActionsCol}
                     columns={columns}
                   />
-                  {/*<ExpandedSections*/}
-                  {/*  key={`expanded-sections-${row.id}`}*/}
-                  {/*  expandedSectionsRenderer={expandedSectionsRenderer}*/}
-                  {/*  row={row}*/}
-                  {/*/>*/}
+                  <ExpandedSections
+                    key={`expanded-sections-${row.id}`}
+                    expandedSectionsRenderer={expandedSectionsRenderer}
+                    row={row}
+                  />
                 </tbody>
               ))}
             </StyledTable>

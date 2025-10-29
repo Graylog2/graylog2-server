@@ -16,15 +16,12 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useMemo } from 'react';
 import type { Row } from '@tanstack/react-table';
+import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
-
-import useSelectedEntities from './hooks/useSelectedEntities';
 import TableCell from './TableCell';
 import type { ColumnRenderersByAttribute, Column, EntityBase } from './types';
-import RowCheckbox from './RowCheckbox';
 
 const ActionsCell = styled.td`
   text-align: right;
@@ -52,38 +49,16 @@ type Props<Entity extends EntityBase> = {
 };
 
 const TableRow = <Entity extends EntityBase, Meta>({
-  columns,
-  columnRenderersByAttribute,
-  displaySelect,
   displayActions,
   row,
   actions = undefined,
   index,
   actionsRef,
-  isEntitySelectable,
 }: Props<Entity>) => {
-  // const { toggleEntitySelect, selectedEntities } = useSelectedEntities();
-  // const isSelected = !!selectedEntities?.includes(row.id);
   const actionButtons = displayActions ? <ButtonToolbar>{actions(row)}</ButtonToolbar> : null;
-  // const isSelectDisabled = useMemo(
-  //   () => !(displaySelect && isEntitySelectable(row)),
-  //   [displaySelect, row, isEntitySelectable],
-  // );
-  // const title = `${isSelected ? 'Deselect' : 'Select'} entity`;
 
   return (
     <tr>
-      {/*{displaySelect && (*/}
-      {/*  <td aria-label="Select cell">*/}
-      {/*    <RowCheckbox*/}
-      {/*      onChange={() => toggleEntitySelect(entity.id)}*/}
-      {/*      title={title}*/}
-      {/*      checked={isSelected}*/}
-      {/*      disabled={isSelectDisabled}*/}
-      {/*      aria-label={title}*/}
-      {/*    />*/}
-      {/*  </td>*/}
-      {/*)}*/}
       {row.getVisibleCells().map((cell) => (
         <TableCell<Entity, Meta> cell={cell} key={`${row.id}-${cell.column.id}`} />
       ))}

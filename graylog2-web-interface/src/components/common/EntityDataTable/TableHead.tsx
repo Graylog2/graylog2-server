@@ -20,7 +20,7 @@ import type { Table, Header } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
-import type { Column, EntityBase, ColumnRenderersByAttribute } from './types';
+import type { Column, EntityBase } from './types';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -53,21 +53,17 @@ const ActionsHead = styled(Th)<{ $width: number | undefined }>(
 const TableHead = <Entity extends EntityBase>({
   actionsColWidth,
   displayActionsCol,
-  displayBulkSelectCol,
   table,
 }: {
   actionsColWidth: number | undefined;
   columns: Array<Column>;
   columnsOrder: Array<string>;
-  data: Readonly<Array<Entity>>;
   displayActionsCol: boolean;
-  displayBulkSelectCol: boolean;
   table: Table<Entity>;
 }) => (
   <Thead>
     {table.getHeaderGroups().map((headerGroup) => (
       <tr key={headerGroup.id}>
-        {/*{displayBulkSelectCol && <BulkSelectHead data={data} />}*/}
         {headerGroup.headers.map((header) => (
           <TableHeader<Entity> header={header} key={header.id} />
         ))}
