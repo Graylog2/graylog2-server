@@ -27,7 +27,7 @@ import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import generateDomain from 'views/components/visualizations/utils/generateDomain';
-import useXAxisTicks from 'views/components/visualizations/hooks/useXAxisTicks';
+import useXAxisTicksAndType from 'views/components/visualizations/hooks/useXAxisTicksAndType';
 import getThresholdShapes from 'views/components/visualizations/utils/getThresholdShapes';
 
 const useChartLayoutSettingsWithCustomUnits = ({
@@ -40,7 +40,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
   chartData: Array<ChartDefinition>;
 }) => {
   const theme = useTheme();
-  const ticksConfig = useXAxisTicks(config, chartData);
+  const ticksAndTypeConfig = useXAxisTicksAndType(config, chartData);
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
   const { unitTypeMapper, fieldNameToAxisNameMapper, mapperAxisNumber } = useMemo(
@@ -60,7 +60,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
     if (!unitFeatureEnabled)
       return {
         xaxis: {
-          ...ticksConfig,
+          ...ticksAndTypeConfig,
         },
       };
 
@@ -80,14 +80,14 @@ const useChartLayoutSettingsWithCustomUnits = ({
       hovermode: 'x',
       xaxis: {
         domain: generateDomain(Object.keys(unitTypeMapper)?.length),
-        ...ticksConfig,
+        ...ticksAndTypeConfig,
       },
     };
 
     return _layouts;
   }, [
     unitFeatureEnabled,
-    ticksConfig,
+    ticksAndTypeConfig,
     unitTypeMapper,
     barmode,
     chartData,
