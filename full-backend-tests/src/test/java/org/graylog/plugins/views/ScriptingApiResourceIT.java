@@ -933,7 +933,7 @@ public class ScriptingApiResourceIT {
         assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testTimestampGroupingBy1Hour() {
         api.waitFor(() -> {
             var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
@@ -1011,7 +1011,7 @@ public class ScriptingApiResourceIT {
                 .isTrue();
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testTimestampGroupingBy1Day() {
         api.waitFor(() -> {
             var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
@@ -1066,7 +1066,7 @@ public class ScriptingApiResourceIT {
                 .isTrue();
     }
 
-    @FullBackendTest
+    @ContainerMatrixTest
     void testTimestampGroupingByScaling() {
         api.waitFor(() -> {
             var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
