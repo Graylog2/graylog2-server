@@ -55,7 +55,7 @@ const ContentWrap = styled.strong`
   }
 `;
 
-const ThroughputData = styled.span(
+const ThroughputData = styled.span<{ $dataIn?: boolean }>(
   ({ $dataIn, theme }) => css`
     font-size: ${theme.fonts.size.small};
     line-height: 1;

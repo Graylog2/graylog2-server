@@ -20,19 +20,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Streams;
-import org.graylog.storage.opensearch3.OpenSearchClient;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-
-import jakarta.inject.Inject;
-import org.graylog2.indexer.cluster.health.NodeShardAllocation;
+import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog2.indexer.indices.ShardsInfo;
 
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,28 +44,6 @@ public class CatApi {
                   OpenSearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
-    }
-
-    public Map<String, String> aliases() {
-        final Request request = request("GET", "aliases");
-        request.addParameter("h", "alias,index");
-        final List<AliasSummaryResponse> response = perform(request, new TypeReference<List<AliasSummaryResponse>>() {}, "Unable to retrieve aliases");
-
-        return response.stream()
-                .collect(Collectors.toMap(AliasSummaryResponse::alias, AliasSummaryResponse::index));
-    }
-
-    public List<NodeResponse> nodes() {
-        final Request request = request("GET", "nodes");
-        request.addParameter("h", "id,name,role,host,ip,fileDescriptorMax,diskUsed,diskTotal,diskUsedPercent");
-        request.addParameter("full_id", "true");
-        return perform(request, new TypeReference<>() {}, "Unable to retrieve nodes list");
-    }
-
-    public List<IndexSummaryResponse> indices() {
-        final Request request = request("GET", "indices");
-        request.addParameter("h", "index,status,health");
-        return perform(request, new TypeReference<>() {}, "Unable to retrieve indices list");
     }
 
     public Set<String> indices(String index, Collection<String> status, String errorMessage) {
@@ -112,12 +87,6 @@ public class CatApi {
         request.addParameter("s", "index,status");
 
         return perform(request, new TypeReference<JsonNode>() {}, errorMessage);
-    }
-
-    public List<NodeShardAllocation> getNodeShardAllocations() {
-        final Request request = request("GET", "allocation");
-        request.addParameter("h", "node,shards");
-        return perform(request, new TypeReference<>() {}, "Unable to retrieve node shard allocation");
     }
 
     private <R> R perform(Request request, TypeReference<R> responseClass, String errorMessage) {

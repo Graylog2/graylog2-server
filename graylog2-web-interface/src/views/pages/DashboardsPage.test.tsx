@@ -18,6 +18,8 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import { usePluginExports } from 'views/test/testPlugins';
+import { prefixUrl } from 'routing/Routes';
 
 import DashboardsPage from './DashboardsPage';
 
@@ -34,11 +36,18 @@ jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => () =>
   refetch: () => {},
 }));
 
-jest.mock('routing/Routes', () => ({
-  pluginRoute: jest.fn(),
-}));
-
+const pluginExports = {
+  entityCreators: [
+    {
+      type: 'Dashboard',
+      title: 'Create Dashboard',
+      path: prefixUrl('/foo'),
+      id: 'Dashboard',
+    },
+  ],
+};
 describe('DashboardsPage', () => {
+  usePluginExports(pluginExports);
   it('should render header and list', async () => {
     render(
       <DefaultQueryParamProvider>

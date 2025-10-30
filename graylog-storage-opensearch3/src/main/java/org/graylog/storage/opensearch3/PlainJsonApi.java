@@ -18,27 +18,47 @@ package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-
 import jakarta.inject.Inject;
+import org.opensearch.client.opensearch.generic.Body;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Response;
 
-@Deprecated
+import static org.graylog.storage.opensearch3.OfficialOpensearchClient.mapException;
+
 public class PlainJsonApi {
     private final ObjectMapper objectMapper;
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient client;
+    private final OpenSearchClient deprecatedClient;
 
     @Inject
     public PlainJsonApi(ObjectMapper objectMapper,
-                        OpenSearchClient client) {
+                        OpenSearchClient deprecatedClient,
+                        OfficialOpensearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
+        this.deprecatedClient = deprecatedClient;
     }
 
-    public JsonNode perform(Request request, String errorMessage) {
-        return client.execute((c, requestOptions) -> {
+    @Deprecated
+    public PlainJsonApi(ObjectMapper objectMapper, OpenSearchClient client) {
+        this(objectMapper, client, null);
+    }
+
+    public JsonNode performRequest(Request request, String errorMessage) {
+        try {
+            Response response = client.sync().generic().execute(request);
+            String rawJson = response.getBody().map(Body::bodyAsString).orElse("");
+            return objectMapper.readTree(rawJson);
+        } catch (Exception e) {
+            throw mapException(e, errorMessage);
+        }
+    }
+
+    @Deprecated
+    public JsonNode perform(org.graylog.shaded.opensearch2.org.opensearch.client.Request request, String errorMessage) {
+        return deprecatedClient.execute((c, requestOptions) -> {
             request.setOptions(requestOptions);
-            final Response response = c.getLowLevelClient().performRequest(request);
+            org.graylog.shaded.opensearch2.org.opensearch.client.Response response = c.getLowLevelClient().performRequest(request);
             return objectMapper.readTree(response.getEntity().getContent());
         }, errorMessage);
     }
