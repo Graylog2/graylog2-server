@@ -56,7 +56,7 @@ public class AggregationSpecToPivotMapper implements BiFunction<AggregationReque
     private final GroupingToBucketSpecMapper rowGroupCreator;
     private final MetricToSeriesSpecMapper seriesCreator;
     private final MappedFieldTypesService mappedFieldTypesService;
-    private final Function<Collection<String>, Stream<String>> streamCategoryMapper;
+    private final Function<Collection<String>, Set<String>> streamCategoryMapper;
 
     @Inject
     public AggregationSpecToPivotMapper(final GroupingToBucketSpecMapper rowGroupCreator,
@@ -73,7 +73,7 @@ public class AggregationSpecToPivotMapper implements BiFunction<AggregationReque
         final Set<String> allowedStreams = searchUser.streams().loadAllMessageStreams();
         Set<String> requestedStreams = new HashSet<>(aggregationSpec.streams());
         if(!aggregationSpec.streamCategories().isEmpty()) {
-            requestedStreams.addAll(streamCategoryMapper.apply(aggregationSpec.streamCategories()).toList());
+            requestedStreams.addAll(streamCategoryMapper.apply(aggregationSpec.streamCategories()).stream().toList());
         }
         final var filteredStreams = requestedStreams.isEmpty() ?  allowedStreams : requestedStreams.stream().filter(allowedStreams::contains).collect(Collectors.toSet());
         return mappedFieldTypesService.fieldTypesByStreamIds(filteredStreams, RelativeRange.allTime()).stream().collect(Collectors.toMap(MappedFieldTypeDTO::name, MappedFieldTypeDTO::type));
