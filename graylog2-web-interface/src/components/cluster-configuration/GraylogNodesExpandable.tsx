@@ -21,7 +21,6 @@ import { Label } from 'components/bootstrap';
 import { EntityDataTable, Spinner } from 'components/common';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
-import JournalState from 'components/nodes/JournalState';
 import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
 import NumberUtils from 'util/NumberUtils';
 
@@ -29,7 +28,6 @@ import useGraylogNodes from './useGraylogNodes';
 import type { GraylogNode } from './useGraylogNodes';
 import GraylogNodeStatusLabel from './GraylogNodeStatusLabel';
 import GraylogNodeActions from './GraylogNodeActions';
-import JvmHeapUsageText from './JvmHeapUsageText';
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
 
 const SecondaryText = styled.div`
@@ -75,7 +73,6 @@ const getNodeDisplayName = (node: GraylogNode) => {
 
 const GraylogNodesExpandable = () => {
   const { nodes: graylogNodes, isLoading } = useGraylogNodes();
-  
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
 
@@ -102,16 +99,6 @@ const GraylogNodesExpandable = () => {
             return (
               <NodePrimary>
                 {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
-                {/* {nodeId && (
-                  <>
-                    <SecondaryText>
-                      <JournalState nodeId={nodeId} />
-                    </SecondaryText>
-                    <SecondaryText>
-                      <JvmHeapUsageText nodeId={nodeId} />
-                    </SecondaryText>
-                  </>
-                )} */}
               </NodePrimary>
             );
           },
@@ -126,16 +113,35 @@ const GraylogNodesExpandable = () => {
           renderCell: (_value, entity) => {
             const journalCurrent = entity.metrics?.journalSize;
             const journalMax = entity.metrics?.journalMaxSize;
+            const ratio = entity.metrics?.journalSizeRatio;
 
-            return `${NumberUtils.formatBytes(journalCurrent)} / ${NumberUtils.formatBytes(journalMax)}`;
+            return (
+              <div>
+                {`${NumberUtils.formatBytes(journalCurrent)} / ${NumberUtils.formatBytes(journalMax)}`}
+                <SecondaryText>
+                  <span>
+                    {ratio !== undefined && ratio !== null ? NumberUtils.formatPercentage(ratio) : 'N/A'}
+                  </span>
+                </SecondaryText>
+              </div>
+            );
           },
         },
         jvm: {
           renderCell: (_value, entity) => {
             const heapUsed = entity.metrics?.jvmMemoryHeapUsed;
             const heapMax = entity.metrics?.jvmMemoryHeapMaxMemory;
+            const ratio =
+              heapUsed !== undefined && heapUsed !== null && heapMax ? heapUsed / heapMax : undefined;
 
-            return `${NumberUtils.formatBytes(heapUsed)} / ${NumberUtils.formatBytes(heapMax)}`;
+            return (
+              <div>
+                {`${NumberUtils.formatBytes(heapUsed)} / ${NumberUtils.formatBytes(heapMax)}`}
+                <SecondaryText>
+                  <span>{ratio !== undefined ? NumberUtils.formatPercentage(ratio) : 'N/A'}</span>
+                </SecondaryText>
+              </div>
+            );
           },
         },
         state: {
