@@ -28,7 +28,7 @@ const MessageEditFieldConfigurationAction = () => {
 
   return (
     <>
-      <Button bsSize="small" onClick={toggleEditMode}>
+      <Button bsSize="small" onClick={toggleEditMode} title="Edit favorite fields">
         <Icon name="edit_square" /> Edit
       </Button>
       {showModal && <MessageFieldsEditModal toggleEditMode={toggleEditMode} />}

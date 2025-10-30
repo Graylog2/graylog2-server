@@ -20,6 +20,7 @@ import { OrderedSet } from 'immutable';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 const useFormattedFields = () => {
   const { favoriteFields, message, messageFields: fieldTypes } = useContext(MessageFavoriteFieldsContext);
@@ -46,7 +47,7 @@ const useFormattedFields = () => {
 
     return Object.keys(message.formatted_fields)
       .filter((field) => !favoriteFieldsSet.has(field))
-      .sort()
+      .sort((key1, key2) => defaultCompare(key1, key2))
       .map((field) => {
         const { type } = fieldTypes.find(
           (t) => t.name === field,
