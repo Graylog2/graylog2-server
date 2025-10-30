@@ -20,13 +20,16 @@ import type { SearchParams } from 'stores/PaginationTypes';
 import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
 import { EventDefinitionsStore } from 'stores/event-definitions/EventDefinitionsStore';
 import { defaultOnError } from 'util/conditional/onError';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 
 type Options = {
   enabled: boolean;
 };
 
-export const fetchEventDefinitions = (searchParams: SearchParams) =>
-  EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
+export const fetchEventDefinitions = (searchParams: SearchParams) => {
+  CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+  return EventDefinitionsStore.searchPaginated(searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams?.sort.attributeId,
     order: searchParams?.sort.direction,
   }).then(({ elements, pagination, attributes }) => ({
@@ -34,7 +37,7 @@ export const fetchEventDefinitions = (searchParams: SearchParams) =>
     pagination,
     attributes,
   }));
-
+};
 export const fetchEventDefinition = (eventDefinitionId: string) =>
   EventDefinitionsStore.get(eventDefinitionId).then(({ event_definition, context, is_mutable }) => ({
     eventDefinition: event_definition,
