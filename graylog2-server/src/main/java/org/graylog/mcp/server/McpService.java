@@ -179,7 +179,7 @@ public class McpService {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
                     try {
                         final Object result = tool.apply(permissionHelper, callToolRequest.arguments());
-                        if (tool.outputSchema().isPresent()) {
+                        if (tool.isStructuredOutputSet()) {
                             // if we have an output schema we want to return structured content
                             try {
                                 var structuredContent = objectMapper.convertValue(result,

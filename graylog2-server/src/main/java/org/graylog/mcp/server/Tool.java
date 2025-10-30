@@ -99,6 +99,11 @@ public abstract class Tool<P, O> {
         ).useStructuredOutput();
     }
 
+    protected boolean isOutputSchemaEnabled() {
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES
+        ).enableOutputSchema();
+    }
+
     protected ObjectMapper getObjectMapper() {
         return objectMapper;
     }
@@ -127,7 +132,7 @@ public abstract class Tool<P, O> {
 
     @JsonProperty
     public Optional<Map<String, Object>> outputSchema() {
-        return isStructuredOutputSet() ? Optional.ofNullable(outputSchema) : Optional.empty();
+        return isOutputSchemaEnabled() && isStructuredOutputSet() ? Optional.ofNullable(outputSchema) : Optional.empty();
     }
 
     /**
@@ -148,7 +153,7 @@ public abstract class Tool<P, O> {
     protected abstract O apply(PermissionHelper permissionHelper, P parameters);
 
     protected String applyAsText(PermissionHelper permissionHelper, P parameters) {
-        throw new UnsupportedOperationException("Text output not implemented");
+        return apply(permissionHelper, parameters).toString();
     }
 
     public sealed interface ToolResult<T> {
