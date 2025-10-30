@@ -338,9 +338,8 @@ public class ClientOS implements Client {
         // currently the client is recreated on every init of the OS instance, so transport needs to be closed here
         if (opensearchClient != null) {
             try {
-                opensearchClient.sync()._transport().close();
-                opensearchClient.async()._transport().close();
-            } catch (IOException e) {
+                opensearchClient.close();
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
