@@ -92,6 +92,11 @@ public interface StreamService {
      */
     long count();
 
+    /**
+     * @return a map of stream types (Illuminate vs user-created) to their respective counts.
+     */
+    Map<String, Long> countByType();
+
     void pause(Stream stream) throws ValidationException;
 
     void resume(Stream stream) throws ValidationException;

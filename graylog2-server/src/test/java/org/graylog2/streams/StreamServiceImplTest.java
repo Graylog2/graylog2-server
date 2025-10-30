@@ -43,6 +43,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -146,5 +147,15 @@ public class StreamServiceImplTest {
         final Stream stream = streamService.load(new ObjectId(STREAM_ID).toHexString());
         streamService.save(stream);
         verify(eventBus, times(1)).post(StreamsChangedEvent.create(STREAM_ID));
+    }
+
+    @Test
+    @MongoDBFixtures("userIlluminateStreams.json")
+    public void testCountByType() {
+        Map<String, Long> count = streamService.countByType();
+
+        assertThat(count)
+                .containsEntry("illuminate_streams", 2L)
+                .containsEntry("user_streams", 1L);
     }
 }
