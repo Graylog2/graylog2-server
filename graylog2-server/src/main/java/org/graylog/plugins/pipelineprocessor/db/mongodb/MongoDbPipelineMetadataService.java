@@ -23,15 +23,21 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.Set;
 
 import static com.mongodb.client.model.Filters.eq;
+import static org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao.FIELD_PIPELINE_ID;
 
 /**
  * Persists information on pipeline and rules to avoid parsing these repeatedly
  */
 public class MongoDbPipelineMetadataService {
+    private static final Logger LOG = LoggerFactory.getLogger(MongoDbPipelineMetadataService.class);
     public static final String RULES_COLLECTION_NAME = "pipeline_processor_rules_meta";
     public static final String INPUTS_COLLECTION_NAME = "pipeline_processor_inputs_meta";
     private final MongoCollection<PipelineRulesMetadataDao> collection;
@@ -39,15 +45,25 @@ public class MongoDbPipelineMetadataService {
     @Inject
     public MongoDbPipelineMetadataService(MongoCollections mongoCollections) {
         this.collection = mongoCollections.collection(RULES_COLLECTION_NAME, PipelineRulesMetadataDao.class);
-        collection.createIndex(Indexes.ascending(PipelineRulesMetadataDao.FIELD_PIPELINE_ID), new IndexOptions().unique(true));
+        collection.createIndex(Indexes.ascending(FIELD_PIPELINE_ID), new IndexOptions().unique(true));
     }
 
     public ImmutableList<PipelineRulesMetadataDao> getAll() {
         return ImmutableList.copyOf(collection.find());
     }
 
-    public Optional<PipelineRulesMetadataDao> getByPipelineId(final String pipelineId) {
-        return Optional.ofNullable(collection.find(eq(PipelineRulesMetadataDao.FIELD_PIPELINE_ID, pipelineId)).first());
+    public PipelineRulesMetadataDao getByPipelineId(final String pipelineId) throws NotFoundException {
+        final PipelineRulesMetadataDao dao = collection.find(eq(FIELD_PIPELINE_ID, pipelineId)).first();
+        if (dao == null) {
+            throw new NotFoundException("No pipeline found with id: " + pipelineId);
+        }
+        return dao;
+    }
+
+    public Set<String> getPipelinesByRule(final String ruleId) {
+        return collection.find(eq(PipelineRulesMetadataDao.FIELD_RULES, ruleId))
+                .map(PipelineRulesMetadataDao::pipelineId)
+                .into(new HashSet<>());
     }
 
 }

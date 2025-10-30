@@ -32,7 +32,7 @@ import java.util.List;
 public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<PipelineRulesMetadataDao, PipelineRulesMetadataDao.Builder> {
     private static final String FIELD_ID = "id";
     public static final String FIELD_PIPELINE_ID = "pipeline_id";
-    private static final String FIELD_RULES = "rules";
+    public static final String FIELD_RULES = "rules";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_FUNCTIONS = "functions";
     private static final String FIELD_DEPRECATED_FUNCTIONS = "deprecated_functions";
