@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) implements AutoCloseable {
+public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
     private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
 
     public <T> T execute(ThrowingSupplier<T> operation, String errorMessage) {
@@ -53,9 +53,8 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         }
     }
 
-    @Override
-    public void close() throws Exception {
-        Exception exception = null;
+    public void close() throws IOException {
+        IOException exception = null;
         try {
             sync()._transport().close();
         } catch (IOException e) {
