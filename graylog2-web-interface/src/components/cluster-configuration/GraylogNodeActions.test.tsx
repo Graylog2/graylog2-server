@@ -39,6 +39,8 @@ const nodeMock: GraylogNode = {
   timezone: 'Europe/Berlin',
   transport_address: 'http://192.168.64.1:9000/api/',
   version: '6.2.0-SNAPSHOT',
+  id: 'a853111d-85ce-42c0-bc6d-22f7f0fecbb4',
+  metrics: {},
 };
 
 describe('GraylogNodeActions', () => {
