@@ -26,6 +26,8 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.transport.httpclient5.ResponseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -33,6 +35,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
+    private static final Logger LOG = LoggerFactory.getLogger(OfficialOpensearchClient.class);
     private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
 
     public <T> T execute(ThrowingSupplier<T> operation, String errorMessage) {
@@ -53,20 +56,16 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         }
     }
 
-    public void close() throws IOException {
-        IOException exception = null;
+    public void close() {
         try {
             sync()._transport().close();
         } catch (IOException e) {
-            exception = e;
+            LOG.error("Error closing OpenSearch client", e);
         }
         try {
             async()._transport().close();
         } catch (IOException e) {
-            exception = e;
-        }
-        if (exception != null) {
-            throw exception;
+            LOG.error("Error closing async OpenSearch client", e);
         }
     }
 

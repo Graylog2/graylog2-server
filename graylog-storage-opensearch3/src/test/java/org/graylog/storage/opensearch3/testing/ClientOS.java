@@ -337,11 +337,7 @@ public class ClientOS implements Client {
         refreshNode();
         // currently the client is recreated on every init of the OS instance, so transport needs to be closed here
         if (opensearchClient != null) {
-            try {
-                opensearchClient.close();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            opensearchClient.close();
         }
     }
 
