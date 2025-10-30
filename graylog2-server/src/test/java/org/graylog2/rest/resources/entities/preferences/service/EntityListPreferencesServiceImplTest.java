@@ -54,9 +54,7 @@ public class EntityListPreferencesServiceImplTest {
 
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) {
-        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
-        this.toTest = new EntityListPreferencesServiceImpl(new MongoCollections(objectMapperProvider, mongoConnection));
+        this.toTest = new EntityListPreferencesServiceImpl(mongoCollections);
     }
 
     @Test

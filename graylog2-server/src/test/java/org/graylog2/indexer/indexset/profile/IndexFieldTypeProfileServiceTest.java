@@ -17,8 +17,6 @@
 package org.graylog2.indexer.indexset.profile;
 
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog2.bindings.providers.CommonMongoJackObjectMapperProvider;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.entities.DefaultEntityScope;
@@ -33,7 +31,6 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.joda.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,7 +61,6 @@ public class IndexFieldTypeProfileServiceTest {
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) {
         final MongoConnection mongoConnection = mongoCollections.mongoConnection();
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
         final EntityScopeService entityScopeService = new EntityScopeService(Set.of(new DefaultEntityScope()));
         mongoIndexSetService = new MongoIndexSetService(mongoCollections,
                 mock(StreamService.class),
@@ -74,7 +70,7 @@ public class IndexFieldTypeProfileServiceTest {
         );
         indexFieldTypeProfileUsagesService = new IndexFieldTypeProfileUsagesService(mongoConnection);
         toTest = new IndexFieldTypeProfileService(
-                new MongoCollections(new CommonMongoJackObjectMapperProvider(objectMapperProvider), mongoConnection),
+                mongoCollections,
                 indexFieldTypeProfileUsagesService,
                 mongoIndexSetService);
     }

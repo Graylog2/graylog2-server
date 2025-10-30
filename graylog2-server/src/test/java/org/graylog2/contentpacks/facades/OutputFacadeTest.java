@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.graph.Graph;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -85,7 +84,7 @@ public class OutputFacadeTest {
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) throws Exception {
         outputService = new OutputServiceImpl(
-                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongoCollections.mongoConnection()),
+                mongoCollections,
                 streamService,
                 new ClusterEventBus());
         pluginMetaData = new HashSet<>();

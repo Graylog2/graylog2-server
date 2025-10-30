@@ -53,9 +53,8 @@ class MongoDbIndexToolsTest {
     private MongoCollection<Document> rawdb;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb, ObjectMapper objectMapper) {
+    void setUp(MongoDBTestService mongodb, MongoCollections mongoCollections) {
         mongodb.mongoCollection(COLLECTION_NAME).drop();
-        final MongoCollections mongoCollections = new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection());
         this.rawdb = mongoCollections.nonEntityCollection(COLLECTION_NAME, Document.class);
         this.db = spy(this.rawdb);
         toTest = new MongoDbIndexTools(db);

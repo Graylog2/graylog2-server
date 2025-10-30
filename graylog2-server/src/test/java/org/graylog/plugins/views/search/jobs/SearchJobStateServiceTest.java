@@ -21,11 +21,8 @@ import org.graylog.plugins.views.search.QueryResult;
 import org.graylog.plugins.views.search.SearchJobIdentifier;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,9 +49,7 @@ public class SearchJobStateServiceTest {
 
     @BeforeEach
     public void setUp(MongoCollections mongoCollections) {
-        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        this.toTest = new SearchJobStateService(new MongoCollections(objectMapperProvider, mongoConnection));
+        this.toTest = new SearchJobStateService(mongoCollections);
     }
 
     @Test

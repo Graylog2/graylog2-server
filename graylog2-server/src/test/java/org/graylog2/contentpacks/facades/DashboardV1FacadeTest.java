@@ -107,9 +107,7 @@ public class DashboardV1FacadeTest {
         objectMapper.registerSubtypes(new NamedType(StreamFilter.class, StreamFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(QueryStringFilter.class, QueryStringFilter.NAME));
         objectMapper.registerSubtypes(new NamedType(AutoIntervalDTO.class, AutoIntervalDTO.type));
-        final MongoConnection mongoConnection = mongoCollections.connection();
-        final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
-        searchDbService = new ViewFacadeTest.TestSearchDBService(mongoConnection, mapper);
+        searchDbService = new ViewFacadeTest.TestSearchDBService(mongoCollections);
         ViewFacadeTest.TestViewService viewService = new ViewFacadeTest.TestViewService(null, mongoCollections);
         ViewFacadeTest.TestViewSummaryService viewSummaryService = new ViewFacadeTest.TestViewSummaryService(mongoCollections);
         UserService userService = mock(UserService.class);

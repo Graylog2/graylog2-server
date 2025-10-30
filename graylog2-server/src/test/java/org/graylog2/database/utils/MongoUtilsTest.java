@@ -29,7 +29,6 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcernResult;
 import com.mongodb.WriteError;
-import org.graylog2.database.MongoCollection;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.RawBsonDocument;
@@ -37,8 +36,8 @@ import org.bson.types.ObjectId;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.shared.SuppressForbidden;
@@ -71,14 +70,12 @@ class MongoUtilsTest {
     private MongoCollections mongoCollections;
     private MongoCollection<DTO> collection;
     private MongoCollection<DTORef> collectionRef;
-    private MongoUtils<DTO> utils;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
+        this.mongoCollections = mongoCollections;
         collection = mongoCollections.collection("test", DTO.class);
         collectionRef = mongoCollections.collection("test1", DTORef.class);
-        utils = mongoCollections.utils(collection);
     }
 
     @Test

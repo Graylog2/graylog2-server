@@ -101,9 +101,8 @@ public class ViewFacadeTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     public static class TestSearchDBService extends SearchDbService {
-        protected TestSearchDBService(MongoConnection mongoConnection,
-                                      MongoJackObjectMapperProvider mapper) {
-            super(new MongoCollections(mapper, mongoConnection), dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
+        protected TestSearchDBService(MongoCollections mongoCollections) {
+            super(mongoCollections, dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
         }
     }
 
@@ -148,7 +147,7 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(EventList.class);
         final MongoConnection mongoConnection = mongoCollections.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
-        searchDbService = new TestSearchDBService(mongoConnection, mapper);
+        searchDbService = new TestSearchDBService(mongoCollections);
         viewService = new TestViewService(null, mongoCollections);
         viewSummaryService = new TestViewSummaryService(mongoCollections);
         userService = mock(UserService.class);
