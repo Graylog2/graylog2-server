@@ -48,6 +48,7 @@ import type {
 } from './types';
 import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
 import ButtonToolbar from '../../bootstrap/ButtonToolbar';
+import TableRow from 'components/common/EntityDataTable/TableRow';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -87,10 +88,6 @@ const LayoutConfigRow = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
-`;
-
-const Td = styled.td`
-  word-break: break-word;
 `;
 
 const filterAccessibleColumns = (columns: Array<Column>, userPermissions: Immutable.List<string>) =>
@@ -340,10 +337,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     [bulkSelectCol, attributeColumns, actionsCol],
   );
 
-  const mutableEntities = useMemo(() => {
-    console.log('mutable entities');
-    return [...entities];
-  }, [entities]);
+  const mutableEntities = useMemo(() => [...entities], [entities]);
 
   const table = useReactTable({
     data: mutableEntities,
@@ -351,39 +345,18 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
     enableSortingRemoval: false,
-    // initialState: {
-    //   // consider adding actions col here. In this case we need to ensure columnsOrder contains all attributes, otherwise missing ocls will be displayed after the actions col.
-    //   columnOrder: [displayBulkSelectCol ? 'bulk-select' : null, ...columnsOrder].filter(Boolean),
-    // },
-    // state: {
-    //   sorting: activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : [],
-    // },
-    // onSortingChange: (newSortFn) => {
-    //   const newSort = newSortFn();
-    //   onSortChange({ attributeId: newSort[0].id, direction: newSort[0].desc ? 'desc' : 'asc' });
-    // },
-  );
-
-  // Extracted EntityTableRow component
-  interface EntityTableRowProps<Entity> {
-    row: any;
-    expandedSectionsRenderer?: any;
-  }
-
-  const EntityTableRow = <Entity,>({ row, expandedSectionsRenderer }: EntityTableRowProps<Entity>) => (
-    <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-      <tr>
-        {row.getVisibleCells().map((cell: any) => (
-          <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
-        ))}
-      </tr>
-      <ExpandedSections
-        key={`expanded-sections-${row.id}`}
-        expandedSectionsRenderer={expandedSectionsRenderer}
-        entity={row.original}
-      />
-    </tbody>
-  );
+    initialState: {
+      // consider adding actions col here. In this case we need to ensure columnsOrder contains all attributes, otherwise missing ocls will be displayed after the actions col.
+      columnOrder: [displayBulkSelectCol ? 'bulk-select' : null, ...columnsOrder].filter(Boolean),
+    },
+    state: {
+      sorting: activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : [],
+    },
+    onSortingChange: (newSortFn) => {
+      const newSort = newSortFn();
+      onSortChange({ attributeId: newSort[0].id, direction: newSort[0].desc ? 'desc' : 'asc' });
+    },
+  });
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
@@ -411,7 +384,16 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           <ScrollContainer id="scroll-container" ref={tableRef}>
             <StyledTable striped condensed hover>
               <TableHead table={table} />
-              })}
+              {table.getRowModel().rows.map((row) => (
+                <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
+                  <TableRow<Entity> key={row.id} row={row} />
+                  <ExpandedSections
+                    key={`expanded-sections-${row.id}`}
+                    expandedSectionsRenderer={expandedSectionsRenderer}
+                    entity={row.original}
+                  />
+                </tbody>
+              ))}
             </StyledTable>
           </ScrollContainer>
         </ExpandedSectionsProvider>
