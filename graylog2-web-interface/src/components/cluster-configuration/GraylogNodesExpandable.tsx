@@ -74,7 +74,7 @@ const getNodeDisplayName = (node: GraylogNode) => {
 
 const GraylogNodesExpandable = () => {
   const { nodes: graylogNodes, isLoading } = useGraylogNodes();
-  console.log('Graylog Nodes:', graylogNodes);
+  
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
 

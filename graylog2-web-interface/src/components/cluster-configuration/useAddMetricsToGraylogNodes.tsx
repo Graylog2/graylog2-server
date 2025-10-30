@@ -26,11 +26,11 @@ const METRIC_NAMES = {
   journalSegments: 'org.graylog2.journal.segments',
   journalEntriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
   journalSize: 'org.graylog2.journal.size',
-  journalmaxSize: 'org.graylog2.journal.size-limit',
+  journalMaxSize: 'org.graylog2.journal.size-limit',
   journalSizeRatio: 'org.graylog2.journal.utilization-ratio',
   jvmMemoryHeapUsed: 'jvm.memory.heap.used',
   jvmMemoryHeapCommitted: 'jvm.memory.heap.committed',
-  jvmMemoryHeapmaxMemory: 'jvm.memory.heap.max',
+  jvmMemoryHeapMaxMemory: 'jvm.memory.heap.max',
 } as const;
 
 export type GraylogNodeMetrics = { [key: string]: number | undefined | null };
