@@ -23,6 +23,7 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import JournalState from 'components/nodes/JournalState';
 import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
+import NumberUtils from 'util/NumberUtils';
 
 import useGraylogNodes from './useGraylogNodes';
 import type { GraylogNode } from './useGraylogNodes';
@@ -49,7 +50,7 @@ const NodePrimary = styled.div`
   gap: 2px;
 `;
 
-const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
+const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'journal', 'jvm', 'role', 'state'] as const;
 
 const getRoleLabels = (roles: string) =>
   roles
@@ -83,6 +84,8 @@ const GraylogNodesExpandable = () => {
       { id: 'node', title: 'Node' },
       { id: 'type', title: 'Type' },
       { id: 'role', title: 'Role' },
+      { id: 'journal', title: 'Journal' },
+      { id: 'jvm', title: 'JVM' },
       { id: 'state', title: 'State' },
     ],
     [],
@@ -118,6 +121,22 @@ const GraylogNodesExpandable = () => {
         },
         role: {
           renderCell: (_value, entity) => getRoleLabels(entity.is_leader ? 'Leader' : 'Non-Leader'),
+        },
+        journal: {
+          renderCell: (_value, entity) => {
+            const journalCurrent = entity.metrics?.journalSize;
+            const journalMax = entity.metrics?.journalMaxSize;
+
+            return `${NumberUtils.formatBytes(journalCurrent)} / ${NumberUtils.formatBytes(journalMax)}`;
+          },
+        },
+        jvm: {
+          renderCell: (_value, entity) => {
+            const heapUsed = entity.metrics?.jvmMemoryHeapUsed;
+            const heapMax = entity.metrics?.jvmMemoryHeapMaxMemory;
+
+            return `${NumberUtils.formatBytes(heapUsed)} / ${NumberUtils.formatBytes(heapMax)}`;
+          },
         },
         state: {
           renderCell: (_value, entity) => <GraylogNodeStatusLabel node={entity} />,
