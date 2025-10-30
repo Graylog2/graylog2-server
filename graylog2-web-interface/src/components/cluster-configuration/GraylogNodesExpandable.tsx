@@ -102,7 +102,7 @@ const GraylogNodesExpandable = () => {
             return (
               <NodePrimary>
                 {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
-                {nodeId && (
+                {/* {nodeId && (
                   <>
                     <SecondaryText>
                       <JournalState nodeId={nodeId} />
@@ -111,7 +111,7 @@ const GraylogNodesExpandable = () => {
                       <JvmHeapUsageText nodeId={nodeId} />
                     </SecondaryText>
                   </>
-                )}
+                )} */}
               </NodePrimary>
             );
           },
