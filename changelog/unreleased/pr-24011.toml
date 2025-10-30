@@ -1,0 +1,5 @@
+type = "added" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add support for separately opening and closing code blocks. Use context-aware Markdown escaping."
+
+issues = ["graylog-plugin-enterprise#12306"]
+pulls = ["24011"]
