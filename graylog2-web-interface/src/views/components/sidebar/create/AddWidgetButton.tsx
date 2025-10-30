@@ -21,7 +21,6 @@ import sortBy from 'lodash/sortBy';
 import upperCase from 'lodash/upperCase';
 import groupBy from 'lodash/groupBy';
 
-import useLocation from 'routing/useLocation';
 import { Button } from 'components/bootstrap';
 import type View from 'views/logic/views/View';
 import generateId from 'logic/generateId';
@@ -29,7 +28,6 @@ import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import type { GetState } from 'views/types';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
@@ -90,7 +88,6 @@ const CreateMenuItem = ({
   onClick: () => void;
   setOverflowingComponents: React.Dispatch<React.SetStateAction<OverflowingComponents>>;
 }) => {
-  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const dispatch = useViewsDispatch();
   const disabled = creator.useCondition?.() === false;
@@ -102,7 +99,6 @@ const CreateMenuItem = ({
         TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(creator.title).replace(/ /g, '_')] ??
           `Search Widget ${creator.title} Created`,
         {
-          app_pathname: getPathnameWithoutId(location.pathname),
           app_section: 'search-sidebar',
           event_details: {
             widgetType: creator.type,
