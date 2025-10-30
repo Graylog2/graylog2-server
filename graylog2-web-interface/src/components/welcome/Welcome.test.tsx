@@ -96,15 +96,16 @@ jest.mock('components/welcome/hooks/useRecentActivity', () =>
 );
 
 jest.mock('routing/Routes', () => ({
-  pluginRoute: (x) => x,
-  dashboard_show: (x) => `/route/DASHBOARDS_VIEWID/${x}`,
-  getPluginRoute: (x) => () => x,
+  pluginRoute: (x: string) => x,
+  dashboard_show: (x: string) => `/route/DASHBOARDS_VIEWID/${x}`,
+  getPluginRoute: (x: string) => () => x,
   SEARCH: '/search',
   SYSTEM: {
     USERS: {
       edit: () => '/edit-profile-page',
     },
   },
+  show_saved_search: (id: string) => `/search/${id}`,
 }));
 
 jest.mock('hooks/useCurrentUser');

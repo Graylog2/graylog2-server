@@ -30,15 +30,8 @@ jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    delete: jest.fn(),
-    update: {
-      completed: {
-        listen: () => jest.fn(),
-      },
-    },
-  },
+jest.mock('views/api/views', () => ({
+  deleteView: jest.fn(),
 }));
 
 jest.mock('routing/QueryParams', () => ({
