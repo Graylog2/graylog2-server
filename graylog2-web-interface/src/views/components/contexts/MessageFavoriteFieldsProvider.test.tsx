@@ -55,6 +55,7 @@ const Consumer = () => {
 const renderComponent = () =>
   render(
     <MessageFavoriteFieldsProvider
+      isFeatureEnabled
       message={{ id: 'id', index: 'index', fields: { streams: ['stream1'] } }}
       messageFields={Immutable.List([
         FieldTypeMapping.create('fav1', FieldTypes.STRING()),

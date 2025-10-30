@@ -25,14 +25,12 @@ import useMessageFavoriteFields, {
 } from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
-const MessageFavoriteFieldsProvider = ({
-  children = null,
-  message,
-  messageFields,
-}: React.PropsWithChildren<{
+type OriginalProps = React.PropsWithChildren<{
   message: Message;
   messageFields: FieldTypeMappingsList;
-}>) => {
+}>;
+
+const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
   const {
     isLoading,
     saveFields,
@@ -82,4 +80,18 @@ const MessageFavoriteFieldsProvider = ({
   return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;
 };
 
+const MessageFavoriteFieldsProvider = ({
+  children = null,
+  message,
+  messageFields,
+  isFeatureEnabled,
+}: OriginalProps & { isFeatureEnabled: boolean }) => {
+  if (!isFeatureEnabled) return children;
+
+  return (
+    <OriginalMessageFavoriteFieldsProvider message={message} messageFields={messageFields}>
+      {children}
+    </OriginalMessageFavoriteFieldsProvider>
+  );
+};
 export default MessageFavoriteFieldsProvider;
