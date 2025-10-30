@@ -24,6 +24,8 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
+import org.graylog.datanode.configuration.DatanodeKeystoreChangedEvent;
+import org.graylog.datanode.configuration.InitialCertificatesChangeEvent;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -51,6 +53,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
 
     private final OpensearchStateMachine stateMachine;
     private final CsrRequester csrRequester;
+    private final EventBus eventBus;
     private boolean processAutostart = true;
 
 
@@ -71,6 +74,7 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
         this.process = process;
         this.csrRequester = csrRequester;
         this.stateMachine = stateMachine;
+        this.eventBus = eventBus;
         eventBus.register(this);
     }
 
@@ -101,6 +105,15 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                     csrRequester.triggerCertificateSigningRequest();
                 }
             }
+        }
+    }
+
+    @Subscribe
+    public void handleCertificateChangeEvent(DatanodeKeystoreChangedEvent event) {
+        if (stateMachine.isInState(OpensearchState.WAITING_FOR_CONFIGURATION)) {
+            eventBus.post(new InitialCertificatesChangeEvent());
+        } else {
+            stateMachine.fire(OpensearchEvent.CERTIFICATES_RELOAD);
         }
     }
 
