@@ -48,7 +48,7 @@ const NodePrimary = styled.div`
   gap: 2px;
 `;
 
-const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'journal', 'jvm', 'role', 'state'] as const;
+const DEFAULT_VISIBLE_COLUMNS = ['node', 'journal', 'jvm', 'role', 'state'] as const;
 
 const getRoleLabels = (roles: string) =>
   roles
@@ -79,7 +79,6 @@ const GraylogNodesExpandable = () => {
   const columnDefinitions = useMemo<Array<Column>>(
     () => [
       { id: 'node', title: 'Node' },
-      { id: 'type', title: 'Type' },
       { id: 'role', title: 'Role' },
       { id: 'journal', title: 'Journal' },
       { id: 'jvm', title: 'JVM' },
@@ -102,9 +101,6 @@ const GraylogNodesExpandable = () => {
               </NodePrimary>
             );
           },
-        },
-        type: {
-          renderCell: () => 'Graylog',
         },
         role: {
           renderCell: (_value, entity) => getRoleLabels(entity.is_leader ? 'Leader' : 'Non-Leader'),

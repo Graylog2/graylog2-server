@@ -91,7 +91,7 @@ const DataNodesExpandable = () => {
           },
         },
         type: {
-          renderCell: (_value, _entity) => 'Data Node - OpenSearch',
+          renderCell: (_value, _entity) => 'OpenSearch',
         },
         role: {
           renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
