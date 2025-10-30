@@ -17,6 +17,7 @@ import org.opensearch.client.opensearch._types.FlushStats;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -119,10 +120,13 @@ class IndicesAdapterOSTest {
         final IndicesStats graylog12Stats = buildIndicesStats(
                 "P999CCTTFOhEGdspOYh9V",
                 17L,
-                FlushStats.builder().total(1L).totalTimeInMillis(1L).periodic(0L)
+                FlushStats.builder().total(1L).totalTimeInMillis(0L).periodic(1L)
         );
 
-        doReturn(Map.of("graylog_13", graylog13Stats, "graylog_12", graylog12Stats))
+        final LinkedHashMap<String, IndicesStats> returnedMap = new LinkedHashMap<>();
+        returnedMap.put("graylog_13", graylog13Stats);
+        returnedMap.put("graylog_12", graylog12Stats);
+        doReturn(returnedMap)
                 .when(statsApi)
                 .indicesStatsWithDocsAndStore(List.of("graylog_13", "graylog_12"));
 
@@ -158,10 +162,10 @@ class IndicesAdapterOSTest {
                     "uuid": "P999CCTTFOhEGdspOYh9V"
                   }
                 }
-                """.replaceAll("\\s+", "");
+                """.replaceAll("\\s+", "").trim();
         final JsonNode returned = toTest.getIndexStats(List.of("graylog_13", "graylog_12"));
 
-        assertEquals(expected, returned);
+        assertEquals(expected, returned.toString());
     }
 
 
