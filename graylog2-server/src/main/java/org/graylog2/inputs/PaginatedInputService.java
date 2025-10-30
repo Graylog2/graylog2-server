@@ -15,17 +15,17 @@ import java.util.function.Predicate;
 public class PaginatedInputService {
 
     private static final String COLLECTION_NAME = "inputs";
-    private final MongoCollection<InputImpl> collection;
-    private final MongoPaginationHelper<InputImpl> paginationHelper;
+    private final MongoCollection<ShinyInputImpl> collection;
+    private final MongoPaginationHelper<ShinyInputImpl> paginationHelper;
 
     @Inject
     public  PaginatedInputService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.collection(COLLECTION_NAME, InputImpl.class);
+        this.collection = mongoCollections.collection(COLLECTION_NAME, ShinyInputImpl.class);
         this.paginationHelper = mongoCollections.paginationHelper(collection);
     }
 
-    public PaginatedList<InputImpl> findPaginated(Bson searchQuery,
-                                                  Predicate<InputImpl> filter,
+    public PaginatedList<ShinyInputImpl> findPaginated(Bson searchQuery,
+                                                  Predicate<ShinyInputImpl> filter,
                                                   SortOrder order,
                                                   String sortField,
                                                   int page,

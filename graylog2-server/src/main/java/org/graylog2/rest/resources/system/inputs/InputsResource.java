@@ -53,9 +53,9 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
-import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.PaginatedInputService;
+import org.graylog2.inputs.ShinyInputImpl;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -243,9 +243,9 @@ public class InputsResource extends AbstractInputsResource {
                                                   @DefaultValue(MessageInput.FIELD_TITLE) @QueryParam("sort") String sortField,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                   @DefaultValue("asc") @QueryParam("order") SortOrder order) {
-        final Predicate<InputImpl> permissionFilter = input -> isPermitted(RestPermissions.INPUTS_READ, input.getId());
+        final Predicate<ShinyInputImpl> permissionFilter = input -> isPermitted(RestPermissions.INPUTS_READ, input.id());
 
-        final PaginatedList<InputImpl> result = paginatedInputService.findPaginated(
+        final PaginatedList<ShinyInputImpl> result = paginatedInputService.findPaginated(
                 dbQueryCreator.createDbQuery(filters, query),
                 permissionFilter,
                 order,
