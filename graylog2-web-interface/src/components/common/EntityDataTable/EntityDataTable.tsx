@@ -19,7 +19,7 @@ import { useMemo, useRef, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
-import { useReactTable, createColumnHelper, getCoreRowModel, flexRender } from '@tanstack/react-table';
+import { useReactTable, createColumnHelper, getCoreRowModel, flexRender, ColumnDef } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { Table, ButtonGroup } from 'components/bootstrap';
@@ -157,6 +157,54 @@ const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(
   );
 };
 
+const useBulkSelectCol = <Entity extends EntityBase>(displayBulkSelectCol: boolean) => {
+  const columnHelper = createColumnHelper<Entity>();
+
+  return useMemo(
+    () =>
+      displayBulkSelectCol
+        ? columnHelper.display({
+            id: 'bulk-select',
+            size: BULK_SELECT_COLUMN_WIDTH,
+            header: ({ table }) => <BulkSelectHead data={table.options.data} />,
+            cell: ({ row }) => {
+              return (
+                <RowCheckbox
+                  onChange={row.getToggleSelectedHandler()}
+                  title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
+                  checked={row.getIsSelected()}
+                  disabled={!row.getCanSelect()}
+                  aria-label={row.id}
+                />
+              );
+            },
+          })
+        : null,
+    [displayBulkSelectCol, columnHelper],
+  );
+};
+
+const useActionsCol = <Entity extends EntityBase>(
+  displayActionsCol: boolean,
+  actionsColWidth: number,
+  entityActions?: (entity: Entity) => React.ReactNode,
+) => {
+  const columnHelper = createColumnHelper<Entity>();
+
+  return useMemo(
+    () =>
+      displayActionsCol
+        ? columnHelper.display({
+            id: 'actions',
+            size: actionsColWidth,
+            header: 'Actions',
+            cell: ({ row }) => <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>,
+          })
+        : null,
+    [],
+  );
+};
+
 type Props<Entity extends EntityBase, Meta = unknown> = {
   /**
    * Needs to be defined when not all action cells in every row have the same width.
@@ -187,7 +235,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Define default columns order. Column ids need to be snake case. */
   columnsOrder?: Array<string>;
   /** The table data. */
-  entities: Array<Entity>;
+  entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
   expandedSectionsRenderer?: {
     [sectionName: string]: ExpandedSectionRenderer<Entity>;
@@ -269,74 +317,73 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const selectableData = useMemo(() => entities.filter(_isEntitySelectable), [entities, _isEntitySelectable]);
   const columnHelper = createColumnHelper<Entity>();
+  const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol);
+  const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions);
 
-  const _columns = useMemo(
-    () => [
-      ...(displayBulkSelectCol
-        ? [
-            columnHelper.display({
-              id: 'bulk-select',
-              size: BULK_SELECT_COLUMN_WIDTH,
-              header: () => <BulkSelectHead data={entities} />,
-              cell: ({ row }) => {
-                const isSelected = row.getIsSelected();
-                return (
-                  <RowCheckbox
-                    onChange={row.getToggleSelectedHandler()}
-                    title={`${isSelected ? 'Deselect' : 'Select'} entity`}
-                    checked={isSelected}
-                    disabled={!row.getCanSelect()}
-                    aria-label={row.id}
-                  />
-                );
-              },
-            }),
-          ]
-        : []),
-      ...columns.map((col) =>
-        columnHelper.accessor(col.id, {
-          cell: (info) =>
-            columnRenderersByAttribute[col.id].renderCell(info.cell.getValue(), info.row.original, col, meta),
+  const attributeColumns = useMemo(
+    () =>
+      columns.map((col) => {
+        const columnRenderer = columnRenderersByAttribute[col.id];
+        return columnHelper.accessor(col.id, {
           accessorKey: entityAttributesAreCamelCase ? camelCase(col.id) : col.id,
-          header: (info) =>
-            columnRenderersByAttribute[col.id]?.renderHeader
-              ? columnRenderersByAttribute[col.id].renderHeader(info)
-              : col.title,
+          cell: ({ cell, row }) => columnRenderer.renderCell(cell.getValue(), row.original, col, meta),
+          header: () => columnRenderer?.renderHeader?.(col) ?? col.title,
           size: columnsWidths[col.id],
           enableSorting: col.sortable ?? false,
-        }),
-      ),
-      ...(displayActionsCol
-        ? [
-            columnHelper.display({
-              id: 'actions',
-              size: actionsColWidth,
-              header: 'Actions',
-              cell: ({ row }) => <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>,
-            }),
-          ]
-        : []),
-    ],
-    [columnHelper, columnRenderersByAttribute, columns, columnsWidths, entityAttributesAreCamelCase, meta],
+        });
+      }),
+    [columns, columnRenderersByAttribute, entityAttributesAreCamelCase, columnsWidths, meta, columnHelper],
   );
 
+  const reactTableColumns = useMemo(
+    () => [bulkSelectCol, ...attributeColumns, actionsCol].filter(Boolean) as ColumnDef<Entity, unknown>[],
+    [bulkSelectCol, attributeColumns, actionsCol],
+  );
+
+  const mutableEntities = useMemo(() => {
+    console.log('mutable entities');
+    return [...entities];
+  }, [entities]);
+
   const table = useReactTable({
-    data: entities,
-    columns: _columns,
+    data: mutableEntities,
+    columns: reactTableColumns,
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
     enableSortingRemoval: false,
-    initialState: {
-      columnOrder: [...(displayBulkSelectCol ? ['bulk-select'] : []), ...columnsOrder],
-    },
-    state: {
-      sorting: activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : [],
-    },
-    onSortingChange: (newSortFn) => {
-      const newSort = newSortFn();
-      onSortChange({ attributeId: newSort[0].id, direction: newSort[0].desc ? 'desc' : 'asc' });
-    },
-  });
+    // initialState: {
+    //   // consider adding actions col here. In this case we need to ensure columnsOrder contains all attributes, otherwise missing ocls will be displayed after the actions col.
+    //   columnOrder: [displayBulkSelectCol ? 'bulk-select' : null, ...columnsOrder].filter(Boolean),
+    // },
+    // state: {
+    //   sorting: activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : [],
+    // },
+    // onSortingChange: (newSortFn) => {
+    //   const newSort = newSortFn();
+    //   onSortChange({ attributeId: newSort[0].id, direction: newSort[0].desc ? 'desc' : 'asc' });
+    // },
+  );
+
+  // Extracted EntityTableRow component
+  interface EntityTableRowProps<Entity> {
+    row: any;
+    expandedSectionsRenderer?: any;
+  }
+
+  const EntityTableRow = <Entity,>({ row, expandedSectionsRenderer }: EntityTableRowProps<Entity>) => (
+    <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
+      <tr>
+        {row.getVisibleCells().map((cell: any) => (
+          <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+        ))}
+      </tr>
+      <ExpandedSections
+        key={`expanded-sections-${row.id}`}
+        expandedSectionsRenderer={expandedSectionsRenderer}
+        entity={row.original}
+      />
+    </tbody>
+  );
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
@@ -364,20 +411,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           <ScrollContainer id="scroll-container" ref={tableRef}>
             <StyledTable striped condensed hover>
               <TableHead table={table} />
-              {table.getRowModel().rows.map((row) => (
-                <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                  <tr>
-                    {row.getVisibleCells().map((cell) => (
-                      <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
-                    ))}
-                  </tr>
-                  <ExpandedSections
-                    key={`expanded-sections-${row.id}`}
-                    expandedSectionsRenderer={expandedSectionsRenderer}
-                    row={row}
-                  />
-                </tbody>
-              ))}
+              })}
             </StyledTable>
           </ScrollContainer>
         </ExpandedSectionsProvider>
