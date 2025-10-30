@@ -39,7 +39,7 @@ public abstract class PipelineInputsMetadataDao implements BuildableMongoEntity<
             @JsonProperty("pipeline_id") String pipelineId,
             @JsonProperty("rule_id") String ruleId,
             @JsonProperty("stages") Set<Integer> stages,
-            @JsonProperty("connected_stream") Set<String> connectedStreams
+            @JsonProperty("connected_streams") Set<String> connectedStreams
     ) {}
 
     @Id

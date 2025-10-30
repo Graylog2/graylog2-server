@@ -52,12 +52,7 @@ public interface InputService extends PersistedService {
 
     Set<Input> findByIds(Collection<String> ids);
 
-    default List<String> findIdsByName(String name) {
-        return all().stream()
-                .filter(input -> input.getTitle().equals(name))
-                .map(Input::getId)
-                .toList();
-    }
+    List<String> findIdsByTitle(String title);
 
     Input findForThisNode(String nodeId, String id) throws NotFoundException;
 
