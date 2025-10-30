@@ -51,15 +51,6 @@ const NodePrimary = styled.div`
 
 const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
 
-type GraylogNodeEntity = {
-  id: string;
-  node: string;
-  type: string;
-  role: string;
-  state: GraylogNode;
-  nodeInfo: GraylogNode;
-};
-
 const getRoleLabels = (roles: string) =>
   roles
     .split(',')
@@ -70,6 +61,16 @@ const getRoleLabels = (roles: string) =>
         <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
       </span>
     ));
+
+const getNodeDisplayName = (node: GraylogNode) => {
+  const nodeNameParts = [node.short_node_id, node.hostname].filter(Boolean);
+
+  if (nodeNameParts.length) {
+    return nodeNameParts.join(' / ');
+  }
+
+  return node.node_id ?? node.hostname ?? node.id;
+};
 
 const GraylogNodesExpandable = () => {
   const { nodes: graylogNodes, isLoading } = useGraylogNodes();
@@ -86,16 +87,17 @@ const GraylogNodesExpandable = () => {
     [],
   );
 
-  const columnRenderers = useMemo<ColumnRenderers<GraylogNodeEntity>>(
+  const columnRenderers = useMemo<ColumnRenderers<GraylogNode>>(
     () => ({
       attributes: {
         node: {
           renderCell: (_value, entity) => {
-            const nodeId = entity.nodeInfo.node_id;
+            const nodeId = entity.node_id;
+            const nodeName = getNodeDisplayName(entity);
 
             return (
               <NodePrimary>
-                {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{entity.node}</Link> : entity.node}
+                {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
                 {nodeId && (
                   <>
                     <SecondaryText>
@@ -110,28 +112,18 @@ const GraylogNodesExpandable = () => {
             );
           },
         },
+        type: {
+          renderCell: () => 'Graylog',
+        },
         role: {
-          renderCell: (_value, entity) => getRoleLabels(entity.role),
+          renderCell: (_value, entity) => getRoleLabels(entity.is_leader ? 'Leader' : 'Non-Leader'),
         },
         state: {
-          renderCell: (_value, entity) => <GraylogNodeStatusLabel node={entity.nodeInfo} />,
+          renderCell: (_value, entity) => <GraylogNodeStatusLabel node={entity} />,
         },
       },
     }),
     [],
-  );
-
-  const graylogNodeEntities = useMemo<ReadonlyArray<GraylogNodeEntity>>(
-    () =>
-      graylogNodes.map((graylogNode) => ({
-        id: graylogNode.nodeInfo.node_id ?? graylogNode.nodeName,
-        node: graylogNode.nodeName,
-        type: graylogNode.type,
-        role: graylogNode.role,
-        state: graylogNode.nodeInfo,
-        nodeInfo: graylogNode.nodeInfo,
-      })),
-    [graylogNodes],
   );
 
   const handleColumnsChange = useCallback((newColumns: Array<string>) => {
@@ -144,16 +136,13 @@ const GraylogNodesExpandable = () => {
 
   const handleSortChange = useCallback(() => {}, []);
 
-  const renderActions = useCallback((entity: GraylogNodeEntity) => <GraylogNodeActions node={entity.nodeInfo} />, []);
+  const renderActions = useCallback((entity: GraylogNode) => <GraylogNodeActions node={entity} />, []);
 
-  if (!graylogNodeEntities.length && !isLoading) {
-    return null;
-  }
 
   return (
     <ClusterNodesSectionWrapper title="Graylog Nodes" headerLeftSection={isLoading && <Spinner />}>
-      <EntityDataTable<GraylogNodeEntity>
-        entities={graylogNodeEntities}
+      <EntityDataTable<GraylogNode>
+        entities={graylogNodes}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         onColumnsChange={handleColumnsChange}

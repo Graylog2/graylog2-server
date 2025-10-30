@@ -20,17 +20,10 @@ import { NodesStore } from 'stores/nodes/NodesStore';
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import type { SystemOverview } from 'stores/cluster/types';
 
-export type GraylogNode = NodeInfo & SystemOverview;
-
-export type GraylogClusterNode = {
-  nodeName: string;
-  type: string;
-  role: string;
-  nodeInfo: GraylogNode;
-};
+export type GraylogNode = NodeInfo & SystemOverview & { id: string };
 
 export type UseGraylogNodesResult = {
-  nodes: Array<GraylogClusterNode>;
+  nodes: Array<GraylogNode>;
   isLoading: boolean;
 };
 
@@ -38,15 +31,18 @@ const useGraylogNodes = (): UseGraylogNodesResult => {
   const { nodes: graylogNodesStore } = useStore(NodesStore);
   const { clusterOverview: systemInfo } = useStore(ClusterOverviewStore);
 
-  const graylogNodes = Object.values(graylogNodesStore || {}).map((graylogNode) => ({
-    nodeName: `${graylogNode?.short_node_id} / ${graylogNode?.hostname}`,
-    type: 'Server',
-    role: graylogNode?.is_leader ? 'Leader' : 'Non-Leader',
-    nodeInfo: {
+  const graylogNodes = Object.values(graylogNodesStore || {}).map((graylogNode) => {
+    const nodeOverview = systemInfo?.[graylogNode.node_id];
+    const combinedNode = {
       ...graylogNode,
-      ...(systemInfo || {})[graylogNode?.node_id],
-    } as GraylogNode,
-  }));
+      ...nodeOverview,
+    };
+
+    return {
+      ...combinedNode,
+      id: combinedNode.node_id,
+    } as GraylogNode;
+  });
 
   return {
     nodes: graylogNodes,

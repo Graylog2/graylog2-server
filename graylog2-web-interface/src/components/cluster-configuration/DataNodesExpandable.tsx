@@ -38,21 +38,15 @@ const RoleLabel = styled(Label)`
 
 const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
 
-type DataNodeEntity = {
-  id: string;
-  node: string;
-  type: string;
-  role: Array<string>;
-  state: DataNode;
-  nodeInfo: DataNode;
-};
-
 const getRoleLabels = (roles: Array<string>) =>
   roles.map((role) => (
     <span key={role}>
       <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
     </span>
   ));
+
+const getDataNodeRoles = (dataNode: DataNode) =>
+  dataNode.opensearch_roles?.map((currentRole) => currentRole.trim()).filter(Boolean) ?? [];
 
 const DEFAULT_SEARCH_PARAMS: SearchParams = {
   query: '',
@@ -81,58 +75,36 @@ const DataNodesExpandable = () => {
     [],
   );
 
-  const columnRenderers = useMemo<ColumnRenderers<DataNodeEntity>>(
+  const columnRenderers = useMemo<ColumnRenderers<DataNode>>(
     () => ({
       attributes: {
         node: {
           renderCell: (_value, entity) => {
-            const datanodeRouteId = entity.nodeInfo.node_id ?? entity.nodeInfo.id;
+            const datanodeRouteId = entity.node_id ?? entity.id;
+            const nodeName = entity.hostname ?? datanodeRouteId;
 
             if (!datanodeRouteId) {
-              return entity.node;
+              return nodeName;
             }
 
-            return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{entity.node}</Link>;
+            return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
           },
         },
+        type: {
+          renderCell: (_value, _entity) => 'Data Node - OpenSearch',
+        },
         role: {
-          renderCell: (_value, entity) => getRoleLabels(entity.role),
+          renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
         },
         state: {
-          renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity.nodeInfo} />,
+          renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
         },
       },
     }),
     [],
   );
 
-  const dataNodeEntities = useMemo(
-    () => {
-      const dataNodes = dataNodesResponse?.list || [];
-
-      return dataNodes.map((dataNode, index) => {
-        const roles = dataNode?.opensearch_roles?.map((currentRole) => currentRole.trim()).filter(Boolean) ?? [];
-        const nodeName = dataNode?.hostname ?? dataNode?.node_id ?? dataNode?.cluster_address ?? dataNode?.rest_api_address;
-        const nodeId =
-          dataNode?.node_id ??
-          dataNode?.id ??
-          dataNode?.hostname ??
-          dataNode?.cluster_address ??
-          dataNode?.rest_api_address ??
-          `data-node-${index}`;
-
-        return {
-          id: nodeId,
-          node: nodeName ?? nodeId,
-          type: 'Data Node - OpenSearch',
-          role: roles,
-          state: dataNode,
-          nodeInfo: dataNode,
-        };
-      });
-    },
-    [dataNodesResponse],
-  );
+  const dataNodes = dataNodesResponse?.list ?? [];
 
   const handleColumnsChange = useCallback((newColumns: Array<string>) => {
     if (!newColumns.length) {
@@ -144,14 +116,14 @@ const DataNodesExpandable = () => {
 
   const handleSortChange = useCallback(() => {}, []);
   const renderActions = useCallback(
-    (entity: DataNodeEntity) => <DataNodeActions dataNode={entity.nodeInfo} refetch={refetch} />,
+    (entity: DataNode) => <DataNodeActions dataNode={entity} refetch={refetch} />,
     [refetch],
   );
 
   return (
     <ClusterNodesSectionWrapper title="Data Nodes" headerLeftSection={isInitialLoading && <Spinner />}>
-      <EntityDataTable<DataNodeEntity>
-        entities={dataNodeEntities}
+      <EntityDataTable<DataNode>
+        entities={dataNodes}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         onColumnsChange={handleColumnsChange}
