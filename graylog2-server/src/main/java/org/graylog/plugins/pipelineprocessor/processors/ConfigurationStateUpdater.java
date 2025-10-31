@@ -58,6 +58,7 @@ public class ConfigurationStateUpdater {
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
     private final PipelineResolver pipelineResolver;
     private final PipelineMetricRegistry pipelineMetricRegistry;
+    private final PipelineMetadataUpdater metadataListener;
 
     @Inject
     public ConfigurationStateUpdater(RuleService ruleService,
@@ -67,6 +68,7 @@ public class ConfigurationStateUpdater {
                                      PipelineResolver.Factory pipelineResolverFactory,
                                      RuleMetricsConfigService ruleMetricsConfigService,
                                      MetricRegistry metricRegistry,
+                                     PipelineMetadataUpdater metadataListener,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
                                      PipelineInterpreter.State.Factory stateFactory) {
@@ -85,6 +87,7 @@ public class ConfigurationStateUpdater {
                 pipelineRuleParser
         );
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        this.metadataListener = metadataListener;
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
@@ -104,6 +107,11 @@ public class ConfigurationStateUpdater {
         return newState;
     }
 
+    private synchronized PipelineInterpreter.State reloadAndSave(RulesChangedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        metadataListener.handleRuleChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+        return state;
+    }
 
     /**
      * Can be used to inspect or use the current state of the pipeline system.
@@ -123,7 +131,7 @@ public class ConfigurationStateUpdater {
             pipelineMetricRegistry.removeRuleMetrics(ref.id());
         });
         event.updatedRules().forEach(ref -> log.debug("Refreshing rule {}", ref.id()));
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe

@@ -436,9 +436,11 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
+                mock(PipelineMetadataUpdater.class),
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true)
+                (currentPipelines, streamPipelineConnections, ruleMetricsConfig) ->
+                        new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, metricRegistry, 1, true)
         );
         return new PipelineInterpreter(
                 messageQueueAcknowledger,
@@ -492,6 +494,7 @@ public class PipelineInterpreterTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
+                mock(PipelineMetadataUpdater.class),
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)

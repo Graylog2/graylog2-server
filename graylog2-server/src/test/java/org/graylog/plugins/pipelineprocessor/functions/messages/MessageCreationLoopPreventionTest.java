@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.processors.PipelineMetadataUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.plugin.Message;
@@ -139,6 +140,7 @@ class MessageCreationLoopPreventionTest extends BaseParserTest {
                 (config, ruleParser) -> new PipelineResolver(ruleParser, config),
                 ruleMetricsConfigService,
                 metricRegistry,
+                mock(PipelineMetadataUpdater.class),
                 Executors.newScheduledThreadPool(1),
                 eventBus,
                 (currentPipelines, streamPipelineConnections, ruleMetricsConfig) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, ruleMetricsConfig, new MetricRegistry(), 1, true)

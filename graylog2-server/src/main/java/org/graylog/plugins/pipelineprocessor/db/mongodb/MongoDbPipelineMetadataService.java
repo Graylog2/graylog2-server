@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao.FIELD_PIPELINE_ID;
@@ -64,6 +65,12 @@ public class MongoDbPipelineMetadataService {
         return collection.find(eq(PipelineRulesMetadataDao.FIELD_RULES, ruleId))
                 .map(PipelineRulesMetadataDao::pipelineId)
                 .into(new HashSet<>());
+    }
+
+    public Set<String> getPipelinesByRules(final Set<String> ruleIds) {
+        return ruleIds.stream()
+                .flatMap(ruleId -> getPipelinesByRule(ruleId).stream())
+                .collect(Collectors.toSet());
     }
 
 }

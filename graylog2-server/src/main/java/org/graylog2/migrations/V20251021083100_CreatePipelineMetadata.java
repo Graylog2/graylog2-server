@@ -16,21 +16,16 @@
  */
 package org.graylog2.migrations;
 
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.ImmutableMap;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.InsertOneModel;
 import jakarta.inject.Inject;
-import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineAnalyzer;
-import org.graylog.plugins.pipelineprocessor.processors.PipelineMetricRegistry;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolverConfig;
 import org.graylog2.database.MongoCollection;
@@ -56,24 +51,21 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
     private final MongoDatabase db;
     private final PipelineResolver pipelineResolver;
     private final PipelineAnalyzer pipelineAnalyzer;
-    private final PipelineMetricRegistry pipelineMetricRegistry;
     private final MongoCollection<PipelineRulesMetadataDao> rulesCollection;
     private final MongoCollection<PipelineInputsMetadataDao> inputsCollection;
 
     @Inject
     public V20251021083100_CreatePipelineMetadata(MongoConnection mongoConnection,
                                                   MongoCollections mongoCollections,
+                                                  MongoDbRuleService ruleService,
                                                   PipelineService pipelineService,
                                                   PipelineAnalyzer pipelineAnalyzer,
-                                                  RuleService ruleService,
                                                   PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                                   PipelineRuleParser pipelineRuleParser,
-                                                  MetricRegistry metricRegistry,
                                                   PipelineResolver.Factory pipelineResolverFactory) {
         this.db = mongoConnection.getMongoDatabase();
         this.rulesCollection = mongoCollections.collection(RULES_COLLECTION_NAME, PipelineRulesMetadataDao.class);
         this.inputsCollection = mongoCollections.collection(INPUTS_COLLECTION_NAME, PipelineInputsMetadataDao.class);
-        this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
         this.pipelineAnalyzer = pipelineAnalyzer;
         this.pipelineResolver = pipelineResolverFactory.create(
                 PipelineResolverConfig.of(
@@ -113,11 +105,8 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
     private void createMetadata() {
         LOG.info("Creating pipeline metadata collection.");
         final List<InsertOneModel<PipelineRulesMetadataDao>> ruleRecords = new ArrayList<>();
-
-        final ImmutableMap<String, Pipeline> pipelines = pipelineResolver.resolvePipelines(pipelineMetricRegistry);
-        final ImmutableMap<String, Pipeline> functions = pipelineResolver.resolveFunctions(pipelines.values(), pipelineMetricRegistry);
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
-                pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords);
+                pipelineAnalyzer.analyzePipelines(pipelineResolver, ruleRecords);
 
         final List<InsertOneModel<PipelineInputsMetadataDao>> inputRecords = new ArrayList<>();
         inputMentions.forEach((inputId, mentionedInEntries) -> {

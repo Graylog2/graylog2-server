@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.client.model.InsertOneModel;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -57,17 +57,27 @@ public class PipelineAnalyzer {
     private static final Logger LOG = LoggerFactory.getLogger(PipelineAnalyzer.class);
     private final PipelineStreamConnectionsService connectionsService;
     private final InputService inputService;
+    private final PipelineMetricRegistry pipelineMetricRegistry;
 
     @Inject
     public PipelineAnalyzer(
             PipelineStreamConnectionsService connectionsService,
-            InputService inputService
+            InputService inputService,
+            MetricRegistry metricRegistry
     ) {
         this.connectionsService = connectionsService;
         this.inputService = inputService;
+        this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
     }
 
-    @Nonnull
+    public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
+            PipelineResolver resolver,
+            List<InsertOneModel<PipelineRulesMetadataDao>> ruleRecords) {
+        final ImmutableMap<String, Pipeline> pipelines = resolver.resolvePipelines(pipelineMetricRegistry);
+        final ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), pipelineMetricRegistry);
+        return analyzePipelines(pipelines, functions, ruleRecords);
+    }
+
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             ImmutableMap<String, Pipeline> pipelines,
             ImmutableMap<String, Pipeline> functions,
