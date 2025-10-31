@@ -104,6 +104,7 @@ public class UsersResourceTest {
     private static final String TOKEN_NAME = "tokenName";
 
     private static final String ADMIN_OBJECT_ID = new ObjectId().toHexString();
+    public static final String ALLOWED_ROLE_LOWER_CASE = TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US);
 
     @Mock
     private UsersResource usersResource;
@@ -151,7 +152,9 @@ public class UsersResourceTest {
     public void createSuccess() throws ValidationException, NotFoundException {
         Role role = mock(Role.class);
         when(role.getId()).thenReturn(new ObjectId().toHexString());
-        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), role));
+        when(role.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, role));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
 
@@ -165,11 +168,55 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void createFailureOnMissingRoleAssignPermission() {
+    public void failOnUnallowedRoleAssignment() throws NotFoundException {
+        Role readerRole = mock(Role.class);
+        when(readerRole.getId()).thenReturn(new ObjectId().toHexString());
+        when(readerRole.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+
+        String forbiddenRole = "ADMIN";
+        Role adminRole = mock(Role.class);
+        when(adminRole.getId()).thenReturn(new ObjectId().toHexString());
+        when(adminRole.getName()).thenReturn("admin");
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
+        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
+        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <admin>"));
+    }
+
+    @Test
+    public void failOnUnallowedRoleUnAssignment() throws NotFoundException {
+        Role readerRole = mock(Role.class);
+        ObjectId readerRoleId = new ObjectId();
+        when(readerRole.getId()).thenReturn(readerRoleId.toHexString());
+        when(readerRole.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+
+        Role adminRole = mock(Role.class);
+        ObjectId adminRoleId = new ObjectId();
+        when(adminRole.getId()).thenReturn(adminRoleId.toHexString());
+        when(adminRole.getName()).thenReturn("ADMIN");
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
+
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of(UserImpl.ROLES, List.of(readerRoleId, adminRoleId))));
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        when(userService.loadById("creator")).thenReturn(creator);
+        when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD)));
+        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
+    }
+
+    @Test
+    public void createFailureOnWrongRoleAssignPermission() {
         String testRole = "forbiddenRole";
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-        assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
     }
 
     @Test
@@ -397,7 +444,7 @@ public class UsersResourceTest {
      */
     public static class TestUsersResource extends UsersResource {
 
-        private static final String ALLOWED_ROLE = "allowed_role";
+        private static final String ALLOWED_ROLE = "READER";
         private final Subject subject;
 
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
@@ -420,7 +467,7 @@ public class UsersResourceTest {
 
         @Override
         protected void checkPermission(String permission, String instanceId) {
-            if (permission.equals(RestPermissions.ROLES_EDIT) && instanceId.equals(ALLOWED_ROLE)) {
+            if (permission.equals(RestPermissions.ROLES_ASSIGN) && instanceId.equals(ALLOWED_ROLE)) {
                 return;
             }
             super.checkPermission(permission, instanceId);

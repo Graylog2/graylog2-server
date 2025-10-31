@@ -25,6 +25,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +62,8 @@ public abstract class IndicesGetAllMessageFieldsIT extends ElasticsearchBaseTest
                 new NullAuditEventSender(),
                 new EventBus(),
                 indicesAdapter(),
-                mock(IndexFieldTypeProfileService.class)
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class)
         );
     }
 

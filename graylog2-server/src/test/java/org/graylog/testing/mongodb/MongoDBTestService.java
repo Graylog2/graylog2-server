@@ -20,7 +20,6 @@ import com.google.common.io.Resources;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionImpl;
@@ -48,11 +47,20 @@ public class MongoDBTestService implements AutoCloseable {
     private MongoConnectionImpl mongoConnection;
 
     /**
+     * Create service instance with the default version and network.
+     *
+     * @return the service instance
+     */
+    public static MongoDBTestService create(Network network) {
+        return new MongoDBTestService(MongoDBContainer.create(network));
+    }
+
+    /**
      * Create service instance with the given version and network.
      *
      * @return the service instance
      */
-    public static MongoDBTestService create(MongodbServer version, Network network) {
+    public static MongoDBTestService create(MongoDBVersion version, Network network) {
         return new MongoDBTestService(MongoDBContainer.create(version, network));
     }
 

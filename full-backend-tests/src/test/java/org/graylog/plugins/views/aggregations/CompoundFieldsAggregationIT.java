@@ -18,25 +18,23 @@ package org.graylog.plugins.views.aggregations;
 
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.inputs.PortBoundGelfInputApi;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.Map;
 
-import static org.graylog.testing.containermatrix.SearchServer.ES7;
-import static org.graylog.testing.containermatrix.SearchServer.OS1;
-import static org.graylog.testing.containermatrix.SearchServer.OS2;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_4;
-import static org.graylog.testing.containermatrix.SearchServer.OS2_LATEST;
-
-@ContainerMatrixTestsConfiguration(searchVersions = {ES7, OS1, OS2, OS2_4, OS2_LATEST})
+@GraylogBackendConfiguration
 public class CompoundFieldsAggregationIT {
-    private final GraylogApis api;
-    public CompoundFieldsAggregationIT(GraylogApis api) {
-        this.api = api;
+
+    private static GraylogApis api;
+
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void aggregate() throws Exception {
         final PortBoundGelfInputApi gelf = api.gelf().createGelfHttpInput();
         try (final var env1 = api.createEnvironment(gelf)) {

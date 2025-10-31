@@ -27,6 +27,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.Indices;
@@ -101,7 +102,8 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 new NullAuditEventSender(),
                 mock(EventBus.class),
                 createIndicesAdapter(),
-                mock(IndexFieldTypeProfileService.class)
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class)
         );
         final Configuration withStreamAwarenessOff = spy(new Configuration());
         doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();
