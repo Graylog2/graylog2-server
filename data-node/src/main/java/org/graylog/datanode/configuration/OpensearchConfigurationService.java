@@ -73,7 +73,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
     }
 
     @Subscribe
-    public void onKeystoreChange(InitialCertificatesChangeEvent event) {
+    public void onKeystoreChange(DatanodeCertificateChangedEvent event) {
         // configuration relies on the keystore. Initial change there should rebuild the configuration and restart
         // dependent services
         triggerConfigurationChangedEvent();
