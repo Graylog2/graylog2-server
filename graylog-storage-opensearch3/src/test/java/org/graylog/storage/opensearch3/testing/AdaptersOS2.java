@@ -23,7 +23,7 @@ import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
 import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS2;
 import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
-import org.graylog.storage.opensearch3.IndicesAdapterOS2;
+import org.graylog.storage.opensearch3.IndicesAdapterOS;
 import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS2;
@@ -37,6 +37,7 @@ import org.graylog.storage.opensearch3.SearchesAdapterOS;
 import org.graylog.storage.opensearch3.SortOrderMapper;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
+import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
@@ -78,12 +79,14 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
-        return new IndicesAdapterOS2(client,
-                new org.graylog.storage.opensearch3.stats.StatsApi(objectMapper, client),
+        return new IndicesAdapterOS(client,
+                new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch3.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client)
+                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
+                new IndexStatisticsBuilder(),
+                objectMapper
         );
     }
 

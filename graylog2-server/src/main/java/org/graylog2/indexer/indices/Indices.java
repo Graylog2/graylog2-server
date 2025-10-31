@@ -36,6 +36,7 @@ import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
@@ -78,6 +79,7 @@ public class Indices {
     private final EventBus eventBus;
     private final IndicesAdapter indicesAdapter;
     private final IndexFieldTypeProfileService profileService;
+    private final CountsAdapter countsAdapter;
 
     @Inject
     public Indices(IndexMappingFactory indexMappingFactory,
@@ -85,13 +87,15 @@ public class Indices {
                    AuditEventSender auditEventSender,
                    EventBus eventBus,
                    IndicesAdapter indicesAdapter,
-                   IndexFieldTypeProfileService profileService) {
+                   IndexFieldTypeProfileService profileService,
+                   CountsAdapter countsAdapter) {
         this.indexMappingFactory = indexMappingFactory;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
         this.eventBus = eventBus;
         this.indicesAdapter = indicesAdapter;
         this.profileService = profileService;
+        this.countsAdapter = countsAdapter;
     }
 
     public IndicesBlockStatus getIndicesBlocksStatus(final List<String> indices) {
@@ -138,7 +142,7 @@ public class Indices {
     }
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
-        return indicesAdapter.numberOfMessages(indexName);
+        return countsAdapter.totalCount(List.of(indexName));
     }
 
     public IndexSetStats getIndexSetStats() {
