@@ -45,13 +45,7 @@ const ActionItem = ({ itemGrn, activityType, itemTitle, userName = null }: Props
   return (
     <div>
       {`The ${entityTypeTitle} `}
-      {!showLink ? (
-        <i>{entityTitle}</i>
-      ) : (
-        <Link target="_blank" to={entityLink}>
-          {entityTitle}
-        </Link>
-      )}
+      {!showLink ? <i>{entityTitle}</i> : <Link to={entityLink}>{entityTitle}</Link>}
       {' was '}
       {`${activityType}d`}
       {userName ? ` by ${userName}` : ''}
