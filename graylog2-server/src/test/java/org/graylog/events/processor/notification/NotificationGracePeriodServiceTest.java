@@ -23,20 +23,20 @@ import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.notifications.NotificationGracePeriodService;
 import org.graylog.events.processor.EventDefinition;
 import org.joda.time.DateTime;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class NotificationGracePeriodServiceTest {
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
     private EventDefinition definition;
     @Mock

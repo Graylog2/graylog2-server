@@ -20,9 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import com.mongodb.client.model.Filters;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
@@ -43,7 +40,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MongoDBExtension.class)
-@ExtendWith(MongoJackExtension.class)
 @ExtendWith(MockitoExtension.class)
 @MongoDBFixtures("roles.json")
 class PaginatedAuthzRolesServiceTest {
@@ -51,12 +47,10 @@ class PaginatedAuthzRolesServiceTest {
     private UserService userService;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoObjectMapperProvider,
+    void setUp(MongoCollections mongoCollections,
                @Mock UserService userService) {
         this.userService = userService;
-        this.service = new PaginatedAuthzRolesService(
-                new MongoCollections(mongoObjectMapperProvider, mongodb.mongoConnection()), userService);
+        this.service = new PaginatedAuthzRolesService(mongoCollections, userService);
     }
 
     @Test

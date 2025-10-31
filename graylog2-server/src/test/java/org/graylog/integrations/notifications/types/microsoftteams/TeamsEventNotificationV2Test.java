@@ -44,24 +44,28 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class TeamsEventNotificationV2Test {
 
     // Code under test
@@ -182,7 +186,7 @@ public class TeamsEventNotificationV2Test {
     private TeamsEventNotificationConfigV2 notificationConfig;
     private EventNotificationContext eventNotificationContext;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         getDummyTeamsNotificationConfig();
         eventNotificationContext = NotificationTestData.getDummyContext(getNotificationDto(), "unit_tests").toBuilder().build();
@@ -230,27 +234,33 @@ public class TeamsEventNotificationV2Test {
         assertThat(customMessageModel.get("job_trigger_id")).isEqualTo("<unknown>");
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithInvalidWebhookUrl() throws EventNotificationException {
-        givenGoodNotificationService();
-        givenTeamsClientThrowsPermException();
-        // When execute is called with an invalid webhook URL, we expect an event notification exception.
-        teamsEventNotification.execute(eventNotificationContext);
+    @Test
+    public void executeWithInvalidWebhookUrl() {
+        assertThrows(EventNotificationException.class, () -> {
+            givenGoodNotificationService();
+            givenTeamsClientThrowsPermException();
+            // When execute is called with an invalid webhook URL, we expect an event notification exception.
+            teamsEventNotification.execute(eventNotificationContext);
+        });
     }
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithNullEventTimerange() throws EventNotificationException {
-        EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
-        assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
-        assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
-        assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfigV2.TYPE_NAME);
-        teamsEventNotification.execute(yetAnotherContext);
+    @Test
+    public void executeWithNullEventTimerange() {
+        assertThrows(EventNotificationException.class, () -> {
+            EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
+            assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
+            assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
+            assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfigV2.TYPE_NAME);
+            teamsEventNotification.execute(yetAnotherContext);
+        });
     }
 
-    @Test(expected = PermanentEventNotificationException.class)
+    @Test
     public void buildCustomMessageWithInvalidTemplate() throws EventNotificationException {
-        notificationConfig = buildInvalidTemplate();
-        teamsEventNotification.generateBody(eventNotificationContext, notificationConfig);
+        assertThrows(PermanentEventNotificationException.class, () -> {
+            notificationConfig = buildInvalidTemplate();
+            teamsEventNotification.generateBody(eventNotificationContext, notificationConfig);
+        });
     }
 
     @Test

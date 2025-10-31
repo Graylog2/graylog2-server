@@ -30,7 +30,6 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.ContentPackEntityResolver;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -65,11 +64,10 @@ class DefaultEntityDependencyResolverTest {
     void setUp(@Mock ContentPackEntityResolver contentPackEntityResolver,
                GRNRegistry grnRegistry,
                @Mock GRNDescriptorService grnDescriptorService,
-               MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider objectMapperProvider) {
+               MongoCollections mongoCollections) {
 
         this.grnRegistry = grnRegistry;
-        DBGrantService dbGrantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
+        DBGrantService dbGrantService = new DBGrantService(mongoCollections);
         this.contentPackEntityResolver = contentPackEntityResolver;
         this.grnDescriptorService = grnDescriptorService;
         entityDependencyResolver = new DefaultEntityDependencyResolver(contentPackEntityResolver, grnRegistry, grnDescriptorService, dbGrantService);

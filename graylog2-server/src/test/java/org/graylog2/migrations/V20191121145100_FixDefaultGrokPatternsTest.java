@@ -21,8 +21,9 @@ import org.graylog2.grok.GrokPatternService;
 import org.graylog2.migrations.V20191121145100_FixDefaultGrokPatterns.MigrationCompleted;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -39,6 +40,7 @@ import static org.mockito.Mockito.when;
 
 
 public class V20191121145100_FixDefaultGrokPatternsTest {
+    private AutoCloseable mocks;
     private static final String PATTERN_NAME = "COMMONAPACHELOG";
 
     @Mock
@@ -49,9 +51,9 @@ public class V20191121145100_FixDefaultGrokPatternsTest {
     @InjectMocks
     private V20191121145100_FixDefaultGrokPatterns migration;
 
-    @Before
+    @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -93,5 +95,10 @@ public class V20191121145100_FixDefaultGrokPatternsTest {
         verify(grokPatternService).update(argThat(p -> PATTERN_NAME.equals(p.name()) && patternToMigrate.migrateTo()
                 .equals(p.pattern())));
         verify(configService).write(MigrationCompleted.create(Collections.singleton(PATTERN_NAME)));
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 }

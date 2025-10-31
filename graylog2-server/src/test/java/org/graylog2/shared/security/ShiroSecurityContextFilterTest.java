@@ -20,15 +20,15 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import jakarta.inject.Provider;
 
 import jakarta.ws.rs.BadRequestException;
@@ -43,13 +43,14 @@ import java.util.Base64;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class ShiroSecurityContextFilterTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ContainerRequestContext requestContext;
@@ -58,12 +59,12 @@ public class ShiroSecurityContextFilterTest {
 
     private ShiroSecurityContextFilter filter;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpInjector() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(securityContext.isSecure()).thenReturn(false);
         when(requestContext.getSecurityContext()).thenReturn(securityContext);
@@ -101,23 +102,27 @@ public class ShiroSecurityContextFilterTest {
         assertThat(argument.getValue().getAuthenticationScheme()).isNull();
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void filterWithMalformedBasicAuthShouldThrowBadRequestException() throws Exception {
-        final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
-        headers.putSingle(HttpHeaders.AUTHORIZATION, "Basic ****");
-        when(requestContext.getHeaders()).thenReturn(headers);
+        assertThrows(BadRequestException.class, () -> {
+            final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
+            headers.putSingle(HttpHeaders.AUTHORIZATION, "Basic ****");
+            when(requestContext.getHeaders()).thenReturn(headers);
 
-        filter.filter(requestContext);
+            filter.filter(requestContext);
+        });
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void filterWithBasicAuthAndMalformedCredentialsShouldThrowBadRequestException() throws Exception {
-        final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
-        final String credentials = Base64.getEncoder().encodeToString("user_pass".getBytes(StandardCharsets.US_ASCII));
-        headers.putSingle(HttpHeaders.AUTHORIZATION, "Basic " + credentials);
-        when(requestContext.getHeaders()).thenReturn(headers);
+        assertThrows(BadRequestException.class, () -> {
+            final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
+            final String credentials = Base64.getEncoder().encodeToString("user_pass".getBytes(StandardCharsets.US_ASCII));
+            headers.putSingle(HttpHeaders.AUTHORIZATION, "Basic " + credentials);
+            when(requestContext.getHeaders()).thenReturn(headers);
 
-        filter.filter(requestContext);
+            filter.filter(requestContext);
+        });
     }
 
     @Test

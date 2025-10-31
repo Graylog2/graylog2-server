@@ -24,16 +24,17 @@ import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TeamsEventNotificationConfigTest {
 
@@ -140,10 +141,12 @@ public class TeamsEventNotificationConfigTest {
 
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void toContentPackEntity() {
-        final TeamsEventNotificationConfig teamsEventNotificationConfig = TeamsEventNotificationConfig.builder().build();
-        teamsEventNotificationConfig.toContentPackEntity(EntityDescriptorIds.empty());
+        assertThrows(NullPointerException.class, () -> {
+            final TeamsEventNotificationConfig teamsEventNotificationConfig = TeamsEventNotificationConfig.builder().build();
+            teamsEventNotificationConfig.toContentPackEntity(EntityDescriptorIds.empty());
+        });
     }
 }
 

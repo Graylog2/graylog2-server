@@ -19,8 +19,8 @@ package org.graylog.testing.elasticsearch;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.storage.SearchVersion;
-import org.junit.Before;
 import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Collections;
 import java.util.Map;
@@ -40,7 +40,7 @@ public abstract class ElasticsearchBaseTest {
     @Rule
     public final SkipDefaultIndexTemplateWatcher skipTemplatesWatcher = new SkipDefaultIndexTemplateWatcher();
 
-    @Before
+    @BeforeEach
     public void before() {
         if (!skipTemplatesWatcher.shouldSkip()) {
             addGraylogDefaultIndexTemplate();

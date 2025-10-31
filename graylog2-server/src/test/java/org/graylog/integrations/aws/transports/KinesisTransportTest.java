@@ -17,7 +17,7 @@
 package org.graylog.integrations.aws.transports;
 
 import org.graylog2.plugin.inputs.MisfireException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
