@@ -22,10 +22,11 @@ import { NOTIFICATIONS_QUERY_KEY } from 'components/notifications/constants';
 
 const POLL_INTERVAL = 3000;
 
+const fetchNotifications = () => SystemNotifications.listNotifications({ requestShouldExtendSession: false });
 const useNotifications = () => {
   const { data, isLoading } = useQuery({
     queryKey: NOTIFICATIONS_QUERY_KEY,
-    queryFn: SystemNotifications.listNotifications,
+    queryFn: fetchNotifications,
     refetchInterval: POLL_INTERVAL,
   });
 
