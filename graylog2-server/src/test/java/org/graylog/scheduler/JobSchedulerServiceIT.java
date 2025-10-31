@@ -85,7 +85,7 @@ class JobSchedulerServiceIT {
     private final Map<String, Job.Factory> jobFactories = new HashMap<>();
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoCollections mongoCollections) throws Exception {
+    void setUp(MongoDBTestService mongoDBTestService) throws Exception {
 
         final ObjectMapper objectMapper = new ObjectMapperProvider(getClass().getClassLoader(), Set.of(
                 new NamedType(UnlimitedJob.class, UnlimitedJob.TYPE_NAME),
@@ -101,6 +101,7 @@ class JobSchedulerServiceIT {
         final Duration lockExpirationDuration = Duration.seconds(10);
 
         final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        final var mongoCollections = new MongoCollections(mapperProvider, mongoDBTestService.mongoConnection());
         jobDefinitionService = new DBJobDefinitionService(mongoCollections, mapperProvider);
 
         jobTriggerService = new DBJobTriggerService(

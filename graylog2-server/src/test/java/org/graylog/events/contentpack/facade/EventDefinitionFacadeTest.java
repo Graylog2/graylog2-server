@@ -55,6 +55,7 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -145,7 +146,7 @@ public class EventDefinitionFacadeTest {
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 AggregationEventProcessorConfig.class,
@@ -158,10 +159,27 @@ public class EventDefinitionFacadeTest {
         jobDefinitionService = mock(DBJobDefinitionService.class);
         jobTriggerService = mock(DBJobTriggerService.class);
         jobSchedulerClock = mock(JobSchedulerClock.class);
-        eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, entityRegistrar, new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
-        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService, jobDefinitionService, jobTriggerService, mock(Provider.class), jobSchedulerClock, clusterEventBus, entitySourceService);
+        eventDefinitionService = new DBEventDefinitionService(
+                new MongoCollections(mapperProvider, dbTestService.mongoConnection()),
+                stateService,
+                entityRegistrar,
+                new EntityScopeService(ENTITY_SCOPES),
+                new IgnoreSearchFilters());
+        eventDefinitionHandler = new EventDefinitionHandler(eventDefinitionService,
+                jobDefinitionService,
+                jobTriggerService,
+                mock(Provider.class),
+                jobSchedulerClock,
+                clusterEventBus,
+                entitySourceService);
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
-        facade = new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityRegistrar);
+        facade = new EventDefinitionFacade(objectMapper,
+                eventDefinitionHandler,
+                pluginMetaData,
+                jobDefinitionService,
+                eventDefinitionService,
+                userService,
+                entityRegistrar);
     }
 
     @Test

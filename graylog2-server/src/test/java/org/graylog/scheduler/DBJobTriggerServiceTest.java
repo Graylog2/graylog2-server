@@ -31,6 +31,7 @@ import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
@@ -78,12 +79,10 @@ public class DBJobTriggerServiceTest {
 
     private DBJobTriggerService dbJobTriggerService;
     private final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-07-29T00:00:00.000Z"));
-    private MongoJackObjectMapperProvider mapperProvider;
     private MongoCollections mongoCollections;
 
     @BeforeEach
-    public void setUp(MongoCollections mongoCollections) throws Exception {
-        this.mongoCollections = mongoCollections;
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         lenient().when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
 
         ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -91,7 +90,8 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(OnceJobSchedule.class, OnceJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
-        mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
         this.dbJobTriggerService = serviceWithClock(clock);
     }
 

@@ -52,7 +52,7 @@ import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
@@ -110,7 +110,7 @@ public class LegacyAlertConditionMigratorTest {
     private SchedulerCapabilitiesService schedulerCapabilitiesService;
 
     @BeforeEach
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
         objectMapper.registerSubtypes(new NamedType(AggregationEventProcessorConfig.class, AggregationEventProcessorConfig.TYPE_NAME));
@@ -131,7 +131,9 @@ public class LegacyAlertConditionMigratorTest {
         objectMapper.registerSubtypes(new NamedType(Sum.class, Sum.NAME));
 
         final MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
+        final MongoConnection mongoConnection = dbTestService.mongoConnection();
+        final var mongoCollections = new MongoCollections(mongoJackObjectMapperProvider, mongoConnection);
+
         final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoCollections, mongoJackObjectMapperProvider);
         final DBJobTriggerService jobTriggerService = new DBJobTriggerService(mongoCollections, new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), clock, schedulerCapabilitiesService, Duration.minutes(5));

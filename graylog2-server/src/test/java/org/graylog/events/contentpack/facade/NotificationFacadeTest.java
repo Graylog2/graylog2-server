@@ -37,6 +37,7 @@ import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -103,7 +104,7 @@ public class NotificationFacadeTest {
 
     @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
                 EmailEventNotificationConfig.class,
@@ -115,6 +116,8 @@ public class NotificationFacadeTest {
 
         jobDefinitionService = mock(DBJobDefinitionService.class);
         stateService = mock(DBEventProcessorStateService.class);
+
+        final var mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
         eventDefinitionService = new DBEventDefinitionService(mongoCollections, stateService, mock(EntityRegistrar.class), null, new IgnoreSearchFilters());
 
         notificationService = new DBNotificationService(mongoCollections, mock(EntityRegistrar.class));

@@ -39,7 +39,7 @@ import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.security.shares.EntitySharesService;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
@@ -107,7 +107,7 @@ public class EventDefinitionHandlerTest {
     private DBJobTriggerService jobTriggerService;
 
     @BeforeEach
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorParameters.class, TestEventProcessorParameters.TYPE_NAME));
@@ -119,7 +119,7 @@ public class EventDefinitionHandlerTest {
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-
+        final var mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
         this.eventDefinitionService = spy(new DBEventDefinitionService(mongoCollections, stateService, mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters()));
         this.jobDefinitionService = spy(new DBJobDefinitionService(mongoCollections, mapperProvider));

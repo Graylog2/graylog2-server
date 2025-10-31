@@ -16,9 +16,13 @@
  */
 package org.graylog.plugins.views.search.db;
 
+import name.falgout.jeffrey.testing.junit.guice.GuiceExtension;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModule;
+import name.falgout.jeffrey.testing.junit.guice.IncludeModules;
 import org.graylog.plugins.views.search.SearchRequirements;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.testing.inject.InputConfigurationModule;
 import org.graylog.testing.inject.TestPasswordSecretModule;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
@@ -28,13 +32,10 @@ import org.graylog2.shared.bindings.ValidatorModule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.Duration;
-import org.jukito.JukitoRunner;
-import org.jukito.UseModules;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 
 import java.util.Collections;
@@ -49,8 +50,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MongoDBExtension.class)
-@RunWith(JukitoRunner.class)
-@UseModules({ObjectMapperModule.class, ValidatorModule.class, TestPasswordSecretModule.class})
+@ExtendWith(GuiceExtension.class)
+@IncludeModules({
+        @IncludeModule(InputConfigurationModule.class),
+        @IncludeModule(ObjectMapperModule.class),
+        @IncludeModule(ValidatorModule.class),
+        @IncludeModule(TestPasswordSecretModule.class)
+})
 public class SearchesCleanUpJobWithDBServicesTest {
 
     private SearchesCleanUpJob searchesCleanUpJob;

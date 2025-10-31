@@ -51,6 +51,7 @@ import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListCon
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -131,7 +132,7 @@ public class ViewFacadeTest {
     private EntityRegistrar entityRegistrar;
 
     @BeforeEach
-    public void setUp(MongoCollections mongoCollections) {
+    public void setUp(MongoDBTestService dbTestService) {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
@@ -145,8 +146,9 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(MessageList.class);
         objectMapper.registerSubtypes(Pivot.class);
         objectMapper.registerSubtypes(EventList.class);
-        final MongoConnection mongoConnection = mongoCollections.mongoConnection();
+        final MongoConnection mongoConnection = dbTestService.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
+        final var mongoCollections = new MongoCollections(mapper, mongoConnection);
         searchDbService = new TestSearchDBService(mongoCollections);
         viewService = new TestViewService(null, mongoCollections);
         viewSummaryService = new TestViewSummaryService(mongoCollections);

@@ -44,6 +44,7 @@ import org.graylog.security.UserContext;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -95,7 +96,7 @@ public class AggregationEventProcessorConfigTest {
     private JobSchedulerTestClock clock;
 
     @BeforeEach
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(AggregationEventProcessorConfig.class, AggregationEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TemplateFieldValueProvider.Config.class, TemplateFieldValueProvider.Config.TYPE_NAME));
@@ -104,8 +105,11 @@ public class AggregationEventProcessorConfigTest {
         when(userContext.isPermitted(anyString())).thenReturn(true);
 
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.dbService = new DBEventDefinitionService(mongoCollections, stateService,
-                mock(EntityRegistrar.class), null, new IgnoreSearchFilters());
+        this.dbService = new DBEventDefinitionService(new MongoCollections(mapperProvider, dbTestService.mongoConnection()),
+                stateService,
+                mock(EntityRegistrar.class),
+                null,
+                new IgnoreSearchFilters());
         this.clock = new JobSchedulerTestClock(DateTime.now(DateTimeZone.UTC));
     }
 

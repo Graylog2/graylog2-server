@@ -26,6 +26,7 @@ import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.entities.DefaultEntityScope;
@@ -61,13 +62,13 @@ public class DBEventProcessorServiceTest {
     private DBEventDefinitionService dbService;
 
     @BeforeEach
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(PersistToStreamsStorageHandler.Config.class, PersistToStreamsStorageHandler.Config.TYPE_NAME));
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
-        this.dbService = new DBEventDefinitionService(mongoCollections,
+        this.dbService = new DBEventDefinitionService(new MongoCollections(mapperProvider, dbTestService.mongoConnection()),
                 stateService, mock(EntityRegistrar.class), new EntityScopeService(ENTITY_SCOPES), new IgnoreSearchFilters());
     }
 

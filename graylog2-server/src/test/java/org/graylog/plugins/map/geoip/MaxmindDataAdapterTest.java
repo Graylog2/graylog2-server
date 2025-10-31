@@ -28,8 +28,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
 
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
@@ -39,14 +39,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
-        MaxmindDataAdapterTest.CityDatabaseTest.class,
-        MaxmindDataAdapterTest.CountryDatabaseTest.class,
-        MaxmindDataAdapterTest.AsnDatabaseTest.class,
-        MaxmindDataAdapterTest.IPinfoStandardLocationDatabaseTest.class,
-        MaxmindDataAdapterTest.IPinfoASNDatabaseTest.class,
-})
 public class MaxmindDataAdapterTest {
     private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
     private static final String GEO_LITE2_COUNTRY_MMDB = "/GeoLite2-Country.mmdb";
@@ -130,6 +122,7 @@ public class MaxmindDataAdapterTest {
     @Nested
     @RunWith(ConditionalRunner.class)
     @ResourceExistsCondition(GEO_LITE2_CITY_MMDB)
+    @EnabledIf(GEO_LITE2_CITY_MMDB)
     public class CityDatabaseTest extends Base {
         public CityDatabaseTest() {
             super(DatabaseType.MAXMIND_CITY);

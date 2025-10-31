@@ -23,6 +23,7 @@ import org.graylog.events.TestEventProcessorParameters;
 import org.graylog.events.processor.EventProcessorExecutionJob;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -47,13 +48,14 @@ public class DBJobDefinitionServiceTest {
     private DBJobDefinitionService service;
 
     @BeforeEach
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorConfig.class, TestEventProcessorConfig.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestEventProcessorParameters.class, TestEventProcessorParameters.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(EventProcessorExecutionJob.Config.class, EventProcessorExecutionJob.TYPE_NAME));
 
-        this.service = new DBJobDefinitionService(mongoCollections, new MongoJackObjectMapperProvider(objectMapper));
+        final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        this.service = new DBJobDefinitionService(new MongoCollections(mapperProvider, dbTestService.mongoConnection()), mapperProvider);
     }
 
     @Test
