@@ -19,9 +19,6 @@ import { useMemo, useRef, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
-import { useReactTable, createColumnHelper, getCoreRowModel, flexRender, ColumnDef } from '@tanstack/react-table';
-import camelCase from 'lodash/camelCase';
-import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -38,18 +35,10 @@ import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
-import type {
-  ColumnRenderers,
-  ColumnRenderer,
-  Column,
-  EntityBase,
-  ColumnRenderersByAttribute,
-  ExpandedSectionRenderer,
-} from './types';
-import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
-import ButtonToolbar from '../../bootstrap/ButtonToolbar';
+import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute, ExpandedSectionRenderer } from './types';
 import TableRow from 'components/common/EntityDataTable/TableRow';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
+import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -152,54 +141,6 @@ const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(
 
       return [id, columnRenderer];
     }),
-  );
-};
-
-const useBulkSelectCol = <Entity extends EntityBase>(displayBulkSelectCol: boolean) => {
-  const columnHelper = createColumnHelper<Entity>();
-
-  return useMemo(
-    () =>
-      displayBulkSelectCol
-        ? columnHelper.display({
-            id: 'bulk-select',
-            size: BULK_SELECT_COLUMN_WIDTH,
-            header: ({ table }) => <BulkSelectHead data={table.options.data} />,
-            cell: ({ row }) => {
-              return (
-                <RowCheckbox
-                  onChange={row.getToggleSelectedHandler()}
-                  title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
-                  checked={row.getIsSelected()}
-                  disabled={!row.getCanSelect()}
-                  aria-label={row.id}
-                />
-              );
-            },
-          })
-        : null,
-    [displayBulkSelectCol, columnHelper],
-  );
-};
-
-const useActionsCol = <Entity extends EntityBase>(
-  displayActionsCol: boolean,
-  actionsColWidth: number,
-  entityActions?: (entity: Entity) => React.ReactNode,
-) => {
-  const columnHelper = createColumnHelper<Entity>();
-
-  return useMemo(
-    () =>
-      displayActionsCol
-        ? columnHelper.display({
-            id: 'actions',
-            size: actionsColWidth,
-            header: 'Actions',
-            cell: ({ row }) => <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>,
-          })
-        : null,
-    [],
   );
 };
 
@@ -315,34 +256,23 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const selectableData = useMemo(() => entities.filter(_isEntitySelectable), [entities, _isEntitySelectable]);
-  const columnHelper = createColumnHelper<Entity>();
-  const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol);
-  const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions);
 
-  const attributeCols = useMemo(
-    () =>
-      columns.map((col) => {
-        const columnRenderer = columnRenderersByAttribute[col.id];
-        return columnHelper.accessor(col.id, {
-          accessorKey: entityAttributesAreCamelCase ? camelCase(col.id) : col.id,
-          cell: ({ cell, row }) => columnRenderer.renderCell(cell.getValue(), row.original, col, meta),
-          header: () => columnRenderer?.renderHeader?.(col) ?? col.title,
-          size: columnsWidths[col.id],
-          enableSorting: col.sortable ?? false,
-        });
-      }),
-    [columns, columnRenderersByAttribute, entityAttributesAreCamelCase, columnsWidths, meta, columnHelper],
-  );
-
-  const reactTableColumns = useMemo(
-    () => [bulkSelectCol, ...attributeCols, actionsCol].filter(Boolean) as ColumnDef<Entity, unknown>[],
-    [bulkSelectCol, attributeCols, actionsCol],
-  );
+  const columnsDefinitions = useColumnDefinitions<Entity>({
+    displayBulkSelectCol,
+    displayActionsCol,
+    actionsColWidth,
+    entityActions,
+    columns,
+    columnRenderersByAttribute,
+    columnsWidths,
+    meta,
+    entityAttributesAreCamelCase,
+  });
 
   const table = useTable<Entity>({
     entities,
     sort: activeSort,
-    columns: reactTableColumns,
+    columns: columnsDefinitions,
     columnsOrder,
     onSortChange,
     displayBulkSelectCol,
