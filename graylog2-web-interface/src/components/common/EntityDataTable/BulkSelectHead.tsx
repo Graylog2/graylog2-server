@@ -19,10 +19,8 @@ import { useMemo, useEffect, useRef } from 'react';
 import uniq from 'lodash/uniq';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
-import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { Th } from 'components/common/EntityDataTable/TableHead';
 
 export type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 

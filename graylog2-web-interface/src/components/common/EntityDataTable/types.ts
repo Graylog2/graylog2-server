@@ -20,10 +20,12 @@ import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 export type EntityBase = {
   id: string;
+  [key: string]: unknown;
 };
 
 export type Column = {
   anyPermissions?: boolean;
+  isEntityAttribute: boolean;
 } & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.

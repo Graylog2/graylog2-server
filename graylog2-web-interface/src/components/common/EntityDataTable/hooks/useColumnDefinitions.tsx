@@ -15,15 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { EntityBase, ColumnRenderersByAttribute, Column } from 'components/common/EntityDataTable/types';
 import * as React from 'react';
 import { useMemo } from 'react';
-import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
-import ButtonToolbar from '../../../bootstrap/ButtonToolbar';
+import type { ColumnDef, CellContext } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
+
+import type { EntityBase, ColumnRenderersByAttribute, Column } from 'components/common/EntityDataTable/types';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
+import { ButtonToolbar } from 'components/bootstrap';
 
 const useBulkSelectCol = <Entity extends EntityBase>(
   displayBulkSelectCol: boolean,
@@ -39,27 +41,26 @@ const useBulkSelectCol = <Entity extends EntityBase>(
             size: BULK_SELECT_COLUMN_WIDTH,
             // Todo: check is we can make use of enableRowSelection from useReactTable instead
             header: ({ table }) => <BulkSelectHead data={table.options.data.filter(isEntitySelectable)} />,
-            cell: ({ row }) => {
-              return (
-                <RowCheckbox
-                  onChange={row.getToggleSelectedHandler()}
-                  title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
-                  checked={row.getIsSelected()}
-                  disabled={!row.getCanSelect()}
-                  aria-label={row.id}
-                />
-              );
-            },
+            cell: ({ row }) => (
+              <RowCheckbox
+                onChange={row.getToggleSelectedHandler()}
+                title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
+                checked={row.getIsSelected()}
+                disabled={!row.getCanSelect()}
+                aria-label={row.id}
+              />
+            ),
           })
         : null,
-    [displayBulkSelectCol, columnHelper],
+    [displayBulkSelectCol, columnHelper, isEntitySelectable],
   );
 };
 
 const useActionsCol = <Entity extends EntityBase>(
   displayActionsCol: boolean,
   actionsColWidth: number,
-  entityActions?: (entity: Entity) => React.ReactNode,
+  entityActions: (entity: Entity) => React.ReactNode | undefined,
+  colRef: React.MutableRefObject<HTMLDivElement>,
 ) => {
   const columnHelper = createColumnHelper<Entity>();
 
@@ -70,14 +71,19 @@ const useActionsCol = <Entity extends EntityBase>(
             id: 'actions',
             size: actionsColWidth,
             header: 'Actions',
-            cell: ({ row }) => <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>,
+            cell: ({ row }) => (
+              <div ref={colRef}>
+                <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>
+              </div>
+            ),
           })
         : null,
-    [],
+    [actionsColWidth, colRef, columnHelper, displayActionsCol, entityActions],
   );
 };
 
 type Props<Entity extends EntityBase, Meta> = {
+  actionsRef: React.MutableRefObject<HTMLDivElement>;
   actionsColWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columns: Array<Column>;
@@ -89,7 +95,9 @@ type Props<Entity extends EntityBase, Meta> = {
   isEntitySelectable: (entity: Entity) => boolean;
   meta: Meta;
 };
+
 const useColumnDefinitions = <Entity extends EntityBase, Meta>({
+  actionsRef,
   actionsColWidth,
   columnRenderersByAttribute,
   columns,
@@ -103,19 +111,30 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 }: Props<Entity, Meta>) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol, isEntitySelectable);
-  const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions);
+  const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions, actionsRef);
 
   const attributeCols = useMemo(
     () =>
       columns.map((col) => {
         const columnRenderer = columnRenderersByAttribute[col.id];
-        return columnHelper.accessor(col.id, {
-          accessorKey: entityAttributesAreCamelCase ? camelCase(col.id) : col.id,
-          cell: ({ cell, row }) => columnRenderer.renderCell(cell.getValue(), row.original, col, meta),
+        const baseColDef = {
+          id: col.id,
+          cell: ({ row, getValue }: CellContext<Entity, unknown>) =>
+            columnRenderer.renderCell(getValue(), row.original, col, meta),
           header: () => columnRenderer?.renderHeader?.(col) ?? col.title,
           size: columnsWidths[col.id],
-          enableSorting: col.sortable ?? false,
-        });
+        };
+
+        if (col.isEntityAttribute) {
+          const attributeName = entityAttributesAreCamelCase ? camelCase(col.id) : col.id;
+
+          return columnHelper.accessor((row) => row[attributeName], {
+            enableSorting: col.sortable ?? false,
+            ...baseColDef,
+          });
+        }
+
+        return columnHelper.display(baseColDef);
       }),
     [columns, columnRenderersByAttribute, entityAttributesAreCamelCase, columnsWidths, meta, columnHelper],
   );

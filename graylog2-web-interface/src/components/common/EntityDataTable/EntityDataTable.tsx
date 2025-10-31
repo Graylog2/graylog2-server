@@ -19,6 +19,7 @@ import { useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
+
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -29,15 +30,16 @@ import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
-import BulkActionsRow from './BulkActionsRow';
-import TableHead from './TableHead';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
-import type { ColumnRenderers, Column, EntityBase, ExpandedSectionRenderer } from './types';
 import TableRow from 'components/common/EntityDataTable/TableRow';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useElementsWidths from 'components/common/EntityDataTable/hooks/useElementsWidths';
+
+import type { ColumnRenderers, Column, EntityBase, ExpandedSectionRenderer } from './types';
+import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
+import TableHead from './TableHead';
+import BulkActionsRow from './BulkActionsRow';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -226,6 +228,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
+    actionsRef,
     actionsColWidth,
     columnRenderersByAttribute,
     columns,
