@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import FormDataContext from 'integrations/contexts/FormDataContext';
@@ -23,7 +23,7 @@ import { StatusIcon } from 'components/common';
 
 import { ApiRoutes } from './common/Routes';
 import { toAWSCloudTrailInputCreateRequest } from './common/formDataAdapter';
-import type { ErrorMessageType, HandleSubmitType } from './types';
+import type { HandleSubmitType } from './types';
 
 import FormWrap from '../common/FormWrap';
 
@@ -69,7 +69,6 @@ type Props = {
 };
 
 const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
-  const [formError, setFormError] = useState<ErrorMessageType>(null);
   const { formData } = useContext(FormDataContext);
 
   const throttleEnabled = !!formData.awsCloudTrailThrottleEnabled?.value;
@@ -81,16 +80,11 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
     toAWSCloudTrailInputCreateRequest(formData)
   );
 
-  useEffect(() => {
-    setSaveInput(null);
-
-    if (saveInput.error) {
-      setFormError({
-        full_message: saveInput.error,
-        nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
-      });
-    }
-  }, [saveInput.error, setSaveInput]);
+  // Derive error state directly from saveInput.error
+  const formError = saveInput.error ? {
+    full_message: saveInput.error,
+    nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
+  } : null;
 
   const handleSubmit = () => {
     if (externalInputSubmit) {

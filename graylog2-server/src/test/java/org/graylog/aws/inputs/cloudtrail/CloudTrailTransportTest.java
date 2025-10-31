@@ -118,7 +118,6 @@ public class CloudTrailTransportTest {
         given(mockConfiguration.getString(eq(CK_ASSUME_ROLE_ARN))).willReturn(TEST_ARN);
         given(mockConfiguration.getString(eq(CK_AWS_SQS_REGION), any())).willReturn(TEST_REGION);
         given(mockConfiguration.getString(eq(CK_AWS_S3_REGION), any())).willReturn(TEST_REGION);
-        given(mockConfiguration.getString(eq(CK_LEGACY_AWS_REGION), any())).willReturn(TEST_REGION);
 
         given(mockCloudTrailInput.getConfiguration()).willReturn(mockConfiguration);
     }
