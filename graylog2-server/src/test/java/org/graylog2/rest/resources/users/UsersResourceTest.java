@@ -183,7 +183,7 @@ public class UsersResourceTest {
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
-        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <admin>"));
+        assertThat(exception.getMessage()).contains("Not authorized to access resource id <admin>");
     }
 
     @Test
@@ -208,7 +208,7 @@ public class UsersResourceTest {
         when(subject.getPrincipal()).thenReturn(creator.getName());
 
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD)));
-        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
+        assertThat(exception.getMessage()).contains("Not authorized to access resource id <ADMIN>");
     }
 
     @Test
