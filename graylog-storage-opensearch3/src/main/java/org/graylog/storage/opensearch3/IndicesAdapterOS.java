@@ -369,11 +369,6 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 "Unable to close index " + index);
     }
 
-    @Override
-    public long numberOfMessages(final String index) {
-        return statsApi.numberOfMessagesInIndex(index);
-    }
-
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);
