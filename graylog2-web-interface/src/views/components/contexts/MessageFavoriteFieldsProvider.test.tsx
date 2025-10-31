@@ -16,7 +16,8 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
 
 import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
@@ -82,11 +83,11 @@ describe('MessageFavoriteFieldsProvider', () => {
   it('add and remove favorite fields updates favorites', async () => {
     renderComponent();
 
-    fireEvent.click(await screen.findByRole('button', { name: /add-new/i }));
+    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
 
     expect(screen.getByTestId('favorites')).toHaveTextContent('"new"');
 
-    fireEvent.click(await screen.findByRole('button', { name: /remove-new/i }));
+    userEvent.click(await screen.findByRole('button', { name: /remove-new/i }));
 
     expect(screen.getByTestId('favorites')).not.toHaveTextContent('"new"');
   });
@@ -94,9 +95,9 @@ describe('MessageFavoriteFieldsProvider', () => {
   it('saveFavoriteField calls saveFields', async () => {
     renderComponent();
 
-    fireEvent.click(await screen.findByRole('button', { name: /add-new/i }));
+    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
 
-    fireEvent.click(await screen.findByRole('button', { name: /save/i }));
+    userEvent.click(await screen.findByRole('button', { name: /save/i }));
 
     expect(mockSaveFields).toHaveBeenCalledWith(['field1', 'field2', 'new']);
   });
@@ -104,10 +105,10 @@ describe('MessageFavoriteFieldsProvider', () => {
   it('resetFavoriteField resets to DEFAULT_FIELDS and saves', async () => {
     renderComponent();
 
-    fireEvent.click(await screen.findByRole('button', { name: /add-new/i }));
+    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
     expect(screen.getByTestId('favorites')).toHaveTextContent('"new"');
 
-    fireEvent.click(await screen.findByRole('button', { name: /preresaction/i }));
+    userEvent.click(await screen.findByRole('button', { name: /preresaction/i }));
 
     expect(mockSaveFields).toHaveBeenCalledWith(DEFAULT_FIELDS);
 
@@ -117,9 +118,9 @@ describe('MessageFavoriteFieldsProvider', () => {
   it('cancelEdit resets favorites to initia', async () => {
     renderComponent();
 
-    fireEvent.click(await screen.findByRole('button', { name: /add-new/i }));
+    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
     expect(screen.getByTestId('favorites')).toHaveTextContent(JSON.stringify(['field1', 'field2', 'new']));
-    fireEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+    userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
 
     expect(screen.getByTestId('favorites')).toHaveTextContent(JSON.stringify(['field1', 'field2']));
   });

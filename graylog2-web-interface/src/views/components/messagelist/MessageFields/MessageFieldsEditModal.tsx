@@ -25,6 +25,7 @@ import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import useFormattedFields from 'views/components/messagelist/MessageFields/hooks/useFormattedFields';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import StringUtils from 'util/StringUtils';
 
 const FieldsContainer = styled.div(
   ({ theme }) => css`
@@ -50,6 +51,10 @@ const StyledButtonGroup = styled(ButtonGroup)`
   gap: ${({ theme }) => theme.spacings.xs};
 `;
 
+const StyledAlert = styled(Alert)`
+  margin-top: 0;
+`;
+
 const MessageFieldsEditModal = ({ toggleEditMode }) => {
   const { formattedFavorites, formattedRest } = useFormattedFields();
   const { message, saveFavoriteField, resetFavoriteField, cancelEdit } = useContext(MessageFavoriteFieldsContext);
@@ -73,15 +78,16 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
   }, [cancelEdit, toggleEditMode]);
 
   return (
-    <Modal onHide={cancelModal} show>
+    <Modal onHide={cancelModal} show rootProps={{ zIndex: 1030 }}>
       <Modal.Header>
         <Modal.Title>Favorite fields configuration</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <ModalContentContainer>
           <FieldsContainer>
-            <Alert bsStyle="info">
-              Favorite fields will be applied to the streams{' '}
+            <StyledAlert bsStyle="info">
+              Favorite fields will be applied to the{' '}
+              {StringUtils.pluralize(messageStreams.length, ' stream ', ' streams ')}
               {messageStreams.map((stream, index) => {
                 const isLast = index === messageStreams.length - 1;
 
@@ -93,7 +99,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
                 );
               })}{' '}
               in which this message is routed.
-            </Alert>
+            </StyledAlert>
             <MessageFieldsEditModeList fields={formattedFavorites} message={message} isFavorite />
             <MessageFieldsEditModeList fields={formattedRest} message={message} isFavorite={false} />
           </FieldsContainer>
@@ -102,7 +108,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
       <Modal.Footer>
         <ButtonContainer>
           <Button bsStyle="link" onClick={_resetFavoriteField}>
-            Reset fields configuration
+            Reset to default
           </Button>
           <StyledButtonGroup>
             <Button onClick={cancelModal}>Cancel</Button>

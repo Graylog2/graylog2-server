@@ -118,7 +118,7 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
 
   it('Reset fields call the context handlers', async () => {
     renderComponent();
-    const resetFieldsButton = await screen.findByRole('button', { name: /reset fields/i });
+    const resetFieldsButton = await screen.findByRole('button', { name: /reset to default/i });
     fireEvent.click(resetFieldsButton);
     expect(resetFavoriteField).toHaveBeenCalled();
     expect(mockedToggleEditMode).toHaveBeenCalled();

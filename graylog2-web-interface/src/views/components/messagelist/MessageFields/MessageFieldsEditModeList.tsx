@@ -61,7 +61,7 @@ const MessageFieldsEditModeList = ({ fields, message, isFavorite }: MessageField
 
   return (
     <>
-      <h6>{isFavorite ? 'Favorites' : 'Details'}</h6>
+      <h3>{isFavorite ? 'Favorites' : 'Details'}</h3>
       <Container>
         <SortableList<FormattedField>
           items={fields}

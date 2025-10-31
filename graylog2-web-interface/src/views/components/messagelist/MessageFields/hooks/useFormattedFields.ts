@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useCallback } from 'react';
 import { OrderedSet } from 'immutable';
 
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
@@ -24,42 +24,34 @@ import { defaultCompare } from 'logic/DefaultCompare';
 
 const useFormattedFields = () => {
   const { favoriteFields, message, messageFields: fieldTypes } = useContext(MessageFavoriteFieldsContext);
+  const fieldsMapper = useCallback(
+    (field: string) => {
+      const { type } = fieldTypes.find(
+        (t) => t.name === field,
+        undefined,
+        FieldTypeMapping.create(field, FieldType.Unknown),
+      );
+
+      const value = message?.formatted_fields?.[field];
+
+      return { value, field, type, id: field };
+    },
+    [fieldTypes, message?.formatted_fields],
+  );
 
   const formattedFavorites = useMemo(() => {
     const formattedFieldSet = OrderedSet(Object.keys(message.formatted_fields));
 
-    return favoriteFields
-      .filter((field) => formattedFieldSet.has(field))
-      .map((field) => {
-        const { type } = fieldTypes.find(
-          (t) => t.name === field,
-          undefined,
-          FieldTypeMapping.create(field, FieldType.Unknown),
-        );
-
-        const value = message?.formatted_fields?.[field];
-
-        return { value, field, type, id: field };
-      });
-  }, [favoriteFields, fieldTypes, message.formatted_fields]);
+    return favoriteFields.filter((field) => formattedFieldSet.has(field)).map(fieldsMapper);
+  }, [favoriteFields, fieldsMapper, message.formatted_fields]);
   const formattedRest = useMemo(() => {
     const favoriteFieldsSet = OrderedSet(favoriteFields);
 
     return Object.keys(message.formatted_fields)
       .filter((field) => !favoriteFieldsSet.has(field))
       .sort((key1, key2) => defaultCompare(key1, key2))
-      .map((field) => {
-        const { type } = fieldTypes.find(
-          (t) => t.name === field,
-          undefined,
-          FieldTypeMapping.create(field, FieldType.Unknown),
-        );
-
-        const value = message?.formatted_fields?.[field];
-
-        return { value, field, type, id: field };
-      });
-  }, [favoriteFields, fieldTypes, message.formatted_fields]);
+      .map(fieldsMapper);
+  }, [favoriteFields, fieldsMapper, message.formatted_fields]);
 
   return { formattedFavorites, formattedRest };
 };

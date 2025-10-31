@@ -28,7 +28,7 @@ const Container = styled.div(
   `,
 );
 
-const MessageFieldsEditModeList = ({ fields, message, isFavorite }: MessageFieldsListProps) => {
+const MessageFieldsViewModeList = ({ fields, message, isFavorite }: MessageFieldsListProps) => {
   if (!fields.length) return null;
 
   return (
@@ -45,4 +45,4 @@ const MessageFieldsEditModeList = ({ fields, message, isFavorite }: MessageField
   );
 };
 
-export default MessageFieldsEditModeList;
+export default MessageFieldsViewModeList;
