@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +78,7 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
     public static RuntimeException mapException(Throwable t, String message) {
         if (t instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
-                return new IndexNotFoundException(t.getMessage());
+                return new IndexNotFoundException(message, List.of(t.getMessage(), "Try recalculating your index ranges"));
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
                 return new MasterNotDiscoveredException();

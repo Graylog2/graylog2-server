@@ -16,10 +16,9 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
@@ -44,8 +43,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptio
 import org.graylog.shaded.opensearch2.org.opensearch.client.GetAliasesResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Requests;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CloseIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteAliasRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.AliasMetadata;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.common.unit.TimeValue;
@@ -79,9 +76,9 @@ import org.graylog2.plugin.Message;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
+import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.cat.IndicesRequest;
 import org.opensearch.client.opensearch.cat.IndicesResponse;
 import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
@@ -95,8 +92,13 @@ import org.opensearch.client.opensearch.indices.GetAliasResponse;
 import org.opensearch.client.opensearch.indices.GetIndexRequest;
 import org.opensearch.client.opensearch.indices.GetIndexResponse;
 import org.opensearch.client.opensearch.indices.GetIndicesSettingsResponse;
+import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutMappingRequest;
+import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
+import org.opensearch.client.opensearch.indices.stats.IndicesStats;
+import org.opensearch.client.opensearch.indices.update_aliases.AddAction;
+import org.opensearch.client.opensearch.indices.update_aliases.RemoveAction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +106,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -188,8 +191,11 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Set<String> resolveAlias(String alias) {
+        if (!aliasExists(alias)) { // needed to ensure same behavior as old client
+            return Collections.emptySet();
+        }
         GetAliasResponse result = c.execute(() -> indicesClient.getAlias(GetAliasRequest.builder()
-                .index(alias)
+                .name(alias)
                 .build()), "Error resolving alias " + alias);
         return result.result().keySet();
     }
@@ -213,7 +219,11 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .settings(createIndexSettings(indexSettings));
         if (mapping != null) {
             // TODO: This sucks
-//            builder.mappings(TypeMapping.of(m -> m.properties(mapping)));
+            try {
+                builder.mappings(typeMappingFromMap(mapping));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
         return builder.build();
     }
@@ -250,13 +260,23 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Map<String, Object> getIndexMapping(@Nonnull String index) {
+        return c.execute(() -> {
+            GetMappingResponse response = indicesClient.getMapping(r -> r.index(index)
+                    .allowNoIndices(true)
+                    .ignoreUnavailable(true)
+                    .expandWildcards(ExpandWildcard.All));
+            IndexMappingRecord indexMappingRecord = response.get(index);
+            return typeMappingToMap(indexMappingRecord.mappings());
+        }, "Couldn't read mapping of index " + index);
+    }
 
-        final GetMappingsRequest request = new GetMappingsRequest()
-                .indices(index)
-                .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+    private Map<String, Object> typeMappingToMap(TypeMapping mapping) throws JsonProcessingException {
+        return objectMapper.readValue(mapping.toJsonString(), new TypeReference<>() {});
+    }
 
-        return client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions).mappings().get(index).sourceAsMap(),
-                "Couldn't read mapping of index " + index);
+    private TypeMapping typeMappingFromMap(Map<String, Object> mapping) throws JsonProcessingException {
+        String json = objectMapper.writeValueAsString(mapping);
+        return objectMapper.readValue(json, TypeMapping.class);
     }
 
     @Override
@@ -386,10 +406,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public void removeAlias(String index, String alias) {
-        final DeleteAliasRequest request = new DeleteAliasRequest(index, alias);
-
-        client.execute((c, requestOptions) -> c.indices().deleteAlias(request, requestOptions),
-                "Unable to remove alias " + alias + ", pointing to " + index);
+        removeAliases(Set.of(index), alias);
     }
 
     @Override
@@ -533,8 +550,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public boolean aliasExists(String alias) {
-        final GetAliasesRequest request = new GetAliasesRequest(alias);
-        return client.execute((c, requestOptions) -> c.indices().existsAlias(request, requestOptions));
+        return c.execute(() -> indicesClient.existsAlias(r -> r.name(alias)).value(),
+                "Error trying to check if alias exists: " + alias);
     }
 
     @Override
@@ -555,42 +572,34 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public void cycleAlias(String aliasName, String targetIndex) {
-        final IndicesAliasesRequest.AliasActions addAlias = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
-                .index(targetIndex)
-                .alias(aliasName);
-        final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest()
-                .addAliasAction(addAlias);
-
-        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
-                "Couldn't point alias " + aliasName + " to index " + targetIndex);
+        c.execute(() -> indicesClient.updateAliases(request ->
+                request.actions(action ->
+                        action.add(addAction ->
+                                addAction.index(targetIndex).alias(aliasName)
+                        )
+                )
+        ), "Couldn't point alias " + aliasName + " to index " + targetIndex);
     }
 
     @Override
     public void cycleAlias(String aliasName, String targetIndex, String oldIndex) {
-        final IndicesAliasesRequest.AliasActions addAlias = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.ADD)
-                .index(targetIndex)
-                .alias(aliasName);
-        final IndicesAliasesRequest.AliasActions removeAlias = new IndicesAliasesRequest.AliasActions(IndicesAliasesRequest.AliasActions.Type.REMOVE)
-                .index(oldIndex)
-                .alias(aliasName);
-        final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest()
-                .addAliasAction(removeAlias)
-                .addAliasAction(addAlias);
-
-        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
-                "Couldn't switch alias " + aliasName + " from index " + oldIndex + " to index " + targetIndex);
+        c.execute(() -> indicesClient.updateAliases(request ->
+                request.actions(
+                        new RemoveAction.Builder().index(oldIndex).alias(aliasName).build().toAction(),
+                        new AddAction.Builder().index(targetIndex).alias(aliasName).build().toAction()
+                )
+        ), "Couldn't switch alias " + aliasName + " from index " + oldIndex + " to index " + targetIndex);
     }
 
     @Override
     public void removeAliases(Set<String> indices, String alias) {
-        final IndicesAliasesRequest indicesAliasesRequest = new IndicesAliasesRequest();
-        final IndicesAliasesRequest.AliasActions aliasAction = IndicesAliasesRequest.AliasActions.remove()
-                .alias(alias)
-                .indices(indices.toArray(new String[0]));
-        indicesAliasesRequest.addAliasAction(aliasAction);
-
-        client.execute((c, requestOptions) -> c.indices().updateAliases(indicesAliasesRequest, requestOptions),
-                "Couldn't remove alias " + alias + " from indices " + indices);
+        c.execute(() -> indicesClient.updateAliases(request ->
+                request.actions(action ->
+                        action.remove(removeAction ->
+                                removeAction.indices(indices.stream().toList()).alias(alias)
+                        )
+                )
+        ), "Couldn't remove alias " + alias + " from indices " + indices);
     }
 
     @Override

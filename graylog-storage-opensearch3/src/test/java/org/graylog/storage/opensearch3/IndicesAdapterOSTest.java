@@ -52,6 +52,8 @@ class IndicesAdapterOSTest {
     @Mock
     private OpenSearchClient client;
     @Mock
+    private OfficialOpensearchClient opensearchClient;
+    @Mock
     private StatsApi statsApi;
     @Mock
     private ClusterStatsApi clusterStatsApi;
@@ -68,9 +70,9 @@ class IndicesAdapterOSTest {
     void setUp() {
         toTest = new IndicesAdapterOS(
                 client,
+                opensearchClient,
                 statsApi,
                 clusterStatsApi,
-                catApi,
                 clusterStateApi,
                 indexTemplateAdapter,
                 indexStatisticsBuilder,
