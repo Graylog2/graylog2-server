@@ -26,8 +26,6 @@ import type { SearchesConfig } from 'components/search/SearchConfig';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import MessageEditFieldConfigurationAction from 'views/components/messagelist/MessageFields/MessageEditFieldConfigurationAction';
 import useFeature from 'hooks/useFeature';
@@ -46,7 +44,6 @@ const TestAgainstStreamButton = ({
 
   const sendEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-message-table',
       app_action_value: 'seach-message-table-test-against-stream',
     });
@@ -114,6 +111,7 @@ const MessageActions = ({
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
+  const sendTelemetry = useSendTelemetry();
 
   if (disabled) {
     return <ButtonGroup />;
@@ -147,7 +145,6 @@ const MessageActions = ({
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
       {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}
-    </ButtonGroup>
   );
 };
 
