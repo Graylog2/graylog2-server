@@ -23,8 +23,6 @@ import useThemes from 'theme/hooks/useThemes';
 
 import ColorSchemeContext from './ColorSchemeContext';
 
-import 'material-symbols/rounded.css';
-
 type Props = {
   children: React.ReactNode;
   initialThemeModeOverride?: ColorScheme;
