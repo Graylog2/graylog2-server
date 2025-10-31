@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+import { useRef, useMemo } from 'react';
+
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { Column } from 'components/common/EntityDataTable';
-import { useRef, useMemo } from 'react';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';

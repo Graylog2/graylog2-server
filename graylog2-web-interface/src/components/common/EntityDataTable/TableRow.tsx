@@ -16,9 +16,11 @@
  */
 
 import * as React from 'react';
-import { flexRender, Row } from '@tanstack/react-table';
-import { EntityBase } from 'components/common/EntityDataTable/types';
+import type { Row } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 import { styled } from 'styled-components';
+
+import type { EntityBase } from 'components/common/EntityDataTable/types';
 
 const Td = styled.td`
   word-break: break-word;
@@ -30,9 +32,9 @@ type Props<Entity extends EntityBase> = {
 
 const TableRow = <Entity extends EntityBase>({ row }: Props<Entity>) => (
   <tr>
-    {row.getVisibleCells().map((cell) => {
-      return <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>;
-    })}
+    {row.getVisibleCells().map((cell) => (
+      <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+    ))}
   </tr>
 );
 

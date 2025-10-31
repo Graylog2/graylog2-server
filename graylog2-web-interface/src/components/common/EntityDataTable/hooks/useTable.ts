@@ -16,8 +16,10 @@
  */
 
 import { useMemo, useCallback } from 'react';
-import { getCoreRowModel, useReactTable, ColumnDef, SortingState, Updater } from '@tanstack/react-table';
-import { EntityBase } from 'components/common/EntityDataTable/types';
+import type { ColumnDef, SortingState, Updater } from '@tanstack/react-table';
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
+
+import type { EntityBase } from 'components/common/EntityDataTable/types';
 import type { Sort } from 'stores/PaginationTypes';
 
 type Props<Entity extends EntityBase> = {
@@ -46,10 +48,13 @@ const useTable = <Entity extends EntityBase>({
     () => [displayBulkSelectCol ? 'bulk-select' : null, ...columnsOrder].filter(Boolean),
     [displayBulkSelectCol, columnsOrder],
   );
-  const onSortingChange = useCallback((updater: Updater<SortingState>) => {
-    const newSorting = updater instanceof Function ? updater(sorting) : updater;
-    onSortChange({ attributeId: newSorting[0].id, direction: newSorting[0].desc ? 'desc' : 'asc' });
-  }, []);
+  const onSortingChange = useCallback(
+    (updater: Updater<SortingState>) => {
+      const newSorting = updater instanceof Function ? updater(sorting) : updater;
+      onSortChange({ attributeId: newSorting[0].id, direction: newSorting[0].desc ? 'desc' : 'asc' });
+    },
+    [onSortChange, sorting],
+  );
 
   return useReactTable({
     data,

@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import styled from 'styled-components';
+
 import CommonSortIcon from 'components/common/SortIcon';
 
 const StyledCommonSortIcon = styled(CommonSortIcon)`
