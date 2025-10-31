@@ -52,7 +52,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class ViewService implements ViewUtils<ViewDTO> {
-    private static final String COLLECTION_NAME = "views";
+    public static final String COLLECTION_NAME = "views";
 
     private final ClusterConfigService clusterConfigService;
     private final ViewRequirements.Factory viewRequirementsFactory;

@@ -86,11 +86,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public OpenSearchInstance init() {
         super.init();
-
+        // TODO: Check if client creation can be aware of cache to avoid recreating the client for every test method
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
         this.officialOpensearchClient = buildOfficialClient();
-        this.client = new ClientOS2(this.openSearchClient, featureFlags);
+        this.client = new ClientOS(this.openSearchClient, officialOpensearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS2(openSearchClient, officialOpensearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
