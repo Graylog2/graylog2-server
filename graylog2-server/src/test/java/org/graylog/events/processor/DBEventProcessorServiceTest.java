@@ -41,6 +41,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -134,5 +135,15 @@ public class DBEventProcessorServiceTest {
         assertThat(dto.storage()).hasSize(1);
         // We will always add a persist-to-streams handler for now
         assertThat(dto.storage()).containsOnly(PersistToStreamsStorageHandler.Config.createWithDefaultEventsStream());
+    }
+
+    @Test
+    @MongoDBFixtures("user-illuminate-event-definitions.json")
+    public void testCountByType() {
+        final Map<String, Long> counts = dbService.countByType();
+
+        assertThat(counts)
+                .containsEntry("illuminate_event_definitions", 1L)
+                .containsEntry("user_event_definitions", 1L);
     }
 }
