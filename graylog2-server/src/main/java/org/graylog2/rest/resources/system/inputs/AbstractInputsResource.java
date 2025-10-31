@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.google.common.base.Strings;
 import org.graylog2.inputs.Input;
+import org.graylog2.inputs.ShinyInputImpl;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -62,6 +63,27 @@ public class AbstractInputsResource extends RestResource {
                 input.getStaticFields(),
                 input.getNodeId());
     }
+
+    protected InputSummary getInputSummary(ShinyInputImpl input) {
+        final InputDescription inputDescription = this.availableInputs.get(input.type());
+        final ConfigurationRequest configurationRequest = inputDescription != null ? inputDescription.getConfigurationRequest() : null;
+        // remove after sharing inputs implemented (input types check)
+        final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.id()) && isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.type()) ?
+                input.configuration() : maskPasswordsInConfiguration(input.configuration(), configurationRequest);
+        final Map<String, String> staticFields = input.staticFields() != null ? input.staticFields() : Map.of();
+        return InputSummary.create(input.title(),
+                input.isGlobal(),
+                InputDescription.getInputDescriptionName(inputDescription, input.type()),
+                input.contentPack(),
+                input.id(),
+                input.createdAt(),
+                input.type(),
+                input.creatorUserId(),
+                configuration,
+                staticFields,
+                input.nodeId());
+    }
+
 
     protected Map<String, Object> maskPasswordsInConfiguration(Map<String, Object> configuration, ConfigurationRequest configurationRequest) {
         if (configuration == null || configurationRequest == null) {

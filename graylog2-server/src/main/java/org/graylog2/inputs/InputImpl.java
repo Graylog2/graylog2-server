@@ -20,9 +20,11 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBList;
 import com.mongodb.DBObject;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.EnumUtils;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.MongoEntity;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
@@ -45,7 +47,7 @@ import static org.graylog2.shared.security.RestPermissions.INPUTS_READ;
 
 @DbEntity(collection = "inputs",
           readPermission = INPUTS_READ)
-public class InputImpl extends PersistedImpl implements Input {
+public class InputImpl extends PersistedImpl implements Input, MongoEntity {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
     public static final String FIELD_ID = "_id";
@@ -181,5 +183,11 @@ public class InputImpl extends PersistedImpl implements Input {
     @Override
     public void setDesiredState(IOState.Type desiredState) {
         fields.put(MessageInput.FIELD_DESIRED_STATE, desiredState.toString());
+    }
+
+    @Nullable
+    @Override
+    public String id() {
+        return id.toHexString();
     }
 }
