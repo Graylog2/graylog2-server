@@ -14,7 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as MessageDetail } from './MessageDetail';
-export { default as MessageField } from './MessageField';
-export { default as MessageFields } from './MessageFields/MessageFields';
-export { default as MessageTableEntry } from './MessageTableEntry';
+
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import type { Message } from 'views/components/messagelist/Types';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+
+export type FormattedField = {
+  value: any;
+  type: FieldType;
+  field: string;
+  id: string;
+};
+
+export type MessageFieldsListProps = {
+  fields: Array<FormattedField>;
+  message: Message;
+  isFavorite: boolean;
+};
+
+export type MessageFieldsComponentProps = {
+  message: Message;
+  fields: FieldTypeMappingsList;
+};

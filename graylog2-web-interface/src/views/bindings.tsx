@@ -122,6 +122,7 @@ import TextWidget from 'views/logic/widgets/TextWidget';
 import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
 import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -354,6 +355,22 @@ const exports: PluginExports = {
       resetFocus: false,
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
+    },
+    {
+      type: 'add-field-to-favorite',
+      title: 'Add field to favorites',
+      handler: ToggleFavoriteField,
+      isEnabled: () => true,
+      resetFocus: false,
+      isHidden: (props) => ToggleFavoriteField.isHidden(true, props),
+    },
+    {
+      type: 'remove-field-to-favorite',
+      title: 'Remove field from favorites',
+      handler: ToggleFavoriteField,
+      isEnabled: () => true,
+      resetFocus: false,
+      isHidden: (props) => ToggleFavoriteField.isHidden(false, props),
     },
   ],
   valueActions: filterCloudValueActions(

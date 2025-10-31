@@ -14,7 +14,20 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-export { default as MessageDetail } from './MessageDetail';
-export { default as MessageField } from './MessageField';
-export { default as MessageFields } from './MessageFields/MessageFields';
-export { default as MessageTableEntry } from './MessageTableEntry';
+
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
+
+const useMessageFavoriteFields = (streams: Array<string>) => {
+  const saveFields = (fields: Array<string>) => {
+    // eslint-disable-next-line no-console
+    console.log('SAVE', { fields, streams });
+  };
+
+  return {
+    isLoading: false,
+    favoriteFields: DEFAULT_FIELDS,
+    saveFields,
+  };
+};
+
+export default useMessageFavoriteFields;

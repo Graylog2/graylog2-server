@@ -66,6 +66,7 @@ import type { ValueRendererProps } from 'views/components/messagelist/decoration
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import type { MessageFavoriteFieldsContextState } from 'views/components/contexts/MessageFavoriteFieldsContext';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -258,10 +259,13 @@ export interface ActionContexts {
   widget: Widget;
   message: Message;
   valuePath: ValuePath;
-  isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
   fieldTypes?: FieldTypeMappingsList;
+  favoriteFields?: MessageFavoriteFieldsContextState['favoriteFields'];
+  addWithSaveToFavoriteFields?: MessageFavoriteFieldsContextState['addWithSaveToFavoriteFields'];
+  removeWithSaveFromFavoriteFields?: MessageFavoriteFieldsContextState['removeWithSaveFromFavoriteFields'];
+  isLocalNode?: boolean;
 }
 
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
