@@ -25,17 +25,19 @@ type Props<Entity extends EntityBase> = {
   columnsOrder: Array<string>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
+  isEntitySelectable: (entity: Entity) => boolean;
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
 };
 
 const useTable = <Entity extends EntityBase>({
-  entities,
-  sort,
   columns,
   columnsOrder,
-  onSortChange,
   displayBulkSelectCol,
+  entities,
+  isEntitySelectable,
+  onSortChange,
+  sort,
 }: Props<Entity>) => {
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
@@ -55,6 +57,7 @@ const useTable = <Entity extends EntityBase>({
     getCoreRowModel: getCoreRowModel(),
     manualSorting: true,
     enableSortingRemoval: false,
+    enableRowSelection: (row) => isEntitySelectable(row.original),
     initialState: {
       columnOrder,
     },

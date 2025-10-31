@@ -225,27 +225,27 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     fixedActionsCellWidth,
   });
 
-  const selectableData = useMemo(() => entities.filter(_isEntitySelectable), [entities, _isEntitySelectable]);
-
-  const columnsDefinitions = useColumnDefinitions<Entity>({
-    displayBulkSelectCol,
-    displayActionsCol,
+  const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsColWidth,
-    entityActions,
-    columns,
     columnRenderersByAttribute,
+    columns,
     columnsWidths,
-    meta,
+    displayActionsCol,
+    displayBulkSelectCol,
+    entityActions,
     entityAttributesAreCamelCase,
+    isEntitySelectable: _isEntitySelectable,
+    meta,
   });
 
   const table = useTable<Entity>({
-    entities,
-    sort: activeSort,
     columns: columnsDefinitions,
     columnsOrder,
-    onSortChange,
     displayBulkSelectCol,
+    entities,
+    isEntitySelectable: _isEntitySelectable,
+    onSortChange,
+    sort: activeSort,
   });
 
   return (

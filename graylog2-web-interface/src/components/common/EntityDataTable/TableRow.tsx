@@ -36,4 +36,4 @@ const TableRow = <Entity extends EntityBase>({ row }: Props<Entity>) => (
   </tr>
 );
 
-export default React.memo(TableRow);
+export default React.memo(TableRow) as typeof TableRow;

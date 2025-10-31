@@ -15,23 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
-
-import fetch from 'logic/rest/FetchProvider';
-import { qualifyUrl } from 'util/URLUtils';
-import type FetchError from 'logic/errors/FetchError';
 import type { EntityBase, ColumnRenderersByAttribute, Column } from 'components/common/EntityDataTable/types';
 import * as React from 'react';
-import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
 import { useMemo } from 'react';
+import { createColumnHelper, ColumnDef } from '@tanstack/react-table';
 import ButtonToolbar from '../../../bootstrap/ButtonToolbar';
-import type { Sort } from 'stores/PaginationTypes';
 import camelCase from 'lodash/camelCase';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
 
-const useBulkSelectCol = <Entity extends EntityBase>(displayBulkSelectCol: boolean) => {
+const useBulkSelectCol = <Entity extends EntityBase>(
+  displayBulkSelectCol: boolean,
+  isEntitySelectable: (entity: Entity) => boolean,
+) => {
   const columnHelper = createColumnHelper<Entity>();
 
   return useMemo(
@@ -40,7 +37,8 @@ const useBulkSelectCol = <Entity extends EntityBase>(displayBulkSelectCol: boole
         ? columnHelper.display({
             id: 'bulk-select',
             size: BULK_SELECT_COLUMN_WIDTH,
-            header: ({ table }) => <BulkSelectHead data={table.options.data} />,
+            // Todo: check is we can make use of enableRowSelection from useReactTable instead
+            header: ({ table }) => <BulkSelectHead data={table.options.data.filter(isEntitySelectable)} />,
             cell: ({ row }) => {
               return (
                 <RowCheckbox
@@ -80,29 +78,31 @@ const useActionsCol = <Entity extends EntityBase>(
 };
 
 type Props<Entity extends EntityBase, Meta> = {
-  displayBulkSelectCol: boolean;
-  displayActionsCol: boolean;
   actionsColWidth: number;
-  entityActions?: (entity: Entity) => React.ReactNode;
-  columns: Array<Column>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
+  columns: Array<Column>;
   columnsWidths: { [attributeId: string]: number };
-  meta: Meta;
+  displayActionsCol: boolean;
+  displayBulkSelectCol: boolean;
+  entityActions?: (entity: Entity) => React.ReactNode;
   entityAttributesAreCamelCase: boolean;
+  isEntitySelectable: (entity: Entity) => boolean;
+  meta: Meta;
 };
 const useColumnDefinitions = <Entity extends EntityBase, Meta>({
-  displayBulkSelectCol,
-  displayActionsCol,
   actionsColWidth,
-  entityActions,
-  columns,
   columnRenderersByAttribute,
+  columns,
   columnsWidths,
-  meta,
+  displayActionsCol,
+  displayBulkSelectCol,
+  entityActions,
   entityAttributesAreCamelCase,
+  isEntitySelectable,
+  meta,
 }: Props<Entity, Meta>) => {
   const columnHelper = createColumnHelper<Entity>();
-  const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol);
+  const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol, isEntitySelectable);
   const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions);
 
   const attributeCols = useMemo(
