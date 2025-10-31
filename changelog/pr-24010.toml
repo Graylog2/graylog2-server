@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix sometimes missing fields and missing filtering for selected fields in message table CSV export in reports."
+
+pulls = ["24010", "Graylog2/graylog-plugin-enterprise#12368"]
+issues = ["Graylog2/graylog-plugin-enterprise#12308", "Graylog2/graylog-plugin-enterprise#12236"]

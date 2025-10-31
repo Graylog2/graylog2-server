@@ -81,7 +81,7 @@ class ExportTabularResultResponseTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final byte[] bytes = Resources.toByteArray(Resources.getResource("org/graylog/plugins/views/search/rest/export/response/sample_message_list_result.json"));
         final MessageList.Result messageListResult = objectMapper.readValue(bytes, MessageList.Result.class);
-        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(messageListResult);
+        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(List.of(), messageListResult);
 
         final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
                 List.of("sequence_nr","ingest_time","gl2_receive_timestamp","took_ms","source"),
