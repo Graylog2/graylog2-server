@@ -41,7 +41,7 @@ type ExplainedSearch = {
       };
     };
   };
-  search_errors: Array<Object>;
+  search_errors: Array<object>;
 };
 
 export type SearchExplainContextType = {
