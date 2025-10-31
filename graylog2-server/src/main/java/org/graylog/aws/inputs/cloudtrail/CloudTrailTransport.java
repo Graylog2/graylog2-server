@@ -109,12 +109,8 @@ public class CloudTrailTransport extends ThrottleableTransport2 {
         final String awsAccessKey = input.getConfiguration().getString(CK_AWS_ACCESS_KEY);
         final EncryptedValue secretAccessKey = input.getConfiguration().getEncryptedValue(CK_AWS_SECRET_KEY);
         final String assumeRoleArn = input.getConfiguration().getString(CK_ASSUME_ROLE_ARN);
-
-        // Backward compatibility: Check for legacy aws_region field first, then fall back to default
-        final String legacyRegionName = input.getConfiguration().getString(CK_LEGACY_AWS_REGION, DEFAULT_REGION.getName());
-        // Use specific region if provided, otherwise fall back to legacy region
-        final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, legacyRegionName);
-        final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, legacyRegionName);
+        final String sqsRegionName = input.getConfiguration().getString(CK_AWS_SQS_REGION, DEFAULT_REGION.getName());
+        final String s3RegionName = input.getConfiguration().getString(CK_AWS_S3_REGION, DEFAULT_REGION.getName());
 
         LOG.debug("Using SQS region: {}, S3 region: {}", sqsRegionName, s3RegionName);
 
