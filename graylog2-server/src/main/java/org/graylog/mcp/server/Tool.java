@@ -17,11 +17,17 @@
 package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import io.modelcontextprotocol.spec.McpSchema;
+import jakarta.inject.Inject;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.web.customization.CustomizationConfig;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,8 +39,20 @@ import java.util.Optional;
  * @param <O> Output type
  */
 public abstract class Tool<P, O> {
+    public record ToolContext(
+            ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider,
+            CustomizationConfig  customizationConfig,
+            ClusterConfigService clusterConfigService
+    ) {
+        @Inject
+        public ToolContext {}
+    }
 
     private final ObjectMapper objectMapper;
+    private final ClusterConfigService clusterConfigService;
+    private final String productName;
+
     private final TypeReference<P> parameterType;
     private final String name;
     private final String title;
@@ -43,21 +61,23 @@ public abstract class Tool<P, O> {
     private final Map<String, Object> outputSchema;
 
     protected Tool(
-            ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider,
+            ToolContext context,
             TypeReference<P> parameterType,
             TypeReference<O> outputType,
             String name,
             String title,
             String description) {
-        this.objectMapper = objectMapper;
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
 
+        this.objectMapper = context.objectMapper();
+        this.clusterConfigService = context.clusterConfigService();
+        this.productName = context.customizationConfig().productName();
+
         // Get the schema generator with all contributed modules
-        SchemaGenerator generator = schemaGeneratorProvider.get();
+        SchemaGenerator generator = context.schemaGeneratorProvider().get();
 
         // we can precompute the schema for our parameters, it's statically known
         final var inputSchemaNode = generator.generateSchema(parameterType.getType());
@@ -74,9 +94,21 @@ public abstract class Tool<P, O> {
         }
     }
 
+    protected boolean isStructuredOutputSet() {
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES
+        ).useStructuredOutput();
+    }
+
+    protected boolean isOutputSchemaEnabled() {
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES
+        ).enableOutputSchema();
+    }
+
     protected ObjectMapper getObjectMapper() {
         return objectMapper;
     }
+
+    public String getProductName() { return productName; }
 
     @JsonProperty
     public String name() {
@@ -100,7 +132,7 @@ public abstract class Tool<P, O> {
 
     @JsonProperty
     public Optional<Map<String, Object>> outputSchema() {
-        return Optional.ofNullable(outputSchema);
+        return isOutputSchemaEnabled() && isStructuredOutputSet() ? Optional.ofNullable(outputSchema) : Optional.empty();
     }
 
     /**
@@ -110,10 +142,30 @@ public abstract class Tool<P, O> {
      * @param parameterMap raw parameter map
      * @return the return value of the tool call
      */
-    public O apply(PermissionHelper permissionHelper, Map<String, Object> parameterMap) {
+    public ToolResult<O> apply(PermissionHelper permissionHelper, Map<String, Object> parameterMap) {
         final P p = objectMapper.convertValue(parameterMap, parameterType);
-        return apply(permissionHelper, p);
+        if (!isStructuredOutputSet()) {
+            return new ToolResult.Text<>(applyAsText(permissionHelper, p));
+        }
+        return new ToolResult.Data<>(apply(permissionHelper, p));
     }
 
     protected abstract O apply(PermissionHelper permissionHelper, P parameters);
+
+    protected String applyAsText(PermissionHelper permissionHelper, P parameters) {
+        return apply(permissionHelper, parameters).toString();
+    }
+
+    public sealed interface ToolResult<T> {
+        record Text<T>(@JsonValue String value) implements ToolResult<T> {
+            @Override
+            public @NotNull String toString() { return value != null ? value : "(empty)"; }
+        }
+        record Data<T>(@JsonValue T value) implements ToolResult<T> {
+            @Override
+            public @NotNull String toString() {
+                return value != null && !value.toString().isBlank() ? value.toString() : "{}";
+            }
+        }
+    }
 }

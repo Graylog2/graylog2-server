@@ -24,13 +24,27 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 @AutoValue
 public abstract class McpConfiguration {
-    public static final McpConfiguration DEFAULT_VALUES = create(false);
+    public static final McpConfiguration DEFAULT_VALUES = create(
+            false,
+            true,
+            false
+    );
 
     @JsonProperty("enable_remote_access")
     public abstract boolean enableRemoteAccess();
 
+    @JsonProperty("use_structured_output")
+    public abstract boolean useStructuredOutput();
+
+    @JsonProperty("enable_output_schema")
+    public abstract boolean enableOutputSchema();
+
     @JsonCreator
-    public static McpConfiguration create(@JsonProperty("enable_remote_access") boolean enableRemoteAccess) {
-        return new AutoValue_McpConfiguration(enableRemoteAccess);
+    public static McpConfiguration create(
+            @JsonProperty("enable_remote_access") boolean enableRemoteAccess,
+            @JsonProperty("use_structured_output") boolean useStructuredOutput,
+            @JsonProperty("enable_output_schema") boolean enableOutputSchema
+    ) {
+        return new AutoValue_McpConfiguration(enableRemoteAccess, useStructuredOutput, enableOutputSchema);
     }
 }
