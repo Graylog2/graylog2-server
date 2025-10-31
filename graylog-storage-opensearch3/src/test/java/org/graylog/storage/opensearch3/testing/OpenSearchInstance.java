@@ -92,7 +92,7 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         this.officialOpensearchClient = buildOfficialClient();
         this.client = new ClientOS(this.openSearchClient, officialOpensearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient, officialOpensearchClient, featureFlags);
+        adapters = new AdaptersOS(openSearchClient, officialOpensearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         if (isFirstContainerStart) {
             afterContainerCreated();
