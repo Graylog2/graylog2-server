@@ -145,7 +145,7 @@ public class RecentActivityService {
         // filter relevant activities by permissions
         final var principal = grnRegistry.newGRN(GRNTypes.USER, user.getUser().getId());
         final var grantees = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).toList();
-        final var sharedEntities = getShareGRNsFor(principal, Capability.VIEW);
+        final var sharedEntities = getShareGRNsFor(principal);
         var query = Filters.or(Filters.in(RecentActivityDTO.FIELD_GRANTEE, grantees), Filters.in(RecentActivityDTO.FIELD_ITEM_GRN, sharedEntities));
         return pagination
                 .perPage(perPage)
