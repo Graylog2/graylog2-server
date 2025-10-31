@@ -39,7 +39,7 @@ public class NodeAdapterOS implements NodeAdapter {
         final InfoResponse info = client.execute(() -> client.sync().info(), "Unable to retrieve search engine version and distribution");
         final OpenSearchVersionInfo versionInfo = info.version();
         final Version versionNumber = parseVersion(versionInfo.number());
-        final String distributionString = StringUtils.toUpperCase(versionInfo.distribution());
+        final String distributionString = versionInfo.distribution() != null ? StringUtils.toUpperCase(versionInfo.distribution()) : null;
         return Optional.of(
                 SearchVersion.create(
                         distributionString,

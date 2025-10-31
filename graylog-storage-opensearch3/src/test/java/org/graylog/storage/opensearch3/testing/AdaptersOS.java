@@ -56,7 +56,7 @@ import java.util.List;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
-public class AdaptersOS2 implements Adapters {
+public class AdaptersOS implements Adapters {
 
     @Deprecated
     private final OpenSearchClient client;
@@ -65,7 +65,7 @@ public class AdaptersOS2 implements Adapters {
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
-    public AdaptersOS2(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
+    public AdaptersOS(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
         this.client = client;
         this.officialOpensearchClient = officialOpensearchClient;
         this.featureFlags = featureFlags;
