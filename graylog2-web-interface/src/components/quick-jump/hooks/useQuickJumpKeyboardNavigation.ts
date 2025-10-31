@@ -43,7 +43,7 @@ type Result = {
   highlightedIndex: number;
   modalProps: {
     onKeyDownCapture: (event: React.KeyboardEvent) => void;
-  }
+  };
   searchInputProps: {
     ref: React.MutableRefObject<React.ComponentRef<typeof Input> | null>;
   };
