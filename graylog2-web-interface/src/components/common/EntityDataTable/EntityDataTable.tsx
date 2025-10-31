@@ -279,6 +279,10 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
+  const sorting = useMemo(
+    () => (activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : []),
+    [activeSort],
+  );
   const _isEntitySelectable = useCallback(
     (entity: Entity) => {
       if (!displayBulkSelectCol) return false;
@@ -350,11 +354,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
       columnOrder: [displayBulkSelectCol ? 'bulk-select' : null, ...columnsOrder].filter(Boolean),
     },
     state: {
-      sorting: activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : [],
+      sorting,
     },
-    onSortingChange: (newSortFn) => {
-      const newSort = newSortFn();
-      onSortChange({ attributeId: newSort[0].id, direction: newSort[0].desc ? 'desc' : 'asc' });
+    onSortingChange: (updater) => {
+      const newSorting = updater instanceof Function ? updater(sorting) : updater;
+      onSortChange({ attributeId: newSorting[0].id, direction: newSorting[0].desc ? 'desc' : 'asc' });
     },
   });
 
