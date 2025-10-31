@@ -16,17 +16,9 @@
  */
 
 import React, { useCallback } from 'react';
-import styled, { css } from 'styled-components';
 
-import { Icon } from 'components/common';
 import useFavoriteItemMutation from 'hooks/useFavoriteItemMutation';
-
-const StyledIcon = styled(Icon)<{ $isFavorite: boolean }>(
-  ({ theme, $isFavorite }) => css`
-    color: ${$isFavorite ? theme.colors.variant.info : undefined};
-    cursor: pointer;
-  `,
-);
+import CommonFavoriteIcon from 'views/components/common/CommonFavoriteIcon';
 
 type Props = {
   isFavorite: boolean;
@@ -46,16 +38,7 @@ const FavoriteIcon = ({ isFavorite, grn, onChange, className = undefined }: Prop
   }, [isFavorite, deleteItem, grn, onChange, putItem]);
   const title = isFavorite ? 'Remove from favorites' : 'Add to favorites';
 
-  return (
-    <StyledIcon
-      className={className}
-      onClick={onClick}
-      title={title}
-      $isFavorite={isFavorite}
-      name="star"
-      type={isFavorite ? 'solid' : 'regular'}
-    />
-  );
+  return <CommonFavoriteIcon className={className} onClick={onClick} title={title} isFavorite={isFavorite} />;
 };
 
 export default FavoriteIcon;

@@ -27,13 +27,20 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
+import MessageEditFieldConfigurationAction from 'views/components/messagelist/MessageFields/MessageEditFieldConfigurationAction';
+import useFeature from 'hooks/useFeature';
 
-const _getTestAgainstStreamButton = (
-  streams: Immutable.List<any>,
-  index: string,
-  id: string,
-  sendTelemetry: ReturnType<typeof useSendTelemetry>,
-) => {
+const TestAgainstStreamButton = ({
+  streams,
+  index,
+  id,
+}: {
+  streams: Immutable.List<any>;
+  index: string;
+  id: string;
+}) => {
+  const sendTelemetry = useSendTelemetry();
+
   const sendEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
       app_section: 'search-message-table',
@@ -102,7 +109,7 @@ const MessageActions = ({
   searchConfig,
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
-  const sendTelemetry = useSendTelemetry();
+  const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
 
   if (disabled) {
     return <ButtonGroup />;
@@ -134,7 +141,8 @@ const MessageActions = ({
       <ClipboardButton title="Copy ID" text={id} bsSize="small" />
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
       {surroundingSearchButton}
-      {disableTestAgainstStream ? null : _getTestAgainstStreamButton(streams, index, id, sendTelemetry)}
+      {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
+      {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}
     </ButtonGroup>
   );
 };
