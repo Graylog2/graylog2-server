@@ -32,6 +32,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.buckets.ESTime
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -71,6 +72,7 @@ class ESTimeHandlerTest {
         when(time.fields()).thenReturn(Collections.singletonList("foobar"));
         final AggTypes aggTypes = mock(AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
+        when(queryContext.timezone()).thenReturn(DateTimeZone.UTC);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }
 
