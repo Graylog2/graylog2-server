@@ -35,7 +35,6 @@ import org.graylog.datanode.process.ProcessListener;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
-import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +42,6 @@ import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.security.KeyStore;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -67,28 +65,10 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     private void persistCertificates(OpensearchConfigurationDir confDir, OpensearchCertificates certificates) {
-        persistConfigFile(confDir, new KeystoreConfigFile(Path.of(OpensearchSecurityConfigurationBean.TARGET_DATANODE_HTTP_KEYSTORE_FILENAME), new KeystoreInformation() {
-            @Override
-            public KeyStore loadKeystore() {
-                return certificates.getHttpKeystore().get();
-            }
-
-            @Override
-            public char[] password() {
-                return certificates.getPassword();
-            }
-        }));
-        persistConfigFile(confDir, new KeystoreConfigFile(Path.of(OpensearchSecurityConfigurationBean.TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME), new KeystoreInformation() {
-            @Override
-            public KeyStore loadKeystore() {
-                return certificates.getTransportKeystore().get();
-            }
-
-            @Override
-            public char[] password() {
-                return certificates.getPassword();
-            }
-        }));
+        final KeystoreConfigFile httpFile = OpensearchCertificateFile.create(OpensearchSecurityConfigurationBean.TARGET_DATANODE_HTTP_KEYSTORE_FILENAME, certificates.getHttpKeystore(), certificates.getPassword());
+        final KeystoreConfigFile transportFile = OpensearchCertificateFile.create(OpensearchSecurityConfigurationBean.TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME, certificates.getTransportKeystore(), certificates.getPassword());
+        persistConfigFile(confDir, httpFile);
+        persistConfigFile(confDir, transportFile);
     }
 
     private static void persistConfigFile(OpensearchConfigurationDir confDir, DatanodeConfigFile cf) {
