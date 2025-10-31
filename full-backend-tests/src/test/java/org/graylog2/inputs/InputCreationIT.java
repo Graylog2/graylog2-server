@@ -52,8 +52,9 @@ public class InputCreationIT {
     void testFailingAwsCloudTrailInputCreation(GraylogApis apis) {
         String inputId = apis.inputs().createGlobalInput("testInput",
                 "org.graylog.aws.inputs.cloudtrail.CloudTrailInput",
-                Map.of("aws_region", "us-east-1",
-                        "cloudtrail_queue_name", "invalid-queue-no-messages-read",
+                Map.of("aws_s3_region", "us-east-1",
+                        "aws_sqs_region", "us-east-1",
+                        "aws_sqs_queue_name", "invalid-queue-no-messages-read",
                         "aws_access_key", "invalid-access-key",
                         "aws_secret_key", "invalid-secret-key",
                         "polling_interval", 1,

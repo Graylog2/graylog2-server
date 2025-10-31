@@ -56,6 +56,7 @@ import org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNot
 import org.graylog.integrations.pagerduty.PagerDutyNotification;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.pagerduty.PagerDutyNotificationConfigEntity;
+import org.graylog2.migrations.V20251030000000_CloudTrailInputConfigMigration;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 import org.slf4j.Logger;
@@ -191,6 +192,7 @@ public class IntegrationsModule extends PluginModule {
         addMessageInput(CloudTrailInput.class);
         addRestResource(CloudTrailResource.class);
         bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
+        addMigration(V20251030000000_CloudTrailInputConfigMigration.class);
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);
