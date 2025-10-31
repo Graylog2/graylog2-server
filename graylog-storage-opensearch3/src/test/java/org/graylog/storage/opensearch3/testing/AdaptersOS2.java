@@ -26,7 +26,7 @@ import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
 import org.graylog.storage.opensearch3.IndicesAdapterOS;
 import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.MessagesAdapterOS2;
-import org.graylog.storage.opensearch3.NodeAdapterOS2;
+import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.PlainJsonApi;
@@ -92,7 +92,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public NodeAdapter nodeAdapter() {
-        return new NodeAdapterOS2(client, objectMapper);
+        return new NodeAdapterOS(officialOpensearchClient);
     }
 
     @Override
