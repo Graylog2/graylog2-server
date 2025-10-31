@@ -18,10 +18,9 @@ import React, { useMemo } from 'react';
 import type { Modifiers } from 'react-day-picker';
 import { DayPicker } from 'react-day-picker';
 import styled, { css } from 'styled-components';
-import moment from 'moment';
 import 'react-day-picker/style.css';
 
-import { isValidDate, toDateObject, adjustFormat, DATE_TIME_FORMATS } from 'util/DateTime';
+import { isValidDate, toDateObject, adjustFormat } from 'util/DateTime';
 
 const StyledDayPicker = styled(DayPicker)(
   ({ theme }) => css`
@@ -74,7 +73,7 @@ const DatePicker = ({ date = undefined, fromDate = undefined, onChange, showOuts
 
   return (
     <StyledDayPicker
-      defaultMonth={selectedDate ? moment(selectedDate, DATE_TIME_FORMATS.date).toDate() : undefined}
+      defaultMonth={selectedDate ? toDateObject(selectedDate).toDate() : undefined}
       onDayClick={onChange}
       modifiers={modifiers}
       timeZone="UTC"
