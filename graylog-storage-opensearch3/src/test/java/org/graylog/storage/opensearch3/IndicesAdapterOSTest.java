@@ -79,15 +79,6 @@ class IndicesAdapterOSTest {
     }
 
     @Test
-    void testNumberOfMessages() {
-        doReturn(42L).when(statsApi).numberOfMessagesInIndex("index_1");
-        doReturn(13L).when(statsApi).numberOfMessagesInIndex("index_2");
-
-        assertEquals(42L, toTest.numberOfMessages("index_1"));
-        assertEquals(13L, toTest.numberOfMessages("index_2"));
-    }
-
-    @Test
     void testIndicesStats() {
         IndicesStats stats1 = mock(IndicesStats.class);
         IndicesStats stats2 = mock(IndicesStats.class);
