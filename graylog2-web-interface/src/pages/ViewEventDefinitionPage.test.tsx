@@ -66,6 +66,7 @@ jest.mock('components/event-definitions/event-definition-form/EventDefinitionSum
   mockComponent('EventDefinitionSummary'),
 );
 jest.mock('hooks/usePluginEntities');
+jest.mock('components/perspectives/hooks/useActivePerspective', () => () => ({ activePerspective: 'foo' }));
 
 describe('<ViewEventDefinitionPage />', () => {
   beforeEach(() => {
@@ -75,7 +76,12 @@ describe('<ViewEventDefinitionPage />', () => {
         ({
           'licenseCheck': [(_license: string) => ({ data: { valid: false } })],
           'eventProcedures': [],
-          'alerts.pageNavigation': [{ description: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST }],
+          'pageNavigation': [
+            {
+              description: 'Alerts',
+              children: [{ description: 'Event Definitions', path: Routes.ALERTS.DEFINITIONS.LIST }],
+            },
+          ],
           'eventDefinitions.components.editSigmaModal': [],
         })[entityKey],
     );
