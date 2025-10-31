@@ -51,28 +51,32 @@ public class IndexSetRestrictionsService {
     private final IndexSetTemplateService templateService;
     private final IndexSetDefaultTemplateService indexSetDefaultTemplateService;
     private final ObjectMapper objectMapper;
+    private final IndexSetConfigTransformer indexSetConfigTransformer;
     private final ParseContext parseContext;
 
     @Inject
     public IndexSetRestrictionsService(IndexSetTemplateService templateService,
                                        IndexSetDefaultTemplateService indexSetDefaultTemplateService,
-                                       ObjectMapper objectMapper) {
+                                       ObjectMapper objectMapper,
+                                       IndexSetConfigTransformer indexSetConfigTransformer) {
         this.templateService = templateService;
         this.indexSetDefaultTemplateService = indexSetDefaultTemplateService;
         this.objectMapper = objectMapper;
+        this.indexSetConfigTransformer = indexSetConfigTransformer;
         parseContext = JsonPath.using(Configuration.defaultConfiguration()
                 .addOptions(Option.DEFAULT_PATH_LEAF_TO_NULL));
     }
 
 
     public IndexSetConfig createIndexSetConfig(IndexSetCreationRequest creationRequest, boolean skipRestrictionCheck) {
-        IndexSetTemplateConfig indexSetTemplateConfig = Optional.ofNullable(creationRequest.indexSetTemplateId())
-                .flatMap(templateService::get)
-                .map(IndexSetTemplate::indexSetConfig)
-                .orElse(indexSetDefaultTemplateService.getOrCreateDefaultConfig());
+        IndexSetTemplateConfig indexSetTemplateConfig = indexSetConfigTransformer.transform(
+                Optional.ofNullable(creationRequest.indexSetTemplateId())
+                        .flatMap(templateService::get)
+                        .map(IndexSetTemplate::indexSetConfig)
+                        .orElse(indexSetDefaultTemplateService.getOrCreateDefaultConfig()));
 
         final IndexSetConfig newConfig = creationRequest.toIndexSetConfig(true, indexSetTemplateConfig.fieldRestrictions());
-        if(!skipRestrictionCheck) {
+        if (!skipRestrictionCheck) {
             checkRestrictions(indexSetTemplateConfig.fieldRestrictions(), doc(newConfig), doc(indexSetTemplateConfig));
         }
         return newConfig;
@@ -84,7 +88,7 @@ public class IndexSetRestrictionsService {
         final IndexSetConfig newConfig = updateRequest.toIndexSetConfig(oldConfig);
         if (!skipRestrictionCheck) {
             DocumentContext doc1 = doc(newConfig);
-            DocumentContext doc2 = doc(oldConfig);
+            DocumentContext doc2 = doc(indexSetConfigTransformer.transform(oldConfig));
             if (!Objects.equals(doc1.read(FIELD_RESTRICTIONS_PATH), doc2.read(FIELD_RESTRICTIONS_PATH))) {
                 throw new ForbiddenException("Missing permission %s to change field %s!".formatted(
                         RestPermissions.INDEXSETS_FIELD_RESTRICTIONS_EDIT, FIELD_RESTRICTIONS));
