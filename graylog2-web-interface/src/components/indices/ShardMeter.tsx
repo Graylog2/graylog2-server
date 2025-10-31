@@ -18,7 +18,7 @@ import React from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
-const Meter = (meter) => {
+const Meter = ({ meter }) => {
   const value = <span>{numeral(meter.total).format('0,0')} ops</span>;
 
   if (meter.total > 0) {
