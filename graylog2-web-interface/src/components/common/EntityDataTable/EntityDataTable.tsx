@@ -49,6 +49,7 @@ import type {
 import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
 import ButtonToolbar from '../../bootstrap/ButtonToolbar';
 import TableRow from 'components/common/EntityDataTable/TableRow';
+import useTable from 'components/common/EntityDataTable/hooks/useTable';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -279,10 +280,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
-  const sorting = useMemo(
-    () => (activeSort ? [{ id: activeSort.attributeId, desc: activeSort.direction === 'desc' }] : []),
-    [activeSort],
-  );
+
   const _isEntitySelectable = useCallback(
     (entity: Entity) => {
       if (!displayBulkSelectCol) return false;
@@ -321,7 +319,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol);
   const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions);
 
-  const attributeColumns = useMemo(
+  const attributeCols = useMemo(
     () =>
       columns.map((col) => {
         const columnRenderer = columnRenderersByAttribute[col.id];
@@ -337,29 +335,17 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   );
 
   const reactTableColumns = useMemo(
-    () => [bulkSelectCol, ...attributeColumns, actionsCol].filter(Boolean) as ColumnDef<Entity, unknown>[],
-    [bulkSelectCol, attributeColumns, actionsCol],
+    () => [bulkSelectCol, ...attributeCols, actionsCol].filter(Boolean) as ColumnDef<Entity, unknown>[],
+    [bulkSelectCol, attributeCols, actionsCol],
   );
 
-  const mutableEntities = useMemo(() => [...entities], [entities]);
-
-  const table = useReactTable({
-    data: mutableEntities,
+  const table = useTable<Entity>({
+    entities,
+    sort: activeSort,
     columns: reactTableColumns,
-    getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,
-    enableSortingRemoval: false,
-    initialState: {
-      // consider adding actions col here. In this case we need to ensure columnsOrder contains all attributes, otherwise missing ocls will be displayed after the actions col.
-      columnOrder: [displayBulkSelectCol ? 'bulk-select' : null, ...columnsOrder].filter(Boolean),
-    },
-    state: {
-      sorting,
-    },
-    onSortingChange: (updater) => {
-      const newSorting = updater instanceof Function ? updater(sorting) : updater;
-      onSortChange({ attributeId: newSorting[0].id, direction: newSorting[0].desc ? 'desc' : 'asc' });
-    },
+    columnsOrder,
+    onSortChange,
+    displayBulkSelectCol,
   });
 
   return (
