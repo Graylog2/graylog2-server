@@ -62,6 +62,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedX
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
@@ -87,14 +88,16 @@ import java.util.stream.Stream;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
-public class ClientOS2 implements Client {
-    private static final Logger LOG = LoggerFactory.getLogger(ClientOS2.class);
+public class ClientOS implements Client {
+    private static final Logger LOG = LoggerFactory.getLogger(ClientOS.class);
     private final OpenSearchClient client;
+    private final OfficialOpensearchClient opensearchClient;
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
 
-    public ClientOS2(final OpenSearchClient client, final List<String> featureFlags) {
+    public ClientOS(final OpenSearchClient client, final OfficialOpensearchClient opensearchClient, final List<String> featureFlags) {
         this.client = client;
+        this.opensearchClient = opensearchClient;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
     }
@@ -332,6 +335,10 @@ public class ClientOS2 implements Client {
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
         refreshNode();
+        // currently the client is recreated on every init of the OS instance, so transport needs to be closed here
+        if (opensearchClient != null) {
+            opensearchClient.close();
+        }
     }
 
     private String[] existingComposableTemplates() {
