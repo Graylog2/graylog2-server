@@ -40,7 +40,6 @@ const TestAgainstStreamButton = ({
   id: string;
 }) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
 
   const sendEvent = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_MESSAGE_TABLE_TEST_AGAINST_STREAM, {
@@ -111,7 +110,6 @@ const MessageActions = ({
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
   const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
-  const sendTelemetry = useSendTelemetry();
 
   if (disabled) {
     return <ButtonGroup />;
@@ -145,6 +143,7 @@ const MessageActions = ({
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
       {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}
+    </ButtonGroup>
   );
 };
 
