@@ -20,8 +20,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
-import org.graylog.plugins.map.ConditionalRunner;
-import org.graylog.plugins.map.ResourceExistsCondition;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.junit.jupiter.api.AfterEach;
@@ -29,7 +27,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
-import org.junit.runner.RunWith;
 
 import java.net.URISyntaxException;
 import java.util.concurrent.TimeUnit;
@@ -78,7 +75,9 @@ public class MaxmindDataAdapterTest {
 
         @AfterEach
         public void tearDown() throws Exception {
-            adapter.doStop();
+            if (adapter != null) {
+                adapter.doStop();
+            }
         }
 
         private String getTestDatabasePath(String name) throws URISyntaxException {
@@ -120,12 +119,14 @@ public class MaxmindDataAdapterTest {
     }
 
     @Nested
-    @RunWith(ConditionalRunner.class)
-    @ResourceExistsCondition(GEO_LITE2_CITY_MMDB)
-    @EnabledIf(GEO_LITE2_CITY_MMDB)
+    @EnabledIf("enabled")
     public class CityDatabaseTest extends Base {
         public CityDatabaseTest() {
             super(DatabaseType.MAXMIND_CITY);
+        }
+
+        public static boolean enabled() {
+            return MaxmindDataAdapterTest.class.getResource(GEO_LITE2_CITY_MMDB) != null;
         }
 
         @Test
@@ -173,11 +174,14 @@ public class MaxmindDataAdapterTest {
     }
 
     @Nested
-    @RunWith(ConditionalRunner.class)
-    @ResourceExistsCondition(GEO_LITE2_COUNTRY_MMDB)
+    @EnabledIf("enabled")
     public class CountryDatabaseTest extends Base {
         public CountryDatabaseTest() {
             super(DatabaseType.MAXMIND_COUNTRY);
+        }
+
+        public static boolean enabled() {
+            return MaxmindDataAdapterTest.class.getResource(GEO_LITE2_COUNTRY_MMDB) != null;
         }
 
         @Test
@@ -211,11 +215,14 @@ public class MaxmindDataAdapterTest {
     }
 
     @Nested
-    @RunWith(ConditionalRunner.class)
-    @ResourceExistsCondition(GEO_LITE2_ASN_MMDB)
+    @EnabledIf("enabled")
     public class AsnDatabaseTest extends Base {
         public AsnDatabaseTest() {
             super(DatabaseType.MAXMIND_ASN);
+        }
+
+        public static boolean enabled() {
+            return MaxmindDataAdapterTest.class.getResource(GEO_LITE2_ASN_MMDB) != null;
         }
 
         @Test
@@ -239,11 +246,14 @@ public class MaxmindDataAdapterTest {
     }
 
     @Nested
-    @RunWith(ConditionalRunner.class)
-    @ResourceExistsCondition(IPINFO_STANDARD_LOCATION_MMDB)
+    @EnabledIf("enabled")
     public class IPinfoStandardLocationDatabaseTest extends Base {
         public IPinfoStandardLocationDatabaseTest() {
             super(DatabaseType.IPINFO_STANDARD_LOCATION);
+        }
+
+        public static boolean enabled() {
+            return MaxmindDataAdapterTest.class.getResource(IPINFO_STANDARD_LOCATION_MMDB) != null;
         }
 
         @Test
@@ -268,11 +278,14 @@ public class MaxmindDataAdapterTest {
     }
 
     @Nested
-    @RunWith(ConditionalRunner.class)
-    @ResourceExistsCondition(IPINFO_ASN_MMDB)
+    @EnabledIf("enabled")
     public class IPinfoASNDatabaseTest extends Base {
         public IPinfoASNDatabaseTest() {
             super(DatabaseType.IPINFO_ASN);
+        }
+
+        public static boolean enabled() {
+            return MaxmindDataAdapterTest.class.getResource(IPINFO_ASN_MMDB) != null;
         }
 
         @Test
