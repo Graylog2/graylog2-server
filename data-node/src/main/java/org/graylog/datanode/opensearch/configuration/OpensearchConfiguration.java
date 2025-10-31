@@ -21,12 +21,12 @@ import jakarta.annotation.Nonnull;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.process.Environment;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
 import org.graylog.datanode.process.configuration.files.YamlConfigFile;
-import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpHost;
 
 import java.nio.file.Path;
@@ -82,7 +82,7 @@ public class OpensearchConfiguration {
     }
 
     public boolean isHttpsEnabled() {
-        return httpCertificate().isPresent();
+        return certificates().isPresent();
     }
 
     /**
@@ -109,17 +109,11 @@ public class OpensearchConfiguration {
                 .orElseThrow(() -> new IllegalArgumentException("This should not happen, truststore should always be present"));
     }
 
-    public Optional<KeystoreInformation> httpCertificate() {
+    public Optional<OpensearchCertificates> certificates() {
         return configurationParts.stream()
-                .map(DatanodeConfigurationPart::httpCertificate)
+                .map(DatanodeConfigurationPart::opensearchCertificates)
                 .filter(Objects::nonNull)
-                .findFirst();
-    }
-
-    public Optional<KeystoreInformation> transportCertificate() {
-        return configurationParts.stream()
-                .map(DatanodeConfigurationPart::transportCertificate)
-                .filter(Objects::nonNull)
+                .filter(OpensearchCertificates::hasCertificates)
                 .findFirst();
     }
 

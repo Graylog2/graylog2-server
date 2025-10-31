@@ -17,43 +17,41 @@
 package org.graylog.datanode.configuration.variants;
 
 import jakarta.annotation.Nullable;
-import org.graylog.security.certutil.csr.KeystoreInformation;
+
+import java.security.KeyStore;
+import java.util.function.Supplier;
 
 public class OpensearchCertificates {
 
-    @Nullable
-    private final KeystoreInformation transportCertificate;
+    private final Supplier<KeyStore> httpKeystore;
+    private final Supplier<KeyStore> transportKeystore;
+
     @Nullable
     private final String transportKeyAlias;
     @Nullable
-    private final KeystoreInformation httpCertificate;
-    @Nullable
     private final String httpKeyAlias;
 
-    public OpensearchCertificates(@Nullable KeystoreInformation transportCertificate, @Nullable String transportKeyAlias, @Nullable KeystoreInformation httpCertificate, @Nullable String httpKeyAlias) {
-        this.transportCertificate = transportCertificate;
-        this.transportKeyAlias = transportKeyAlias;
-        this.httpCertificate = httpCertificate;
-        this.httpKeyAlias = httpKeyAlias;
-    }
 
-    public OpensearchCertificates(KeystoreInformation transportCertificate, KeystoreInformation httpCertificate) {
-        // null aliases mean autodetection - first alias will be used
-        this(transportCertificate, null, httpCertificate, null);
+    private final char[] password;
+
+    public OpensearchCertificates(char[] password, Supplier<KeyStore> httpKeystore, @Nullable String httpKeyAlias, Supplier<KeyStore> transportKeystore, @Nullable String transportKeyAlias) {
+        this.httpKeystore = httpKeystore;
+        this.transportKeystore = transportKeystore;
+        this.transportKeyAlias = transportKeyAlias;
+        this.httpKeyAlias = httpKeyAlias;
+        this.password = password;
     }
 
     public static OpensearchCertificates none() {
-        return new OpensearchCertificates(null, null, null, null);
+        return new OpensearchCertificates(null, null, null, null, null);
     }
 
-    @Nullable
-    public KeystoreInformation getTransportCertificate() {
-        return transportCertificate;
+    public Supplier<KeyStore> getHttpKeystore() {
+        return httpKeystore;
     }
 
-    @Nullable
-    public KeystoreInformation getHttpCertificate() {
-        return httpCertificate;
+    public Supplier<KeyStore> getTransportKeystore() {
+        return transportKeystore;
     }
 
     @Nullable
@@ -66,7 +64,11 @@ public class OpensearchCertificates {
         return httpKeyAlias;
     }
 
-    public boolean hasBothCertificates() {
-        return getHttpCertificate() != null && getTransportCertificate() != null;
+    public char[] getPassword() {
+        return password;
+    }
+
+    public boolean hasCertificates() {
+        return getHttpKeystore() != null && getTransportKeystore() != null;
     }
 }

@@ -25,13 +25,17 @@ import com.github.rholder.retry.WaitStrategies;
 import jakarta.validation.constraints.NotNull;
 import org.graylog.datanode.configuration.OpensearchConfigurationDir;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchSecurityConfigurationBean;
 import org.graylog.datanode.process.CommandLineProcess;
 import org.graylog.datanode.process.CommandLineProcessListener;
 import org.graylog.datanode.process.ProcessInformation;
 import org.graylog.datanode.process.ProcessListener;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
+import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
+import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +43,7 @@ import java.io.Closeable;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.security.KeyStore;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -49,10 +54,41 @@ public class OpensearchCommandLineProcess implements Closeable {
 
     private final CommandLineProcess commandLineProcess;
     private final CommandLineProcessListener resultHandler;
+    private final OpensearchConfiguration config;
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
         final OpensearchConfigurationDir confDir = config.getOpensearchConfigTargetDir();
         config.configFiles().forEach(cf -> persistConfigFile(confDir, cf));
+        persistCertificates(config);
+    }
+
+    private void persistCertificates(OpensearchConfiguration config) {
+        config.certificates().filter(OpensearchCertificates::hasCertificates).ifPresent(certificates -> persistCertificates(config.getOpensearchConfigTargetDir(), certificates));
+    }
+
+    private void persistCertificates(OpensearchConfigurationDir confDir, OpensearchCertificates certificates) {
+        persistConfigFile(confDir, new KeystoreConfigFile(Path.of(OpensearchSecurityConfigurationBean.TARGET_DATANODE_HTTP_KEYSTORE_FILENAME), new KeystoreInformation() {
+            @Override
+            public KeyStore loadKeystore() {
+                return certificates.getHttpKeystore().get();
+            }
+
+            @Override
+            public char[] password() {
+                return certificates.getPassword();
+            }
+        }));
+        persistConfigFile(confDir, new KeystoreConfigFile(Path.of(OpensearchSecurityConfigurationBean.TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME), new KeystoreInformation() {
+            @Override
+            public KeyStore loadKeystore() {
+                return certificates.getTransportKeystore().get();
+            }
+
+            @Override
+            public char[] password() {
+                return certificates.getPassword();
+            }
+        }));
     }
 
     private static void persistConfigFile(OpensearchConfigurationDir confDir, DatanodeConfigFile cf) {
@@ -67,6 +103,7 @@ public class OpensearchCommandLineProcess implements Closeable {
     }
 
     public OpensearchCommandLineProcess(OpensearchConfiguration config, ProcessListener listener) {
+        this.config = config;
         configureOpensearchKeystoreSecrets(config);
         final Path executable = config.getOpensearchDistribution().getOpensearchExecutable();
         writeOpenSearchConfig(config);
@@ -129,5 +166,10 @@ public class OpensearchCommandLineProcess implements Closeable {
     @NotNull
     public ProcessInformation processInfo() {
         return commandLineProcess.processInfo();
+    }
+
+    public void hotReload() {
+        LOG.info("Triggered hot reload of opensearch certificates");
+        persistCertificates(config);
     }
 }
