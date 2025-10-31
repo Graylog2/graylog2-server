@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class OpenSearchFilterDeprecationWarningsInterceptorTest {
     @Test
-    public void testInterceptorNoHeader() throws IOException, HttpException {
+    public void testInterceptorNoHeader() {
         OpenSearchFilterDeprecationWarningsInterceptor interceptor = new OpenSearchFilterDeprecationWarningsInterceptor();
 
         HttpResponse response = new BasicHttpResponse(new BasicStatusLine(new ProtocolVersion("HTTP", 0, 0), 0, null));

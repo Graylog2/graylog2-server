@@ -16,13 +16,14 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.apache.hc.client5.http.auth.CredentialsProvider;
-import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManager;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.impl.nio.PoolingAsyncClientConnectionManagerBuilder;
 import org.apache.hc.client5.http.ssl.ClientTlsStrategyBuilder;
 import org.apache.hc.core5.http.HttpHost;
@@ -30,12 +31,14 @@ import org.apache.hc.core5.http.HttpRequestInterceptor;
 import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.util.Timeout;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
+import org.graylog2.configuration.IndexerHosts;
+import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
-import org.graylog2.configuration.IndexerHosts;
-import org.graylog2.security.jwt.IndexerJwtAuthToken;
 
 import javax.net.ssl.SSLContext;
 import java.net.URI;
@@ -69,8 +72,9 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     public OfficialOpensearchClientProvider(
             @IndexerHosts List<URI> hosts,
             IndexerJwtAuthToken indexerJwtAuthToken,
-            CredentialsProvider credentialsProvider) {
-        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider));
+            CredentialsProvider credentialsProvider,
+            ElasticsearchClientConfiguration clientConfiguration) {
+        clientCache = Suppliers.memoize(() -> createClient(hosts, indexerJwtAuthToken, credentialsProvider, clientConfiguration));
     }
 
     @Override
@@ -79,7 +83,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
     }
 
     @Nonnull
-    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider) {
+    private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration) {
 
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
 
@@ -94,29 +98,57 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         }
 
         final ApacheHttpClient5TransportBuilder builder = ApacheHttpClient5TransportBuilder.builder(hosts);
+
+        builder.setRequestConfigCallback(requestConfigBuilder ->
+                requestConfigBuilder
+                        .setConnectionRequestTimeout(timeout(clientConfiguration.elasticsearchConnectTimeout()))
+                        .setResponseTimeout(timeout(clientConfiguration.elasticsearchSocketTimeout()))
+                        .setExpectContinueEnabled(clientConfiguration.useExpectContinue())
+                        .setAuthenticationEnabled(true)
+        );
+
+        builder.setChunkedEnabled(clientConfiguration.compressionEnabled());
+
         builder.setHttpClientConfigCallback(httpClientBuilder -> {
+
             final TlsStrategy tlsStrategy = ClientTlsStrategyBuilder.create()
                     .setSslContext(sslcontext)
                     // See https://issues.apache.org/jira/browse/HTTPCLIENT-2219
                     .setTlsDetailsFactory(sslEngine -> new TlsDetails(sslEngine.getSession(), sslEngine.getApplicationProtocol()))
                     .build();
 
-            final PoolingAsyncClientConnectionManager connectionManager = PoolingAsyncClientConnectionManagerBuilder
-                    .create()
+            httpClientBuilder.setConnectionManager(PoolingAsyncClientConnectionManagerBuilder.create()
+                    .setMaxConnPerRoute(clientConfiguration.elasticsearchMaxTotalConnectionsPerRoute())
+                    .setMaxConnTotal(clientConfiguration.elasticsearchMaxTotalConnections())
+                    .setDefaultConnectionConfig(
+                            ConnectionConfig.custom()
+                                    .setConnectTimeout(timeout(clientConfiguration.elasticsearchConnectTimeout()))
+                                    .setSocketTimeout(timeout(clientConfiguration.elasticsearchSocketTimeout()))
+                                    .build()
+
+                    )
                     .setTlsStrategy(tlsStrategy)
-                    .build();
+                    .build());
+
+            httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 
             if (indexerJwtAuthToken.isJwtAuthEnabled()) {
                 httpClientBuilder.addRequestInterceptorLast(jwtInterceptor(indexerJwtAuthToken));
             }
 
-            return httpClientBuilder
-                    .setDefaultCredentialsProvider(credentialsProvider)
-                    .setConnectionManager(connectionManager);
+            if (clientConfiguration.muteDeprecationWarnings()) {
+                httpClientBuilder.addResponseInterceptorFirst(new OpenSearchFilterDeprecationWarningsInterceptor());
+            }
+
+            return httpClientBuilder;
         });
 
         final OpenSearchTransport transport = builder.build();
         return new OfficialOpensearchClient(new OpenSearchClient(transport), new OpenSearchAsyncClient(transport));
+    }
+
+    private static Timeout timeout(Duration duration) {
+        return Timeout.ofSeconds(duration.toSeconds());
     }
 
     private static HttpRequestInterceptor jwtInterceptor(IndexerJwtAuthToken indexerJwtAuthToken) {
