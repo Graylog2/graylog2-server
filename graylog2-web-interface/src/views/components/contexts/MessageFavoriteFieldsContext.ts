@@ -25,11 +25,13 @@ import type { Message } from 'views/components/messagelist/Types';
 export type MessageFavoriteFieldsContextState = {
   isLoadingFavoriteFields: boolean;
   addToFavoriteFields: (field: string) => void;
+  addWithSaveToFavoriteFields: (field: string) => void;
   favoriteFields: Array<string>;
   removeFromFavoriteFields: (field: string) => void;
+  removeWithSaveFromFavoriteFields: (field: string) => void;
   cancelEdit: () => void;
   resetFavoriteField: () => void;
-  saveFavoriteField: () => void;
+  saveFavoriteFields: () => void;
   setFavorites: React.Dispatch<React.SetStateAction<Array<string>>>;
   messageFields: FieldTypeMappingsList;
   message: Message;
@@ -38,11 +40,13 @@ export type MessageFavoriteFieldsContextState = {
 const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsContextState>({
   isLoadingFavoriteFields: false,
   addToFavoriteFields: () => {},
+  addWithSaveToFavoriteFields: () => {},
   favoriteFields: [],
   removeFromFavoriteFields: () => {},
+  removeWithSaveFromFavoriteFields: () => {},
   cancelEdit: () => {},
   resetFavoriteField: () => {},
-  saveFavoriteField: () => {},
+  saveFavoriteFields: () => {},
   setFavorites: () => {},
   messageFields: Immutable.List([]),
   message: undefined,

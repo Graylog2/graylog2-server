@@ -44,7 +44,7 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     setFavorites((favs) => favs.filter((fav) => fav !== field));
   };
 
-  const saveFavoriteField = useCallback(() => {
+  const saveFavoriteFields = useCallback(() => {
     saveFields(favorites);
   }, [favorites, saveFields]);
 
@@ -57,6 +57,26 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     setFavorites(initialFavoriteFields);
   }, [initialFavoriteFields]);
 
+  const addWithSaveToFavoriteFields = useCallback(
+    (field: string) => {
+      // TODO: remove when BE will be implemented;
+      addToFavoriteFields(field);
+
+      saveFields(uniq([...favorites, field]));
+    },
+    [favorites, saveFields],
+  );
+
+  const removeWithSaveFromFavoriteFields = useCallback(
+    (field: string) => {
+      // TODO: remove when BE will be implemented;
+      removeFromFavoriteFields(field);
+
+      saveFields(favorites.filter((fav) => fav !== field));
+    },
+    [favorites, saveFields],
+  );
+
   useEffect(() => {
     if (initialFavoriteFields) setFavorites(initialFavoriteFields);
   }, [initialFavoriteFields]);
@@ -67,14 +87,26 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
       addToFavoriteFields,
       favoriteFields: favorites,
       removeFromFavoriteFields,
+      addWithSaveToFavoriteFields,
+      removeWithSaveFromFavoriteFields,
       cancelEdit,
       resetFavoriteField,
-      saveFavoriteField,
+      saveFavoriteFields,
       setFavorites,
       messageFields,
       message,
     }),
-    [isLoading, favorites, cancelEdit, resetFavoriteField, saveFavoriteField, messageFields, message],
+    [
+      isLoading,
+      favorites,
+      addWithSaveToFavoriteFields,
+      removeWithSaveFromFavoriteFields,
+      cancelEdit,
+      resetFavoriteField,
+      saveFavoriteFields,
+      messageFields,
+      message,
+    ],
   );
 
   return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;

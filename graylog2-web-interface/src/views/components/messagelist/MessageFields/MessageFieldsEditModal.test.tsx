@@ -34,7 +34,7 @@ import MessageFieldsEditModal from './MessageFieldsEditModal';
 const removeFromFavoriteFields = jest.fn();
 const addToFavoriteFields = jest.fn();
 const resetFavoriteField = jest.fn();
-const saveFavoriteField = jest.fn();
+const saveFavoriteFields = jest.fn();
 const cancelEdit = jest.fn();
 const mockedToggleEditMode = jest.fn();
 
@@ -82,7 +82,7 @@ const renderComponent = () =>
                 removeFromFavoriteFields,
                 addToFavoriteFields,
                 resetFavoriteField,
-                saveFavoriteField,
+                saveFavoriteFields,
                 cancelEdit,
                 message,
               } as any
@@ -128,7 +128,7 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
     renderComponent();
     const saveFieldsButton = await screen.findByRole('button', { name: /save configuration/i });
     fireEvent.click(saveFieldsButton);
-    expect(saveFavoriteField).toHaveBeenCalled();
+    expect(saveFavoriteFields).toHaveBeenCalled();
     expect(mockedToggleEditMode).toHaveBeenCalled();
   });
 

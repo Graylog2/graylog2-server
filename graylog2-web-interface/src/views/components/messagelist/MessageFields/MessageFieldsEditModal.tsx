@@ -52,15 +52,15 @@ const StyledButtonGroup = styled(ButtonGroup)`
 
 const MessageFieldsEditModal = ({ toggleEditMode }) => {
   const { formattedFavorites, formattedRest } = useFormattedFields();
-  const { message, saveFavoriteField, resetFavoriteField, cancelEdit } = useContext(MessageFavoriteFieldsContext);
+  const { message, saveFavoriteFields, resetFavoriteField, cancelEdit } = useContext(MessageFavoriteFieldsContext);
   const messageStreams = useStore(StreamsStore, ({ streams }) =>
     streams.filter((stream) => message.fields.streams.includes(stream.id)),
   );
 
-  const _saveFavoriteField = useCallback(() => {
-    saveFavoriteField();
+  const _saveFavoriteFields = useCallback(() => {
+    saveFavoriteFields();
     toggleEditMode();
-  }, [saveFavoriteField, toggleEditMode]);
+  }, [saveFavoriteFields, toggleEditMode]);
 
   const _resetFavoriteField = useCallback(() => {
     resetFavoriteField();
@@ -106,7 +106,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
           </Button>
           <StyledButtonGroup>
             <Button onClick={cancelModal}>Cancel</Button>
-            <Button bsStyle="primary" onClick={_saveFavoriteField}>
+            <Button bsStyle="primary" onClick={_saveFavoriteFields}>
               Save Configuration
             </Button>
           </StyledButtonGroup>

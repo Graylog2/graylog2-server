@@ -45,7 +45,7 @@ const Consumer = () => {
       <div data-testid="favorites">{JSON.stringify(contextValue.favoriteFields)}</div>
       <Button onClick={() => contextValue.addToFavoriteFields('new')}>add-new</Button>
       <Button onClick={() => contextValue.removeFromFavoriteFields('new')}>remove-new</Button>
-      <Button onClick={contextValue.saveFavoriteField}>save-action</Button>
+      <Button onClick={contextValue.saveFavoriteFields}>save-action</Button>
       <Button onClick={contextValue.resetFavoriteField}>preresaction</Button>
       <Button onClick={contextValue.cancelEdit}>cancel-action</Button>
     </div>
@@ -91,7 +91,7 @@ describe('MessageFavoriteFieldsProvider', () => {
     expect(screen.getByTestId('favorites')).not.toHaveTextContent('"new"');
   });
 
-  it('saveFavoriteField calls saveFields', async () => {
+  it('saveFavoriteFields calls saveFields', async () => {
     renderComponent();
 
     fireEvent.click(await screen.findByRole('button', { name: /add-new/i }));

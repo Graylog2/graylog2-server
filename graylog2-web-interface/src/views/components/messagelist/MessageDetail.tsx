@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useMemo, useContext, useCallback } from 'react';
+import { useState, useContext, useCallback } from 'react';
 import Immutable from 'immutable';
 import styled from 'styled-components';
 
-import { AdditionalContext } from 'views/logic/ActionContext';
 import { Link } from 'components/common/router';
 import { Col, Label, Row } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
@@ -38,6 +37,7 @@ import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
 import useFeature from 'hooks/useFeature';
+import MessageDetailAdditionalContext from 'views/components/contexts/MessageDetailAdditionalContext';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -94,7 +94,6 @@ const MessageDetail = ({
   const { fields, index, id, decoration_stats: decorationStats } = message;
   const { gl2_source_node, gl2_source_input, associated_assets } = fields;
   const { isLocalNode } = useIsLocalNode(gl2_source_node);
-  const additionalContext = useMemo(() => ({ isLocalNode }), [isLocalNode]);
   const { all } = useContext(FieldTypesContext);
 
   const _toggleShowOriginal = () => {
@@ -148,12 +147,12 @@ const MessageDetail = ({
   const messageTitle = _formatMessageTitle(index, id);
 
   return (
-    <AdditionalContext.Provider value={additionalContext}>
-      <MessageDetailProviders message={message}>
-        <MessageFavoriteFieldsProvider
-          message={message}
-          messageFields={messageFields}
-          isFeatureEnabled={isFavoriteFieldsEnabled}>
+    <MessageFavoriteFieldsProvider
+      message={message}
+      messageFields={messageFields}
+      isFeatureEnabled={isFavoriteFieldsEnabled}>
+      <MessageDetailAdditionalContext isLocalNode={isLocalNode}>
+        <MessageDetailProviders message={message}>
           <>
             <Row className="row-sm">
               <Col md={12}>
@@ -210,9 +209,9 @@ const MessageDetail = ({
               </Col>
             </Row>
           </>
-        </MessageFavoriteFieldsProvider>
-      </MessageDetailProviders>
-    </AdditionalContext.Provider>
+        </MessageDetailProviders>
+      </MessageDetailAdditionalContext>
+    </MessageFavoriteFieldsProvider>
   );
 };
 
