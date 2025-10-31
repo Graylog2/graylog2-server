@@ -41,7 +41,10 @@ const ExtractorsPage = () => {
       ? nodes.nodes?.[params.nodeId]
       : Object.values(nodes.nodes).filter((_node) => _node.is_leader)[0];
   });
-  const { data: input } = useQuery(['input', params.inputId], () => InputsActions.get(params.inputId));
+  const { data: input } = useQuery({
+    queryKey: ['input', params.inputId],
+    queryFn: () => InputsActions.get(params.inputId),
+  });
 
   useEffect(() => {
     NodesActions.list();

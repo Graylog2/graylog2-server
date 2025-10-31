@@ -34,12 +34,18 @@ const BooleanOperatorSelect = styled(({ isFirstElement: _ignored, ...props }) =>
 `;
 
 type BooleanOperatorSelectorProps = {
+  placeholder?: string;
   initialText?: string;
   operator: string;
   onOperatorChange: (...args: any[]) => void;
 };
 
-const BooleanOperatorSelector = ({ initialText = '', operator, onOperatorChange }: BooleanOperatorSelectorProps) => (
+const BooleanOperatorSelector = ({
+  initialText = '',
+  operator,
+  onOperatorChange,
+  placeholder = 'Boolean operator',
+}: BooleanOperatorSelectorProps) => (
   <Col md={12}>
     <OperatorSelector className="form-inline">
       {initialText && (
@@ -50,8 +56,7 @@ const BooleanOperatorSelector = ({ initialText = '', operator, onOperatorChange 
       <BooleanOperatorSelect isFirstElement={!initialText}>
         <Select
           className="boolean-operator"
-          matchProp="label"
-          aria-label="Boolean Operator"
+          placeholder={placeholder}
           size="small"
           onChange={onOperatorChange}
           options={[

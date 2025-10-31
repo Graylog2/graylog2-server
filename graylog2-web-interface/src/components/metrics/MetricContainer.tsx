@@ -27,13 +27,12 @@ type Props = {
   metrics: ClusterMetric;
   metricsUpdatedAt: number;
   name: string;
-  zeroOnMissing: boolean;
+  zeroOnMissing?: boolean;
   children: React.ReactElement[] | React.ReactElement;
 };
 
 class MetricContainer extends React.Component<Props> {
   static defaultProps = {
-    metricsUpdatedAt: TimeHelper.nowInSeconds(),
     zeroOnMissing: true,
   };
 
@@ -105,6 +104,6 @@ export default connect(
   ({ metricsStore, ...otherProps }) => ({
     ...otherProps,
     metrics: metricsStore.metrics,
-    metricsUpdatedAt: metricsStore.metricsUpdatedAt,
+    metricsUpdatedAt: metricsStore.metricsUpdatedAt ?? TimeHelper.nowInSeconds(),
   }),
 );

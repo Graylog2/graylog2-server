@@ -20,26 +20,24 @@ import { Link } from 'components/common/router';
 import { Select, Spinner } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
-import FormUtils from 'util/FormsUtils';
+import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTablesActions } from 'stores/lookup-tables/LookupTablesStore';
 
-type LookupTableConverterConfigurationProps = {
+type Props = {
   type: string;
   configuration: any;
   onChange: (...args: any[]) => void;
 };
 
-class LookupTableConverterConfiguration extends React.Component<
-  LookupTableConverterConfigurationProps,
-  {
-    [key: string]: any;
-  }
-> {
-  state = {
-    lookupTables: undefined,
-  };
-
+class LookupTableConverterConfiguration extends React.Component<Props, { lookupTables: any }> {
   private converterEnabled: Input;
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      lookupTables: false,
+    };
+  }
 
   componentDidMount() {
     this.props.onChange(this.props.type, this._getConverterObject());
@@ -58,7 +56,7 @@ class LookupTableConverterConfiguration extends React.Component<
   _toggleConverter = (event) => {
     let converter;
 
-    if (FormUtils.getValueFromInput(event.target) === true) {
+    if (getValueFromInput(event.target) === true) {
       converter = this._getConverterObject();
     }
 
@@ -71,8 +69,6 @@ class LookupTableConverterConfiguration extends React.Component<
     newConfig[key] = value;
     this.props.onChange(this.props.type, this._getConverterObject(newConfig));
   };
-
-  _onChange = (key) => (event) => this._updateConfigValue(key, FormUtils.getValueFromInput(event.target));
 
   _onSelect = (key) => (value) => this._updateConfigValue(key, value);
 
@@ -117,7 +113,6 @@ class LookupTableConverterConfiguration extends React.Component<
                   placeholder="Select a lookup table"
                   clearable={false}
                   options={lookupTables}
-                  matchProp="label"
                   onChange={this._onSelect('lookup_table_name')}
                   value={this.props.configuration.lookup_table_name}
                 />

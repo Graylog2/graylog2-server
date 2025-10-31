@@ -196,7 +196,9 @@ const StreamDetails = ({ stream }: Props) => {
     (newStream: Stream) =>
       StreamsStore.update(stream.id, newStream, (response) => {
         UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
-        queryClient.invalidateQueries(['stream', stream.id]);
+        queryClient.invalidateQueries({
+          queryKey: ['stream', stream.id],
+        });
 
         return response;
       }),

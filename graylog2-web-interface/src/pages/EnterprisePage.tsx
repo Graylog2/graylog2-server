@@ -16,10 +16,8 @@
  */
 import React from 'react';
 
-import { useStore } from 'stores/connect';
-import { NodesStore } from 'stores/nodes/NodesStore';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { GraylogClusterOverview } from 'components/cluster';
+import { DocumentTitle, PageHeader } from 'components/common';
+import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import PluginList from 'components/enterprise/PluginList';
 import EnterpriseProductLink from 'components/enterprise/EnterpriseProductLink';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -28,23 +26,21 @@ import AdvertisementSection from 'components/enterprise/AdvertisementSection';
 import usePluggableUpsellWrapper from 'hooks/usePluggableUpsellWrapper';
 
 const EnterprisePage = () => {
-  const nodes = useStore(NodesStore);
   const productName = useProductName();
   const UpsellWrapper = usePluggableUpsellWrapper();
 
-  if (!nodes) {
-    return <Spinner />;
-  }
-
   return (
-    <DocumentTitle title={`Try ${productName} Enterprise`}>
+    <DocumentTitle title={`${productName} Enterprise`}>
       <div>
-        <PageHeader title={`Try ${productName} Enterprise`}>
+        <PageHeader
+          title={
+            <>
+              <UpsellWrapper>Try</UpsellWrapper> {productName} Enterprise
+            </>
+          }>
           <span>
-            {productName} Enterprise adds commercial functionality to the Open Source {productName} core.{' '}
             <UpsellWrapper>
-              You can learn more about {productName} Enterprise on the{' '}
-              <EnterpriseProductLink>product page</EnterpriseProductLink>.
+              <EnterpriseProductLink>Learn More</EnterpriseProductLink> about {productName} Enterprise features.
             </UpsellWrapper>
           </span>
         </PageHeader>

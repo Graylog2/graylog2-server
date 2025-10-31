@@ -38,6 +38,7 @@ export type Props<ItemType extends ListItemType> = {
   displayOverlayInPortal?: boolean;
   items?: Array<ItemType>;
   onMoveItem: (newList: Array<ItemType>, sourceIndex: number, destinationIndex: number) => void;
+  fullWidth?: boolean;
 };
 
 /**
@@ -55,6 +56,7 @@ const SortableList = <ItemType extends ListItemType>({
   displayOverlayInPortal = false,
   items = [],
   onMoveItem,
+  fullWidth = false,
 }: Props<ItemType>) => {
   const onDragEnd = useCallback(
     (result: DropResult) => {
@@ -75,7 +77,7 @@ const SortableList = <ItemType extends ListItemType>({
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="droppable">
         {({ droppableProps, innerRef, placeholder }) => (
-          <div {...droppableProps} ref={innerRef}>
+          <div {...droppableProps} ref={innerRef} style={{ width: fullWidth ? '100%' : undefined }}>
             <List
               alignItemContent={alignItemContent}
               items={items}

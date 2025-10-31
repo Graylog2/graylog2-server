@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
@@ -621,7 +622,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         List<JournalReadEntry> messages = read(startOffset, requestedMaximumCount);
 
-        if (messages.isEmpty()) {
+        if (messages.isEmpty() && !shuttingDown) {
             // If we got an empty result BUT we know that there are more messages in the log, we bump the readOffset
             // by 1 and try to read again. We continue until we either get an non-empty result or we reached the
             // end of the log.
@@ -655,6 +656,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * @param requestedMaximumCount Maximum number of entries to return.
      * @return A list of entries
      */
+    @Override
     public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);
@@ -789,12 +791,21 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
         }
     }
 
+    @Override
     public long getCommittedOffset() {
         return committedOffset.get();
     }
 
+    @Override
     public long getNextReadOffset() {
         return nextReadOffset;
+    }
+
+    @Override
+    public void resetNextReadOffset() {
+        final long newValue = committedOffset.get() + 1;
+        LOG.info("Resetting next read offset to the last committed offset ({} -> {})", this.nextReadOffset, newValue);
+        this.nextReadOffset = newValue;
     }
 
     /**
@@ -855,7 +866,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
     @Override
     protected void shutDown() throws Exception {
         LOG.debug("Shutting down journal!");
-        shuttingDown = true;
+        triggerShutDown();
 
         offsetFlusherFuture.cancel(false);
         logRetentionFuture.cancel(false);
@@ -869,6 +880,11 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
 
         // Teardown log metrics to prevent errors when restarting instances.
         teardownLogMetrics();
+    }
+
+    @VisibleForTesting
+    void triggerShutDown() {
+        shuttingDown = true;
     }
 
     /**
@@ -913,20 +929,6 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      */
     public int numberOfSegments() {
         return kafkaLog.numberOfSegments();
-    }
-
-    /**
-     * Returns the highest journal offset that has been writting to persistent storage by Graylog.
-     * <p>
-     * Every message at an offset prior to this one can be considered as processed and does not need to be held in
-     * the journal any longer. By default Graylog will try to aggressively flush the journal to consume a smaller
-     * amount of disk space.
-     * </p>
-     *
-     * @return the offset of the last message which has been successfully processed.
-     */
-    public long getCommittedReadOffset() {
-        return committedOffset.get();
     }
 
     /**

@@ -23,7 +23,7 @@ import { NotificationsList } from 'components/notifications';
 import { SystemJobsComponent } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
-import { GraylogClusterOverview } from 'components/cluster';
+import GraylogClusterOverview from 'components/cluster/GraylogClusterOverview';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
 const SystemOverviewPage = () => (

@@ -69,6 +69,7 @@ public class UnknownFieldsValidator implements QueryValidator {
                 .filter(term -> !SEARCHABLE_ES_FIELDS.contains(term.getRealFieldName()))
                 .filter(term -> !RESERVED_SETTABLE_FIELDS.contains(term.getRealFieldName()))
                 .filter(term -> !availableFields.contains(term.getRealFieldName()))
+                .filter(term -> !term.getRealFieldName().contains("*"))
                 .distinct()
                 .collect(Collectors.groupingBy(ParsedTerm::getRealFieldName));
 

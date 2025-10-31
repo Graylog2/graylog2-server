@@ -16,112 +16,33 @@
  */
 package org.graylog.security.entities;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.grn.GRN;
-import org.graylog.grn.GRNDescriptorService;
-import org.graylog.grn.GRNRegistry;
-import org.graylog.grn.GRNType;
-import org.graylog.grn.GRNTypes;
-import org.graylog.security.DBGrantService;
-import org.graylog.security.shares.Grantee;
-import org.graylog2.contentpacks.ContentPackService;
-import org.graylog2.contentpacks.model.ModelId;
-import org.graylog2.contentpacks.model.ModelType;
-import org.graylog2.contentpacks.model.ModelTypes;
 
-import javax.annotation.Nullable;
+/**
+ * Resolves dependencies for entities identified by GRNs (Global Resource Names).
+ * <p>
+ * Implementations of this interface provide methods to determine which other entities
+ * a given entity depends on.
+ */
+public interface EntityDependencyResolver {
+    /**
+     * Resolves the dependencies for the given entity. Dependencies are other entities which require a capability grant
+     * for the grantee to be present in order for the grantee to make effective use of the entity being shared with
+     * them.
+     *
+     * @param entity the GRN of the entity whose dependencies should be resolved
+     * @return an immutable set of {@link EntityDescriptor} representing the dependencies of the entity
+     */
+    ImmutableSet<EntityDescriptor> resolve(GRN entity);
 
-import jakarta.inject.Inject;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
-
-public class EntityDependencyResolver {
-    private final ContentPackService contentPackService;
-    private final GRNRegistry grnRegistry;
-    private final GRNDescriptorService descriptorService;
-    private final DBGrantService grantService;
-    // Some dependencies can be ignored.
-    // E.g. To view a stream with a custom output, a user does not need output permissions
-    private static final Map<GRNType, Set<ModelType>> IGNORED_DEPENDENCIES = ImmutableMap.<GRNType, Set<ModelType>>builder()
-            .put(GRNTypes.SEARCH, ImmutableSet.of(ModelTypes.OUTPUT_V1))
-            .put(GRNTypes.STREAM, ImmutableSet.of(ModelTypes.OUTPUT_V1))
-            .put(GRNTypes.DASHBOARD, ImmutableSet.of(ModelTypes.OUTPUT_V1))
-            .put(GRNTypes.EVENT_DEFINITION, ImmutableSet.of(ModelTypes.EVENT_PROCEDURE_V1))
-            .build();
-
-    @Inject
-    public EntityDependencyResolver(ContentPackService contentPackService,
-                                    GRNRegistry grnRegistry,
-                                    GRNDescriptorService descriptorService,
-                                    DBGrantService grantService) {
-        this.contentPackService = contentPackService;
-        this.grnRegistry = grnRegistry;
-        this.descriptorService = descriptorService;
-        this.grantService = grantService;
-    }
-
-    public ImmutableSet<EntityDescriptor> resolve(GRN entity) {
-        // TODO: Replace entity excerpt usage with GRNDescriptors once we implemented GRN descriptors for every entity
-        final ImmutableMap<GRN, Optional<String>> entityExcerpts = contentPackService.listAllEntityExcerpts().stream()
-                // TODO: Use the GRNRegistry instead of manually building a GRN. Requires all entity types to be in the registry.
-                .collect(ImmutableMap.toImmutableMap(e -> GRNType.create(e.type().name(), e.type().name() + ":").newGRNBuilder().entity(e.id().id()).build(),
-                        v -> Optional.ofNullable(v.title())));
-
-        final Set<org.graylog2.contentpacks.model.entities.EntityDescriptor> descriptors = contentPackService.resolveEntities(Collections.singleton(org.graylog2.contentpacks.model.entities.EntityDescriptor.builder()
-                .id(ModelId.of(entity.entity()))
-                // TODO: This is a hack! Until we stop using the content-pack dependency resolver, we have to use a different version for dashboards here
-                .type(ModelType.of(entity.type(), "dashboard".equals(entity.type()) ? "2" : "1")) // TODO: Any way of NOT hardcoding the version here?
-                .build()));
-
-        final ImmutableSet<GRN> dependencies = descriptors.stream()
-                .filter(dep -> {
-                    // Filter dependencies that aren't needed for grants sharing
-                    // TODO This is another reason why we shouldn't be using the content pack resolver ¯\_(ツ)_/¯
-                    final Set<ModelType> ignoredDeps = IGNORED_DEPENDENCIES.getOrDefault(entity.grnType(), ImmutableSet.of());
-                    return !ignoredDeps.contains(dep.type());
-                })
-                // TODO: Work around from using the content pack dependency resolver:
-                //  We've added stream_title content pack entities in https://github.com/Graylog2/graylog2-server/pull/17089,
-                //  but in this context we want to return the actual dependent Stream to add additional permissions to.
-                .map(descriptor -> ModelTypes.STREAM_REF_V1.equals(descriptor.type())
-                        ? org.graylog2.contentpacks.model.entities.EntityDescriptor.create(descriptor.id(), ModelTypes.STREAM_V1)
-                        : descriptor)
-                .map(descriptor -> grnRegistry.newGRN(descriptor.type().name(), descriptor.id().id()))
-                .filter(dependency -> !entity.equals(dependency)) // Don't include the given entity in dependencies
-                .collect(ImmutableSet.toImmutableSet());
-
-        final Map<GRN, Set<GRN>> targetOwners = grantService.getOwnersForTargets(dependencies);
-
-        return dependencies.stream()
-                .map(dependency -> {
-                    String title = entityExcerpts.get(dependency) != null ? entityExcerpts.get(dependency).orElse("unnamed dependency: <" + dependency + ">") : "unknown dependency: <" + dependency + ">";
-                    return EntityDescriptor.create(
-                            dependency,
-                            title,
-                            getOwners(targetOwners.get(dependency))
-                    );
-                })
-                .collect(ImmutableSet.toImmutableSet());
-    }
-
-    private Set<Grantee> getOwners(@Nullable Set<GRN> owners) {
-        return firstNonNull(owners, Collections.<GRN>emptySet()).stream()
-                .map(descriptorService::getDescriptor)
-                // TODO there is a duplicate in GranteeSharesService
-                .map(descriptor -> {
-                            if (descriptor.grn().equals(GRNRegistry.GLOBAL_USER_GRN)) {
-                                return Grantee.createGlobal();
-                            }
-                            return Grantee.create(descriptor.grn(), descriptor.grn().type(), descriptor.title());
-                        }
-                )
-                .collect(Collectors.toSet());
-    }
+    /**
+     * Creates an {@link EntityDescriptor} from the given GRN.
+     * <p>
+     * TODO: this interface is not a good fit for this method, consider moving it.
+     *
+     * @param entity the GRN of the entity
+     * @return an {@link EntityDescriptor} for the given entity
+     */
+    EntityDescriptor descriptorFromGRN(GRN entity);
 }

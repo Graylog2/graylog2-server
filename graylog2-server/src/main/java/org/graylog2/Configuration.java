@@ -153,6 +153,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "stale_leader_timeout", validators = PositiveIntegerValidator.class)
     private Integer staleLeaderTimeout;
 
+    @Parameter(value = "static_leader_timeout", converter = JavaDurationConverter.class)
+    private java.time.Duration staticLeaderTimeout = java.time.Duration.of(60, java.time.temporal.ChronoUnit.SECONDS);
+
     @Parameter(value = "ldap_connection_timeout", validators = PositiveIntegerValidator.class)
     private int ldapConnectionTimeout = 2000;
 
@@ -220,6 +223,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
 
     @Parameter(value = "enable_preflight_web")
     private boolean enablePreflightWeb = false;
+
+    @Parameter(value = "preflight_web_password")
+    private String preflightWebPassword = null;
 
     @Parameter(value = "query_latency_monitoring_enabled")
     private boolean queryLatencyMonitoringEnabled = false;
@@ -291,6 +297,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     // nodes before giving up
     @Parameter(value = INSTALL_OUTPUT_BUFFER_DRAINING_MAX_RETRIES, validators = PositiveIntegerValidator.class)
     private int installOutputBufferDrainingMaxRetries = DEFAULT_INSTALL_RETRIES;
+
+    @Parameter(value = "global_inputs_only")
+    private boolean globalInputsOnly = false;
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
@@ -449,6 +458,10 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         return staleLeaderTimeout != null ? staleLeaderTimeout : staleMasterTimeout;
     }
 
+    public java.time.Duration getStaticLeaderTimeout() {
+        return staticLeaderTimeout;
+    }
+
     public int getLdapConnectionTimeout() {
         return ldapConnectionTimeout;
     }
@@ -604,6 +617,10 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         return searchQueryEngineDataLakeJobsQueueSize;
     }
 
+    public String getPreflightWebPassword() {
+        return preflightWebPassword;
+    }
+
     public static class NodeIdFileValidator implements Validator<String> {
         @Override
         public void validate(String name, String path) throws ValidationException {
@@ -706,5 +723,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Override
     public boolean withInputs() {
         return true;
+    }
+
+    public boolean isGlobalInputsOnly() {
+        return globalInputsOnly;
     }
 }

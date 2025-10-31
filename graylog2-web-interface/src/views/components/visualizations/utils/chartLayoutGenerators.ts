@@ -18,7 +18,6 @@
 import zipWith from 'lodash/zipWith';
 import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
-import moment from 'moment';
 import type { DefaultTheme } from 'styled-components';
 
 import type { FieldUnitType } from 'views/types';
@@ -34,7 +33,6 @@ import {
 } from 'views/components/visualizations/utils/unitConverters';
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type FieldUnit from 'views/logic/aggregationbuilder/FieldUnit';
-import type { AbsoluteTimeRange } from 'views/logic/queries/Query';
 import {
   DEFAULT_AXIS_KEY,
   TIME_AXIS_LABELS_QUANTITY,
@@ -50,7 +48,7 @@ import formatValueWithUnitLabel from 'views/components/visualizations/utils/form
 
 type DefaultAxisKey = 'withoutUnit';
 
-const getYAxisPosition = (axisCount: number) => {
+export const getYAxisPosition = (axisCount: number) => {
   const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
 
   if (axisCount % 2 === 0) {
@@ -126,7 +124,7 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   };
 };
 
-const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
+export const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
   switch (unitTypeKey) {
     case 'percent':
       return {
@@ -158,79 +156,22 @@ const getUnitLayoutWithData = (
 type SeriesName = string;
 type AxisName = string;
 
-const getWidth = (total: number, offsetMultiplier: number) => (total <= 1 ? undefined : offsetMultiplier / total);
-
-const getOffset = (offsetNumber: number, totalOffsets: number, offsetMultiplier: number) => {
-  const width = getWidth(totalOffsets, offsetMultiplier);
-  if (!width) return undefined;
-  const firstOffset = (width / 2) * (1 - totalOffsets);
-
-  return firstOffset + width * (offsetNumber - 1);
-};
-
-export type AdditionalSettings = {
-  yaxis: string /**  y axis name y, y2 etc */;
-  totalAxis: number /**  total number of y-axis */;
-  axisNumber: number /**  number of y-axis (1...N) */;
-  totalTraces: number /**  total number of traces for each x value (in fact total amount of series) */;
-  traceIndex: number /**  number (0...N) */;
-  effectiveTimerange?: AbsoluteTimeRange;
-  isTimeline?: boolean;
-  xAxisItemsLength?: number /** total amount of x values */;
-};
-
-type BarChartTraceOffsetSettings = {
-  /** Needs to group traces. In case if barmode: 'stack' | 'relative' | 'overlay'
-   * we are grouping by y-axis to join traces into same trace on chart */
-  offsetgroup: number | string;
-  /** In case if barmode: 'stack' | 'relative' | 'overlay'we are divide whole possible
-   * width for traces by total axis. In other case we divide by total traces */
-  width: number;
-  /** alignment is relative to the trace center */
-  offset: number;
-};
-
-export const getBarChartTraceOffsetSettings = (
+/** Needs to group traces. In case if barmode: 'stack' | 'relative' | 'overlay'
+ * we are grouping by y-axis to join traces into same trace on chart */
+export const getBarChartTraceOffsetGroup = (
   barmode: BarMode,
-  {
-    yaxis,
-    totalAxis,
-    axisNumber,
-    traceIndex,
-    totalTraces,
-    effectiveTimerange,
-    isTimeline,
-    xAxisItemsLength,
-  }: AdditionalSettings,
-): BarChartTraceOffsetSettings | {} => {
-  const offsetMultiplier =
-    xAxisItemsLength && isTimeline && effectiveTimerange
-      ? moment(effectiveTimerange.to).diff(effectiveTimerange.from) / xAxisItemsLength
-      : 1;
-
+  yaxis: string,
+  traceIndex: number,
+): string | number | undefined => {
   if (barmode === 'stack' || barmode === 'relative' || barmode === 'overlay') {
-    const width = getWidth(totalAxis, offsetMultiplier);
-    const offset = getOffset(axisNumber, totalAxis, offsetMultiplier);
-
-    return {
-      offsetgroup: yaxis,
-      width,
-      offset,
-    };
+    return yaxis;
   }
 
   if (barmode === 'group') {
-    const width = getWidth(totalTraces, offsetMultiplier);
-    const offset = getOffset(traceIndex + 1, totalTraces, offsetMultiplier);
-
-    return {
-      offsetgroup: traceIndex,
-      width,
-      offset,
-    };
+    return traceIndex;
   }
 
-  return {};
+  return undefined;
 };
 
 export type UnitTypeMapper = {} | Record<FieldUnitType, { axisKeyName: string; axisCount: number }>;
@@ -340,6 +281,7 @@ export const generateLayouts = ({
       const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
 
       if (!res[unitType]) {
+        // eslint-disable-next-line no-param-reassign
         res[unitType] = [value.y];
       } else {
         res[unitType].push(value.y);
@@ -377,16 +319,16 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>;
 export const getHoverTemplateSettings = ({
   convertedValues,
   unit,
-  name,
+  name = undefined,
 }: {
   convertedValues: Array<any>;
   unit: FieldUnit;
-  name: string;
+  name?: string;
 }): { text: Array<string>; hovertemplate: string; meta: string } | {} => {
   if (unit?.unitType === 'time' || unit?.unitType === 'size') {
     return {
       text: getHoverTexts({ convertedValues, unit }),
-      hovertemplate: '%{text}<br><extra>%{meta}</extra>',
+      hovertemplate: `%{text}<br>${name ? '<extra>%{meta}</extra>' : '<extra></extra>'}`,
       meta: name,
     };
   }

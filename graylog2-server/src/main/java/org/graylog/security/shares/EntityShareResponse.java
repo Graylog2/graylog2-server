@@ -68,7 +68,7 @@ public abstract class EntityShareResponse {
         return Builder.create();
     }
 
-    public abstract EntityShareResponse.Builder toBuilder();
+    public abstract Builder toBuilder();
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -113,7 +113,7 @@ public abstract class EntityShareResponse {
     }
 
     @AutoValue
-    public static abstract class AvailableCapability {
+    public abstract static class AvailableCapability {
         @JsonProperty("id")
         public abstract String id();
 
@@ -128,7 +128,7 @@ public abstract class EntityShareResponse {
     }
 
     @AutoValue
-    public static abstract class ActiveShare {
+    public abstract static class ActiveShare {
         @JsonProperty("grant")
         public abstract String grant();
 

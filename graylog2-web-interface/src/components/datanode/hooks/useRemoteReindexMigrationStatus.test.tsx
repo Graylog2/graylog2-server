@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import useRemoteReindexMigrationStatus from './useRemoteReindexMigrationStatus';
 
@@ -32,7 +32,7 @@ describe('useRemoteReindexMigrationStatus', () => {
     };
     const onTriggerStep = mockOnTrigger();
 
-    const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
+    const { result } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
 
     await waitFor(() => expect(result.current.migrationStatus).toBe(undefined));
     await waitFor(() => expect(result.current.nextSteps).toEqual(['RETRY_MIGRATE_EXISTING_DATA']));
@@ -47,7 +47,7 @@ describe('useRemoteReindexMigrationStatus', () => {
     const migrationState = { response: { progress: 0, status: 'STARTING' } } as unknown as MigrationState;
     const onTriggerStep = mockOnTrigger(migrationState);
 
-    const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
+    const { result } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
 
     await waitFor(() => expect(onTriggerStep).toHaveBeenCalled());
     await waitFor(() => expect(result.current.migrationStatus).toEqual(migrationState.response));
@@ -66,7 +66,7 @@ describe('useRemoteReindexMigrationStatus', () => {
     const migrationState = { response: { progress: 100, status: 'FINISHED' } } as unknown as MigrationState;
     const onTriggerStep = mockOnTrigger(migrationState);
 
-    const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
+    const { result } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
 
     await waitFor(() => expect(onTriggerStep).toHaveBeenCalled());
     await waitFor(() => expect(result.current.migrationStatus).toEqual(migrationState.response));
@@ -83,7 +83,7 @@ describe('useRemoteReindexMigrationStatus', () => {
     const migrationState = { response: { progress: 100, status: 'FINISHED' } } as unknown as MigrationState;
     const onTriggerStep = mockOnTrigger(migrationState);
 
-    const { result, waitFor } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
+    const { result } = renderHook(() => useRemoteReindexMigrationStatus(currentStep, onTriggerStep, 1));
 
     await waitFor(() => expect(onTriggerStep).toHaveBeenCalled());
     await waitFor(() => expect(result.current.migrationStatus).toEqual(migrationState.response));

@@ -36,14 +36,6 @@ jest.mock('logic/rest/FetchProvider', () => jest.fn());
 
 jest.mock('preflight/hooks/useDataNodes');
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
-
 describe('CertificateProvisioning', () => {
   beforeEach(() => {
     asMock(fetch).mockReturnValue(Promise.resolve());
@@ -74,7 +66,7 @@ describe('CertificateProvisioning', () => {
     asMock(fetch).mockImplementationOnce(() => Promise.reject(new Error('Error')));
 
     renderPreflight(
-      <DefaultQueryClientProvider options={{ logger }}>
+      <DefaultQueryClientProvider>
         <CertificateProvisioning onSkipProvisioning={() => {}} />
       </DefaultQueryClientProvider>,
     );

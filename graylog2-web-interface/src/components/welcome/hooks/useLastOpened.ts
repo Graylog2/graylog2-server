@@ -28,28 +28,29 @@ const urlPrefix = '/startpage';
 
 export const LAST_OPEN_QUERY_KEY = 'last_open_query_key';
 
-const fetchLastOpen = async ({ page }: RequestQuery): Promise<PaginatedLastOpened> => {
-  const url = PaginationURL(`${urlPrefix}/lastOpened`, page, 5, '');
+const fetchLastOpen = async ({ page, per_page = 5 }: RequestQuery): Promise<PaginatedLastOpened> => {
+  const url = PaginationURL(`${urlPrefix}/lastOpened`, page, per_page, '');
 
   return fetch('GET', qualifyUrl(url));
 };
 
 const useLastOpened = (pagination: RequestQuery): { data: PaginatedLastOpened; isFetching: boolean } =>
-  useQuery(
-    [LAST_OPEN_QUERY_KEY, pagination],
-    () =>
+  useQuery({
+    queryKey: [LAST_OPEN_QUERY_KEY, pagination],
+
+    queryFn: () =>
       defaultOnError(
         fetchLastOpen(pagination),
         'Loading last opened items failed with status',
         'Could not load last opened items',
       ),
-    {
-      retry: 0,
-      initialData: {
-        lastOpened: [],
-        ...DEFAULT_PAGINATION,
-      },
+
+    retry: 0,
+
+    initialData: {
+      lastOpened: [],
+      ...DEFAULT_PAGINATION,
     },
-  );
+  });
 
 export default useLastOpened;

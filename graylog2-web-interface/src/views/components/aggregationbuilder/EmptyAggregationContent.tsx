@@ -26,7 +26,7 @@ import InteractiveContext from '../contexts/InteractiveContext';
 
 type Props = {
   toggleEdit: () => void;
-  editing: boolean;
+  editing?: boolean;
 };
 
 const Container = styled.div`

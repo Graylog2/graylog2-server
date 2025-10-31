@@ -20,7 +20,7 @@ import { useContext, useMemo } from 'react';
 import type Widget from 'views/logic/widgets/Widget';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 import useWidgetActions from 'views/components/widgets/useWidgetActions';
-import type { WidgetActionType } from 'views/components/widgets/Types';
+import { isWidgetMenuAction } from 'views/components/widgets/Types';
 
 type Props = {
   widget: Widget;
@@ -30,9 +30,8 @@ const ExtraMenuWidgetActions = ({ widget }: Props) => {
   const widgetFocusContext = useContext(WidgetFocusContext);
   const pluginWidgetActions = useWidgetActions();
 
-  const extraWidgetActions = useMemo<Array<WidgetActionType>>(
-    () =>
-      pluginWidgetActions.filter(({ isHidden = () => false, position }) => !isHidden(widget) && position === 'menu'),
+  const extraWidgetActions = useMemo(
+    () => pluginWidgetActions.filter(isWidgetMenuAction).filter(({ isHidden = () => false }) => !isHidden(widget)),
     [pluginWidgetActions, widget],
   );
 

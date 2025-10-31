@@ -25,6 +25,7 @@ import Routes from 'routing/Routes';
 import FavoriteIcon from 'views/components/FavoriteIcon';
 import type { SearchParams } from 'stores/PaginationTypes';
 import { createGRN } from 'logic/permissions/GRN';
+import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 
 const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, loadFunc: (searchId: string) => void) => {
   if (!selectedSavedSearchId || !loadFunc) {
@@ -39,6 +40,8 @@ const onLoad = (onLoadSavedSearch: () => void, selectedSavedSearchId: string, lo
 };
 
 const useColumnRenderers = (onLoadSavedSearch: () => void, searchParams: SearchParams): ColumnRenderers<View> => {
+  const { pluggableColumnRenderers } = usePluggableEntityTableElements<View>(null, 'search');
+
   const queryClient = useQueryClient();
 
   return {
@@ -68,7 +71,7 @@ const useColumnRenderers = (onLoadSavedSearch: () => void, searchParams: SearchP
             grn={createGRN('search', search.id)}
             onChange={(newValue) => {
               queryClient.setQueriesData(
-                ['saved-searches', 'overview', searchParams],
+                { queryKey: ['saved-searches', 'overview', searchParams] },
                 (cur: { list: Array<View>; pagination: { total: number } }) => ({
                   ...cur,
                   list: cur.list.map((view) => {
@@ -84,6 +87,7 @@ const useColumnRenderers = (onLoadSavedSearch: () => void, searchParams: SearchP
           />
         ),
       },
+      ...(pluggableColumnRenderers || {}),
     },
   };
 };

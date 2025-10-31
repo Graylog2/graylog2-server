@@ -17,8 +17,10 @@
 package org.graylog2.database.utils;
 
 import com.google.common.collect.Streams;
+import com.google.errorprone.annotations.MustBeClosed;
 import com.mongodb.ErrorCategory;
 import com.mongodb.MongoException;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
@@ -147,6 +149,7 @@ public class MongoUtils<T extends MongoEntity> {
      * @param <T>           document type of the underlying collection
      * @return A stream that should be used in a try-with-resources statement or closed manually to free underlying resources.
      */
+    @MustBeClosed
     public static <T> Stream<T> stream(@Nonnull MongoIterable<T> mongoIterable) {
         final var cursor = mongoIterable.cursor();
         return Streams.stream(cursor).onClose(cursor::close);
@@ -180,6 +183,16 @@ public class MongoUtils<T extends MongoEntity> {
      */
     public Optional<T> getById(String id) {
         return getById(new ObjectId(id));
+    }
+
+    /**
+     * Convenience method to look up documents  matching the given collection of IDs.
+     *
+     * @param ids Hex string representation of documents' {@link ObjectId}s.
+     * @return A {@link FindIterable} containing all available documents in the collection, which match the given ids.
+     */
+    public FindIterable<T> getByIds(Collection<String> ids) {
+        return collection.find(stringIdsIn(ids));
     }
 
     /**

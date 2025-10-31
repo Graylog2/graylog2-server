@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 
-import { Title, Space, Button } from 'preflight/components/common';
+import { Title, Space } from 'preflight/components/common';
+import Button from 'components/bootstrap/Button';
 import ResumeStartupButton from 'preflight/components/ResumeStartupButton';
 
 type Props = {
@@ -33,7 +34,7 @@ const ConfigurationFinished = ({
   const description = isSkippingProvisioning ? (
     <>
       You&apos;ve finished the configuration successfully. You can still{' '}
-      <Button variant="light" onClick={() => setIsSkippingProvisioning(false)} size="compact-xs">
+      <Button onClick={() => setIsSkippingProvisioning(false)} bsSize="xs">
         go back
       </Button>{' '}
       to provision the certificates.

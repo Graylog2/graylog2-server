@@ -17,8 +17,6 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -45,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -63,29 +60,22 @@ public class NotificationsResource extends RestResource {
         this.notificationService = notificationService;
     }
 
+    public record NotificationsResponse(int total, List<Notification> notifications) {
+        static NotificationsResponse create(List<Notification> notifications) {
+            return new NotificationsResponse(notifications.size(), notifications);
+        }
+    }
+
     @GET
     @Timed
     @ApiOperation(value = "Get all active notifications")
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> listNotifications() {
-        final List<Map<String, Object>> notifications = Lists.newArrayList();
-        for (Notification n : notificationService.all()) {
-            final String notificationType = n.getType().toString().toLowerCase(Locale.ENGLISH);
-            if (!isPermitted(RestPermissions.NOTIFICATIONS_READ, notificationType)) {
-                continue;
-            }
+    public NotificationsResponse listNotifications() {
+        final var notifications = notificationService.all().stream()
+                .filter(notification -> isPermitted(RestPermissions.NOTIFICATIONS_READ, notification.getType().toString()))
+                .toList();
 
-            final Map<String, Object> notification = n.asMap();
-            try {
-                notifications.add(notification);
-            } catch (IllegalArgumentException e) {
-                LOG.warn("There is a notification type we can't handle: [" + n.getType() + "]");
-            }
-        }
-
-        return ImmutableMap.of(
-                "total", notifications.size(),
-                "notifications", notifications);
+        return NotificationsResponse.create(notifications);
     }
 
     @DELETE

@@ -28,6 +28,7 @@ import {
   relativeDifferenceDays,
   toDateObject,
   toUTCFromTz,
+  readableDifference,
 } from 'util/DateTime';
 
 const mockRootTimeZone = 'America/Chicago';
@@ -180,6 +181,16 @@ describe('DateTime utils', () => {
     it('should throw an error for an invalid date', () => {
       relativeDifference(invalidDate);
       expectErrorForInvalidDate();
+    });
+  });
+
+  describe('readableDifference', () => {
+    it('should return a readable difference for two dates', () => {
+      expect(readableDifference('2020-01-01T10:00:00.000', '2020-01-10T10:00:00.000')).toBe('9 days');
+    });
+
+    it('should return a readable difference for two dates in ms', () => {
+      expect(readableDifference('2020-01-01T10:00:00.000', '2020-01-01T10:00:00.120')).toBe('120 milliseconds');
     });
   });
 

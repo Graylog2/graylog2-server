@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.graph.MutableGraph;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.views.search.engine.BackendQuery;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchfilters.model.UsesSearchFilters;
@@ -45,7 +44,6 @@ import static org.graylog2.contentpacks.facades.StreamReferenceFacade.getStreamE
 
 @AutoValue
 @JsonDeserialize(builder = WidgetDTO.Builder.class)
-@WithBeanGetter
 public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSearchFilters {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
@@ -56,6 +54,8 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
     public static final String FIELD_QUERY = "query";
     public static final String FIELD_STREAMS = "streams";
     public static final String FIELD_STREAM_CATEGORIES = "stream_categories";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_CONTEXT = "context";
 
     @JsonProperty(FIELD_ID)
     public abstract String id();
@@ -86,6 +86,14 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
 
     @JsonProperty(FIELD_CONFIG)
     public abstract WidgetConfigDTO config();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String description();
+
+    @JsonProperty(FIELD_CONTEXT)
+    @Nullable
+    public abstract String context();
 
     public static Builder builder() {
         return Builder.builder();
@@ -128,6 +136,12 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 defaultImpl = UnknownWidgetConfigDTO.class)
         public abstract Builder config(WidgetConfigDTO config);
 
+        @JsonProperty(FIELD_DESCRIPTION)
+        public abstract Builder description(@Nullable String description);
+
+        @JsonProperty(FIELD_CONTEXT)
+        public abstract Builder context(@Nullable String context);
+
         public abstract WidgetDTO build();
 
         @JsonCreator
@@ -148,6 +162,8 @@ public abstract class WidgetDTO implements ContentPackable<WidgetEntity>, UsesSe
                 .collect(Collectors.toSet());
         final WidgetEntity.Builder builder = WidgetEntity.builder()
                 .id(this.id())
+                .description(this.description())
+                .context(this.context())
                 .config(this.config())
                 .filter(this.filter())
                 .filters(filters().stream().map(filter -> filter.toContentPackEntity(entityDescriptorIds)).toList())

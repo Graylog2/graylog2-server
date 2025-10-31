@@ -107,10 +107,6 @@ const validate = (values: FormValues) => {
     errors = { ...errors, until: rangeError };
   }
 
-  if (values.from === undefined && values.until === undefined) {
-    errors = { ...errors, from: 'Remove filter to search from "All time" until "Now".' };
-  }
-
   return errors;
 };
 

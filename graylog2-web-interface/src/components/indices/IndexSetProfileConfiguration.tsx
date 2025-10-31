@@ -35,10 +35,12 @@ const IndexSetProfileConfiguration = ({
   value,
   onChange,
   name,
+  disabled = false,
 }: {
   name: string;
   value: string;
   onChange: (value: string | null) => void;
+  disabled?: boolean;
 }) => {
   const { isLoading, options } = useProfileOptions();
   const _onChange = (val: string) => onChange(val || null);
@@ -55,13 +57,13 @@ const IndexSetProfileConfiguration = ({
       </StyledAlert>
       <Row>
         <Col md={12}>
-          <Input id={name} label="Index field type mapping profile">
+          <Input id={name} label="Index field type mapping profile (optional)">
             <StyledSelect
               placeholder="Select index field type profile"
               inputId={name}
               options={options}
               value={value}
-              disabled={isLoading}
+              disabled={isLoading || disabled}
               onChange={_onChange}
             />
           </Input>

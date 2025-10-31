@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import jQuery from 'jquery';
+import * as React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ConfigurationForm } from 'components/configurationforms';
@@ -52,107 +52,87 @@ type Props = {
   showHelp?: boolean;
 };
 
-type State = {
-  typeDefinition?: DecoratorType;
-  typeName?: string;
-};
+const _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => ({
+  value: typeName,
+  label: typeDefinition.name,
+});
 
-class AddDecoratorButton extends React.Component<Props, State> {
-  static defaultProps = {
-    disabled: false,
-    showHelp: true,
-    stream: null,
+const AddDecoratorButton = ({
+  decoratorTypes,
+  disabled = false,
+  showHelp = true,
+  stream = null,
+  nextOrder,
+  onCreate,
+}: Props) => {
+  const [typeName, setTypeName] = useState<string | undefined>(undefined);
+  const [typeDefinition, setTypeDefinition] = useState<DecoratorType | undefined>(undefined);
+  const _handleCancel = () => {
+    setTypeDefinition(undefined);
+    setTypeName(undefined);
   };
 
-  private configurationForm: any;
+  const _handleSubmit = useCallback(
+    (data: ConfigurationFormData<Decorator['config']>) => {
+      const request = {
+        id: generateObjectId(),
+        stream,
+        type: data.type,
+        config: data.configuration,
+        order: nextOrder,
+      };
 
-  constructor(props: Props) {
-    super(props);
+      onCreate(request);
+      setTypeName(undefined);
+    },
+    [nextOrder, onCreate, stream],
+  );
 
-    this.configurationForm = React.createRef();
+  const _onTypeChange = useCallback(
+    (decoratorType: string) => {
+      setTypeName(decoratorType);
+      setTypeDefinition(decoratorTypes[decoratorType] ?? ({} as DecoratorType));
+    },
+    [decoratorTypes],
+  );
 
-    this.state = {};
-  }
+  const decoratorTypeOptions = useMemo(
+    () => Object.entries(decoratorTypes).map(([name, type]) => _formatDecoratorType(type, name)),
+    [decoratorTypes],
+  );
+  const wrapperComponent = InlineForm();
+  const configurationForm =
+    typeName !== undefined ? (
+      <ConfigurationForm<Decorator['config']>
+        key="configuration-form-output"
+        configFields={typeDefinition.requested_configuration}
+        title={`Create new ${typeDefinition.name}`}
+        typeName={typeName}
+        includeTitleField={false}
+        wrapperComponent={wrapperComponent as React.ComponentProps<typeof ConfigurationForm>['wrapperComponent']}
+        submitAction={_handleSubmit}
+        cancelAction={_handleCancel}
+      />
+    ) : null;
 
-  // eslint-disable-next-line class-methods-use-this
-  _formatDecoratorType = (typeDefinition: DecoratorType, typeName: string) => ({
-    value: typeName,
-    label: typeDefinition.name,
-  });
-
-  _handleCancel = () => this.setState({ typeName: undefined, typeDefinition: undefined });
-
-  _handleSubmit = (data: ConfigurationFormData<Decorator['config']>) => {
-    const { stream, nextOrder, onCreate } = this.props;
-
-    const request = {
-      id: generateObjectId(),
-      stream,
-      type: data.type,
-      config: data.configuration,
-      order: nextOrder,
-    };
-
-    onCreate(request);
-    this.setState({ typeName: undefined });
-  };
-
-  // eslint-disable-next-line react/no-unused-class-component-methods
-  _openModal = () => this.configurationForm?.current?.open();
-
-  _onTypeChange = (decoratorType) => {
-    const { decoratorTypes } = this.props;
-
-    this.setState({ typeName: decoratorType });
-
-    if (decoratorTypes[decoratorType]) {
-      this.setState({ typeDefinition: decoratorTypes[decoratorType] });
-    } else {
-      this.setState({ typeDefinition: {} as DecoratorType });
-    }
-  };
-
-  render() {
-    const { typeDefinition, typeName } = this.state;
-    const { decoratorTypes, disabled, showHelp = true } = this.props;
-
-    const decoratorTypeOptions = jQuery.map(decoratorTypes, this._formatDecoratorType);
-    const wrapperComponent = InlineForm();
-    const configurationForm =
-      typeName !== undefined ? (
-        <ConfigurationForm<Decorator['config']>
-          ref={this.configurationForm}
-          key="configuration-form-output"
-          configFields={typeDefinition.requested_configuration}
-          title={`Create new ${typeDefinition.name}`}
-          typeName={typeName}
-          includeTitleField={false}
-          wrapperComponent={wrapperComponent as React.ComponentProps<typeof ConfigurationForm>['wrapperComponent']}
-          submitAction={this._handleSubmit}
-          cancelAction={this._handleCancel}
-        />
-      ) : null;
-
-    return (
-      <>
-        <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
-          <div className={DecoratorStyles.addDecoratorSelect}>
-            <Select
-              placeholder="Select decorator"
-              onChange={this._onTypeChange}
-              options={decoratorTypeOptions}
-              matchProp="label"
-              disabled={disabled}
-              value={typeName}
-            />
-          </div>
+  return (
+    <>
+      <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
+        <div className={DecoratorStyles.addDecoratorSelect}>
+          <Select
+            placeholder="Select decorator"
+            onChange={_onTypeChange}
+            options={decoratorTypeOptions}
+            disabled={disabled}
+            value={typeName}
+          />
         </div>
-        {showHelp && <PopoverHelp />}
+      </div>
+      {showHelp && <PopoverHelp />}
 
-        {typeName && <ConfigurationFormContainer>{configurationForm}</ConfigurationFormContainer>}
-      </>
-    );
-  }
-}
+      {typeName && <ConfigurationFormContainer>{configurationForm}</ConfigurationFormContainer>}
+    </>
+  );
+};
 
 export default AddDecoratorButton;

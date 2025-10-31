@@ -29,8 +29,6 @@ import DocsHelper from 'util/DocsHelper';
 import { defaultCompare } from 'logic/DefaultCompare';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import FieldSelect from 'views/logic/fieldactions/ChangeFieldType/FieldSelect';
 import useFieldTypesForMappings from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings';
 import type { FieldTypePutResponse, FieldTypePutResponseJson } from 'views/logic/fieldactions/ChangeFieldType/types';
@@ -119,10 +117,8 @@ const ChangeFieldTypeModal = ({
 
   const [indexSetSelection, setIndexSetSelection] = useState<Array<string>>();
 
-  const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLading } = usePutFieldTypeMutation();
+  const { putFieldTypeMutation, isLoading: fieldTypeMutationIsLoading } = usePutFieldTypeMutation();
 
-  const { pathname } = useLocation();
-  const telemetryPathName = useMemo(() => getPathnameWithoutId(pathname), [pathname]);
   const onSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
@@ -135,7 +131,6 @@ const ChangeFieldTypeModal = ({
       })
         .then((responseJson: FieldTypePutResponseJson) => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CHANGED, {
-            app_pathname: telemetryPathName,
             app_action_value: {
               value: 'change-field-type',
               rotated,
@@ -166,7 +161,6 @@ const ChangeFieldTypeModal = ({
       putFieldTypeMutation,
       rotated,
       sendTelemetry,
-      telemetryPathName,
       type,
     ],
   );
@@ -177,18 +171,16 @@ const ChangeFieldTypeModal = ({
 
   useEffect(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_OPENED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'change-field-type-opened',
     });
-  }, [sendTelemetry, telemetryPathName]);
+  }, [sendTelemetry]);
 
   const onCancel = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_FIELD_VALUE_ACTION.CHANGE_FIELD_TYPE_CLOSED, {
-      app_pathname: telemetryPathName,
       app_action_value: 'change-field-type-closed',
     });
     onClose();
-  }, [onClose, sendTelemetry, telemetryPathName]);
+  }, [onClose, sendTelemetry]);
 
   useEffect(() => {
     setIndexSetSelection(initialSelectedIndexSets);
@@ -197,12 +189,12 @@ const ChangeFieldTypeModal = ({
   return (
     <BootstrapModalForm
       title={<span>Change {fieldName} Field Type</span>}
-      submitButtonText={fieldTypeMutationIsLading ? 'Changing field type...' : 'Change field type'}
+      submitButtonText={fieldTypeMutationIsLoading ? 'Changing field type...' : 'Change field type'}
       onSubmitForm={onSubmit}
       onCancel={onCancel}
       show={show}
       bsSize="large"
-      submitButtonDisabled={fieldTypeMutationIsLading}>
+      submitButtonDisabled={fieldTypeMutationIsLoading || !indexSetSelection?.length}>
       <div>
         {showFieldSelect && (
           <FieldSelect indexSetId={initialSelectedIndexSets[0]} onFieldChange={setModalData} field={fieldName} />

@@ -34,12 +34,14 @@ export type StreamConfiguration = Pick<Stream, 'index_set_id' | 'title' | 'remov
 
 const createStream = async (stream: StreamConfiguration): Promise<{ stream_id: string }> =>
   Streams.create({
-    matching_type: undefined,
-    rules: undefined,
-    content_pack: undefined,
-    description: undefined,
+    entity: {
+      matching_type: undefined,
+      rules: undefined,
+      content_pack: undefined,
+      description: undefined,
+      ...stream,
+    },
     share_request: undefined,
-    ...stream,
   });
 
 const startStream = async (streamId) => Streams.resume(streamId);
@@ -68,14 +70,30 @@ const connectPipeline = async ({ pipelineId, streamId }: { pipelineId: string; s
   PipelinesConnections.connectStreams({ stream_ids: [streamId], pipeline_id: pipelineId });
 
 const useSetupInputMutations = () => {
-  const createStreamMutation = useMutation(createStream);
-  const startStreamMutation = useMutation(startStream);
-  const createPipelineMutation = useMutation(createPipeline);
-  const updateRoutingMutation = useMutation(updateRouting);
-  const deleteStreamMutation = useMutation(deleteStream);
-  const deletePipelineMutation = useMutation(deletePipeline);
-  const deleteRoutingRuleMutation = useMutation(deleteRoutingRule);
-  const connectPipelineMutation = useMutation(connectPipeline);
+  const createStreamMutation = useMutation({
+    mutationFn: createStream,
+  });
+  const startStreamMutation = useMutation({
+    mutationFn: startStream,
+  });
+  const createPipelineMutation = useMutation({
+    mutationFn: createPipeline,
+  });
+  const updateRoutingMutation = useMutation({
+    mutationFn: updateRouting,
+  });
+  const deleteStreamMutation = useMutation({
+    mutationFn: deleteStream,
+  });
+  const deletePipelineMutation = useMutation({
+    mutationFn: deletePipeline,
+  });
+  const deleteRoutingRuleMutation = useMutation({
+    mutationFn: deleteRoutingRule,
+  });
+  const connectPipelineMutation = useMutation({
+    mutationFn: connectPipeline,
+  });
 
   return {
     createStreamMutation,

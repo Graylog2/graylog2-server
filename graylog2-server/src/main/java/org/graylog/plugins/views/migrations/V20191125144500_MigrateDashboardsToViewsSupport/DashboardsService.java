@@ -16,8 +16,9 @@
  */
 package org.graylog.plugins.views.migrations.V20191125144500_MigrateDashboardsToViewsSupport;
 
-import org.graylog2.database.MongoCollection;
+import com.google.errorprone.annotations.MustBeClosed;
 import jakarta.inject.Inject;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 
@@ -32,6 +33,7 @@ class DashboardsService {
         this.db = mongoCollections.collection(COLLECTION_NAME, Dashboard.class);
     }
 
+    @MustBeClosed
     Stream<Dashboard> streamAll() {
         return MongoUtils.stream(db.find());
     }

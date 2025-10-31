@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix possible race condition when creating database collection for recent activity."
+
+pulls = ["23111"]
+issues = ["23092"]

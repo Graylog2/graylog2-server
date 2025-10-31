@@ -17,17 +17,15 @@
 import * as React from 'react';
 import { useEffect, useState, useCallback } from 'react';
 
-import type User from 'logic/users/User';
 import withParams from 'routing/withParams';
 import { Row, Col } from 'components/bootstrap';
-import { isPermitted } from 'util/PermissionsMixin';
 import DocsHelper from 'util/DocsHelper';
 import UsersDomain from 'domainActions/users/UsersDomain';
 import { PageHeader, DocumentTitle, Spinner } from 'components/common';
 import TokenList from 'components/users/TokenList';
 import UsersPageNavigation from 'components/users/navigation/UsersPageNavigation';
 import UserActionLinks from 'components/users/navigation/UserActionLinks';
-import useCurrentUser from 'hooks/useCurrentUser';
+import useBasicUser from 'hooks/useBasicUser';
 
 type Props = {
   params: {
@@ -46,25 +44,10 @@ const PageTitle = ({ fullName }: { fullName: string | null | undefined }) => (
   </>
 );
 
-const _loadTokens = (loadedUser, currentUser, setTokens) => {
+const _loadTokens = (loadedUser, setTokens) => {
   if (loadedUser) {
-    if (isPermitted(currentUser?.permissions, [`users:tokenlist:${loadedUser.username}`])) {
-      UsersDomain.loadTokens(loadedUser.id).then(setTokens);
-    } else {
-      setTokens([]);
-    }
+    UsersDomain.loadTokens(loadedUser.id).then(setTokens);
   }
-};
-
-const _deleteToken = (tokenId, tokenName, userId, loadTokens, setDeletingTokenId) => {
-  const promise = UsersDomain.deleteToken(userId, tokenId, tokenName);
-
-  setDeletingTokenId(tokenId);
-
-  promise.then(() => {
-    loadTokens();
-    setDeletingTokenId(undefined);
-  });
 };
 
 const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl) => {
@@ -84,33 +67,33 @@ const _createToken = (tokenName, userId, loadTokens, setCreatingToken, tokenTtl)
 };
 
 const UserEditPage = ({ params }: Props) => {
-  const currentUser = useCurrentUser();
-  const [loadedUser, setLoadedUser] = useState<User | undefined>();
   const [tokens, setTokens] = useState([]);
-  const [deletingTokenId, setDeletingTokenId] = useState();
   const [creatingToken, setCreatingToken] = useState(false);
 
   const userId = params?.userId;
 
-  const loadTokens = useCallback(() => _loadTokens(loadedUser, currentUser, setTokens), [currentUser, loadedUser]);
-  const _handleTokenDelete = (tokenId, tokenName) =>
-    _deleteToken(tokenId, tokenName, userId, loadTokens, setDeletingTokenId);
+  const { data: loadedUser } = useBasicUser(userId, { enabled: !!userId });
+
+  const loadTokens = useCallback(() => _loadTokens(loadedUser, setTokens), [loadedUser]);
   const _handleTokenCreate = ({ tokenName, tokenTtl }: { tokenName: string; tokenTtl: string }) =>
     _createToken(tokenName, userId, loadTokens, setCreatingToken, tokenTtl);
 
   useEffect(() => {
     loadTokens();
   }, [loadTokens, loadedUser]);
-  useEffect(() => {
-    UsersDomain.load(userId).then(setLoadedUser);
-  }, [userId]);
 
   return (
     <DocumentTitle title={`Edit Tokens Of User ${loadedUser?.fullName ?? ''}`}>
       <UsersPageNavigation />
       <PageHeader
         title={<PageTitle fullName={loadedUser?.fullName} />}
-        actions={<UserActionLinks userId={userId} userIsReadOnly={loadedUser?.readOnly ?? false} />}
+        actions={
+          <UserActionLinks
+            userId={userId}
+            username={loadedUser?.username ?? ''}
+            userIsReadOnly={loadedUser?.readOnly ?? false}
+          />
+        }
         documentationLink={{
           title: 'Permissions documentation',
           path: DocsHelper.PAGES.USERS_ROLES,
@@ -124,10 +107,9 @@ const UserEditPage = ({ params }: Props) => {
             <TokenList
               tokens={tokens}
               user={loadedUser}
-              onDelete={_handleTokenDelete}
               onCreate={_handleTokenCreate}
               creatingToken={creatingToken}
-              deletingToken={deletingTokenId}
+              onDelete={loadTokens}
             />
           ) : (
             <Row>

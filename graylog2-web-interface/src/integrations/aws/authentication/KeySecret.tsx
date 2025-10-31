@@ -20,6 +20,10 @@ import styled from 'styled-components';
 import ValidatedInput from 'integrations/aws/common/ValidatedInput';
 import MaskedInput from 'integrations/aws/common/MaskedInput';
 
+const StyledMaskedInput = styled(MaskedInput)`
+  margin-bottom: 0;
+`;
+
 type KeySecretProps = {
   onChange: (...args: any[]) => void;
   awsKey?: any;
@@ -29,7 +33,7 @@ type KeySecretProps = {
 const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined }: KeySecretProps) => (
   <>
     <ValidatedInput
-      id="awsCloudWatchAwsKey"
+      id="awsAccessKey"
       type="text"
       label="AWS Access Key"
       placeholder="AK****************"
@@ -42,7 +46,7 @@ const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined }: KeyS
     />
 
     <StyledMaskedInput
-      id="awsCloudWatchAwsSecret"
+      id="awsSecretKey"
       label="AWS Secret Key"
       placeholder="***********"
       onChange={onChange}
@@ -54,9 +58,5 @@ const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined }: KeyS
     />
   </>
 );
-
-const StyledMaskedInput = styled(MaskedInput)`
-  margin-bottom: 0;
-`;
 
 export default KeySecret;

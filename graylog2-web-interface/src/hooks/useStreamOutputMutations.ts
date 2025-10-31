@@ -27,25 +27,31 @@ const removeStreamOutput = async ({ streamId, outputId }: { streamId: string; ou
   StreamOutputs.remove(streamId, outputId);
 
 const useStreamOutputMutation = () => {
-  const addMutation = useMutation(addStreamOutput, {
+  const addMutation = useMutation({
+    mutationFn: addStreamOutput,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Adding output to stream failed with status: ${errorThrown}`,
         'Could not add output to stream',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Output has been successfully added to Stream.', 'Success!');
     },
   });
 
-  const removeMutation = useMutation(removeStreamOutput, {
+  const removeMutation = useMutation({
+    mutationFn: removeStreamOutput,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting output from stream failed with status: ${errorThrown}`,
         'Could not delete output from stream',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Output has been successfully removed from stream.', 'Success!');
     },

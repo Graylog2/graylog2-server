@@ -33,7 +33,7 @@ import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
  * Representing the message type mapping in Elasticsearch. This is giving ES more
  * information about what the fields look like and how it should analyze them.
  */
-public abstract class IndexMapping implements IndexMappingTemplate {
+public abstract class IndexMapping extends AbstractMapping {
     public static final String TYPE_MESSAGE = "message";
 
     @Override
@@ -174,9 +174,5 @@ public abstract class IndexMapping implements IndexMappingTemplate {
 
     private Map<String, Boolean> enabled() {
         return ImmutableMap.of("enabled", true);
-    }
-
-    protected String dateFormat() {
-        return Constants.ES_DATE_FORMAT;
     }
 }

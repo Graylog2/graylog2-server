@@ -17,11 +17,29 @@
 package org.graylog2.bootstrap.preflight.web.resources.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+
+/**
+ * @param role deprecated, use list of roles instead
+ */
 public record CreateClientCertRequest(
         @JsonProperty("principal") String principal,
-        @JsonProperty("role") String role,
+        @JsonProperty("role") @Deprecated String role,
+        @JsonProperty("roles") @Nullable List<String> roles,
         @JsonProperty("password") String password,
         @JsonProperty("certificate_lifetime") @NotNull String certificateLifetime
-) {}
+) {
+    @Override
+    public List<String> roles() {
+        if (roles != null && !roles.isEmpty()) {
+            return roles;
+        } else {
+            return List.of(role);
+        }
+    }
+}

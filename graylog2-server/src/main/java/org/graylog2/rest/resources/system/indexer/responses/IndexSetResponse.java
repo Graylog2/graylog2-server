@@ -16,32 +16,88 @@
  */
 package org.graylog2.rest.resources.system.indexer.responses;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
+import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
+import org.graylog2.indexer.indexset.fields.UseLegacyRotationField;
+import org.graylog2.shared.fields.IdField;
 
-import java.util.List;
-import java.util.Map;
+import javax.annotation.Nullable;
 
-@JsonAutoDetect
 @AutoValue
-@WithBeanGetter
-public abstract class IndexSetResponse {
-    @JsonProperty("total")
-    public abstract int total();
+public abstract class IndexSetResponse implements
+        IdField,
+        ExtendedIndexSetFields,
+        UseLegacyRotationField,
+        FieldRestrictionsField {
 
-    @JsonProperty("index_sets")
-    public abstract List<IndexSetSummary> indexSets();
+    private static final String FIELD_DEFAULT = "default";
+    private static final String FIELD_CAN_BE_DEFAULT = "can_be_default";
+    private static final String FIELD_DATA_TIERING_STATUS = "data_tiering_status";
 
-    @JsonProperty("stats")
-    public abstract Map<String, IndexSetStats> stats();
 
-    @JsonCreator
-    public static IndexSetResponse create(@JsonProperty("total") int total,
-                                          @JsonProperty("index_sets") List<IndexSetSummary> ranges,
-                                          @JsonProperty("stats") Map<String, IndexSetStats> stats) {
-        return new AutoValue_IndexSetResponse(total, ranges, stats);
+    @JsonProperty(FIELD_DEFAULT)
+    public abstract boolean isDefault();
+
+    @JsonProperty(FIELD_CAN_BE_DEFAULT)
+    public abstract boolean canBeDefault();
+
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty(FIELD_DATA_TIERING_STATUS)
+    public abstract DataTieringStatus dataTieringStatus();
+
+    public static Builder builder() {
+        return new AutoValue_IndexSetResponse.Builder();
+    }
+
+    public static IndexSetResponse fromIndexSetConfig(IndexSetConfig indexSetConfig,
+                                                      boolean isDefault,
+                                                      DataTieringStatus dataTieringStatus) {
+        return builder()
+                .id(indexSetConfig.id())
+                .title(indexSetConfig.title())
+                .description(indexSetConfig.description())
+                .isDefault(isDefault)
+                .isWritable(indexSetConfig.isWritable())
+                .canBeDefault(indexSetConfig.isRegularIndex())
+                .indexPrefix(indexSetConfig.indexPrefix())
+                .shards(indexSetConfig.shards())
+                .replicas(indexSetConfig.replicas())
+                .rotationStrategyClass(indexSetConfig.rotationStrategyClass())
+                .rotationStrategyConfig(indexSetConfig.rotationStrategyConfig())
+                .retentionStrategyClass(indexSetConfig.retentionStrategyClass())
+                .retentionStrategyConfig(indexSetConfig.retentionStrategyConfig())
+                .creationDate(indexSetConfig.creationDate())
+                .indexAnalyzer(indexSetConfig.indexAnalyzer())
+                .indexOptimizationMaxNumSegments(indexSetConfig.indexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(indexSetConfig.indexOptimizationDisabled())
+                .fieldTypeRefreshInterval(indexSetConfig.fieldTypeRefreshInterval())
+                .indexTemplateType(indexSetConfig.indexTemplateType().orElse(null))
+                .fieldTypeProfile(indexSetConfig.fieldTypeProfile())
+                .dataTieringConfig(indexSetConfig.dataTieringConfig())
+                .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
+                .dataTieringStatus(dataTieringStatus)
+                .fieldRestrictions(indexSetConfig.fieldRestrictions())
+                .build();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder implements
+            IdFieldBuilder<Builder>,
+            ExtendedIndexSetFieldsBuilder<Builder>,
+            UseLegacyRotationFieldBuilder<Builder>,
+            FieldRestrictionsFieldBuilder<Builder> {
+
+        public abstract Builder isDefault(boolean isDefault);
+
+        public abstract Builder canBeDefault(boolean canBeDefault);
+
+        public abstract Builder dataTieringStatus(@Nullable DataTieringStatus dataTieringStatus);
+
+        public abstract IndexSetResponse build();
     }
 }

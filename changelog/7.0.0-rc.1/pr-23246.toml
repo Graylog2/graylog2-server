@@ -1,0 +1,5 @@
+type = "f"
+message = "Add java heap size validator to opensearch_heap property in datanode"
+
+issues = ["23237"]
+pulls = ["23246"]

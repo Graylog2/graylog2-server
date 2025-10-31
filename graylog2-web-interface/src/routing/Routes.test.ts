@@ -34,7 +34,7 @@ describe('Routes', () => {
     });
 
     it('returns a route from function', () => {
-      expect(Routes.node('id')).toMatch('/system/nodes/id');
+      expect(Routes.SYSTEM.CLUSTER.NODE_SHOW('id')).toMatch('/system/cluster/node/id');
     });
 
     it('routes contain query parameters', () => {
@@ -64,7 +64,7 @@ describe('Routes', () => {
     });
 
     it('returns a route from function', () => {
-      expect(Routes.node('id')).toMatch(`${prefix}/system/nodes/id`);
+      expect(Routes.SYSTEM.CLUSTER.NODE_SHOW('id')).toMatch(`${prefix}/system/cluster/node/id`);
     });
 
     it('routes contain query parameters', () => {
@@ -98,7 +98,7 @@ describe('Routes', () => {
     });
 
     it('returns a route from function', () => {
-      expect(Routes.node('id')).toMatch('/system/nodes/id');
+      expect(Routes.SYSTEM.CLUSTER.NODE_SHOW('id')).toMatch('/system/cluster/node/id');
     });
 
     it('routes contain query parameters', () => {

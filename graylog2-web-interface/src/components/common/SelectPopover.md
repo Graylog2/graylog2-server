@@ -23,7 +23,6 @@ class SelectPopoverExample extends React.Component {
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
           <SelectPopover
-            id="example-popover"
             title="Filter by color"
             triggerNode={
               <Button bsStyle="info" bsSize="small">
@@ -98,7 +97,6 @@ class SelectPopoverFormattedExample extends React.Component {
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
           <SelectPopover
-            id="example-popover-formatted"
             title="Filter by color"
             triggerNode={
               <Button bsStyle="info" bsSize="small">

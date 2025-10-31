@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import isEmpty from 'lodash/isEmpty';
 
 import type SharedEntity from 'logic/permissions/SharedEntity';
 import { useStore } from 'stores/connect';
@@ -27,9 +28,10 @@ import type Grantee from 'logic/permissions/Grantee';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 import { createGRN } from 'logic/permissions/GRN';
 import { Section, Spinner } from 'components/common';
+import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
+import type { SelectionRequest } from 'components/permissions/Grantee/GranteesSelector';
+import GranteesList from 'components/permissions/Grantee/GranteesList';
 
-import type { SelectionRequest } from './GranteesSelector';
-import GranteesList from './GranteesList';
 import EntityCreateCapabilitySelect from './EntityCreateCapabilitySelect';
 import {
   GranteesSelect,
@@ -50,6 +52,7 @@ type Props = {
   entityTypeTitle?: string | null | undefined;
   defaultSharePayload?: EntitySharePayload;
   onSetEntityShare: (payload: EntitySharePayload) => void;
+  dependenciesGRN?: Array<GRN>;
 };
 
 const _renderGranteesSelectOption = ({ label, granteeType }: { label: string; granteeType: Grantee['type'] }) => (
@@ -70,6 +73,7 @@ const EntityCreateShareFormGroup = ({
   onSetEntityShare,
   entityId = null,
   entityTypeTitle = '',
+  dependenciesGRN = null,
   defaultSharePayload = undefined,
 }: Props) => {
   const { state: entityShareState } = useStore(EntityShareStore);
@@ -77,9 +81,15 @@ const EntityCreateShareFormGroup = ({
   const defaultShareSelection = { granteeId: null, capabilityId: 'view' };
   const [disableSubmit, setDisableSubmit] = useState(entityShareState?.validationResults?.failed);
   const [shareSelection, setShareSelection] = useState<SelectionRequest>(defaultShareSelection);
+  const [entityShare, setEntityShare] = useState<Omit<EntitySharePayload, 'prepare_request'>>(
+    defaultSharePayload ?? null,
+  );
+  const PluggableEntityShareFormGroup = usePluggableEntityShareFormGroup();
 
   useEffect(() => {
-    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, defaultSharePayload);
+    const { selected_collections: _, ...rest } = defaultSharePayload ?? {};
+
+    EntityShareDomain.prepare(entityType, entityTitle, entityGRN, rest);
   }, [entityType, entityTitle, entityGRN, defaultSharePayload]);
 
   const resetSelection = () => {
@@ -94,32 +104,44 @@ const EntityCreateShareFormGroup = ({
 
     const payload: EntitySharePayload = {
       selected_grantee_capabilities: newSelectedCapabilities,
+      prepare_request: dependenciesGRN,
     };
 
+    setEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
+
     return EntityShareDomain.prepare(entityType, entityTitle, entityGRN, payload).then((response) => {
-      onSetEntityShare(payload);
+      onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
       resetSelection();
-      setDisableSubmit(false);
 
       return response;
     });
   };
 
   const handleDeletion = (granteeId: GRN) => {
-    const newSelectedGranteeCapabilities = entityShareState?.selectedGranteeCapabilities.remove(granteeId);
+    const newSelectedCapabilities = entityShareState?.selectedGranteeCapabilities.remove(granteeId);
 
     setDisableSubmit(true);
 
+    const prepare_request = isEmpty(newSelectedCapabilities) ? null : dependenciesGRN;
     const payload: EntitySharePayload = {
-      selected_grantee_capabilities: newSelectedGranteeCapabilities,
+      selected_grantee_capabilities: newSelectedCapabilities,
+      prepare_request,
     };
+    setEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
 
     return EntityShareDomain.prepare(entityType, entityTitle, null, payload).then((response) => {
-      onSetEntityShare(payload);
+      onSetEntityShare({ ...entityShare, selected_grantee_capabilities: newSelectedCapabilities });
       setDisableSubmit(false);
 
       return response;
     });
+  };
+
+  const handleAdditionalFormChange = (values: Partial<EntitySharePayload>) => {
+    const newEntityShare = { ...entityShare, ...values };
+
+    setEntityShare(newEntityShare);
+    onSetEntityShare(newEntityShare);
   };
 
   const handleAddCollaborator = () => {
@@ -149,7 +171,7 @@ const EntityCreateShareFormGroup = ({
                 value={shareSelection.capabilityId}
               />
               <ShareSubmitButton
-                bsStyle="success"
+                bsStyle="primary"
                 title="Add Collaborator"
                 onClick={handleAddCollaborator}
                 disabled={disableSubmit || !shareSelection.granteeId}>
@@ -175,6 +197,13 @@ const EntityCreateShareFormGroup = ({
             validationResults={entityShareState.validationResults}
             availableGrantees={entityShareState.availableGrantees}
           />
+          {PluggableEntityShareFormGroup && (
+            <PluggableEntityShareFormGroup
+              entityType={entityType}
+              onChange={handleAdditionalFormChange}
+              value={defaultSharePayload?.selected_collections || []}
+            />
+          )}
         </>
       ) : (
         <Spinner />

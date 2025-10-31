@@ -66,7 +66,9 @@ const FilterRuleEditButton = ({ streamId, filterRule, destinationType }: Props) 
     const submitFilterHandler = isNew ? createStreamOutputRule : updateStreamOutputRule;
 
     submitFilterHandler({ streamId, filterOutputRule }).then(() => {
-      queryClient.invalidateQueries(['streams']);
+      queryClient.invalidateQueries({
+        queryKey: ['streams'],
+      });
       setShowForm(false);
     });
   };

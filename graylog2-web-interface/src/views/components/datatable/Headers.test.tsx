@@ -16,21 +16,32 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import { OrderedMap } from 'immutable';
 
 import Series from 'views/logic/aggregationbuilder/Series';
 import type Pivot from 'views/logic/aggregationbuilder/Pivot';
+import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
 import SortConfig from 'views/logic/aggregationbuilder/SortConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
+import useViewsPlugin from 'views/test/testViewsPlugin';
 
 import Headers from './Headers';
 
 jest.mock('components/common/Timestamp', () => 'Timestamp');
 jest.mock('views/hooks/useActiveQueryId', () => () => 'foobar');
+jest.mock(
+  'views/components/Field',
+  () =>
+    ({ children = undefined, type }: React.PropsWithChildren<{ type: FieldType }>) => (
+      <span>
+        {children} - {type.type}
+      </span>
+    ),
+);
 
 const onSortChange = jest.fn();
 const seriesWithName = (fn: string, name: string) =>
@@ -76,70 +87,54 @@ describe('Headers', () => {
     </table>
   );
 
-  it('renders a header for every series', () => {
-    const wrapper = mount(<RenderHeaders series={[Series.forFunction('count()'), Series.forFunction('avg(foo)')]} />);
+  useViewsPlugin();
 
-    expect(wrapper).not.toBeEmptyRender();
-
-    const fields = wrapper.find('Field');
-
-    expect(fields).toHaveLength(2);
+  it('renders a header for every series', async () => {
+    render(<RenderHeaders series={[Series.forFunction('count()'), Series.forFunction('avg(foo)')]} />);
+    await screen.findByText(/count\(\)/);
+    await screen.findByText(/avg\(foo\)/);
   });
 
   describe('infers types properly', () => {
-    const expectCorrectTypes = (wrapper) => {
-      const countField = wrapper.find('Field[name="count()"]');
-
-      expect(countField).toHaveProp('type', FieldTypes.LONG());
-
-      const avgField = wrapper.find('Field[name="avg(foo)"]');
-
-      expect(avgField).toHaveProp('type', FieldTypes.DATE());
-
-      const minField = wrapper.find('Field[name="min(foo)"]');
-
-      expect(minField).toHaveProp('type', FieldTypes.DATE());
-    };
-
-    it('for non-renamed series', () => {
+    it('for non-renamed series', async () => {
       const series = [Series.forFunction('count()'), Series.forFunction('avg(foo)'), Series.forFunction('min(foo)')];
-      const wrapper = mount(
-        <RenderHeaders series={series} fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />,
-      );
+      render(<RenderHeaders series={series} fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />);
 
-      expectCorrectTypes(wrapper);
+      await screen.findByText(/count\(\) - long/);
+      await screen.findByText(/avg\(foo\) - date/);
+      await screen.findByText(/min\(foo\) - date/);
     });
 
-    it('for renamed series', () => {
+    it('for renamed series', async () => {
       const series = [
         seriesWithName('count()', 'Total Count'),
-        seriesWithName('avg(foo)', 'Average Foness'),
+        seriesWithName('avg(foo)', 'Average Fooness'),
         seriesWithName('min(foo)', 'Minimal Fooness'),
       ];
-      const wrapper = mount(
-        <RenderHeaders series={series} fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />,
-      );
-
-      expectCorrectTypes(wrapper);
+      render(<RenderHeaders series={series} fields={[FieldTypeMapping.create('foo', FieldTypes.DATE())]} />);
+      await screen.findByText(/Total Count - long/);
+      await screen.findByText(/Average Fooness - date/);
+      await screen.findByText(/Minimal Fooness - date/);
     });
 
-    it('renders with `null` fields', () => {
-      const series = [seriesWithName('foo', 'Total Count'), seriesWithName('avg(foo)', 'Average Foness')];
+    it('renders with `null` fields', async () => {
+      const series = [seriesWithName('foo', 'Total Count'), seriesWithName('avg(foo)', 'Average Fooness')];
 
-      const wrapper = mount(<RenderHeaders series={series} fields={null} />);
+      render(<RenderHeaders series={series} fields={null} />);
 
-      expect(wrapper).toExist();
+      await screen.findByText(/Total Count/);
+      await screen.findByText(/Average Fooness/);
     });
   });
 
   describe('renders sort icon', () => {
     const series = [
       seriesWithName('foo', 'Total Count'),
-      seriesWithName('avg(foo)', 'Average Foness'),
+      seriesWithName('avg(foo)', 'Average Fooness'),
       seriesWithName('bar', 'Bar'),
     ];
     const mountWrapper = () =>
-      mount(
+      render(
         <RenderHeaders
           series={series}
           fields={null}
@@ -150,57 +145,35 @@ describe('Headers', () => {
         />,
       );
 
-    it('active ascend', () => {
-      const wrapper = mountWrapper();
+    it('active ascend', async () => {
+      mountWrapper();
 
-      const ascIcon = wrapper
-        .find('FieldSortIcon[fieldName="foo"]')
-        .find('button[title="Sort foo Descending"].active')
-        .find('Icon.sort-icon-asc');
-
-      expect(ascIcon).toExist();
+      expect(await screen.findByRole('button', { name: /sort foo descending/i })).toHaveClass('active');
     });
 
-    it('active descent', () => {
-      const wrapper = mountWrapper();
+    it('active descent', async () => {
+      mountWrapper();
 
-      const dscIcon = wrapper
-        .find('FieldSortIcon[fieldName="bar"]')
-        .find('button[title="Remove bar sort"].active')
-        .find('Icon.sort-icon-desc');
-
-      expect(dscIcon).toExist();
+      expect(await screen.findByRole('button', { name: /Remove bar sort/i })).toHaveClass('active');
     });
 
-    it('inactive ascend', () => {
-      const wrapper = mountWrapper();
+    it('inactive ascend', async () => {
+      mountWrapper();
 
-      const inactiveIcon = wrapper
-        .find('FieldSortIcon[fieldName="avg(foo)"]')
-        .find('button[title="Sort avg(foo) Ascending"]:not(.active)')
-        .find('Icon.sort-icon-desc');
-
-      expect(inactiveIcon).toExist();
+      expect(await screen.findByRole('button', { name: /Sort avg\(foo\) Ascending/i })).not.toHaveClass('active');
     });
 
-    it('with sequence numbers', () => {
-      const wrapper = mountWrapper();
+    it('with sequence numbers', async () => {
+      mountWrapper();
 
-      const fooButton = wrapper
-        .find('FieldSortIcon[fieldName="foo"]')
-        .find('button[title="Sort foo Descending"].active')
-        .find('span')
-        .at(1)
-        .text();
-      const barButton = wrapper
-        .find('FieldSortIcon[fieldName="bar"]')
-        .find('button[title="Remove bar sort"].active')
-        .find('span')
-        .at(1)
-        .text();
+      const fooButton = await screen.findByRole('button', { name: /Sort foo descending/i });
+      const barButton = await screen.findByRole('button', { name: /Remove bar sort/i });
 
-      expect(fooButton).toBe('1');
-      expect(barButton).toBe('2');
+      expect(fooButton).toHaveClass('active');
+      expect(fooButton.innerHTML).toContain('1');
+
+      expect(barButton).toHaveClass('active');
+      expect(barButton.innerHTML).toContain('2');
     });
   });
 });

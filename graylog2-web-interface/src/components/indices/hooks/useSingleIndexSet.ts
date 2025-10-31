@@ -14,11 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
-import type FetchError from 'logic/errors/FetchError';
-import { type IndexSet } from 'stores/indices/IndexSetsStore';
+import type { IndexSet } from 'stores/indices/IndexSetsStore';
 import { qualifyUrl } from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { defaultOnError } from 'util/conditional/onError';
@@ -34,18 +33,18 @@ const useSingleIndexSet = (
   isSuccess: boolean;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isSuccess } = useQuery<IndexSet, FetchError>(
-    ['indexSet', indexSetId],
-    () =>
+  const { data, refetch, isInitialLoading, isSuccess } = useQuery({
+    queryKey: ['indexSet', indexSetId],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSet(indexSetId),
         `Loading index set with id: ${indexSetId} failed with status`,
         'Could not load index set',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+  });
 
   return {
     data,

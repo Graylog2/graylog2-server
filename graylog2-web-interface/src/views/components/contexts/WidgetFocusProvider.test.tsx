@@ -32,6 +32,7 @@ import { Button } from 'components/bootstrap';
 import useView from 'views/hooks/useView';
 import View from 'views/logic/views/View';
 import ViewState from 'views/logic/views/ViewState';
+import { setNewWidget } from 'views/logic/slices/widgetsSlice';
 
 const mockNavigate = jest.fn();
 
@@ -45,6 +46,10 @@ jest.mock('react-router-dom', () => ({
 }));
 
 jest.mock('views/stores/useViewsDispatch');
+jest.mock('views/logic/slices/widgetsSlice', () => ({
+  ...jest.requireActual('views/logic/slices/widgetsSlice'),
+  setNewWidget: jest.fn(),
+}));
 
 const emptyLocation = {
   pathname: '',
@@ -226,5 +231,47 @@ describe('WidgetFocusProvider', () => {
     renderSUT(jest.fn());
 
     expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it('sets new widget when unfocusing a widget', async () => {
+    const dispatch = jest.fn();
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
+    asMock(useLocation).mockReturnValue({
+      ...emptyLocation,
+      search: '?focusedId=widget-id&focusing=true',
+    });
+
+    const consume = ({ unsetWidgetFocusing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetFocusing()}>Unfocus!</Button>
+    );
+
+    renderSUT(consume);
+
+    const button = await screen.findByRole('button', { name: 'Unfocus!' });
+    fireEvent.click(button);
+
+    // setNewWidget should be dispatched with the focused widget id
+    expect(setNewWidget).toHaveBeenCalledWith('widget-id');
+  });
+
+  it('sets new widget when leaving edit mode', async () => {
+    const dispatch = jest.fn();
+    asMock(useViewsDispatch).mockReturnValue(dispatch);
+    asMock(useLocation).mockReturnValue({
+      ...emptyLocation,
+      search: '?focusedId=widget-id&editing=true',
+    });
+
+    const consume = ({ unsetWidgetEditing }: WidgetFocusContextType) => (
+      <Button onClick={() => unsetWidgetEditing()}>Cancel Edit!</Button>
+    );
+
+    renderSUT(consume);
+
+    const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
+    fireEvent.click(button);
+
+    // setNewWidget should be dispatched with the focused widget id
+    expect(setNewWidget).toHaveBeenCalledWith('widget-id');
   });
 });

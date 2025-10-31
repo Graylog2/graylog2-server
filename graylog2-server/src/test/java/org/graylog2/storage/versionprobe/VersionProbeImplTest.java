@@ -24,12 +24,13 @@ import io.jsonwebtoken.Jwts;
 import jakarta.annotation.Nonnull;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response;
+import mockwebserver3.Dispatcher;
+import mockwebserver3.MockResponse;
+import mockwebserver3.MockWebServer;
+import mockwebserver3.RecordedRequest;
 import okhttp3.Credentials;
+import okhttp3.Headers;
 import okhttp3.OkHttpClient;
-import okhttp3.mockwebserver.Dispatcher;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okhttp3.mockwebserver.RecordedRequest;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.graylog2.security.JwtSecret;
@@ -78,12 +79,12 @@ class VersionProbeImplTest {
 
     @AfterEach
     void tearDown() throws IOException {
-        server.shutdown();
+        server.close();
     }
 
     @Test
     void testSuccessfulVersionProbe() throws URISyntaxException {
-        server.enqueue(new MockResponse().setBody(OPENSEARCH_RESPONSE));
+        server.enqueue(new MockResponse(200, Headers.of(), OPENSEARCH_RESPONSE));
         final CollectingVersionProbeListener versionProbeListener = new CollectingVersionProbeListener();
         final VersionProbe versionProbe = new VersionProbeImpl(objectMapper(), okHttpClient(), jwtTokenProvider(randomSecret(), true), 100, Duration.milliseconds(10), versionProbeListener);
         final Optional<SearchVersion> probedVersion = versionProbe.probe(Collections.singleton(server.url("/").url().toURI()));
@@ -120,9 +121,7 @@ class VersionProbeImplTest {
             @Nonnull
             @Override
             public MockResponse dispatch(@Nonnull RecordedRequest recordedRequest) throws InterruptedException {
-                return new MockResponse()
-                        .setBody("unauthorized")
-                        .setResponseCode(Response.Status.UNAUTHORIZED.getStatusCode());
+                return new MockResponse(Response.Status.UNAUTHORIZED.getStatusCode(), Headers.of(), "unauthorized");
             }
         };
     }
@@ -190,14 +189,11 @@ class VersionProbeImplTest {
             @Nonnull
             @Override
             public MockResponse dispatch(@Nonnull RecordedRequest recordedRequest) throws InterruptedException {
-                final String auth = recordedRequest.getHeader(HttpHeaders.AUTHORIZATION);
+                final String auth = recordedRequest.getHeaders().get(HttpHeaders.AUTHORIZATION);
                 if (auth != null && auth.equals(basicAuthCredentials)) {
-                    return new MockResponse()
-                            .setBody(OPENSEARCH_RESPONSE);
+                    return new MockResponse(200, Headers.of(), OPENSEARCH_RESPONSE);
                 } else {
-                    return new MockResponse()
-                            .setBody("Unauthorized")
-                            .setResponseCode(Response.Status.UNAUTHORIZED.getStatusCode());
+                    return new MockResponse(Response.Status.UNAUTHORIZED.getStatusCode(), Headers.of(), "Unauthorized");
                 }
             }
         };
@@ -225,11 +221,9 @@ class VersionProbeImplTest {
                         });
 
                 if (parsedToken.isEmpty()) {
-                    return new MockResponse()
-                            .setBody("Failed to parse auth header")
-                            .setResponseCode(Response.Status.UNAUTHORIZED.getStatusCode());
+                    return new MockResponse(Response.Status.UNAUTHORIZED.getStatusCode(), Headers.of(), "Failed to parse auth header");
                 } else {
-                    return new MockResponse().setBody(OPENSEARCH_RESPONSE);
+                    return new MockResponse(200, Headers.of(), OPENSEARCH_RESPONSE);
                 }
             }
         };
@@ -246,6 +240,7 @@ class VersionProbeImplTest {
         return new IndexerJwtAuthTokenProvider(
                 secret,
                 Duration.seconds(60),
+                Duration.seconds(30),
                 Duration.seconds(30),
                 useJwtAuthentication,
                 Clock.systemDefaultZone()

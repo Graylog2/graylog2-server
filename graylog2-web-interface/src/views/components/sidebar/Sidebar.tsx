@@ -24,8 +24,7 @@ import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPa
 import SearchPagePreferencesContext from 'views/components/contexts/SearchPagePreferencesContext';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
+import zIndices from 'theme/z-indices';
 
 import SidebarNavigation from './SidebarNavigation';
 import ContentColumn from './ContentColumn';
@@ -56,7 +55,7 @@ const ContentOverlay = styled.div(
     position: fixed;
     inset: 0 0 0 50px;
     background: ${chroma(theme.colors.brand.tertiary).alpha(0.25).css()};
-    z-index: 5;
+    z-index: ${zIndices.sidebarOverlay};
   `,
 );
 
@@ -95,7 +94,6 @@ const Sidebar = ({
   enableSidebarPinning = true,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
   const sidebarIsPinned = searchPageLayout?.config.sidebar.isPinned || forceSideBarPinned;
   const initialSectionKey = sections[0].key;
   const [activeSectionKey, setActiveSectionKey] = useState<string | undefined>(
@@ -105,7 +103,6 @@ const Sidebar = ({
 
   const toggleSidebar = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_TOGGLE, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_action_value: 'search_sidebar',
       initialSectionKey,
       activeSectionKey,

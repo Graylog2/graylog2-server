@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -50,19 +50,19 @@ const useIndexSetFieldTypesAll = (
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(
-    ['indexSetFieldTypesAll', indexSetId],
-    () =>
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['indexSetFieldTypesAll', indexSetId],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSetFieldTypesAll(indexSetId),
         'Loading index field types failed with status',
         'Could not load index field types',
       ),
-    {
-      keepPreviousData: true,
-      enabled: !!indexSetId,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+    enabled: !!indexSetId,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

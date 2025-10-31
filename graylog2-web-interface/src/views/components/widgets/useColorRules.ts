@@ -43,7 +43,14 @@ const useColorRules = () => {
       if (isAggregationWidgetConfig(config)) {
         const { chartColors = {} } = config.formattingSettings ?? WidgetFormattingSettings.empty();
 
-        return Object.entries(chartColors).map(([key, value]) => ({ widgetId, name: key, color: value }) as ColorRule);
+        return Object.entries(chartColors).map(
+          ([key, value]) =>
+            ({
+              widgetId,
+              name: key,
+              color: value,
+            }) as ColorRule,
+        );
       }
 
       return [];

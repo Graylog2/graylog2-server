@@ -48,7 +48,7 @@ const defaultProps = {
   position: 'bottom',
 } as const;
 
-const TimeRangePicker = (props: React.ComponentProps<typeof OriginalTimeRangePicker>) => (
+const TimeRangePicker = ({ ...props }: React.ComponentProps<typeof OriginalTimeRangePicker>) => (
   <OriginalTimeRangePicker {...props}>
     <button type="button">Open</button>
   </OriginalTimeRangePicker>

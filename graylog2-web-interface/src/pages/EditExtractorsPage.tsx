@@ -23,7 +23,7 @@ import DocsHelper from 'util/DocsHelper';
 import Routes from 'routing/Routes';
 import { ExtractorsActions, ExtractorsStore } from 'stores/extractors/ExtractorsStore';
 import { InputsActions, InputsStore } from 'stores/inputs/InputsStore';
-import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
+import universalSearch from 'stores/search/UniversalSearch';
 import { useStore } from 'stores/connect';
 import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
@@ -39,31 +39,21 @@ const EditExtractorsPage = () => {
     InputsActions.get(inputId);
     ExtractorsActions.get(inputId, extractorId);
 
-    UniversalSearchStore.search(
+    universalSearch(
       'relative',
       `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
-      { relative: 3600 },
+      { type: 'relative', range: 3600 },
       undefined,
       1,
     ).then((response) => {
-      if (response.total_results > 0) {
-        setExampleMessage(response.messages[0]);
-      } else {
-        setExampleMessage({});
-      }
+      setExampleMessage(response.total_results > 0 ? response.messages[0] : {});
     });
   }, [extractorId, inputId]);
 
   const _isLoading = !(input && extractor && exampleMessage);
 
   const _extractorSaved = () => {
-    let url;
-
-    if (input.global) {
-      url = Routes.global_input_extractors(inputId);
-    } else {
-      url = Routes.local_input_extractors(nodeId, inputId);
-    }
+    const url = input.global ? Routes.global_input_extractors(inputId) : Routes.local_input_extractors(nodeId, inputId);
 
     history.push(url);
   };

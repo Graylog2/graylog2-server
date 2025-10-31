@@ -24,7 +24,8 @@ type Headers = { [key: string]: string | number | boolean | string[] };
 type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 const request = (method: Methods, path: string, body: any, query: Query, headers: Headers) => {
-  const pathWithQueryParameters = Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query)}` : path;
+  const pathWithQueryParameters =
+    Object.entries(query).length > 0 ? `${path}?${Qs.stringify(query, { indices: false })}` : path;
   const builder = new Builder(method, URLUtils.qualifyUrl(pathWithQueryParameters)).json(body);
 
   const builderWithHeaders = Object.entries(headers).reduce(

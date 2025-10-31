@@ -21,5 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class CloudTrailSessionContext {
     @JsonProperty("attributes")
     public CloudTrailSessionContextAttributes attributes;
+    @JsonProperty("sessionIssuer")
+    public CloudTrialSessionContextIssuer sessionIssuer;
 
 }

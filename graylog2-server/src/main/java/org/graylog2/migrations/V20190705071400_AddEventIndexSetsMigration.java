@@ -17,12 +17,10 @@
 package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.bson.conversions.Bson;
-import org.bson.types.ObjectId;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
@@ -48,16 +46,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
-import java.util.Collections;
-import java.util.Map;
 import java.util.Optional;
 
 import static java.util.Locale.US;
 import static java.util.Objects.requireNonNull;
 import static org.graylog.events.processor.DBEventDefinitionService.SYSTEM_NOTIFICATION_EVENT_DEFINITION;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_PREFIX;
-import static org.graylog2.indexer.indexset.SimpleIndexSetConfig.FIELD_INDEX_TEMPLATE_TYPE;
+import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_INDEX_PREFIX;
+import static org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields.FIELD_INDEX_TEMPLATE_TYPE;
 
 public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20190705071400_AddEventIndexSetsMigration.class);
@@ -190,19 +186,18 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void createEventsStream(String streamId, String streamTitle, String streamDescription, IndexSet indexSet) {
-        final ObjectId id = new ObjectId(streamId);
-        final Map<String, Object> fields = ImmutableMap.<String, Object>builder()
-                .put(StreamImpl.FIELD_TITLE, streamTitle)
-                .put(StreamImpl.FIELD_DESCRIPTION, streamDescription)
-                .put(StreamImpl.FIELD_DISABLED, false)
-                .put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC))
-                .put(StreamImpl.FIELD_CREATOR_USER_ID, "admin")
-                .put(StreamImpl.FIELD_MATCHING_TYPE, StreamImpl.MatchingType.DEFAULT.name())
-                .put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, true)
-                .put(StreamImpl.FIELD_INDEX_SET_ID, requireNonNull(indexSet.getConfig().id(), "index set ID cannot be null"))
-                .put(StreamImpl.FIELD_DEFAULT_STREAM, false)
+        final Stream stream = StreamImpl.builder()
+                .id(streamId)
+                .title(streamTitle)
+                .description(streamDescription)
+                .disabled(false)
+                .createdAt(DateTime.now(DateTimeZone.UTC))
+                .creatorUserId("admin")
+                .matchingType(StreamImpl.MatchingType.DEFAULT)
+                .removeMatchesFromDefaultStream(true)
+                .indexSetId(requireNonNull(indexSet.getConfig().id(), "index set ID cannot be null"))
+                .isDefault(false)
                 .build();
-        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), indexSet);
 
         try {
             streamService.save(stream);
@@ -213,6 +208,9 @@ public class V20190705071400_AddEventIndexSetsMigration extends Migration {
     }
 
     private void ensureSystemNotificationEventsDefinition() {
+        // This migration installs a system-provided event definition. Its related entry in the entity_source
+        // collection is installed via a different migration (V20250917184400_AddSystemEntitySource). Any future
+        // migrations that install system-provided entities should take care of adding the entity_source entry as well.
         try (java.util.stream.Stream<EventDefinitionDto> eventDefinitionStream = dbService.streamSystemEventDefinitions()) {
             if (eventDefinitionStream.findAny().isEmpty()) {
                 EventDefinitionDto eventDto =

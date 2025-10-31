@@ -46,7 +46,7 @@ class TokenCollectingQueryParserTest {
         tokenManagerMock = mock(CollectingQueryParserTokenManager.class);
         collectedTokensSimulation = new ArrayList<>();
         doReturn(collectedTokensSimulation).when(tokenManagerMock).getTokens();
-        toTest = new TokenCollectingQueryParser(tokenManagerMock, ParsedTerm.DEFAULT_FIELD, ANALYZER);
+        toTest = new TokenCollectingQueryParser(tokenManagerMock, ParsedTerm.DEFAULT_FIELD, ANALYZER, 32768);
 
         testTerm = new Term("x", "nvmd");
     }

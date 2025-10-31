@@ -19,6 +19,7 @@ import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import { MenuItem } from 'components/bootstrap';
+import suppressConsole from 'helpers/suppressConsole';
 
 import ActionDropdown from './ActionDropdown';
 
@@ -54,7 +55,10 @@ describe('ActionDropdown', () => {
 
     expect(screen.queryByText('Foo')).not.toBeInTheDocument();
 
-    await userEvent.click(triggerButton);
+    // Disabling HTML validation error for this line due to nesting buttons within each other
+    await suppressConsole(async () => {
+      await userEvent.click(triggerButton);
+    });
 
     await screen.findByRole('menuitem', { name: 'Foo' });
 

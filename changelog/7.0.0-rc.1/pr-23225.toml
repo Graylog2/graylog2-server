@@ -1,0 +1,5 @@
+type = "f"
+message = "Improve color of status icon in streams and users overview, in dark mode."
+
+pulls = ["23225"]
+issues = ["20746"]

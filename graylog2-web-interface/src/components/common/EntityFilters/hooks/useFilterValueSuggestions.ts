@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
@@ -66,19 +66,19 @@ const useFilterValueSuggestions = (
     throw Error(`Attribute meta data for attribute "${attributeId}" is missing related collection.`);
   }
 
-  const { data, isInitialLoading } = useQuery(
-    ['filters', 'suggestions', searchParams],
-    () =>
+  const { data, isInitialLoading } = useQuery({
+    queryKey: ['filters', 'suggestions', searchParams],
+
+    queryFn: () =>
       defaultOnError(
         fetchFilterValueSuggestions(collection, searchParams, collectionProperty),
         'Loading suggestions for filter failed with status',
         'Could not load filter suggestions',
       ),
-    {
-      retry: 0,
-      keepPreviousData: true,
-    },
-  );
+
+    retry: 0,
+    placeholderData: keepPreviousData,
+  });
 
   return {
     data: data ?? DEFAULT_DATA,

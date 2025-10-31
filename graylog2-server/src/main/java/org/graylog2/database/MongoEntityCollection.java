@@ -244,6 +244,12 @@ public class MongoEntityCollection<T extends MongoEntity> implements MongoCollec
         return delegate.findOneAndUpdate(filter, update, options);
     }
 
+    @Nullable
+    @Override
+    public T findOneAndUpdate(@Nonnull Bson filter, @Nonnull List<? extends Bson> update, @Nonnull FindOneAndUpdateOptions options) {
+        return delegate.findOneAndUpdate(filter, update, options);
+    }
+
     @Override
     public void drop() {
         delegate.drop();

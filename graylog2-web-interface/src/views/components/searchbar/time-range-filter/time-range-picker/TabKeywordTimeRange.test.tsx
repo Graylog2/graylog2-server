@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { asElement, fireEvent, render, waitFor, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react';
@@ -71,7 +71,6 @@ describe('TabKeywordTimeRange', () => {
   };
 
   const changeInput = async (input, value) =>
-    // eslint-disable-next-line testing-library/no-unnecessary-act
     act(async () => {
       const { name } = asElement(input, HTMLInputElement);
 
@@ -81,7 +80,6 @@ describe('TabKeywordTimeRange', () => {
   const asyncRender = async (element) => {
     let wrapper;
 
-    // eslint-disable-next-line testing-library/no-unnecessary-act
     await act(async () => {
       wrapper = render(element);
     });

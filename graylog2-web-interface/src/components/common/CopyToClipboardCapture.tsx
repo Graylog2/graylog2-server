@@ -26,20 +26,21 @@ type Props = {
  * This component calls `formatSelection` every time the user copies encapsulated content (`children`) to the clipboard.
  * `formatSelection` allows to format the selected content before it gets stored in the clipboard.
  */
-const CopyToClipboardCapture = React.forwardRef<HTMLDivElement, Props>(
-  ({ formatSelection, children, className = undefined }: Props, ref) => {
-    const _onCopy = (event) => {
-      const selection = formatSelection(document.getSelection());
-      event.clipboardData.setData('text/plain', selection);
-      event.preventDefault();
-    };
+const CopyToClipboardCapture = (
+  { formatSelection, children, className = undefined }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
+  const _onCopy = (event) => {
+    const selection = formatSelection(document.getSelection());
+    event.clipboardData.setData('text/plain', selection);
+    event.preventDefault();
+  };
 
-    return (
-      <div className={className} ref={ref} onCopy={_onCopy}>
-        {children}
-      </div>
-    );
-  },
-);
+  return (
+    <div className={className} ref={ref} onCopy={_onCopy}>
+      {children}
+    </div>
+  );
+};
 
-export default CopyToClipboardCapture;
+export default React.forwardRef(CopyToClipboardCapture);

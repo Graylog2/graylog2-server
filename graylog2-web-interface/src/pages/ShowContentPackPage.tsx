@@ -34,6 +34,7 @@ import useContentPackRevisions from 'components/content-packs/hooks/useContentPa
 import useContentPackInstallations from 'components/content-packs/hooks/useContentPackInstallations';
 import type FetchError from 'logic/errors/FetchError';
 import MarketplaceLink from 'components/support/MarketplaceLink';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 import ShowContentPackStyle from './ShowContentPackPage.css';
 
@@ -127,8 +128,13 @@ const ShowContentPackPage = () => {
     );
   };
 
-  const _installContentPack = (contentPackId: string, contentPackRev: string, parameters) => {
-    ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(
+  const _installContentPack = (
+    contentPackId: string,
+    contentPackRev: number,
+    parameters: {},
+    shareRequest: EntitySharePayload,
+  ) => {
+    ContentPacksActions.install(contentPackId, contentPackRev, parameters, shareRequest).then(
       () => {
         UserNotification.success('Content Pack installed successfully.', 'Success');
         refetchInstallations();

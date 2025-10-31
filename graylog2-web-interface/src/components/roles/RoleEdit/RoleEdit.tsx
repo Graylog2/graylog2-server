@@ -41,7 +41,7 @@ const RoleEdit = ({ role }: Props) => {
       </div>
       <div>
         <UsersSection role={role} />
-        <IfPermitted permissions="teams:edit">
+        <IfPermitted permissions="team:edit">
           <TeamsSection role={role} />
         </IfPermitted>
       </div>

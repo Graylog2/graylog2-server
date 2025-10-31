@@ -27,6 +27,8 @@ import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.apache.shiro.authz.Permission;
 import org.apache.shiro.authz.permission.WildcardPermission;
 import org.bson.types.ObjectId;
@@ -53,10 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -240,6 +238,25 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
         LOG.debug("Loaded user {}/{}/{} from MongoDB", authServiceUid, username, userId);
         return Optional.ofNullable(userFactory.create((ObjectId) userId, userObject.toMap()));
+    }
+
+    @Override
+    public Optional<User> loadByAuthServiceUid(String authServiceUid) {
+        checkArgument(!isBlank(authServiceUid), "authServiceUid cannot be blank");
+
+        final DBObject query = new BasicDBObject(UserImpl.AUTH_SERVICE_UID, authServiceUid);
+        final List<DBObject> result = query(UserImpl.class, query);
+
+        if (result.size() > 1) {
+            final String msg = "There was more than one matching user for auth service UID <" + authServiceUid + ">. " +
+                    "This should never happen.";
+            LOG.error(msg);
+            throw new DuplicateUserException(msg);
+        }
+
+        return result.stream()
+                .map(dbObj -> (User) userFactory.create((ObjectId) dbObj.get("_id"), dbObj.toMap()))
+                .findFirst();
     }
 
     @Override

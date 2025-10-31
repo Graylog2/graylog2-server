@@ -191,7 +191,7 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
                         .withStartupTimeout(Duration.ofSeconds(60)));
 
         // explicitly configured ENV variables will override those set above
-        if(env != null) {
+        if (env != null) {
             env.forEach(container::withEnv);
         }
 
@@ -231,11 +231,11 @@ public class DatanodeDevContainerBuilder implements org.graylog.testing.datanode
 
     private static ImageFromDockerfile createImage() {
 
-        final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-datanode:latest", false);
+        final ImageFromDockerfile image = new ImageFromDockerfile("local/graylog-full-backend-test-datanode:latest", false);
 
         return image.withDockerfileFromBuilder(builder ->
         {
-            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:17-jre-jammy")
+            final DockerfileBuilder fileBuilder = builder.from("eclipse-temurin:21-jre-jammy")
                     .workDir(IMAGE_WORKING_DIR)
                     .run("mkdir -p opensearch/config")
                     .run("mkdir -p opensearch/data")

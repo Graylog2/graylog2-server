@@ -1,5 +1,3 @@
-import { renderHook } from 'wrappedTestingLibrary/hooks';
-
 /*
  * Copyright (C) 2020 Graylog, Inc.
  *
@@ -16,6 +14,8 @@ import { renderHook } from 'wrappedTestingLibrary/hooks';
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
+
 import useDataNodesCA from 'preflight/hooks/useDataNodesCA';
 import { CONFIGURATION_STEPS } from 'preflight/Constants';
 import asMock from 'helpers/mocking/AsMock';
@@ -64,7 +64,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -75,7 +75,7 @@ describe('useConfigurationStep', () => {
       isInitialLoading: true,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() => expect(result.current.isLoading).toBe(true));
   });
@@ -86,7 +86,7 @@ describe('useConfigurationStep', () => {
       data: undefined,
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() =>
       expect(result.current).toEqual({
@@ -103,7 +103,7 @@ describe('useConfigurationStep', () => {
       data: { id: 'ca-id', type: 'ca-type' },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() =>
       expect(result.current).toEqual({
@@ -148,7 +148,7 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() =>
       expect(result.current).toEqual({
@@ -173,7 +173,7 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: true }));
+    const { result } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: true }));
 
     await waitFor(() =>
       expect(result.current).toEqual({
@@ -218,7 +218,7 @@ describe('useConfigurationStep', () => {
       },
     });
 
-    const { result, waitFor } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
+    const { result } = renderHook(() => useConfigurationStep({ isSkippingProvisioning: false }));
 
     await waitFor(() =>
       expect(result.current).toEqual({

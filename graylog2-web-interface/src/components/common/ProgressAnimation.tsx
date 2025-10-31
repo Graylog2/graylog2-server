@@ -42,7 +42,7 @@ const ProgressAnimation = styled.div<{ $animationDuration: number; $increase: bo
     bottom: 0;
     height: 2px;
     animation: linear ${$increase ? animateIncrease : animateDecrease} ${$animationDuration}ms;
-    background-color: ${theme.colors.global.textDefault};
+    background-color: ${theme.colors.text.primary};
     z-index: 2;
     ${$increase ? 'left: 0;' : 'right: 0;'}
   `,

@@ -44,16 +44,18 @@ const useStreamsByIndexSet = (
   data: ResponseData;
   isLoading: boolean;
 } => {
-  const { data, isLoading } = useQuery<ResponseData, FetchError>(
-    [STREAMS_BY_INDEX_SET_ID],
-    () =>
+  const { data, isLoading } = useQuery({
+    queryKey: [STREAMS_BY_INDEX_SET_ID],
+
+    queryFn: () =>
       onError(fetchStreamsByIndexSet(indexSetId), (errorThrown: FetchError) => {
         if (!(errorThrown.status === 404)) {
           UserNotification.error(`Loading streams by index set failed with: ${errorThrown}`);
         }
       }),
-    { enabled },
-  );
+
+    enabled,
+  });
 
   return {
     data: data,

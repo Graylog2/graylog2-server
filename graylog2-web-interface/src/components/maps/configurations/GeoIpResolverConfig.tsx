@@ -189,7 +189,6 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                         required
                         disabled={!values.enabled}
                         options={availableVendorTypes()}
-                        matchProp="label"
                         value={values.db_vendor_type}
                         onChange={(option) => {
                           setFieldValue('db_vendor_type', option);
@@ -241,10 +240,8 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                         id="pull_from_cloud"
                         name="pull_from_cloud"
                         placeholder="Select cloud storage"
-                        required
                         disabled={!values.enabled}
                         options={cloudStorageOptions}
-                        matchProp="label"
                         value={values.pull_from_cloud}
                         onChange={(option) => {
                           setFieldValue('pull_from_cloud', option);

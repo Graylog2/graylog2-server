@@ -14,19 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import * as Immutable from 'immutable';
+import debounce from 'lodash/debounce';
 
-import { Panel, Table } from 'components/bootstrap';
+import { Table } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import HelpPanel from 'components/event-definitions/common/HelpPanel';
-
-import styles from './FilterPreview.css';
+import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import useCurrentUser from 'hooks/useCurrentUser';
+import generateId from 'logic/generateId';
+import type { SearchExecutionResult } from 'views/types';
+import useSearchExecutors from 'views/components/contexts/useSearchExecutors';
+import Search from 'views/logic/search/Search';
+import createSearch from 'views/logic/slices/createSearch';
+import SearchExecutionState from 'views/logic/search/SearchExecutionState';
+import Query from 'views/logic/queries/Query';
+import type { LookupTableParameterJsonEmbryonic } from 'components/event-definitions/event-definition-types/FilterForm';
+import LookupTableParameter from 'views/logic/parameters/LookupTableParameter';
+import type User from 'logic/users/User';
+import { isPermitted } from 'util/PermissionsMixin';
+import FilterPreviewResults from 'components/event-definitions/event-definition-types/FilterPreviewResults';
 
 type FilterPreviewProps = {
-  searchResult?: any;
-  errors?: any[];
-  isFetchingData?: boolean;
-  displayPreview?: boolean;
+  config: EventDefinition['config'];
 };
 
 type Message = {
@@ -74,12 +86,92 @@ const SearchResult = ({
   );
 };
 
-const FilterPreview = ({
-  searchResult = {},
-  displayPreview = false,
-  errors = [],
-  isFetchingData = false,
-}: FilterPreviewProps) => {
+const constructSearch = (config: EventDefinition['config'], searchTypeId: string, queryId: string) => {
+  const formattedStreams = config?.streams?.map((stream) => ({ type: 'stream', id: stream })) || [];
+
+  const queryBuilder = Query.builder()
+    .id(queryId)
+    .query({ type: 'elasticsearch', query_string: config?.query || '*' })
+    .timerange({ type: 'relative', range: (config?.search_within_ms || 0) / 1000 })
+    .filter(formattedStreams.length === 0 ? null : Immutable.Map({ type: 'or', filters: formattedStreams }))
+    .filters(config.filters)
+    .searchTypes([
+      {
+        id: searchTypeId,
+        type: 'messages',
+        limit: 10,
+        offset: 0,
+        filter: undefined,
+        filters: undefined,
+        name: undefined,
+        query: undefined,
+        timerange: undefined,
+        streams: [],
+        stream_categories: [],
+        sort: [],
+        decorators: [],
+      },
+    ]);
+
+  const query = queryBuilder.build();
+
+  return Search.create()
+    .toBuilder()
+    .parameters(
+      config?.query_parameters
+        ?.filter((param: LookupTableParameterJsonEmbryonic) => !param.embryonic)
+        .map((param) => LookupTableParameter.fromJSON(param)) ?? [],
+    )
+    .queries([query])
+    .build();
+};
+
+const isPermittedToSeePreview = (currentUser: User, config: EventDefinition['config']) => {
+  const missingPermissions = config?.streams?.some(
+    (stream) => !isPermitted(currentUser.permissions, `streams:read:${stream}`),
+  );
+
+  return !missingPermissions;
+};
+
+const useExecutePreview = (config: EventDefinition['config']) => {
+  const currentUser = useCurrentUser();
+  const queryId = useMemo(() => generateId(), []);
+  const searchTypeId = useMemo(() => generateId(), []);
+  const [results, setResults] = useState<SearchExecutionResult>();
+  const { startJob, executeJobResult } = useSearchExecutors();
+  const executeSearch = useMemo(
+    () =>
+      debounce(
+        (search: Search) =>
+          createSearch(search)
+            .then((createdSearch) => startJob(createdSearch, [searchTypeId], SearchExecutionState.empty()))
+            .then((jobIds) => executeJobResult({ jobIds }))
+            .then((result) => setResults(result)),
+        250,
+      ),
+    [executeJobResult, searchTypeId, startJob],
+  );
+
+  useEffect(() => {
+    if (isPermittedToSeePreview(currentUser, config)) {
+      const search = constructSearch(config, searchTypeId, queryId);
+      executeSearch(search);
+    }
+  }, [config, currentUser, executeSearch, queryId, searchTypeId]);
+
+  return {
+    errors: results?.result?.errors,
+    result: results?.result?.forId(queryId)?.searchTypes?.[searchTypeId],
+  };
+};
+
+const FilterPreview = ({ config }: FilterPreviewProps) => {
+  const currentUser = useCurrentUser();
+  const displayPreview = isPermittedToSeePreview(currentUser, config);
+  const results = useExecutePreview(config);
+  const { result: searchResult = {}, errors = [] } = results ?? {};
+  const isFetchingData = !results?.result;
   const hasError = errors?.length > 0;
 
   return (
@@ -106,18 +198,13 @@ const FilterPreview = ({
       </HelpPanel>
 
       {displayPreview && (
-        <Panel className={styles.filterPreview} bsStyle={hasError ? 'danger' : 'default'}>
-          <Panel.Heading>
-            <Panel.Title>Filter Preview</Panel.Title>
-          </Panel.Heading>
-          <Panel.Body>
-            {hasError ? (
-              <p>{errors[0].description}</p>
-            ) : (
-              <SearchResult isFetchingData={isFetchingData} searchResult={searchResult} />
-            )}
-          </Panel.Body>
-        </Panel>
+        <FilterPreviewResults hasError={hasError}>
+          {hasError ? (
+            <p>{errors[0].description}</p>
+          ) : (
+            <SearchResult isFetchingData={isFetchingData} searchResult={searchResult} />
+          )}
+        </FilterPreviewResults>
       )}
     </>
   );

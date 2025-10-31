@@ -28,7 +28,7 @@ import org.mongojack.ObjectId;
 @AutoValue
 @JsonAutoDetect
 @JsonDeserialize(builder = ScopedDTO.Builder.class)
-public abstract class ScopedDTO extends ScopedEntity {
+public abstract class ScopedDTO implements ScopedEntity<ScopedDTO.Builder> {
 
     @JsonProperty("name")
     public abstract String name();
@@ -40,7 +40,7 @@ public abstract class ScopedDTO extends ScopedEntity {
     }
 
     @AutoValue.Builder
-    public abstract static class Builder extends AbstractBuilder<Builder> {
+    public abstract static class Builder implements ScopedEntity.Builder<Builder> {
         @Override
         @Id
         @ObjectId

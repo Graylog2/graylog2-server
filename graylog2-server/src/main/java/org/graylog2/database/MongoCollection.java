@@ -467,6 +467,21 @@ public interface MongoCollection<TDocument extends MongoEntity> {
     TDocument findOneAndUpdate(@Nonnull Bson filter, @Nonnull Bson update, @Nonnull FindOneAndUpdateOptions options);
 
     /**
+     * Atomically find a document and update it.
+     *
+     * <p>Note: Supports retryable writes on MongoDB server versions 3.6 or higher when the retryWrites setting is enabled.</p>
+     *
+     * @param filter  a document describing the query filter, which may not be null.
+     * @param update  a pipeline describing the update, which may not be null.
+     * @param options the options to apply to the operation
+     * @return the document that was updated.  Depending on the value of the {@code returnOriginal} property, this will either be the
+     * document as it was before the update or as it is after the update.  If no documents matched the query filter, then null will be
+     * returned
+     */
+    @Nullable
+    TDocument findOneAndUpdate(@Nonnull Bson filter, @Nonnull List<? extends Bson> update, @Nonnull FindOneAndUpdateOptions options);
+
+    /**
      * Drops this collection from the Database.
      */
     void drop();

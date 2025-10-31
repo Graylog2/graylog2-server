@@ -303,7 +303,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
         final MongoCollection<Document> tokenColl = mongoCollection(AccessTokenImpl.class);
         final AggregateIterable<Document> aggregateIt = tokenColl.aggregate(pipeline);
-        try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
+        try (final var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
             return stream.map(d -> {
                 final Optional<Document> userDetails = Optional.ofNullable(d.get(join, Document.class));
                         return new ExpiredToken(
@@ -335,7 +335,7 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
                         include(AccessTokenImpl.USERNAME)
                 ))
         ));
-        try (var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
+        try (final var stream = StreamSupport.stream(aggregateIt.spliterator(), false)) {
             return stream.map(d ->
                             new ExpiredToken(
                                     d.getObjectId(AccessTokenImpl.ID_FIELD).toString(),

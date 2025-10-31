@@ -26,14 +26,14 @@ describe('formDataAdapter', () => {
     let awsAccessSecret = 'secret';
 
     if (formData.awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret) {
-      awsAccessKey = 'awsCloudWatchAwsKey';
-      awsAccessSecret = 'awsCloudWatchAwsSecret';
+      awsAccessKey = 'awsAccessKey';
+      awsAccessSecret = 'awsSecretKey';
     }
 
     // Mapping keys taken from /api/system/inputs/types/org.graylog.integrations.aws.inputs.AWSInput
     const mappings = {
       aws_access_key: awsAccessKey,
-      aws_assume_role_arn: 'awsCloudWatchAssumeARN',
+      aws_assume_role_arn: 'awsAssumeRoleARN',
       aws_flow_log_prefix: 'awsCloudWatchAddFlowLogPrefix',
       aws_message_type: 'awsCloudWatchKinesisInputType',
       aws_region: 'awsCloudWatchAwsRegion',
@@ -45,6 +45,7 @@ describe('formDataAdapter', () => {
       kinesis_record_batch_size: 'awsCloudWatchBatchSize',
       kinesis_stream_name: 'awsCloudWatchKinesisStream',
       throttling_allowed: 'awsCloudWatchThrottleEnabled',
+      override_source: 'overrideSource',
     };
 
     const request = toGenericInputCreateRequest(formData);
@@ -71,14 +72,14 @@ describe('formDataAdapter', () => {
     let awsAccessSecret = 'secret';
 
     if (formData.awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret) {
-      awsAccessKey = 'awsCloudWatchAwsKey';
-      awsAccessSecret = 'awsCloudWatchAwsSecret';
+      awsAccessKey = 'awsAccessKey';
+      awsAccessSecret = 'awsSecretKey';
     }
 
     const mappings = {
       aws_access_key_id: awsAccessKey,
       aws_secret_access_key: awsAccessSecret,
-      assume_role_arn: 'awsCloudWatchAssumeARN',
+      assume_role_arn: 'awsAssumeRoleARN',
       cloudwatch_endpoint: 'awsEndpointCloudWatch',
       dynamodb_endpoint: 'awsEndpointDynamoDB',
       iam_endpoint: 'awsEndpointIAM',
@@ -106,22 +107,24 @@ describe('formDataAdapter', () => {
   };
 
   it('adapts formData into an AWS request with key & secret', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
-      awsCloudWatchAssumeARN: { value: '' },
-      awsCloudWatchAwsKey: { value: 'mykey' },
+      awsAssumeRoleARN: { value: '' },
+      awsAccessKey: { value: 'mykey' },
       awsEndpointCloudWatch: { value: undefined },
       awsEndpointDynamoDB: { value: undefined },
       awsEndpointIAM: { value: undefined },
       awsEndpointKinesis: { value: undefined },
-      awsCloudWatchAwsSecret: { value: 'mysecret' },
+      awsSecretKey: { value: 'mysecret' },
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with automatic auth', () => {
-    testAWSRequest({
+    const request = testAWSRequest({
       awsAuthenticationType: { value: AWS_AUTH_TYPES.automatic },
-      awsCloudWatchAssumeARN: { value: '' },
+      awsAssumeRoleARN: { value: '' },
       key: 'mykey',
       awsEndpointCloudWatch: { value: undefined },
       awsEndpointDynamoDB: { value: undefined },
@@ -129,6 +132,8 @@ describe('formDataAdapter', () => {
       awsEndpointKinesis: { value: undefined },
       secret: 'mysecret',
     });
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an AWS request with additional options', () => {
@@ -140,13 +145,13 @@ describe('formDataAdapter', () => {
     const request = testAWSRequest(
       {
         awsAuthenticationType: { value: AWS_AUTH_TYPES.keysecret },
-        awsCloudWatchAssumeARN: { value: '' },
-        awsCloudWatchAwsKey: { value: 'mykey' },
+        awsAssumeRoleARN: { value: '' },
+        awsAccessKey: { value: 'mykey' },
         awsEndpointCloudWatch: { value: undefined },
         awsEndpointDynamoDB: { value: undefined },
         awsEndpointIAM: { value: undefined },
         awsEndpointKinesis: { value: undefined },
-        awsCloudWatchAwsSecret: { value: 'mysecret' },
+        awsSecretKey: { value: 'mysecret' },
       },
       options,
     );
@@ -155,10 +160,14 @@ describe('formDataAdapter', () => {
   });
 
   it('adapts formData into an InputCreateRequest with key & secret', () => {
-    testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithKeySecretAuth);
+
+    expect(request).toBeDefined();
   });
 
   it('adapts formData into an InputCreateRequest with automatic auth', () => {
-    testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+    const request = testGenericInputCreateRequest(exampleFormDataWithAutomaticAuth);
+
+    expect(request).toBeDefined();
   });
 });

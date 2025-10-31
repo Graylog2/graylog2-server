@@ -26,6 +26,7 @@ import type { Stream } from 'logic/streams/types';
 import type { ColumnRenderer } from 'components/common/EntityDataTable/types';
 import type { StepType } from 'components/common/Wizard';
 import type { InputSetupWizardStep } from 'components/inputs/InputSetupWizard';
+import type { TelemetryEventType } from 'logic/telemetry/TelemetryContext';
 
 interface PluginRoute {
   path: string;
@@ -37,7 +38,7 @@ interface PluginRoute {
 
 interface PluginNavigationDropdownItem {
   description: string;
-  path: string;
+  path: QualifiedUrl<string>;
   permissions?: string | Array<string>;
   requiredFeatureFlag?: string;
 }
@@ -57,7 +58,7 @@ type PluginNavigation = {
   BadgeComponent?: React.ComponentType<{ text: string }>;
   position?: { last: true } | { after: string } | undefined;
   permissions?: string | Array<string>;
-  useIsValidLicense?: () => boolean;
+  useCondition?: () => boolean;
 } & (PluginNavigationLink | PluginNavigationDropdown);
 
 interface PluginNavigationItems {
@@ -146,7 +147,12 @@ interface LogoutHook {
 
 type DataTiering = {
   type: string;
-  TiersConfigurationFields: React.ComponentType<{ valuesPrefix?: string }>;
+  TiersConfigurationFields: React.ComponentType<{
+    valuesPrefix?: string;
+    hiddenFields?: string[];
+    immutableFields?: string[];
+    ignoreFieldRestrictions?: boolean;
+  }>;
   TiersSummary: React.ComponentType<{
     config: DataTieringConfig;
   }>;
@@ -246,14 +252,57 @@ interface PluginDataLake {
   DataLakeStreamDeleteWarning: React.ComponentType;
 }
 
+interface PageNavigation {
+  description: string;
+  perspective?: string;
+  children: Array<{
+    description: string;
+    position?: PluginNavigation['position'];
+    permissions?: string | Array<string>;
+    useCondition?: () => boolean;
+    requiredFeatureFlag?: string;
+    path: QualifiedUrl<string>;
+    exactPathMatch?: boolean;
+  }>;
+}
+
+type CreatorTelemetryEvent = {
+  type: TelemetryEventType;
+  section: string;
+  actionValue: string;
+};
+interface EntityCreator {
+  id: string;
+  title: string;
+  path: QualifiedUrl<string>;
+  permissions?: string | Array<string>;
+  telemetryEvent?: CreatorTelemetryEvent;
+}
+
+type HelpMenuItem = {
+  description: string;
+  permissions?: string | Array<string>;
+} & ({ externalLink?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
+
+type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
+
+type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
+    /**
+     * List of nav items. Define permissions if the item should only be displayed for users with specific permissions.
+     * By default, an item is active if the current URL starts with the item URL.
+     * If you only want to display an item as active only when its path matches exactly, set `exactPathMatch` to true.
+     */
+    pageNavigation?: Array<PageNavigation>;
     dataLake?: Array<PluginDataLake>;
     dataTiering?: Array<DataTiering>;
     defaultNavigation?: Array<PluginNavigation>;
     navigationItems?: Array<PluginNavigationItems>;
     globalNotifications?: Array<GlobalNotification>;
+    helpMenu?: Array<HelpMenuItem>;
     fieldValueProviders?: Array<FieldValueProvider>;
     license?: Array<License>;
     inputSetupWizard?: Array<InputSetupWizard>;
@@ -265,7 +314,6 @@ declare module 'graylog-web-plugin/plugin' {
     // access to certain contexts like PerspectivesContext
     pageContextProviders?: Array<React.ComponentType<React.PropsWithChildrean<{}>>>;
     routes?: Array<PluginRoute>;
-    entityRoutes?: Array<(id: string, type: string) => string>;
     pages?: PluginPages;
     pageFooter?: Array<PluginPageFooter>;
     cloud?: Array<PluginCloud>;
@@ -273,6 +321,9 @@ declare module 'graylog-web-plugin/plugin' {
     inputConfiguration?: Array<InputConfiguration>;
     loginProviderType?: Array<ProviderType>;
     'hooks.logout'?: Array<LogoutHook>;
+    entityRoutes?: Array<RouteGenerator>;
+    entityTypeRoute?: Array<EntityTypeRouteGenerator>;
+    entityCreators?: Array<EntityCreator>;
   }
   interface PluginMetadata {
     name?: string;
@@ -286,12 +337,14 @@ declare module 'graylog-web-plugin/plugin' {
   }
 
   interface PluginManifest extends PluginRegistration {
+    // eslint-disable-next-line @typescript-eslint/no-misused-new
     new (json: {}, exports: PluginExports): PluginManifest;
   }
 
+  type WrapWithArray<T> = T extends Array<any> ? T : Array<T>;
   interface PluginStore {
     register: (manifest: PluginRegistration) => void;
-    exports: <T extends keyof PluginExports>(key: T) => PluginExports[T];
+    exports: <T extends keyof PluginExports>(key: T) => WrapWithArray<PluginExports[T]>;
     unregister: (manifest: PluginRegistration) => void;
     get: () => Array<PluginRegistration>;
   }

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 import { Alert, Button, Modal } from 'components/bootstrap';
 import { ModalSubmit } from 'components/common';
@@ -42,10 +42,10 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
     setError(false);
   };
 
-  const handleError = () => {
+  const handleError = useCallback(() => {
     setSuccess(false);
     setError(true);
-  };
+  }, []);
 
   return (
     <Modal show onHide={() => {}}>
@@ -78,7 +78,7 @@ const SetupModal = ({ onSubmit, onCancel, groupName, streamName }: SetupModalPro
 
       <Modal.Footer>
         {agreed ? (
-          <Button bsStyle="success" onClick={success ? onSubmit : onCancel} type="button" disabled={!error && !success}>
+          <Button bsStyle="primary" onClick={success ? onSubmit : onCancel} type="button" disabled={!error && !success}>
             {buttonText}
           </Button>
         ) : (

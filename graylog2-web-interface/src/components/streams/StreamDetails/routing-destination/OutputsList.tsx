@@ -45,7 +45,9 @@ const OutputsList = ({ outputs, streamId, getTypeDefinition, isLoadingOutputType
     });
 
     OutputsStore.update(output, data, (result) => {
-      queryClient.invalidateQueries(['outputs', 'overview']);
+      queryClient.invalidateQueries({
+        queryKey: ['outputs', 'overview'],
+      });
 
       return result;
     });

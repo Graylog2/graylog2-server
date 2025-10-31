@@ -81,10 +81,10 @@ const UserEdit = ({ user }: Props) => {
         </div>
         <div>
           <PermissionsUpdateInfo />
-          <IfPermitted permissions="users:rolesedit">
+          <IfPermitted permissions={`users:rolesedit:${user.username}`}>
             <RolesSection user={user} onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
           </IfPermitted>
-          <IfPermitted permissions="teams:edit">
+          <IfPermitted permissions="team:edit">
             <TeamsSection user={user} />
           </IfPermitted>
           {currentUser.id === user.id && (

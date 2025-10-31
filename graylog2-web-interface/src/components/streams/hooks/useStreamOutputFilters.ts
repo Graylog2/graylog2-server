@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import * as Immutable from 'immutable';
 
 import PaginationURL from 'util/PaginationURL';
@@ -77,18 +77,17 @@ const useStreamOutputFilters = (
   isLoading: boolean;
   isSuccess: boolean;
 } => {
-  const { data, refetch, isLoading, isSuccess } = useQuery(
-    keyFn(streamId, destinationType, pagination),
-    () =>
+  const { data, refetch, isLoading, isSuccess } = useQuery({
+    queryKey: keyFn(streamId, destinationType, pagination),
+
+    queryFn: () =>
       defaultOnError(
         fetchStreamOutputFilters(streamId, { ...pagination, query: `destination_type:${destinationType}` }),
         'Loading stream output filters failed with status',
         'Could not load stream output filters',
       ),
-    {
-      keepPreviousData: true,
-    },
-  );
+    placeholderData: keepPreviousData,
+  });
 
   return {
     data,

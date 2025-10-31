@@ -35,6 +35,9 @@ import org.graylog.events.processor.modifier.EventModifier;
 import org.graylog.events.processor.storage.EventStorageHandler;
 import org.graylog.grn.GRNDescriptorProvider;
 import org.graylog.grn.GRNType;
+import org.graylog.grn.GRNTypeProvider;
+import org.graylog.mcp.server.ResourceProvider;
+import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.export.ExportFormat;
 import org.graylog.scheduler.Job;
 import org.graylog.scheduler.JobDefinitionConfig;
@@ -44,6 +47,9 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.scheduler.rest.JobResourceHandler;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
+import org.graylog.security.entities.EntityRegistrationHandler;
+import org.graylog.security.shares.PluggableEntityHandler;
+import org.graylog.security.shares.SyncedEntitiesResolver;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
@@ -66,6 +72,7 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.outputs.FilteredMessageOutput;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.plugin.quickjump.QuickJumpProvider;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
@@ -363,6 +370,26 @@ public abstract class PluginModule extends Graylog2Module {
         mapBinder.addBinding(type).to(descriptorProvider);
     }
 
+    protected void addGRNTypeProvider(Class<? extends GRNTypeProvider> grnTypeProvider) {
+        final Multibinder<GRNTypeProvider> grnTypeProviderBinder = Multibinder.newSetBinder(binder(), GRNTypeProvider.class);
+        grnTypeProviderBinder.addBinding().to(grnTypeProvider);
+    }
+
+    protected void addEntityRegistrationHandler(Class<? extends EntityRegistrationHandler> entityRegistrationHandlerClass) {
+        final var handlerBinder = Multibinder.newSetBinder(binder(), EntityRegistrationHandler.class);
+        handlerBinder.addBinding().to(entityRegistrationHandlerClass);
+    }
+
+    protected void addSyncedEntitiesResolver(Class<? extends SyncedEntitiesResolver> resolverClass) {
+        final Multibinder<SyncedEntitiesResolver> syncedEntitiesResolverBinder = Multibinder.newSetBinder(binder(), SyncedEntitiesResolver.class);
+        syncedEntitiesResolverBinder.addBinding().to(resolverClass);
+    }
+
+    protected void addPluggableEntityHandler(Class<? extends PluggableEntityHandler> handlerClass) {
+        final Multibinder<PluggableEntityHandler> binder = Multibinder.newSetBinder(binder(), PluggableEntityHandler.class);
+        binder.addBinding().to(handlerClass);
+    }
+
     protected MapBinder<String, AuthServiceBackend.Factory<? extends AuthServiceBackend>> authServiceBackendBinder() {
         return MapBinder.newMapBinder(
                 binder(),
@@ -476,5 +503,41 @@ public abstract class PluginModule extends Graylog2Module {
 
             dbEntitiesBinder().addBinding().toInstance(entitiesClass);
         }
+    }
+
+    protected MapBinder<String, Tool<?, ?>> mcpToolBinder() {
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<Tool<?, ?>>() {});
+    }
+
+    protected void addMcpTool(String name, Class<? extends Tool<?, ?>> toolClass) {
+        mcpToolBinder().addBinding(name).to(toolClass);
+    }
+
+    protected MapBinder<GRNType, ResourceProvider> mcpResourceBinder() {
+        return MapBinder.newMapBinder(binder(), GRNType.class, ResourceProvider.class);
+    }
+
+    protected void addMcpResource(GRNType grnType, Class<? extends ResourceProvider> resourceClass) {
+        mcpResourceBinder().addBinding(grnType).to(resourceClass);
+    }
+
+    protected Multibinder<com.github.victools.jsonschema.generator.Module> schemaModuleBinder() {
+        return Multibinder.newSetBinder(
+                binder(),
+                com.github.victools.jsonschema.generator.Module.class,
+                org.graylog.mcp.server.McpSchemaModule.class
+        );
+    }
+
+    protected void addSchemaModule(Class<? extends com.github.victools.jsonschema.generator.Module> moduleClass) {
+        schemaModuleBinder().addBinding().to(moduleClass);
+    }
+
+    protected Multibinder<QuickJumpProvider> quickJumpProviderBinder() {
+        return Multibinder.newSetBinder(binder(), QuickJumpProvider.class);
+    }
+
+    protected void addQuickJumpProvider(QuickJumpProvider provider) {
+        quickJumpProviderBinder().addBinding().toInstance(provider);
     }
 }

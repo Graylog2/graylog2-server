@@ -20,13 +20,11 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = JobTriggerLock.Builder.class)
 public abstract class JobTriggerLock {
     static final String FIELD_OWNER = "owner";

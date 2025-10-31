@@ -16,5 +16,8 @@
  */
 package org.graylog.security.certutil.csr;
 
-public record ClientCert(String principal, String role, String caCertificate, String privateKey, String certificate) {
+import java.util.List;
+
+public record ClientCert(String principal, List<String> roles, String caCertificate, String privateKey,
+                         String certificate) {
 }

@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 
 import type { Pagination } from 'stores/PaginationTypes';
 import mockedPermissions from 'logic/permissions/mocked';
 import type { PaginatedEntityShares } from 'actions/permissions/EntityShareActions';
 import { DataTable, PaginatedList, Spinner, NoSearchResult } from 'components/common';
+import usePluggableSharedEntityTableElements from 'hooks/usePluggableSharedEntityTableElements';
 
 import SharedEntitiesFilter from './SharedEntitiesFilter';
 import SharedEntitiesOverviewItem from './SharedEntitiesOverviewItem';
@@ -66,12 +67,16 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
   const [pagination, setPagination] = useState<Pagination>(DEFAULT_PAGINATION);
   const { list, context, pagination: { total } = { total: 0 } } = paginatedEntityShares || {};
   const { page, query, additionalQueries } = pagination;
+  const { pluggableAttributes } = usePluggableSharedEntityTableElements();
 
   useEffect(
     () => _loadSharedEntities(pagination, searchPaginated, setPaginatedEntityShares, setLoading),
     [pagination, searchPaginated, setLoading],
   );
-
+  const tableHeaders = useMemo(
+    () => [...TABLE_HEADERS, ...(pluggableAttributes && pluggableAttributes.attributeNames)],
+    [pluggableAttributes],
+  );
   const _handleSearch = (newQuery: string) => setPagination({ ...pagination, query: newQuery });
   const _handleFilter = (param: string, value: string) =>
     setPagination({ ...pagination, query, additionalQueries: { ...additionalQueries, [param]: value } });
@@ -96,7 +101,7 @@ const SharedEntitiesOverview = ({ entityType, searchPaginated, setLoading }: Pro
           dataRowFormatter={(sharedEntity) => _sharedEntityOverviewItem(sharedEntity, context)}
           filterKeys={[]}
           noDataText={<NoSearchResult>No shared entities have been found.</NoSearchResult>}
-          headers={TABLE_HEADERS}
+          headers={tableHeaders}
           id="shared-entities"
           rowClassName="no-bm"
           rows={list.toJS()}

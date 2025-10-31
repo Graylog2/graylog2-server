@@ -26,6 +26,18 @@ type MaskedInputProps = React.ComponentProps<typeof ValidatedInput> & {
   className?: string;
 };
 
+const LabelWrapper = styled.span`
+  display: flex;
+  align-items: center;
+`;
+
+const ToggleMask = styled.button`
+  border: 0;
+  background: none;
+  padding: 0;
+  margin: 0 0 0 12px;
+`;
+
 const MaskedInput = ({ className = undefined, label, ...props }: MaskedInputProps) => {
   const [masked, setMasked] = useState(true);
   const toggleLabel = (
@@ -41,17 +53,5 @@ const MaskedInput = ({ className = undefined, label, ...props }: MaskedInputProp
     <ValidatedInput {...props} type={masked ? 'password' : 'text'} label={toggleLabel} formGroupClassName={className} />
   );
 };
-
-const LabelWrapper = styled.span`
-  display: flex;
-  align-items: center;
-`;
-
-const ToggleMask = styled.button`
-  border: 0;
-  background: none;
-  padding: 0;
-  margin: 0 0 0 12px;
-`;
 
 export default MaskedInput;

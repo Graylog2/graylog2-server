@@ -57,7 +57,7 @@ const StyledMenuDropdown = styled(Menu.Dropdown)`
 
 const DropdownIcon = styled(Icon)(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   `,
 );
 

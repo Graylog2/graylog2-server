@@ -29,7 +29,7 @@ const menuItemStyles = css(
       > li > a {
         padding: 3px 10px;
         display: flex;
-        color: ${theme.colors.global.textDefault};
+        color: ${theme.colors.text.primary};
 
         &:hover,
         &:focus {

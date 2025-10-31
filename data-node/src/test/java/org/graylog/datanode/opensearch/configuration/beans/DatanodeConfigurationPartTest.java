@@ -19,9 +19,12 @@ package org.graylog.datanode.opensearch.configuration.beans;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
+import org.graylog.datanode.process.configuration.files.TextConfigFile;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.Collections;
+import java.util.List;
 
 class DatanodeConfigurationPartTest {
 
@@ -37,6 +40,8 @@ class DatanodeConfigurationPartTest {
                 .systemProperty("java.home", "/jdk")
                 .withWarning("Unsupported property foo")
                 .withWarning("Unsupported property bar")
+                .withConfigFile(new TextConfigFile(Path.of("bar.txt"), "bar"))
+                .withConfigFiles(List.of(new TextConfigFile(Path.of("foo.txt"), "foo")))
                 .build();
 
         Assertions.assertThat(configurationPart.nodeRoles())
@@ -60,5 +65,10 @@ class DatanodeConfigurationPartTest {
                 .hasSize(2)
                 .contains("Unsupported property foo")
                 .contains("Unsupported property bar");
+
+        Assertions.assertThat(configurationPart.configFiles())
+                .hasSize(2)
+                .extracting(cf -> cf.relativePath().getFileName().toString())
+                .contains("bar.txt", "foo.txt");
     }
 }

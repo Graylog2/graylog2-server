@@ -52,7 +52,7 @@ jest.mock('hooks/useSearchConfiguration');
 
 const DashboardSearchBar = () => (
   <TestStoreProvider>
-    <OriginalDashboardSearchBar />
+    <OriginalDashboardSearchBar scrollContainer={{ current: null }} />
   </TestStoreProvider>
 );
 

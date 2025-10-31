@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { useEffect } from 'react';
 
 import { Spinner } from 'components/common';
@@ -26,7 +26,7 @@ import LegacyNotificationForm from './LegacyNotificationForm';
 
 type LegacyNotificationFormContainerProps = React.ComponentProps<EventNotificationTypes['formComponent']>;
 
-const LegacyNotificationFormContainer = (props: LegacyNotificationFormContainerProps) => {
+const LegacyNotificationFormContainer = ({ ...props }: LegacyNotificationFormContainerProps) => {
   useEffect(() => {
     EventNotificationsActions.listAllLegacyTypes();
   }, []);

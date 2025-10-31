@@ -23,7 +23,7 @@ const HelpBlock = styled(BootstrapHelpBlock)(
     display: block;
     margin-top: 5px;
     margin-bottom: 10px;
-    color: ${theme.colors.gray[50]};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

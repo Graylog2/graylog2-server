@@ -63,9 +63,10 @@ public abstract class StreamCategoryFilter implements Filter {
 
     public Filter toStreamFilter(Function<Collection<String>, Stream<String>> categoryMappingFunction,
                                  StreamPermissions streamPermissions) {
-        String[] mappedStreamIds = categoryMappingFunction.apply(List.of(category()))
-                .filter(streamPermissions::canReadStream)
-                .toArray(String[]::new);
+        String[] mappedStreamIds;
+        try (var stream = categoryMappingFunction.apply(List.of(category()))) {
+            mappedStreamIds = stream.filter(streamPermissions::canReadStream).toArray(String[]::new);
+        }
         // If the streamPermissions do not allow for any of the streams to be read, nullify this filter.
         if (mappedStreamIds.length == 0) {
             return null;

@@ -46,13 +46,13 @@ import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog.plugins.pipelineprocessor.db.PipelineDao.FIELD_SOURCE;
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 public class MongoDbPipelineService implements PipelineService {
-    private static final RateLimitedLog log = getRateLimitedLog(MongoDbPipelineService.class);
+    private static final RateLimitedLog log = createDefaultRateLimitedLog(MongoDbPipelineService.class);
 
     public static final String COLLECTION = "pipeline_processor_pipelines";
 
@@ -149,7 +149,9 @@ public class MongoDbPipelineService implements PipelineService {
 
     @Override
     public Set<PipelineDao> loadByIds(Set<String> pipelineIds) {
-        return MongoUtils.stream(collection.find(stringIdsIn(pipelineIds))).collect(Collectors.toSet());
+        try (final var stream = MongoUtils.stream(collection.find(stringIdsIn(pipelineIds)))) {
+            return stream.collect(Collectors.toSet());
+        }
     }
 
     public long count(Bson filter) {

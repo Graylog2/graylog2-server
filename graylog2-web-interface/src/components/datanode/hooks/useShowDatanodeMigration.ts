@@ -33,7 +33,9 @@ const useShowDatanodeMigration = (): {
   const { permissions } = useCurrentUser();
   const canStartDataNode = React.useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
 
-  const { data: isDatanodeConfiguredAndUsed } = useQuery(['show_datanode_migration'], fetchShowDatanodeMigration, {
+  const { data: isDatanodeConfiguredAndUsed } = useQuery({
+    queryKey: ['show_datanode_migration'],
+    queryFn: fetchShowDatanodeMigration,
     enabled: canStartDataNode,
   });
 

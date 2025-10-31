@@ -18,7 +18,7 @@ import styled, { css } from 'styled-components';
 
 const Title = styled.p(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     margin-bottom: 15px;
   `,
 );

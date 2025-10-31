@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import * as Immutable from 'immutable';
 
 import { Alert, Col, DropdownButton, MenuItem, Row } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import MessageShow from 'components/search/MessageShow';
 import NumberUtils from 'util/NumberUtils';
+import type { Stream } from 'logic/streams/types';
 
 import SimulationChanges from './SimulationChanges';
 import SimulationPreview from './SimulationPreview';
@@ -33,7 +35,7 @@ const VIEW_OPTIONS = {
 };
 
 type SimulationResultsProps = {
-  stream: any;
+  stream: Stream;
   originalMessage?: any;
   simulationResults?: any;
   isLoading?: boolean;
@@ -121,9 +123,9 @@ class SimulationResults extends React.Component<
       return null;
     }
 
-    const streams = {
+    const streams = Immutable.Map({
       [stream.id]: stream,
-    };
+    });
 
     // eslint-disable-next-line no-nested-ternary
     const originalMessagePreview = isLoading ? (

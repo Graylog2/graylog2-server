@@ -22,10 +22,8 @@ import type { LookupTableCache, validationErrorsType } from 'src/logic/lookup-ta
 
 import { Col, Row } from 'components/bootstrap';
 import { FormikFormGroup, FormSubmit } from 'components/common';
-import { LookupTableCachesActions } from 'stores/lookup-tables/LookupTableCachesStore';
+import { useCreateCache, useUpdateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useScopePermissions from 'hooks/useScopePermissions';
-import Routes from 'routing/Routes';
-import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -55,8 +53,9 @@ const INIT_CACHE: LookupTableCache = {
 
 type Props = {
   type: string;
-  saved: () => void;
+  saved: (response: any) => void;
   title: string;
+  onCancel: () => void;
   create?: boolean;
   cache?: LookupTableCache;
   validate?: (arg: LookupTableCache) => void;
@@ -67,6 +66,7 @@ const CacheForm = ({
   type,
   saved,
   title,
+  onCancel,
   create = true,
   cache = INIT_CACHE,
   validate = null,
@@ -75,6 +75,8 @@ const CacheForm = ({
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(create);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
+  const { createCache, creatingCache } = useCreateCache();
+  const { updateCache, updatingCache } = useUpdateCache();
   const sendTelemetry = useSendTelemetry();
 
   const plugin = React.useMemo(() => PluginStore.exports('lookupTableCaches').find((p) => p.type === type), [type]);
@@ -122,9 +124,9 @@ const CacheForm = ({
   };
 
   const handleSubmit = (values: LookupTableCache) => {
-    const promise = create ? LookupTableCachesActions.create(values) : LookupTableCachesActions.update(values);
+    const promise = create ? createCache(values) : updateCache(values);
 
-    return promise.then(() => {
+    return promise.then((response) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CACHE_CREATED' : 'CACHE_UPDATED'], {
         app_pathname: 'lut',
         app_section: 'lut_cache',
@@ -133,29 +135,26 @@ const CacheForm = ({
         },
       });
 
-      saved();
+      saved(response);
     });
   };
 
-  const history = useHistory();
-  const onCancel = () => history.push(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   const updatable = !create && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   return (
     <>
       <Title title={title} typeName={pluginName} create={create} />
-      <Row>
-        <Col lg={6} style={{ marginTop: 10 }}>
-          <Formik
-            initialValues={{ ...INIT_CACHE, ...cache }}
-            validate={handleValidation}
-            validateOnBlur
-            validateOnChange={false}
-            validateOnMount={!create}
-            onSubmit={handleSubmit}
-            enableReinitialize>
-            {({ errors, values, setValues, isSubmitting }) => (
-              <Form className="form form-horizontal">
+      <Formik
+        initialValues={{ ...INIT_CACHE, ...cache }}
+        validate={handleValidation}
+        validateOnChange
+        validateOnMount={!create}
+        onSubmit={handleSubmit}
+        enableReinitialize>
+        {({ errors, values, setValues, isSubmitting }) => (
+          <Form className="form form-horizontal">
+            <Row>
+              <Col lg={6} style={{ marginTop: 10 }}>
                 <fieldset>
                   <FormikFormGroup
                     type="text"
@@ -193,38 +192,36 @@ const CacheForm = ({
                   />
                 </fieldset>
                 {configFieldSet}
-                <fieldset>
-                  <Row>
-                    <Col mdOffset={3} sm={12}>
-                      {create && (
-                        <FormSubmit
-                          submitButtonText="Create cache"
-                          submitLoadingText="Creating cache..."
-                          isSubmitting={isSubmitting}
-                          isAsyncSubmit
-                          onCancel={onCancel}
-                        />
-                      )}
-                      {updatable && (
-                        <FormSubmit
-                          submitButtonText="Update cache"
-                          submitLoadingText="Updating cache..."
-                          isAsyncSubmit
-                          isSubmitting={isSubmitting}
-                          onCancel={onCancel}
-                        />
-                      )}
-                    </Col>
-                  </Row>
-                </fieldset>
-              </Form>
-            )}
-          </Formik>
-        </Col>
-        <Col lg={6} style={{ marginTop: 10 }}>
-          {DocComponent ? <DocComponent /> : null}
-        </Col>
-      </Row>
+              </Col>
+              <Col lg={6} style={{ marginTop: 10 }}>
+                {DocComponent ? <DocComponent /> : null}
+              </Col>
+            </Row>
+            <Row style={{ marginBottom: 20 }}>
+              <Col md={3} mdOffset={9}>
+                {create && (
+                  <FormSubmit
+                    submitButtonText="Create cache"
+                    submitLoadingText="Creating cache..."
+                    isSubmitting={isSubmitting || creatingCache}
+                    isAsyncSubmit
+                    onCancel={onCancel}
+                  />
+                )}
+                {updatable && (
+                  <FormSubmit
+                    submitButtonText="Update cache"
+                    submitLoadingText="Updating cache..."
+                    isAsyncSubmit
+                    isSubmitting={isSubmitting || updatingCache}
+                    onCancel={onCancel}
+                  />
+                )}
+              </Col>
+            </Row>
+          </Form>
+        )}
+      </Formik>
     </>
   );
 };

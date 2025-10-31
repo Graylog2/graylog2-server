@@ -23,7 +23,7 @@ import com.google.common.eventbus.EventBus;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
-import org.graylog2.streams.StreamImpl;
+import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Test;
@@ -137,6 +137,6 @@ public class StreamCacheServiceTest {
     }
 
     private Stream createStream(ObjectId id, Map<String, Object> fields) {
-        return new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), null);
+        return new StreamMock(id, fields, Collections.emptyList(), Collections.emptySet(), null);
     }
 }

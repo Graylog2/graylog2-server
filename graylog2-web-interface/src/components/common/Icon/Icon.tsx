@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import React, { forwardRef } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 
 import type { SizeProp, RotateProp, IconName, FlipProp, IconType } from './types';
@@ -41,14 +41,17 @@ const spinAnimation = keyframes`
   }
 `;
 
+type ColorVariants = 'success' | 'warning';
+
 const StyledSpan = styled.span<{
   $size: string;
   $spin: boolean;
   $rotation: RotateProp;
   $flip: FlipProp;
   $fill: boolean;
+  $bsStyle: ColorVariants | undefined;
 }>(
-  ({ $size, $spin, $rotation, $flip, $fill }) => css`
+  ({ $bsStyle, $size, $spin, $rotation, $flip, $fill, theme }) => css`
     font-variation-settings:
       'opsz' 48,
       'wght' 700 ${$fill ? ", 'FILL' 1" : ''};
@@ -61,10 +64,12 @@ const StyledSpan = styled.span<{
         `
       : 'none'};
     vertical-align: middle;
+    color: ${$bsStyle ? theme.colors.button[$bsStyle].background : 'inherit'};
   `,
 );
 
 type Props = {
+  bsStyle?: ColorVariants; // if this prop is not defined, the inherited font color will be used.
   className?: string;
   'data-testid'?: string;
   /** Name of Material Symbol icon */
@@ -93,23 +98,27 @@ type Props = {
  * Uses Material Symbols: https://fonts.google.com/icons
  * Have a look at the `BrandIcon` component for brand icons.
  */
-const Icon = ({
-  name,
-  type = 'solid',
-  size = undefined,
-  className = undefined,
-  rotation = 0,
-  spin = false,
-  flip = undefined,
-  style = undefined,
-  'data-testid': testId = undefined,
-  onClick = undefined,
-  onMouseEnter = undefined,
-  onMouseLeave = undefined,
-  onFocus = undefined,
-  tabIndex = undefined,
-  title = undefined,
-}: Props) => (
+const Icon = (
+  {
+    bsStyle = undefined,
+    name,
+    type = 'solid',
+    size = undefined,
+    className = undefined,
+    rotation = 0,
+    spin = false,
+    flip = undefined,
+    style = undefined,
+    'data-testid': testId = undefined,
+    onClick = undefined,
+    onMouseEnter = undefined,
+    onMouseLeave = undefined,
+    onFocus = undefined,
+    tabIndex = undefined,
+    title = undefined,
+  }: Props,
+  ref: React.ForwardedRef<HTMLSpanElement>,
+) => (
   <StyledSpan
     className={`material-symbols-rounded ${className ?? ''}`}
     data-testid={testId}
@@ -120,6 +129,8 @@ const Icon = ({
     onMouseEnter={onMouseEnter}
     onMouseLeave={onMouseLeave}
     tabIndex={tabIndex}
+    ref={ref}
+    $bsStyle={bsStyle}
     $rotation={rotation}
     $flip={flip}
     $size={size}
@@ -129,4 +140,4 @@ const Icon = ({
   </StyledSpan>
 );
 
-export default Icon;
+export default forwardRef(Icon);

@@ -1,0 +1,5 @@
+type="a"
+message="Update system generated routing when corresponding stream is renamed or deleted."
+
+pulls = ["22766"]
+issues = ["22131"]

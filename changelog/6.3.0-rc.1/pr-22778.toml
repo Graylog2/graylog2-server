@@ -1,0 +1,5 @@
+type = "f"
+message = "Turn permission error into validation error for empty streams in event definition."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10869"]
+pulls = ["22778"]

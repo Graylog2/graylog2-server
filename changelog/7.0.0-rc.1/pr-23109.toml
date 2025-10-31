@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fixed issue for CloudTrail input which overwrote userIdentity fields for temporary credentials"
+
+issues = ["22086"]
+pulls = ["23109"]

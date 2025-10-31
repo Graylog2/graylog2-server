@@ -50,6 +50,7 @@ const Routes = {
   NOTFOUND: '/notfound',
   SEARCH: '/search',
   STREAMS: '/streams',
+  STREAM_NEW: '/streams/new',
   ALERTS: {
     LIST: '/alerts',
     replay_search: (alertId: string) => `/alerts/${alertId}/replay-search`,
@@ -69,7 +70,7 @@ const Routes = {
     },
   },
   SECURITY: {
-    OVERVIEW: `${SECURITY_PATH}/overview`,
+    OVERVIEW: `${SECURITY_PATH}`,
     USER_ACTIVITY: `${SECURITY_PATH}/user-activity`,
     HOST_ACTIVITY: `${SECURITY_PATH}/host-activity`,
     NETWORK_ACTIVITY: `${SECURITY_PATH}/network-activity`,
@@ -78,6 +79,7 @@ const Routes = {
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
+  DASHBOARD_NEW: '/dashboards/new',
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
@@ -194,6 +196,7 @@ const Routes = {
       },
     },
     PIPELINES: {
+      CREATE: '/system/pipelines/new',
       OVERVIEW: '/system/pipelines',
       PIPELINE: (pipelineId: string) => `/system/pipelines/${pipelineId}`,
       RULES: '/system/pipelines/rules',
@@ -301,8 +304,6 @@ const Routes = {
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
 
   show_saved_search: (searchId: string) => `/search/${searchId}`,
-
-  node: (nodeId: string) => `/system/nodes/${nodeId}`,
 
   node_inputs: (nodeId: string) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
   global_input_extractors: (inputId: string) => `/system/inputs/${inputId}/extractors`,

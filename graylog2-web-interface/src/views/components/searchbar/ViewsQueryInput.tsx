@@ -88,51 +88,48 @@ type Props = {
 const defaultCompleterFactory = (...args: ConstructorParameters<typeof SearchBarAutoCompletions>) =>
   new SearchBarAutoCompletions(...args);
 
-const ViewsQueryInput = forwardRef<Editor, Props>(
-  (
-    {
-      value,
-      timeRange,
-      streams,
-      name,
-      onChange,
-      error,
-      isValidating,
-      disableExecution,
-      validate,
-      onExecute,
-      commands,
-      view,
-      warning,
-      placeholder,
-      onBlur,
-      inputId,
-      completerFactory = defaultCompleterFactory,
-    },
-    ref,
-  ) => {
-    const completer = useCompleter({ streams, timeRange, completerFactory, view });
+const ViewsQueryInput = (
+  {
+    value,
+    timeRange = undefined,
+    streams = undefined,
+    name,
+    onChange,
+    error = undefined,
+    isValidating,
+    disableExecution = undefined,
+    validate,
+    onExecute,
+    commands = undefined,
+    view = undefined,
+    warning = undefined,
+    placeholder = undefined,
+    onBlur = undefined,
+    inputId = undefined,
+    completerFactory = defaultCompleterFactory,
+  }: Props,
+  ref: React.ForwardedRef<Editor>,
+) => {
+  const completer = useCompleter({ streams, timeRange, completerFactory, view });
 
-    return (
-      <AsyncQueryInput
-        value={value}
-        onBlur={onBlur}
-        inputId={inputId}
-        completer={completer}
-        ref={ref}
-        name={name}
-        onChange={onChange}
-        placeholder={placeholder}
-        error={error}
-        isValidating={isValidating}
-        warning={warning}
-        disableExecution={disableExecution}
-        validate={validate}
-        onExecute={onExecute}
-        commands={commands}
-      />
-    );
-  },
-);
-
-export default ViewsQueryInput;
+  return (
+    <AsyncQueryInput
+      value={value}
+      onBlur={onBlur}
+      inputId={inputId}
+      completer={completer}
+      ref={ref}
+      name={name}
+      onChange={onChange}
+      placeholder={placeholder}
+      error={error}
+      isValidating={isValidating}
+      warning={warning}
+      disableExecution={disableExecution}
+      validate={validate}
+      onExecute={onExecute}
+      commands={commands}
+    />
+  );
+};
+export default forwardRef(ViewsQueryInput);

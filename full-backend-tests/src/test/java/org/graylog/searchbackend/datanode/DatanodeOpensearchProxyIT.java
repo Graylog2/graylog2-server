@@ -16,23 +16,28 @@
  */
 package org.graylog.searchbackend.datanode;
 
-import com.github.rholder.retry.RetryException;
 import io.restassured.response.ValidatableResponse;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog2.storage.SearchVersion;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.DATANODE_DEV, additionalConfigurationParameters = {@ContainerMatrixTestsConfiguration.ConfigurationParameter(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")})
+import static java.time.Duration.ofSeconds;
+import static org.awaitility.Awaitility.waitAtMost;
+
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS,
+                             env = {@GraylogBackendConfiguration.Env(key = "GRAYLOG_DATANODE_PROXY_API_ALLOWLIST", value = "true")}
+)
+@EnabledIfSearchServer(distribution = SearchVersion.Distribution.DATANODE)
 public class DatanodeOpensearchProxyIT {
 
     private GraylogApis apis;
@@ -42,33 +47,42 @@ public class DatanodeOpensearchProxyIT {
         this.apis = apis;
     }
 
-    @ContainerMatrixTest
-    void testProxyPlaintextGet() throws ExecutionException, RetryException {
-        final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cat/indices", 200);
-        final String responseBody = response.extract().body().asString();
-        Assertions.assertThat(responseBody).contains("graylog_0").contains("gl-system-events_0");
+    @FullBackendTest
+    void testProxyPlaintextGet() {
+        waitAtMost(ofSeconds(30)).until(() -> {
+            final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cat/indices", 200);
+            final String responseBody = response.extract().body().asString();
+            return responseBody.contains("graylog_0") && responseBody.contains("gl-system-events_0");
+        });
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testProxyJsonGet() {
-        final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_mapping", 200);
-        response.assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
+        waitAtMost(ofSeconds(30)).until(() -> {
+            try {
+                final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_mapping", 200);
+                response.assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
+            } catch (AssertionError e) {
+                return false;
+            }
+            return true;
+        });
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testForbiddenUrl() {
         final String message = apis.get("/datanodes/any/opensearch/_search", 400).extract().body().asString();
         Assertions.assertThat(message).contains("This request is not allowed");
     }
 
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testNonAdminUser() {
         //HTTP 401/unauthorized for any non-admin user
-        apis.get("/datanodes/any/opensearch/_search", Users.JOHN_DOE, Collections.emptyMap(),401);
+        apis.get("/datanodes/any/opensearch/_search", Users.JOHN_DOE, Collections.emptyMap(), 401);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTargetSpecificDatanodeInstance() {
         final List<String> datanodes = apis.system().datanodes().properJSONPath().read("elements.*.hostname");
         Assertions.assertThat(datanodes).isNotEmpty();
@@ -77,7 +91,7 @@ public class DatanodeOpensearchProxyIT {
         apis.get("/datanodes/" + hostname + "/opensearch/_mapping", 200).assertThat().body("graylog_0.mappings.properties.gl2_accounted_message_size.type", Matchers.equalTo("long"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testQueryParameters() {
         final ValidatableResponse response = apis.get("/datanodes/any/opensearch/_cluster/settings?include_defaults=true", 200);
         response.assertThat().body("defaults.cluster.name", Matchers.equalTo("datanode-cluster"));

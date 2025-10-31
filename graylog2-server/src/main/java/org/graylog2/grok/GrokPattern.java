@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
@@ -29,7 +28,6 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class GrokPattern implements MongoEntity, BuildableMongoEntity<GrokPattern, GrokPattern.Builder> {
 
@@ -44,18 +42,18 @@ public abstract class GrokPattern implements MongoEntity, BuildableMongoEntity<G
     @ObjectId
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty(FIELD_NAME)
     public abstract String name();
 
-    @JsonProperty
+    @JsonProperty(FIELD_PATTERN)
     public abstract String pattern();
 
-    @JsonProperty
+    @JsonProperty(FIELD_CONTENT_PACK)
     @Nullable
     public abstract String contentPack();
 
     @JsonCreator
-    public static GrokPattern create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+    public static GrokPattern create(@JsonProperty(FIELD_ID) @Id @ObjectId @Nullable String id,
                                      @JsonProperty(FIELD_NAME) String name,
                                      @JsonProperty(FIELD_PATTERN) String pattern,
                                      @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack) {

@@ -19,9 +19,11 @@ package org.graylog.datanode.opensearch.configuration;
 
 import org.graylog.datanode.process.configuration.beans.ConfigurationBuildParams;
 
+import java.nio.file.Path;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 public record OpensearchConfigurationParams(List<X509Certificate> trustedCertificates,
-                                            java.util.Map<String, String> transientConfiguration) implements ConfigurationBuildParams {
+                                            java.util.Map<String, String> transientConfiguration,
+                                            Path targetConfigDir) implements ConfigurationBuildParams {
 }

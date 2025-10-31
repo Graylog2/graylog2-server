@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import type { ModalRootProps } from '@mantine/core';
 import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
@@ -29,11 +30,26 @@ const ModalOverlay = styled(MantineModal.Overlay)`
 
 const ModalContent = styled(MantineModal.Content)`
   z-index: ${zIndices.modalBody};
+  border-radius: 10px;
 `;
 
-const ModalRoot = styled(MantineModal.Root)(
-  ({ theme }) => css`
+const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>(
+  ({ theme, $scrollInContent }) => css`
     --mantine-color-body: ${theme.colors.global.contentBackground};
+    ${$scrollInContent &&
+    css`
+      .mantine-Modal-content {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .mantine-Modal-body {
+        flex: 1;
+        overflow: auto;
+        display: flex;
+        flex-direction: column;
+      }
+    `})
   `,
 );
 
@@ -55,9 +71,11 @@ type Props = {
   children: React.ReactNode;
   show?: boolean;
   bsSize?: ModalSize;
-  enforceFocus?: boolean;
   backdrop?: boolean;
   closable?: boolean;
+  fullScreen?: boolean;
+  scrollInContent?: boolean;
+  rootProps?: Partial<Omit<ModalRootProps, 'opened' | 'onClose'>>;
 };
 
 const Modal = ({
@@ -65,19 +83,24 @@ const Modal = ({
   show = false,
   children,
   bsSize = undefined,
-  enforceFocus = false,
   backdrop = true,
   closable = true,
+  fullScreen = false,
+  scrollInContent = false,
+  rootProps = {},
 }: Props) => (
-  <ModalRoot
+  <StyledModalRoot
+    $scrollInContent={scrollInContent}
     opened={show}
     onClose={onHide}
     size={sizeForMantine(bsSize)}
-    trapFocus={enforceFocus}
-    closeOnEscape={closable}>
+    trapFocus
+    closeOnEscape={closable}
+    fullScreen={fullScreen}
+    {...(rootProps || {})}>
     {backdrop && <ModalOverlay />}
     <ModalContent>{children}</ModalContent>
-  </ModalRoot>
+  </StyledModalRoot>
 );
 
 Modal.Header = ({ children, showCloseButton = true }: { children: React.ReactNode; showCloseButton?: boolean }) => (

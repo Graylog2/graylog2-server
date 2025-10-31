@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Row, Col, Button, Table, Label, SegmentedControl, Alert, Modal } from 'components/bootstrap';
@@ -92,11 +92,20 @@ const upgradeInstructionsDocumentationMessage = (
 );
 
 const DataNodeUpgradePage = () => {
+  const upgradeListRef = useRef();
+
   const { data, isInitialLoading } = useDataNodeUpgradeStatus();
   const [upgradeMethod, setUpgradeMethod] = useState<DataNodeUpgradeMethodType>('cluster-restart');
   const [openUpgradeConfirmDialog, setOpenUpgradeConfirmDialog] = useState<boolean>(false);
 
+  const scrollIntoDataNodeUpgradedList = () => {
+    if (!isInitialLoading && upgradeListRef?.current) {
+      (upgradeListRef.current as HTMLTableSectionElement).scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const startNodeUpgrade = async (node: DataNodeInformation) => {
+    scrollIntoDataNodeUpgradedList();
     saveNodeToUpgrade(node?.hostname);
     setOpenUpgradeConfirmDialog(true);
     stopShardReplication();
@@ -286,7 +295,10 @@ const DataNodeUpgradePage = () => {
               </dd>
               <dt>Number of Shards:</dt>
               <dd>
-                {data?.cluster_state?.active_shards || 0} ({data?.cluster_state?.unassigned_shards || 0} unassigned)
+                {data?.cluster_state?.active_shards || 0} active,&nbsp;
+                {data?.cluster_state?.initializing_shards || 0} initializing,&nbsp;
+                {data?.cluster_state?.relocating_shards || 0} relocating,&nbsp;
+                {data?.cluster_state?.unassigned_shards || 0} unassigned
               </dd>
             </StyledHorizontalDl>
             <br />
@@ -346,7 +358,7 @@ const DataNodeUpgradePage = () => {
                   <h3>Upgraded Nodes</h3>
                   <br />
                   <Table>
-                    <tbody>
+                    <tbody ref={upgradeListRef}>
                       {data?.up_to_date_nodes?.map((upgraded_node) => (
                         <tr key={upgraded_node?.hostname}>
                           <td>

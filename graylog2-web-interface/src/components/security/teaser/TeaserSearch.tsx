@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useMemo } from 'react';
+import { useMemo, forwardRef } from 'react';
 import 'wicg-inert';
 
 import Hotspot from 'components/security/teaser/Hotspot';
@@ -49,12 +49,12 @@ const DashboardOverlay = styled.div`
   z-index: 1;
 `;
 
-const searchAreaContainer =
-  (hotspots: Array<HotspotMeta>) =>
-  ({ children }: React.PropsWithChildren) => (
-    <StyledPageContentLayout>
+const searchAreaContainer = (hotspots: Array<HotspotMeta>) =>
+  forwardRef<HTMLDivElement, React.PropsWithChildren>(({ children }, ref) => (
+    <StyledPageContentLayout ref={ref}>
       <DashboardOverlay>
         {hotspots.map(({ description, positionX, positionY }, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <Hotspot positionX={positionX} positionY={positionY} index={index} key={`hotspot-${index}`}>
             {description}
           </Hotspot>
@@ -62,7 +62,7 @@ const searchAreaContainer =
       </DashboardOverlay>
       <div inert="">{children}</div>
     </StyledPageContentLayout>
-  );
+  ));
 
 type Props = {
   searchJson: Partial<SearchJson>;

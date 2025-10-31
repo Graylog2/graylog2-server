@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -29,6 +29,7 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.SortOrder;
@@ -73,8 +74,9 @@ public class ViewServiceTest {
         this.dbService = new ViewService(
                 clusterConfigService,
                 view -> new ViewRequirements(Collections.emptySet(), view),
-                mock(EntityOwnershipService.class),
+                mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
+                mock(EntitySourceService.class),
                 mongoCollections);
         this.searchUser = TestSearchUser.builder().build();
     }

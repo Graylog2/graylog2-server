@@ -16,15 +16,13 @@
  */
 package org.graylog.security.rest;
 
+import jakarta.ws.rs.ForbiddenException;
 import org.graylog.grn.GRN;
-import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.ws.rs.ForbiddenException;
 
 // TODO: Move contents of this to RestResource in server
 public abstract class RestResourceWithOwnerCheck extends RestResource implements PluginRestResource {
@@ -33,17 +31,12 @@ public abstract class RestResourceWithOwnerCheck extends RestResource implements
     protected void checkOwnership(GRN entity) {
         if (!isOwner(entity)) {
             LOG.info("Not authorized to access entity <{}>. User <{}> is missing permission <{}:{}>",
-                    entity, getSubject().getPrincipal(), RestPermissions.ENTITY_OWN, entity);
+                    entity, getSubject().getPrincipal(), Permission.ENTITY_OWN.permission(), entity);
             throw new ForbiddenException("Not authorized to access entity <" + entity + ">");
         }
     }
 
     protected boolean isOwner(GRN entity) {
-        return isPermitted(RestPermissions.ENTITY_OWN, entity);
-    }
-
-
-    protected boolean isPermitted(String type, GRN target) {
-        return getSubject().isPermitted(GRNPermission.create(type, target));
+        return getSubject().isPermitted(Permission.ENTITY_OWN.toShiroPermission(entity));
     }
 }

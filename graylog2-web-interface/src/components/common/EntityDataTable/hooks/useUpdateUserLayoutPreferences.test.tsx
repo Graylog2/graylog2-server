@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 
 import { layoutPreferences, layoutPreferencesJSON } from 'fixtures/entityListLayoutPreferences';
@@ -42,7 +42,7 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should update user layout preferences', async () => {
-    const { result, waitFor } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
+    const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
     result.current.mutate(layoutPreferences);
 
@@ -56,7 +56,7 @@ describe('useUserSearchFilterQuery hook', () => {
   });
 
   it('should allow partial update of user layout preferences', async () => {
-    const { result, waitFor } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
+    const { result } = renderHook(() => useUpdateUserLayoutPreferences('streams'), { wrapper });
 
     result.current.mutate({ perPage: 100 });
 

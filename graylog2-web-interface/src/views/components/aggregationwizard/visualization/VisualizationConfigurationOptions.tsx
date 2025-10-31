@@ -27,11 +27,6 @@ import NumericField from './configurationFields/NumericField';
 import SelectField from './configurationFields/SelectField';
 import MultiSelectField from './configurationFields/MultiSelectField';
 
-type Props = {
-  name: string;
-  fields: Array<ConfigurationField>;
-};
-
 const TitleLabelWithHelp = styled.div`
   display: flex;
   align-items: center;
@@ -81,14 +76,19 @@ export type FieldComponentProps = {
   values: any;
 };
 
-const VisualizationConfigurationOptions = ({ name: namePrefix, fields = [] }: Props) => {
+type Props = {
+  name: string;
+  fields: Array<ConfigurationField> | undefined;
+};
+
+const VisualizationConfigurationOptions = ({ name: namePrefix, fields }: Props) => {
   const { values } = useFormikContext();
   const visualizationConfig: VisualizationConfigFormValues = getIn(values, namePrefix);
 
   return (
     <>
       {fields
-        .filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
+        ?.filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
         .map((field) => {
           const Component = componentForType(field.type);
           const title = titleForField(field);

@@ -129,7 +129,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     @Documentation(visible = false)
     @Parameter(value = "native_lib_dir", required = true)
-    private Path nativeLibDir = Path.of("native_libs");
+    private String nativeLibDir = "native_libs";
 
     @Documentation("How many log entries of the opensearch process should Datanode hold in memory and make accessible via API calls.")
     @Parameter(value = "process_logs_buffer_size")
@@ -152,7 +152,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             Opensearch heap memory. Initial and maximum heap must be identical for OpenSearch, otherwise the boot fails.
             So it's only one config option.
             """)
-    @Parameter(value = "opensearch_heap")
+    @Parameter(value = "opensearch_heap", validators = {JavaHeapSizeValidator.class})
     private String opensearchHeap = "1g";
 
     @Documentation("HTTP port on which the embedded opensearch listens")
@@ -224,6 +224,16 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     @Documentation("This configuration defines validity interval of JWT tokens")
     @Parameter(value = "indexer_jwt_auth_token_expiration_duration")
     Duration indexerJwtAuthTokenExpirationDuration = Duration.seconds(180);
+
+    @DocumentationSection(heading = "OpenSearch JWT token usage",description = """
+            communication between Graylog and OpenSearch is secured by JWT. These are the defaults used for the token usage
+            adjust them, if you have special needs.
+            """)
+    @Documentation(value = """
+            Sets a window of time, in seconds, to compensate for any disparity between the graylog server and OpenSearch node clock times,
+             thereby preventing authentication failures due to the misalignment.""")
+    @Parameter(value = "indexer_jwt_auth_token_clock_skew_tolerance")
+    Duration indexerJwtAuthTokeClockSkewTolerance = Duration.seconds(30);
 
     @Documentation("""
             The auto-generated node ID will be stored in this file and read after restarts. It is a good idea
@@ -327,8 +337,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
      * <a href="https://opensearch.org/docs/latest/tuning-your-cluster/availability-and-recovery/snapshots/snapshot-restore/#shared-file-system">See snapshot documentation</a>
      */
     @Documentation("Filesystem path where searchable snapshots should be stored")
-    @Parameter(value = "path_repo", converter = StringListConverter.class)
-    private List<String> pathRepo;
+    @Parameter(value = "path_repo", converter = PathListConverter.class, validators = DirectoriesWritableValidator.class)
+    private List<Path> pathRepo;
 
     @Documentation("This setting limits the number of clauses a Lucene BooleanQuery can have.")
     @Parameter(value = "opensearch_indices_query_bool_max_clause_count")
@@ -512,7 +522,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
     }
 
     public Path getNativeLibDir() {
-        return nativeLibDir;
+        return getOpensearchConfigLocation().resolve(Path.of(nativeLibDir));
     }
 
     public static class NodeIdFileValidator implements Validator<String> {
@@ -704,7 +714,7 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return searchCacheSize;
     }
 
-    public List<String> getPathRepo() {
+    public List<Path> getPathRepo() {
         return pathRepo;
     }
 
@@ -748,5 +758,9 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
 
     public Duration getIndexerJwtAuthTokenExpirationDuration() {
         return indexerJwtAuthTokenExpirationDuration;
+    }
+
+    public Duration getIndexerJwtAuthTokenClockSkewTolerance() {
+        return indexerJwtAuthTokeClockSkewTolerance;
     }
 }

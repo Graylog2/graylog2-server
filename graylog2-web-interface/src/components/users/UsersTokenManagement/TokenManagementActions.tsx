@@ -17,22 +17,33 @@
 import React, { useState } from 'react';
 
 import { Button, ButtonToolbar } from 'components/bootstrap';
-import { ConfirmDialog } from 'components/common';
+import { ConfirmDialog, IfPermitted } from 'components/common';
 import useDeleteTokenMutation from 'components/users/UsersTokenManagement/hooks/useDeleteTokenMutation';
 
-type Props = { userId: string; tokenId: string; tokenName: string };
+type Props = {
+  userId: string;
+  username: string;
+  tokenId: string;
+  tokenName: string;
+  onDeleteCallback?: () => void;
+};
 
-const TokenActions = ({ userId, tokenId, tokenName }: Props) => {
+const TokenActions = ({ userId, username, tokenId, tokenName, onDeleteCallback = () => {} }: Props) => {
   const { deleteToken } = useDeleteTokenMutation(userId, tokenId);
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   const cancelDelete = () => {
     setShowDeleteDialog(false);
   };
 
   const handleDelete = () => {
+    setIsDeleting(true);
+
     deleteToken().then(() => {
       setShowDeleteDialog(false);
+      setIsDeleting(false);
+      onDeleteCallback();
     });
   };
 
@@ -41,19 +52,19 @@ const TokenActions = ({ userId, tokenId, tokenName }: Props) => {
   };
 
   return (
-    <>
+    <IfPermitted permissions={[`users:tokenremove:${username}`]}>
       {showDeleteDialog && (
         <ConfirmDialog show={showDeleteDialog} title="Deleting token" onCancel={cancelDelete} onConfirm={handleDelete}>
           <p>You are about to delete the token: &quot;{tokenName}&quot;. Are you sure?</p>
         </ConfirmDialog>
       )}
 
-      <ButtonToolbar>
-        <Button bsSize="xs" bsStyle="danger" onClick={onDelete}>
+      <ButtonToolbar className="pull-right">
+        <Button bsSize="xs" disabled={isDeleting} bsStyle="danger" onClick={onDelete}>
           Delete
         </Button>
       </ButtonToolbar>
-    </>
+    </IfPermitted>
   );
 };
 

@@ -223,7 +223,6 @@ const RuleBlockForm = ({
                     options={options}
                     optionRenderer={optionRenderer}
                     clearable={false}
-                    matchProp="label"
                     autoFocus
                     onChange={(option: string) => handleChange(option, resetForm)}
                     value={selectedBlockDict?.name || ''}

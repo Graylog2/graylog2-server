@@ -19,12 +19,12 @@ import * as React from 'react';
 import { Icon } from 'components/common';
 
 type Props = {
-  invalidStepKeys: Array<string>;
+  invalidStepKeys: Array<string> | undefined;
   stepKey: string;
 };
 
-const StepTitleWarning = ({ invalidStepKeys = [], stepKey }: Props) => {
-  if (invalidStepKeys.includes(stepKey)) {
+const StepTitleWarning = ({ invalidStepKeys, stepKey }: Props) => {
+  if (invalidStepKeys?.includes(stepKey)) {
     return (
       <>
         <Icon name="warning" />{' '}

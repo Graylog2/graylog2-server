@@ -15,15 +15,40 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { Attribute, Sort } from 'stores/PaginationTypes';
 
-export const DEFAULT_LAYOUT = (isEvidenceModal: boolean) => ({
-  entityTableId: 'dashboards',
-  defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: isEvidenceModal
-    ? ['title', 'description', 'summary']
-    : ['title', 'description', 'summary', 'favorite'],
-});
+const getDashboardTableElements = (pluggableAttributes?: {
+  attributeNames?: Array<string>;
+  attributes?: Array<Attribute>;
+}) => {
+  const getDefaultLayout = (hideAdditionalColumns: boolean) => ({
+    entityTableId: 'dashboards',
+    defaultPageSize: 20,
+    defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
+    defaultDisplayedAttributes: hideAdditionalColumns
+      ? ['title', 'description', 'summary']
+      : ['title', 'description', 'summary', 'favorite', ...(pluggableAttributes?.attributeNames || [])],
+  });
 
-export const COLUMNS_ORDER = ['title', 'summary', 'description', 'owner', 'created_at', 'last_updated_at', 'favorite'];
+  const columnOrder = [
+    'title',
+    'summary',
+    'description',
+    'owner',
+    '_entity_source.source',
+    'created_at',
+    'last_updated_at',
+    'favorite',
+    ...(pluggableAttributes?.attributeNames || []),
+  ];
+
+  const additionalAttributes = [...(pluggableAttributes?.attributes || [])];
+
+  return {
+    getDefaultLayout,
+    columnOrder,
+    additionalAttributes,
+  };
+};
+
+export default getDashboardTableElements;

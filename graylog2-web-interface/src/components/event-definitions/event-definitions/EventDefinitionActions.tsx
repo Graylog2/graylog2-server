@@ -34,6 +34,7 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import { MoreActions } from 'components/common/EntityDataTable';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
+import usePluggableEntitySharedActions from 'hooks/usePluggableEntitySharedActions';
 
 import type { EventDefinition } from '../event-definitions-types';
 import {
@@ -88,6 +89,9 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const navigate = useNavigate();
+  const { actions: pluggableActions, actionModals: pluggableActionModals } =
+    usePluggableEntitySharedActions<EventDefinition>(eventDefinition, 'event_definition');
+  const moreActions = [pluggableActions.length ? pluggableActions : null].filter(Boolean);
 
   const showActions = (): boolean => scopePermissions?.is_mutable;
 
@@ -260,21 +264,27 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
               Edit
             </MenuItem>
           </IfPermitted>
-          {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
-            <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
-          )}
-          <MenuItem divider />
-          <MenuItem
-            disabled={isSystemEventDefinition(eventDefinition)}
-            title={isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined}
-            onClick={
-              isSystemEventDefinition(eventDefinition)
-                ? undefined
-                : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
-            }>
-            {isEnabled ? 'Disable' : 'Enable'}
-          </MenuItem>
-
+          <IfPermitted permissions="eventdefinitions:create">
+            {!isSystemEventDefinition(eventDefinition) && !isSigmaEventDefinition(eventDefinition) && (
+              <MenuItem onClick={() => handleAction(DIALOG_TYPES.COPY, eventDefinition)}>Duplicate</MenuItem>
+            )}
+            <MenuItem divider />
+          </IfPermitted>
+          <IfPermitted permissions={`eventdefinitions:edit:${eventDefinition.id}`}>
+            <MenuItem
+              disabled={isSystemEventDefinition(eventDefinition)}
+              title={
+                isSystemEventDefinition(eventDefinition) ? 'System Event Definition cannot be disabled' : undefined
+              }
+              onClick={
+                isSystemEventDefinition(eventDefinition)
+                  ? undefined
+                  : () => handleAction(isEnabled ? DIALOG_TYPES.DISABLE : DIALOG_TYPES.ENABLE, eventDefinition)
+              }>
+              {isEnabled ? 'Disable' : 'Enable'}
+            </MenuItem>
+          </IfPermitted>
+          {moreActions}
           {showActions() && (
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
@@ -292,7 +302,14 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           )}
           {isAggregationEventDefinition(eventDefinition) && (
             <>
-              <MenuItem divider />
+              <IfPermitted
+                permissions={[
+                  `eventdefinitions:edit:${eventDefinition.id}`,
+                  `eventdefinitions:delete:${eventDefinition.id}`,
+                ]}
+                anyPermissions>
+                <MenuItem divider />
+              </IfPermitted>
               <LinkContainer to={Routes.ALERTS.DEFINITIONS.replay_search(eventDefinition.id)}>
                 <MenuItem>Replay search</MenuItem>
               </LinkContainer>
@@ -326,6 +343,7 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
           onConfirm={onSigmaModalClose}
         />
       )}
+      {pluggableActionModals}
     </>
   );
 };

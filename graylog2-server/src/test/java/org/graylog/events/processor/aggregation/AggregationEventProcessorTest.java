@@ -41,8 +41,7 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamMock;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -62,6 +61,7 @@ import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -101,14 +101,14 @@ public class AggregationEventProcessorTest {
 
     @Before
     public void setUp() throws Exception {
-        when(streamService.loadAll()).thenReturn(ImmutableList.of(
-                new StreamMock(Collections.singletonMap("_id", "stream-1"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-2"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", "stream-3"), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_EVENTS_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.DEFAULT_SYSTEM_EVENTS_STREAM_ID), emptyList()),
-                new StreamMock(Collections.singletonMap("_id", StreamImpl.FAILURES_STREAM_ID), emptyList())
+        when(streamService.streamAllIds()).thenAnswer(inv -> java.util.stream.Stream.of(
+                "stream-1",
+                "stream-2",
+                "stream-3",
+                Stream.DEFAULT_STREAM_ID,
+                Stream.DEFAULT_EVENTS_STREAM_ID,
+                Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID,
+                Stream.FAILURES_STREAM_ID
         ));
 
         eventStreamService = new EventStreamService(streamService);
@@ -117,6 +117,7 @@ public class AggregationEventProcessorTest {
     @Test
     public void createEventsWithFilter() throws Exception {
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(TimeRange.class))).thenReturn(true);
+        when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
@@ -176,7 +177,7 @@ public class AggregationEventProcessorTest {
 
         // If the dependency check returns true, there should be no exception raised and the state service should be called
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(true);
-
+        when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {})).doesNotThrowAnyException();
 
         verify(stateService, times(1)).setState("dto-id-1", timerange.from(), timerange.to());

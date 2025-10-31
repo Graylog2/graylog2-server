@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import styled, { css } from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import usePluginEntities from 'hooks/usePluginEntities';
 
 import StandardFooter from './StandardFooter';
 
@@ -38,7 +39,7 @@ const StyledFooter = styled.footer(
 );
 
 const Footer = () => {
-  const customFooter = PluginStore.exports('pageFooter');
+  const customFooter = usePluginEntities('pageFooter');
 
   if (customFooter.length === 1) {
     const CustomFooter = customFooter[0].component;

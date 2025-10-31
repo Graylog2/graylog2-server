@@ -24,7 +24,8 @@ import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
 import org.graylog.security.Capability;
 import org.graylog.security.DBGrantService;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityOwnershipRegistrationHandler;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog.testing.GRNExtension;
 import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
@@ -33,6 +34,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
@@ -44,6 +46,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -67,14 +70,16 @@ class ViewOwnershipToGrantsMigrationTest {
                GRNRegistry grnRegistry,
                @Mock ClusterConfigService clusterConfigService,
                @Mock UserService userService,
-               @Mock ViewSummaryService viewSummaryService) {
+               @Mock ViewSummaryService viewSummaryService,
+               @Mock EntitySourceService entitySourceService) {
 
         this.userService = userService;
         this.grantService = new DBGrantService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
 
-        final EntityOwnershipService entityOwnershipService = new EntityOwnershipService(grantService, grnRegistry);
         final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
-        final TestViewService viewService = new TestViewService(clusterConfigService, entityOwnershipService, viewSummaryService, mongoCollections);
+        final EntityRegistrar entityRegistrar = new EntityRegistrar(grantService, grnRegistry,
+                () -> Set.of(new EntityOwnershipRegistrationHandler(grantService, grnRegistry)));
+        final TestViewService viewService = new TestViewService(clusterConfigService, entityRegistrar, viewSummaryService, entitySourceService, mongoCollections);
 
         this.migration = new ViewOwnerShipToGrantsMigration(userService, grantService, "admin", viewService, grnRegistry);
     }
@@ -134,10 +139,11 @@ class ViewOwnershipToGrantsMigrationTest {
 
     public static class TestViewService extends ViewService {
         public TestViewService(ClusterConfigService clusterConfigService,
-                               EntityOwnershipService entityOwnerShipService,
+                               EntityRegistrar entityRegistrar,
                                ViewSummaryService viewSummaryService,
+                               EntitySourceService entitySourceService,
                                MongoCollections mongoCollections) {
-            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityOwnerShipService, viewSummaryService, mongoCollections);
+            super(clusterConfigService, view -> new ViewRequirements(Collections.emptySet(), view), entityRegistrar, viewSummaryService, entitySourceService, mongoCollections);
         }
     }
 }

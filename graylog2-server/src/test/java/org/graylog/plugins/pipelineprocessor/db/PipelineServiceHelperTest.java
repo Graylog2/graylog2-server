@@ -90,9 +90,7 @@ public class PipelineServiceHelperTest {
                         "stage 1 match either\n" +
                         "%s" +
                         "end",
-                name,
-                String.join("", stage0Rules),
-                String.join("", stage1Rules)
+                name, stage0Rules, stage1Rules
         );
     }
 

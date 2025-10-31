@@ -109,7 +109,10 @@ const CopyToDashboardForm = ({
   const showCreateNewDashboardCheckbox = typeof onCreateNewDashboard === 'function';
 
   return (
-    <Modal show onHide={() => {}}>
+    <Modal show onHide={onCancel}>
+      <Modal.Header>
+        <Modal.Title>Copy widget to dashboard</Modal.Title>
+      </Modal.Header>
       <Modal.Body>
         {isLoadingDashboards && <Spinner />}
         {!isLoadingDashboards && (

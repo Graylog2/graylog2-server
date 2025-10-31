@@ -118,6 +118,16 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
 ): ConnectedComponent<C, MappedProps> {
   const wrappedComponentName = Component.displayName || Component.name || 'Unknown/Anonymous';
 
+  const genProps = (state: ResultType<Stores>): MappedProps => {
+    const storeProps = {};
+
+    Object.keys(stores).forEach((key) => {
+      storeProps[key] = state[key];
+    });
+
+    return mapProps(storeProps as ResultType<Stores>);
+  };
+
   class ConnectStoresWrapper extends React.Component<ConnectedProps<C, MappedProps>> {
     // eslint-disable-next-line react/state-in-constructor
     state: ResultType<Stores>;
@@ -168,8 +178,8 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
     }
 
     shouldComponentUpdate(nextProps, nextState) {
-      const thisChildProps = this._genProps(this.state);
-      const nextChildProps = this._genProps(nextState);
+      const thisChildProps = genProps(this.state);
+      const nextChildProps = genProps(nextState);
 
       return !(isDeepEqual(thisChildProps, nextChildProps) && isDeepEqual(this.props, nextProps));
     }
@@ -178,18 +188,8 @@ function connect<C extends React.ComponentType<React.ComponentProps<C>>, Stores,
       this.unsubscribes.forEach((unsub) => unsub());
     }
 
-    _genProps = (state: ResultType<Stores>): MappedProps => {
-      const storeProps = {};
-
-      Object.keys(stores).forEach((key) => {
-        storeProps[key] = state[key];
-      });
-
-      return mapProps(storeProps as ResultType<Stores>);
-    };
-
     render() {
-      const nextProps = this._genProps(this.state);
+      const nextProps = genProps(this.state);
       // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { ref, ...componentProps } = this.props;

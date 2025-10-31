@@ -25,6 +25,6 @@ const EventDefinitionPriorityEnum = {
     3: { name: 'high' },
     4: { name: 'critical' },
   },
-};
+} as const;
 
 export default EventDefinitionPriorityEnum;

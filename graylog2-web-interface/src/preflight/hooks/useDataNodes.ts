@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
 import { qualifyUrl } from 'util/URLUtils';
@@ -60,7 +60,7 @@ const useDataNodes = (): {
         },
       ),
     refetchInterval: 3000,
-    keepPreviousData: true,
+    placeholderData: keepPreviousData,
     retry: false,
   });
 

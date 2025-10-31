@@ -22,15 +22,14 @@ import org.graylog.plugins.views.search.db.SearchDbService;
 import org.graylog.plugins.views.search.views.ViewDTO;
 import org.graylog.plugins.views.search.views.ViewService;
 import org.graylog.plugins.views.search.views.ViewSummaryService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.contentpacks.model.EntityPermissions;
-import org.graylog.security.entities.EntityOwnershipService;
 import org.graylog2.contentpacks.model.ModelType;
 import org.graylog2.contentpacks.model.ModelTypes;
 import org.graylog2.contentpacks.model.entities.Entity;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
 
-import java.util.List;
 import java.util.Optional;
 
 public class DashboardFacade extends ViewFacade implements DashboardEntityCreator {
@@ -42,8 +41,8 @@ public class DashboardFacade extends ViewFacade implements DashboardEntityCreato
                            ViewService viewService,
                            ViewSummaryService viewSummaryService,
                            UserService userService,
-                           EntityOwnershipService entityOwnershipService) {
-        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityOwnershipService);
+                           EntityRegistrar entityRegistrar) {
+        super(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityRegistrar);
     }
 
     @Override

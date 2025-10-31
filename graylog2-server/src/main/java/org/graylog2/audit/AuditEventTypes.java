@@ -166,7 +166,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SYSTEM_JOB_ACKNOWLEDGE = PREFIX + "system_job:acknowledge";
     public static final String SYSTEM_NOTIFICATION_CREATE = PREFIX + "system_notification:create";
     public static final String SYSTEM_NOTIFICATION_DELETE = PREFIX + "system_notification:delete";
-    public static final String URL_WHITELIST_UPDATE = PREFIX + "url_whitelist:update";
+    public static final String URL_ALLOWLIST_UPDATE = PREFIX + "url_allowlist:update";
     public static final String USER_ACCESS_TOKEN_CREATE = PREFIX + "user_access_token:create";
     public static final String USER_ACCESS_TOKEN_DELETE = PREFIX + "user_access_token:delete";
     public static final String USER_CREATE = PREFIX + "user:create";
@@ -178,6 +178,17 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_UPDATE = PREFIX + "user:update";
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
     public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
+
+    // must be private, otherwise the sanity check test in AuditCoverageTest picks it up and fails
+    private static final String MCP_PREFIX = "mcp_server" + ":";
+    public static final String MCP_PROTOCOL_INITIALIZE = MCP_PREFIX + "protocol:initialize";
+    public static final String MCP_RESOURCE_LIST = MCP_PREFIX + "resource:list";
+    public static final String MCP_RESOURCE_READTEMPLATES = MCP_PREFIX + "resource:read_templates";
+    public static final String MCP_RESOURCE_READ = MCP_PREFIX + "resource:read";
+    public static final String MCP_PROMPT_LIST = MCP_PREFIX + "prompt:list";
+    public static final String MCP_PROMPT_GET = MCP_PREFIX + "prompt:get";
+    public static final String MCP_TOOL_LIST = MCP_PREFIX + "tool:list";
+    public static final String MCP_TOOL_CALL = MCP_PREFIX + "tool:call";
 
     private static final ImmutableSet<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(ALARM_CALLBACK_CREATE)
@@ -320,7 +331,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(SYSTEM_JOB_ACKNOWLEDGE)
             .add(SYSTEM_NOTIFICATION_CREATE)
             .add(SYSTEM_NOTIFICATION_DELETE)
-            .add(URL_WHITELIST_UPDATE)
+            .add(URL_ALLOWLIST_UPDATE)
             .add(USER_ACCESS_TOKEN_CREATE)
             .add(USER_ACCESS_TOKEN_DELETE)
             .add(USER_CREATE)
@@ -333,6 +344,14 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(TELEMETRY_USER_SETTINGS_UPDATE)
             .add(CONTENT_STREAM_USER_SETTINGS_UPDATE)
             .add(CERTIFICATE_RENEWAL_MANUALLY_INITIATED)
+            .add(MCP_PROTOCOL_INITIALIZE)
+            .add(MCP_RESOURCE_LIST)
+            .add(MCP_RESOURCE_READ)
+            .add(MCP_RESOURCE_READTEMPLATES)
+            .add(MCP_TOOL_LIST)
+            .add(MCP_TOOL_CALL)
+            .add(MCP_PROMPT_LIST)
+            .add(MCP_PROMPT_GET)
             .build();
 
     @Override

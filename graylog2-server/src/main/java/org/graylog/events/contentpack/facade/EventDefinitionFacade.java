@@ -34,7 +34,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.JobDefinitionDto;
 import org.graylog.security.GrantDTO;
-import org.graylog.security.entities.EntityOwnershipService;
+import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.facades.EntityFacade;
 import org.graylog2.contentpacks.model.EntityPermissions;
@@ -71,7 +71,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
     private final DBEventDefinitionService eventDefinitionService;
     private final Set<PluginMetaData> pluginMetaData;
     private final UserService userService;
-    private final EntityOwnershipService entityOwnershipService;
+    private final EntityRegistrar entityRegistrar;
 
     @Inject
     public EventDefinitionFacade(ObjectMapper objectMapper,
@@ -80,14 +80,14 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
                                  DBJobDefinitionService jobDefinitionService,
                                  DBEventDefinitionService eventDefinitionService,
                                  UserService userService,
-                                 EntityOwnershipService entityOwnershipService) {
+                                 EntityRegistrar entityRegistrar) {
         this.objectMapper = objectMapper;
         this.pluginMetaData = pluginMetaData;
         this.eventDefinitionHandler = eventDefinitionHandler;
         this.jobDefinitionService = jobDefinitionService;
         this.eventDefinitionService = eventDefinitionService;
         this.userService = userService;
-        this.entityOwnershipService = entityOwnershipService;
+        this.entityRegistrar = entityRegistrar;
     }
 
     @VisibleForTesting
@@ -180,7 +180,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        try (var stream = eventDefinitionService.streamAll()) {
+        try (final var stream = eventDefinitionService.streamAll()) {
             return stream
                     .filter(ed -> ed.config().isContentPackExportable())
                     .map(this::createExcerpt)
@@ -230,7 +230,7 @@ public class EventDefinitionFacade implements EntityFacade<EventDefinitionDto> {
 
     @Override
     public List<GrantDTO> resolveGrants(EventDefinitionDto nativeEntity) {
-        return entityOwnershipService.getGrantsForTarget(GRNTypes.EVENT_DEFINITION, nativeEntity.id());
+        return entityRegistrar.getGrantsForTarget(GRNTypes.EVENT_DEFINITION, nativeEntity.id());
     }
 
     @Override

@@ -32,13 +32,13 @@ const BrandLink = styled(Link)(
     display: inline-flex;
     align-items: center;
     min-height: ${NAV_ITEM_HEIGHT};
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
 
     &:hover,
     &:active,
     &:focus {
       text-decoration: none;
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
   `,
 );

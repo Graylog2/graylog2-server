@@ -45,7 +45,8 @@ public class StreamListFingerprint {
 
         final StringBuilder sb = new StringBuilder();
         for (Stream stream : Ordering.from(getStreamComparator()).sortedCopy(streams)) {
-            sb.append(stream.hashCode());
+            // TODO: Add getFingerprint() to StreamRule and Output interfaces when refactoring to use mongojack
+            sb.append(stream.getFingerprint());
 
             for (StreamRule rule : Ordering.from(getStreamRuleComparator()).sortedCopy(stream.getStreamRules())) {
                 sb.append(rule.hashCode());

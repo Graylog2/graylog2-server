@@ -28,24 +28,36 @@ type Props = {
   open?: boolean;
   onMenuChange?: (newState: boolean) => void;
   width?: number;
+  dataTestId?: string;
 } & Pick<React.ComponentProps<typeof Button>, 'bsStyle' | 'bsSize' | 'children' | 'id' | 'onClick'>;
-const SplitButton = React.forwardRef<HTMLButtonElement, Props>(
-  ({ children, disabled = false, title, open, onMenuChange, width, onClick, ...props }, ref) => (
-    <Menu opened={open} onChange={onMenuChange} width={width}>
-      <ButtonGroup>
-        <Button {...props} disabled={disabled} onClick={onClick}>
-          {title}
+const SplitButton = (
+  {
+    children,
+    disabled = false,
+    title,
+    open = undefined,
+    onMenuChange = undefined,
+    width = undefined,
+    onClick,
+    dataTestId = undefined,
+    ...props
+  }: Props,
+  ref: React.ForwardedRef<HTMLButtonElement>,
+) => (
+  <Menu opened={open} onChange={onMenuChange} width={width}>
+    <ButtonGroup data-testid={dataTestId}>
+      <Button {...props} disabled={disabled} onClick={onClick}>
+        {title}
+      </Button>
+      <Menu.Target>
+        <Button ref={ref} aria-label="More Actions" {...props}>
+          <Icon name="arrow_drop_down" />
         </Button>
-        <Menu.Target>
-          <Button ref={ref} aria-label="More Actions" {...props}>
-            <Icon name="arrow_drop_down" />
-          </Button>
-        </Menu.Target>
-        <Menu.Dropdown>{children}</Menu.Dropdown>
-      </ButtonGroup>
-    </Menu>
-  ),
+      </Menu.Target>
+      <Menu.Dropdown>{children}</Menu.Dropdown>
+    </ButtonGroup>
+  </Menu>
 );
 
 /** @component */
-export default SplitButton;
+export default React.forwardRef(SplitButton);

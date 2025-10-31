@@ -36,11 +36,11 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter.getRateLimitedLog;
+import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
 @Singleton
 public class PipelineServiceHelper {
-    private static final RateLimitedLog logger = getRateLimitedLog(PipelineServiceHelper.class);
+    private static final RateLimitedLog logger = createDefaultRateLimitedLog(PipelineServiceHelper.class);
 
     private final PipelineRuleParser pipelineParser;
 

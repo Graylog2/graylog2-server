@@ -20,7 +20,7 @@ import AppConfig from '../AppConfig';
 
 const HideOnCloud = ({ children, ...rest }) => {
   if (AppConfig.isCloud()) {
-    return <></>;
+    return null;
   }
 
   return React.Children.map(children, (child) => {

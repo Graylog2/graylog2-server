@@ -17,32 +17,18 @@
 import React, { useEffect, useState } from 'react';
 
 import { getFullVersion } from 'util/Version';
-import connect from 'stores/connect';
-import type { Store } from 'stores/StoreTypes';
 import { SystemStore } from 'stores/system/SystemStore';
 import useProductName from 'brand-customization/useProductName';
-
-type SystemStoreState = {
-  system: {
-    version?: string;
-    hostname?: string;
-  };
-};
+import useSystemDetails from 'hooks/useSystemDetails';
 
 type Jvm = {
   info: string;
 };
 
-type Props = {
-  system?: {
-    version?: string;
-    hostname?: string;
-  };
-};
-
-const StandardFooter = ({ system = undefined }: Props) => {
+const StandardFooter = () => {
   const productName = useProductName();
   const [jvm, setJvm] = useState<Jvm | undefined>();
+  const system = useSystemDetails();
 
   useEffect(() => {
     let mounted = true;
@@ -58,23 +44,15 @@ const StandardFooter = ({ system = undefined }: Props) => {
     };
   }, []);
 
-  if (!(system && jvm)) {
-    return (
-      <>
-        {productName} {getFullVersion()}
-      </>
-    );
-  }
-
-  return (
+  return !(system && jvm) ? (
+    <>
+      {productName} {getFullVersion()}
+    </>
+  ) : (
     <>
       {productName} {system.version} on {system.hostname} ({jvm.info})
     </>
   );
 };
 
-export default connect(
-  StandardFooter,
-  { system: SystemStore as Store<SystemStoreState> },
-  ({ system: { system } = { system: undefined } }) => ({ system }),
-);
+export default StandardFooter;

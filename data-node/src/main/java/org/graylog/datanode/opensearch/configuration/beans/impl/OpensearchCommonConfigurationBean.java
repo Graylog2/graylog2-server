@@ -33,7 +33,12 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     private final Configuration localConfiguration;
     private final DatanodeConfiguration datanodeConfiguration;
 
-    private static final List<String> DEFAULT_NODE_ROLES = List.of("cluster_manager", "data", "ingest", "remote_cluster_client");
+    private static final List<String> DEFAULT_NODE_ROLES = List.of(
+            OpensearchNodeRole.CLUSTER_MANAGER,
+            OpensearchNodeRole.DATA,
+            OpensearchNodeRole.INGEST,
+            OpensearchNodeRole.REMOTE_CLUSTER_CLIENT
+    );
 
     @Inject
     public OpensearchCommonConfigurationBean(Configuration localConfiguration, DatanodeConfiguration datanodeConfiguration) {
@@ -45,14 +50,14 @@ public class OpensearchCommonConfigurationBean implements DatanodeConfigurationB
     public DatanodeConfigurationPart buildConfigurationPart(OpensearchConfigurationParams buildParams) {
         return DatanodeConfigurationPart.builder()
                 .properties(commonOpensearchConfig(buildParams))
-                .nodeRoles(getNodeRoles())
+                .nodeRoles(getNodeRoles(localConfiguration))
                 .javaOpt("-Xms%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Xmx%s".formatted(localConfiguration.getOpensearchHeap()))
                 .javaOpt("-Dopensearch.transport.cname_in_publish_address=true")
                 .build();
     }
 
-    private List<String> getNodeRoles() {
+    public static List<String> getNodeRoles(Configuration localConfiguration) {
         final List<String> configuredRoles = localConfiguration.getNodeRoles();
         if(configuredRoles != null && !configuredRoles.isEmpty()) {
             return configuredRoles;

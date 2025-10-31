@@ -27,6 +27,8 @@ import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits
 import useFeature from 'hooks/useFeature';
 import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
 import generateDomain from 'views/components/visualizations/utils/generateDomain';
+import useXAxisTicksAndType from 'views/components/visualizations/hooks/useXAxisTicksAndType';
+import getThresholdShapes from 'views/components/visualizations/utils/getThresholdShapes';
 
 const useChartLayoutSettingsWithCustomUnits = ({
   config,
@@ -38,15 +40,29 @@ const useChartLayoutSettingsWithCustomUnits = ({
   chartData: Array<ChartDefinition>;
 }) => {
   const theme = useTheme();
+  const ticksAndTypeConfig = useXAxisTicksAndType(config, chartData);
   const unitFeatureEnabled = useFeature(UNIT_FEATURE_FLAG);
   const widgetUnits = useWidgetUnits(config);
-  const { unitTypeMapper } = useMemo(
+  const { unitTypeMapper, fieldNameToAxisNameMapper, mapperAxisNumber } = useMemo(
     () => generateMappersForYAxis({ series: config.series, units: widgetUnits }),
     [config.series, widgetUnits],
   );
 
+  const { shapes: thresholdShapes, annotations: thresholdsAnnotations } = getThresholdShapes({
+    series: config.series,
+    widgetUnits,
+    fieldNameToAxisNameMapper,
+    mapperAxisNumber,
+    theme,
+  });
+
   return useCallback(() => {
-    if (!unitFeatureEnabled) return {};
+    if (!unitFeatureEnabled)
+      return {
+        xaxis: {
+          ...ticksAndTypeConfig,
+        },
+      };
 
     const generatedLayouts = generateLayouts({
       unitTypeMapper,
@@ -59,12 +75,28 @@ const useChartLayoutSettingsWithCustomUnits = ({
 
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,
+      shapes: thresholdShapes,
+      annotations: thresholdsAnnotations,
       hovermode: 'x',
-      xaxis: { domain: generateDomain(Object.keys(unitTypeMapper)?.length) },
+      xaxis: {
+        domain: generateDomain(Object.keys(unitTypeMapper)?.length),
+        ...ticksAndTypeConfig,
+      },
     };
 
     return _layouts;
-  }, [barmode, chartData, config, theme, unitFeatureEnabled, unitTypeMapper, widgetUnits]);
+  }, [
+    unitFeatureEnabled,
+    ticksAndTypeConfig,
+    unitTypeMapper,
+    barmode,
+    chartData,
+    widgetUnits,
+    config,
+    theme,
+    thresholdShapes,
+    thresholdsAnnotations,
+  ]);
 };
 
 export default useChartLayoutSettingsWithCustomUnits;

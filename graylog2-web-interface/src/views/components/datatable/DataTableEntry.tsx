@@ -18,7 +18,9 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import type * as Immutable from 'immutable';
 import flatten from 'lodash/flatten';
+// eslint-disable-next-line no-restricted-imports
 import get from 'lodash/get';
+import styled, { css } from 'styled-components';
 
 import Value from 'views/components/Value';
 import type FieldType from 'views/logic/fieldtypes/FieldType';
@@ -42,17 +44,19 @@ type Field = {
   source: string;
 };
 type Props = {
+  index: number;
   columnPivots: Array<string>;
   columnPivotValues: Array<Array<string>>;
   fields: Immutable.Set<Field>;
   item: { [key: string]: any };
   series: Array<Series>;
+  showRowNumbers: boolean;
   types: FieldTypeMappingsList;
   valuePath: ValuePath;
   units: UnitsConfig;
 };
 
-const _c = (field, value, path, source) => ({ field, value, path, source });
+const _c = (field: string, value: any, path: ValuePath, source: string) => ({ field, value, path, source });
 
 type ColumnProps = {
   field: string;
@@ -85,19 +89,43 @@ const Column = ({ field, value, type, valuePath, source, unit }: ColumnProps) =>
   );
 };
 
-const fullValuePathForField = (fieldName, valuePath) => {
+const fullValuePathForField = (fieldName: string, valuePath: ValuePath) => {
   const currentSeries = parseSeries(fieldName);
 
   return currentSeries && currentSeries.field ? [...valuePath, { _exists_: currentSeries.field }] : valuePath;
 };
 
-const columnNameToField = (column, series = []) => {
+const columnNameToField = (column: string, series: Series[] = []) => {
   const currentSeries = series.find((s) => s.effectiveName === column);
 
   return currentSeries ? currentSeries.function : column;
 };
 
-const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, valuePath, item, types, units }: Props) => {
+const LineNumber = styled.td(
+  ({ theme }) => css`
+    &&& {
+      width: 20px;
+      min-width: 20px;
+      max-width: 200px;
+      white-space: nowrap;
+      text-align: right;
+      color: ${theme.colors.text.secondary};
+    }
+  `,
+);
+
+const DataTableEntry = ({
+  index,
+  columnPivots,
+  fields,
+  series,
+  columnPivotValues,
+  valuePath,
+  item,
+  showRowNumbers,
+  types,
+  units,
+}: Props) => {
   const classes = 'message-group';
   const activeQuery = useActiveQueryId();
 
@@ -127,6 +155,7 @@ const DataTableEntry = ({ columnPivots, fields, series, columnPivotValues, value
 
   return (
     <tr className={`fields-row ${classes}`}>
+      {showRowNumbers && <LineNumber>{index}</LineNumber>}
       {columns.map(({ field, value, path, source }, idx) => {
         const key = `${activeQuery}-${field}=${value}-${idx}`;
         const nameForField = columnNameToField(field, series);

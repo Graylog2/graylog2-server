@@ -116,70 +116,69 @@ type Props = {
   onDelete: (rule: HighlightingRuleClass) => Promise<void>;
 };
 
-const HighlightingRule = forwardRef<HTMLDivElement, Props>(
-  (
-    { rule, className = undefined, draggableProps = undefined, dragHandleProps = undefined, onUpdate, onDelete },
-    ref,
-  ) => {
-    const { field, value, color, condition } = rule;
-    const [showForm, setShowForm] = useState(false);
-    const sendTelemetry = useSendTelemetry();
-    const location = useLocation();
+const HighlightingRule = (
+  { rule, className = undefined, draggableProps = undefined, dragHandleProps = undefined, onUpdate, onDelete }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
+  const { field, value, color, condition } = rule;
+  const [showForm, setShowForm] = useState(false);
+  const sendTelemetry = useSendTelemetry();
+  const location = useLocation();
 
-    const _onChange = useCallback(
-      (newColor: HighlightingColor, hidePopover: () => void) => {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_UPDATED, {
-          app_pathname: getPathnameWithoutId(location.pathname),
-          app_action_value: 'search-sidebar-highlight-color-update',
-        });
+  const _onChange = useCallback(
+    (newColor: HighlightingColor, hidePopover: () => void) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_UPDATED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_action_value: 'search-sidebar-highlight-color-update',
+      });
 
-        return onUpdate(rule, rule.field, rule.value, rule.condition, newColor).then(hidePopover);
-      },
-      [location.pathname, onUpdate, rule, sendTelemetry],
-    );
+      return onUpdate(rule, rule.field, rule.value, rule.condition, newColor).then(hidePopover);
+    },
+    [location.pathname, onUpdate, rule, sendTelemetry],
+  );
 
-    const _onDelete = useCallback(() => {
-      if (window.confirm('Do you really want to remove this highlighting?')) {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
-          app_pathname: getPathnameWithoutId(location.pathname),
-          app_action_value: 'search-sidebar-highlight-delete',
-        });
+  const _onDelete = useCallback(() => {
+    // eslint-disable-next-line no-alert
+    if (window.confirm('Do you really want to remove this highlighting?')) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_SIDEBAR_HIGHLIGHT_DELETED, {
+        app_pathname: getPathnameWithoutId(location.pathname),
+        app_action_value: 'search-sidebar-highlight-delete',
+      });
 
-        return onDelete(rule);
-      }
+      return onDelete(rule);
+    }
 
-      return Promise.resolve();
-    }, [location.pathname, onDelete, rule, sendTelemetry]);
+    return Promise.resolve();
+  }, [location.pathname, onDelete, rule, sendTelemetry]);
 
-    return (
-      <Container className={className} ref={ref} {...(draggableProps ?? {})}>
-        <RuleColorPreview color={color} onChange={_onChange} />
-        <RightCol>
-          <RuleContainer data-testid="highlighting-rule">
-            <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
-          </RuleContainer>
-          <ButtonContainer>
-            <IconButton title="Edit this Highlighting Rule" name="edit_square" onClick={() => setShowForm(true)} />
-            <IconButton title="Remove this Highlighting Rule" name="delete" onClick={_onDelete} />
-            {dragHandleProps && (
-              <DragHandle {...dragHandleProps}>
-                <Icon name="drag_indicator" />
-              </DragHandle>
-            )}
-          </ButtonContainer>
-        </RightCol>
-        {showForm && (
-          <HighlightForm
-            onClose={() => setShowForm(false)}
-            rule={rule}
-            onSubmit={(newField, newValue, newCondition, newColor) =>
-              onUpdate(rule, newField, newValue, newCondition, newColor)
-            }
-          />
-        )}
-      </Container>
-    );
-  },
-);
+  return (
+    <Container className={className} ref={ref} {...(draggableProps ?? {})}>
+      <RuleColorPreview color={color} onChange={_onChange} />
+      <RightCol>
+        <RuleContainer data-testid="highlighting-rule">
+          <strong>{field}</strong> {ConditionLabelMap[condition]} <i>&quot;{String(value)}&quot;</i>.
+        </RuleContainer>
+        <ButtonContainer>
+          <IconButton title="Edit this Highlighting Rule" name="edit_square" onClick={() => setShowForm(true)} />
+          <IconButton title="Remove this Highlighting Rule" name="delete" onClick={_onDelete} />
+          {dragHandleProps && (
+            <DragHandle {...dragHandleProps}>
+              <Icon name="drag_indicator" />
+            </DragHandle>
+          )}
+        </ButtonContainer>
+      </RightCol>
+      {showForm && (
+        <HighlightForm
+          onClose={() => setShowForm(false)}
+          rule={rule}
+          onSubmit={(newField, newValue, newCondition, newColor) =>
+            onUpdate(rule, newField, newValue, newCondition, newColor)
+          }
+        />
+      )}
+    </Container>
+  );
+};
 
-export default HighlightingRule;
+export default forwardRef(HighlightingRule);
