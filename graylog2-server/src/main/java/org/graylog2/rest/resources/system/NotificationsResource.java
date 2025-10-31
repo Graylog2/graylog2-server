@@ -34,7 +34,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.notifications.Notification;
-import org.graylog2.notifications.NotificationService;
+import org.graylog2.notifications.NotificationPersistenceService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -53,10 +53,10 @@ public class NotificationsResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(NotificationsResource.class);
 
-    private final NotificationService notificationService;
+    private final NotificationPersistenceService notificationService;
 
     @Inject
-    public NotificationsResource(NotificationService notificationService) {
+    public NotificationsResource(NotificationPersistenceService notificationService) {
         this.notificationService = notificationService;
     }
 
