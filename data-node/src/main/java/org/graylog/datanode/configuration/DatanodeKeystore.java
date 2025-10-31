@@ -151,7 +151,7 @@ public class DatanodeKeystore {
                 LOG.info("Datanoce certificate issuer changed, triggering change event");
                 eventBus.post(new DatanodeCertificateChangedEvent());
             } else {
-                LOG.info("Datanoce certificate issuer renewed, triggering renewal event");
+                LOG.info("Datanoce certificate renewed, triggering renewal event");
                 eventBus.post(new DatanodeCertificateRenewedEvent());
             }
         }
