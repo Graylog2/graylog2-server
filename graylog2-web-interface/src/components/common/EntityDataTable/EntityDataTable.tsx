@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useRef, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
@@ -24,9 +24,7 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
-import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
-import useElementDimensions from 'hooks/useElementDimensions';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
@@ -35,10 +33,11 @@ import BulkActionsRow from './BulkActionsRow';
 import TableHead from './TableHead';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
-import type { ColumnRenderers, Column, EntityBase, ColumnRenderersByAttribute, ExpandedSectionRenderer } from './types';
+import type { ColumnRenderers, Column, EntityBase, ExpandedSectionRenderer } from './types';
 import TableRow from 'components/common/EntityDataTable/TableRow';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
+import useElementsWidths from 'components/common/EntityDataTable/hooks/useElementsWidths';
 
 const ScrollContainer = styled.div`
   width: 100%;
@@ -96,35 +95,6 @@ const filterAccessibleColumns = (columns: Array<Column>, userPermissions: Immuta
 // todo use tanstack query logic instead
 const filterVisibleColumns = (columnDefinitions: Array<Column>, visibleColumns: Array<string>) =>
   visibleColumns.map((columnId) => columnDefinitions.find(({ id }) => id === columnId)).filter((column) => !!column);
-
-const useElementsWidths = <Entity extends EntityBase, Meta>({
-  columns,
-  columnRenderersByAttribute,
-  displayBulkSelectCol,
-  fixedActionsCellWidth,
-}: {
-  columns: Array<Column>;
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
-  displayBulkSelectCol: boolean;
-  fixedActionsCellWidth: number | undefined;
-}) => {
-  const tableRef = useRef<HTMLTableElement>(null);
-  const actionsRef = useRef<HTMLDivElement>();
-  const { width: tableWidth } = useElementDimensions(tableRef);
-  const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
-  const actionsColInnerWidth = fixedActionsCellWidth ?? actionsRef.current?.offsetWidth ?? 0;
-  const actionsColWidth = actionsColInnerWidth ? actionsColInnerWidth + CELL_PADDING * 2 : 0;
-
-  const columnsWidths = useColumnsWidths<Entity>({
-    actionsColWidth,
-    bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
-    columnRenderersByAttribute,
-    columnsIds,
-    tableWidth,
-  });
-
-  return { tableRef, actionsRef, columnsWidths, actionsColWidth };
-};
 
 const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(
   columns: Array<Column>,
