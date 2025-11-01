@@ -277,4 +277,22 @@ class MongoUtilsTest {
                 .isEqualTo(orig)
                 .isEqualTo(util.getById(orig.id()).orElse(null));
     }
+
+    @Test
+    void testCountByField() {
+        collection.insertMany(List.of(
+                new DTO(null, "name-1"),
+                new DTO(null, "name-2"),
+                new DTO(null, "name-2"),
+                new DTO(null, null)
+        ));
+
+        Map<String, Long> counts = utils.countByField("name");
+
+        assertThat(counts)
+                .containsEntry("name-1", 1L)
+                .containsEntry("name-2", 2L)
+                .hasSize(2)
+                .doesNotContainKey(null);
+    }
 }
