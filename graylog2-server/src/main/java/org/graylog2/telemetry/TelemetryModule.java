@@ -17,6 +17,7 @@
 package org.graylog2.telemetry;
 
 import com.google.inject.multibindings.Multibinder;
+import org.graylog2.outputs.OutputsMetricsSupplier;
 import org.graylog2.plugin.PluginModule;
 import org.graylog2.telemetry.scheduler.TelemetrySubmissionPeriodical;
 
@@ -28,5 +29,7 @@ public class TelemetryModule extends PluginModule {
 
         addPeriodical(TelemetrySubmissionPeriodical.class);
         Multibinder.newSetBinder(binder(), TelemetryDataProvider.class);
+
+        addTelemetryMetricProvider("Outputs Metrics", OutputsMetricsSupplier.class);
     }
 }
