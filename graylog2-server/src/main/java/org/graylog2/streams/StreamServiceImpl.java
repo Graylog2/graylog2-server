@@ -384,7 +384,7 @@ public class StreamServiceImpl implements StreamService {
     }
 
     @Override
-    public Map<String, Long> countByType() {
+    public Map<String, Long> countBySource() {
         long illuminateStreamCount = collection.countDocuments(
                 Filters.and(
                         Filters.regex(FIELD_TITLE, "^Illuminate:"),

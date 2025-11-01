@@ -35,7 +35,7 @@ public class StreamsMetricsSupplier implements TelemetryMetricSupplier {
 
     @Override
     public Optional<TelemetryEvent> get() {
-        Map<String, Object> metrics = new HashMap<>(streamService.countByType());
+        Map<String, Object> metrics = new HashMap<>(streamService.countBySource());
 
         return Optional.of(TelemetryEvent.of(metrics));
     }

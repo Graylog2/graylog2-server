@@ -151,8 +151,8 @@ public class StreamServiceImplTest {
 
     @Test
     @MongoDBFixtures("userIlluminateStreams.json")
-    public void testCountByType() {
-        Map<String, Long> count = streamService.countByType();
+    public void testCountBySource() {
+        Map<String, Long> count = streamService.countBySource();
 
         assertThat(count)
                 .containsEntry("illuminate_streams", 2L)

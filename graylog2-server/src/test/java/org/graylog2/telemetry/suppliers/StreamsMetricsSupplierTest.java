@@ -46,7 +46,7 @@ public class StreamsMetricsSupplierTest {
                 "user_streams", 5L
         );
 
-        when(streamService.countByType()).thenReturn(counts);
+        when(streamService.countBySource()).thenReturn(counts);
 
         Optional<TelemetryEvent> event = streamsMetricsSupplier.get();
 
