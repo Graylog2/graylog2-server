@@ -261,9 +261,9 @@ public class DBEventDefinitionService {
     }
 
     /**
-     * @return a map of event definition types (Illuminate vs user-created) to their respective counts.
+     * @return a map with counts of event definitions grouped by source (Illuminate vs user-created).
      */
-    public Map<String, Long> countByType() {
+    public Map<String, Long> countBySource() {
         long illuminateEventCount = collection.countDocuments(
                 Filters.eq(ScopedEntity.FIELD_SCOPE, ILLUMINATE_SCOPE_NAME)
         );

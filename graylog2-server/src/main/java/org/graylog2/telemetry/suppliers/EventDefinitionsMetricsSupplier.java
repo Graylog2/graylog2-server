@@ -35,7 +35,7 @@ public class EventDefinitionsMetricsSupplier implements TelemetryMetricSupplier 
 
     @Override
     public Optional<TelemetryEvent> get() {
-        Map<String, Object> metrics = new HashMap<>(dbEventDefinitionService.countByType());
+        Map<String, Object> metrics = new HashMap<>(dbEventDefinitionService.countBySource());
 
         return Optional.of(TelemetryEvent.of(metrics));
     }

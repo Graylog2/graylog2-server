@@ -139,8 +139,8 @@ public class DBEventProcessorServiceTest {
 
     @Test
     @MongoDBFixtures("user-illuminate-event-definitions.json")
-    public void testCountByType() {
-        final Map<String, Long> counts = dbService.countByType();
+    public void testCountBySource() {
+        final Map<String, Long> counts = dbService.countBySource();
 
         assertThat(counts)
                 .containsEntry("illuminate_event_definitions", 1L)

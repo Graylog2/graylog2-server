@@ -46,7 +46,7 @@ public class EventDefinitionsMetricsSupplierTest {
                 "user_event_definitions", 2L
         );
 
-        when(dbEventDefinitionService.countByType()).thenReturn(counts);
+        when(dbEventDefinitionService.countBySource()).thenReturn(counts);
 
         Optional<TelemetryEvent> event = eventDefinitionsMetricsSupplier.get();
 
