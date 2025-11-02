@@ -23,7 +23,11 @@ import camelCase from 'lodash/camelCase';
 
 import type { EntityBase, ColumnRenderersByAttribute, Column } from 'components/common/EntityDataTable/types';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
-import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import {
+  BULK_SELECT_COLUMN_WIDTH,
+  BULK_SELECT_COL_ID,
+  ACTIONS_COL_ID,
+} from 'components/common/EntityDataTable/Constants';
 import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
 import { ButtonToolbar } from 'components/bootstrap';
 
@@ -37,10 +41,11 @@ const useBulkSelectCol = <Entity extends EntityBase>(
     () =>
       displayBulkSelectCol
         ? columnHelper.display({
-            id: 'bulk-select',
+            id: BULK_SELECT_COL_ID,
             size: BULK_SELECT_COLUMN_WIDTH,
             // Todo: check is we can make use of enableRowSelection from useReactTable instead
             header: ({ table }) => <BulkSelectHead data={table.options.data.filter(isEntitySelectable)} />,
+            enableHiding: false,
             cell: ({ row }) => (
               <RowCheckbox
                 onChange={row.getToggleSelectedHandler()}
@@ -68,9 +73,10 @@ const useActionsCol = <Entity extends EntityBase>(
     () =>
       displayActionsCol
         ? columnHelper.display({
-            id: 'actions',
+            id: ACTIONS_COL_ID,
             size: actionsColWidth,
             header: 'Actions',
+            enableHiding: false,
             cell: ({ row }) => (
               <div ref={colRef}>
                 <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>
@@ -123,18 +129,22 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
             columnRenderer.renderCell(getValue(), row.original, col, meta),
           header: () => columnRenderer?.renderHeader?.(col) ?? col.title,
           size: columnsWidths[col.id],
+          enableHiding: true,
+          meta: {
+            label: col.title,
+          },
         };
 
-        if (col.isEntityAttribute) {
-          const attributeName = entityAttributesAreCamelCase ? camelCase(col.id) : col.id;
-
-          return columnHelper.accessor((row) => row[attributeName], {
-            enableSorting: col.sortable ?? false,
-            ...baseColDef,
-          });
+        if (col.isDerived) {
+          return columnHelper.display(baseColDef);
         }
 
-        return columnHelper.display(baseColDef);
+        const attributeName = entityAttributesAreCamelCase ? camelCase(col.id) : col.id;
+
+        return columnHelper.accessor((row) => row[attributeName], {
+          enableSorting: col.sortable ?? false,
+          ...baseColDef,
+        });
       }),
     [columns, columnRenderersByAttribute, entityAttributesAreCamelCase, columnsWidths, meta, columnHelper],
   );

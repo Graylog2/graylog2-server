@@ -20,6 +20,7 @@ import type { Table } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
+
 import type { EntityBase } from './types';
 
 const Thead = styled.thead(

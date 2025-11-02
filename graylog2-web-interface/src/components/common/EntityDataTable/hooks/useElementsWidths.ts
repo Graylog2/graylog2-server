@@ -28,6 +28,7 @@ type Props<Entity extends EntityBase, Meta> = {
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   displayBulkSelectCol: boolean;
   fixedActionsCellWidth: number | undefined;
+  visibleColumns: Array<string>;
 };
 
 const useElementsWidths = <Entity extends EntityBase, Meta>({
@@ -35,11 +36,15 @@ const useElementsWidths = <Entity extends EntityBase, Meta>({
   columnRenderersByAttribute,
   displayBulkSelectCol,
   fixedActionsCellWidth,
+  visibleColumns,
 }: Props<Entity, Meta>) => {
   const tableRef = useRef<HTMLTableElement>(null);
   const actionsRef = useRef<HTMLDivElement>();
   const { width: tableWidth } = useElementDimensions(tableRef);
-  const columnsIds = useMemo(() => columns.map(({ id }) => id), [columns]);
+  const columnsIds = useMemo(
+    () => columns.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
+    [columns, visibleColumns],
+  );
   const actionsColInnerWidth = fixedActionsCellWidth ?? actionsRef.current?.offsetWidth ?? 0;
   const actionsColWidth = actionsColInnerWidth ? actionsColInnerWidth + CELL_PADDING * 2 : 0;
 

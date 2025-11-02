@@ -38,7 +38,13 @@ describe('<EntityDataTable />', () => {
     { id: 'title', title: 'Title', type: 'STRING', sortable: true },
     { id: 'description', title: 'Description', type: 'STRING', sortable: true },
     { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
-    { id: 'status', title: 'Status', type: 'STRING', sortable: true, permissions: ['status:read'] },
+    {
+      id: 'status',
+      title: 'Status',
+      type: 'STRING',
+      sortable: true,
+      permissions: ['status:read'],
+    },
     { id: 'created_at', title: 'Created At', type: 'STRING', sortable: true },
   ];
 

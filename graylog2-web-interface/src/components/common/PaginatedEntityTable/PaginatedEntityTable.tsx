@@ -136,8 +136,8 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
 
   const columnDefinitions = useMemo(
     () => [
-      ...(paginatedEntities?.attributes ?? []).map((attribute) => ({ isEntityAttribute: true, ...attribute })),
-      ...additionalAttributes.map((attribute) => ({ isEntityAttribute: false, ...attribute })),
+      ...(paginatedEntities?.attributes ?? []),
+      ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute })),
     ],
     [additionalAttributes, paginatedEntities?.attributes],
   );

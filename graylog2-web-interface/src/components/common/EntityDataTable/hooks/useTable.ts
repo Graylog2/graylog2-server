@@ -16,44 +16,81 @@
  */
 
 import { useMemo, useCallback } from 'react';
-import type { ColumnDef, SortingState, Updater } from '@tanstack/react-table';
+import type { ColumnDef, SortingState, Updater, VisibilityState } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import type { Sort } from 'stores/PaginationTypes';
+import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
+
+const useComputedColumnOrder = (visibleColumns: Array<string>, attributeColumnsOder: Array<string>) =>
+  useMemo(() => {
+    const visibleSet = new Set(visibleColumns);
+    const coreOrder = attributeColumnsOder.filter((id) => visibleSet.has(id));
+    // Display columns, which are not part of the defined order, at the end of the table (before actions column)
+    const additionalVisible = visibleColumns.filter(
+      (id) => !UTILITY_COLUMNS.has(id) && !attributeColumnsOder.includes(id),
+    );
+
+    return [
+      visibleSet.has(BULK_SELECT_COL_ID) ? BULK_SELECT_COL_ID : null,
+      ...coreOrder,
+      ...additionalVisible,
+      visibleSet.has(ACTIONS_COL_ID) ? ACTIONS_COL_ID : null,
+    ].filter(Boolean);
+  }, [visibleColumns, attributeColumnsOder]);
 
 type Props<Entity extends EntityBase> = {
   columns: Array<ColumnDef<Entity>>;
-  columnsOrder: Array<string>;
-  displayBulkSelectCol: boolean;
+  attributeColumnsOder: Array<string>;
   entities: ReadonlyArray<Entity>;
   isEntitySelectable: (entity: Entity) => boolean;
+  onColumnsChange: (visibleColumns: Array<string>) => void;
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
+  visibleColumns: Array<string>;
 };
 
 const useTable = <Entity extends EntityBase>({
   columns,
-  columnsOrder,
-  displayBulkSelectCol,
+  attributeColumnsOder,
   entities,
   isEntitySelectable,
+  onColumnsChange,
   onSortChange,
   sort,
+  visibleColumns,
 }: Props<Entity>) => {
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
-  // consider adding actions col here. In this case we need to ensure columnsOrder contains all attributes, otherwise missing ocls will be displayed after the actions col.
-  const columnOrder = useMemo(
-    () => [displayBulkSelectCol ? 'bulk-select' : null, ...columnsOrder].filter(Boolean),
-    [displayBulkSelectCol, columnsOrder],
-  );
+
   const onSortingChange = useCallback(
     (updater: Updater<SortingState>) => {
       const newSorting = updater instanceof Function ? updater(sorting) : updater;
       onSortChange({ attributeId: newSorting[0].id, direction: newSorting[0].desc ? 'desc' : 'asc' });
     },
     [onSortChange, sorting],
+  );
+
+  const columnVisibility = useMemo(
+    () => Object.fromEntries(columns.map(({ id }) => [id, visibleColumns.includes(id)])),
+    [columns, visibleColumns],
+  );
+
+  const columnOrder = useComputedColumnOrder(visibleColumns, attributeColumnsOder);
+
+  const onColumnVisibilityChange = useCallback(
+    (updater: Updater<VisibilityState>) => {
+      const newColumnVisibility = updater instanceof Function ? updater(columnVisibility) : updater;
+
+      return onColumnsChange(
+        Object.entries(newColumnVisibility)
+          .filter(([_colId, isVisible]) => isVisible)
+          .map(([colId]) => colId)
+          .filter((colId) => !UTILITY_COLUMNS.has(colId)),
+      );
+    },
+    [columnVisibility, onColumnsChange],
   );
 
   return useReactTable({
@@ -63,12 +100,13 @@ const useTable = <Entity extends EntityBase>({
     manualSorting: true,
     enableSortingRemoval: false,
     enableRowSelection: (row) => isEntitySelectable(row.original),
-    initialState: {
-      columnOrder,
-    },
     state: {
       sorting,
+      columnVisibility,
+      columnOrder,
     },
+    onColumnOrderChange: () => {},
+    onColumnVisibilityChange,
     onSortingChange,
   });
 };

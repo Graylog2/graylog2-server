@@ -25,7 +25,7 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING, ACTIONS_COL_ID, BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
@@ -93,10 +93,6 @@ const filterAccessibleColumns = (columns: Array<Column>, userPermissions: Immuta
 
     return true;
   });
-
-// todo use tanstack query logic instead
-const filterVisibleColumns = (columnDefinitions: Array<Column>, visibleColumns: Array<string>) =>
-  visibleColumns.map((columnId) => columnDefinitions.find(({ id }) => id === columnId)).filter((column) => !!column);
 
 const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(
   columns: Array<Column>,
@@ -177,7 +173,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnDefinitions,
   columnRenderers: customColumnRenderers = undefined,
-  columnsOrder = [],
+  columnsOrder: attributeColumnsOder = [],
   entities,
   expandedSectionsRenderer = undefined,
   onColumnsChange,
@@ -185,7 +181,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
   entityActions = undefined,
-  visibleColumns,
+  visibleColumns: visibleAttributeColumns,
   meta = undefined,
 }: Props<Entity, Meta>) => {
   const currentUser = useCurrentUser();
@@ -193,6 +189,16 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
+
+  const visibleColumns = useMemo(
+    () =>
+      [
+        ...visibleAttributeColumns,
+        displayActionsCol ? ACTIONS_COL_ID : null,
+        displayBulkSelectCol ? BULK_SELECT_COL_ID : null,
+      ].filter(Boolean),
+    [displayActionsCol, displayBulkSelectCol, visibleAttributeColumns],
+  );
 
   const _isEntitySelectable = useCallback(
     (entity: Entity) => {
@@ -205,14 +211,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     [displayBulkSelectCol, isEntitySelectable],
   );
 
-  const accessibleColumns = useMemo(
+  const columns = useMemo(
     () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
     [columnDefinitions, currentUser.permissions],
-  );
-
-  const columns = useMemo(
-    () => filterVisibleColumns(accessibleColumns, visibleColumns),
-    [accessibleColumns, visibleColumns],
   );
 
   const columnRenderersByAttribute = useMemo(
@@ -221,10 +222,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   );
 
   const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths<Entity, Meta>({
-    columns,
     columnRenderersByAttribute,
+    columns,
     displayBulkSelectCol,
     fixedActionsCellWidth,
+    visibleColumns,
   });
 
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
@@ -243,12 +245,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const table = useTable<Entity>({
     columns: columnsDefinitions,
-    columnsOrder,
-    displayBulkSelectCol,
+    attributeColumnsOder,
     entities,
     isEntitySelectable: _isEntitySelectable,
+    onColumnsChange,
     onSortChange,
     sort: activeSort,
+    visibleColumns,
   });
 
   return (
@@ -266,11 +269,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 {displayPageSizeSelect && (
                   <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
                 )}
-                <ColumnsVisibilitySelect
-                  allColumns={accessibleColumns}
-                  selectedColumns={visibleColumns}
-                  onChange={onColumnsChange}
-                />
+                <ColumnsVisibilitySelect table={table} />
               </ButtonGroup>
             </LayoutConfigRow>
           </ActionsRow>
