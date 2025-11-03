@@ -37,7 +37,7 @@ import static org.graylog2.database.utils.MongoUtils.insertedIdAsString;
 import static org.graylog2.database.utils.MongoUtils.stream;
 
 public class DBNotificationService {
-    private static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
+    public static final String NOTIFICATION_COLLECTION_NAME = "event_notifications";
 
     private final EntityRegistrar entityRegistrar;
     private final MongoCollection<NotificationDto> collection;

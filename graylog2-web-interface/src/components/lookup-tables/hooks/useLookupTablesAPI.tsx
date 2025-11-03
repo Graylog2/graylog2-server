@@ -72,10 +72,16 @@ export function useCreateLookupTable() {
 }
 
 export function useUpdateLookupTable() {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateLookupTable,
     onSuccess: () => {
       UserNotification.success('Lookup Table updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-tables'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -119,9 +125,6 @@ export function usePurgeAllLookupTableKey() {
 export function useTestLookupTableKey() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: testLookupTableKey,
-    onSuccess: () => {
-      UserNotification.success('Lookup table purged successfully');
-    },
     onError: (error: Error) => UserNotification.error(error.message),
   });
 
@@ -208,10 +211,16 @@ export function useCreateCache() {
 }
 
 export function useUpdateCache() {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateCache,
     onSuccess: () => {
       UserNotification.success('Cache updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['caches'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -276,10 +285,16 @@ export function useCreateAdapter() {
 }
 
 export function useUpdateAdapter() {
+  const queryClient = useQueryClient();
+
   const { mutateAsync, isPending: isLoading } = useMutation({
     mutationFn: updateDataAdapter,
     onSuccess: () => {
       UserNotification.success('Data Adapter updated successfully');
+      queryClient.invalidateQueries({
+        queryKey: ['adapters'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });

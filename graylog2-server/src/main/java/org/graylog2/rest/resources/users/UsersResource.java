@@ -20,7 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
@@ -49,7 +49,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -60,6 +59,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.UserContext;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
+import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -74,6 +74,7 @@ import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
+import org.graylog2.rest.models.users.responses.BasicUserResponse;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
 import org.graylog2.rest.models.users.responses.TokenSummary;
@@ -92,7 +93,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
-import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
@@ -107,7 +107,6 @@ import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -144,6 +143,8 @@ import static org.graylog2.users.PasswordComplexityConfig.SPECIAL_CHARACTERS_COD
 @Api(value = "Users", description = "User accounts", tags = {CLOUD_VISIBLE})
 public class UsersResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(UsersResource.class);
+    private static final int USERNAME_PERMISSION_PARTS_LENGTH = 3;
+    private static final String USER_PERMISSION_DOMAIN = "users";
 
     private final UserManagementService userManagementService;
     private final PaginatedUserService paginatedUserService;
@@ -239,6 +240,28 @@ public class UsersResource extends RestResource {
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
 
         return toUserResponse(user, isSelf || canEditUserPermissions, Optional.of(AllUserSessions.create(sessionService)));
+    }
+
+    @GET
+    @Path("/basic/id/{userId}")
+    @ApiOperation(value = "Get basic user data by userId")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "The user could not be found.")
+    })
+    public BasicUserResponse getBasicUserById(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+                                              @PathParam("userId") String userId) {
+
+        final User user = loadUserById(userId);
+        if (!isPermitted(USERS_READ, user.getName())) {
+            throw new ForbiddenException("Not allowed to view userId " + userId);
+        }
+        return BasicUserResponse.builder()
+                .id(user.getId())
+                .username(user.getName())
+                .fullName(user.getFullName())
+                .readOnly(user.isReadOnly())
+                .isServiceAccount(user.isServiceAccount())
+                .build();
     }
 
     /**
@@ -442,26 +465,47 @@ public class UsersResource extends RestResource {
     }
 
     private void setUserRoles(@Nullable List<String> roles, User user) {
-        if (roles != null) {
-            try {
-                final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
-                List<String> unknownRoles = new ArrayList<>();
-                roles.forEach(roleName -> {
-                    checkPermission(RestPermissions.ROLES_EDIT, roleName);
-                    if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
-                        unknownRoles.add(roleName);
-                    }
-                });
-                if (!unknownRoles.isEmpty()) {
-                    throw new BadRequestException(
-                            String.format(Locale.ENGLISH, "Invalid role names: %s", StringUtils.join(unknownRoles, ", "))
-                    );
-                }
-                final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
-                user.setRoleIds(Sets.newHashSet(roleIds));
-            } catch (org.graylog2.database.NotFoundException e) {
-                throw new InternalServerErrorException(e);
+        if (roles == null) {
+            return;
+        }
+
+        try {
+            final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+            final Map<String, String> idToNameMap = nameMap.values().stream()
+                    .collect(Collectors.toMap(Role::getId, r -> r.getName().toLowerCase(Locale.US)));
+
+            final Set<String> normalizedRoles = roles.stream()
+                    .map(r -> r.toLowerCase(Locale.US))
+                    .collect(Collectors.toSet());
+
+            final List<String> unknownRoles = normalizedRoles.stream()
+                    .filter(r -> !nameMap.containsKey(r)).toList();
+
+            if (!unknownRoles.isEmpty()) {
+                throw new BadRequestException(
+                        String.format(Locale.ENGLISH, "Invalid role names: %s", String.join(", ", unknownRoles))
+                );
             }
+
+            final Set<String> currentRoleNames = user.getRoleIds().stream()
+                    .map(idToNameMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            final Set<String> changedRoles = Sets.symmetricDifference(normalizedRoles, currentRoleNames);
+
+            for (String changedRole : changedRoles) {
+                checkPermission(RestPermissions.ROLES_ASSIGN, nameMap.get(changedRole).getName());
+            }
+
+            final Set<String> roleIds = normalizedRoles.stream()
+                    .map(nameMap::get)
+                    .map(Role::getId)
+                    .collect(Collectors.toSet());
+
+            user.setRoleIds(roleIds);
+
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new InternalServerErrorException(e);
         }
     }
 
@@ -856,7 +900,7 @@ public class UsersResource extends RestResource {
         List<WildcardPermission> wildcardPermissions;
         List<GRNPermission> grnPermissions;
         if (includePermissions) {
-            wildcardPermissions = userManagementService.getWildcardPermissionsForUser(user);
+            wildcardPermissions = addUserIdPermissions(userManagementService.getWildcardPermissionsForUser(user), user);
             grnPermissions = userManagementService.getGRNPermissionsForUser(user);
         } else {
             wildcardPermissions = List.of();
@@ -926,6 +970,37 @@ public class UsersResource extends RestResource {
                             .roles(adminRoles)
                             .build();
                 });
+    }
+
+    /**
+     * This method duplicates username-based user permissions with userId variants
+     * (users:<action>:<userId>) so the UI can work when only the userId is known.
+     * Do NOT add these id-based variants for backend authorization; server-side
+     * permission checks must continue to use the original username form.
+     */
+    private List<WildcardPermission> addUserIdPermissions(List<WildcardPermission> permissions, User user) {
+        ImmutableSet.Builder<WildcardPermission> builder = ImmutableSet.builder();
+        final Map<String, String> userIdCache = new HashMap<>();
+        if (user != null) {
+            userIdCache.put(user.getName(), user.getId());
+        }
+        for (WildcardPermission permission : permissions) {
+            String[] parts = permission.toString().split(":");
+            boolean hasUsername = parts.length == USERNAME_PERMISSION_PARTS_LENGTH && USER_PERMISSION_DOMAIN.equals(parts[0]);
+            if (hasUsername) {
+                String username = parts[parts.length-1];
+                String userId = userIdCache.computeIfAbsent(username, name -> {
+                    final User loadedUser = userManagementService.load(name);
+                    return loadedUser != null ? loadedUser.getId() : null;
+                });
+                if (userId != null) {
+                    parts[2] = userId;
+                    builder.add(new CaseSensitiveWildcardPermission(String.join(":", parts)));
+                }
+            }
+
+        }
+        return builder.addAll(permissions).build().asList();
     }
 
     public record GenerateTokenTTL(@JsonProperty Optional<PeriodDuration> tokenTTL) {

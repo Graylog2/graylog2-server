@@ -16,14 +16,13 @@
  */
 package org.graylog2.shared.rest.resources.csp;
 
+import jakarta.inject.Inject;
 import org.graylog.security.authservice.DBAuthServiceBackendService;
 import org.graylog2.configuration.ContentStreamConfiguration;
 import org.graylog2.configuration.TelemetryConfiguration;
 import org.graylog2.rest.PaginationParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.net.URI;
 import java.util.stream.Collectors;
@@ -36,10 +35,11 @@ public class CSPServiceImpl implements CSPService {
     private final CSPResources cspResources;
 
     @Inject
-    protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, ContentStreamConfiguration contentStreamConfiguration, DBAuthServiceBackendService dbService) {
+    protected CSPServiceImpl(TelemetryConfiguration telemetryConfiguration, ContentStreamConfiguration contentStreamConfiguration, DBAuthServiceBackendService dbService,
+                             CSPResources cspResources) {
         this.telemetryApiHost = telemetryConfiguration.getTelemetryApiHost();
         this.dbService = dbService;
-        this.cspResources = new CSPResources();
+        this.cspResources = cspResources;
         this.contentStreamRssApiHost = getContentStreamHost(contentStreamConfiguration.getContentStreamRssUri());
         updateConnectSrc();
     }

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable global-require */
 
 const hooks = [
   {
@@ -27,21 +26,25 @@ const hooks = [
   },
 ];
 
-module.exports = (context) => ({
-  CallExpression: (node) => {
-    const { callee } = node;
+module.exports = {
+  meta: { type: 'problem', fixable: false },
+  create: (context) => ({
+    CallExpression: (node) => {
+      const { callee } = node;
 
-    hooks.forEach(({ name: hookName, relatedContext }) => {
-      if (relatedContext) {
-        if (callee.name === 'useContext'
-          && callee?.parent?.arguments?.[0].name === relatedContext
-          && !context.getFilename().includes(hookName)
-        ) {
-          context.report(node, `Implement ${hookName} hook instead of consuming ${relatedContext}.`);
+      hooks.forEach(({ name: hookName, relatedContext }) => {
+        if (relatedContext) {
+          if (
+            callee.name === 'useContext' &&
+            callee?.parent?.arguments?.[0].name === relatedContext &&
+            !context.getFilename().includes(hookName)
+          ) {
+            context.report(node, `Implement ${hookName} hook instead of consuming ${relatedContext}.`);
+          }
         }
-      }
-    });
-  },
-});
+      });
+    },
+  }),
+};
 
 module.schema = [];

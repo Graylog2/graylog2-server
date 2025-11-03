@@ -23,8 +23,6 @@ import QueryValidationActions from 'views/actions/QueryValidationActions';
 import type { IconName } from 'components/common/Icon';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 
 export const SEARCH_BUTTON_WIDTH = '64';
 
@@ -64,7 +62,7 @@ type Props = {
 
 const onButtonClick = (
   e: MouseEvent,
-  disabled: Boolean,
+  disabled: boolean,
   triggerTelemetry: () => void,
   onClick?: (e: MouseEvent) => void,
 ) => {
@@ -86,13 +84,11 @@ const SearchButton = ({
   onClick = undefined,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const location = useLocation();
   const className = disabled ? 'disabled' : '';
   const title = dirty ? 'Perform search (changes were made after last search execution)' : 'Perform Search';
 
   const triggerTelemetry = () => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_BUTTON_CLICKED, {
-      app_pathname: getPathnameWithoutId(location.pathname),
       app_section: 'search-bar',
       app_action_value: 'search-button',
       event_details: {
@@ -107,7 +103,7 @@ const SearchButton = ({
       title={title}
       className={className}
       type="submit"
-      bsStyle="success"
+      bsStyle="primary"
       $dirty={dirty && !displaySpinner}>
       {displaySpinner ? <Spinner delay={0} text="" /> : <Icon name={glyph} size="lg" />}
     </StyledButton>

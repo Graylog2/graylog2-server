@@ -16,38 +16,14 @@
  */
 import * as React from 'react';
 
-import AppConfig from 'util/AppConfig';
 import PageNavigation from 'components/common/PageNavigation';
-import Routes from 'routing/Routes';
 import { Row } from 'components/bootstrap';
+import { PAGE_NAV_TITLE } from 'components/indices/bindings';
 
-const PREM_ONLY_NAV_ITEMS = [
-  {
-    description: 'Index Set Templates',
-    path: Routes.SYSTEM.INDICES.TEMPLATES.OVERVIEW,
-    exactPathMatch: false,
-    permissions: 'indexset_templates:read',
-  },
-];
-
-const NAV_ITEMS = [
-  { description: 'Indices & Index Sets', path: Routes.SYSTEM.INDICES.LIST, exactPathMatch: true },
-  {
-    description: 'Field Type Profiles',
-    path: Routes.SYSTEM.INDICES.FIELD_TYPE_PROFILES.OVERVIEW,
-    exactPathMatch: false,
-    permissions: 'mappingprofiles:read',
-  },
-];
-
-const IndicesPageNavigation = () => {
-  const navItems = AppConfig.isCloud() ? NAV_ITEMS : [...NAV_ITEMS, ...PREM_ONLY_NAV_ITEMS];
-
-  return (
-    <Row>
-      <PageNavigation items={navItems} />
-    </Row>
-  );
-};
+const IndicesPageNavigation = () => (
+  <Row>
+    <PageNavigation page={PAGE_NAV_TITLE} />
+  </Row>
+);
 
 export default IndicesPageNavigation;

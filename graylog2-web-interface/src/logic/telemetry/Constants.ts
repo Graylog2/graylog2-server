@@ -250,6 +250,7 @@ export const TELEMETRY_EVENT_TYPE = {
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
+    MARKDOWN_UPDATED: 'Configurations Markdown Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',

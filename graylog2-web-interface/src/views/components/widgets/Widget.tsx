@@ -29,7 +29,6 @@ import TimerangeInfo from 'views/components/widgets/TimerangeInfo';
 import type WidgetConfig from 'views/logic/widgets/WidgetConfig';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useWidgetResults from 'views/components/useWidgetResults';
-import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { updateWidget, updateWidgetConfig, setWidgetTitle, updateDescription } from 'views/logic/slices/widgetActions';
@@ -43,11 +42,12 @@ import {
   useSendWidgetEditTelemetry,
   useSendWidgetEditCancelTelemetry,
   useSendWidgetConfigUpdateTelemetry,
-} from 'views/components/widgets/telemety';
+} from 'views/components/widgets/telemetry';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import useGlobalOverride from 'views/hooks/useGlobalOverride';
 import { setGlobalOverrideTimerange, setGlobalOverrideQuery } from 'views/logic/slices/searchExecutionSlice';
 import type GlobalOverride from 'views/logic/search/GlobalOverride';
+import useQueryFieldTypes from 'views/hooks/useQueryFieldTypes';
 
 import WidgetFrame from './WidgetFrame';
 import WidgetHeader from './WidgetHeader';
@@ -81,12 +81,6 @@ const _visualizationForType = (type: string) => widgetDefinition(type).visualiza
 const _editComponentForType = (type: string) => widgetDefinition(type).editComponent;
 
 const _hasOwnEditSubmitButton = (type: string) => widgetDefinition(type).hasEditSubmitButton;
-
-const useQueryFieldTypes = () => {
-  const fieldTypes = useContext(FieldTypesContext);
-
-  return useMemo(() => fieldTypes.currentQuery, [fieldTypes.currentQuery]);
-};
 
 const WidgetFooter = styled.div(
   ({ theme }) => css`

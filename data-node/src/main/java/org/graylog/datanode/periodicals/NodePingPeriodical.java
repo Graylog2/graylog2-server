@@ -20,6 +20,7 @@ import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.opensearch.OpensearchProcess;
+import org.graylog.datanode.opensearch.configuration.beans.impl.OpensearchCommonConfigurationBean;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
@@ -145,12 +146,20 @@ public class NodePingPeriodical extends Periodical {
                 .setRestApiAddress(datanodeRestApiUri.get())
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
-                .setOpensearchRoles(opensearchRoles.get())
+                .setOpensearchRoles(getOpensearchRoles())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build();
 
         nodeService.ping(dto);
 
+    }
+
+    private List<String> getOpensearchRoles() {
+        List<String> roles = opensearchRoles.get();
+        if (roles == null || roles.isEmpty()) {
+            return OpensearchCommonConfigurationBean.getNodeRoles(configuration);
+        }
+        return roles;
     }
 
     private void registerServer() {
@@ -162,7 +171,7 @@ public class NodePingPeriodical extends Periodical {
                 .setDataNodeStatus(DataNodeStatus.STARTING)
                 .setCertValidUntil(certValidUntil.get())
                 .setDatanodeVersion(version.getVersion().toString())
-                .setOpensearchRoles(opensearchRoles.get())
+                .setOpensearchRoles(getOpensearchRoles())
                 .setConfigurationWarnings(configurationWarnings.get())
                 .build());
 

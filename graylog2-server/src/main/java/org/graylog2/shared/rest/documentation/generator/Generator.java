@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.documentation.generator;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchemaGenerator;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
@@ -65,6 +66,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -74,7 +76,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Strings.nullToEmpty;
@@ -87,6 +91,7 @@ import static com.google.common.base.Strings.nullToEmpty;
  * and too big for what we want to do with it.
  */
 public class Generator {
+    private static final String INNER_CLASSES_SEPARATOR = "__";
 
     private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
 
@@ -94,6 +99,14 @@ public class Generator {
     public static final String CLOUD_VISIBLE = "cloud";
 
     private static final Map<String, Object> overviewResult = Maps.newHashMap();
+    private static final String PROPERTIES = "properties";
+    private static final String ADDITIONAL_PROPERTIES = "additional_properties";
+    private static final String ITEMS = "items";
+    private static final String REF = "$ref";
+    private static final String TYPE = "type";
+    private static final String GENERIC_CLASSES_SEPARATOR = "_";
+    private static final String ROUTE_SEPARATOR = "/";
+    private static final String PATH = "path";
 
     private final Set<Class<?>> resourceClasses;
     private final Map<Class<?>, String> pluginMapping;
@@ -111,7 +124,7 @@ public class Generator {
         this.resourceClasses = resourceClasses;
         this.pluginMapping = pluginMapping;
         this.pluginPathPrefix = pluginPathPrefix;
-        this.mapper = mapper;
+        this.mapper = mapper.copy().registerModule(new Jdk8Module());
         this.isCloud = isCloud;
         this.prefixPlugins = prefixPlugins;
     }
@@ -126,12 +139,12 @@ public class Generator {
 
         if (pluginMapping.containsKey(resourceClass)) {
             prefixedPath.append(pluginPathPrefix)
-                    .append("/")
+                    .append(ROUTE_SEPARATOR)
                     .append(pluginMapping.get(resourceClass));
         }
 
-        if (!resourcePath.startsWith("/")) {
-            prefixedPath.append("/");
+        if (!resourcePath.startsWith(ROUTE_SEPARATOR)) {
+            prefixedPath.append(ROUTE_SEPARATOR);
         }
 
         return prefixedPath.append(resourcePath).toString();
@@ -160,7 +173,7 @@ public class Generator {
 
             final Map<String, Object> apiDescription = Maps.newHashMap();
             apiDescription.put("name", (prefixPlugins && prefixedPath.startsWith(pluginPathPrefix)) ? "Plugins/" + info.value() : info.value());
-            apiDescription.put("path", prefixedPath);
+            apiDescription.put(PATH, prefixedPath);
             apiDescription.put("description", info.description());
 
             apis.add(apiDescription);
@@ -243,7 +256,7 @@ public class Generator {
                             produces = method.getAnnotation(Produces.class);
                         }
                     }
-                    api.put("path", methodPath);
+                    api.put(PATH, methodPath);
 
                     Map<String, Object> operation = Maps.newHashMap();
                     operation.put("method", determineHttpMethod(method));
@@ -262,13 +275,13 @@ public class Generator {
                     if (responseType != null) {
                         models.putAll(responseType.models());
                         if (responseType.name() != null && isObjectSchema(responseType.type())) {
-                            operation.put("type", responseType.name());
+                            operation.put(TYPE, responseType.name());
                             models.put(responseType.name(), responseType.type());
                         } else {
                             if (responseType.type() != null) {
                                 operation.putAll(responseType.type());
                             } else {
-                                operation.put("type", responseType.name());
+                                operation.put(TYPE, responseType.name());
                             }
                         }
                     }
@@ -296,12 +309,12 @@ public class Generator {
             }
         }
 
-        if (basePath.endsWith("/")) {
+        if (basePath.endsWith(ROUTE_SEPARATOR)) {
             basePath = basePath.substring(0, basePath.length() - 1);
         }
 
         Collections.sort(apis, (o1, o2) -> ComparisonChain.start()
-                .compare(o1.get("path").toString(), o2.get("path").toString())
+                .compare(o1.get(PATH).toString(), o2.get(PATH).toString())
                 .result());
 
         // generate the json schema for the auto-mapped return types
@@ -401,7 +414,7 @@ public class Generator {
             final Map<String, Object> modelItemsDefinition;
             if (valueType instanceof Class && isPrimitive((Class<?>) valueType)) {
                 valueName = mapPrimitives(((Class<?>) valueType).getSimpleName());
-                modelItemsDefinition = Collections.singletonMap("additional_properties", valueName);
+                modelItemsDefinition = Collections.singletonMap(ADDITIONAL_PROPERTIES, valueName);
             } else {
                 final TypeSchema valueSchema = typeSchema(valueType);
                 if (valueSchema == null) {
@@ -409,7 +422,7 @@ public class Generator {
                 }
                 valueName = valueSchema.name();
                 models.putAll(valueSchema.models());
-                modelItemsDefinition = Collections.singletonMap("additional_properties", Collections.singletonMap("$ref", valueName));
+                modelItemsDefinition = Collections.singletonMap(ADDITIONAL_PROPERTIES, Collections.singletonMap(REF, valueName));
                 if (valueSchema.type() != null) {
                     models.put(valueName, valueSchema.type());
                 }
@@ -418,13 +431,13 @@ public class Generator {
 
             final String modelName = valueName + "Map";
             final Map<String, Object> model = ImmutableMap.<String, Object>builder()
-                    .put("type", "object")
+                    .put(TYPE, "object")
                     .put("id", modelName)
-                    .put("properties", Collections.emptyMap())
+                    .put(PROPERTIES, Collections.emptyMap())
                     .putAll(modelItemsDefinition)
                     .build();
             models.put(modelName, model);
-            return createTypeSchema(modelName, Collections.singletonMap("type", modelName), models);
+            return createTypeSchema(modelName, Collections.singletonMap(TYPE, modelName), models);
         }
         if (returnType.isAssignableFrom(Optional.class)) {
             final Type valueType = typeParameters(genericType)[0];
@@ -437,7 +450,7 @@ public class Generator {
             final Map<String, Object> modelItemsDefinition;
             if (valueType instanceof Class && isPrimitive((Class<?>) valueType)) {
                 valueName = mapPrimitives(((Class<?>) valueType).getSimpleName());
-                modelItemsDefinition = Collections.singletonMap("items", valueName);
+                modelItemsDefinition = Collections.singletonMap(ITEMS, valueName);
             } else {
                 final TypeSchema valueSchema = typeSchema(valueType);
                 if (valueSchema == null) {
@@ -449,17 +462,17 @@ public class Generator {
                 }
                 models.putAll(valueSchema.models());
                 //final String valueModelId = (String)((Map<String, Object>)models.get(valueName)).get("id");
-                modelItemsDefinition = Collections.singletonMap("items", Collections.singletonMap("$ref", valueName));
+                modelItemsDefinition = Collections.singletonMap(ITEMS, Collections.singletonMap(REF, valueName));
             }
             final String modelName = valueName + "Array";
             final Map<String, Object> model = ImmutableMap.<String, Object>builder()
-                    .put("type", "array")
+                    .put(TYPE, "array")
                     .put("id", modelName)
-                    .put("properties", Collections.emptyMap())
+                    .put(PROPERTIES, Collections.emptyMap())
                     .putAll(modelItemsDefinition)
                     .build();
             models.put(modelName, model);
-            return createTypeSchema(modelName, Collections.singletonMap("type", modelName), models);
+            return createTypeSchema(modelName, Collections.singletonMap(TYPE, modelName), models);
         }
 
         final String modelName = uniqueModelName(genericType, returnType);
@@ -473,72 +486,84 @@ public class Generator {
     }
 
     private String uniqueModelName(Type genericType, Class<?> returnType) {
-        final var simpleName = returnType.getSimpleName();
+        final var simpleName = nestedNames(returnType).collect(Collectors.joining(INNER_CLASSES_SEPARATOR));
         if (genericType instanceof ParameterizedType parameterizedType) {
             final var classNames = Arrays.stream(parameterizedType.getActualTypeArguments())
                     .map(type -> uniqueModelName(type, classForType(type)))
                     .toList();
-            return simpleName + "_" + Joiner.on("_").join(classNames);
+            return simpleName + GENERIC_CLASSES_SEPARATOR + Joiner.on(GENERIC_CLASSES_SEPARATOR).join(classNames);
         }
         return simpleName;
+    }
+
+    private Stream<String> nestedNames(Class<?> returnType) {
+        if (returnType.getEnclosingClass() == null) {
+            return Stream.of(returnType.getSimpleName());
+        }
+        return Stream.concat(nestedNames(returnType.getEnclosingClass()), Stream.of(returnType.getSimpleName()));
     }
 
     private TypeSchema extractInlineModels(Map<String, Object> genericTypeSchema) {
         if (isObjectSchema(genericTypeSchema)) {
             final Map<String, Object> newGenericTypeSchema = new HashMap<>(genericTypeSchema);
             final Map<String, Object> models = new HashMap<>();
-            if (genericTypeSchema.get("properties") instanceof Map) {
-                final Map<String, Object> properties = (Map<String, Object>) genericTypeSchema.get("properties");
+            if (genericTypeSchema.get(PROPERTIES) instanceof Map) {
+                final Map<String, Object> properties = (Map<String, Object>) genericTypeSchema.get(PROPERTIES);
                 final Map<String, Object> newProperties = properties.entrySet().stream().map(entry -> {
                             final Map<String, Object> property = (Map<String, Object>) entry.getValue();
                             final TypeSchema propertySchema = extractInlineModels(property);
                             models.putAll(propertySchema.models());
+                            final Map<String, Object> type = reuseTypeRef(propertySchema.type());
                             if (propertySchema.name() == null) {
-                                return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), propertySchema.type());
+                                return new AbstractMap.SimpleEntry<>(entry.getKey(), type);
                             }
                             if (propertySchema.type() != null) {
-                                models.put(propertySchema.name(), propertySchema.type());
+                                models.put(propertySchema.name(), type);
                             }
-                            return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap("$ref", propertySchema.name()));
+                            return new AbstractMap.SimpleEntry<String, Object>(entry.getKey(), Collections.singletonMap(REF, propertySchema.name()));
                         })
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-                newGenericTypeSchema.put("properties", newProperties);
+                newGenericTypeSchema.put(PROPERTIES, newProperties);
             }
-            if (genericTypeSchema.get("additional_properties") instanceof Map) {
-                final Map<String, Object> additionalProperties = (Map<String, Object>) genericTypeSchema.get("additional_properties");
+            if (genericTypeSchema.get(ADDITIONAL_PROPERTIES) instanceof Map) {
+                final Map<String, Object> additionalProperties = (Map<String, Object>) genericTypeSchema.get(ADDITIONAL_PROPERTIES);
                 final TypeSchema itemsSchema = extractInlineModels(additionalProperties);
                 models.putAll(itemsSchema.models());
                 if (itemsSchema.name() != null) {
                     if (itemsSchema.type() != null) {
                         models.put(itemsSchema.name(), itemsSchema.type());
                     }
-                    newGenericTypeSchema.put("additional_properties", Collections.singletonMap("$ref", itemsSchema.name()));
+                    newGenericTypeSchema.put(ADDITIONAL_PROPERTIES, Collections.singletonMap(REF, itemsSchema.name()));
                 } else {
                     if (itemsSchema.type() != null) {
-                        newGenericTypeSchema.put("additional_properties", itemsSchema.type());
+                        final Map<String, Object> type = reuseTypeRef(itemsSchema.type());
+                        newGenericTypeSchema.put(ADDITIONAL_PROPERTIES, itemsSchema.type());
                     }
                 }
             }
 
-            if (!genericTypeSchema.containsKey("properties")) {
-                newGenericTypeSchema.put("properties", Collections.emptyMap());
+            if (!genericTypeSchema.containsKey(PROPERTIES)) {
+                newGenericTypeSchema.put(PROPERTIES, Collections.emptyMap());
             }
-            final String id = shortenJsonSchemaURN((String) genericTypeSchema.get("id"));
+            final String id = shortenJsonSchemaURNs((String) genericTypeSchema.get("id"));
             return createTypeSchema(id, newGenericTypeSchema, models);
         }
 
         if (isArraySchema(genericTypeSchema)) {
             final Map<String, Object> models = new HashMap<>();
             final Map<String, Object> newGenericTypeSchema = new HashMap<>(genericTypeSchema);
-            if (genericTypeSchema.get("items") instanceof Map) {
-                final Map<String, Object> items = (Map<String, Object>) genericTypeSchema.get("items");
+            if (genericTypeSchema.get(ITEMS) instanceof Map) {
+                final Map<String, Object> items = (Map<String, Object>) genericTypeSchema.get(ITEMS);
                 final TypeSchema itemsSchema = extractInlineModels(items);
                 models.putAll(itemsSchema.models());
                 if (itemsSchema.name() != null) {
                     if (itemsSchema.type() != null) {
                         models.put(itemsSchema.name(), itemsSchema.type());
                     }
-                    newGenericTypeSchema.put("items", Collections.singletonMap("$ref", itemsSchema.name()));
+                    newGenericTypeSchema.put(ITEMS, Collections.singletonMap(REF, itemsSchema.name()));
+                } else {
+                    final Map<String, Object> type = reuseTypeRef(itemsSchema.type());
+                    newGenericTypeSchema.put(ITEMS, type);
                 }
             }
             return createTypeSchema(null, newGenericTypeSchema, models);
@@ -546,20 +571,56 @@ public class Generator {
         return createTypeSchema(null, genericTypeSchema, Collections.emptyMap());
     }
 
+    private Map<String, Object> reuseTypeRef(Map<String, Object> type) {
+        if (type.get(REF) != null) {
+            type.put(REF, shortenJsonSchemaURNs((String) type.get(REF)));
+        }
+
+        return type;
+    }
+
+    private static final Pattern IDENT =
+            Pattern.compile("[A-Za-z_][A-Za-z0-9_$:]*");
+
+    private static final Set<String> KEYWORDS =
+            Set.of("extends", "super");
+
+    private List<String> splitIfGeneric(String genericFqcn) {
+        if (genericFqcn == null) {
+            return null;
+        }
+        final List<String> result = new ArrayList<>();
+        final var m = IDENT.matcher(genericFqcn);
+        while (m.find()) {
+            final var token = m.group();
+            if (!KEYWORDS.contains(token) && !token.equals("?")) {
+                result.add(token);
+            }
+        }
+        return result;
+    }
+
+    private String shortenJsonSchemaURNs(@Nullable String id) {
+        final var genericParts = splitIfGeneric(id);
+        return genericParts != null ? genericParts.stream().map(this::shortenJsonSchemaURN).collect(Collectors.joining(GENERIC_CLASSES_SEPARATOR)) : null;
+    }
     private String shortenJsonSchemaURN(@Nullable String id) {
         if (id == null) {
             return null;
         }
         final Splitter splitter = Splitter.on(":");
         final List<String> segments = splitter.splitToList(id);
-        return segments.size() > 0
-                ? segments.get(segments.size() - 1)
-                : id;
+        if (segments.isEmpty()) {
+            return id;
+        }
+        return segments.stream()
+                .filter(segment -> Character.isUpperCase(segment.codePointAt(0)))
+                .collect(Collectors.joining(INNER_CLASSES_SEPARATOR));
     }
 
     private static Optional<String> typeOfSchema(@Nullable Map<String, Object> typeSchema) {
         return Optional.ofNullable(typeSchema)
-                .map(schema -> Strings.emptyToNull((String) schema.get("type")));
+                .map(schema -> Strings.emptyToNull((String) schema.get(TYPE)));
     }
 
     private static boolean isArraySchema(Map<String, Object> genericTypeSchema) {
@@ -571,18 +632,18 @@ public class Generator {
     }
 
     private Map<String, Object> schemaForType(Type valueType) {
-        final SchemaFactoryWrapper schemaFactoryWrapper = new SchemaFactoryWrapper() {};
+        final SchemaFactoryWrapper schemaFactoryWrapper = new CustomSchemaFactoryWrapper();
         final JsonSchemaGenerator schemaGenerator = new JsonSchemaGenerator(mapper, schemaFactoryWrapper);
         try {
             final JsonSchema schema = schemaGenerator.generateSchema(mapper.getTypeFactory().constructType(valueType));
             final Map<String, Object> schemaMap = mapper.readValue(mapper.writeValueAsBytes(schema), Map.class);
-            if (schemaMap.containsKey("additional_properties") && !schemaMap.containsKey("properties")) {
-                schemaMap.put("properties", Collections.emptyMap());
+            if (schemaMap.containsKey(ADDITIONAL_PROPERTIES) && !schemaMap.containsKey(PROPERTIES)) {
+                schemaMap.put(PROPERTIES, Collections.emptyMap());
             }
-            if (schemaMap.equals(Collections.singletonMap("type", "any"))) {
+            if (schemaMap.equals(Collections.singletonMap(TYPE, "any"))) {
                 return ImmutableMap.of(
-                        "type", "object",
-                        "properties", Collections.emptyMap()
+                        TYPE, "object",
+                        PROPERTIES, Collections.emptyMap()
                 );
             }
             return schemaMap;
@@ -706,11 +767,11 @@ public class Generator {
 
     // Leading slash but no trailing.
     private String cleanRoute(String route) {
-        if (!route.startsWith("/")) {
-            route = "/" + route;
+        if (!route.startsWith(ROUTE_SEPARATOR)) {
+            route = ROUTE_SEPARATOR + route;
         }
 
-        if (route.endsWith("/")) {
+        if (route.endsWith(ROUTE_SEPARATOR)) {
             route = route.substring(0, route.length() - 1);
         }
 
@@ -876,7 +937,7 @@ public class Generator {
             }
 
             if (typeSchema.type() == null || isObjectSchema(typeSchema.type())) {
-                result.put("type", typeSchema.name());
+                result.put(TYPE, typeSchema.name());
             } else {
                 result.putAll(typeSchema.type());
             }

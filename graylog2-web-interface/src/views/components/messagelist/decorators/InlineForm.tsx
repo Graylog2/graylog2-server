@@ -48,7 +48,7 @@ const InlineForm = (submitTitle: string = 'Create'): React.ComponentType<Props> 
     return (
       <form onSubmit={onSubmit} ref={ref}>
         {children}
-        <Button type="submit" bsStyle="success" disabled={disabled}>
+        <Button type="submit" bsStyle="primary" disabled={disabled}>
           {submitTitle}
         </Button>{' '}
         <Button type="button" disabled={disabled} onClick={onCancel}>
