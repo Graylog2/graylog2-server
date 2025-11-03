@@ -88,8 +88,6 @@ public interface IndicesAdapter {
 
     void close(String indexName);
 
-    long numberOfMessages(String indexName);
-
     boolean aliasExists(String alias) throws IOException;
 
     Map<String, Set<String>> aliases(String indexPattern);

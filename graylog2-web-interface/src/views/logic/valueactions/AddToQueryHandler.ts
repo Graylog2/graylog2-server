@@ -45,7 +45,11 @@ const AddToQueryHandler =
     const oldQuery = selectQueryString(queryId)(getState());
     const valuesToAdd = uniq(
       hasMultipleValueForActions(contexts)
-        ? contexts.valuePath.map(() => ({ field, value, type: fieldTypeFor(field, contexts?.fieldTypes) }))
+        ? contexts.valuePath.map((path) => {
+            const [pathField, pathValue] = Object.entries(path)[0];
+
+            return { field: pathField, value: pathValue, type: fieldTypeFor(field, contexts?.fieldTypes) };
+          })
         : [{ field, value, type }],
     );
 
