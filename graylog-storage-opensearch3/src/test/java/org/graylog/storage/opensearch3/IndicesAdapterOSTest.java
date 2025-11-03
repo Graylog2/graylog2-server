@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.graylog.storage.opensearch3.cat.CatApi;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -50,15 +49,11 @@ class IndicesAdapterOSTest {
     private IndicesAdapterOS toTest;
 
     @Mock
-    private OpenSearchClient client;
-    @Mock
     private OfficialOpensearchClient opensearchClient;
     @Mock
     private StatsApi statsApi;
     @Mock
     private ClusterStatsApi clusterStatsApi;
-    @Mock
-    private CatApi catApi;
     @Mock
     private ClusterStateApi clusterStateApi;
     @Mock
