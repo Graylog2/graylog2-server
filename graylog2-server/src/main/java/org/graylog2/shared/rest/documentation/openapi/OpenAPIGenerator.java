@@ -40,6 +40,8 @@ import java.util.Set;
  *   tests, this is not ideal. Maybe we should expose the context and provide means to create it with a
  *   user-defined context id.
  */
+// TODO: make the old generator work with the new annotations as an intermediate step
+// TODO: make sure that the reader doesn't run into concurrency issues (call the openapi endpoint in quick succession. maybe we have to bind the resource as a singleton?)
 @Singleton
 public class OpenAPIGenerator {
 
@@ -61,6 +63,10 @@ public class OpenAPIGenerator {
         this.modelConverter = modelConverter;
         this.readerFactory = readerFactory;
     }
+
+    // TODO: create a constructor/factory method to easily create a generator from a non-guice
+    //   context? Probably need to provide Jackson subtypes as a parameter to register with
+    //   the object mapper
 
     /**
      * Generates and returns the complete OpenAPI specification.

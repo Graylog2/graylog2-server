@@ -16,6 +16,12 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -36,7 +42,6 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -50,23 +55,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OpenAPIGeneratorTest {
 
     private OpenAPIGenerator generator;
+    private ObjectMapperConfiguration objectMapperConfiguration;
 
     @BeforeEach
     void setUp() {
         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
                 Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class, NotPublicCloudResource.class));
-        final var objectMapperConfiguration = new ObjectMapperConfiguration(
+
+        objectMapperConfiguration = new ObjectMapperConfiguration(
                 ObjectMapperProvider.class.getClassLoader(),
-                Collections.emptySet(),
+                Set.of(new NamedType(ChildType1.class, "child-type-1"), new NamedType(ChildType2.class, "child-type-2")),
                 new EncryptedValueService(UUID.randomUUID().toString()),
                 GRNRegistry.createWithBuiltinTypes(),
                 InputConfigurationBeanDeserializerModifier.withoutConfig()
         );
+
         generator = new OpenAPIGenerator(
                 Version.from(1, 0, 0),
                 new CustomOpenAPIScanner(Set.of(RootTestResource.class), pluginRestResources, true),
                 new CustomObjectMapperProcessor(objectMapperConfiguration),
-                new CustomModelConverter(),
+                new CustomModelConverter(objectMapperConfiguration.configure(new ObjectMapper())),
                 (config) -> new CustomReader(pluginRestResources, config)
         );
     }
@@ -151,6 +159,24 @@ class OpenAPIGeneratorTest {
         assertThat(rateProperty.getProperties()).isNullOrEmpty();
     }
 
+    @Test
+    void generateOpenApiSpec_withRegisteredJacksonSubtypes() throws Exception {
+        final var mapper = objectMapperConfiguration.configure(new ObjectMapper());
+
+        final var childType1 = mapper.readValue("{\"type\":\"child-type-1\",\"age\":5}", ParentType.class);
+        final var childType2 = mapper.readValue("{\"type\":\"child-type-2\",\"age\":5}", ParentType.class);
+
+
+        assertThat(childType1).isInstanceOf(ChildType1.class);
+        assertThat(childType2).isInstanceOf(ChildType2.class);
+
+        final var openAPI = generator.generateOpenApiSpec();
+
+        System.out.println(Json.pretty(openAPI));
+
+        assertThat(openAPI.getComponents().getSchemas()).isEmpty();
+    }
+
     @PublicCloudAPI
     @Path("/test")
     @Produces(MediaType.APPLICATION_JSON)
@@ -210,8 +236,12 @@ class OpenAPIGeneratorTest {
 
         @NoAuditEvent("Test2")
         @GET
-        public Response getTest() {
-            return Response.ok().build();
+        public ParentType getTest() {
+            if (Math.random() < 0.5) {
+                return new ChildType1(2);
+            } else {
+                return new ChildType2(2);
+            }
         }
     }
 
@@ -248,4 +278,31 @@ class OpenAPIGeneratorTest {
             Optional<Double> optionalDouble,  // For comparison with OptionalDouble
             OptionalDouble rate
     ) {}
+
+    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
+//    @JsonSubTypes({
+//            @JsonSubTypes.Type(value = ChildType1.class, name = "child-type-1"),
+//            @JsonSubTypes.Type(value = ChildType2.class, name = "child-type-2"),
+//    })
+    public interface ParentType {
+        String type();
+    }
+
+    @JsonTypeName("child-type-1")
+    public record ChildType1(int age) implements ParentType {
+        @Override
+        @JsonProperty("type")
+        public String type() {
+            return "child-type-1";
+        }
+    }
+
+    @JsonTypeName("child-type-2")
+    public record ChildType2(long age) implements ParentType {
+        @Override
+        @JsonProperty("type")
+        public String type() {
+            return "child-type-2";
+        }
+    }
 }

@@ -63,6 +63,7 @@ public class CustomReader extends Reader {
      */
     @Override
     public OpenAPI read(Class<?> cls, String parentPath, String parentMethod, boolean isSubresource, RequestBody parentRequestBody, ApiResponses parentResponses, Set<String> parentTags, List<Parameter> parentParameters, Set<Class<?>> scannedResources) {
+        // TODO: synchronize to avoid concurrency issues? test this!
         final var pathPrefix = prefixes.get(cls);
 
         getPaths().clear();
