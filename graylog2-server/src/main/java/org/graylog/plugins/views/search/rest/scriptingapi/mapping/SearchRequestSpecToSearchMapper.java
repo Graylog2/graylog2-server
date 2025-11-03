@@ -33,6 +33,7 @@ import org.graylog2.streams.StreamService;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -61,11 +62,11 @@ public class SearchRequestSpecToSearchMapper {
         return mapToSearch(aggregationRequestSpec, searchUser, pivotCreator);
     }
 
-    private <T extends SearchRequestSpec> Search mapToSearch(final T searchRequestSpec, final SearchUser searchUser, Function<T, ? extends SearchType> searchTypeCreator) {
+    private <T extends SearchRequestSpec> Search mapToSearch(final T searchRequestSpec, final SearchUser searchUser, BiFunction<T, SearchUser, ? extends SearchType> searchTypeCreator) {
 
         Query query = Query.builder()
                 .id(QUERY_ID)
-                .searchTypes(Set.of(searchTypeCreator.apply(searchRequestSpec)))
+                .searchTypes(Set.of(searchTypeCreator.apply(searchRequestSpec, searchUser)))
                 .query(ElasticsearchQueryString.ofNullable(searchRequestSpec.queryString()))
                 .timerange(getTimerange(searchRequestSpec))
                 .build();
