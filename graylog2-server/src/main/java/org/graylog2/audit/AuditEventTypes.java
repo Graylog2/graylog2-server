@@ -76,6 +76,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_CREATE = PREFIX + "extractor:create";
     public static final String EXTRACTOR_DELETE = PREFIX + "extractor:delete";
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
+    public static final String FAVORITE_FIELDS_UPDATE = PREFIX + "favorite_fields:update";
     public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
     public static final String FIELD_TYPE_POLLING_TRIGGERED = PREFIX + "field_type_polling:trigger";
