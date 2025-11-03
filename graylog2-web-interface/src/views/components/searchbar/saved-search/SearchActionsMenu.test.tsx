@@ -26,7 +26,6 @@ import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
 import type { ViewLoaderContextType } from 'views/logic/ViewLoaderContext';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type { NewViewLoaderContextType } from 'views/logic/NewViewLoaderContext';
 import NewViewLoaderContext from 'views/logic/NewViewLoaderContext';
 import * as ViewsPermissions from 'views/Permissions';
@@ -44,6 +43,7 @@ import HotkeysProvider from 'contexts/HotkeysProvider';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import { createEntityShareState } from 'fixtures/entityShareState';
 import { EntityShareStore } from 'stores/permissions/EntityShareStore';
+import { createView } from 'views/api/views';
 
 import SearchActionsMenu from './SearchActionsMenu';
 
@@ -64,10 +64,8 @@ jest.mock('stores/permissions/EntityShareStore', () => ({
   },
 }));
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
 jest.mock('views/hooks/useView');
@@ -84,7 +82,7 @@ jest.mock('views/logic/slices/viewSlice', () => {
 });
 
 describe('SearchActionsMenu', () => {
-  const createView = (id: string = undefined) =>
+  const _createView = (id: string = undefined) =>
     View.builder()
       .id(id)
       .title('title')
@@ -94,7 +92,7 @@ describe('SearchActionsMenu', () => {
       .owner('owningUser')
       .build();
 
-  const defaultView = createView();
+  const defaultView = _createView();
 
   type SimpleSearchActionsMenuProps = {
     loadNewView?: NewViewLoaderContextType;
@@ -190,7 +188,7 @@ describe('SearchActionsMenu', () => {
           .build(),
       );
 
-      asMock(useView).mockReturnValue(createView('some-id'));
+      asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
       userEvent.click(await screen.findByRole('button', { name: /open search actions/i }));
       const exportMenuItem = await screen.findByText('Edit metadata');
@@ -241,7 +239,7 @@ describe('SearchActionsMenu', () => {
 
       const updatedView = defaultView.toBuilder().title('title and further title').id('new-search-id').build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
+      await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
     });
 
     it('should extend a saved search with plugin data on duplication', async () => {
@@ -271,13 +269,13 @@ describe('SearchActionsMenu', () => {
         .id('new-search-id')
         .build();
 
-      await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
+      await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedView, null, 'some-id-1'));
 
       expect(screen.queryByText('Pluggable component!')).not.toBeInTheDocument();
     });
 
     it('should save search when pressing related keyboard shortcut', async () => {
-      asMock(useView).mockReturnValue(createView('some-id'));
+      asMock(useView).mockReturnValue(_createView('some-id'));
       render(<SimpleSearchActionsMenu />);
       userEvent.keyboard('{Meta>}s{/Meta}');
 

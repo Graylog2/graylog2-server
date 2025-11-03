@@ -29,8 +29,6 @@ import ToolsStore from 'stores/tools/ToolsStore';
 import type { SearchesConfig } from 'components/search/SearchConfig';
 import { isTypeRelativeWithEnd } from 'views/typeGuards/timeRange';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import type { BsSize } from 'components/bootstrap/types';
 
 type PresetOption = {
@@ -143,7 +141,6 @@ const TimeRangePresetDropdown = ({
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const { formatTime } = useUserDateTime();
-  const location = useLocation();
   const { options, setOptions: setDropdownOptions } = usePresetOptions(disabled, limitDuration);
 
   const _onChange = useCallback(
@@ -153,13 +150,12 @@ const TimeRangePresetDropdown = ({
       }
 
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_TIMERANGE_PRESET_SELECTED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
         app_section: 'search-bar',
         app_action_value: 'timerange-preset-selector',
         event_details: { timerange },
       });
     },
-    [formatTime, location.pathname, onChange, sendTelemetry],
+    [formatTime, onChange, sendTelemetry],
   );
 
   const onToggle = useCallback(

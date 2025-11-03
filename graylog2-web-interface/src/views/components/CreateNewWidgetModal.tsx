@@ -28,8 +28,6 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
 import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const modalTitle = 'Create new widget';
@@ -76,7 +74,6 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
   const dispatch = useViewsDispatch();
-  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { setWidgetEditing } = useContext(WidgetFocusContext);
 
@@ -85,7 +82,6 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
       creators.map(({ title, func, icon: WidgetIcon }) => {
         const onClick = async () => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
-            app_pathname: getPathnameWithoutId(location.pathname),
             app_section: 'search-widget',
           });
 
@@ -109,7 +105,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
           </CreateWidgetButton>
         );
       }),
-    [creators, dispatch, location.pathname, position, sendTelemetry, setWidgetEditing, view],
+    [creators, dispatch, position, sendTelemetry, setWidgetEditing, view],
   );
 
   return (

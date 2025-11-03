@@ -19,13 +19,11 @@ import { useState, useContext, useCallback } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { getPathnameWithoutId } from 'util/URLUtils';
 import type { BackendWidgetPosition } from 'views/types';
 import ExportModal from 'views/components/export/ExportModal';
 import MoveWidgetToTab from 'views/logic/views/MoveWidgetToTab';
 import { loadAsDashboard, loadDashboard } from 'views/logic/views/Actions';
 import { IconButton } from 'components/common';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -45,13 +43,13 @@ import fetchSearch from 'views/logic/views/fetchSearch';
 import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import useParameters from 'views/hooks/useParameters';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import ExtractWidgetIntoNewView from 'views/logic/views/ExtractWidgetIntoNewView';
 import ExtraMenuWidgetActions from 'views/components/widgets/ExtraMenuWidgetActions';
 import { widgetActionsMenuClass } from 'views/components/widgets/Constants';
 import type { ActionComponents } from 'views/components/actions/ActionHandler';
+import { getView, updateView as _updateView } from 'views/api/views';
 
 import ReplaySearchButton from './ReplaySearchButton';
 import ExtraDropdownWidgetActions from './ExtraDropdownWidgetActions';
@@ -84,15 +82,15 @@ const _onCopyToDashboard = async (
     return;
   }
 
-  const dashboardJson = await ViewManagementActions.get(dashboardId);
+  const dashboardJson = await getView(dashboardId);
   const dashboard = View.fromJSON(dashboardJson);
   const search = await fetchSearch(dashboardJson.search_id).then((searchJson) => Search.fromJSON(searchJson));
   const newDashboard = CopyWidgetToDashboard(widgetId, view, dashboard.toBuilder().search(search).build());
 
-  if (newDashboard && newDashboard.search) {
+  if (newDashboard?.search) {
     const newSearch = await createSearch(newDashboard.search);
     const newDashboardWithSearch = newDashboard.toBuilder().search(newSearch).build();
-    await ViewManagementActions.update(newDashboardWithSearch);
+    await _updateView(newDashboardWithSearch);
 
     loadDashboard(history, newDashboardWithSearch.id);
   }
@@ -167,7 +165,6 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
   const [showMoveWidgetToTab, setShowMoveWidgetToTab] = useState(false);
   const dispatch = useViewsDispatch();
   const history = useHistory();
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const { parameters, parameterBindings } = useParameters();
   const [overflowingComponents, setOverflowingComponents] = useState<ActionComponents>({});
@@ -175,67 +172,61 @@ const WidgetActionsMenu = ({ isFocused, onPositionsChange, position, title, togg
 
   const onDuplicate = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DUPLICATE, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-duplicate-button',
     });
 
     return dispatch(_onDuplicate(widget.id, unsetWidgetFocusing, title));
-  }, [sendTelemetry, pathname, dispatch, widget.id, unsetWidgetFocusing, title]);
+  }, [sendTelemetry, dispatch, widget.id, unsetWidgetFocusing, title]);
 
   const onCopyToDashboard = useCallback(
     (widgetId: string, dashboardId: string) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.COPY_TO_DASHBOARD, {
-        app_pathname: getPathnameWithoutId(pathname),
         app_section: 'search-widget',
         app_action_value: 'widget-copy-to-dashboard-button',
       });
 
       return _onCopyToDashboard(view, setShowCopyToDashboard, widgetId, dashboardId, history);
     },
-    [history, pathname, sendTelemetry, view],
+    [history, sendTelemetry, view],
   );
 
   const onCreateNewDashboard = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CREATE_NEW_DASHBOARD, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-create-new-dashboard-button',
     });
 
     return _onCreateNewDashboard(view, widget.id, history);
-  }, [sendTelemetry, pathname, view, widget.id, history]);
+  }, [sendTelemetry, view, widget.id, history]);
 
   const onMoveWidgetToTab = useCallback(
     (widgetId: string, queryId: string, keepCopy: boolean) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.MOVE, {
-        app_pathname: getPathnameWithoutId(pathname),
         app_section: 'search-widget',
         app_action_value: 'widget-move-button',
       });
 
       return _onMoveWidgetToPage(dispatch, view, setShowMoveWidgetToTab, widgetId, queryId, keepCopy);
     },
-    [dispatch, pathname, sendTelemetry, view],
+    [dispatch, sendTelemetry, view],
   );
   const onDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.DELETED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-delete-button',
     });
 
     return dispatch(_onDelete(widget, view, title));
-  }, [dispatch, pathname, sendTelemetry, title, view, widget]);
+  }, [dispatch, sendTelemetry, title, view, widget]);
   const focusWidget = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.FOCUSED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_section: 'search-widget',
       app_action_value: 'widget-focus-button',
     });
 
     return setWidgetFocusing(widget.id);
-  }, [pathname, sendTelemetry, setWidgetFocusing, widget.id]);
+  }, [sendTelemetry, setWidgetFocusing, widget.id]);
 
   return (
     <Container className={widgetActionsMenuClass}>
