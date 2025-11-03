@@ -16,25 +16,18 @@
  */
 package org.graylog2.notifications;
 
-import org.graylog2.cluster.Node;
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface NotificationService {
-    boolean isFirst(Notification.Type type);
+public interface NotificationPersistenceService extends Iterable<Notification> {
+    List<Notification> all();
 
-    Notification build();
+    Optional<Notification> getByTypeAndKey(Notification.Type type, @Nullable String key);
 
-    Notification buildNow();
+    int destroy(Notification notification);
 
-    boolean fixed(Notification.Type type);
+    int destroyAllByType(Notification.Type type);
 
-    boolean fixed(Notification.Type type, String key);
-
-    boolean fixed(Notification.Type type, Node node);
-
-    boolean fixed(Notification notification);
-
-    boolean publishIfFirst(Notification notification);
+    int destroyAllByTypeAndKey(Notification.Type type, @Nullable String key);
 }

@@ -28,8 +28,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.apache.commons.io.IOUtils;
 import jakarta.ws.rs.ForbiddenException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -77,6 +77,7 @@ import org.graylog2.indexer.migration.TaskStatus;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.notifications.Notification;
+import org.graylog2.notifications.NotificationPersistenceService;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.plugin.Tools;
@@ -131,7 +132,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final RemoteReindexMigrationService reindexMigrationService;
 
     private final DatanodeRestApiProxy datanodeRestApiProxy;
-    private final NotificationService notificationService;
+    private final NotificationPersistenceService notificationService;
 
     private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
@@ -139,6 +140,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final SystemJobManager systemJobManager;
 
     private final DatanodeMigrationLockService migrationLockService;
+    private final NotificationService notifier;
 
     @Inject
     public RemoteReindexingMigrationAdapterOS2(final OpenSearchClient client,
@@ -148,12 +150,13 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                final ObjectMapper objectMapper,
                                                RemoteReindexMigrationService reindexMigrationService,
                                                DatanodeRestApiProxy datanodeRestApiProxy,
-                                               NotificationService notificationService,
+                                               NotificationPersistenceService notificationService,
                                                IndexRangesCleanupPeriodical indexRangesCleanupPeriodical,
                                                RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                                CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
                                                SystemJobManager systemJobManager,
-                                               DatanodeMigrationLockService migrationLockService) {
+                                               DatanodeMigrationLockService migrationLockService,
+                                               NotificationService notifier) {
         this.client = client;
         this.indices = indices;
         this.indexSetRegistry = indexSetRegistry;
@@ -167,6 +170,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.systemJobManager = systemJobManager;
         this.migrationLockService = migrationLockService;
+        this.notifier = notifier;
     }
 
     @Override
@@ -724,11 +728,11 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         if (status != Status.RUNNING) {
             notificationService.destroyAllByType(REMOTE_REINDEX_RUNNING);
         }
-        Notification notification = notificationService.buildNow();
+        Notification notification = notifier.buildNow();
         notification.addType(status == Status.RUNNING ? REMOTE_REINDEX_RUNNING : REMOTE_REINDEX_FINISHED);
         notification.addDetail("status", status.name());
         notification.addSeverity(Notification.Severity.NORMAL);
-        notificationService.publishIfFirst(notification);
+        notifier.publishIfFirst(notification);
     }
 
 }
