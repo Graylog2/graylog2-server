@@ -18,7 +18,6 @@ package org.graylog.storage.opensearch3.stats;
 
 import jakarta.inject.Inject;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.opensearch.client.opensearch._types.DocStats;
 import org.opensearch.client.opensearch._types.Level;
 import org.opensearch.client.opensearch._types.StoreStats;
 import org.opensearch.client.opensearch.indices.IndicesStatsRequest;
@@ -41,19 +40,6 @@ public class StatsApi {
     @Inject
     public StatsApi(final OfficialOpensearchClient client) {
         this.client = client;
-    }
-
-    public long numberOfMessagesInIndex(final String index) {
-        return Optional.ofNullable(
-                        stats(Collections.singleton(index),
-                                List.of(),
-                                false)
-                                .all()
-                                .primaries()
-                                .docs()
-                ).map(DocStats::count)
-                .orElse(0L);
-
     }
 
     public IndicesStats indexStatsWithShardLevel(final String index) {
