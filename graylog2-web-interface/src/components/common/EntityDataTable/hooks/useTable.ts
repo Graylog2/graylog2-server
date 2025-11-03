@@ -94,20 +94,21 @@ const useTable = <Entity extends EntityBase>({
   );
 
   return useReactTable({
-    data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
-    manualSorting: true,
-    enableSortingRemoval: false,
+    data,
     enableRowSelection: (row) => isEntitySelectable(row.original),
-    state: {
-      sorting,
-      columnVisibility,
-      columnOrder,
-    },
+    enableSortingRemoval: false,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
+    manualSorting: true,
     onColumnOrderChange: () => {},
     onColumnVisibilityChange,
     onSortingChange,
+    state: {
+      columnOrder,
+      columnVisibility,
+      sorting,
+    },
   });
 };
 
