@@ -79,7 +79,7 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
-        return new IndicesAdapterOS(client, officialOpensearchClient,
+        return new IndicesAdapterOS(officialOpensearchClient,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),

@@ -16,15 +16,19 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.github.joschi.jadconfig.util.Duration;
+import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.core5.http.ContentTooLongException;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.opensearch.client.ApiClient;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.transport.httpclient5.ApacheHttpClient5Options;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +36,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 
 public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
     private static final Logger LOG = LoggerFactory.getLogger(OfficialOpensearchClient.class);
@@ -68,6 +75,18 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         } catch (IOException e) {
             LOG.error("Error closing async OpenSearch client", e);
         }
+    }
+
+    public static <T extends ApiClient<?, ?>> T withTimeout(T apiClient, Duration timeout) {
+        ApacheHttpClient5Options options = (ApacheHttpClient5Options) getIfNull(apiClient._transportOptions(), ApacheHttpClient5Options.DEFAULT);
+        RequestConfig requestConfig = getIfNull(options.getRequestConfig(), RequestConfig.DEFAULT);
+        ApacheHttpClient5Options optionsWithTimeout = options.toBuilder().setRequestConfig(
+                RequestConfig
+                        .copy(requestConfig)
+                        .setResponseTimeout(timeout.toMilliseconds(), TimeUnit.MILLISECONDS)
+                        .build()
+        ).build();
+        return (T) apiClient.withTransportOptions(optionsWithTimeout);
     }
 
     @FunctionalInterface

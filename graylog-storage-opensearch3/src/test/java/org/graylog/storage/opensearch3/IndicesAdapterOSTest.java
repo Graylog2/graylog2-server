@@ -69,7 +69,6 @@ class IndicesAdapterOSTest {
     @BeforeEach
     void setUp() {
         toTest = new IndicesAdapterOS(
-                client,
                 opensearchClient,
                 statsApi,
                 clusterStatsApi,
