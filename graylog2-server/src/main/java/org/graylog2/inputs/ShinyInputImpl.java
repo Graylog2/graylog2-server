@@ -17,6 +17,7 @@
 package org.graylog2.inputs;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -28,7 +29,9 @@ import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.plugin.IOState;
 import org.joda.time.DateTime;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = ShinyInputImpl.Builder.class)
@@ -44,7 +47,7 @@ public abstract class ShinyInputImpl implements BuildableMongoEntity<ShinyInputI
 
     @JsonProperty("static_fields")
     @Nullable
-    public abstract Map<String, String> staticFields();
+    public abstract Set<Map<String, String>> staticFields();
 
     @JsonProperty("type")
     public abstract String type();
@@ -80,6 +83,19 @@ public abstract class ShinyInputImpl implements BuildableMongoEntity<ShinyInputI
         return IOState.Type.RUNNING;
     }
 
+    public Map<String, String> getStaticFields() {
+        final Set<Map<String, String>> staticFieldsSet = staticFields();
+        if (staticFieldsSet == null) {
+            return Map.of();
+        }
+
+        final Map<String, String> merged = new HashMap<>();
+        for (Map<String, String> entry : staticFieldsSet) {
+            merged.putAll(entry);
+        }
+        return merged;
+    }
+
     @AutoValue.Builder
     @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder implements BuildableMongoEntity.Builder<ShinyInputImpl, Builder> {
@@ -96,7 +112,17 @@ public abstract class ShinyInputImpl implements BuildableMongoEntity<ShinyInputI
         public abstract Builder configuration(Map<String, Object> configuration);
 
         @JsonProperty("static_fields")
-        public abstract Builder staticFields(@Nullable Map<String, String> staticFields);
+        public abstract Builder staticFields(Set<Map<String, String>> fields);
+
+        @JsonIgnore
+        public Builder setStaticFields(Map<String, String> value) {
+            if (value == null) {
+                return staticFields(Set.of());
+            }
+
+            Set<Map<String, String>> wrapped = Set.of(new HashMap<>(value));
+            return staticFields(wrapped);
+        }
 
         @JsonProperty("type")
         public abstract Builder type(String type);

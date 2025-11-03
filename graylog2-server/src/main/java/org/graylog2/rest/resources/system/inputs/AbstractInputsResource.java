@@ -70,7 +70,7 @@ public class AbstractInputsResource extends RestResource {
         // remove after sharing inputs implemented (input types check)
         final Map<String, Object> configuration = isPermitted(RestPermissions.INPUTS_EDIT, input.id()) && isPermitted(RestPermissions.INPUT_TYPES_CREATE, input.type()) ?
                 input.configuration() : maskPasswordsInConfiguration(input.configuration(), configurationRequest);
-        final Map<String, String> staticFields = input.staticFields() != null ? input.staticFields() : Map.of();
+        final Map<String, String> staticFields = input.getStaticFields() != null ? input.getStaticFields() : Map.of();
         return InputSummary.create(input.title(),
                 input.isGlobal(),
                 InputDescription.getInputDescriptionName(inputDescription, input.type()),
