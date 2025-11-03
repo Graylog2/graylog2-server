@@ -428,11 +428,6 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public long numberOfMessages(final String index) {
-        return statsApi.numberOfMessagesInIndex(index);
-    }
-
-    @Override
     public Map<String, Set<String>> aliases(String indexPattern) {
         GetAliasRequest request = GetAliasRequest.of(r -> r
                 .index(indexPattern)
