@@ -251,18 +251,17 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnOrder,
     entities,
     isEntitySelectable: _isEntitySelectable,
+    onChangeSelection,
     onColumnsChange,
     onSortChange,
     sort: activeSort,
     visibleColumns,
+    initialSelection,
   });
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
-      <SelectedEntitiesProvider<Entity>
-        initialSelection={initialSelection}
-        onChangeSelection={onChangeSelection}
-        entities={entities}>
+      <SelectedEntitiesProvider<Entity> table={table}>
         <ExpandedSectionsProvider>
           <ActionsRow>
             <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
@@ -281,7 +280,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               <TableHead table={table} />
               {table.getRowModel().rows.map((row) => (
                 <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                  <TableRow<Entity> key={row.id} row={row} columnOrder={columnOrder} />
+                  <TableRow<Entity> key={row.id} row={row} columnOrder={columnOrder} isSelected={row.getIsSelected()} />
                   <ExpandedSections
                     key={`expanded-sections-${row.id}`}
                     expandedSectionsRenderer={expandedSectionsRenderer}

@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import type { ColumnDef, SortingState, Updater, VisibilityState } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
@@ -32,6 +32,8 @@ type Props<Entity extends EntityBase> = {
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
   visibleColumns: Array<string>;
+  initialSelection: any;
+  onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void;
 };
 
 const useTable = <Entity extends EntityBase>({
@@ -43,7 +45,11 @@ const useTable = <Entity extends EntityBase>({
   onSortChange,
   sort,
   visibleColumns,
+  initialSelection = [],
+  onChangeSelection,
 }: Props<Entity>) => {
+  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection);
+
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
 
@@ -74,6 +80,24 @@ const useTable = <Entity extends EntityBase>({
     [columnVisibility, onColumnsChange],
   );
 
+  const onRowSelectionChange = useCallback(
+    (updater: Updater<Record<string, boolean>>) => {
+      const newRowSelection =
+        updater instanceof Function ? updater(Object.fromEntries(selectedEntities.map((id) => [id, true]))) : updater;
+
+      const newSelection = Object.entries(newRowSelection)
+        .filter(([_id, isSelected]) => isSelected)
+        .map(([id]) => id);
+
+      setSelectedEntities(newSelection);
+
+      if (onChangeSelection) {
+        onChangeSelection(newSelection, entities);
+      }
+    },
+    [entities, onChangeSelection, selectedEntities],
+  );
+
   return useReactTable({
     columns,
     data,
@@ -84,11 +108,13 @@ const useTable = <Entity extends EntityBase>({
     manualSorting: true,
     onColumnOrderChange: () => {},
     onColumnVisibilityChange,
+    onRowSelectionChange,
     onSortingChange,
     state: {
       columnOrder,
       columnVisibility,
       sorting,
+      rowSelection: Object.fromEntries(selectedEntities.map((id) => [id, true])),
     },
   });
 };

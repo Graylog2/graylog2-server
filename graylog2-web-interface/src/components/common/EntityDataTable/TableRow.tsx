@@ -30,6 +30,8 @@ type Props<Entity extends EntityBase> = {
   row: Row<Entity>;
   // eslint-disable-next-line react/no-unused-prop-types
   columnOrder: Array<string>; // changes when column visibility or order changes.
+  // eslint-disable-next-line react/no-unused-prop-types
+  isSelected: boolean;
 };
 
 const TableRow = <Entity extends EntityBase>({ row }: Props<Entity>) => (
@@ -42,5 +44,5 @@ const TableRow = <Entity extends EntityBase>({ row }: Props<Entity>) => (
 
 export default React.memo(
   TableRow,
-  (prev, next) => prev.row === next.row && prev.columnOrder === next.columnOrder,
+  (prev, next) => prev.columnOrder === next.columnOrder && prev.isSelected === next.isSelected,
 ) as typeof TableRow;
