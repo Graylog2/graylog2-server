@@ -17,27 +17,47 @@
 package org.graylog.plugins.views.search.rest.scriptingapi.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.ValidationException;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+
 //no column/row choice, assuming API does not care about visualization, and we can ignore it
 public record Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
-                       @JsonProperty("limit") int limit) {
+                       @JsonProperty("limit") Optional<Integer> limit,
+                       @JsonProperty("timeunit") Optional<String> timeunit,
+                       @JsonProperty("scaling") Optional<Double> scaling) {
 
     public Grouping(String fieldName) {
-        this(fieldName, Values.DEFAULT_LIMIT);
+        this(fieldName, Optional.of(Values.DEFAULT_LIMIT), Optional.empty(), Optional.empty());
+    }
+
+    public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
+                    @JsonProperty("limit") Optional<Integer> limit,
+                    @JsonProperty("timeunit") Optional<String> timeunit,
+                    @JsonProperty("scaling") Optional<Double> scaling) {
+        this.fieldName = fieldName;
+        this.limit = limit.map(lim -> lim <= 0 ? Values.DEFAULT_LIMIT : lim);
+        this.timeunit = timeunit;
+        this.scaling = scaling;
+
+        // only one of the three following parameters are allowed to be present
+        final AtomicInteger attrCounter = new AtomicInteger();
+        limit.ifPresent(l -> attrCounter.getAndIncrement());
+        timeunit.ifPresent(t -> attrCounter.getAndIncrement());
+        scaling.ifPresent(s -> attrCounter.getAndIncrement());
+        if(attrCounter.get() > 1) {
+            throw new ValidationException("Only one attribute out of 'limit', 'timeunit' or 'scaling' can be specified");
+        }
     }
 
     public Grouping(@JsonProperty("field") @Valid @NotBlank String fieldName,
                     @JsonProperty("limit") int limit) {
-        this.fieldName = fieldName;
-        if (limit <= 0) {
-            this.limit = Values.DEFAULT_LIMIT;
-        } else {
-            this.limit = limit;
-        }
+        this(fieldName, Optional.of(limit), Optional.empty(), Optional.empty());
     }
 
     @Deprecated
