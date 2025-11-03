@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import styled, { css, useTheme } from 'styled-components';
-import defer from 'lodash/defer';
+import styled, { css } from 'styled-components';
 
 import { Icon } from 'components/common';
 import { COLOR_SCHEME_LIGHT, COLOR_SCHEME_DARK } from 'theme/constants';
 import Switch from 'components/common/Switch';
+import useThemeMode from 'theme/hooks/useThemeMode';
 
 const ThemeModeToggleWrap = styled.div`
   display: flex;
@@ -32,27 +31,12 @@ const ThemeModeToggleWrap = styled.div`
 const ModeIcon = styled(Icon)<{ $currentMode: boolean }>(
   ({ theme, $currentMode }) => css`
     opacity: ${$currentMode ? '1' : '0.5'};
-    color: ${$currentMode ? theme.colors.brand.primary : theme.colors.variant.darkest.default};
+    color: ${$currentMode ? theme.colors.variant.danger : theme.colors.variant.darkest.default};
   `,
 );
 
 const ThemeModeToggle = () => {
-  const theme = useTheme();
-  const currentMode = theme.mode;
-  const [loadingTheme, setLoadingTheme] = useState(false);
-
-  useEffect(() => {
-    if (loadingTheme) {
-      setLoadingTheme(false);
-    }
-  }, [loadingTheme, theme]);
-
-  const toggleThemeMode = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setLoadingTheme(true);
-    const newMode = event.target.checked ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT;
-    defer(() => theme.changeMode(newMode));
-  };
-
+  const { currentMode, toggleThemeMode, loadingTheme } = useThemeMode();
   const loadingLightMode = currentMode === COLOR_SCHEME_DARK && loadingTheme;
   const loadingDarkMode = currentMode === COLOR_SCHEME_LIGHT && loadingTheme;
 

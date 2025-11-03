@@ -194,6 +194,7 @@ const AppRouter = () => {
             { path: RoutePaths.WELCOME, element: <WelcomePage /> },
             { path: RoutePaths.OPENAPI_BROWSER, element: <OpenApiBrowserPage /> },
             { path: RoutePaths.STREAMS, element: <StreamsPage /> },
+            { path: RoutePaths.STREAM_NEW, element: <StreamsPage /> },
             { path: RoutePaths.stream_view(':streamId'), element: <StreamDetailsPage /> },
             { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
             !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },

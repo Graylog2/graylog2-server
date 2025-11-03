@@ -223,7 +223,7 @@ public class AuthServiceBackendsResource extends RestResource {
             return roleService.findIdMap(roleIds).values()
                     .stream()
                     .map(role -> {
-                        final String roleName = isPermitted(RestPermissions.ROLES_READ, role.getId()) ? role.getName() : "unknown";
+                        final String roleName = isPermitted(RestPermissions.ROLES_READ, role.getName()) ? role.getName() : "unknown";
                         return Maps.immutableEntry(role.getId(), Collections.singletonMap("title", roleName));
                     })
                     .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

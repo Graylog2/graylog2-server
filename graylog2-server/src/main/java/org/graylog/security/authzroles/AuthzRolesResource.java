@@ -39,7 +39,6 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import java.util.function.Predicate;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -65,6 +64,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -187,9 +187,10 @@ public class AuthzRolesResource extends RestResource {
     @Path("{roleId}")
     @Produces(MediaType.APPLICATION_JSON)
     public AuthzRoleDTO get(@Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId) {
-        checkPermission(RestPermissions.ROLES_READ, roleId);
-        return authzRolesService.get(roleId).orElseThrow(
+        AuthzRoleDTO authzRoleDTO = authzRolesService.get(roleId).orElseThrow(
                 () -> new NotFoundException("Could not find role with id: " + roleId));
+        checkPermission(RestPermissions.ROLES_READ, authzRoleDTO.name());
+        return authzRoleDTO;
     }
 
     @GET
@@ -260,7 +261,7 @@ public class AuthzRolesResource extends RestResource {
             }
             authzRolesService.get(roleId)
                     .ifPresentOrElse(role -> {
-                        checkPermission(RestPermissions.ROLES_EDIT, role.name());
+                        checkPermission(RestPermissions.ROLES_ASSIGN, role.name());
                     }, () -> {
                         throw new NotFoundException("Cannot find role with id: " + roleId);
                     });

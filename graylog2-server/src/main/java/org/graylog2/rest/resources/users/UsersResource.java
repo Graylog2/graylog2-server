@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,7 +51,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -78,6 +76,7 @@ import org.graylog2.rest.models.users.requests.CreateUserRequest;
 import org.graylog2.rest.models.users.requests.PermissionEditRequest;
 import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.rest.models.users.requests.UpdateUserPreferences;
+import org.graylog2.rest.models.users.responses.BasicUserResponse;
 import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.rest.models.users.responses.TokenList;
 import org.graylog2.rest.models.users.responses.TokenSummary;
@@ -96,7 +95,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
-import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
@@ -111,7 +109,6 @@ import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -246,6 +243,28 @@ public class UsersResource extends RestResource {
         final boolean canEditUserPermissions = isPermitted(USERS_PERMISSIONSEDIT, user.getName());
 
         return toUserResponse(user, isSelf || canEditUserPermissions, Optional.of(AllUserSessions.create(sessionService)));
+    }
+
+    @GET
+    @Path("/basic/id/{userId}")
+    @ApiOperation(value = "Get basic user data by userId")
+    @ApiResponses({
+            @ApiResponse(code = 404, message = "The user could not be found.")
+    })
+    public BasicUserResponse getBasicUserById(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+                                              @PathParam("userId") String userId) {
+
+        final User user = loadUserById(userId);
+        if (!isPermitted(USERS_READ, user.getName())) {
+            throw new ForbiddenException("Not allowed to view userId " + userId);
+        }
+        return BasicUserResponse.builder()
+                .id(user.getId())
+                .username(user.getName())
+                .fullName(user.getFullName())
+                .readOnly(user.isReadOnly())
+                .isServiceAccount(user.isServiceAccount())
+                .build();
     }
 
     /**
@@ -450,26 +469,47 @@ public class UsersResource extends RestResource {
     }
 
     private void setUserRoles(@Nullable List<String> roles, User user) {
-        if (roles != null) {
-            try {
-                final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
-                List<String> unknownRoles = new ArrayList<>();
-                roles.forEach(roleName -> {
-                    checkPermission(RestPermissions.ROLES_EDIT, roleName);
-                    if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
-                        unknownRoles.add(roleName);
-                    }
-                });
-                if (!unknownRoles.isEmpty()) {
-                    throw new BadRequestException(
-                            String.format(Locale.ENGLISH, "Invalid role names: %s", StringUtils.join(unknownRoles, ", "))
-                    );
-                }
-                final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
-                user.setRoleIds(Sets.newHashSet(roleIds));
-            } catch (org.graylog2.database.NotFoundException e) {
-                throw new InternalServerErrorException(e);
+        if (roles == null) {
+            return;
+        }
+
+        try {
+            final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+            final Map<String, String> idToNameMap = nameMap.values().stream()
+                    .collect(Collectors.toMap(Role::getId, r -> r.getName().toLowerCase(Locale.US)));
+
+            final Set<String> normalizedRoles = roles.stream()
+                    .map(r -> r.toLowerCase(Locale.US))
+                    .collect(Collectors.toSet());
+
+            final List<String> unknownRoles = normalizedRoles.stream()
+                    .filter(r -> !nameMap.containsKey(r)).toList();
+
+            if (!unknownRoles.isEmpty()) {
+                throw new BadRequestException(
+                        String.format(Locale.ENGLISH, "Invalid role names: %s", String.join(", ", unknownRoles))
+                );
             }
+
+            final Set<String> currentRoleNames = user.getRoleIds().stream()
+                    .map(idToNameMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            final Set<String> changedRoles = Sets.symmetricDifference(normalizedRoles, currentRoleNames);
+
+            for (String changedRole : changedRoles) {
+                checkPermission(RestPermissions.ROLES_ASSIGN, nameMap.get(changedRole).getName());
+            }
+
+            final Set<String> roleIds = normalizedRoles.stream()
+                    .map(nameMap::get)
+                    .map(Role::getId)
+                    .collect(Collectors.toSet());
+
+            user.setRoleIds(roleIds);
+
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new InternalServerErrorException(e);
         }
     }
 

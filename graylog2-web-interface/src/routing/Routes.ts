@@ -50,6 +50,7 @@ const Routes = {
   NOTFOUND: '/notfound',
   SEARCH: '/search',
   STREAMS: '/streams',
+  STREAM_NEW: '/streams/new',
   ALERTS: {
     LIST: '/alerts',
     replay_search: (alertId: string) => `/alerts/${alertId}/replay-search`,
@@ -78,6 +79,7 @@ const Routes = {
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
+  DASHBOARD_NEW: '/dashboards/new',
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   OPENAPI_BROWSER: '/openapi-browser',
@@ -195,6 +197,7 @@ const Routes = {
       },
     },
     PIPELINES: {
+      CREATE: '/system/pipelines/new',
       OVERVIEW: '/system/pipelines',
       PIPELINE: (pipelineId: string) => `/system/pipelines/${pipelineId}`,
       RULES: '/system/pipelines/rules',

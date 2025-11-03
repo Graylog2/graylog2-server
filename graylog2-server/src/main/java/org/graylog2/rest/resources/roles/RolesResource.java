@@ -22,6 +22,20 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.graylog2.shared.rest.PublicCloudAPI;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -45,23 +59,6 @@ import org.graylog2.users.RoleService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.Collection;
@@ -94,13 +91,14 @@ public class RolesResource extends RestResource {
     }
 
     @GET
-    @RequiresPermissions(RestPermissions.ROLES_READ)
-    @Operation(summary = "List all roles")
+    @Operation("List all roles")
     public RolesResponse listAll() {
         final Set<Role> roles = roleService.loadAll();
         Set<RoleResponse> roleResponses = Sets.newHashSetWithExpectedSize(roles.size());
         for (Role role : roles) {
-            roleResponses.add(RoleResponse.create(role.getName(), Optional.ofNullable(role.getDescription()), role.getPermissions(), role.isReadOnly()));
+            if (isPermitted(RestPermissions.ROLES_READ, role.getName())) {
+                roleResponses.add(RoleResponse.create(role.getName(), Optional.ofNullable(role.getDescription()), role.getPermissions(), role.isReadOnly()));
+            }
         }
 
         return RolesResponse.create(roleResponses);
@@ -257,7 +255,7 @@ public class RolesResource extends RestResource {
                               @Parameter(name = "username") @PathParam("username") String username,
                               @Parameter(name = "JSON Body", description = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.") String body) throws NotFoundException {
         checkPermission(RestPermissions.USERS_EDIT, username);
-        checkPermission(RestPermissions.ROLES_EDIT, rolename);
+        checkPermission(RestPermissions.ROLES_ASSIGN, rolename);
 
         final User user = userService.load(username);
         if (user == null) {
@@ -287,7 +285,7 @@ public class RolesResource extends RestResource {
     public Response removeMember(@Parameter(name = "rolename") @PathParam("rolename") String rolename,
                                  @Parameter(name = "username") @PathParam("username") String username) throws NotFoundException {
         checkPermission(RestPermissions.USERS_EDIT, username);
-        checkPermission(RestPermissions.ROLES_EDIT, rolename);
+        checkPermission(RestPermissions.ROLES_ASSIGN, rolename);
 
         final User user = userService.load(username);
         if (user == null) {

@@ -14,6 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { TIMESTAMP_FIELD } from 'views/Constants';
+import Pivot, { DateType, ValuesType } from 'views/logic/aggregationbuilder/Pivot';
+
 import AggregationWidgetConfig from './AggregationWidgetConfig';
 import Series from './Series';
 import SortConfig from './SortConfig';
@@ -32,5 +35,32 @@ describe('AggregationWidgetConfig', () => {
       .build();
 
     expect(config.sort).toEqual([]);
+  });
+
+  describe('isTimeline', () => {
+    it('non-date row pivot fields are not timelines', () => {
+      const config = AggregationWidgetConfig.builder()
+        .rowPivots([Pivot.create(['action'], ValuesType)])
+        .build();
+      expect(config.isTimeline).toEqual(false);
+    });
+    it('supports default timestamp field', () => {
+      const config = AggregationWidgetConfig.builder()
+        .rowPivots([Pivot.create([TIMESTAMP_FIELD], DateType)])
+        .build();
+      expect(config.isTimeline).toEqual(true);
+    });
+    it('multiple timestamp fields are not a timeline', () => {
+      const config = AggregationWidgetConfig.builder()
+        .rowPivots([Pivot.create([TIMESTAMP_FIELD], DateType), Pivot.create([TIMESTAMP_FIELD], DateType)])
+        .build();
+      expect(config.isTimeline).toEqual(false);
+    });
+    it('supports alternative timestamp fields', () => {
+      const config = AggregationWidgetConfig.builder()
+        .rowPivots([Pivot.create(['@timestamp'], DateType)])
+        .build();
+      expect(config.isTimeline).toEqual(true);
+    });
   });
 });

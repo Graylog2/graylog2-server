@@ -18,8 +18,8 @@ package org.graylog.pipelines;
 
 import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 
@@ -33,48 +33,48 @@ import static org.graylog2.plugin.streams.Stream.DEFAULT_EVENTS_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_SYSTEM_EVENTS_STREAM_ID;
 
-@ContainerMatrixTestsConfiguration
+@GraylogBackendConfiguration
 public class StreamsPipelinesIT {
     private static final String pipeline1Title = "Test Pipeline 1";
     private static final String pipeline2Title = "Test Pipeline 2";
-    private final GraylogApis api;
 
-    private String indexSetId;
-    private String stream1Id;
-    private String stream2Id;
-    private String stream3Id;
-    private String pipeline1Id;
-    private String pipeline2Id;
+    private static GraylogApis api;
 
-    public StreamsPipelinesIT(GraylogApis api) {
-        this.api = api;
-    }
+    private static String indexSetId;
+    private static String stream1Id;
+    private static String stream2Id;
+    private static String stream3Id;
+    private static String pipeline1Id;
+    private static String pipeline2Id;
 
     @BeforeAll
-    void beforeAll() throws ExecutionException, RetryException {
-        this.indexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
-        this.stream1Id = api.streams().createStream("New Stream 1", this.indexSetId);
-        this.stream2Id = api.streams().createStream("New Stream 2", this.indexSetId);
-        this.stream3Id = api.streams().createStream("New Stream 3", this.indexSetId);
-        this.pipeline1Id = api.pipelines().create(pipeline1Title, Set.of(stream1Id, stream2Id));
-        this.pipeline2Id = api.pipelines().create(pipeline2Title, Set.of(stream1Id, stream3Id));
+    static void beforeAll(GraylogApis graylogApis) throws ExecutionException, RetryException {
+        api = graylogApis;
+        indexSetId = api.indices().createIndexSet("Test Indices", "Some test indices", "streamstest");
+        stream1Id = api.streams().createStream("New Stream 1", indexSetId);
+        stream2Id = api.streams().createStream("New Stream 2", indexSetId);
+        stream3Id = api.streams().createStream("New Stream 3", indexSetId);
+        pipeline1Id = api.pipelines().create(pipeline1Title, Set.of(stream1Id, stream2Id));
+        pipeline2Id = api.pipelines().create(pipeline2Title, Set.of(stream1Id, stream3Id));
     }
 
     @AfterAll
     void afterAll() {
         api.pipelines().delete(pipeline1Id);
         api.pipelines().delete(pipeline2Id);
-        api.streams().deleteStream(this.stream1Id);
-        api.streams().deleteStream(this.stream2Id);
-        api.streams().deleteStream(this.stream3Id);
-        api.indices().deleteIndexSet(this.indexSetId, true);
+        api.streams().deleteStream(stream1Id);
+        api.streams().deleteStream(stream2Id);
+        api.streams().deleteStream(stream3Id);
+        api.indices().deleteIndexSet(indexSetId, true);
     }
 
     private record BulkPipelinesRequest(Collection<String> streamIds) {}
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void bulkRetrievalOfPipelineConnections() throws Exception {
-        final var result = api.post("/streams/pipelines", new BulkPipelinesRequest(Set.of(stream1Id, stream2Id, stream3Id)), 200)
+        final var result = api.post("/streams/pipelines",
+                        new BulkPipelinesRequest(Set.of(stream1Id, stream2Id, stream3Id)),
+                        200)
                 .extract().body().jsonPath();
         final var pipeline1 = pipelineSummary(pipeline1Id, pipeline1Title);
         final var pipeline2 = pipelineSummary(pipeline2Id, pipeline2Title);
@@ -84,9 +84,13 @@ public class StreamsPipelinesIT {
         assertThat(result.getList(stream3Id)).containsExactlyInAnyOrder(pipeline2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void bulkRetrievalOfPipelineConnectionsForBuiltinStreams() throws Exception {
-        final var result = api.post("/streams/pipelines", new BulkPipelinesRequest(Set.of(DEFAULT_STREAM_ID, DEFAULT_EVENTS_STREAM_ID, DEFAULT_SYSTEM_EVENTS_STREAM_ID)), 200)
+        final var result = api.post("/streams/pipelines",
+                        new BulkPipelinesRequest(Set.of(DEFAULT_STREAM_ID,
+                                DEFAULT_EVENTS_STREAM_ID,
+                                DEFAULT_SYSTEM_EVENTS_STREAM_ID)),
+                        200)
                 .extract().body().jsonPath();
 
         assertThat(result.getList(DEFAULT_STREAM_ID)).isEmpty();
@@ -94,7 +98,7 @@ public class StreamsPipelinesIT {
         assertThat(result.getList(DEFAULT_SYSTEM_EVENTS_STREAM_ID)).isEmpty();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void bulkRetrievalOfPipelineConnectionsForDanglingReferences() throws Exception {
         final var defaultIndexSet = api.indices().defaultIndexSetId();
         final var streamId = api.streams().createStream("Stream with dangling pipeline reference", defaultIndexSet);
@@ -107,7 +111,7 @@ public class StreamsPipelinesIT {
         assertThat(result.getList(streamId)).isEmpty();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void retrievePipelineConnectionsForASingleStream() {
         var result = api.get("/streams/" + stream1Id + "/pipelines", 200)
                 .extract().body().jsonPath();
