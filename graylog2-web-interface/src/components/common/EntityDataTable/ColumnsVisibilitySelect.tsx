@@ -61,12 +61,13 @@ const colLabel = <Entity extends EntityBase>(column: Column<Entity>) =>
 const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
   const isSelected = column.getIsVisible();
   const toggleVisibility = () => column.toggleVisibility();
+  const label = colLabel(column);
 
   return (
-    <MenuItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${column}`}>
+    <MenuItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${label}`}>
       <ListItemInner>
         <ColumnCheckbox checked={isSelected} onChange={toggleVisibility} />
-        <ColumnTitle>{colLabel(column)}</ColumnTitle>
+        <ColumnTitle>{label}</ColumnTitle>
       </ListItemInner>
     </MenuItem>
   );

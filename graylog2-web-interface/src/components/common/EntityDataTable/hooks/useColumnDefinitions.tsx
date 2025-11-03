@@ -43,7 +43,7 @@ const useBulkSelectCol = <Entity extends EntityBase>(
         ? columnHelper.display({
             id: BULK_SELECT_COL_ID,
             size: BULK_SELECT_COLUMN_WIDTH,
-            // Todo: check is we can make use of enableRowSelection from useReactTable instead
+            // Todo: check if we can make use of enableRowSelection from useReactTable instead
             header: ({ table }) => <BulkSelectHead data={table.options.data.filter(isEntitySelectable)} />,
             enableHiding: false,
             cell: ({ row }) => (
@@ -52,7 +52,6 @@ const useBulkSelectCol = <Entity extends EntityBase>(
                 title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
                 checked={row.getIsSelected()}
                 disabled={!row.getCanSelect()}
-                aria-label={row.id}
               />
             ),
           })
@@ -126,7 +125,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
         const baseColDef = {
           id: col.id,
           cell: ({ row, getValue }: CellContext<Entity, unknown>) =>
-            columnRenderer.renderCell(getValue(), row.original, col, meta),
+            columnRenderer?.renderCell?.(getValue(), row.original, col, meta) ?? getValue(),
           header: () => columnRenderer?.renderHeader?.(col) ?? col.title,
           size: columnsWidths[col.id],
           enableHiding: true,

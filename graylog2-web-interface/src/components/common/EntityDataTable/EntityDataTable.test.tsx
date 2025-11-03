@@ -313,7 +313,7 @@ describe('<EntityDataTable />', () => {
     userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
     userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
 
-    expect(onColumnsChange).toHaveBeenCalledWith(['description', 'status', 'title']);
+    expect(onColumnsChange).toHaveBeenCalledWith(['title', 'description', 'status']);
   });
 
   it('should hande entities with camel case attributes', async () => {
