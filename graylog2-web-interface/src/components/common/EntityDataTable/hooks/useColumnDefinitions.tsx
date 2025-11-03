@@ -65,7 +65,7 @@ const ActionsHead = styled.div`
   text-align: right;
 `;
 
-const ActionButtonToolbar = styled(ButtonToolbar)`
+const Actions = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
@@ -87,7 +87,7 @@ const useActionsCol = <Entity extends EntityBase>(
             enableHiding: false,
             cell: ({ row }) => (
               <div ref={colRef}>
-                <ActionButtonToolbar>{entityActions(row.original)}</ActionButtonToolbar>
+                <Actions>{entityActions(row.original)}</Actions>
               </div>
             ),
           })

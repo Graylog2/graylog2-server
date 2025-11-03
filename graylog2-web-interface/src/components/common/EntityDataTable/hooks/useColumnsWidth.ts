@@ -76,7 +76,7 @@ const columnsWidth = ({
   );
 };
 
-const useColumnsWidths = <Entity extends EntityBase>({
+const useColumnsWidth = <Entity extends EntityBase>({
   actionsColWidth,
   bulkSelectColWidth,
   columnRenderersByAttribute,
@@ -117,4 +117,4 @@ const useColumnsWidths = <Entity extends EntityBase>({
   return columnsWidths;
 };
 
-export default useColumnsWidths;
+export default useColumnsWidth;

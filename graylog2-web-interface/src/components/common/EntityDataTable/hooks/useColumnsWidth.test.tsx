@@ -16,9 +16,9 @@
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-import useColumnsWidths from './useColumnsWidths';
+import useColumnsWidth from './useColumnsWidth';
 
-describe('useColumnsWidths hook test', () => {
+describe('useColumnsWidth hook test', () => {
   it('should calculate width for columns with flexible width', async () => {
     const columnRenderersByAttribute = {
       title: { width: 1 },
@@ -27,7 +27,7 @@ describe('useColumnsWidths hook test', () => {
     const columnsIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
-      useColumnsWidths({
+      useColumnsWidth({
         columnRenderersByAttribute,
         columnsIds,
         actionsColWidth: 0,
@@ -51,7 +51,7 @@ describe('useColumnsWidths hook test', () => {
     const columnsIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
-      useColumnsWidths({
+      useColumnsWidth({
         columnRenderersByAttribute,
         columnsIds,
         actionsColWidth: 0,
@@ -74,7 +74,7 @@ describe('useColumnsWidths hook test', () => {
     const columnsIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
-      useColumnsWidths({
+      useColumnsWidth({
         columnRenderersByAttribute,
         columnsIds,
         actionsColWidth: 50,

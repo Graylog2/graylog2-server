@@ -21,7 +21,7 @@ import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/E
 import type { Column } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
-import useColumnsWidths from 'components/common/EntityDataTable/hooks/useColumnsWidths';
+import useColumnsWidth from 'components/common/EntityDataTable/hooks/useColumnsWidth';
 
 type Props<Entity extends EntityBase, Meta> = {
   columns: Array<Column>;
@@ -48,7 +48,7 @@ const useElementsWidths = <Entity extends EntityBase, Meta>({
   const actionsColInnerWidth = fixedActionsCellWidth ?? actionsRef.current?.offsetWidth ?? 0;
   const actionsColWidth = actionsColInnerWidth ? actionsColInnerWidth + CELL_PADDING * 2 : 0;
 
-  const columnsWidths = useColumnsWidths<Entity>({
+  const columnsWidths = useColumnsWidth<Entity>({
     actionsColWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
     columnRenderersByAttribute,
