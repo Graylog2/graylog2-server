@@ -83,7 +83,7 @@ public record ExportTabularResultResponse(@JsonProperty List<String> header,
         }
 
         // iterating over all messages for the header to make sure that we collect all headers from all messages
-        final var header = (fields != null && !fields.isEmpty()) ? fields : m.messages().stream().flatMap(s -> s.message().keySet().stream()).collect(Collectors.toSet()).stream().toList();
+        final var header = (fields != null && !fields.isEmpty()) ? fields : m.messages().stream().flatMap(s -> s.message().keySet().stream()).distinct().toList();
         final var rows = m.messages()
                             .stream()
                             .map(message ->
