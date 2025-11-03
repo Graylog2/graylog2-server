@@ -20,6 +20,7 @@ import { useMemo } from 'react';
 import type { ColumnDef, CellContext } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
+import styled from 'styled-components';
 
 import type { EntityBase, ColumnRenderersByAttribute, Column } from 'components/common/EntityDataTable/types';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
@@ -60,6 +61,14 @@ const useBulkSelectCol = <Entity extends EntityBase>(
   );
 };
 
+const ActionsHead = styled.div`
+  text-align: right;
+`;
+
+const ActionButtonToolbar = styled(ButtonToolbar)`
+  justify-content: flex-end;
+`;
+
 const useActionsCol = <Entity extends EntityBase>(
   displayActionsCol: boolean,
   actionsColWidth: number,
@@ -74,11 +83,11 @@ const useActionsCol = <Entity extends EntityBase>(
         ? columnHelper.display({
             id: ACTIONS_COL_ID,
             size: actionsColWidth,
-            header: 'Actions',
+            header: () => <ActionsHead>Actions</ActionsHead>,
             enableHiding: false,
             cell: ({ row }) => (
               <div ref={colRef}>
-                <ButtonToolbar>{entityActions(row.original)}</ButtonToolbar>
+                <ActionButtonToolbar>{entityActions(row.original)}</ActionButtonToolbar>
               </div>
             ),
           })
