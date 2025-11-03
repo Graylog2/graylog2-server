@@ -245,6 +245,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_DELETE)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
+            .add(FAVORITE_FIELDS_UPDATE)
             .add(FIELD_TYPE_MAPPING_CREATE)
             .add(FIELD_TYPE_MAPPING_DELETE)
             .add(FIELD_TYPE_POLLING_TRIGGERED)
