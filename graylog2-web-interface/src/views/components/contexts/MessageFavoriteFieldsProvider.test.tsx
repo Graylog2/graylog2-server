@@ -44,11 +44,7 @@ const Consumer = () => {
   return (
     <div>
       <div data-testid="favorites">{JSON.stringify(contextValue.favoriteFields)}</div>
-      <Button onClick={() => contextValue.addToFavoriteFields('new')}>add-new</Button>
-      <Button onClick={() => contextValue.removeFromFavoriteFields('new')}>remove-new</Button>
-      <Button onClick={contextValue.saveFavoriteField}>save-action</Button>
-      <Button onClick={contextValue.resetFavoriteField}>preresaction</Button>
-      <Button onClick={contextValue.cancelEdit}>cancel-action</Button>
+      <Button onClick={() => contextValue.saveFavoriteField(['field1', 'field2', 'new'])}>save-action</Button>
     </div>
   );
 };
@@ -71,7 +67,7 @@ describe('MessageFavoriteFieldsProvider', () => {
     asMock(useMessageFavoriteFields).mockReturnValue({
       isLoading: false,
       saveFields: mockSaveFields,
-      editingFavoriteFields: ['field1', 'field2'],
+      favoriteFields: ['field1', 'field2'],
     });
   });
   it('initializes favorites from hook and exposes them via context', () => {
@@ -80,48 +76,11 @@ describe('MessageFavoriteFieldsProvider', () => {
     expect(screen.getByTestId('favorites')).toHaveTextContent(JSON.stringify(['field1', 'field2']));
   });
 
-  it('add and remove favorite fields updates favorites', async () => {
-    renderComponent();
-
-    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
-
-    expect(screen.getByTestId('favorites')).toHaveTextContent('"new"');
-
-    userEvent.click(await screen.findByRole('button', { name: /remove-new/i }));
-
-    expect(screen.getByTestId('favorites')).not.toHaveTextContent('"new"');
-  });
-
   it('saveFavoriteField calls saveFields', async () => {
     renderComponent();
-
-    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
 
     userEvent.click(await screen.findByRole('button', { name: /save/i }));
 
     expect(mockSaveFields).toHaveBeenCalledWith(['field1', 'field2', 'new']);
-  });
-
-  it('resetFavoriteField resets to DEFAULT_FIELDS and saves', async () => {
-    renderComponent();
-
-    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
-    expect(screen.getByTestId('favorites')).toHaveTextContent('"new"');
-
-    userEvent.click(await screen.findByRole('button', { name: /preresaction/i }));
-
-    expect(mockSaveFields).toHaveBeenCalledWith(DEFAULT_FIELDS);
-
-    expect(screen.getByTestId('favorites')).toHaveTextContent(JSON.stringify(DEFAULT_FIELDS));
-  });
-
-  it('cancelEdit resets favorites to initia', async () => {
-    renderComponent();
-
-    userEvent.click(await screen.findByRole('button', { name: /add-new/i }));
-    expect(screen.getByTestId('favorites')).toHaveTextContent(JSON.stringify(['field1', 'field2', 'new']));
-    userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
-
-    expect(screen.getByTestId('favorites')).toHaveTextContent(JSON.stringify(['field1', 'field2']));
   });
 });

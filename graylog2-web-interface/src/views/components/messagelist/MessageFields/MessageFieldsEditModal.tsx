@@ -57,8 +57,13 @@ const StyledAlert = styled(Alert)`
 `;
 
 const MessageFieldsEditModal = ({ toggleEditMode }) => {
-  const { editingFavoriteFields, saveEditedFavoriteFields, resetFavoriteField, setFavorites } =
-    useMessageFavoriteFieldsForEditing();
+  const {
+    editingFavoriteFields,
+    saveEditedFavoriteFields,
+    resetFavoriteFields,
+    reorderFavoriteFields,
+    onFavoriteToggle,
+  } = useMessageFavoriteFieldsForEditing();
   const { formattedFavorites, formattedRest } = useFormattedFields(editingFavoriteFields);
   const { message } = useContext(MessageFavoriteFieldsContext);
   const messageStreams = useStore(StreamsStore, ({ streams }) =>
@@ -70,10 +75,10 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
     toggleEditMode();
   }, [saveEditedFavoriteFields, toggleEditMode]);
 
-  const _resetFavoriteField = useCallback(() => {
-    resetFavoriteField();
+  const _resetFavoriteFields = useCallback(() => {
+    resetFavoriteFields();
     toggleEditMode();
-  }, [resetFavoriteField, toggleEditMode]);
+  }, [resetFavoriteFields, toggleEditMode]);
 
   return (
     <Modal onHide={toggleEditMode} show rootProps={{ zIndex: 1030 }}>
@@ -99,13 +104,15 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
               in which this message is routed.
             </StyledAlert>
             <MessageFieldsEditModeList
-              setFavorites={setFavorites}
+              reorderFavoriteFields={reorderFavoriteFields}
+              onFavoriteToggle={onFavoriteToggle}
               fields={formattedFavorites}
               message={message}
               isFavorite
             />
             <MessageFieldsEditModeList
-              setFavorites={setFavorites}
+              reorderFavoriteFields={reorderFavoriteFields}
+              onFavoriteToggle={onFavoriteToggle}
               fields={formattedRest}
               message={message}
               isFavorite={false}
@@ -115,7 +122,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
       </Modal.Body>
       <Modal.Footer>
         <ButtonContainer>
-          <Button bsStyle="link" onClick={_resetFavoriteField}>
+          <Button bsStyle="link" onClick={_resetFavoriteFields}>
             Reset to default
           </Button>
           <StyledButtonGroup>

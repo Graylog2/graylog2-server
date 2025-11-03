@@ -16,7 +16,8 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { StoreMock as MockStore, asMock } from 'helpers/mocking';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
@@ -28,14 +29,14 @@ import View from 'views/logic/views/View';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import suppressConsole from 'helpers/suppressConsole';
 import useFormattedFields from 'views/components/messagelist/MessageFields/hooks/useFormattedFields';
+import useMessageFavoriteFieldsForEditing from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
 
 import MessageFieldsEditModal from './MessageFieldsEditModal';
 
-const removeFromFavoriteFields = jest.fn();
-const addToFavoriteFields = jest.fn();
-const resetFavoriteField = jest.fn();
-const saveFavoriteField = jest.fn();
-const cancelEdit = jest.fn();
+const reorderFavoriteFields = jest.fn();
+const onFavoriteToggle = jest.fn();
+const resetFavoriteFields = jest.fn();
+const saveFavoriteFields = jest.fn();
 const mockedToggleEditMode = jest.fn();
 
 jest.mock('views/stores/StreamsStore', () => ({
@@ -44,6 +45,7 @@ jest.mock('views/stores/StreamsStore', () => ({
 }));
 
 jest.mock('views/components/messagelist/MessageFields/hooks/useFormattedFields');
+jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing');
 
 const formattedFavorites = [
   {
@@ -79,11 +81,7 @@ const renderComponent = () =>
           <MessageFavoriteFieldsContext.Provider
             value={
               {
-                removeFromFavoriteFields,
-                addToFavoriteFields,
-                resetFavoriteField,
-                saveFavoriteField,
-                cancelEdit,
+                saveFavoriteField: saveFavoriteFields,
                 message,
               } as any
             }>
@@ -99,6 +97,13 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
 
   beforeEach(() => {
     asMock(useFormattedFields).mockReturnValue({ formattedRest, formattedFavorites });
+    asMock(useMessageFavoriteFieldsForEditing).mockReturnValue({
+      resetFavoriteFields,
+      reorderFavoriteFields,
+      onFavoriteToggle,
+      editingFavoriteFields: ['fav1', 'fav2'],
+      saveEditedFavoriteFields: saveFavoriteFields,
+    });
   });
 
   it('renders headings', async () => {
@@ -108,46 +113,52 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
     await screen.findByRole('heading', { name: /details/i });
   });
 
-  it('cancel button calls cancelEdit', async () => {
+  it('cancel button runs mockedToggleEditMode', async () => {
     renderComponent();
     const backToMessageButton = await screen.findByRole('button', { name: /cancel/i });
-    fireEvent.click(backToMessageButton);
-    expect(cancelEdit).toHaveBeenCalled();
+    userEvent.click(backToMessageButton);
     expect(mockedToggleEditMode).toHaveBeenCalled();
   });
 
   it('Reset fields call the context handlers', async () => {
     renderComponent();
     const resetFieldsButton = await screen.findByRole('button', { name: /reset to default/i });
-    fireEvent.click(resetFieldsButton);
-    expect(resetFavoriteField).toHaveBeenCalled();
+    userEvent.click(resetFieldsButton);
+    expect(resetFavoriteFields).toHaveBeenCalled();
     expect(mockedToggleEditMode).toHaveBeenCalled();
   });
 
   it('Save configuration call the context handlers', async () => {
     renderComponent();
     const saveFieldsButton = await screen.findByRole('button', { name: /save configuration/i });
-    fireEvent.click(saveFieldsButton);
-    expect(saveFavoriteField).toHaveBeenCalled();
+    userEvent.click(saveFieldsButton);
+    expect(saveFavoriteFields).toHaveBeenCalled();
     expect(mockedToggleEditMode).toHaveBeenCalled();
   });
 
-  it('clicking favorite icon in Favorites calls removeFromFavoriteFields with field name', async () => {
+  it('clicking favorite icon in Favorites calls onFavoriteToggle with field name', async () => {
     renderComponent();
 
     const removeIcon = await screen.findByTitle(/remove fav1 from favorites/i);
 
-    await suppressConsole(() => fireEvent.click(removeIcon));
+    await suppressConsole(() => userEvent.click(removeIcon));
 
-    expect(removeFromFavoriteFields).toHaveBeenCalledWith('fav1');
+    expect(onFavoriteToggle).toHaveBeenCalledWith('fav1');
   });
 
-  test('clicking favorite icon in Details calls addToFavoriteFields with field name', async () => {
+  it('clicking favorite icon in Details calls onFavoriteToggle with field name', async () => {
     await renderComponent();
 
     const removeIcon = await screen.findByTitle(/add rest1 to favorites/i);
-    fireEvent.click(removeIcon);
-    expect(addToFavoriteFields).toHaveBeenCalled();
-    expect(addToFavoriteFields).toHaveBeenCalledWith('rest1');
+    userEvent.click(removeIcon);
+    expect(onFavoriteToggle).toHaveBeenCalledWith('rest1');
+  });
+
+  it('clicking reset to default calls resetFavoriteFields with field name', async () => {
+    await renderComponent();
+
+    const resetButton = await screen.findByRole('button', { name: /reset to default/i });
+    userEvent.click(resetButton);
+    expect(resetFavoriteFields).toHaveBeenCalledWith();
   });
 });

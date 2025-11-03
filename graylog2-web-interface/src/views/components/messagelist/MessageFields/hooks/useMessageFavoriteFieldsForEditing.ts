@@ -15,26 +15,43 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useState, useCallback, useContext } from 'react';
+import uniq from 'lodash/uniq';
 
 import { DEFAULT_FIELDS } from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import type { FormattedField } from 'views/components/messagelist/MessageFields/types';
 
 const useMessageFavoriteFieldsForEditing = () => {
   const { saveFavoriteField, favoriteFields: initialFavoriteFields } = useContext(MessageFavoriteFieldsContext);
   const [favorites, setFavorites] = useState<Array<string>>(initialFavoriteFields ?? []);
-  const resetFavoriteField = useCallback(() => {
+  const resetFavoriteFields = useCallback(() => {
     setFavorites(DEFAULT_FIELDS);
     saveFavoriteField(DEFAULT_FIELDS);
   }, [saveFavoriteField]);
   const saveEditedFavoriteFields = useCallback(() => {
     saveFavoriteField(favorites);
   }, [favorites, saveFavoriteField]);
+  const reorderFavoriteFields = useCallback((items: Array<FormattedField>) => {
+    setFavorites(items.map((item: FormattedField) => item.field));
+  }, []);
+  const onFavoriteToggle = useCallback(
+    (fieldName: string) =>
+      setFavorites((favs) => {
+        const isFavorite = favs.includes(fieldName);
+
+        if (isFavorite) return favs.filter((fav) => fav !== fieldName);
+
+        return uniq([...favs, fieldName]);
+      }),
+    [setFavorites],
+  );
 
   return {
     editingFavoriteFields: favorites,
-    resetFavoriteField,
+    resetFavoriteFields,
     saveEditedFavoriteFields,
-    setFavorites,
+    reorderFavoriteFields,
+    onFavoriteToggle,
   };
 };
 

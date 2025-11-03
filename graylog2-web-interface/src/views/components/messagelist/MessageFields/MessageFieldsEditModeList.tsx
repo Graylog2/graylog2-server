@@ -32,14 +32,13 @@ const Container = styled.div(
   `,
 );
 
-const MessageFieldsEditModeList = ({ fields, message, setFavorites, isFavorite }: MessageFieldsListProps) => {
-  const onMoveItem = useCallback(
-    (items: Array<FormattedField>) => {
-      setFavorites(items.map((item: FormattedField) => item.field));
-    },
-    [setFavorites],
-  );
-
+const MessageFieldsEditModeList = ({
+  fields,
+  message,
+  onFavoriteToggle,
+  reorderFavoriteFields,
+  isFavorite,
+}: MessageFieldsListProps) => {
   const customContentRender = useCallback(
     ({ item: { field, value, type } }) => (
       <MessageFieldEditMode
@@ -49,10 +48,10 @@ const MessageFieldsEditModeList = ({ fields, message, setFavorites, isFavorite }
         message={message}
         value={value}
         isFavorite={isFavorite}
-        setFavorites={setFavorites}
+        onFavoriteToggle={onFavoriteToggle}
       />
     ),
-    [isFavorite, message, setFavorites],
+    [isFavorite, message, onFavoriteToggle],
   );
 
   if (!fields.length) return null;
@@ -63,7 +62,7 @@ const MessageFieldsEditModeList = ({ fields, message, setFavorites, isFavorite }
       <Container>
         <SortableList<FormattedField>
           items={fields}
-          onMoveItem={onMoveItem}
+          onMoveItem={reorderFavoriteFields}
           displayOverlayInPortal
           alignItemContent="center"
           customContentRender={customContentRender}

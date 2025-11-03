@@ -17,7 +17,6 @@
 
 import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
-import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { Message } from 'views/components/messagelist/Types';
@@ -30,7 +29,7 @@ type Props = {
   message: Message;
   value: any;
   isFavorite: boolean;
-  setFavorites: React.Dispatch<React.SetStateAction<Array<string>>>;
+  onFavoriteToggle: (field: string) => void;
 };
 
 const DefinitionDescription = styled.dd(
@@ -54,17 +53,14 @@ const Container = styled.div(
   `,
 );
 
-const MessageFieldEditMode = ({ fieldName, fieldType, message, value, isFavorite, setFavorites }: Props) => {
-  const onFavoriteToggle = useCallback(
-    () => setFavorites((favs) => (isFavorite ? favs.filter((fav) => fav !== fieldName) : uniq([...favs, fieldName]))),
-    [fieldName, isFavorite, setFavorites],
-  );
-
+const MessageFieldEditMode = ({ fieldName, fieldType, message, value, isFavorite, onFavoriteToggle }: Props) => {
   const favTitle = isFavorite ? `Remove ${fieldName} from favorites` : `Add ${fieldName} to favorites`;
+
+  const _onFavoriteToggle = useCallback(() => onFavoriteToggle(fieldName), [fieldName, onFavoriteToggle]);
 
   return (
     <Container>
-      <CommonFavoriteIcon isFavorite={isFavorite} title={favTitle} onClick={onFavoriteToggle} />
+      <CommonFavoriteIcon isFavorite={isFavorite} title={favTitle} onClick={_onFavoriteToggle} />
       <FieldValueContainer>
         <b>
           <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
