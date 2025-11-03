@@ -199,7 +199,7 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
     public void testIndexCreationDate() {
         Optional<DateTime> dateTime = indicesAdapter.indexCreationDate(TEST_INDEX);
         assertThat(dateTime).isPresent();
-        assertThat(dateTime.get()).isBetween(DateTime.now().minusMinutes(1), DateTime.now().plusMinutes(1));
+        assertThat(dateTime.get()).isBetween(DateTime.now(DateTimeZone.UTC).minusMinutes(1), DateTime.now(DateTimeZone.UTC).plusMinutes(1));
     }
 
     @Test
