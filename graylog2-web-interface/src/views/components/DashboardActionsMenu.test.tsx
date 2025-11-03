@@ -25,7 +25,6 @@ import type { LayoutState } from 'views/components/contexts/SearchPageLayoutCont
 import Search from 'views/logic/search/Search';
 import View from 'views/logic/views/View';
 import { SAVE_COPY, BLANK } from 'views/components/contexts/SearchPageLayoutContext';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import useSaveViewFormControls from 'views/hooks/useSaveViewFormControls';
 import useCurrentUser from 'hooks/useCurrentUser';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -33,6 +32,7 @@ import useViewsPlugin from 'views/test/testViewsPlugin';
 import OnSaveViewAction from 'views/logic/views/OnSaveViewAction';
 import HotkeysProvider from 'contexts/HotkeysProvider';
 import SearchPageLayoutProvider from 'views/components/contexts/SearchPageLayoutProvider';
+import { createView } from 'views/api/views';
 
 import DashboardActionsMenu from './DashboardActionsMenu';
 
@@ -41,10 +41,8 @@ jest.mock('views/hooks/useSaveViewFormControls');
 jest.mock('hooks/useCurrentUser');
 jest.mock('logic/generateObjectId', () => jest.fn(() => 'new-dashboard-id'));
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    create: jest.fn((v) => Promise.resolve(v)).mockName('create'),
-  },
+jest.mock('views/api/views', () => ({
+  createView: jest.fn((v) => Promise.resolve(v)).mockName('create'),
 }));
 
 jest.mock('stores/permissions/EntityShareStore', () => ({
@@ -122,7 +120,7 @@ describe('DashboardActionsMenu', () => {
 
     const updatedDashboard = mockView.toBuilder().id('new-dashboard-id').build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null, undefined));
+    await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, undefined));
   });
 
   it('should extend a dashboard with plugin data on duplication', async () => {
@@ -146,7 +144,7 @@ describe('DashboardActionsMenu', () => {
       .summary('This dashboard has been extended by a plugin')
       .build();
 
-    await waitFor(() => expect(ViewManagementActions.create).toHaveBeenCalledWith(updatedDashboard, null, 'view-id'));
+    await waitFor(() => expect(createView).toHaveBeenCalledWith(updatedDashboard, null, 'view-id'));
   });
 
   it('should open edit dashboard meta information modal', async () => {
