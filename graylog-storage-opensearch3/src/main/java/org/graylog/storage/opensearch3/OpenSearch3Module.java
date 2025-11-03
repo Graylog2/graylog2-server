@@ -83,7 +83,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
         bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
         bindForSupportedVersion(MoreSearchAdapter.class).to(MoreSearchAdapterOS2.class);
-        bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS2.class);
+        bindForSupportedVersion(NodeAdapter.class).to(NodeAdapterOS.class);
         bindForSupportedVersion(SearchesAdapter.class).to(SearchesAdapterOS.class);
         bindForSupportedVersion(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
                 .to(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2.class);
