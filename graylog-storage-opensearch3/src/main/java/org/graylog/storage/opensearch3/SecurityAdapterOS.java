@@ -16,97 +16,59 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
-import org.graylog.shaded.opensearch2.org.apache.http.entity.ContentType;
-import org.graylog.shaded.opensearch2.org.apache.http.entity.StringEntity;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
 import org.graylog2.indexer.security.SecurityAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.security.GetRoleMappingResponse;
+import org.opensearch.client.opensearch.security.PatchRoleMappingResponse;
+import org.opensearch.client.opensearch.security.RoleMapping;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 
 /**
  * see: https://opensearch.org/docs/latest/security/access-control/api/
  */
 public class SecurityAdapterOS implements SecurityAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(SecurityAdapterOS.class);
 
-    final private PlainJsonApi jsonApi;
-    private final ObjectMapper objectMapper;
+    private final OfficialOpensearchClient client;
 
     @Inject
-    public SecurityAdapterOS(final ObjectMapper objectMapper,
-                             final PlainJsonApi jsonApi) {
-        this.objectMapper = objectMapper;
-        this.jsonApi = jsonApi;
+    public SecurityAdapterOS(OfficialOpensearchClient openSearchClient) {
+        this.client = openSearchClient;
     }
 
     @Override
     public Mapping getMappingForRole(final String role) {
-        final JsonNode result = jsonApi.perform(request("GET", "rolesmapping/" + role), "Unable to retrieve role mapping for role " + role);
-
-        final JsonNode fields = result.path(role);
         try {
-            return objectMapper.treeToValue(fields, Mapping.class);
-        } catch (JsonProcessingException e) {
+            final GetRoleMappingResponse response = client.sync().security().getRoleMapping(r -> r.role(role));
+            final RoleMapping roleMapping = response.get(role);
+            return new Mapping(roleMapping.backendRoles(), roleMapping.hosts(), roleMapping.users());
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     public MappingResponse addUserToRoleMapping(final String role, final String user) {
-        final var mapping = getMappingForRole(role);
-        if(!mapping.users().contains(user)) {
-            final List<String> users = new ArrayList<>();
-            users.addAll(mapping.users());
-            users.add(user);
-            return setUserToRoleMapping(role, new Mapping(mapping.backendRoles(), mapping.hosts(), users));
-        } else {
+        if (getMappingForRole(role).users().contains(user)) {
             return new MappingResponse("OK", "User already in mapping");
+        } else {
+            return patchRoleUsers(role, "add", user);
         }
     }
 
     public MappingResponse removeUserFromRoleMapping(final String role, final String user) {
-        final var mapping = getMappingForRole(role);
-        if(mapping.users().contains(user)) {
-            final var users = mapping.users().stream().filter(u -> !u.equals(user)).toList();
-            return setUserToRoleMapping(role, new Mapping(mapping.backendRoles(), mapping.hosts(), users));
-        } else {
-            return new MappingResponse("OK", "User did not exist in mapping");
-        }
+        return patchRoleUsers(role, "remove", user);
     }
 
-    private MappingResponse setUserToRoleMapping(final String role, final Mapping mapping) {
+    @Nonnull
+    private MappingResponse patchRoleUsers(String role, String operation, String user) {
         try {
-            final JsonNode result = jsonApi.perform(
-                    request("PUT", "rolesmapping/" + role,
-                            new StringEntity(objectMapper.writeValueAsString(mapping), ContentType.APPLICATION_JSON)
-                    ),
-                    "Could not set role mapping for role " + role);
-
-            var retval = new MappingResponse(result.get("status").asText(), result.get("message").asText());
-            return retval;
-        } catch (JsonProcessingException ex) {
-            LOG.error("Could not send Request: {}", ex.getMessage(), ex);
-            return new MappingResponse("ERROR", ex.getMessage());
+            final PatchRoleMappingResponse response = client.sync().security().patchRoleMapping(r -> r.role(role).operations(op -> op.path("/users").op(operation).value(JsonData.of(List.of(user)))));
+            return new MappingResponse(response.status(), response.message());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    private Request request(@SuppressWarnings("SameParameterValue") String method, String endpoint) {
-        return this.request(method, endpoint, null);
-    }
-
-    private Request request(@SuppressWarnings("SameParameterValue") String method, String endpoint, HttpEntity entity) {
-        final Request request = new Request(method, "/_plugins/_security/api/" + endpoint);
-        request.addParameter("format", "json");
-        if(entity != null) {
-            request.setEntity(entity);
-        }
-        return request;
     }
 }
