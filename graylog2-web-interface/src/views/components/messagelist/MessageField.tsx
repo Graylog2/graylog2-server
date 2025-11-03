@@ -75,22 +75,28 @@ export const MessageFieldName = ({ fieldName, fieldType, message }: MessageField
   );
 };
 
+const ValueContext = ({
+  isDecoratedField,
+  children = null,
+}: React.PropsWithChildren<{ isDecoratedField: boolean }>) => {
+  if (isDecoratedField)
+    return (
+      <InteractiveContext.Provider value={false}>
+        {children} <DecoratedField>(decorated)</DecoratedField>
+      </InteractiveContext.Provider>
+    );
+
+  return <>{children}</>;
+};
+
 export const MessageFieldValue = ({ message, fieldName, fieldType, value }: MessageFieldValueProps) => {
   const isDecoratedField =
     message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
 
   const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
 
-  const ValueContext = isDecoratedField
-    ? ({ children }) => (
-        <InteractiveContext.Provider value={false}>
-          {children} <DecoratedField>(decorated)</DecoratedField>
-        </InteractiveContext.Provider>
-      )
-    : ({ children }) => children;
-
   return (
-    <ValueContext>
+    <ValueContext isDecoratedField={isDecoratedField}>
       <Value
         field={fieldName}
         value={innerValue}

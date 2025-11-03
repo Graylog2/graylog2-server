@@ -50,18 +50,12 @@ export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponent
   return <MessageDetailsDL className="message-details-fields">{renderedFields}</MessageDetailsDL>;
 };
 
-const useMessageFieldsComponent = (): React.ComponentType<MessageFieldsComponentProps> => {
+const MessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
   const featureEnabled = useFeature('message_table_favorite_fields');
 
-  if (featureEnabled) return MessageFieldsViewMode;
+  if (featureEnabled) return <MessageFieldsViewMode />;
 
-  return DefaultMessageFields;
-};
-
-const MessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
-  const MessageFieldsComponent = useMessageFieldsComponent();
-
-  return <MessageFieldsComponent message={message} fields={fields} />;
+  return <DefaultMessageFields message={message} fields={fields} />;
 };
 
 export default MessageFields;
