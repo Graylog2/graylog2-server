@@ -46,7 +46,7 @@ public class DashboardsMetricsSupplierTest {
                 "user_dashboards", 2L
         );
 
-        when(dashboardService.countByType()).thenReturn(counts);
+        when(dashboardService.countBySource()).thenReturn(counts);
 
         Optional<TelemetryEvent> event = dashboardsMetricsSupplier.get();
 

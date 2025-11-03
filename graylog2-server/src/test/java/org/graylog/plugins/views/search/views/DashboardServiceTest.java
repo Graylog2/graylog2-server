@@ -54,8 +54,8 @@ public class DashboardServiceTest {
 
     @Test
     @MongoDBFixtures("dashboards.json")
-    public void testCountByType() {
-        final Map<String, Long> counts = dashboardService.countByType();
+    public void testCountBySource() {
+        final Map<String, Long> counts = dashboardService.countBySource();
 
         assertThat(counts)
                 .containsEntry("illuminate_dashboards", 1L)

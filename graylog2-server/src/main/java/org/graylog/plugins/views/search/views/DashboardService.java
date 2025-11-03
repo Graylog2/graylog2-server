@@ -38,9 +38,9 @@ public class DashboardService {
     }
 
     /**
-     * @return a map of dashboard types (Illuminate vs user-created) to their respective counts.
+     * @return a map with counts of dashboards grouped by source (Illuminate vs user-created).
      */
-    public Map<String, Long> countByType() {
+    public Map<String, Long> countBySource() {
         long illuminateDashboardCount = viewService.collection().countDocuments(
                 Filters.and(
                         Filters.regex(ViewDTO.FIELD_TITLE, "^Illuminate:"),

@@ -35,7 +35,7 @@ public class DashboardsMetricsSupplier implements TelemetryMetricSupplier {
 
     @Override
     public Optional<TelemetryEvent> get() {
-        Map<String, Object> metrics = new HashMap<>(dashboardService.countByType());
+        Map<String, Object> metrics = new HashMap<>(dashboardService.countBySource());
 
         return Optional.of(TelemetryEvent.of(metrics));
     }
