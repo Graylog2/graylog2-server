@@ -21,28 +21,11 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import type { Sort } from 'stores/PaginationTypes';
-import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
-
-const useComputedColumnOrder = (visibleColumns: Array<string>, attributeColumnsOder: Array<string>) =>
-  useMemo(() => {
-    const visibleSet = new Set(visibleColumns);
-    const coreOrder = attributeColumnsOder.filter((id) => visibleSet.has(id));
-    // Display columns, which are not part of the defined order, at the end of the table (before actions column)
-    const additionalVisible = visibleColumns.filter(
-      (id) => !UTILITY_COLUMNS.has(id) && !attributeColumnsOder.includes(id),
-    );
-
-    return [
-      visibleSet.has(BULK_SELECT_COL_ID) ? BULK_SELECT_COL_ID : null,
-      ...coreOrder,
-      ...additionalVisible,
-      visibleSet.has(ACTIONS_COL_ID) ? ACTIONS_COL_ID : null,
-    ].filter(Boolean);
-  }, [visibleColumns, attributeColumnsOder]);
+import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 
 type Props<Entity extends EntityBase> = {
   columns: Array<ColumnDef<Entity>>;
-  attributeColumnsOder: Array<string>;
+  columnOrder: Array<string>;
   entities: ReadonlyArray<Entity>;
   isEntitySelectable: (entity: Entity) => boolean;
   onColumnsChange: (visibleColumns: Array<string>) => void;
@@ -53,7 +36,7 @@ type Props<Entity extends EntityBase> = {
 
 const useTable = <Entity extends EntityBase>({
   columns,
-  attributeColumnsOder,
+  columnOrder,
   entities,
   isEntitySelectable,
   onColumnsChange,
@@ -76,8 +59,6 @@ const useTable = <Entity extends EntityBase>({
     () => Object.fromEntries(columns.map(({ id }) => [id, visibleColumns.includes(id)])),
     [columns, visibleColumns],
   );
-
-  const columnOrder = useComputedColumnOrder(visibleColumns, attributeColumnsOder);
 
   const onColumnVisibilityChange = useCallback(
     (updater: Updater<VisibilityState>) => {

@@ -28,6 +28,8 @@ const Td = styled.td`
 
 type Props<Entity extends EntityBase> = {
   row: Row<Entity>;
+  // eslint-disable-next-line react/no-unused-prop-types
+  columnOrder: Array<string>; // changes when column visibility or order changes.
 };
 
 const TableRow = <Entity extends EntityBase>({ row }: Props<Entity>) => (
@@ -38,4 +40,7 @@ const TableRow = <Entity extends EntityBase>({ row }: Props<Entity>) => (
   </tr>
 );
 
-export default React.memo(TableRow) as typeof TableRow;
+export default React.memo(
+  TableRow,
+  (prev, next) => prev.row === next.row && prev.columnOrder === next.columnOrder,
+) as typeof TableRow;

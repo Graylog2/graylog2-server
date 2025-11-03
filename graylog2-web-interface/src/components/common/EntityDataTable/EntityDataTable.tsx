@@ -35,6 +35,7 @@ import TableRow from 'components/common/EntityDataTable/TableRow';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useElementsWidths from 'components/common/EntityDataTable/hooks/useElementsWidths';
+import useColumnOrder from 'components/common/EntityDataTable/hooks/useColumnOrder';
 
 import type { ColumnRenderers, Column, EntityBase, ExpandedSectionRenderer } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
@@ -200,6 +201,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     [displayActionsCol, displayBulkSelectCol, visibleAttributeColumns],
   );
 
+  const columnOrder = useColumnOrder(visibleColumns, attributeColumnsOder);
+
   const _isEntitySelectable = useCallback(
     (entity: Entity) => {
       if (!displayBulkSelectCol) return false;
@@ -245,7 +248,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const table = useTable<Entity>({
     columns: columnsDefinitions,
-    attributeColumnsOder,
+    columnOrder,
     entities,
     isEntitySelectable: _isEntitySelectable,
     onColumnsChange,
@@ -278,7 +281,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               <TableHead table={table} />
               {table.getRowModel().rows.map((row) => (
                 <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                  <TableRow<Entity> key={row.id} row={row} />
+                  <TableRow<Entity> key={row.id} row={row} columnOrder={columnOrder} />
                   <ExpandedSections
                     key={`expanded-sections-${row.id}`}
                     expandedSectionsRenderer={expandedSectionsRenderer}
