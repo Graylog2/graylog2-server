@@ -26,7 +26,6 @@ import org.graylog2.plugin.Message;
 
 import java.util.Map;
 
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class RenameFields extends AbstractFunction<Void> {
