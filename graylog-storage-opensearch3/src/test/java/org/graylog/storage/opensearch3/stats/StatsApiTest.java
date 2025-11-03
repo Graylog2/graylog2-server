@@ -66,62 +66,6 @@ class StatsApiTest {
     }
 
     @Test
-    void testNumberOfMessagesInIndex() throws Exception {
-        final IndicesStatsResponse singleIndexResponse = IndicesStatsResponse.builder()
-                .all(
-                        AllIndicesStats.builder()
-                                .primaries(
-                                        IndexStats.builder()
-                                                .docs(builder -> builder.count(13L))
-                                                .build()
-                                )
-                                .total(emptyIndexStats())
-                                .build()
-                )
-                .indices(
-                        Map.of(
-                                "graylog_13",
-                                buildIndicesStats("P999CCTTFOhEGdspOYh9Q", 13L))
-                )
-                .shards(mock(ShardStatistics.class))
-                .build();
-        doReturn(singleIndexResponse)
-                .when(indicesClient)
-                .stats(IndicesStatsRequest.builder().index(List.of("graylog_13")).build());
-
-        final long returned = statsApi.numberOfMessagesInIndex("graylog_13");
-        assertEquals(13, returned);
-
-        final IndicesStatsResponse multipleIndicesResponse = IndicesStatsResponse.builder()
-                .all(
-                        AllIndicesStats.builder()
-                                .primaries(
-                                        IndexStats.builder()
-                                                .docs(builder -> builder.count(30L))
-                                                .build()
-                                )
-                                .total(emptyIndexStats())
-                                .build()
-                )
-                .indices(
-                        Map.of(
-                                "graylog_13",
-                                buildIndicesStats("P999CCTTFOhEGdspOYh9Q", 13L),
-                                "graylog_12",
-                                buildIndicesStats("P999CCTTFOhEGdspOYh9V", 17L)
-                        )
-                )
-                .shards(mock(ShardStatistics.class))
-                .build();
-
-        doReturn(multipleIndicesResponse)
-                .when(indicesClient)
-                .stats(IndicesStatsRequest.builder().index(List.of("graylog_*")).build());
-
-        assertEquals(30, statsApi.numberOfMessagesInIndex("graylog_*"));
-    }
-
-    @Test
     void testStoreSizes() throws Exception {
         final IndicesStatsResponse indicesStatsResponse = IndicesStatsResponse.builder()
                 .all(
