@@ -19,7 +19,10 @@ package org.graylog.plugins.pipelineprocessor.db.mongodb;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.ReplaceOneModel;
+import com.mongodb.client.model.ReplaceOptions;
 import jakarta.inject.Inject;
+import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -27,11 +30,15 @@ import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Filters.eq;
+import static org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao.FIELD_INPUT_ID;
 import static org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao.FIELD_PIPELINE_ID;
 
 /**
@@ -41,20 +48,23 @@ public class MongoDbPipelineMetadataService {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbPipelineMetadataService.class);
     public static final String RULES_COLLECTION_NAME = "pipeline_processor_rules_meta";
     public static final String INPUTS_COLLECTION_NAME = "pipeline_processor_inputs_meta";
-    private final MongoCollection<PipelineRulesMetadataDao> collection;
+    private final MongoCollection<PipelineRulesMetadataDao> rulesCollection;
+    private final MongoCollection<PipelineInputsMetadataDao> inputsCollection;
 
     @Inject
     public MongoDbPipelineMetadataService(MongoCollections mongoCollections) {
-        this.collection = mongoCollections.collection(RULES_COLLECTION_NAME, PipelineRulesMetadataDao.class);
-        collection.createIndex(Indexes.ascending(FIELD_PIPELINE_ID), new IndexOptions().unique(true));
+        this.rulesCollection = mongoCollections.collection(RULES_COLLECTION_NAME, PipelineRulesMetadataDao.class);
+        rulesCollection.createIndex(Indexes.ascending(FIELD_PIPELINE_ID), new IndexOptions().unique(true));
+
+        this.inputsCollection = mongoCollections.collection(INPUTS_COLLECTION_NAME, PipelineInputsMetadataDao.class);
     }
 
     public ImmutableList<PipelineRulesMetadataDao> getAll() {
-        return ImmutableList.copyOf(collection.find());
+        return ImmutableList.copyOf(rulesCollection.find());
     }
 
     public PipelineRulesMetadataDao getByPipelineId(final String pipelineId) throws NotFoundException {
-        final PipelineRulesMetadataDao dao = collection.find(eq(FIELD_PIPELINE_ID, pipelineId)).first();
+        final PipelineRulesMetadataDao dao = rulesCollection.find(eq(FIELD_PIPELINE_ID, pipelineId)).first();
         if (dao == null) {
             throw new NotFoundException("No pipeline found with id: " + pipelineId);
         }
@@ -62,7 +72,7 @@ public class MongoDbPipelineMetadataService {
     }
 
     public Set<String> getPipelinesByRule(final String ruleId) {
-        return collection.find(eq(PipelineRulesMetadataDao.FIELD_RULES, ruleId))
+        return rulesCollection.find(eq(PipelineRulesMetadataDao.FIELD_RULES, ruleId))
                 .map(PipelineRulesMetadataDao::pipelineId)
                 .into(new HashSet<>());
     }
@@ -73,4 +83,60 @@ public class MongoDbPipelineMetadataService {
                 .collect(Collectors.toSet());
     }
 
+    public void saveRulesMetadata(List<PipelineRulesMetadataDao> ruleRecords) {
+        saveRulesMetadata(rulesCollection, ruleRecords, true);
+    }
+
+    public static void saveRulesMetadata(MongoCollection<PipelineRulesMetadataDao> rulesCollection,
+                                         List<PipelineRulesMetadataDao> ruleRecords,
+                                         boolean upsert) {
+        if (!ruleRecords.isEmpty()) {
+            LOG.info("Inserting/Updating {} pipeline rules metadata records.", ruleRecords.size());
+            if (upsert) {
+                List<ReplaceOneModel<PipelineRulesMetadataDao>> ops = ruleRecords.stream()
+                        .map(ruleRecord -> new ReplaceOneModel<>(
+                                eq(FIELD_PIPELINE_ID, ruleRecord.pipelineId()),
+                                ruleRecord,
+                                new ReplaceOptions().upsert(true)
+                        ))
+                        .toList();
+                rulesCollection.bulkWrite(ops);
+            } else {
+                rulesCollection.insertMany(ruleRecords);
+            }
+        }
+    }
+
+    public void saveInputsMetadata(Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
+        saveInputsMetadata(inputsCollection, inputMentions, true);
+    }
+
+    public static void saveInputsMetadata(MongoCollection<PipelineInputsMetadataDao> inputsCollection,
+                                          Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions,
+                                          boolean upsert) {
+        final List<PipelineInputsMetadataDao> inputRecords = new ArrayList<>();
+        inputMentions.forEach((inputId, mentionedInEntries) -> {
+            final PipelineInputsMetadataDao inputMetadata = PipelineInputsMetadataDao.builder()
+                    .inputId(inputId)
+                    .mentionedIn(new ArrayList<>(mentionedInEntries))
+                    .build();
+            inputRecords.add(inputMetadata);
+        });
+
+        if (!inputRecords.isEmpty()) {
+            LOG.info("Inserting/Updating {} pipeline inputs metadata records.", inputRecords.size());
+            if (upsert) {
+                List<ReplaceOneModel<PipelineInputsMetadataDao>> ops = inputRecords.stream()
+                        .map(inputRecord -> new ReplaceOneModel<>(
+                                eq(FIELD_INPUT_ID, inputRecord.inputId()),
+                                inputRecord,
+                                new ReplaceOptions().upsert(true)
+                        ))
+                        .toList();
+                inputsCollection.bulkWrite(ops);
+            } else {
+                inputsCollection.insertMany(inputRecords);
+            }
+        }
+    }
 }

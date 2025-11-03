@@ -24,8 +24,8 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @JsonDeserialize(builder = AutoValue_PipelineRulesMetadataDao.Builder.class)
 @AutoValue
@@ -47,25 +47,25 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     public abstract String pipelineId();
 
     @JsonProperty(FIELD_RULES)
-    public abstract List<String> rules();
+    public abstract Set<String> rules();
 
     @JsonProperty(FIELD_STREAMS)
-    public abstract List<String> streams();
+    public abstract Set<String> streams();
 
     @JsonProperty(FIELD_FUNCTIONS)
-    public abstract List<String> functions();
+    public abstract Set<String> functions();
 
 
     @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
-    public abstract List<String> deprecatedFunctions();
+    public abstract Set<String> deprecatedFunctions();
 
     public static Builder builder() {
         return new AutoValue_PipelineRulesMetadataDao.Builder()
                 .pipelineId("")
-                .rules(new ArrayList<>())
-                .streams(new ArrayList<>())
-                .functions(new ArrayList<>())
-                .deprecatedFunctions(new ArrayList<>());
+                .rules(new HashSet<>())
+                .streams(new HashSet<>())
+                .functions(new HashSet<>())
+                .deprecatedFunctions(new HashSet<>());
     }
 
     @AutoValue.Builder
@@ -79,15 +79,15 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
         public abstract Builder pipelineId(String pipelineId);
 
         @JsonProperty(FIELD_RULES)
-        public abstract Builder rules(List<String> rules);
+        public abstract Builder rules(Set<String> rules);
 
         @JsonProperty(FIELD_STREAMS)
-        public abstract Builder streams(List<String> streams);
+        public abstract Builder streams(Set<String> streams);
 
         @JsonProperty(FIELD_FUNCTIONS)
-        public abstract Builder functions(List<String> functions);
+        public abstract Builder functions(Set<String> functions);
 
         @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
-        public abstract Builder deprecatedFunctions(List<String> deprecatedFunctions);
+        public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
     }
 }

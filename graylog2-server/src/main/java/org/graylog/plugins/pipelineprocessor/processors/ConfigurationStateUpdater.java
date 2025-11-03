@@ -113,6 +113,12 @@ public class ConfigurationStateUpdater {
         return state;
     }
 
+    private synchronized PipelineInterpreter.State reloadAndSave(PipelinesChangedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        metadataListener.handlePipelineChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+        return state;
+    }
+
     /**
      * Can be used to inspect or use the current state of the pipeline system.
      * For example, the interpreter
@@ -141,7 +147,7 @@ public class ConfigurationStateUpdater {
             pipelineMetricRegistry.removePipelineMetrics(id);
         });
         event.updatedPipelineIds().forEach(id -> log.debug("Refreshing pipeline {}", id));
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe

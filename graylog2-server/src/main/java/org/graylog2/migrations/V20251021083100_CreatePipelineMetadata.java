@@ -17,12 +17,12 @@
 package org.graylog2.migrations;
 
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.InsertOneModel;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineAnalyzer;
@@ -104,26 +104,11 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
 
     private void createMetadata() {
         LOG.info("Creating pipeline metadata collection.");
-        final List<InsertOneModel<PipelineRulesMetadataDao>> ruleRecords = new ArrayList<>();
+        final List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
                 pipelineAnalyzer.analyzePipelines(pipelineResolver, ruleRecords);
 
-        final List<InsertOneModel<PipelineInputsMetadataDao>> inputRecords = new ArrayList<>();
-        inputMentions.forEach((inputId, mentionedInEntries) -> {
-            final PipelineInputsMetadataDao inputMetadata = PipelineInputsMetadataDao.builder()
-                    .inputId(inputId)
-                    .mentionedIn(new ArrayList<>(mentionedInEntries))
-                    .build();
-            inputRecords.add(new InsertOneModel<>(inputMetadata));
-        });
-        if (!inputRecords.isEmpty()) {
-            LOG.info("Inserting {} pipeline inputs metadata records.", inputRecords.size());
-            inputsCollection.bulkWrite(inputRecords);
-        }
-
-        if (!ruleRecords.isEmpty()) {
-            LOG.info("Inserting {} pipeline rules metadata records.", ruleRecords.size());
-            rulesCollection.bulkWrite(ruleRecords);
-        }
+        MongoDbPipelineMetadataService.saveRulesMetadata(rulesCollection, ruleRecords, false);
+        MongoDbPipelineMetadataService.saveInputsMetadata(inputsCollection, inputMentions, false);
     }
 }

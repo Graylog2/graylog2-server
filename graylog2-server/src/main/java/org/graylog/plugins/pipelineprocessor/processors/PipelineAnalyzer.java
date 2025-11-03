@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
-import com.mongodb.client.model.InsertOneModel;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -40,7 +39,6 @@ import org.graylog2.inputs.InputService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -72,7 +70,7 @@ public class PipelineAnalyzer {
 
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             PipelineResolver resolver,
-            List<InsertOneModel<PipelineRulesMetadataDao>> ruleRecords) {
+            List<PipelineRulesMetadataDao> ruleRecords) {
         final ImmutableMap<String, Pipeline> pipelines = resolver.resolvePipelines(pipelineMetricRegistry);
         final ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), pipelineMetricRegistry);
         return analyzePipelines(pipelines, functions, ruleRecords);
@@ -81,7 +79,7 @@ public class PipelineAnalyzer {
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
             ImmutableMap<String, Pipeline> pipelines,
             ImmutableMap<String, Pipeline> functions,
-            List<InsertOneModel<PipelineRulesMetadataDao>> ruleRecords) {
+            List<PipelineRulesMetadataDao> ruleRecords) {
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = new HashMap<>();
 
         pipelines.values().forEach(pipeline -> {
@@ -93,9 +91,9 @@ public class PipelineAnalyzer {
                     .map(PipelineConnections::streamId)
                     .collect(Collectors.toSet());
 
-            List<String> ruleList = new ArrayList<>();
-            List<String> functionList = new ArrayList<>();
-            List<String> deprecatedFunctionList = new ArrayList<>();
+            Set<String> ruleSet = new HashSet<>();
+            Set<String> functionSet = new HashSet<>();
+            Set<String> deprecatedFunctionSet = new HashSet<>();
 
             if (stages != null) {
                 stages.forEach(stage -> {
@@ -103,30 +101,30 @@ public class PipelineAnalyzer {
                     if (rules != null) {
                         rules.forEach(rule -> {
                             if (rule != null) {
-                                ruleList.add(rule.id());
-                                analyzeRule(pipeline, connectedStreams, stage, rule, functionList, deprecatedFunctionList, inputMentions);
+                                ruleSet.add(rule.id());
+                                analyzeRule(pipeline, connectedStreams, stage, rule, functionSet, deprecatedFunctionSet, inputMentions);
                             }
                         });
                     }
                 });
             }
             rulesBuilder
-                    .rules(ruleList)
-                    .streams(connectedStreams.stream().toList())
-                    .functions(functionList)
-                    .deprecatedFunctions(deprecatedFunctionList);
-            ruleRecords.add(new InsertOneModel<>(rulesBuilder.build()));
+                    .rules(ruleSet)
+                    .streams(connectedStreams)
+                    .functions(functionSet)
+                    .deprecatedFunctions(deprecatedFunctionSet);
+            ruleRecords.add(rulesBuilder.build());
         });
         return inputMentions;
     }
 
     private void analyzeRule(Pipeline pipeline, Set<String> connectedStreams,
                              Stage stage, Rule rule,
-                             List<String> functionList, List<String> deprecatedFunctionList,
+                             Set<String> functions, Set<String> deprecatedFunctionList,
                              Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
         MetaDataListener ruleListener = new MetaDataListener(pipeline, connectedStreams, stage, rule, inputMentions);
         new RuleAstWalker().walk(ruleListener, rule);
-        functionList.addAll(ruleListener.getFunctions());
+        functions.addAll(ruleListener.getFunctions());
         deprecatedFunctionList.addAll(ruleListener.getDeprecatedFunctions());
     }
 

@@ -17,22 +17,23 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.eventbus.Subscribe;
-import com.mongodb.client.model.InsertOneModel;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.NotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,15 +57,28 @@ public class PipelineMetadataUpdater {
         this.ruleService = ruleService;
     }
 
-    @Subscribe
+    public void handlePipelineChanges(PipelinesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
+        Set<PipelineDao> pipelineDaos = affectedPipelines(event);
+        handleChanges(pipelineDaos, state, resolver, metricRegistry);
+    }
+
     public void handleRuleChanges(RulesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
         Set<RuleDao> ruleDaos = affectedRules(event);
         Set<PipelineDao> pipelineDaos = affectedPipelines(ruleDaos);
-        ImmutableMap<String, Pipeline> pipelines = affectedPipelinesAsMap(pipelineDaos, state);
-        final ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), metricRegistry);
+        handleChanges(pipelineDaos, state, resolver, metricRegistry);
+    }
 
-        final List<InsertOneModel<PipelineRulesMetadataDao>> ruleRecords = new ArrayList<>();
-        pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords);
+    private void handleChanges(Set<PipelineDao> pipelineDaos,
+                               PipelineInterpreter.State state,
+                               PipelineResolver resolver,
+                               PipelineMetricRegistry metricRegistry) {
+        ImmutableMap<String, Pipeline> pipelines = affectedPipelinesAsMap(pipelineDaos, state);
+        ImmutableMap<String, Pipeline> functions = resolver.resolveFunctions(pipelines.values(), metricRegistry);
+        List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
+        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords);
+
+        metadataService.saveRulesMetadata(ruleRecords);
+        metadataService.saveInputsMetadata(inputMentions);
     }
 
     private Set<RuleDao> affectedRules(RulesChangedEvent event) {
@@ -84,8 +98,14 @@ public class PipelineMetadataUpdater {
     }
 
     private Set<PipelineDao> affectedPipelines(Set<RuleDao> rules) {
-        Set<String> pipelineIds = metadataService.getPipelinesByRules(rules.stream().map(RuleDao::id).collect(Collectors.toSet()));
-        return pipelineIds.stream()
+        return rules.stream()
+                .map(RuleDao::title)
+                .flatMap(title -> pipelineService.loadBySourcePattern(title).stream())
+                .collect(Collectors.toSet());
+    }
+
+    private Set<PipelineDao> affectedPipelines(PipelinesChangedEvent event) {
+        return Stream.concat(event.updatedPipelineIds().stream(), event.deletedPipelineIds().stream())
                 .map(id -> {
                     try {
                         return pipelineService.load(id);
