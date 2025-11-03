@@ -23,10 +23,15 @@ import SelectEntitiesContext from './SelectEntitiesContext';
 import type { EntityBase } from '../types';
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
+  selectedEntities: Array<Entity['id']>;
   table: Table<Entity>;
 }>;
 
-const SelectedEntitiesProvider = <Entity extends EntityBase>({ children = undefined, table }: Props<Entity>) => {
+const SelectedEntitiesProvider = <Entity extends EntityBase>({
+  children = undefined,
+  selectedEntities,
+  table,
+}: Props<Entity>) => {
   const deselectEntity = useCallback(
     (targetEntityId: EntityBase['id']) => table.setRowSelection((cur) => ({ ...cur, [targetEntityId]: false })),
     [table],
@@ -47,14 +52,12 @@ const SelectedEntitiesProvider = <Entity extends EntityBase>({ children = undefi
     () => ({
       setSelectedEntities: (rows: Array<string>) =>
         table.setRowSelection(Object.fromEntries(rows.map((id) => [id, true]))),
-      selectedEntities: Object.entries(table.getState().rowSelection)
-        .filter(([_id, isSelected]) => isSelected)
-        .map(([id]) => id),
+      selectedEntities,
       deselectEntity,
       selectEntity,
       toggleEntitySelect,
     }),
-    [table, deselectEntity, selectEntity, toggleEntitySelect],
+    [selectedEntities, deselectEntity, selectEntity, toggleEntitySelect, table],
   );
 
   return <SelectEntitiesContext.Provider value={contextValue}>{children}</SelectEntitiesContext.Provider>;

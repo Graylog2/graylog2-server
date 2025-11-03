@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback } from 'react';
+import { useMemo, useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
@@ -190,6 +190,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
+  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
 
   const visibleColumns = useMemo(
     () =>
@@ -242,7 +243,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
     entityActions,
     entityAttributesAreCamelCase,
-    isEntitySelectable: _isEntitySelectable,
     meta,
   });
 
@@ -256,12 +256,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     onSortChange,
     sort: activeSort,
     visibleColumns,
-    initialSelection,
+    selectedEntities,
+    setSelectedEntities,
   });
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
-      <SelectedEntitiesProvider<Entity> table={table}>
+      <SelectedEntitiesProvider<Entity> table={table} selectedEntities={selectedEntities}>
         <ExpandedSectionsProvider>
           <ActionsRow>
             <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>

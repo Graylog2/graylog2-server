@@ -29,13 +29,9 @@ import {
   BULK_SELECT_COL_ID,
   ACTIONS_COL_ID,
 } from 'components/common/EntityDataTable/Constants';
-import BulkSelectHead from 'components/common/EntityDataTable/BulkSelectHead';
 import { ButtonToolbar } from 'components/bootstrap';
 
-const useBulkSelectCol = <Entity extends EntityBase>(
-  displayBulkSelectCol: boolean,
-  isEntitySelectable: (entity: Entity) => boolean,
-) => {
+const useBulkSelectCol = <Entity extends EntityBase>(displayBulkSelectCol: boolean) => {
   const columnHelper = createColumnHelper<Entity>();
 
   return useMemo(
@@ -44,8 +40,22 @@ const useBulkSelectCol = <Entity extends EntityBase>(
         ? columnHelper.display({
             id: BULK_SELECT_COL_ID,
             size: BULK_SELECT_COLUMN_WIDTH,
-            // Todo: check if we can make use of enableRowSelection from useReactTable instead
-            header: ({ table }) => <BulkSelectHead data={table.options.data.filter(isEntitySelectable)} />,
+            header: ({ table }) => {
+              const checked = table.getIsAllRowsSelected();
+              const title = `${checked ? 'Deselect' : 'Select'} all visible entities`;
+
+              return (
+                <RowCheckbox
+                  onChange={table.getToggleAllRowsSelectedHandler()}
+                  checked={checked}
+                  indeterminate={table.getIsSomeRowsSelected()}
+                  title={title}
+                  disabled={!table.options?.data?.length}
+                  aria-label={title}
+                />
+              );
+            },
+
             enableHiding: false,
             cell: ({ row }) => (
               <RowCheckbox
@@ -57,7 +67,7 @@ const useBulkSelectCol = <Entity extends EntityBase>(
             ),
           })
         : null,
-    [displayBulkSelectCol, columnHelper, isEntitySelectable],
+    [displayBulkSelectCol, columnHelper],
   );
 };
 
@@ -106,7 +116,6 @@ type Props<Entity extends EntityBase, Meta> = {
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
   entityAttributesAreCamelCase: boolean;
-  isEntitySelectable: (entity: Entity) => boolean;
   meta: Meta;
 };
 
@@ -120,11 +129,10 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   displayBulkSelectCol,
   entityActions,
   entityAttributesAreCamelCase,
-  isEntitySelectable,
   meta,
 }: Props<Entity, Meta>) => {
   const columnHelper = createColumnHelper<Entity>();
-  const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol, isEntitySelectable);
+  const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol);
   const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions, actionsRef);
 
   const attributeCols = useMemo(

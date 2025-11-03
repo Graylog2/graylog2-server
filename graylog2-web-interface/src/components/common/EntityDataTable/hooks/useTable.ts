@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { ColumnDef, SortingState, Updater, VisibilityState } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
@@ -32,7 +32,8 @@ type Props<Entity extends EntityBase> = {
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
   visibleColumns: Array<string>;
-  initialSelection: any;
+  selectedEntities: Array<Entity['id']>;
+  setSelectedEntities: any;
   onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void;
 };
 
@@ -45,11 +46,10 @@ const useTable = <Entity extends EntityBase>({
   onSortChange,
   sort,
   visibleColumns,
-  initialSelection = [],
+  selectedEntities,
+  setSelectedEntities,
   onChangeSelection,
 }: Props<Entity>) => {
-  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection);
-
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
 
@@ -95,7 +95,7 @@ const useTable = <Entity extends EntityBase>({
         onChangeSelection(newSelection, entities);
       }
     },
-    [entities, onChangeSelection, selectedEntities],
+    [entities, onChangeSelection, selectedEntities, setSelectedEntities],
   );
 
   return useReactTable({
