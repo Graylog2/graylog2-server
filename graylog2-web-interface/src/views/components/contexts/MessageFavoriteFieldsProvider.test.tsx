@@ -71,7 +71,7 @@ describe('MessageFavoriteFieldsProvider', () => {
     asMock(useMessageFavoriteFields).mockReturnValue({
       isLoading: false,
       saveFields: mockSaveFields,
-      favoriteFields: ['field1', 'field2'],
+      editingFavoriteFields: ['field1', 'field2'],
     });
   });
   it('initializes favorites from hook and exposes them via context', () => {

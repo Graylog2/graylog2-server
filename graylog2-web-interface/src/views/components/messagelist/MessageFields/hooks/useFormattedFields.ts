@@ -22,8 +22,8 @@ import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { defaultCompare } from 'logic/DefaultCompare';
 
-const useFormattedFields = () => {
-  const { favoriteFields, message, messageFields: fieldTypes } = useContext(MessageFavoriteFieldsContext);
+const useFormattedFields = (favoriteFields: Array<string>) => {
+  const { message, messageFields: fieldTypes } = useContext(MessageFavoriteFieldsContext);
   const fieldsMapper = useCallback(
     (field: string) => {
       const { type } = fieldTypes.find(

@@ -14,18 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
 
 export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
 
 const useMessageFavoriteFields = (streams: Array<string>) => {
+  const [favorites, setFavorites] = React.useState<Array<string>>(DEFAULT_FIELDS);
   const saveFields = (fields: Array<string>) => {
     // eslint-disable-next-line no-console
-    console.log('SAVE', { fields, streams });
+    console.log(streams, fields);
+    setFavorites(fields);
   };
 
   return {
     isLoading: false,
-    favoriteFields: DEFAULT_FIELDS,
+    favoriteFields: favorites,
     saveFields,
   };
 };

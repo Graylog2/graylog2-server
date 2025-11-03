@@ -30,6 +30,7 @@ export type MessageFieldsListProps = {
   fields: Array<FormattedField>;
   message: Message;
   isFavorite: boolean;
+  setFavorites?: React.Dispatch<React.SetStateAction<Array<string>>>;
 };
 
 export type MessageFieldsComponentProps = {

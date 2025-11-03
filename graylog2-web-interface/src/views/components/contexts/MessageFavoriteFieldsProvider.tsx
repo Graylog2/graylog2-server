@@ -15,14 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo, useEffect, useCallback } from 'react';
-import uniq from 'lodash/uniq';
+import React, { useMemo, useCallback } from 'react';
 
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import useMessageFavoriteFields, {
-  DEFAULT_FIELDS,
-} from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields';
+import useMessageFavoriteFields from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 
 type OriginalProps = React.PropsWithChildren<{
@@ -36,45 +33,23 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     saveFields,
     favoriteFields: initialFavoriteFields,
   } = useMessageFavoriteFields(message.fields.streams);
-  const [favorites, setFavorites] = React.useState<Array<string>>([]);
-  const addToFavoriteFields = (field: string) => {
-    setFavorites((favs) => uniq([...favs, field]));
-  };
-  const removeFromFavoriteFields = (field: string) => {
-    setFavorites((favs) => favs.filter((fav) => fav !== field));
-  };
 
-  const saveFavoriteField = useCallback(() => {
-    saveFields(favorites);
-  }, [favorites, saveFields]);
-
-  const resetFavoriteField = useCallback(() => {
-    setFavorites(DEFAULT_FIELDS);
-    saveFields(DEFAULT_FIELDS);
-  }, [saveFields]);
-
-  const cancelEdit = useCallback(() => {
-    setFavorites(initialFavoriteFields);
-  }, [initialFavoriteFields]);
-
-  useEffect(() => {
-    if (initialFavoriteFields) setFavorites(initialFavoriteFields);
-  }, [initialFavoriteFields]);
+  const saveFavoriteField = useCallback(
+    (favoritesToSave: Array<string>) => {
+      saveFields(favoritesToSave);
+    },
+    [saveFields],
+  );
 
   const contextValue = useMemo(
     () => ({
       isLoadingFavoriteFields: isLoading,
-      addToFavoriteFields,
-      favoriteFields: favorites,
-      removeFromFavoriteFields,
-      cancelEdit,
-      resetFavoriteField,
+      favoriteFields: initialFavoriteFields,
       saveFavoriteField,
-      setFavorites,
       messageFields,
       message,
     }),
-    [isLoading, favorites, cancelEdit, resetFavoriteField, saveFavoriteField, messageFields, message],
+    [isLoading, initialFavoriteFields, saveFavoriteField, messageFields, message],
   );
 
   return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;

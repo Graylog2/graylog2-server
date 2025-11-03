@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useContext, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
+import uniq from 'lodash/uniq';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
 import type { Message } from 'views/components/messagelist/Types';
 import { MessageFieldName, MessageFieldValue } from 'views/components/messagelist/MessageField';
-import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import CommonFavoriteIcon from 'views/components/common/CommonFavoriteIcon';
 
 type Props = {
@@ -30,6 +30,7 @@ type Props = {
   message: Message;
   value: any;
   isFavorite: boolean;
+  setFavorites: React.Dispatch<React.SetStateAction<Array<string>>>;
 };
 
 const DefinitionDescription = styled.dd(
@@ -53,13 +54,11 @@ const Container = styled.div(
   `,
 );
 
-const MessageFieldEditMode = ({ fieldName, fieldType, message, value, isFavorite }: Props) => {
-  const { removeFromFavoriteFields, addToFavoriteFields } = useContext(MessageFavoriteFieldsContext);
-  const onFavoriteToggle = useCallback(() => {
-    const clb = isFavorite ? removeFromFavoriteFields : addToFavoriteFields;
-
-    return clb(fieldName);
-  }, [addToFavoriteFields, fieldName, isFavorite, removeFromFavoriteFields]);
+const MessageFieldEditMode = ({ fieldName, fieldType, message, value, isFavorite, setFavorites }: Props) => {
+  const onFavoriteToggle = useCallback(
+    () => setFavorites((favs) => (isFavorite ? favs.filter((fav) => fav !== fieldName) : uniq([...favs, fieldName]))),
+    [fieldName, isFavorite, setFavorites],
+  );
 
   const favTitle = isFavorite ? `Remove ${fieldName} from favorites` : `Add ${fieldName} to favorites`;
 

@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback, useContext } from 'react';
+import React, { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import MessageFieldEditMode from 'views/components/messagelist/MessageFields/MessageFieldEditMode';
 import type { MessageFieldsListProps, FormattedField } from 'views/components/messagelist/MessageFields/types';
 import { SortableList } from 'components/common';
-import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -33,8 +32,13 @@ const Container = styled.div(
   `,
 );
 
-const MessageFieldsEditModeList = ({ fields, message, isFavorite }: MessageFieldsListProps) => {
-  const { setFavorites } = useContext(MessageFavoriteFieldsContext);
+const MessageFieldsEditModeList = ({ fields, message, setFavorites, isFavorite }: MessageFieldsListProps) => {
+  const onMoveItem = useCallback(
+    (items: Array<FormattedField>) => {
+      setFavorites(items.map((item: FormattedField) => item.field));
+    },
+    [setFavorites],
+  );
 
   const customContentRender = useCallback(
     ({ item: { field, value, type } }) => (
@@ -45,16 +49,10 @@ const MessageFieldsEditModeList = ({ fields, message, isFavorite }: MessageField
         message={message}
         value={value}
         isFavorite={isFavorite}
+        setFavorites={setFavorites}
       />
     ),
-    [isFavorite, message],
-  );
-
-  const onMoveItem = useCallback(
-    (items: Array<FormattedField>) => {
-      setFavorites(items.map((item: FormattedField) => item.field));
-    },
-    [setFavorites],
+    [isFavorite, message, setFavorites],
   );
 
   if (!fields.length) return null;

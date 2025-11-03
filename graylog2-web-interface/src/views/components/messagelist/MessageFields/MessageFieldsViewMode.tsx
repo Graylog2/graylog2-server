@@ -22,8 +22,8 @@ import useFormattedFields from 'views/components/messagelist/MessageFields/hooks
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 
 const MessageFieldsViewMode = () => {
-  const { formattedFavorites, formattedRest } = useFormattedFields();
-  const { message } = useContext(MessageFavoriteFieldsContext);
+  const { message, favoriteFields } = useContext(MessageFavoriteFieldsContext);
+  const { formattedFavorites, formattedRest } = useFormattedFields(favoriteFields);
 
   return (
     <>
