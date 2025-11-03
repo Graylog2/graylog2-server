@@ -23,8 +23,6 @@ import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 class NodeAdapterOSIT {
@@ -40,7 +38,7 @@ class NodeAdapterOSIT {
     }
 
     @Test
-    void testOpensearchVersionFetching() throws IOException {
+    void testOpensearchVersionFetching() {
         assertThat(adapter.version())
                 .isNotEmpty()
                 .contains(SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, SearchServer.DEFAULT_VERSION.version()));
