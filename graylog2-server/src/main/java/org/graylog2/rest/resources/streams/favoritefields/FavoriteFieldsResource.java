@@ -32,7 +32,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.rest.resources.streams.responses.StreamCreatedResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.FavoriteFieldsService;
@@ -59,7 +58,7 @@ public class FavoriteFieldsResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Set favorite fields for a list of streams", response = StreamCreatedResponse.class)
+    @ApiOperation(value = "Set favorite fields for a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
@@ -73,7 +72,7 @@ public class FavoriteFieldsResource extends RestResource {
 
     @PUT
     @Timed
-    @ApiOperation(value = "Add favorite field for a list of streams", response = StreamCreatedResponse.class)
+    @ApiOperation(value = "Add favorite field for a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
@@ -85,7 +84,7 @@ public class FavoriteFieldsResource extends RestResource {
 
     @DELETE
     @Timed
-    @ApiOperation(value = "Remove favorite field from a list of streams", response = StreamCreatedResponse.class)
+    @ApiOperation(value = "Remove favorite field from a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
