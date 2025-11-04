@@ -254,7 +254,7 @@ const TemplateForm = ({
         data_tiering:
           selectedRetentionSegment === 'legacy'
             ? undefined
-            : prepareDataTieringConfig(index_set_config.data_tiering, PluginStore, false),
+            : prepareDataTieringConfig(index_set_config.data_tiering, PluginStore, false, true),
       },
     };
 
@@ -273,7 +273,7 @@ const TemplateForm = ({
       ...indexSetConfig
     } = values.index_set_config;
 
-    const data_tiering = prepareDataTieringInitialValues(values.index_set_config.data_tiering, PluginStore, false);
+    const data_tiering = prepareDataTieringInitialValues(values.index_set_config.data_tiering, PluginStore, false, true);
 
     return {
       ...values,
