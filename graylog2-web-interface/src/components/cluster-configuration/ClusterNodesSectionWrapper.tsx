@@ -64,6 +64,12 @@ const TableWrapper = styled.div<{ $maxHeight?: string }>(
       div#scroll-container {
         max-height: ${$maxHeight};
         overflow-y: auto;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
       }
 
       div#scroll-container table thead {
