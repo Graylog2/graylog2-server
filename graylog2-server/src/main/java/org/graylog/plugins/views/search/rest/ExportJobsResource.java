@@ -67,7 +67,7 @@ public class ExportJobsResource extends RestResource {
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
     public String createForSearch(
             @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @Parameter(description = "Optional overrides") @Valid ResultFormat formatFromClient) {
+            @Parameter(name = "Optional overrides") @Valid ResultFormat formatFromClient) {
         return exportJobService.save(exportJobFactory.forSearch(searchId, formatFromClient));
     }
 
@@ -78,7 +78,7 @@ public class ExportJobsResource extends RestResource {
     public String createForSearchType(
             @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @Parameter(description = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
-            @Parameter(description = "Optional overrides") @Valid ResultFormat formatFromClient) {
+            @Parameter(name = "Optional overrides") @Valid ResultFormat formatFromClient) {
         return exportJobService.save(exportJobFactory.forSearchType(searchId, searchTypeId, formatFromClient));
     }
 }

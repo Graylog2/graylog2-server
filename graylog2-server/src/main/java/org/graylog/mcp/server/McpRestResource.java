@@ -91,7 +91,7 @@ public class McpRestResource extends RestResource {
                          @HeaderParam(HEADER_MCP_PROTOCOL_VERSION) String protocolVersionHeader,
                          @HeaderParam(HEADER_MCP_SESSION_ID) String mcpSessionIdHeader,
                          @Context SearchUser searchUser,
-                         @Parameter(description = "jsonrpc_message", required = true) JsonNode payload) throws IOException {
+                         @Parameter(name = "jsonrpc_message", required = true) JsonNode payload) throws IOException {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
                 McpConfiguration.DEFAULT_VALUES);
         if (!mcpConfig.enableRemoteAccess()) {

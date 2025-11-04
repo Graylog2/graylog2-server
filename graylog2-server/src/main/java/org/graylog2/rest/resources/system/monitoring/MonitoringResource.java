@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.system.monitoring;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -38,6 +37,7 @@ import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creatio
 import org.graylog.plugins.views.search.engine.monitoring.data.histogram.creation.ValueComputation;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.Period;
@@ -46,8 +46,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

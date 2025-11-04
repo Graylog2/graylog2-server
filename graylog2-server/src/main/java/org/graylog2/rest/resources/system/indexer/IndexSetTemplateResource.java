@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.validation.Validator;
@@ -51,6 +50,7 @@ import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequir
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirementsChecker;
 import org.graylog2.indexer.indexset.template.rest.IndexSetTemplateResponse;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -60,7 +60,6 @@ import java.util.Objects;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication

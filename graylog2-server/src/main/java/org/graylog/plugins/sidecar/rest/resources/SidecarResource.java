@@ -20,7 +20,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.ApiOperation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -305,9 +304,9 @@ public class SidecarResource extends RestResource implements PluginRestResource 
 
     @GET
     @Path("/user")
-    @ApiOperation(value = "Get basic sidecar user")
+    @Operation(summary = "Get basic sidecar user")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The sidecar user could not be found.")
+            @ApiResponse(responseCode = "404", description = "The sidecar user could not be found.")
     })
     public BasicUserResponse getBasicSidecarUser() {
 

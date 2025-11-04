@@ -247,11 +247,11 @@ public class UsersResource extends RestResource {
 
     @GET
     @Path("/basic/id/{userId}")
-    @ApiOperation(value = "Get basic user data by userId")
+    @Operation(summary = "Get basic user data by userId")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The user could not be found.")
+            @ApiResponse(responseCode = "404", description = "The user could not be found.")
     })
-    public BasicUserResponse getBasicUserById(@ApiParam(name = "userId", value = "The userId to return information for.", required = true)
+    public BasicUserResponse getBasicUserById(@Parameter(name = "userId", description = "The userId to return information for.", required = true)
                                               @PathParam("userId") String userId) {
 
         final User user = loadUserById(userId);

@@ -57,7 +57,7 @@ public class AggregationWidgetExportResource extends RestResource {
     @Path("/{filename}")
     public Response exportData(@Parameter @Valid PivotResult pivotResult,
                                @HeaderParam("Accept") String mediaType,
-                               @Parameter(description = "filename") @PathParam("filename") String filename) {
+                               @Parameter(name = "filename") @PathParam("filename") String filename) {
         return RestTools.respondWithFile(
                         filename,
                         ExportTabularResultResponse.fromPivotResult(pivotResult),

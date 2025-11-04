@@ -117,7 +117,7 @@ public class SupportBundleResource extends RestResource {
     @RestrictToLeader
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_DOWNLOAD)
-    public Response download(@PathParam("filename") @Parameter(description = "filename") String filename) {
+    public Response download(@PathParam("filename") @Parameter(name = "filename") String filename) {
         var mediaType = MediaType.valueOf(MediaType.APPLICATION_OCTET_STREAM);
         StreamingOutput streamingOutput = outputStream -> supportBundleService.downloadBundle(filename, outputStream);
         return respondWithFile(filename, streamingOutput, mediaType)
@@ -130,7 +130,7 @@ public class SupportBundleResource extends RestResource {
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @RestrictToLeader
     @AuditEvent(type = AuditEventTypes.SUPPORT_BUNDLE_DELETE)
-    public Response delete(@PathParam("filename") @Parameter(description = "filename") String filename) throws IOException {
+    public Response delete(@PathParam("filename") @Parameter(name = "filename") String filename) throws IOException {
         try {
             supportBundleService.deleteBundle(filename);
         } catch (NoSuchFileException e) {

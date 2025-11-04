@@ -22,7 +22,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -50,6 +49,7 @@ import org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResp
 import org.graylog2.rest.resources.streams.responses.StreamRuleListResponse;
 import org.graylog2.rest.resources.streams.responses.StreamRuleTypeResponse;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
@@ -58,8 +58,6 @@ import org.graylog2.streams.StreamService;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

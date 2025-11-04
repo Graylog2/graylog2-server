@@ -18,27 +18,14 @@ package org.graylog2.rest.resources.entities.preferences;
 
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.security.UserContext;
-import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
-import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
-import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotEmpty;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -48,8 +35,16 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.security.UserContext;
+import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
+import org.graylog2.rest.resources.entities.preferences.service.EntityListPreferencesService;
+import org.graylog2.shared.rest.PublicCloudAPI;
 
 @RequiresAuthentication
 @PublicCloudAPI

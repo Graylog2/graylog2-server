@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -63,6 +62,7 @@ import org.graylog2.rest.models.PaginatedResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -76,7 +76,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "Pipelines/Rules", description = "Rules for the pipeline message processor")
@@ -264,7 +263,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @Path("/multiple")
     @POST
     @NoAuditEvent("only used to get multiple pipeline rules")
-    public Collection<RuleSource> getBulk(@Parameter(description = "rules") BulkRuleRequest rules) {
+    public Collection<RuleSource> getBulk(@Parameter(name = "rules") BulkRuleRequest rules) {
         Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
 
         return ruleDaos.stream()

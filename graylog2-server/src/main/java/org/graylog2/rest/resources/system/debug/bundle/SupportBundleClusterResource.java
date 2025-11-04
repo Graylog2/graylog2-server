@@ -117,7 +117,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @Operation(summary = "Downloads the requested bundle")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response download(@PathParam("filename") @Parameter(description = "filename") String filename) throws IOException {
+    public Response download(@PathParam("filename") @Parameter(name = "filename") String filename) throws IOException {
         final NodeResponse<ResponseBody> nodeResponse = requestOnLeader(c -> c.downloadBundle(filename), RemoteSupportBundleInterface.class);
         if (nodeResponse.isSuccess()) {
             // we cannot use try-with because the ResponseBody needs to stream the output
@@ -146,7 +146,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @Operation(summary = "Delete a certain support bundle")
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
-    public Response delete(@PathParam("filename") @Parameter(description = "filename") String filename) throws IOException {
+    public Response delete(@PathParam("filename") @Parameter(name = "filename") String filename) throws IOException {
         final NodeResponse<Void> nodeResponse = requestOnLeader(c -> c.deleteBundle(filename), RemoteSupportBundleInterface.class);
         return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
     }

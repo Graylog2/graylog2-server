@@ -18,22 +18,18 @@ package org.graylog2.database.entities;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.shared.rest.resources.RestResource;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "EntityScope", description = "Provide a list of available Entity Scopes")

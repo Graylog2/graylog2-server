@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +45,7 @@ import org.graylog2.rest.resources.system.indexer.requests.FieldTypeSummaryReque
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldTypeSummary;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetIdAndType;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -54,7 +54,6 @@ import java.util.Locale;
 import java.util.Set;
 
 import static org.graylog2.indexer.indexset.IndexSetFieldTypeSummaryService.DEFAULT_SORT_FIELD;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

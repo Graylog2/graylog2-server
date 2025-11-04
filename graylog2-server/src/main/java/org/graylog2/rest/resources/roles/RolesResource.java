@@ -91,7 +91,7 @@ public class RolesResource extends RestResource {
     }
 
     @GET
-    @Operation("List all roles")
+    @Operation(summary = "List all roles")
     public RolesResponse listAll() {
         final Set<Role> roles = roleService.loadAll();
         Set<RoleResponse> roleResponses = Sets.newHashSetWithExpectedSize(roles.size());

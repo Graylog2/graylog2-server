@@ -19,7 +19,6 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -52,13 +51,12 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.stream.Collectors;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "Pipelines/Rulebuilder", description = "Rules for the pipeline message processor generated using the rulebuilder")

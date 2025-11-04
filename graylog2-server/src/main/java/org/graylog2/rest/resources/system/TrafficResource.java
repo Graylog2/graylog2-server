@@ -20,22 +20,18 @@ package org.graylog2.rest.resources.system;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.system.traffic.TrafficCounterService;
-import org.joda.time.Duration;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.system.traffic.TrafficCounterService;
+import org.joda.time.Duration;
 
 @PublicCloudAPI
 @Tag(name = "System/ClusterTraffic", description = "Cluster traffic stats")

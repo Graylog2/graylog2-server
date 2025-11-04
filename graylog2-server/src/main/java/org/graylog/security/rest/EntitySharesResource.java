@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -52,6 +51,7 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +62,6 @@ import java.util.List;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog.security.shares.EntityShareRequest.SELECTED_GRANTEE_CAPABILITIES;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 
 @Path("/authz/shares")

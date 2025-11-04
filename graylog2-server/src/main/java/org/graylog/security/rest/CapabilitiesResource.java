@@ -79,7 +79,7 @@ public class CapabilitiesResource extends RestResource {
     @GET
     @Path("/{capability}")
     @Operation(summary = "Return the requested capability")
-    public CapabilityDescriptorResponse get(@Parameter(description = "capability") @PathParam("capability") @NotBlank String capabilityString) {
+    public CapabilityDescriptorResponse get(@Parameter(name = "capability") @PathParam("capability") @NotBlank String capabilityString) {
         final var capability = parseCapability(capabilityString);
 
         checkPermission(RestPermissions.CAPABILITIES_READ, capability.name());
@@ -126,8 +126,8 @@ public class CapabilitiesResource extends RestResource {
     @GET
     @Path("/{capability}/{entity}")
     @Operation(summary = "Get permissions for a specific capability and entity")
-    public CapabilityPermissionsResponse entityCapabilityPermissions(@Parameter(description = "capability") @PathParam("capability") @NotBlank String capabilityString,
-                                                                     @Parameter(description = "entity") @PathParam("entity") @NotBlank String entity) {
+    public CapabilityPermissionsResponse entityCapabilityPermissions(@Parameter(name = "capability") @PathParam("capability") @NotBlank String capabilityString,
+                                                                     @Parameter(name = "entity") @PathParam("entity") @NotBlank String entity) {
         final var entityGrn = grnRegistry.parse(entity);
         final var capability = parseCapability(capabilityString);
 

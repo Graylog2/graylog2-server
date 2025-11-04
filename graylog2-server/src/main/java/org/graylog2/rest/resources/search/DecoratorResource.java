@@ -20,24 +20,9 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.audit.AuditEventTypes;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.decorators.Decorator;
-import org.graylog2.decorators.DecoratorImpl;
-import org.graylog2.decorators.DecoratorService;
-import org.graylog2.plugin.configuration.ConfigurableTypeInfo;
-import org.graylog2.plugin.decorators.SearchResponseDecorator;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -47,12 +32,22 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.decorators.Decorator;
+import org.graylog2.decorators.DecoratorImpl;
+import org.graylog2.decorators.DecoratorService;
+import org.graylog2.plugin.configuration.ConfigurableTypeInfo;
+import org.graylog2.plugin.decorators.SearchResponseDecorator;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

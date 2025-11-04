@@ -19,7 +19,6 @@ package org.graylog.security.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -42,13 +41,12 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CertificateAuthorityInformation;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateCARequest;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.net.URI;
 import java.util.List;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @Path("/ca")
 @Produces(MediaType.APPLICATION_JSON)

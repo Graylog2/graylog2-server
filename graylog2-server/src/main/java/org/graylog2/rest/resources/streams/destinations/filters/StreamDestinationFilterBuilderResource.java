@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -39,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.RuleBuilderServi
 import org.graylog.plugins.pipelineprocessor.rulebuilder.parser.validation.ValidatorService;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.rest.RuleBuilderDto;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNullElse;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "Stream/Destinations/Filters/Builder", description = "Stream destination filter builder")

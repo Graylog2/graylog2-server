@@ -19,36 +19,22 @@ package org.graylog.plugins.views.startpage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
-import org.graylog.plugins.views.search.permissions.SearchUser;
-import org.graylog.plugins.views.favorites.Favorite;
-import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
-import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.rest.models.PaginatedResponse;
-import org.graylog2.shared.rest.resources.RestResource;
-
 import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotEmpty;
-
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
-
-import java.util.Optional;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.views.search.permissions.SearchUser;
+import org.graylog.plugins.views.startpage.lastOpened.LastOpened;
+import org.graylog.plugins.views.startpage.recentActivities.RecentActivity;
+import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
 
 @PublicCloudAPI
 @Tag(name = "StartPage")

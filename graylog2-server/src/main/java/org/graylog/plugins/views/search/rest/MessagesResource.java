@@ -20,7 +20,6 @@ import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BadRequestException;
@@ -59,6 +58,7 @@ import org.graylog.plugins.views.search.validation.ValidationStatus;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
@@ -69,8 +69,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "Search/Messages", description = "Simple search returning (matching) messages only, as CSV.")
@@ -176,7 +174,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @NoAuditEvent("Has custom audit events")
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearch(
             @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
-            @Parameter(description = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Parameter(name = "Optional overrides") @Valid ResultFormat formatFromClient,
             @Context SearchUser searchUser) {
         ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 
@@ -194,7 +192,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     public ChunkedOutput<SimpleMessageChunk> retrieveForSearchType(
             @Parameter(description = "ID of an existing Search", name = "searchId") @PathParam("searchId") String searchId,
             @Parameter(description = "ID of a Message Table contained in the Search", name = "searchTypeId") @PathParam("searchTypeId") String searchTypeId,
-            @Parameter(description = "Optional overrides") @Valid ResultFormat formatFromClient,
+            @Parameter(name = "Optional overrides") @Valid ResultFormat formatFromClient,
             @Context SearchUser searchUser) {
         ResultFormat format = fillInIfNecessary(emptyIfNull(formatFromClient), searchUser);
 

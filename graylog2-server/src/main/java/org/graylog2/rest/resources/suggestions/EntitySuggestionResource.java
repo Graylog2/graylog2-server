@@ -20,22 +20,18 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.database.suggestions.EntitySuggestionResponse;
-import org.graylog2.database.suggestions.EntitySuggestionService;
-import org.graylog2.shared.rest.resources.RestResource;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.DefaultValue;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.database.suggestions.EntitySuggestionResponse;
+import org.graylog2.database.suggestions.EntitySuggestionService;
+import org.graylog2.shared.rest.PublicCloudAPI;
+import org.graylog2.shared.rest.resources.RestResource;
 
 @RequiresAuthentication
 @PublicCloudAPI

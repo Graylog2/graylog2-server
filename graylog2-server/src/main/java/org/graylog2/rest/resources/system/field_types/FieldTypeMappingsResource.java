@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -41,6 +40,7 @@ import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -52,7 +52,6 @@ import java.util.stream.Collectors;
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_CREATE;
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

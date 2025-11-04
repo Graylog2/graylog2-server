@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -45,6 +44,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.streams.StreamService;
 
@@ -61,7 +61,6 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
 import static org.graylog.plugins.views.search.ExplainResults.IndexRangeResult.fromIndexRange;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

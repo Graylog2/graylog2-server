@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -56,11 +55,11 @@ import org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleService
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdentifier;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -68,7 +67,6 @@ import java.util.stream.Collectors;
 import static org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode.OFF;
 import static org.graylog.plugins.views.search.engine.suggestions.FieldValueSuggestionMode.TEXTUAL_ONLY;
 import static org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService.DEFAULT_LIMIT;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI
@@ -109,7 +107,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
     @Path("/query_strings")
     @Operation(summary = "Suggest last used query strings")
     public List<QueryString> suggestQueryStrings(@Context SearchUser searchUser,
-                                                 @Parameter(description = "limit") @QueryParam("limit") Integer limit) {
+                                                 @Parameter(name = "limit") @QueryParam("limit") Integer limit) {
         return lastUsedQueryStringsService.get(searchUser.getUser(), Optional.ofNullable(limit).orElse(DEFAULT_LIMIT));
     }
 

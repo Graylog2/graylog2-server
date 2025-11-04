@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -49,6 +48,7 @@ import org.graylog2.rest.models.system.indexer.responses.IndexerClusterOverview;
 import org.graylog2.rest.models.system.indexer.responses.IndexerOverview;
 import org.graylog2.rest.resources.system.DeflectorResource;
 import org.graylog2.rest.resources.system.IndexRangesResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.ArrayList;
@@ -60,7 +60,6 @@ import java.util.Optional;
 
 import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.TierType.HOT;
 import static org.graylog2.rest.models.system.indexer.responses.IndexSummary.TierType.WARM;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

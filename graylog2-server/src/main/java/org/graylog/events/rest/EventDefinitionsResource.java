@@ -29,7 +29,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -96,6 +95,7 @@ import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -109,7 +109,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @PublicCloudAPI
@@ -311,7 +310,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     })
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_CREATE)
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public Response create(@Parameter(description = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
+    public Response create(@Parameter(name = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
                            @Parameter(name = "JSON Body") CreateEntityRequest<EventDefinitionDto> createEntityRequest, @Context UserContext userContext) {
         final EventDefinitionDto dto = createEntityRequest.entity();
         checkEventDefinitionPermissions(dto, "create");
@@ -340,7 +339,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     })
     @AuditEvent(type = EventsAuditEventTypes.EVENT_DEFINITION_UPDATE)
     public Response update(@Parameter(name = "definitionId") @PathParam("definitionId") @NotBlank String definitionId,
-                           @Parameter(description = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
+                           @Parameter(name = "schedule") @QueryParam("schedule") @DefaultValue("true") boolean schedule,
                            @Parameter(name = "JSON Body") EventDefinitionDto dto,
                            @Context UserContext userContext) {
         checkPermission(RestPermissions.EVENT_DEFINITIONS_EDIT, definitionId);

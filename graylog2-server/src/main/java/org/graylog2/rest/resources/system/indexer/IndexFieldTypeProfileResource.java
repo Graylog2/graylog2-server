@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -44,6 +43,7 @@ import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileIdAndName;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -52,7 +52,6 @@ import java.util.List;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_FIELD_TYPE_PROFILE_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI
