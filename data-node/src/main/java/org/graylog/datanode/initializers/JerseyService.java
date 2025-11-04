@@ -45,7 +45,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.DatanodeCertificateChangedEvent;
 import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
 import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
@@ -123,14 +122,6 @@ public class JerseyService extends AbstractIdleService {
                 configuration.getHttpThreadPoolSize());
     }
 
-    @Subscribe
-    public synchronized void handleCertificateChange(DatanodeCertificateChangedEvent event) throws Exception {
-        if (apiHttpServer != null) {
-            LOG.info("Restarting Data node REST API, certificates changed");
-            shutDown();
-            doStartup();
-        }
-    }
 
     @Subscribe
     public synchronized void handleCertificateRenewal(DatanodeCertificateRenewedEvent event) throws Exception {
