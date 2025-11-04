@@ -18,7 +18,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { EntityDataTable, Spinner } from 'components/common';
-import { Label } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
@@ -29,16 +28,8 @@ import type { GraylogNode } from './useGraylogNodes';
 import GraylogNodeStatusLabel from './GraylogNodeStatusLabel';
 import GraylogNodeActions from './GraylogNodeActions';
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
+import RatioIndicator, { SecondaryText, StyledLabel } from './RatioIndicator';
 
-const SecondaryText = styled.div`
-  span {
-    font-size: small;
-  }
-`;
-
-const LeaderLabel = styled(Label)`
-  display: inline-flex;
-`;
 
 const NodePrimary = styled.div`
   display: flex;
@@ -90,7 +81,7 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
                 {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
                 {entity.is_leader && (
                   <SecondaryText>
-                    <LeaderLabel bsSize="xs">Leader</LeaderLabel>
+                    <StyledLabel bsSize="xs">Leader</StyledLabel>
                   </SecondaryText>
                 )}
               </NodePrimary>
@@ -106,11 +97,11 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
             return (
               <div>
                 {`${NumberUtils.formatBytes(journalCurrent)} / ${NumberUtils.formatBytes(journalMax)}`}
-                <SecondaryText>
-                  <span>
-                    {ratio !== undefined && ratio !== null ? NumberUtils.formatPercentage(ratio) : 'N/A'}
-                  </span>
-                </SecondaryText>
+                <RatioIndicator
+                  ratio={ratio}
+                  warningThreshold={0.25}
+                  dangerThreshold={0.5}
+                />
               </div>
             );
           },
@@ -125,9 +116,11 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
             return (
               <div>
                 {`${NumberUtils.formatBytes(heapUsed)} / ${NumberUtils.formatBytes(heapMax)}`}
-                <SecondaryText>
-                  <span>{ratio !== undefined ? NumberUtils.formatPercentage(ratio) : 'N/A'}</span>
-                </SecondaryText>
+                <RatioIndicator
+                  ratio={ratio}
+                  warningThreshold={0.7}
+                  dangerThreshold={0.9}
+                />
               </div>
             );
           },
