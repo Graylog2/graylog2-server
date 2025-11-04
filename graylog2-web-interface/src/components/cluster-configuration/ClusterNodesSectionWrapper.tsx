@@ -78,11 +78,6 @@ const TitleCountButton = styled.button`
   }
 `;
 
-const TitleCountLabel = styled.span`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.fonts.size.body};
-`;
-
 const TableWrapper = styled.div<{ $maxHeight?: string }>(
   ({ $maxHeight, theme }) => css`
     margin-top: calc(-1 * ${theme.spacings.lg});
@@ -149,24 +144,26 @@ const ClusterNodesSectionWrapper = ({
       return title;
     }
 
-    if (typeof onTitleCountClick === 'function') {
-      return (
-        <TitleWrapper>
-          <span>{title}</span>
-          <TitleCountButton
-            type="button"
-            onClick={onTitleCountClick}
-            aria-label={titleCountAriaLabel ?? `${title} (${titleCount})`}>
-            ({titleCount})
-          </TitleCountButton>
-        </TitleWrapper>
-      );
-    }
+    const isInteractive = typeof onTitleCountClick === 'function';
 
     return (
       <TitleWrapper>
         <span>{title}</span>
-        <TitleCountLabel>({titleCount})</TitleCountLabel>
+        <TitleCountButton
+          type="button"
+          onClick={
+            isInteractive
+              ? (event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onTitleCountClick();
+                }
+              : undefined
+          }
+          disabled={!isInteractive}
+          aria-label={titleCountAriaLabel ?? `${title} (${titleCount})`}>
+          ({titleCount})
+        </TitleCountButton>
       </TitleWrapper>
     );
   };

@@ -79,7 +79,7 @@ const ClusterConfigurationNodes = () => {
           <GraylogNodesExpandable
             collapsible={activeSegment === 'all'}
             searchQuery={normalizedSearch}
-            onSelectSegment={() => setActiveSegment('graylog')}
+            onSelectSegment={activeSegment === 'all' ? () => setActiveSegment('graylog') : undefined}
           />
         </SectionCol>
       )}
@@ -88,7 +88,7 @@ const ClusterConfigurationNodes = () => {
           <DataNodesExpandable
             collapsible={activeSegment === 'all'}
             searchQuery={normalizedSearch}
-            onSelectSegment={() => setActiveSegment('data')}
+            onSelectSegment={activeSegment === 'all' ? () => setActiveSegment('data') : undefined}
           />
         </SectionCol>
       )}
