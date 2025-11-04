@@ -25,19 +25,17 @@ import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
 
-const Container = styled.div<{ $hasLeftCol: boolean }>(
+const InnerButtonWrapper = styled.div`
+  gap: ${({ theme }) => theme.spacings.xxs};
+  display: flex;
+  align-items: end;
+`;
+
+const OuterButtonWrapper = styled(InnerButtonWrapper)<{ $hasLeftCol: boolean }>(
   ({ $hasLeftCol }) => css`
     justify-content: ${$hasLeftCol ? 'space-between' : 'end'};
-    display: flex;
-    align-items: end;
   `,
 );
-
-const StyledButtonGroup = styled.div`
-  gap: ${({ theme }) => theme.spacings.xs};
-  display: flex;
-  align-items: center;
-`;
 
 const buttonTitle = (isSubmitting: boolean, submitText: React.ReactNode, submitLoadingText: string) => {
   if (isSubmitting && typeof submitLoadingText === 'string') {
@@ -124,9 +122,9 @@ const ModalSubmit = ({ ...props }: Props) => {
   }, []);
 
   return (
-    <Container $hasLeftCol={!!leftCol} className={className}>
+    <OuterButtonWrapper $hasLeftCol={!!leftCol} className={className}>
       {leftCol}
-      <StyledButtonGroup>
+      <InnerButtonWrapper>
         {isWithCancelProps(props) && (
           <Button
             type="button"
@@ -155,8 +153,8 @@ const ModalSubmit = ({ ...props }: Props) => {
           )}
           {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
         </Button>
-      </StyledButtonGroup>
-    </Container>
+      </InnerButtonWrapper>
+    </OuterButtonWrapper>
   );
 };
 
