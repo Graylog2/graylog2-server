@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.entities.preferences.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Functions;
 
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@JsonInclude(JsonInclude.Include.NON_ABSENT)
 public record EntityListPreferences(@JsonProperty("attributes") Map<String, Attribute> attributes,
                                     @JsonProperty("order") List<String> order,
                                     @JsonProperty("per_page") Integer perPage,
@@ -43,6 +45,7 @@ public record EntityListPreferences(@JsonProperty("attributes") Map<String, Attr
         hide;
     }
 
+    @JsonInclude(JsonInclude.Include.NON_ABSENT)
     public record Attribute(@JsonProperty("status") DisplayStatus status,
                             @JsonProperty("width") Optional<Integer> width) {}
 }
