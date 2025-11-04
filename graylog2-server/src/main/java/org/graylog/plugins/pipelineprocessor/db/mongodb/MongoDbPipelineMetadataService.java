@@ -21,6 +21,7 @@ import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOneModel;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.result.DeleteResult;
 import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
@@ -31,6 +32,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +69,14 @@ public class MongoDbPipelineMetadataService {
         final PipelineRulesMetadataDao dao = rulesCollection.find(eq(FIELD_PIPELINE_ID, pipelineId)).first();
         if (dao == null) {
             throw new NotFoundException("No pipeline found with id: " + pipelineId);
+        }
+        return dao;
+    }
+
+    public PipelineInputsMetadataDao getByInputId(final String inputId) throws NotFoundException {
+        final PipelineInputsMetadataDao dao = inputsCollection.find(eq(FIELD_INPUT_ID, inputId)).first();
+        if (dao == null) {
+            throw new NotFoundException("No input found with id: " + inputId);
         }
         return dao;
     }
@@ -137,6 +147,24 @@ public class MongoDbPipelineMetadataService {
             } else {
                 inputsCollection.insertMany(inputRecords);
             }
+        }
+    }
+
+    public void deleteRulesMetadataByPipelineId(Collection<String> pipelineIds) {
+        final DeleteResult deleteResult = rulesCollection.deleteMany(eq(FIELD_PIPELINE_ID, pipelineIds));
+        if (deleteResult.getDeletedCount() == 0) {
+            LOG.warn("No pipeline rules metadata records found for pipelines {}", pipelineIds);
+        } else {
+            LOG.info("Deleted {} pipeline rules metadata records.", deleteResult.getDeletedCount());
+        }
+    }
+
+    public void deleteByInputId(String id) {
+        final DeleteResult deleteResult = inputsCollection.deleteOne(eq(FIELD_INPUT_ID, id));
+        if (deleteResult.getDeletedCount() == 1) {
+            LOG.info("Deleted pipeline inputs metadata record for input {}", id);
+        } else {
+            LOG.warn("No pipeline inputs metadata record found for input {}", id);
         }
     }
 }

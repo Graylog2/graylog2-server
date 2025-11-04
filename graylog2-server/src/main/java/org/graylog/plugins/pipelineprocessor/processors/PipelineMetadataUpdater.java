@@ -17,6 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -30,13 +32,13 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataS
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Singleton
 public class PipelineMetadataUpdater {
@@ -50,25 +52,29 @@ public class PipelineMetadataUpdater {
     public PipelineMetadataUpdater(MongoDbPipelineMetadataService metadataService,
                                    PipelineAnalyzer pipelineAnalyzer,
                                    PipelineService pipelineService,
-                                   RuleService ruleService) {
+                                   RuleService ruleService,
+                                   EventBus eventBus) {
         this.metadataService = metadataService;
         this.pipelineAnalyzer = pipelineAnalyzer;
         this.pipelineService = pipelineService;
         this.ruleService = ruleService;
+
+        eventBus.register(this);
     }
 
     public void handlePipelineChanges(PipelinesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
         Set<PipelineDao> pipelineDaos = affectedPipelines(event);
-        handleChanges(pipelineDaos, state, resolver, metricRegistry);
+        handleUpdates(pipelineDaos, state, resolver, metricRegistry);
+        handlePipelineDeletions(event);
     }
 
     public void handleRuleChanges(RulesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
         Set<RuleDao> ruleDaos = affectedRules(event);
         Set<PipelineDao> pipelineDaos = affectedPipelines(ruleDaos);
-        handleChanges(pipelineDaos, state, resolver, metricRegistry);
+        handleUpdates(pipelineDaos, state, resolver, metricRegistry);
     }
 
-    private void handleChanges(Set<PipelineDao> pipelineDaos,
+    private void handleUpdates(Set<PipelineDao> pipelineDaos,
                                PipelineInterpreter.State state,
                                PipelineResolver resolver,
                                PipelineMetricRegistry metricRegistry) {
@@ -81,10 +87,14 @@ public class PipelineMetadataUpdater {
         metadataService.saveInputsMetadata(inputMentions);
     }
 
+    private void handlePipelineDeletions(PipelinesChangedEvent event) {
+        metadataService.deleteRulesMetadataByPipelineId(event.deletedPipelineIds());
+    }
+
     private Set<RuleDao> affectedRules(RulesChangedEvent event) {
-        Set<String> ruleIds = Stream.concat(event.updatedRules().stream(), event.deletedRules().stream())
+        Set<String> ruleIds = event.updatedRules().stream()
                 .map(RulesChangedEvent.Reference::id)
-                .collect(java.util.stream.Collectors.toSet());
+                .collect(Collectors.toSet());
 
         return ruleIds.stream()
                 .map(id -> {
@@ -105,7 +115,7 @@ public class PipelineMetadataUpdater {
     }
 
     private Set<PipelineDao> affectedPipelines(PipelinesChangedEvent event) {
-        return Stream.concat(event.updatedPipelineIds().stream(), event.deletedPipelineIds().stream())
+        return event.updatedPipelineIds().stream()
                 .map(id -> {
                     try {
                         return pipelineService.load(id);
@@ -125,5 +135,10 @@ public class PipelineMetadataUpdater {
             }
         }
         return builder.build();
+    }
+
+    @Subscribe
+    public void handleInputDeleted(InputDeletedEvent event) {
+        metadataService.deleteByInputId(event.inputId());
     }
 }

@@ -23,6 +23,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.events.ClusterEventBus;
@@ -205,7 +206,8 @@ class InputsResourceTest {
                                   MessageInputFactory messageInputFactory,
                                   Configuration config) {
             super(inputService, mock(InputDiagnosticService.class), streamService, streamRuleService,
-                    pipelineService, messageInputFactory, config, mock(ClusterEventBus.class));
+                    pipelineService, messageInputFactory, config, mock(MongoDbPipelineMetadataService.class),
+                    mock(ClusterEventBus.class));
             configuration = mock(HttpConfiguration.class);
 
             this.user = mock(User.class);

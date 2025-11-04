@@ -43,7 +43,9 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
@@ -73,6 +75,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -99,6 +102,7 @@ public class InputsResource extends AbstractInputsResource {
     private final PipelineService pipelineService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
+    private final MongoDbPipelineMetadataService metadataService;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
@@ -109,6 +113,7 @@ public class InputsResource extends AbstractInputsResource {
                           PipelineService pipelineService,
                           MessageInputFactory messageInputFactory,
                           Configuration config,
+                          MongoDbPipelineMetadataService metadataService,
                           ClusterEventBus clusterEventBus) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
@@ -118,6 +123,7 @@ public class InputsResource extends AbstractInputsResource {
         this.pipelineService = pipelineService;
         this.messageInputFactory = messageInputFactory;
         this.config = config;
+        this.metadataService = metadataService;
         this.clusterEventBus = clusterEventBus;
     }
 
@@ -150,6 +156,32 @@ public class InputsResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
         final Input input = inputService.find(inputId);
         return inputDiagnosticService.getInputDiagnostics(input, searchUser);
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Get information about usage of input in pipeline rules")
+    @Path("meta/{inputId}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No such input.")
+    })
+    public PipelineInputsMetadataDao pipelineMetadata(@ApiParam(name = "inputId", required = true)
+                                                      @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
+        final PipelineInputsMetadataDao dao = metadataService.getByInputId(inputId);
+
+        // filter out entries the user is not allowed to see
+        final PipelineInputsMetadataDao.Builder builder = PipelineInputsMetadataDao.builder()
+                .id(dao.id())
+                .inputId(dao.inputId());
+        List<PipelineInputsMetadataDao.MentionedInEntry> mentionedIn = new ArrayList<>();
+        for (PipelineInputsMetadataDao.MentionedInEntry entry : dao.mentionedIn()) {
+            if (isPermitted(PipelineRestPermissions.PIPELINE_READ, entry.pipelineId())) {
+                mentionedIn.add(entry);
+            }
+        }
+        builder.mentionedIn(mentionedIn);
+        return builder.build();
     }
 
     public record InputReferences(
