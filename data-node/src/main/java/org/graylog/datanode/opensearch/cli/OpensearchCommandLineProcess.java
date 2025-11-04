@@ -55,7 +55,7 @@ public class OpensearchCommandLineProcess implements Closeable {
     private final OpensearchConfiguration config;
 
     private void writeOpenSearchConfig(final OpensearchConfiguration config) {
-        final OpensearchConfigurationDir confDir = config.getOpensearchConfigurationDir();
+        final OpensearchConfigurationDir confDir = config.getOpensearchConfigTargetDir();
         config.configFiles().forEach(cf -> persistConfigFile(confDir, cf));
         persistCertificates(config);
     }

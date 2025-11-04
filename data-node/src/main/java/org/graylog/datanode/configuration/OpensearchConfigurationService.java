@@ -103,6 +103,8 @@ public class OpensearchConfigurationService extends AbstractIdleService {
 
     private OpensearchConfiguration get() {
 
+        final OpensearchConfigurationDir targetConfigDir = datanodeConfiguration.datanodeDirectories().createUniqueOpensearchProcessConfigurationDir();
+
         final List<DatanodeConfigurationPart> configurationParts = opensearchConfigurationBeans.stream()
                 .map(bean -> bean.buildConfigurationPart(new OpensearchConfigurationParams(trustedCertificates, transientConfiguration)))
                 .collect(Collectors.toList());
@@ -110,6 +112,7 @@ public class OpensearchConfigurationService extends AbstractIdleService {
         return new OpensearchConfiguration(
                 datanodeConfiguration.opensearchDistributionProvider().get(),
                 datanodeConfiguration.datanodeDirectories(),
+                targetConfigDir,
                 localConfiguration.getHostname(),
                 localConfiguration.getOpensearchHttpPort(),
                 configurationParts
