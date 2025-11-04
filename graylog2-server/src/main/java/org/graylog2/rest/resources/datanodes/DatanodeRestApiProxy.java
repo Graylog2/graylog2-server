@@ -23,6 +23,7 @@ import com.google.common.net.HttpHeaders;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -38,6 +39,7 @@ import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.indexer.datanode.ProxyRequestAdapter;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
+import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
@@ -58,16 +60,16 @@ import java.util.stream.Collectors;
 @Singleton
 public class DatanodeRestApiProxy implements ProxyRequestAdapter {
 
-    private final IndexerJwtAuthToken authToken;
+    private final Provider<IndexerJwtAuthToken> authToken;
     private final NodeService<DataNodeDto> nodeService;
     private final ObjectMapper objectMapper;
     private final DatanodeResolver datanodeResolver;
     private final OkHttpClient httpClient;
 
     @Inject
-    public DatanodeRestApiProxy(IndexerJwtAuthToken authTokenProvider, NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, DatanodeResolver datanodeResolver, OkHttpClient okHttpClient, @Named("proxied_requests_default_call_timeout")
+    public DatanodeRestApiProxy(IndexerJwtAuthTokenProvider authTokenProvider, NodeService<DataNodeDto> nodeService, ObjectMapper objectMapper, DatanodeResolver datanodeResolver, OkHttpClient okHttpClient, @Named("proxied_requests_default_call_timeout")
     com.github.joschi.jadconfig.util.Duration defaultProxyTimeout) {
-        this.authToken = authTokenProvider;
+        this.authToken = authTokenProvider.alwaysEnabled();
         this.nodeService = nodeService;
         this.objectMapper = objectMapper;
         this.datanodeResolver = datanodeResolver;
@@ -135,7 +137,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
         final Request.Builder builder = new Request.Builder()
                 .url(urlBuilder.build());
 
-        authToken.headerValue().ifPresent(headerValue -> builder.addHeader(HttpHeaders.AUTHORIZATION, headerValue));
+        authToken.get().headerValue().ifPresent(headerValue -> builder.addHeader(HttpHeaders.AUTHORIZATION, headerValue));
 
         switch (request.method().toUpperCase(Locale.ROOT)) {
             case "GET" -> builder.get();
@@ -160,7 +162,7 @@ public class DatanodeRestApiProxy implements ProxyRequestAdapter {
                             .addConverterFactory(JacksonConverterFactory.create(objectMapper))
                             .client(httpClient.newBuilder().addInterceptor(chain -> {
                                 final Request.Builder req = chain.request().newBuilder();
-                                authToken.headerValue().ifPresent(headerValue -> req.addHeader(HttpHeaders.AUTHORIZATION, headerValue));
+                                authToken.get().headerValue().ifPresent(headerValue -> req.addHeader(HttpHeaders.AUTHORIZATION, headerValue));
                                 return chain.proceed(req.build());
                             }).build())
                             .build();
