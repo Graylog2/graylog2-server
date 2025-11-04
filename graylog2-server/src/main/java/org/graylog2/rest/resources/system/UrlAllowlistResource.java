@@ -20,7 +20,6 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -41,13 +40,13 @@ import org.graylog2.rest.models.system.urlallowlist.AllowlistCheckRequest;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistCheckResponse;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationRequest;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.urlallowlist.RegexHelper;
 import org.graylog2.system.urlallowlist.UrlAllowlist;
 import org.graylog2.system.urlallowlist.UrlAllowlistService;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @PublicCloudAPI

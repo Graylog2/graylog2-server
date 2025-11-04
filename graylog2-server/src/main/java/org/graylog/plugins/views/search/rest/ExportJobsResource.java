@@ -19,7 +19,11 @@ package org.graylog.plugins.views.search.rest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.export.ExportJobFactory;
@@ -27,17 +31,9 @@ import org.graylog.plugins.views.search.export.ExportJobService;
 import org.graylog.plugins.views.search.export.MessagesRequest;
 import org.graylog.plugins.views.search.export.ResultFormat;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "Search/Export", description = "Creating/Managing Export Jobs.")

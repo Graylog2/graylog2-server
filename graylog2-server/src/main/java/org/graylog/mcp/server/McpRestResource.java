@@ -53,7 +53,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/mcp")

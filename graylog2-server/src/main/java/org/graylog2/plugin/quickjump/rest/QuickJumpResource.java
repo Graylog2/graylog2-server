@@ -37,7 +37,6 @@ import org.graylog2.shared.rest.PublicCloudAPI;
 import java.io.IOException;
 
 import static org.graylog2.plugin.quickjump.QuickJumpConstants.DEFAULT_LIMIT;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "QuickJump", description = "Quick Jump Functionality")

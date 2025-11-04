@@ -21,7 +21,6 @@ import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -51,6 +50,7 @@ import org.graylog2.rest.models.roles.responses.RoleMembershipResponse;
 import org.graylog2.rest.models.roles.responses.RoleResponse;
 import org.graylog2.rest.models.roles.responses.RolesResponse;
 import org.graylog2.rest.models.users.responses.UserSummary;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
@@ -70,7 +70,6 @@ import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static jakarta.ws.rs.core.Response.status;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/roles")

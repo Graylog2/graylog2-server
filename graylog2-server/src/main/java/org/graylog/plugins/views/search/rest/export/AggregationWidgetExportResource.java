@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.rest.export;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.graylog2.shared.rest.PublicCloudAPI;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.HeaderParam;
@@ -35,9 +34,9 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @PublicCloudAPI
 @Tag(name = "Search/Pivot/Export")
