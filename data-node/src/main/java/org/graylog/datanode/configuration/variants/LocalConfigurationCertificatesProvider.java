@@ -16,26 +16,27 @@
  */
 package org.graylog.datanode.configuration.variants;
 
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.OpensearchConfigurationException;
-import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
-import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog.security.certutil.keystore.storage.KeystoreUtils;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.graylog.datanode.Configuration.HTTP_CERTIFICATE_PASSWORD_PROPERTY;
 import static org.graylog.datanode.Configuration.TRANSPORT_CERTIFICATE_PASSWORD_PROPERTY;
+import static org.graylog.security.certutil.CertConstants.PKCS12;
 
 public final class LocalConfigurationCertificatesProvider implements OpensearchCertificatesProvider {
 
@@ -117,24 +118,28 @@ public final class LocalConfigurationCertificatesProvider implements OpensearchC
 
     @Override
     public OpensearchCertificates build() {
-
         final Path transportCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(tranportCertificateFile).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
-        final InMemoryKeystoreInformation transportKeystore = reencrypt(new FilesystemKeystoreInformation(transportCertPath, transportCertificatePassword.toCharArray()));
-
         final Path httpCertPath = datanodeConfiguration.datanodeDirectories().resolveConfigurationSourceFile(httpCertificateFile).orElseThrow(() -> new RuntimeException("This should not happen, certificate expected"));
-        final InMemoryKeystoreInformation httpKeystore = reencrypt(new FilesystemKeystoreInformation(httpCertPath, httpCertificatePassword.toCharArray()));
-
-        return new OpensearchCertificates(transportKeystore, transportCertificateAlias, httpKeystore, httpCertificateAlias);
+        final char[] oneTimePassword = RandomStringUtils.secure().nextAlphabetic(256).toCharArray();
+        return new OpensearchCertificates(oneTimePassword, createSupplier(httpCertPath, httpCertificatePassword, oneTimePassword), httpCertificateAlias, createSupplier(transportCertPath, transportCertificatePassword, oneTimePassword), transportCertificateAlias);
     }
 
-    @Nonnull
-    private static InMemoryKeystoreInformation reencrypt(KeystoreInformation keystoreInformation) {
-        try {
-            final char[] oneTimePassword = RandomStringUtils.randomAlphabetic(256).toCharArray();
-            final KeyStore reencrypted = KeystoreUtils.newStoreCopyContent(keystoreInformation.loadKeystore(), keystoreInformation.password(), oneTimePassword);
-            return new InMemoryKeystoreInformation(reencrypted, oneTimePassword);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    public Supplier<KeyStore> createSupplier(Path keystorePath, String originalPassword, char[] newPassword) {
+        return () -> {
+            try {
+                final KeyStore keystore = loadKeystore(keystorePath, originalPassword);
+                return KeystoreUtils.newStoreCopyContent(keystore, originalPassword.toCharArray(), newPassword);
+            } catch (IOException | GeneralSecurityException e) {
+                throw new RuntimeException("Failed to load keystore from path " + keystorePath, e);
+            }
+        };
+    }
+
+    public KeyStore loadKeystore(Path file, String password) throws IOException, GeneralSecurityException {
+        KeyStore keyStore = KeyStore.getInstance(PKCS12);
+        try (FileInputStream fis = new FileInputStream(file.toFile())) {
+            keyStore.load(fis, password.toCharArray());
+            return keyStore;
         }
     }
 }
