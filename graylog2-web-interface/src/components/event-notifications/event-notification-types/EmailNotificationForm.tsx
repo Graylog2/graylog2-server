@@ -120,9 +120,9 @@ const EmailTemplatesRunner = ({
   onChange: (next: any) => void;
   resetKey?: string | number | undefined;
 }) => {
-  const {
-    data: { valid: validCustomizationLicense } = { valid: false },
-  } = usePluggableLicenseCheck('/license/enterprise/customization');
+  const { data: { valid: validCustomizationLicense } = { valid: false } } = usePluggableLicenseCheck(
+    '/license/enterprise/customization',
+  );
 
   const entities = usePluginEntities('customization.emailTemplates');
   const providingEntity = React.useMemo(
@@ -131,14 +131,13 @@ const EmailTemplatesRunner = ({
   );
 
   const noopUseEmailTemplate = React.useCallback(() => ({ templateConfig: undefined }), []);
-  const useEmailTemplateHook =
-    (providingEntity?.hooks?.useEmailTemplate ?? noopUseEmailTemplate) as () => {
-      templateConfig?: {
-        override_defaults?: boolean;
-        text_body?: string | null;
-        html_body?: string | null;
-      };
+  const useEmailTemplateHook = (providingEntity?.hooks?.useEmailTemplate ?? noopUseEmailTemplate) as () => {
+    templateConfig?: {
+      override_defaults?: boolean;
+      text_body?: string | null;
+      html_body?: string | null;
     };
+  };
 
   const { templateConfig } = useEmailTemplateHook() || {};
 
@@ -165,11 +164,11 @@ const EmailTemplatesRunner = ({
     if (override_defaults === true) {
       const nextCfg = { ...config };
 
-      if (typeof text_body === 'string' && text_body.length > 0 && text_body !== config.body_template) {
+      if (typeof text_body === 'string' && text_body !== config.body_template) {
         nextCfg.body_template = text_body;
         changed = true;
       }
-      if (typeof html_body === 'string' && html_body.length > 0 && html_body !== config.html_body_template) {
+      if (typeof html_body === 'string' && html_body !== config.html_body_template) {
         nextCfg.html_body_template = html_body;
         changed = true;
       }
@@ -650,11 +649,7 @@ class EmailNotificationForm extends React.Component<
 
     return (
       <>
-        <EmailTemplatesRunner
-          config={config}
-          onChange={onChange}
-          resetKey={config?.type || config?.id}
-        />
+        <EmailTemplatesRunner config={config} onChange={onChange} resetKey={config?.type || config?.id} />
         <Input
           id="notification-subject"
           name="subject"
