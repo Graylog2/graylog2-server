@@ -65,5 +65,3 @@ const RatioIndicator = ({ ratio, warningThreshold, dangerThreshold }: Props) => 
 };
 
 export default RatioIndicator;
-
-export { SecondaryText, StyledLabel };

@@ -18,6 +18,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { EntityDataTable, Spinner } from 'components/common';
+import { Label } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
@@ -25,11 +26,9 @@ import NumberUtils from 'util/NumberUtils';
 
 import useGraylogNodes from './useGraylogNodes';
 import type { GraylogNode } from './useGraylogNodes';
-import GraylogNodeStatusLabel from './GraylogNodeStatusLabel';
 import GraylogNodeActions from './GraylogNodeActions';
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
-import RatioIndicator, { SecondaryText, StyledLabel } from './RatioIndicator';
-
+import RatioIndicator from './RatioIndicator';
 
 const NodePrimary = styled.div`
   display: flex;
@@ -37,7 +36,19 @@ const NodePrimary = styled.div`
   gap: 2px;
 `;
 
-const DEFAULT_VISIBLE_COLUMNS = ['node', 'journal', 'jvm', 'state'] as const;
+const StyledLabel = styled(Label)`
+  display: inline-flex;
+`;
+
+const SecondaryText = styled.div`
+  font-size: small;
+
+  span {
+    font-size: inherit;
+  }
+`;
+
+const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'journal', 'jvm', 'health'] as const;
 
 const getNodeDisplayName = (node: GraylogNode) => {
   const nodeNameParts = [node.short_node_id, node.hostname].filter(Boolean);
@@ -61,9 +72,10 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
   const columnDefinitions = useMemo<Array<Column>>(
     () => [
       { id: 'node', title: 'Node' },
+      { id: 'state', title: 'State' },
       { id: 'journal', title: 'Journal' },
       { id: 'jvm', title: 'JVM' },
-      { id: 'state', title: 'State' },
+      { id: 'health', title: 'Health' },
     ],
     [],
   );
@@ -85,6 +97,35 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
                   </SecondaryText>
                 )}
               </NodePrimary>
+            );
+          },
+        },
+        health: {
+          renderCell: (_value, entity) => {
+            const loadBalancersStatus = entity.lb_status?.toUpperCase();
+            const messageProcessingStatus = entity.is_processing ? 'ENABLED' : 'DISABLED';
+
+            return (
+              <>
+                <SecondaryText>
+                  Load Balancers{' '}
+                  <StyledLabel
+                    bsStyle={loadBalancersStatus === 'ALIVE' ? 'success' : 'warning'}
+                    bsSize="xs"
+                    aria-label={`Load Balancers ${loadBalancersStatus ?? 'UNKNOWN'}`}>
+                    {loadBalancersStatus ?? 'UNKNOWN'}
+                  </StyledLabel>
+                </SecondaryText>
+                <SecondaryText>
+                  Message Processing{' '}
+                  <StyledLabel
+                    bsStyle={entity.is_processing ? 'success' : 'warning'}
+                    bsSize="xs"
+                    aria-label={`Message Processing ${messageProcessingStatus}`}>
+                    {messageProcessingStatus}
+                  </StyledLabel>
+                </SecondaryText>
+              </>
             );
           },
         },
@@ -126,7 +167,23 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
           },
         },
         state: {
-          renderCell: (_value, entity) => <GraylogNodeStatusLabel node={entity} />,
+          renderCell: (_value, entity) => {
+            const lifecycleStatus = entity.lifecycle?.toUpperCase();
+
+            if (!lifecycleStatus) {
+              return null;
+            }
+
+            return (
+              <StyledLabel
+                bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
+                bsSize="xs"
+                title={lifecycleStatus}
+                aria-label={lifecycleStatus}>
+                {lifecycleStatus}
+              </StyledLabel>
+            );
+          },
         },
       },
     }),
@@ -144,7 +201,6 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
   const handleSortChange = useCallback(() => {}, []);
 
   const renderActions = useCallback((entity: GraylogNode) => <GraylogNodeActions node={entity} />, []);
-
 
   return (
     <ClusterNodesSectionWrapper
