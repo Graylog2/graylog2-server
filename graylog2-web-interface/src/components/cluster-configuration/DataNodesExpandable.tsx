@@ -57,9 +57,10 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
 
 type Props = {
   collapsible?: boolean;
+  searchQuery?: string;
 };
 
-const DataNodesExpandable = ({ collapsible = true }: Props) => {
+const DataNodesExpandable = ({ collapsible = true, searchQuery = '' }: Props) => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
   const searchParams = DEFAULT_SEARCH_PARAMS;
@@ -130,7 +131,7 @@ const DataNodesExpandable = ({ collapsible = true }: Props) => {
       headerLeftSection={isInitialLoading && <Spinner />}
       collapsible={collapsible}>
       <EntityDataTable<DataNode>
-        entities={dataNodes}
+        entities={[...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes]} // Duplicate entries to simulate more data
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         onColumnsChange={handleColumnsChange}

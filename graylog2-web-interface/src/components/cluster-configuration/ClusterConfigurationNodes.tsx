@@ -14,10 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
+import { SearchForm } from 'components/common';
 
 import GraylogNodesExpandable from './GraylogNodesExpandable';
 import DataNodesExpandable from './DataNodesExpandable';
@@ -32,7 +33,9 @@ const SectionCol = styled(Col)`
 
 const ControlsWrapper = styled.div`
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 `;
 
 type NodeSegment = 'all' | 'graylog' | 'data';
@@ -45,6 +48,8 @@ const SEGMENT_OPTIONS = [
 
 const ClusterConfigurationNodes = () => {
   const [activeSegment, setActiveSegment] = useState<NodeSegment>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
 
   const showGraylogNodes = activeSegment === 'all' || activeSegment === 'graylog';
   const showDataNodes = activeSegment === 'all' || activeSegment === 'data';
@@ -53,6 +58,15 @@ const ClusterConfigurationNodes = () => {
     <Row className="content">
       <SectionCol md={12}>
         <ControlsWrapper>
+          <SearchForm
+            query={searchQuery}
+            placeholder="Search nodes…"
+            wrapperClass=""
+            queryWidth={400}
+            topMargin={0}
+            onQueryChange={setSearchQuery}
+            onReset={() => setSearchQuery('')}
+          />
           <SegmentedControl<NodeSegment>
             value={activeSegment}
             data={SEGMENT_OPTIONS}
@@ -62,12 +76,12 @@ const ClusterConfigurationNodes = () => {
       </SectionCol>
       {showGraylogNodes && (
         <SectionCol md={12}>
-          <GraylogNodesExpandable collapsible={activeSegment === 'all'} />
+          <GraylogNodesExpandable collapsible={activeSegment === 'all'} searchQuery={normalizedSearch} />
         </SectionCol>
       )}
       {showDataNodes && (
         <SectionCol md={12}>
-          <DataNodesExpandable collapsible={activeSegment === 'all'} />
+          <DataNodesExpandable collapsible={activeSegment === 'all'} searchQuery={normalizedSearch} />
         </SectionCol>
       )}
     </Row>

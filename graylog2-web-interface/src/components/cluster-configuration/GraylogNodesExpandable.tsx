@@ -31,9 +31,10 @@ import {
 
 type Props = {
   collapsible?: boolean;
+  searchQuery?: string;
 };
 
-const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
+const GraylogNodesExpandable = ({ collapsible = true, searchQuery = '' }: Props) => {
   const { nodes: graylogNodes, isLoading } = useGraylogNodes();
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
