@@ -65,7 +65,7 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
         value={overrideSource?.value}
         onChange={onChange}
         label="Override Source (optional)"
-        help="The source is set to aws-cloudtrail by default.If desired, you may override it with a custom value."
+        help="The source is set to aws-cloudtrail by default. If desired, you may override it with a custom value."
       />
 
       <Input
