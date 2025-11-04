@@ -82,17 +82,17 @@ const TableWrapper = styled.div<{ $maxHeight?: string }>(
   `,
 );
 
-const getMaxHeightValue = (maxContentHeight: number | string | null) => {
-    if (maxContentHeight === null || maxContentHeight === undefined) {
-      return undefined;
-    }
+const getMaxHeightValue = (maxContentHeight: number | string | null, collapsible: boolean) => {
+  if (!collapsible || maxContentHeight === null || maxContentHeight === undefined) {
+    return undefined;
+  }
 
-    if (typeof maxContentHeight === 'number') {
-      return `${maxContentHeight}px`;
-    }
+  if (typeof maxContentHeight === 'number') {
+    return `${maxContentHeight}px`;
+  }
 
-    return maxContentHeight;
-  };
+  return maxContentHeight;
+};
 
 type Props = React.PropsWithChildren<{
   title: string;
@@ -108,15 +108,15 @@ const ClusterNodesSectionWrapper = ({
   collapsible = true,
   maxContentHeight = 400,
 }: Props) => (
-    <Container>
-      <Section
-        title={title}
-        collapsible={collapsible}
-        headerLeftSection={headerLeftSection}
-        collapseButtonPosition="left">
-        <TableWrapper $maxHeight={getMaxHeightValue(maxContentHeight)}>{children}</TableWrapper>
-      </Section>
-    </Container>
-  );
+  <Container>
+    <Section
+      title={title}
+      collapsible={collapsible}
+      headerLeftSection={headerLeftSection}
+      collapseButtonPosition="left">
+      <TableWrapper $maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
+    </Section>
+  </Container>
+);
 
 export default ClusterNodesSectionWrapper;
