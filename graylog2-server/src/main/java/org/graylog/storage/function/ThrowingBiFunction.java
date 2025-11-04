@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.storage.function;
 
 public interface ThrowingBiFunction<A1, A2, R, E extends Exception> {
     R apply(A1 a1, A2 a2) throws E;
