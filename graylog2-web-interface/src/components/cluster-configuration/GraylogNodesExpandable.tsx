@@ -32,15 +32,21 @@ import {
 type Props = {
   collapsible?: boolean;
   searchQuery?: string;
+  onSelectSegment?: () => void;
 };
 
-const GraylogNodesExpandable = ({ collapsible = true, searchQuery = '' }: Props) => {
+const GraylogNodesExpandable = ({
+  collapsible = true,
+  searchQuery: _searchQuery = '',
+  onSelectSegment = undefined,
+}: Props) => {
   const { nodes: graylogNodes, isLoading } = useGraylogNodes();
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
 
   const columnDefinitions = useMemo<Array<Column>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
+  const totalGraylogNodes = graylogNodes.length;
 
   const handleColumnsChange = useCallback((newColumns: Array<string>) => {
     if (!newColumns.length) {
@@ -56,6 +62,9 @@ const GraylogNodesExpandable = ({ collapsible = true, searchQuery = '' }: Props)
   return (
     <ClusterNodesSectionWrapper
       title="Graylog Nodes"
+      titleCount={totalGraylogNodes}
+      onTitleCountClick={onSelectSegment ?? null}
+      titleCountAriaLabel="Show Graylog Nodes segment"
       headerLeftSection={isLoading && <Spinner />}
       collapsible={collapsible}>
       <EntityDataTable<GraylogNode>

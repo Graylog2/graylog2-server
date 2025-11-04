@@ -58,9 +58,10 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
 type Props = {
   collapsible?: boolean;
   searchQuery?: string;
+  onSelectSegment?: () => void;
 };
 
-const DataNodesExpandable = ({ collapsible = true, searchQuery = '' }: Props) => {
+const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '', onSelectSegment = undefined }: Props) => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
   const searchParams = DEFAULT_SEARCH_PARAMS;
@@ -110,6 +111,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery = '' }: Props) =>
   );
 
   const dataNodes = dataNodesResponse?.list ?? [];
+  const totalDataNodes = dataNodesResponse?.pagination?.total ?? dataNodes.length;
 
   const handleColumnsChange = useCallback((newColumns: Array<string>) => {
     if (!newColumns.length) {
@@ -128,6 +130,9 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery = '' }: Props) =>
   return (
     <ClusterNodesSectionWrapper
       title="Data Nodes"
+      titleCount={totalDataNodes}
+      onTitleCountClick={onSelectSegment ?? null}
+      titleCountAriaLabel="Show Data Nodes segment"
       headerLeftSection={isInitialLoading && <Spinner />}
       collapsible={collapsible}>
       <EntityDataTable<DataNode>

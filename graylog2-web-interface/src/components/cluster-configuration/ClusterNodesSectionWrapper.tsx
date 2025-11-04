@@ -55,6 +55,34 @@ const Container = styled.div`
   }
 `;
 
+const TitleWrapper = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+`;
+
+const TitleCountButton = styled.button`
+  background: none;
+  border: none;
+  color: ${({ theme }) => theme.colors.text.secondary};
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    color: ${({ theme }) => theme.colors.text.primary};
+    outline: none;
+  }
+`;
+
+const TitleCountLabel = styled.span`
+  color: ${({ theme }) => theme.colors.text.secondary};
+  font-size: ${({ theme }) => theme.fonts.size.body};
+`;
+
 const TableWrapper = styled.div<{ $maxHeight?: string }>(
   ({ $maxHeight, theme }) => css`
     margin-top: calc(-1 * ${theme.spacings.lg});
@@ -96,6 +124,9 @@ const getMaxHeightValue = (maxContentHeight: number | string | null, collapsible
 
 type Props = React.PropsWithChildren<{
   title: string;
+  titleCount?: number | null;
+  titleCountAriaLabel?: string;
+  onTitleCountClick?: (() => void) | null;
   headerLeftSection?: React.ReactNode;
   collapsible?: boolean;
   maxContentHeight?: number | string | null;
@@ -104,19 +135,54 @@ type Props = React.PropsWithChildren<{
 const ClusterNodesSectionWrapper = ({
   children = null,
   title,
+  titleCount = null,
+  titleCountAriaLabel = undefined,
+  onTitleCountClick = null,
   headerLeftSection = undefined,
   collapsible = true,
   maxContentHeight = 400,
-}: Props) => (
-  <Container>
-    <Section
-      title={title}
-      collapsible={collapsible}
-      headerLeftSection={headerLeftSection}
-      collapseButtonPosition="left">
-      <TableWrapper $maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
-    </Section>
-  </Container>
-);
+}: Props) => {
+  const renderHeader = () => {
+    const hasCount = titleCount !== null && titleCount !== undefined;
+
+    if (!hasCount) {
+      return title;
+    }
+
+    if (typeof onTitleCountClick === 'function') {
+      return (
+        <TitleWrapper>
+          <span>{title}</span>
+          <TitleCountButton
+            type="button"
+            onClick={onTitleCountClick}
+            aria-label={titleCountAriaLabel ?? `${title} (${titleCount})`}>
+            ({titleCount})
+          </TitleCountButton>
+        </TitleWrapper>
+      );
+    }
+
+    return (
+      <TitleWrapper>
+        <span>{title}</span>
+        <TitleCountLabel>({titleCount})</TitleCountLabel>
+      </TitleWrapper>
+    );
+  };
+
+  return (
+    <Container>
+      <Section
+        title={title}
+        header={renderHeader()}
+        collapsible={collapsible}
+        headerLeftSection={headerLeftSection}
+        collapseButtonPosition="left">
+        <TableWrapper $maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
+      </Section>
+    </Container>
+  );
+};
 
 export default ClusterNodesSectionWrapper;
