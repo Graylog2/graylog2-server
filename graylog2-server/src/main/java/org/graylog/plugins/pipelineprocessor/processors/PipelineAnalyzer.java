@@ -36,8 +36,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.graylog2.shared.inputs.InputRegistry;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,19 +51,21 @@ import static org.graylog.plugins.pipelineprocessor.functions.FromInput.NAME_ARG
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
 public class PipelineAnalyzer {
-    private static final Logger LOG = LoggerFactory.getLogger(PipelineAnalyzer.class);
     private final PipelineStreamConnectionsService connectionsService;
     private final InputService inputService;
+    private final InputRegistry inputRegistry;
     private final PipelineMetricRegistry pipelineMetricRegistry;
 
     @Inject
     public PipelineAnalyzer(
             PipelineStreamConnectionsService connectionsService,
             InputService inputService,
+            InputRegistry inputRegistry,
             MetricRegistry metricRegistry
     ) {
         this.connectionsService = connectionsService;
         this.inputService = inputService;
+        this.inputRegistry = inputRegistry;
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
     }
 
@@ -136,18 +137,6 @@ public class PipelineAnalyzer {
         }
     }
 
-    protected String getInputId(String inputName) {
-        final List<String> inputIds = inputService.findIdsByTitle(inputName);
-        if (inputIds.isEmpty()) {
-            LOG.warn("Could not find input with name '{}'", inputName);
-            return null;
-        }
-        if (inputIds.size() > 1) {
-            LOG.warn("Multiple inputs found with name '{}', using the first one with id '{}'", inputName, inputIds.getFirst());
-        }
-        return inputIds.getFirst();
-    }
-
     class MetaDataListener extends RuleAstBaseListener {
         private final Set<String> functions = new HashSet<>();
         private final Set<String> deprecatedFunctions = new HashSet<>();
@@ -202,7 +191,7 @@ public class PipelineAnalyzer {
                 if (args.getPreComputedValue(ID_ARG) != null) {
                     inputId = args.getPreComputedValue(ID_ARG).toString();
                 } else if (args.getPreComputedValue(NAME_ARG) != null) {
-                    inputId = getInputId(args.getPreComputedValue(NAME_ARG).toString());
+                    inputId = inputRegistry.getIdByTitle(args.getPreComputedValue(NAME_ARG).toString());
                 }
                 if (inputId != null) {
                     createOrUpdateMention(inputId);

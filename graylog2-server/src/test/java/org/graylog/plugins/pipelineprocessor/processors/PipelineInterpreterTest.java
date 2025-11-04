@@ -48,6 +48,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog2.Configuration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
@@ -429,7 +430,9 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
+        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
+                mock(Configuration.class),
+                ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
@@ -487,7 +490,9 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
 
         final MetricRegistry metricRegistry = new MetricRegistry();
-        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
+        final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(
+                mock(Configuration.class),
+                ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,

@@ -25,6 +25,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -135,5 +136,29 @@ public class InputRegistry {
 
     public Stream<IOState<MessageInput>> stream() {
         return inputStates.stream();
+    }
+
+    /**
+     * Get input by name (title). Note that input names are not unique, so this method
+     * returns the first match, based on case-insensitive comparison.
+     *
+     * @param title the input name (title) to search for - ignoring case
+     * @return the first match or null if no input with that name exists.
+     */
+    @Nullable
+    public MessageInput getByTitle(String title) {
+        for (IOState<MessageInput> inputState : inputStates) {
+            final MessageInput messageInput = inputState.getStoppable();
+            if (messageInput.getTitle().equals(title)) {
+                return messageInput;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public String getIdByTitle(String title) {
+        MessageInput input = getByTitle(title);
+        return input != null ? input.getId() : null;
     }
 }

@@ -28,8 +28,6 @@ import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineAnalyzer;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolverConfig;
-import org.graylog2.database.MongoCollection;
-import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,21 +49,19 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
     private final MongoDatabase db;
     private final PipelineResolver pipelineResolver;
     private final PipelineAnalyzer pipelineAnalyzer;
-    private final MongoCollection<PipelineRulesMetadataDao> rulesCollection;
-    private final MongoCollection<PipelineInputsMetadataDao> inputsCollection;
+    private final MongoDbPipelineMetadataService metadataService;
 
     @Inject
     public V20251021083100_CreatePipelineMetadata(MongoConnection mongoConnection,
-                                                  MongoCollections mongoCollections,
                                                   MongoDbRuleService ruleService,
+                                                  MongoDbPipelineMetadataService metadataService,
                                                   PipelineService pipelineService,
                                                   PipelineAnalyzer pipelineAnalyzer,
                                                   PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                                   PipelineRuleParser pipelineRuleParser,
                                                   PipelineResolver.Factory pipelineResolverFactory) {
         this.db = mongoConnection.getMongoDatabase();
-        this.rulesCollection = mongoCollections.collection(RULES_COLLECTION_NAME, PipelineRulesMetadataDao.class);
-        this.inputsCollection = mongoCollections.collection(INPUTS_COLLECTION_NAME, PipelineInputsMetadataDao.class);
+        this.metadataService = metadataService;
         this.pipelineAnalyzer = pipelineAnalyzer;
         this.pipelineResolver = pipelineResolverFactory.create(
                 PipelineResolverConfig.of(
@@ -84,7 +80,7 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
 
     @Override
     public void upgrade() {
-        if (collectionNotExists(RULES_COLLECTION_NAME) || collectionNotExists(INPUTS_COLLECTION_NAME)) {
+        if (anyMissing(Set.of(RULES_COLLECTION_NAME, INPUTS_COLLECTION_NAME))) {
             // rebuild all metadata collections from scratch
             db.getCollection(RULES_COLLECTION_NAME).drop();
             db.getCollection(INPUTS_COLLECTION_NAME).drop();
@@ -93,13 +89,20 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
         }
     }
 
-    private boolean collectionNotExists(String collectionName) {
-        for (String name : db.listCollectionNames()) {
-            if (name.equals(collectionName)) {
-                return false;
+    /**
+     * Check if any of the specified collection candidates is missing.
+     *
+     * @param candidates check for existence of these collections
+     * @return false, if all collections exist; true, if any collection is missing
+     */
+    private boolean anyMissing(Set<String> candidates) {
+        final List<String> collections = db.listCollectionNames().into(new ArrayList<>());
+        for (String name : candidates) {
+            if (!collections.contains(name)) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private void createMetadata() {
@@ -108,7 +111,7 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
                 pipelineAnalyzer.analyzePipelines(pipelineResolver, ruleRecords);
 
-        MongoDbPipelineMetadataService.saveRulesMetadata(rulesCollection, ruleRecords, false);
-        MongoDbPipelineMetadataService.saveInputsMetadata(inputsCollection, inputMentions, false);
+        metadataService.saveRulesMetadata(ruleRecords, false);
+        metadataService.saveInputsMetadata(inputMentions, false);
     }
 }

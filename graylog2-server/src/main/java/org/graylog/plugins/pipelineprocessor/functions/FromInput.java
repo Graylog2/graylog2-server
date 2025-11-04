@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -25,8 +26,6 @@ import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderFunctionGrou
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.shared.inputs.InputRegistry;
-
-import jakarta.inject.Inject;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -53,24 +52,17 @@ public class FromInput extends AbstractFunction<Boolean> {
         String id = idParam.optional(args, context).orElse("");
 
         MessageInput input = null;
-        if ("".equals(id)) {
+        if (id.isEmpty()) {
             final String name = nameParam.optional(args, context).orElse("");
-            for (IOState<MessageInput> messageInputIOState : inputRegistry.getInputStates()) {
-                final MessageInput messageInput = messageInputIOState.getStoppable();
-                if (messageInput.getTitle().equalsIgnoreCase(name)) {
-                    input = messageInput;
-                    break;
-                }
-            }
-            if ("".equals(name)) {
+            if (name.isEmpty()) {
                 return null;
             }
+            input = inputRegistry.getByTitle(name);
         } else {
             final IOState<MessageInput> inputState = inputRegistry.getInputState(id);
             if (inputState != null) {
                 input = inputState.getStoppable();
             }
-
         }
         return input != null
                 && input.getId().equals(context.currentMessage().getSourceInputId());

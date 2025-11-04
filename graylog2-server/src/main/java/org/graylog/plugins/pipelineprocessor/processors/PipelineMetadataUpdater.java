@@ -83,8 +83,8 @@ public class PipelineMetadataUpdater {
         List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords);
 
-        metadataService.saveRulesMetadata(ruleRecords);
-        metadataService.saveInputsMetadata(inputMentions);
+        metadataService.saveRulesMetadata(ruleRecords, true);
+        metadataService.saveInputsMetadata(inputMentions, true);
     }
 
     private void handlePipelineDeletions(PipelinesChangedEvent event) {

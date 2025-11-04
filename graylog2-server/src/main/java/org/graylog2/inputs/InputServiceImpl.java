@@ -136,16 +136,6 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
-    public List<String> findIdsByTitle(String title) {
-        final ImmutableList.Builder<String> inputIds = ImmutableList.builder();
-        for (final DBObject o : query(InputImpl.class, new BasicDBObject(MessageInput.FIELD_TITLE, title))) {
-            final InputImpl fromDbObject = createFromDbObject(o);
-            inputIds.add(fromDbObject.getId());
-        }
-        return inputIds.build();
-    }
-
-    @Override
     public Set<Input> findByIds(Collection<String> ids) {
         final Set<ObjectId> objectIds = ids.stream()
                 .map(ObjectId::new)

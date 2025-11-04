@@ -37,6 +37,7 @@ import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog2.Configuration;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -48,6 +49,7 @@ import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory
 public class ConfigurationStateUpdater {
     private static final RateLimitedLog log = createDefaultRateLimitedLog(ConfigurationStateUpdater.class);
 
+    private final Configuration configuration;
     private final RuleMetricsConfigService ruleMetricsConfigService;
     private final ScheduledExecutorService scheduler;
     private final EventBus serverEventBus;
@@ -58,20 +60,22 @@ public class ConfigurationStateUpdater {
     private final AtomicReference<PipelineInterpreter.State> latestState = new AtomicReference<>();
     private final PipelineResolver pipelineResolver;
     private final PipelineMetricRegistry pipelineMetricRegistry;
-    private final PipelineMetadataUpdater metadataListener;
+    private final PipelineMetadataUpdater metadataUpdater;
 
     @Inject
-    public ConfigurationStateUpdater(RuleService ruleService,
+    public ConfigurationStateUpdater(Configuration configuration,
+                                     RuleService ruleService,
                                      PipelineService pipelineService,
                                      PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                      PipelineRuleParser pipelineRuleParser,
                                      PipelineResolver.Factory pipelineResolverFactory,
                                      RuleMetricsConfigService ruleMetricsConfigService,
                                      MetricRegistry metricRegistry,
-                                     PipelineMetadataUpdater metadataListener,
+                                     PipelineMetadataUpdater metadataUpdater,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
                                      PipelineInterpreter.State.Factory stateFactory) {
+        this.configuration = configuration;
         this.ruleMetricsConfigService = ruleMetricsConfigService;
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
@@ -87,7 +91,7 @@ public class ConfigurationStateUpdater {
                 pipelineRuleParser
         );
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
-        this.metadataListener = metadataListener;
+        this.metadataUpdater = metadataUpdater;
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
@@ -109,13 +113,17 @@ public class ConfigurationStateUpdater {
 
     private PipelineInterpreter.State reloadAndSave(RulesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
-        metadataListener.handleRuleChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            metadataUpdater.handleRuleChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+        }
         return state;
     }
 
     private PipelineInterpreter.State reloadAndSave(PipelinesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
-        metadataListener.handlePipelineChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            metadataUpdater.handlePipelineChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+        }
         return state;
     }
 

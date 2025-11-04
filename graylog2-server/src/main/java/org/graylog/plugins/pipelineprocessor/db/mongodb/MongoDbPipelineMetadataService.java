@@ -59,6 +59,7 @@ public class MongoDbPipelineMetadataService {
         rulesCollection.createIndex(Indexes.ascending(FIELD_PIPELINE_ID), new IndexOptions().unique(true));
 
         this.inputsCollection = mongoCollections.collection(INPUTS_COLLECTION_NAME, PipelineInputsMetadataDao.class);
+        inputsCollection.createIndex(Indexes.ascending(FIELD_INPUT_ID), new IndexOptions().unique(true));
     }
 
     public ImmutableList<PipelineRulesMetadataDao> getAll() {
@@ -93,13 +94,7 @@ public class MongoDbPipelineMetadataService {
                 .collect(Collectors.toSet());
     }
 
-    public void saveRulesMetadata(List<PipelineRulesMetadataDao> ruleRecords) {
-        saveRulesMetadata(rulesCollection, ruleRecords, true);
-    }
-
-    public static void saveRulesMetadata(MongoCollection<PipelineRulesMetadataDao> rulesCollection,
-                                         List<PipelineRulesMetadataDao> ruleRecords,
-                                         boolean upsert) {
+    public void saveRulesMetadata(List<PipelineRulesMetadataDao> ruleRecords, boolean upsert) {
         if (!ruleRecords.isEmpty()) {
             LOG.info("Inserting/Updating {} pipeline rules metadata records.", ruleRecords.size());
             if (upsert) {
@@ -117,13 +112,7 @@ public class MongoDbPipelineMetadataService {
         }
     }
 
-    public void saveInputsMetadata(Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
-        saveInputsMetadata(inputsCollection, inputMentions, true);
-    }
-
-    public static void saveInputsMetadata(MongoCollection<PipelineInputsMetadataDao> inputsCollection,
-                                          Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions,
-                                          boolean upsert) {
+    public void saveInputsMetadata(Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions, boolean upsert) {
         final List<PipelineInputsMetadataDao> inputRecords = new ArrayList<>();
         inputMentions.forEach((inputId, mentionedInEntries) -> {
             final PipelineInputsMetadataDao inputMetadata = PipelineInputsMetadataDao.builder()
