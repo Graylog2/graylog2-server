@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Section } from 'components/common';
 
@@ -27,7 +27,7 @@ const Container = styled.div`
   table thead,
   table thead tr,
   table thead th {
-    background-color: transparent !important;
+    background-color: ${({ theme }) => theme.colors.section.filled} !important;
   }
 
   table tbody {
@@ -55,14 +55,44 @@ const Container = styled.div`
   }
 `;
 
-const TableWrapper = styled.div`
-  margin-top: calc(-1 * ${({ theme }) => theme.spacings.lg});
-`;
+const TableWrapper = styled.div<{ $maxHeight?: string }>(
+  ({ $maxHeight, theme }) => css`
+    margin-top: calc(-1 * ${theme.spacings.lg});
+
+    ${$maxHeight &&
+    css`
+      div#scroll-container {
+        max-height: ${$maxHeight};
+        overflow-y: auto;
+      }
+
+      div#scroll-container table thead {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: ${theme.colors.table.head.background};
+      }
+    `}
+  `,
+);
+
+const getMaxHeightValue = (maxContentHeight: number | string | null) => {
+    if (maxContentHeight === null || maxContentHeight === undefined) {
+      return undefined;
+    }
+
+    if (typeof maxContentHeight === 'number') {
+      return `${maxContentHeight}px`;
+    }
+
+    return maxContentHeight;
+  };
 
 type Props = React.PropsWithChildren<{
   title: string;
   headerLeftSection?: React.ReactNode;
   collapsible?: boolean;
+  maxContentHeight?: number | string | null;
 }>;
 
 const ClusterNodesSectionWrapper = ({
@@ -70,16 +100,17 @@ const ClusterNodesSectionWrapper = ({
   title,
   headerLeftSection = undefined,
   collapsible = true,
+  maxContentHeight = 400,
 }: Props) => (
-  <Container>
-    <Section
-      title={title}
-      collapsible={collapsible}
-      headerLeftSection={headerLeftSection}
-      collapseButtonPosition="left">
-      <TableWrapper>{children}</TableWrapper>
-    </Section>
-  </Container>
-);
+    <Container>
+      <Section
+        title={title}
+        collapsible={collapsible}
+        headerLeftSection={headerLeftSection}
+        collapseButtonPosition="left">
+        <TableWrapper $maxHeight={getMaxHeightValue(maxContentHeight)}>{children}</TableWrapper>
+      </Section>
+    </Container>
+  );
 
 export default ClusterNodesSectionWrapper;
