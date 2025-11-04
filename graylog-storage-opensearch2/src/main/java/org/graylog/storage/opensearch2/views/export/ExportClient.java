@@ -23,8 +23,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.client.RequestOptions;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.shaded.opensearch2.org.opensearch.core.action.ShardOperationFailedException;
+import org.graylog.storage.function.ThrowingBiFunction;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.opensearch2.ThrowingBiFunction;
 import org.graylog2.indexer.ElasticsearchException;
 
 import java.io.IOException;
