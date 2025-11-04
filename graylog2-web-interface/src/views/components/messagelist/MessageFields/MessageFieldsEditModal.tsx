@@ -19,7 +19,7 @@ import React, { useContext, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
 import MessageFieldsEditModeList from 'views/components/messagelist/MessageFields/MessageFieldsEditModeList';
-import { Alert, Modal, Button, ButtonGroup } from 'components/bootstrap';
+import { Alert, Modal, Button } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
 import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -27,6 +27,7 @@ import useFormattedFields from 'views/components/messagelist/MessageFields/hooks
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import StringUtils from 'util/StringUtils';
 import useMessageFavoriteFieldsForEditing from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
+import { ModalSubmit } from 'components/common';
 
 const FieldsContainer = styled.div(
   ({ theme }) => css`
@@ -39,17 +40,6 @@ const ModalContentContainer = styled.div`
   max-height: 500px;
   overflow-y: auto;
   font-size: ${({ theme }) => theme.fonts.size.small};
-`;
-
-const ButtonContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  align-items: end;
-`;
-
-const StyledButtonGroup = styled(ButtonGroup)`
-  gap: ${({ theme }) => theme.spacings.xs};
 `;
 
 const StyledAlert = styled(Alert)`
@@ -121,17 +111,17 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
         </ModalContentContainer>
       </Modal.Body>
       <Modal.Footer>
-        <ButtonContainer>
-          <Button bsStyle="link" onClick={_resetFavoriteFields}>
-            Reset to default
-          </Button>
-          <StyledButtonGroup>
-            <Button onClick={toggleEditMode}>Cancel</Button>
-            <Button bsStyle="primary" onClick={_saveFavoriteField}>
-              Save Configuration
+        <ModalSubmit
+          submitButtonText="Save Configuration"
+          leftCol={
+            <Button bsStyle="link" onClick={_resetFavoriteFields}>
+              Reset to default
             </Button>
-          </StyledButtonGroup>
-        </ButtonContainer>
+          }
+          onCancel={toggleEditMode}
+          onSubmit={_saveFavoriteField}
+          submitButtonType="button"
+        />
       </Modal.Footer>
     </Modal>
   );
