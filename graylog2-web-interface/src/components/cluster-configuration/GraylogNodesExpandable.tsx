@@ -71,7 +71,11 @@ const getNodeDisplayName = (node: GraylogNode) => {
   return node.node_id ?? node.hostname ?? node.id;
 };
 
-const GraylogNodesExpandable = () => {
+type Props = {
+  collapsible?: boolean;
+};
+
+const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
   const { nodes: graylogNodes, isLoading } = useGraylogNodes();
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
@@ -162,7 +166,10 @@ const GraylogNodesExpandable = () => {
 
 
   return (
-    <ClusterNodesSectionWrapper title="Graylog Nodes" headerLeftSection={isLoading && <Spinner />}>
+    <ClusterNodesSectionWrapper
+      title="Graylog Nodes"
+      headerLeftSection={isLoading && <Spinner />}
+      collapsible={collapsible}>
       <EntityDataTable<GraylogNode>
         entities={graylogNodes}
         visibleColumns={visibleColumns}

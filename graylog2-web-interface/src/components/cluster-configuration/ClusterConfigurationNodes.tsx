@@ -62,12 +62,12 @@ const ClusterConfigurationNodes = () => {
       </SectionCol>
       {showGraylogNodes && (
         <SectionCol md={12}>
-          <GraylogNodesExpandable />
+          <GraylogNodesExpandable collapsible={activeSegment === 'all'} />
         </SectionCol>
       )}
       {showDataNodes && (
         <SectionCol md={12}>
-          <DataNodesExpandable />
+          <DataNodesExpandable collapsible={activeSegment === 'all'} />
         </SectionCol>
       )}
     </Row>

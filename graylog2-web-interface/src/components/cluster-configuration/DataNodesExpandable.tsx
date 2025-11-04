@@ -55,7 +55,11 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   sort: { attributeId: 'hostname', direction: 'asc' },
 };
 
-const DataNodesExpandable = () => {
+type Props = {
+  collapsible?: boolean;
+};
+
+const DataNodesExpandable = ({ collapsible = true }: Props) => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
   const searchParams = DEFAULT_SEARCH_PARAMS;
@@ -121,7 +125,10 @@ const DataNodesExpandable = () => {
   );
 
   return (
-    <ClusterNodesSectionWrapper title="Data Nodes" headerLeftSection={isInitialLoading && <Spinner />}>
+    <ClusterNodesSectionWrapper
+      title="Data Nodes"
+      headerLeftSection={isInitialLoading && <Spinner />}
+      collapsible={collapsible}>
       <EntityDataTable<DataNode>
         entities={dataNodes}
         visibleColumns={visibleColumns}
