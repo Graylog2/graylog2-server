@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix issue when modal overlays dropdown when it iside the modal."
+
+issues = ["24112"]
+pulls = ["24115"]
