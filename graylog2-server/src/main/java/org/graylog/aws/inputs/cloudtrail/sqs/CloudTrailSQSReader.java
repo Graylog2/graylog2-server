@@ -30,7 +30,7 @@ import java.util.function.Consumer;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
- * Polls SQS notifications, parses them, and pases the notification to the provided S3 callback.
+ * Polls SQS notifications, parses them, and passes the notification to the provided S3 callback.
  * Each caller supplies their own S3 reader, since files can be in caller-specific formats.
  */
 public class CloudTrailSQSReader {
