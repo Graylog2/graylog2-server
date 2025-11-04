@@ -17,6 +17,7 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ComparisonChain;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
@@ -64,6 +65,11 @@ public class TestIndexSet implements IndexSet {
     @Override
     public String getIndexWildcard() {
         return config.indexPrefix() + SEPARATOR + "*";
+    }
+
+    @Override
+    public BasicIndexSetConfig getBasicConfig() {
+        return getConfig();
     }
 
     @Override

@@ -35,6 +35,7 @@ import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
+import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
 import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -57,17 +58,17 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ)
 public abstract class IndexSetConfig implements
+        BasicIndexSetConfig,
         Comparable<IndexSetConfig>,
         ExtendedIndexSetFields,
         FieldRestrictionsField,
+        IndexTemplateNameField,
         ScopedEntity<IndexSetConfig.Builder> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
     public static final String FIELD_REGULAR = "regular";
     public static final String FIELD_INDEX_MATCH_PATTERN = "index_match_pattern";
     public static final String FIELD_INDEX_WILDCARD = "index_wildcard";
-    public static final String FIELD_INDEX_TEMPLATE_NAME = "index_template_name";
-    public static final String FIELD_CUSTOM_FIELD_MAPPINGS = "custom_field_mappings";
     public static final Duration DEFAULT_FIELD_TYPE_REFRESH_INTERVAL = Duration.standardSeconds(5L);
 
     private static final Set<String> TEMPLATE_TYPES_FOR_INDEX_SETS_WITH_IMMUTABLE_FIELD_TYPES = Set.of(
@@ -234,13 +235,6 @@ public abstract class IndexSetConfig implements
     @Nullable
     public abstract String indexWildcard();
 
-    @JsonProperty(FIELD_INDEX_TEMPLATE_NAME)
-    @NotBlank
-    public abstract String indexTemplateName();
-
-    @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS)
-    public abstract CustomFieldMappings customFieldMappings();
-
     @JsonIgnore
     public boolean isRegularIndex() {
         // Non-writable means the index has been restored and cannot be used as default, no matter if it was explicitly
@@ -278,8 +272,10 @@ public abstract class IndexSetConfig implements
 
     @AutoValue.Builder
     public abstract static class Builder implements
+            BasicIndexSetConfigBuilder<Builder>,
             ExtendedIndexSetFieldsBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder>,
+            IndexTemplateNameFieldBuilder<Builder>,
             ScopedEntity.Builder<Builder> {
 
         public abstract Builder isRegular(@Nullable Boolean isRegular);
@@ -287,10 +283,6 @@ public abstract class IndexSetConfig implements
         public abstract Builder indexMatchPattern(String indexMatchPattern);
 
         public abstract Builder indexWildcard(String indexWildcard);
-
-        public abstract Builder indexTemplateName(String templateName);
-
-        public abstract Builder customFieldMappings(CustomFieldMappings customFieldMappings);
 
         public abstract IndexSetConfig build();
     }

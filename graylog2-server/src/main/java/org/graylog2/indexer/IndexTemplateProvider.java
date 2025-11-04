@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer;
 
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
@@ -27,6 +27,6 @@ public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
     String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
 
     @Nonnull
-    T create(@Nonnull SearchVersion searchVersion, @Nonnull IndexSetConfig indexSetConfig)
+    T create(@Nonnull SearchVersion searchVersion, @Nonnull BasicIndexSetConfig indexSetConfig)
             throws IgnoreIndexTemplate;
 }

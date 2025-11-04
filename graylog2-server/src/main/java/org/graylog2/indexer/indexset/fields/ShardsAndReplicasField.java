@@ -14,22 +14,31 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
+package org.graylog2.indexer.indexset.fields;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.google.auto.value.AutoValue;
-import jakarta.validation.constraints.NotNull;
-import org.graylog2.indexer.BasicIndexSet;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.Min;
 
-@AutoValue
-@JsonAutoDetect
-public abstract class IndexingRequest {
-    public abstract BasicIndexSet indexSet();
+public interface ShardsAndReplicasField {
 
-    public abstract Indexable message();
+    String FIELD_SHARDS = "shards";
+    String FIELD_REPLICAS = "replicas";
 
-    public static IndexingRequest create(@NotNull BasicIndexSet indexSet, @NotNull Indexable message) {
-        return new AutoValue_IndexingRequest(indexSet, message);
+    @Min(1)
+    @JsonProperty(FIELD_SHARDS)
+    int shards();
+
+    @Min(0)
+    @JsonProperty(FIELD_REPLICAS)
+    int replicas();
+
+
+    interface ShardsAndReplicasFieldBuilder<T> {
+
+        @JsonProperty(FIELD_SHARDS)
+        T shards(@Min(1) int shards);
+
+        @JsonProperty(FIELD_REPLICAS)
+        T replicas(@Min(0) int replicas);
     }
-
 }

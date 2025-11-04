@@ -16,15 +16,14 @@
  */
 package org.graylog2.indexer;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.Map;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -41,7 +40,7 @@ public class IndexMappingFactory {
     }
 
     @Nonnull
-    public IndexMappingTemplate createIndexMapping(@Nonnull IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
+    public IndexMappingTemplate createIndexMapping(@Nonnull BasicIndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         final SearchVersion elasticsearchVersion = node.getVersion()
                 .orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
 

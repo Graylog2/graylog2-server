@@ -17,7 +17,7 @@
 package org.graylog2.indexer;
 
 import jakarta.annotation.Nonnull;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.storage.SearchVersion;
 
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;
@@ -28,7 +28,7 @@ public abstract class BasicIndexTemplateProvider<T extends IndexMappingTemplate>
     @Nonnull
     @Override
     public T create(@Nonnull SearchVersion searchVersion,
-                    @Nonnull IndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
+                    @Nonnull BasicIndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         if (isProperSearchVersion(searchVersion)) {
             return createTemplateInstance();
         } else {

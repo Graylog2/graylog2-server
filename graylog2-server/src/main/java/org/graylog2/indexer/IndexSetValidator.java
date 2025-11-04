@@ -23,8 +23,8 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.indexset.fields.BaseIndexSetFields;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.fields.RotationAndRetentionFields;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
@@ -41,10 +41,11 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 import static org.graylog2.indexer.MongoIndexSet.WARM_INDEX_INFIX;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_RETENTION_STRATEGY;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_RETENTION_STRATEGY_CLASS;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_ROTATION_STRATEGY;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY_CLASS;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -80,13 +81,13 @@ public class IndexSetValidator {
         }
 
         Violation refreshIntervalViolation = validateSimpleIndexSetConfig(newConfig);
-        if (refreshIntervalViolation != null){
+        if (refreshIntervalViolation != null) {
             return Optional.of(refreshIntervalViolation);
         }
         return Optional.empty();
     }
 
-    private Violation validateSimpleIndexSetConfig(BaseIndexSetFields newConfig) {
+    private Violation validateSimpleIndexSetConfig(RotationAndRetentionFields newConfig) {
         final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
         if (refreshIntervalViolation != null) {
             return refreshIntervalViolation;
@@ -99,7 +100,7 @@ public class IndexSetValidator {
     }
 
 
-    public Violation validateStrategyFields(BaseIndexSetFields newConfig) {
+    public Violation validateStrategyFields(RotationAndRetentionFields newConfig) {
         if (newConfig.retentionStrategyConfig() == null) {
             return Violation.create(FIELD_RETENTION_STRATEGY + " cannot be null!");
         }
@@ -194,7 +195,7 @@ public class IndexSetValidator {
     @Nullable
     public Violation checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {
         if (!useLegacyRotation && dataTieringConfig == null) {
-            return Violation.create(BaseIndexSetFields.FIELD_DATA_TIERING + " cannot be null!");
+            return Violation.create(FIELD_DATA_TIERING + " cannot be null!");
         }
         return null;
     }

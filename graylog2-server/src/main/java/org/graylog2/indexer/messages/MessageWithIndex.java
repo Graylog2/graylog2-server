@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.BasicIndexSet;
 
-public record MessageWithIndex(ImmutableMessage message, IndexSet indexSet) {
+public record MessageWithIndex(ImmutableMessage message, BasicIndexSet indexSet) {
 }
