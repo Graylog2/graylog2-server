@@ -2652,6 +2652,11 @@
     sort-object "^3.0.3"
     tinyqueue "^3.0.0"
 
+"@material-symbols/font-700@^0.39.0":
+  version "0.39.0"
+  resolved "https://registry.yarnpkg.com/@material-symbols/font-700/-/font-700-0.39.0.tgz#28f45a6a9d0672cae88a3e74cd022dd3f583ccf6"
+  integrity sha512-3VvpRdWVLEcU7LYFXRW91co0nq4aLGfM5Lqw2BTJww47VsrZ/JOGauQdFGJWbsnq35R55gQQ/1xi2N7AIg+7YA==
+
 "@mdn/browser-compat-data@^5.5.35", "@mdn/browser-compat-data@^5.6.19":
   version "5.6.37"
   resolved "https://registry.yarnpkg.com/@mdn/browser-compat-data/-/browser-compat-data-5.6.37.tgz#228d97894a0f0d6a77273e3f707fc31e30ce8112"
@@ -11167,11 +11172,6 @@ material-colors@^1.2.1:
   version "1.2.6"
   resolved "https://registry.yarnpkg.com/material-colors/-/material-colors-1.2.6.tgz#6d1958871126992ceecc72f4bcc4d8f010865f46"
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
-
-material-symbols@^0.35.1:
-  version "0.35.1"
-  resolved "https://registry.yarnpkg.com/material-symbols/-/material-symbols-0.35.1.tgz#deb4db7717026c8143abe33792584adda1944997"
-  integrity sha512-QnWsPGnSZyrB+fzvt51EVnOiiw7ne6FpgUp91VrFwsoEfwkVO/eaGYVSW30lgsb2hEw37ekSLisslIh5+AA8Cg==
 
 math-intrinsics@^1.0.0, math-intrinsics@^1.1.0:
   version "1.1.0"
