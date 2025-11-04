@@ -52,7 +52,7 @@ public class SecurityAdapterOS implements SecurityAdapter {
 
     public MappingResponse addUserToRoleMapping(final String role, final String user) {
         if (getMappingForRole(role).users().contains(user)) {
-            return new MappingResponse("OK", "User already in mapping");
+            return MappingResponse.OK_USER_ALREADY_IN_MAPPING;
         } else {
             return patchRoleUsers(role, "add", user);
         }

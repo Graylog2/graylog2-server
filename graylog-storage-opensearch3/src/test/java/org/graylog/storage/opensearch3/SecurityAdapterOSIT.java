@@ -32,8 +32,12 @@ class SecurityAdapterOSIT {
 
         Assertions.assertThat(adapter.getMappingForRole("all_access").users()).isEmpty();
 
-        adapter.addUserToRoleMapping("all_access", "max.mustermann");
-        adapter.addUserToRoleMapping("all_access", "max.mustermann"); // second invocation, should be ignored
+        Assertions.assertThat(adapter.addUserToRoleMapping("all_access", "max.mustermann"))
+                        .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("'all_access' updated."));
+
+        Assertions.assertThat(adapter.addUserToRoleMapping("all_access", "max.mustermann"))
+                .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("User already in mapping"));
+
         Assertions.assertThat(adapter.getMappingForRole("all_access").users()).containsExactly("max.mustermann");
 
         adapter.removeUserFromRoleMapping("all_access", "max.mustermann");
