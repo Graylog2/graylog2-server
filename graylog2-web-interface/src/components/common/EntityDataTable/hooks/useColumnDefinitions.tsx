@@ -16,8 +16,8 @@
  */
 
 import * as React from 'react';
-import { useMemo } from 'react';
-import type { ColumnDef, CellContext } from '@tanstack/react-table';
+import { useMemo, useCallback } from 'react';
+import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
 import styled from 'styled-components';
@@ -106,6 +106,67 @@ const useActionsCol = <Entity extends EntityBase>(
   );
 };
 
+const useAttributeCols = <Entity extends EntityBase, Meta>({
+  columns,
+  columnRenderersByAttribute,
+  columnsWidths,
+  entityAttributesAreCamelCase,
+  meta,
+  columnHelper,
+}: {
+  columns: Array<Column>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
+  columnsWidths: { [attributeId: string]: number };
+  entityAttributesAreCamelCase: boolean;
+  meta: Meta;
+  columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
+}) => {
+  const cell = useCallback(
+    ({ row, getValue, column }) =>
+      column.columnDef.meta.columnRenderer?.renderCell?.(getValue(), row.original, meta) ?? getValue(),
+    [meta],
+  );
+
+  const header = useCallback((ctx) => {
+    if (!ctx) {
+      return null;
+    }
+    const columnDefMeta = ctx.column.columnDef.meta;
+
+    return columnDefMeta.renderHeader?.(columnDefMeta.label) ?? columnDefMeta.label;
+  }, []);
+
+  return useMemo(
+    () =>
+      columns.map((col) => {
+        const columnRenderer = columnRenderersByAttribute[col.id];
+        const baseColDef = {
+          id: col.id,
+          cell,
+          header,
+          size: columnsWidths[col.id],
+          enableHiding: true,
+          meta: {
+            label: col.title,
+            columnRenderer,
+          },
+        };
+
+        if (col.isDerived) {
+          return columnHelper.display(baseColDef);
+        }
+
+        const attributeName = entityAttributesAreCamelCase ? camelCase(col.id) : col.id;
+
+        return columnHelper.accessor((row) => row[attributeName], {
+          enableSorting: col.sortable ?? false,
+          ...baseColDef,
+        });
+      }),
+    [columns, columnRenderersByAttribute, cell, header, columnsWidths, entityAttributesAreCamelCase, columnHelper],
+  );
+};
+
 type Props<Entity extends EntityBase, Meta> = {
   actionsRef: React.MutableRefObject<HTMLDivElement>;
   actionsColWidth: number;
@@ -134,36 +195,14 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol);
   const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions, actionsRef);
-
-  const attributeCols = useMemo(
-    () =>
-      columns.map((col) => {
-        const columnRenderer = columnRenderersByAttribute[col.id];
-        const baseColDef = {
-          id: col.id,
-          cell: ({ row, getValue }: CellContext<Entity, unknown>) =>
-            columnRenderer?.renderCell?.(getValue(), row.original, col, meta) ?? getValue(),
-          header: () => columnRenderer?.renderHeader?.(col) ?? col.title,
-          size: columnsWidths[col.id],
-          enableHiding: true,
-          meta: {
-            label: col.title,
-          },
-        };
-
-        if (col.isDerived) {
-          return columnHelper.display(baseColDef);
-        }
-
-        const attributeName = entityAttributesAreCamelCase ? camelCase(col.id) : col.id;
-
-        return columnHelper.accessor((row) => row[attributeName], {
-          enableSorting: col.sortable ?? false,
-          ...baseColDef,
-        });
-      }),
-    [columns, columnRenderersByAttribute, entityAttributesAreCamelCase, columnsWidths, meta, columnHelper],
-  );
+  const attributeCols = useAttributeCols<Entity, Meta>({
+    columns,
+    columnRenderersByAttribute,
+    columnsWidths,
+    entityAttributesAreCamelCase,
+    meta,
+    columnHelper,
+  });
 
   return useMemo(
     () => [bulkSelectCol, ...attributeCols, actionsCol].filter(Boolean) as ColumnDef<Entity, unknown>[],

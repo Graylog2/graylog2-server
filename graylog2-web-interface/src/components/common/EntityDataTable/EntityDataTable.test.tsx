@@ -109,7 +109,7 @@ describe('<EntityDataTable />', () => {
           attributes: {
             title: {
               renderCell: (title: string) => `The title: ${title}`,
-              renderHeader: (column) => `Custom ${column.title} Header`,
+              renderHeader: (title) => `Custom ${title} Header`,
             },
           },
         }}
@@ -138,7 +138,7 @@ describe('<EntityDataTable />', () => {
           types: {
             STRING: {
               renderCell: (title: string) => `Custom Cell For Type - ${title}`,
-              renderHeader: (column: { title: string }) => `Custom Header For Type - ${column.title}`,
+              renderHeader: (title: string) => `Custom Header For Type - ${title}`,
             },
           },
         }}
