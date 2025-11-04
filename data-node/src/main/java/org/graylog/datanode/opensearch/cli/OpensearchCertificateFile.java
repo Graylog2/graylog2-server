@@ -14,8 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.datanode.opensearch.cli;
 
-public interface ThrowingBiFunction<A1, A2, R, E extends Exception> {
-    R apply(A1 a1, A2 a2) throws E;
+import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
+
+import java.nio.file.Path;
+import java.security.KeyStore;
+import java.util.function.Supplier;
+
+public class OpensearchCertificateFile  {
+
+    public static KeystoreConfigFile create(String filename, Supplier<KeyStore> supplier, char[] password) {
+        return new KeystoreConfigFile(Path.of(filename), new InMemoryKeystoreInformation(supplier.get(), password));
+    }
 }

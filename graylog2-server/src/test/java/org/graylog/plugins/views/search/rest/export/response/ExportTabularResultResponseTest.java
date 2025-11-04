@@ -81,13 +81,31 @@ class ExportTabularResultResponseTest {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final byte[] bytes = Resources.toByteArray(Resources.getResource("org/graylog/plugins/views/search/rest/export/response/sample_message_list_result.json"));
         final MessageList.Result messageListResult = objectMapper.readValue(bytes, MessageList.Result.class);
-        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(messageListResult);
+        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(List.of(), messageListResult);
 
         final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
                 List.of("sequence_nr","ingest_time","gl2_receive_timestamp","took_ms","source"),
                 List.of(
                         new DataRow(List.of(277, "2024-05-06T12:35:52.284Z", "2024-05-06 12:35:52.284", 48, "example.org")),
                         new DataRow(List.of(278, "2024-05-06T12:35:52.284Z", "2024-05-06 12:35:52.284", 49, "example.org"))
+                )
+        );
+
+        assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    void testCreationFromMessageListWithSelectedFields() throws Exception {
+        final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+        final byte[] bytes = Resources.toByteArray(Resources.getResource("org/graylog/plugins/views/search/rest/export/response/sample_message_list_result.json"));
+        final MessageList.Result messageListResult = objectMapper.readValue(bytes, MessageList.Result.class);
+        final ExportTabularResultResponse response = ExportTabularResultResponse.fromMessageListResult(List.of("sequence_nr", "gl2_receive_timestamp"), messageListResult);
+
+        final ExportTabularResultResponse expectedResponse = new ExportTabularResultResponse(
+                List.of("sequence_nr","gl2_receive_timestamp"),
+                List.of(
+                        new DataRow(List.of(277, "2024-05-06 12:35:52.284")),
+                        new DataRow(List.of(278, "2024-05-06 12:35:52.284"))
                 )
         );
 
