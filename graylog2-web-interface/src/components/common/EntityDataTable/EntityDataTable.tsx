@@ -281,7 +281,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               <TableHead table={table} />
               {table.getRowModel().rows.map((row) => (
                 <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                  <TableRow<Entity> key={row.id} row={row} columnOrder={columnOrder} isSelected={row.getIsSelected()} />
+                  <TableRow<Entity> key={row.id} row={row} />
                   <ExpandedSections
                     key={`expanded-sections-${row.id}`}
                     expandedSectionsRenderer={expandedSectionsRenderer}
