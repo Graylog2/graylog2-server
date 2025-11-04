@@ -31,6 +31,13 @@ const METRIC_NAMES = {
   jvmMemoryHeapUsed: 'jvm.memory.heap.used',
   jvmMemoryHeapCommitted: 'jvm.memory.heap.committed',
   jvmMemoryHeapMaxMemory: 'jvm.memory.heap.max',
+  dataLakeJournalSize: 'org.graylog.plugins.datalake.output.journal.size',
+  dataLakeJournalMaxSize: 'org.graylog.plugins.datalake.output.journal.size-limit',
+  bufferInputUsage: 'org.graylog2.buffers.input.usage',
+  bufferOutputUsage: 'org.graylog2.buffers.output.usage',
+  bufferProcessUsage: 'org.graylog2.buffers.process.usage',
+  throughputIn: 'org.graylog2.throughput.input.1-sec-rate',
+  throughputOut: 'org.graylog2.throughput.output.1-sec-rate',
 } as const;
 
 export type GraylogNodeMetrics = { [key: string]: number | undefined | null };

@@ -15,50 +15,19 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
 
 import { EntityDataTable, Spinner } from 'components/common';
-import { Label } from 'components/bootstrap';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
-import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
-import NumberUtils from 'util/NumberUtils';
+import type { Column } from 'components/common/EntityDataTable';
 
 import useGraylogNodes from './useGraylogNodes';
 import type { GraylogNode } from './useGraylogNodes';
 import GraylogNodeActions from './GraylogNodeActions';
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
-import RatioIndicator from './RatioIndicator';
-
-const NodePrimary = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-`;
-
-const StyledLabel = styled(Label)`
-  display: inline-flex;
-`;
-
-const SecondaryText = styled.div`
-  font-size: small;
-
-  span {
-    font-size: inherit;
-  }
-`;
-
-const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'journal', 'jvm', 'health'] as const;
-
-const getNodeDisplayName = (node: GraylogNode) => {
-  const nodeNameParts = [node.short_node_id, node.hostname].filter(Boolean);
-
-  if (nodeNameParts.length) {
-    return nodeNameParts.join(' / ');
-  }
-
-  return node.node_id ?? node.hostname ?? node.id;
-};
+import {
+  DEFAULT_VISIBLE_COLUMNS,
+  createColumnDefinitions,
+  createColumnRenderers,
+} from './GraylogNodesColumnConfiguration';
 
 type Props = {
   collapsible?: boolean;
@@ -69,126 +38,8 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
 
-  const columnDefinitions = useMemo<Array<Column>>(
-    () => [
-      { id: 'node', title: 'Node' },
-      { id: 'state', title: 'State' },
-      { id: 'journal', title: 'Journal' },
-      { id: 'jvm', title: 'JVM' },
-      { id: 'health', title: 'Health' },
-    ],
-    [],
-  );
-
-  const columnRenderers = useMemo<ColumnRenderers<GraylogNode>>(
-    () => ({
-      attributes: {
-        node: {
-          renderCell: (_value, entity) => {
-            const nodeId = entity.node_id;
-            const nodeName = getNodeDisplayName(entity);
-
-            return (
-              <NodePrimary>
-                {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
-                {entity.is_leader && (
-                  <SecondaryText>
-                    <StyledLabel bsSize="xs">Leader</StyledLabel>
-                  </SecondaryText>
-                )}
-              </NodePrimary>
-            );
-          },
-        },
-        health: {
-          renderCell: (_value, entity) => {
-            const loadBalancersStatus = entity.lb_status?.toUpperCase();
-            const messageProcessingStatus = entity.is_processing ? 'ENABLED' : 'DISABLED';
-
-            return (
-              <>
-                <SecondaryText>
-                  Load Balancers{' '}
-                  <StyledLabel
-                    bsStyle={loadBalancersStatus === 'ALIVE' ? 'success' : 'warning'}
-                    bsSize="xs"
-                    aria-label={`Load Balancers ${loadBalancersStatus ?? 'UNKNOWN'}`}>
-                    {loadBalancersStatus ?? 'UNKNOWN'}
-                  </StyledLabel>
-                </SecondaryText>
-                <SecondaryText>
-                  Message Processing{' '}
-                  <StyledLabel
-                    bsStyle={entity.is_processing ? 'success' : 'warning'}
-                    bsSize="xs"
-                    aria-label={`Message Processing ${messageProcessingStatus}`}>
-                    {messageProcessingStatus}
-                  </StyledLabel>
-                </SecondaryText>
-              </>
-            );
-          },
-        },
-        journal: {
-          renderCell: (_value, entity) => {
-            const journalCurrent = entity.metrics?.journalSize;
-            const journalMax = entity.metrics?.journalMaxSize;
-            const ratio = entity.metrics?.journalSizeRatio;
-
-            return (
-              <div>
-                {`${NumberUtils.formatBytes(journalCurrent)} / ${NumberUtils.formatBytes(journalMax)}`}
-                <RatioIndicator
-                  ratio={ratio}
-                  warningThreshold={0.25}
-                  dangerThreshold={0.5}
-                />
-              </div>
-            );
-          },
-        },
-        jvm: {
-          renderCell: (_value, entity) => {
-            const heapUsed = entity.metrics?.jvmMemoryHeapUsed;
-            const heapMax = entity.metrics?.jvmMemoryHeapMaxMemory;
-            const ratio =
-              heapUsed !== undefined && heapUsed !== null && heapMax ? heapUsed / heapMax : undefined;
-
-            return (
-              <div>
-                {`${NumberUtils.formatBytes(heapUsed)} / ${NumberUtils.formatBytes(heapMax)}`}
-                <RatioIndicator
-                  ratio={ratio}
-                  warningThreshold={0.7}
-                  dangerThreshold={0.9}
-                />
-              </div>
-            );
-          },
-        },
-        state: {
-          renderCell: (_value, entity) => {
-            const lifecycleStatus = entity.lifecycle?.toUpperCase();
-
-            if (!lifecycleStatus) {
-              return null;
-            }
-
-            return (
-              <StyledLabel
-                bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
-                bsSize="xs"
-                title={lifecycleStatus}
-                aria-label={lifecycleStatus}>
-                {lifecycleStatus}
-              </StyledLabel>
-            );
-          },
-        },
-      },
-    }),
-    [],
-  );
+  const columnDefinitions = useMemo<Array<Column>>(() => createColumnDefinitions(), []);
+  const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
   const handleColumnsChange = useCallback((newColumns: Array<string>) => {
     if (!newColumns.length) {
@@ -199,7 +50,6 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
   }, []);
 
   const handleSortChange = useCallback(() => {}, []);
-
   const renderActions = useCallback((entity: GraylogNode) => <GraylogNodeActions node={entity} />, []);
 
   return (
