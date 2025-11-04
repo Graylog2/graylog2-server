@@ -20,6 +20,7 @@ import com.google.common.eventbus.EventBus;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.inject.Singleton;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.security.certutil.KeyPair;
@@ -54,6 +55,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog.security.certutil.CertConstants.PKCS12;
 
+@Singleton
 public class DatanodeKeystore {
 
     static {
