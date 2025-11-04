@@ -32,7 +32,7 @@ import java.util.Arrays;
 
 public class V20251103123300_MigrateEntityListPreferences extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V202406260800_MigrateCertificateAuthority.class);
-    private static final String COLLECTION_NAME = "entity_list_preferences";
+    static final String COLLECTION_NAME = "entity_list_preferences";
     private static final String FIELD_DISPLAYED_ATTRIBUTES = "displayed_attributes";
     private static final String FIELD_ATTRIBUTES = "attributes";
 
