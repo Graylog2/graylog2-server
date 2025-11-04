@@ -107,13 +107,13 @@ public class ConfigurationStateUpdater {
         return newState;
     }
 
-    private synchronized PipelineInterpreter.State reloadAndSave(RulesChangedEvent event) {
+    private PipelineInterpreter.State reloadAndSave(RulesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         metadataListener.handleRuleChanges(event, state, pipelineResolver, pipelineMetricRegistry);
         return state;
     }
 
-    private synchronized PipelineInterpreter.State reloadAndSave(PipelinesChangedEvent event) {
+    private PipelineInterpreter.State reloadAndSave(PipelinesChangedEvent event) {
         final PipelineInterpreter.State state = reloadAndSave();
         metadataListener.handlePipelineChanges(event, state, pipelineResolver, pipelineMetricRegistry);
         return state;
