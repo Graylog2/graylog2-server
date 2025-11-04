@@ -1,6 +1,6 @@
 {
   "name": "graylog-web-plugin",
-  "version": "7.0.0-SNAPSHOT",
+  "version": "7.1.0-SNAPSHOT",
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "packageManager": "yarn@1.22.22",
@@ -32,7 +32,7 @@
   "dependencies": {
     "@graylog/sawmill": "4.0.0",
     "@reduxjs/toolkit": "^2.5.1",
-    "@tanstack/react-query": "5.89.0",
+    "@tanstack/react-query": "5.90.6",
     "@types/react": "18.3.13",
     "babel-preset-graylog": "file:../babel-preset-graylog",
     "eslint-config-graylog": "file:../eslint-config-graylog",

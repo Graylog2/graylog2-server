@@ -16,15 +16,14 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import Routes from 'routing/Routes';
-import { Col, Row, Button, ButtonToolbar } from 'components/bootstrap';
+import { Col, Row, ButtonToolbar } from 'components/bootstrap';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import DocsHelper from 'util/DocsHelper';
 import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import { IndexSetsComponent, IndicesPageNavigation } from 'components/indices';
 import { IndexerClusterHealth } from 'components/indexers';
 import AllIndicesMaintenanceDropdown from 'components/indices/AllIndicesMaintenanceDropdown';
+import CreateButton from 'components/common/CreateButton';
 
 const IndicesPage = () => (
   <DocumentTitle title="Indices and Index Sets">
@@ -33,11 +32,7 @@ const IndicesPage = () => (
       title="Indices & Index Sets"
       actions={
         <ButtonToolbar>
-          <IfPermitted permissions="indexsets:create">
-            <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CREATE}>
-              <Button bsStyle="success">Create index set</Button>
-            </LinkContainer>
-          </IfPermitted>
+          <CreateButton entityKey="Index Set" />
           <IfPermitted permissions="indexranges:rebuild">
             <AllIndicesMaintenanceDropdown />
           </IfPermitted>

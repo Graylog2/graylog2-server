@@ -49,7 +49,7 @@ const UsersCell = ({ users: usersProp }: Props) => {
 
   return (
     <td>
-      <CountBadge>{users.size}</CountBadge> {usersComponents}
+      <CountBadge count={users.size} /> {usersComponents}
     </td>
   );
 };

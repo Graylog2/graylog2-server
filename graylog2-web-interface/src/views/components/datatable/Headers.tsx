@@ -329,7 +329,7 @@ const Headers = ({
       ),
     ),
   );
-  const offset = rollup ? rowFieldNames.length + series.length : rowFieldNames.length;
+  const offset = (rollup ? rowFieldNames.length + series.length : rowFieldNames.length) + (showRowNumbers ? 1 : 0);
 
   return (
     <>

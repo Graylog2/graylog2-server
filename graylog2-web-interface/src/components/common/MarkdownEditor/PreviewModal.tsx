@@ -95,7 +95,7 @@ function PreviewModal({ value, show, onClose }: Props) {
             </Row>
             <Preview value={value} height={height} show />
             <Row style={{ justifyContent: 'flex-end', marginTop: '1rem' }}>
-              <Button bsStyle="success" role="button" onClick={() => onClose()}>
+              <Button bsStyle="primary" role="button" onClick={() => onClose()}>
                 Close
               </Button>
             </Row>
