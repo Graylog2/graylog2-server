@@ -200,7 +200,11 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     public static OpenSearchInstance createSecured() {
-        return OpenSearchInstanceBuilder.builder().withEnabledSecurity().instantiate();
+        System.out.println("Creating secured instance");
+        final OpenSearchInstanceBuilder builder = OpenSearchInstanceBuilder.builder().withEnabledSecurity();
+        // TODO: without disabling caching, we get an unsecured instance. The cache is not differentiating based on configuration of the container
+        builder.cachedInstance(false);
+        return builder.instantiate();
     }
 
     protected void afterContainerCreated() {
