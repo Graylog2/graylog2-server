@@ -44,7 +44,6 @@ const dataTieringFormValuesWithDefaults = (
   values: DataTieringFormValues,
   pluginStore,
   isDataTieringImmutable: boolean,
-  ignoreFieldRestrictions: boolean
 ): DataTieringFormValues => {
   const dataTieringPlugin = pluginStore
     .exports('dataTiering')
@@ -56,7 +55,7 @@ const dataTieringFormValuesWithDefaults = (
       ...DATA_TIERING_HOT_ONLY_DEFAULTS,
       ...DATA_TIERING_HOT_WARM_DEFAULTS,
       ...values,
-      ...(values.type === DATA_TIERING_TYPE.HOT_ONLY && isDataTieringImmutable && !ignoreFieldRestrictions ? { index_hot_lifetime_min: null } : {}),
+      ...(values.type === DATA_TIERING_TYPE.HOT_ONLY && isDataTieringImmutable ? { index_hot_lifetime_min: null } : {}),
     };
 
     return hotWarmDefaults;
@@ -71,7 +70,6 @@ export const prepareDataTieringInitialValues = (
   config: DataTieringConfig,
   pluginStore,
   isDataTieringImmutable: boolean,
-  ignoreFieldRestrictions: boolean
 ): DataTieringFormValues => {
   let formValues = { ...config };
 
@@ -86,7 +84,6 @@ export const prepareDataTieringInitialValues = (
     formValues as unknown as DataTieringFormValues,
     pluginStore,
     isDataTieringImmutable,
-    ignoreFieldRestrictions
   );
 };
 
@@ -94,14 +91,13 @@ export const prepareDataTieringConfig = (
   formValues: DataTieringFormValues,
   pluginStore,
   isDataTieringImmutable: boolean,
-  ignoreFieldRestrictions: boolean
 ): DataTieringConfig => {
   const dataTieringPlugin = pluginStore
     .exports('dataTiering')
     .find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
   const dataTieringType = dataTieringPlugin?.type ?? DATA_TIERING_TYPE.HOT_ONLY;
 
-  let config = dataTieringFormValuesWithDefaults(formValues, pluginStore, isDataTieringImmutable, ignoreFieldRestrictions);
+  let config = dataTieringFormValuesWithDefaults(formValues, pluginStore, isDataTieringImmutable);
 
   if (dataTieringType === DATA_TIERING_TYPE.HOT_ONLY) {
     hotWarmOnlyFormFields.forEach((field) => {

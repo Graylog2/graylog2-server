@@ -173,7 +173,11 @@ const IndexSetConfigurationForm = ({
 
       const configWithDataTiering = {
         ...indexSetValues,
-        data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore, isDataTieringImmutable, ignoreFieldRestrictions),
+        data_tiering: prepareDataTieringConfig(
+          values.data_tiering,
+          PluginStore,
+          isDataTieringImmutable && !ignoreFieldRestrictions,
+        ),
       };
 
       if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults)
@@ -196,7 +200,7 @@ const IndexSetConfigurationForm = ({
       enableDataTieringCloud,
       isCloud,
       isDataTieringImmutable,
-      ignoreFieldRestrictions
+      ignoreFieldRestrictions,
     ],
   );
 
@@ -238,7 +242,11 @@ const IndexSetConfigurationForm = ({
     if (indexSet.data_tiering) {
       return {
         ...indexSet,
-        data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore, isDataTieringImmutable, ignoreFieldRestrictions),
+        data_tiering: prepareDataTieringInitialValues(
+          indexSet.data_tiering,
+          PluginStore,
+          isDataTieringImmutable && !ignoreFieldRestrictions,
+        ),
       };
     }
 
