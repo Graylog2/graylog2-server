@@ -17,8 +17,8 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
 import { EntityDataTable, Spinner } from 'components/common';
+import { Label } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
@@ -36,10 +36,8 @@ const SecondaryText = styled.div`
   }
 `;
 
-const RoleLabel = styled(Label)`
+const LeaderLabel = styled(Label)`
   display: inline-flex;
-  justify-content: center;
-  gap: 4px;
 `;
 
 const NodePrimary = styled.div`
@@ -48,18 +46,7 @@ const NodePrimary = styled.div`
   gap: 2px;
 `;
 
-const DEFAULT_VISIBLE_COLUMNS = ['node', 'journal', 'jvm', 'role', 'state'] as const;
-
-const getRoleLabels = (roles: string) =>
-  roles
-    .split(',')
-    .map((role) => role.trim())
-    .filter(Boolean)
-    .map((role) => (
-      <span key={role}>
-        <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
-      </span>
-    ));
+const DEFAULT_VISIBLE_COLUMNS = ['node', 'journal', 'jvm', 'state'] as const;
 
 const getNodeDisplayName = (node: GraylogNode) => {
   const nodeNameParts = [node.short_node_id, node.hostname].filter(Boolean);
@@ -83,7 +70,6 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
   const columnDefinitions = useMemo<Array<Column>>(
     () => [
       { id: 'node', title: 'Node' },
-      { id: 'role', title: 'Role' },
       { id: 'journal', title: 'Journal' },
       { id: 'jvm', title: 'JVM' },
       { id: 'state', title: 'State' },
@@ -102,12 +88,14 @@ const GraylogNodesExpandable = ({ collapsible = true }: Props) => {
             return (
               <NodePrimary>
                 {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
+                {entity.is_leader && (
+                  <SecondaryText>
+                    <LeaderLabel bsSize="xs">Leader</LeaderLabel>
+                  </SecondaryText>
+                )}
               </NodePrimary>
             );
           },
-        },
-        role: {
-          renderCell: (_value, entity) => getRoleLabels(entity.is_leader ? 'Leader' : 'Non-Leader'),
         },
         journal: {
           renderCell: (_value, entity) => {
