@@ -14,15 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+package org.graylog.datanode.configuration;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
-import org.graylog2.indexer.searches.Sorting;
-
-import java.util.Locale;
-
-public class SortOrderMapper {
-    public SortOrder fromSorting(Sorting sorting) {
-        return SortOrder.valueOf(sorting.getDirection().toString().toUpperCase(Locale.ENGLISH));
-    }
+/**
+ * This event will be triggered every time a datanode certificate gets renewed. The new certificate is issued by the
+ * same issuer.
+ */
+public record DatanodeCertificateRenewedEvent() {
 }
