@@ -23,7 +23,7 @@ import CancellablePromise from 'logic/rest/CancellablePromise';
 import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
 import type { Method } from 'routing/types';
 
-// eslint-disable-next-line global-require
+// eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
 
 const reportServerSuccess = () => {
