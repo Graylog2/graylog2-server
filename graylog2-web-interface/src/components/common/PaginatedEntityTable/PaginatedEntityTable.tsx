@@ -193,7 +193,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
           ) : (
             <EntityDataTable<T, M>
               entities={list}
-              visibleColumns={layoutConfig.displayedAttributes}
+              visibleColumnOrder={layoutConfig.displayedAttributes}
               columnsOrder={columnsOrder}
               expandedSectionsRenderer={expandedSectionsRenderer}
               bulkSelection={bulkSelection}

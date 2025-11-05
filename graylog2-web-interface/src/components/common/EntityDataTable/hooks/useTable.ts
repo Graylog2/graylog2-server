@@ -25,21 +25,19 @@ import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 
 type Props<Entity extends EntityBase> = {
   columnsDefinitions: Array<ColumnDef<Entity>>;
-  columnOrder: Array<string>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
   isEntitySelectable: (entity: Entity) => boolean;
   onColumnsChange: (visibleColumns: Array<string>) => void;
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
-  visibleColumns: Array<string>;
+  visibleColumnOrder: Array<string>;
   selectedEntities: Array<Entity['id']>;
   setSelectedEntities: any;
   onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void;
 };
 
 const useTable = <Entity extends EntityBase>({
-  columnOrder,
   columnsDefinitions,
   displayBulkSelectCol,
   entities,
@@ -50,7 +48,7 @@ const useTable = <Entity extends EntityBase>({
   selectedEntities,
   setSelectedEntities,
   sort,
-  visibleColumns,
+  visibleColumnOrder,
 }: Props<Entity>) => {
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
@@ -64,8 +62,8 @@ const useTable = <Entity extends EntityBase>({
   );
 
   const columnVisibility = useMemo(
-    () => Object.fromEntries(columnsDefinitions.map(({ id }) => [id, visibleColumns.includes(id)])),
-    [columnsDefinitions, visibleColumns],
+    () => Object.fromEntries(columnsDefinitions.map(({ id }) => [id, visibleColumnOrder.includes(id)])),
+    [columnsDefinitions, visibleColumnOrder],
   );
 
   const onColumnVisibilityChange = useCallback(
@@ -113,7 +111,7 @@ const useTable = <Entity extends EntityBase>({
     onRowSelectionChange,
     onSortingChange,
     state: {
-      columnOrder,
+      columnOrder: visibleColumnOrder,
       columnVisibility,
       sorting,
       rowSelection: Object.fromEntries(selectedEntities.map((id) => [id, true])),

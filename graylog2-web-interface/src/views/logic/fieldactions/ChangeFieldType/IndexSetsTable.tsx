@@ -168,7 +168,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
             entityAttributesAreCamelCase
             onSortChange={onSortChange}
             pageSize={layoutConfig.pageSize}
-            visibleColumns={layoutConfig.displayedAttributes}
+            visibleColumnOrder={layoutConfig.displayedAttributes}
           />
         )}
       </PaginatedList>

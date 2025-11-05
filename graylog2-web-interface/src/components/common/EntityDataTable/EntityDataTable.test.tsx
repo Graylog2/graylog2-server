@@ -62,7 +62,7 @@ describe('<EntityDataTable />', () => {
   it('should render selected columns and table headers', async () => {
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onColumnsChange={() => {}}
         onSortChange={() => {}}
@@ -84,7 +84,7 @@ describe('<EntityDataTable />', () => {
   it('should render default cell renderer', async () => {
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -100,7 +100,7 @@ describe('<EntityDataTable />', () => {
   it('should render custom cell and header renderer', async () => {
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -124,7 +124,7 @@ describe('<EntityDataTable />', () => {
   it('should merge attribute and type column renderers renderer', async () => {
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -155,7 +155,7 @@ describe('<EntityDataTable />', () => {
   it('should render row actions', async () => {
     render(
       <EntityDataTable<{ id: string; title: string }>
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -173,7 +173,7 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -189,7 +189,7 @@ describe('<EntityDataTable />', () => {
   it('should display active sort', async () => {
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -210,7 +210,7 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         entityAttributesAreCamelCase
         onSortChange={onSortChange}
@@ -243,7 +243,7 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -270,7 +270,7 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
-        visibleColumns={visibleColumns}
+        visibleColumnOrder={visibleColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -301,7 +301,7 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
-        visibleColumns={['description', 'status']}
+        visibleColumnOrder={['description', 'status']}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -330,7 +330,7 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
-        visibleColumns={[...visibleColumns, 'created_at']}
+        visibleColumnOrder={[...visibleColumns, 'created_at']}
         entities={dataWithCamelCaseAttributes}
         onSortChange={() => {}}
         entityAttributesAreCamelCase

@@ -24,7 +24,7 @@ import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import { CELL_PADDING, ACTIONS_COL_ID, BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
@@ -34,7 +34,7 @@ import TableRow from 'components/common/EntityDataTable/TableRow';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
-import useColumnOrder from 'components/common/EntityDataTable/hooks/useColumnOrder';
+import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
 
 import type { ColumnRenderers, ColumnSchema, EntityBase, ExpandedSectionRenderer } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
@@ -168,7 +168,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Which columns should be displayed. */
-  visibleColumns: Array<string>;
+  visibleColumnOrder: Array<string>;
   /** Meta data. */
   meta?: Meta;
 };
@@ -191,7 +191,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
   entityActions = undefined,
-  visibleColumns: visibleAttributeColumns,
+  visibleColumnOrder: visibleAttributeColumns,
   meta = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
@@ -201,28 +201,22 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
-
-  const visibleColumns = useMemo(
-    () => [
-      ...visibleAttributeColumns,
-      ...(displayActionsCol ? [ACTIONS_COL_ID] : []),
-      ...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []),
-    ],
-    [displayActionsCol, displayBulkSelectCol, visibleAttributeColumns],
-  );
-
-  const columnOrder = useColumnOrder(visibleColumns, attributeColumnsOder);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
+
+  const visibleColumnOrder = useVisibleColumnOrder(
+    visibleAttributeColumns,
+    attributeColumnsOder,
+    displayActionsCol,
+    displayBulkSelectCol,
+  );
 
   const { tableRef, actionsRef, actionsColWidth, columnWidths } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     displayBulkSelectCol,
     fixedActionsCellWidth,
-    visibleColumns,
+    visibleColumns: visibleColumnOrder,
   });
-
-  console.log(visibleColumns, columnOrder);
 
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsRef,
@@ -238,7 +232,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
-    columnOrder,
     columnsDefinitions,
     displayBulkSelectCol,
     entities,
@@ -249,7 +242,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     selectedEntities,
     setSelectedEntities,
     sort: activeSort,
-    visibleColumns,
+    visibleColumnOrder,
   });
 
   return (
