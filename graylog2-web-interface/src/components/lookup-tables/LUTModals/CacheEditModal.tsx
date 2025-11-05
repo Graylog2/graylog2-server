@@ -28,6 +28,7 @@ type Props = {
   onClose: () => void;
   cache: LookupTableCache;
   title: string;
+  validationErrors: any;
 };
 
 const StyledRow = styled(Row)`
@@ -36,7 +37,7 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const CacheEditModal = ({ onClose, title, cache, validationErrors }: Props & { validationErrors: any }) => {
+const CacheEditModal = ({ onClose, title, cache, validationErrors }: Props) => {
   const { validateCache } = useValidateCache();
 
   const validate = (cacheObj: LookupTableCache) => {

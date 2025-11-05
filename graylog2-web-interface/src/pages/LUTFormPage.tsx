@@ -18,28 +18,32 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
-import { LookupTablesOverview } from 'components/lookup-tables';
+import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import LUTModals from 'components/lookup-tables/LUTModals';
+import LookupTableWizard from 'components/lookup-tables/lookup-table-form';
 
-function LUTTablesPage() {
+function LUTFormPage() {
   const navigate = useNavigate();
 
   return (
-    <LUTPageLayout
-      documentTitle="Lookup Tables"
-      pageTitle="Lookup Tables"
-      pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
-      actions={
-        <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.CREATE)}>
-          Create lookup table
-        </Button>
-      }>
-      <LookupTablesOverview />
-      <LUTModals />
-    </LUTPageLayout>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <LUTPageLayout
+        documentTitle="Lookup Tables Create"
+        pageTitle="Lookup Tables Create"
+        pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
+        actions={
+          <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW)}>
+            Back to list
+          </Button>
+        }>
+        <Row className="content" style={{ flexGrow: 1 }}>
+          <Col md={12}>
+            <LookupTableWizard />
+          </Col>
+        </Row>
+      </LUTPageLayout>
+    </div>
   );
 }
 
-export default LUTTablesPage;
+export default LUTFormPage;

@@ -26,7 +26,7 @@ import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 type Actions = {
   create: (dataAdapter: LookupTableAdapter) => Promise<unknown>;
   delete: (idOrName: string) => Promise<unknown>;
-  get: (idOrName: string) => Promise<unknown>;
+  get: (idOrName: string) => Promise<LookupTableAdapter>;
   getTypes: () => Promise<unknown>;
   lookup: (idOrName: string, key: string) => Promise<unknown>;
   reloadPage: () => Promise<unknown>;

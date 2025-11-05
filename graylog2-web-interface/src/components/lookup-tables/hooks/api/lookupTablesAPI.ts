@@ -54,6 +54,9 @@ export const fetchPaginatedLookupTables = async (searchParams: SearchParams) => 
   return promise.then(deserializeLookupTables);
 };
 
+export const fetchLookupTable = async (idOrName: string): Promise<{ lookup_tables: Array<LookupTable> }> =>
+  LookupTablesActions.get(idOrName);
+
 export const createLookupTable = async (payload: LookupTableCache) => LookupTablesActions.create(payload);
 
 export const updateLookupTable = async (payload: LookupTableCache) => LookupTablesActions.update(payload);
@@ -81,6 +84,8 @@ export const fetchPaginatedCaches = async (searchParams: SearchParams) => {
 
   return promise.then(deserializeCaches);
 };
+
+export const fetchCache = async (idOrName: string): Promise<LookupTableCache> => LookupTableCachesActions.get(idOrName);
 
 export const fetchCacheTypes = async () => {
   await LookupTableCachesActions.getTypes();
@@ -114,6 +119,9 @@ export const fetchPaginatedDataAdapters = async (searchParams: SearchParams) => 
 
   return promise.then(deserializeDataAdapters);
 };
+
+export const fetchDataAdapter = async (idOrName: string): Promise<LookupTableAdapter> =>
+  LookupTableDataAdaptersActions.get(idOrName);
 
 export const fetchDataAdapterTypes = async () => {
   await LookupTableDataAdaptersActions.getTypes();

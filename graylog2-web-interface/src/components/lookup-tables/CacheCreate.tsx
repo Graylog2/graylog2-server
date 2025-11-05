@@ -59,6 +59,7 @@ const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
   const plugins = React.useMemo(
     () =>
       cachePlugins.reduce((acc: any, plugin: CachePluginType) => {
+        // eslint-disable-next-line no-param-reassign
         acc[plugin.type] = plugin;
 
         return acc;
@@ -101,7 +102,7 @@ const CacheCreate = ({ saved, onCancel, validationErrors = {} }: Props) => {
     <>
       <StyledRow>
         <Col lg={6}>
-          <Input id="cache-type-select" label="Cache Type" required autoFocus help="The type of cache to configure.">
+          <Input id="cache-type-select" label="Cache Type" required help="The type of cache to configure.">
             <Select
               placeholder="Select Cache Type"
               clearable={false}

@@ -18,28 +18,31 @@ import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
-import { Button } from 'components/bootstrap';
-import { LookupTablesOverview } from 'components/lookup-tables';
+import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import LUTModals from 'components/lookup-tables/LUTModals';
 
-function LUTTablesPage() {
+function LUTDataAdaptersFormPage() {
   const navigate = useNavigate();
 
   return (
-    <LUTPageLayout
-      documentTitle="Lookup Tables"
-      pageTitle="Lookup Tables"
-      pageDescription="Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages."
-      actions={
-        <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.CREATE)}>
-          Create lookup table
-        </Button>
-      }>
-      <LookupTablesOverview />
-      <LUTModals />
-    </LUTPageLayout>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      <LUTPageLayout
+        documentTitle="Lookup Tables - Caches Create"
+        pageTitle="Create Caches for Lookup Tables"
+        pageDescription="Caches provide the actual values for lookup tables."
+        actions={
+          <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW)}>
+            Back to list
+          </Button>
+        }>
+        <Row className="content" style={{ flexGrow: 1 }}>
+          <Col md={12}>
+            <div>Caches Form Placeholder</div>
+          </Col>
+        </Row>
+      </LUTPageLayout>
+    </div>
   );
 }
 
-export default LUTTablesPage;
+export default LUTDataAdaptersFormPage;

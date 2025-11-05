@@ -24,6 +24,7 @@ import UserNotification from 'util/UserNotification';
 import {
   fetchErrors,
   fetchPaginatedLookupTables,
+  fetchLookupTable,
   createLookupTable,
   updateLookupTable,
   purgeLookupTableKey,
@@ -31,11 +32,13 @@ import {
   testLookupTableKey,
   deleteLookupTable,
   fetchPaginatedCaches,
+  fetchCache,
   fetchCacheTypes,
   deleteCache,
   fetchPaginatedDataAdapters,
   deleteDataAdapter,
   fetchLookupPreview,
+  fetchDataAdapter,
   fetchDataAdapterTypes,
   createCache,
   updateCache,
@@ -48,6 +51,22 @@ import {
 export const lookupTablesKeyFn = (searchParams: SearchParams) => ['lookup-tables', 'search', searchParams];
 export function useFetchLookupTables() {
   return { fetchPaginatedLookupTables, lookupTablesKeyFn };
+}
+
+export function useFetchLookupTable(idOrName: string) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['lookup-table-details', idOrName],
+    queryFn: () => defaultOnError(fetchLookupTable(idOrName), 'Failed to fetch lookup table'),
+    retry: false,
+    enabled: !!idOrName,
+  });
+
+  const { lookup_tables } = data || { lookup_tables: [] };
+
+  return {
+    lookupTable: lookup_tables?.[0],
+    loadingLookupTable: isLoading,
+  };
 }
 
 export function useCreateLookupTable() {
@@ -171,6 +190,20 @@ export function useFetchCaches() {
   return { fetchPaginatedCaches, cachesKeyFn };
 }
 
+export function useFetchCache(idOrName: string) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['cache-details', idOrName],
+    queryFn: () => defaultOnError(fetchCache(idOrName), 'Failed to fetch cache'),
+    retry: false,
+    enabled: !!idOrName,
+  });
+
+  return {
+    cache: data,
+    loadingCache: isLoading,
+  };
+}
+
 export function useFetchCacheTypes() {
   const { data, isLoading } = useQuery({
     queryKey: ['cache-types'],
@@ -261,6 +294,20 @@ export function useFetchDataAdapterTypes() {
   });
 
   return { fetchingDataAdapterTypes: isLoading, types: data };
+}
+
+export function useFetchDataAdapter(idOrName: string) {
+  const { data, isLoading } = useQuery({
+    queryKey: ['data-adapter-details', idOrName],
+    queryFn: () => defaultOnError(fetchDataAdapter(idOrName), 'Failed to fetch data adapter'),
+    retry: false,
+    enabled: !!idOrName,
+  });
+
+  return {
+    dataAdapter: data,
+    loadingDataAdapter: isLoading,
+  };
 }
 
 export function useCreateAdapter() {

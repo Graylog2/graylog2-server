@@ -83,9 +83,21 @@ const DataAdapterCreate = ({ saved, onCancel, validationErrors = {} }: DataAdapt
     return [];
   }, [types, fetchingDataAdapterTypes, adapterPlugins]);
 
+  const getCorrectUserpasswd = (config: LookupTableAdapter['config']) => {
+    if (config.user_passwd.is_set) return { is_set: true, keep_value: true };
+
+    return { set_value: '' };
+  };
+
   const handleTypeSelect = React.useCallback(
     (adapterType: string) => {
       const defaultConfig = ObjectUtils.clone(types[adapterType].default_config);
+      const isLDAP = defaultConfig.type === 'LDAP';
+
+      const configWithPassword = {
+        ...defaultConfig,
+        ...(isLDAP ? { user_passwd: getCorrectUserpasswd(defaultConfig) } : {}),
+      };
 
       setType(adapterType);
       setDataAdapter({
@@ -93,7 +105,7 @@ const DataAdapterCreate = ({ saved, onCancel, validationErrors = {} }: DataAdapt
         title: '',
         name: '',
         description: '',
-        config: defaultConfig,
+        config: configWithPassword,
       });
     },
     [types],

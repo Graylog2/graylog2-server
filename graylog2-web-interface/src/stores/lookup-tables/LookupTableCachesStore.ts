@@ -26,7 +26,7 @@ import type { LookupTableCache } from 'logic/lookup-tables/types';
 type Actions = {
   searchPaginated: (page: number, perPage: number, query?: string) => Promise<StoreState>;
   reloadPage: () => Promise<void>;
-  get: (idOrName: string) => Promise<void>;
+  get: (idOrName: string) => Promise<LookupTableCache>;
   create: (cache: LookupTableCache) => Promise<void>;
   update: (cache: LookupTableCache) => Promise<void>;
   getTypes: () => Promise<unknown>;
