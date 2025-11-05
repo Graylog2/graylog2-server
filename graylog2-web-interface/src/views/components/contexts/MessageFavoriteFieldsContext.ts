@@ -28,6 +28,7 @@ export type MessageFavoriteFieldsContextState = {
   messageFields: FieldTypeMappingsList;
   toggleField: (field: string) => void;
   message: Message;
+  isLoading: boolean;
 };
 
 const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsContextState>({
@@ -36,6 +37,7 @@ const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsCo
   messageFields: Immutable.List([]),
   toggleField: () => {},
   message: undefined,
+  isLoading: false,
 });
 
 export default singleton('contexts.MessageFavoriteFieldsContext', () => MessageFavoriteFieldsContext);

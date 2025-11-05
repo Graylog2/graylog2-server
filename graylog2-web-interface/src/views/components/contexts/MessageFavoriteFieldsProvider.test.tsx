@@ -23,19 +23,23 @@ import Immutable from 'immutable';
 import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import { asMock } from 'helpers/mocking';
-import useMessageFavoriteFields from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields';
+import useMessageFavoriteFieldsMutation from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation';
 import { Button } from 'components/bootstrap';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+import { StreamsActions } from 'views/stores/StreamsStore';
+import mockAction from 'helpers/mocking/MockAction';
+import type { Stream } from 'logic/streams/types';
 
 // Mocks for useMessageFavoriteFields and DEFAULT_FIELDS
 const mockSaveFields = jest.fn();
-const DEFAULT_FIELDS = ['default1', 'default2'];
+const mockToggleField = jest.fn();
 
-jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields', () => ({
+jest.mock('views/stores/StreamsStore');
+
+jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation', () => ({
   __esModule: true,
   default: jest.fn(),
-  DEFAULT_FIELDS,
 }));
 
 const Consumer = () => {
@@ -45,6 +49,7 @@ const Consumer = () => {
     <div>
       <div data-testid="favorites">{JSON.stringify(contextValue.favoriteFields)}</div>
       <Button onClick={() => contextValue.saveFavoriteField(['field1', 'field2', 'new'])}>save-action</Button>
+      <Button onClick={() => contextValue.toggleField('field3')}>toggle-action</Button>
     </div>
   );
 };
@@ -52,8 +57,14 @@ const Consumer = () => {
 const renderComponent = () =>
   render(
     <MessageFavoriteFieldsProvider
+      streams={
+        [
+          { favorite_fields: ['field1'], id: 'stream1' },
+          { favorite_fields: ['field2'], id: 'stream2' },
+        ] as Array<Stream>
+      }
       isFeatureEnabled
-      message={{ id: 'id', index: 'index', fields: { streams: ['stream1'] } }}
+      message={{ id: 'id', index: 'index', fields: { streams: ['stream1', 'stream2'] } }}
       messageFields={Immutable.List([
         FieldTypeMapping.create('fav1', FieldTypes.STRING()),
         FieldTypeMapping.create('rest1', FieldTypes.STRING()),
@@ -64,23 +75,32 @@ const renderComponent = () =>
 
 describe('MessageFavoriteFieldsProvider', () => {
   beforeEach(() => {
-    asMock(useMessageFavoriteFields).mockReturnValue({
+    StreamsActions.refresh = mockAction();
+    asMock(useMessageFavoriteFieldsMutation).mockReturnValue({
       isLoading: false,
-      saveFields: mockSaveFields,
-      favoriteFields: ['field1', 'field2'],
+      saveFavoriteField: mockSaveFields,
+      toggleField: mockToggleField,
     });
   });
-  it('initializes favorites from hook and exposes them via context', () => {
+  it('initializes favorites from streams and exposes them via context', () => {
     renderComponent();
 
     expect(screen.getByTestId('favorites')).toHaveTextContent(JSON.stringify(['field1', 'field2']));
   });
 
-  it('saveFavoriteField calls saveFields', async () => {
+  it('saveFavoriteField calls saveFavoriteField from hook', async () => {
     renderComponent();
 
-    userEvent.click(await screen.findByRole('button', { name: /save/i }));
+    userEvent.click(await screen.findByRole('button', { name: /save-action/i }));
 
     expect(mockSaveFields).toHaveBeenCalledWith(['field1', 'field2', 'new']);
+  });
+
+  it('toggleField calls toggleField from hook', async () => {
+    renderComponent();
+
+    userEvent.click(await screen.findByRole('button', { name: /toggle-action/i }));
+
+    expect(mockToggleField).toHaveBeenCalledWith('field3');
   });
 });

@@ -15,19 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import zip from 'lodash/zip';
 import uniq from 'lodash/uniq';
 import flattenDeep from 'lodash/flattenDeep';
-
-import { FavoriteFields } from '@graylog/server-api';
 
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Stream } from 'logic/streams/types';
-import UserNotification from 'util/UserNotification';
-import { StreamsActions } from 'views/stores/StreamsStore';
+import useMessageFavoriteFieldsMutation from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;
@@ -40,67 +37,21 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     () => uniq(flattenDeep(zip(streams.map((stream) => stream.favorite_fields)))),
     [streams],
   );
-
-  const saveFavoriteField = useCallback(
-    (favoritesToSave: Array<string>) => {
-      const newAddedFields = favoritesToSave.filter((f) => !initialFavoriteFields.includes(f));
-
-      const newFavoriteFieldsByStream = Object.fromEntries(
-        streams.map((stream) => [
-          stream.id,
-          favoritesToSave.filter((f) => stream.favorite_fields.includes(f) || newAddedFields.includes(f)),
-        ]),
-      );
-
-      FavoriteFields.set({ fields: newFavoriteFieldsByStream })
-        .then(() => StreamsActions.refresh())
-        .catch((errorThrown) =>
-          UserNotification.error(
-            `Setting fields to favorites failed with error: ${errorThrown}`,
-            'Could not set fields to favorites',
-          ),
-        );
-    },
-    [initialFavoriteFields, streams],
-  );
-
-  const toggleField = useCallback(
-    (field: string) => {
-      const isFavorite = initialFavoriteFields.includes(field);
-      const streamIds = streams.map((stream) => stream.id);
-
-      if (isFavorite) {
-        FavoriteFields.remove({ field, stream_ids: streamIds })
-          .then(() => StreamsActions.refresh())
-          .catch((errorThrown) =>
-            UserNotification.error(
-              `Removing field from favorites failed with error: ${errorThrown}`,
-              'Could not remove fields from favorites',
-            ),
-          );
-      } else {
-        FavoriteFields.add({ field, stream_ids: streamIds })
-          .then(() => StreamsActions.refresh())
-          .catch((errorThrown) =>
-            UserNotification.error(
-              `Adding field to favorites failed with error: ${errorThrown}`,
-              'Could not add field to favorites',
-            ),
-          );
-      }
-    },
-    [initialFavoriteFields, streams],
+  const { saveFavoriteField, toggleField, isLoading } = useMessageFavoriteFieldsMutation(
+    streams,
+    initialFavoriteFields,
   );
 
   const contextValue = useMemo(
     () => ({
+      isLoading,
       favoriteFields: initialFavoriteFields,
       saveFavoriteField,
       messageFields,
       message,
       toggleField,
     }),
-    [initialFavoriteFields, saveFavoriteField, messageFields, message, toggleField],
+    [isLoading, initialFavoriteFields, saveFavoriteField, messageFields, message, toggleField],
   );
 
   return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;
