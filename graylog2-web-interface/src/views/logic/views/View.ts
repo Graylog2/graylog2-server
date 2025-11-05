@@ -60,9 +60,9 @@ type InternalState = {
 };
 
 type EntitySource = {
-  source: String;
-  entityType: String;
-  parentId?: String;
+  source: string;
+  entityType: string;
+  parentId?: string;
 };
 
 export type ViewJson = {
@@ -353,7 +353,7 @@ class Builder {
     return new Builder(this.value.set('lastUpdatedAt', value));
   }
 
-  entitySource(value: String): Builder {
+  entitySource(value: string): Builder {
     return new Builder(this.value.set('entitySource', value));
   }
 
