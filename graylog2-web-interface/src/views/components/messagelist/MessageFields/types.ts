@@ -14,19 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQueryParams, useQueryParam, StringParam, NumberParam, ArrayParam } from 'use-query-params';
 
-const parseNestedObject = (fieldQueryString: string) => {
-  try {
-    return JSON.parse(decodeURIComponent(fieldQueryString));
-  } catch (_error) {
-    return undefined;
-  }
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import type { Message } from 'views/components/messagelist/Types';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+
+export type FormattedField = {
+  value: any;
+  type: FieldType;
+  field: string;
+  id: string;
 };
 
-const NestedObjectParam = {
-  encode: (object: object | null | undefined) => encodeURIComponent(JSON.stringify(object)),
-  decode: (objectStr: string | null | undefined) => parseNestedObject(objectStr),
+export type MessageFieldsListProps = {
+  fields: Array<FormattedField>;
+  message: Message;
+  isFavorite: boolean;
+  reorderFavoriteFields?: (fields: Array<FormattedField>) => void;
+  onFavoriteToggle?: (field: string) => void;
 };
 
-export { useQueryParams, useQueryParam, StringParam, NumberParam, NestedObjectParam, ArrayParam };
+export type MessageFieldsComponentProps = {
+  message: Message;
+  fields: FieldTypeMappingsList;
+};

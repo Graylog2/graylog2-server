@@ -14,19 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQueryParams, useQueryParam, StringParam, NumberParam, ArrayParam } from 'use-query-params';
+import React from 'react';
 
-const parseNestedObject = (fieldQueryString: string) => {
-  try {
-    return JSON.parse(decodeURIComponent(fieldQueryString));
-  } catch (_error) {
-    return undefined;
-  }
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
+
+const useMessageFavoriteFields = (streams: Array<string>) => {
+  const [favorites, setFavorites] = React.useState<Array<string>>(DEFAULT_FIELDS);
+  const saveFields = (fields: Array<string>) => {
+    // eslint-disable-next-line no-console
+    console.log(streams, fields);
+    setFavorites(fields);
+  };
+
+  return {
+    isLoading: false,
+    favoriteFields: favorites,
+    saveFields,
+  };
 };
 
-const NestedObjectParam = {
-  encode: (object: object | null | undefined) => encodeURIComponent(JSON.stringify(object)),
-  decode: (objectStr: string | null | undefined) => parseNestedObject(objectStr),
-};
-
-export { useQueryParams, useQueryParam, StringParam, NumberParam, NestedObjectParam, ArrayParam };
+export default useMessageFavoriteFields;

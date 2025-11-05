@@ -15,33 +15,33 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled, { css } from 'styled-components';
 
-import { Input } from 'components/bootstrap';
+import { Icon } from 'components/common';
 
-type ARNProps = {
-  awsARN?: {
-    value?: string;
-  };
-  onChange: (...args: any[]) => void;
+const StyledIcon = styled(Icon)<{ $isFavorite: boolean }>(
+  ({ theme, $isFavorite }) => css`
+    color: ${$isFavorite ? theme.colors.variant.info : undefined};
+    cursor: pointer;
+  `,
+);
+
+type Props = {
+  className?: string;
+  onClick: () => void;
+  title: string;
+  isFavorite: boolean;
 };
 
-const ARN = ({
-  awsARN = {
-    value: '',
-  },
-
-  onChange,
-}: ARNProps) => (
-  <Input
-    id="awsAssumeRoleARN"
-    type="text"
-    value={awsARN.value}
-    onChange={onChange}
-    label="AWS Assume Role (ARN)"
-    help="Amazon Resource Name with required cross account permission"
-    placeholder="arn:aws:sts::123456789012:assumed-role/some-role"
-    maxLength={2048}
+const CommonFavoriteIcon = ({ className = undefined, onClick, title, isFavorite }: Props) => (
+  <StyledIcon
+    className={className}
+    onClick={onClick}
+    title={title}
+    $isFavorite={isFavorite}
+    name="star"
+    type={isFavorite ? 'solid' : 'regular'}
   />
 );
 
-export default ARN;
+export default CommonFavoriteIcon;
