@@ -73,6 +73,10 @@ public class ElasticsearchClientConfiguration {
 
             Default: inf
             """)
+    /**
+     * Not used anywhere!
+     */
+    @Deprecated(forRemoval = true)
     @Parameter(value = "elasticsearch_idle_timeout")
     private Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
 
@@ -137,6 +141,10 @@ public class ElasticsearchClientConfiguration {
 
             Default: 2
             """)
+    /**
+     * Not used anywhere
+     */
+    @Deprecated
     @Parameter(value = "elasticsearch_max_retries", validators = {PositiveIntegerValidator.class})
     private int elasticsearchMaxRetries = 2;
 
@@ -255,6 +263,7 @@ public class ElasticsearchClientConfiguration {
         return elasticsearchSocketTimeout;
     }
 
+    @Deprecated
     public Duration elasticsearchIdleTimeout() {
         return elasticsearchIdleTimeout;
     }
@@ -283,6 +292,7 @@ public class ElasticsearchClientConfiguration {
         return elasticsearchMaxTotalConnectionsPerRoute;
     }
 
+    @Deprecated(forRemoval = true)
     public int elasticsearchMaxRetries() {
         return elasticsearchMaxRetries;
     }

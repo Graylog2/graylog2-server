@@ -24,7 +24,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RequestOptions;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-import org.graylog.storage.elasticsearch7.ThrowingBiFunction;
+import org.graylog.storage.function.ThrowingBiFunction;
 import org.graylog2.indexer.ElasticsearchException;
 
 import java.io.IOException;
