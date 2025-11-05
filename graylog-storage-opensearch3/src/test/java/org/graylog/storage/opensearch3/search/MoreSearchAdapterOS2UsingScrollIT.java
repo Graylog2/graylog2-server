@@ -25,7 +25,6 @@ import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
-import org.graylog.storage.opensearch3.SortOrderMapper;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.results.ResultMessageFactory;
@@ -46,14 +45,13 @@ public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
 
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final OpenSearchClient client = openSearchInstance.openSearchClient();
-        return new MoreSearchAdapterOS2(client, true, sortOrderMapper,
+        return new MoreSearchAdapterOS2(client, true,
                 new Scroll(client,
                         (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
                         ),
-                        new SearchRequestFactory(sortOrderMapper, false, true, new IgnoreSearchFilters())
+                        new SearchRequestFactory(false, true, new IgnoreSearchFilters())
                 ),
                 new OS2ResultMessageFactory(resultMessageFactory)
 
