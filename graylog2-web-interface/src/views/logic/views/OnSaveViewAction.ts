@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import UserNotification from 'util/UserNotification';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import type View from 'views/logic/views/View';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import { setIsNew, setIsDirty } from 'views/logic/slices/viewSlice';
 import type FetchError from 'logic/errors/FetchError';
 import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import { updateView } from 'views/api/views';
 
 const _extractErrorMessage = (error: FetchError) =>
   error && error.additional && error.additional.body && error.additional.body.message
@@ -29,7 +29,7 @@ const _extractErrorMessage = (error: FetchError) =>
 
 export default (view: View, entityShare?: EntitySharePayload) => async (dispatch: ViewsDispatch) => {
   try {
-    await ViewManagementActions.update(view, entityShare);
+    await updateView(view, entityShare);
     dispatch(setIsNew(false));
     dispatch(setIsDirty(false));
     UserNotification.success(`Saving view "${view.title}" was successful!`, 'Success!');
