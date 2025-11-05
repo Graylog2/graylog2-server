@@ -14,12 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
 
-import type { MaterialSymbol as IconName } from '@material-symbols/font-700';
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
 
-export type SizeProp = 'xs' | 'sm' | 'lg' | 'xl' | '2x' | '3x' | '4x' | '5x' | 'huge';
-export type RotateProp = 0 | 90 | 180 | 270;
-export type FlipProp = 'horizontal' | 'vertical' | 'both';
-export type IconType = 'regular' | 'solid';
+const useMessageFavoriteFields = (streams: Array<string>) => {
+  const [favorites, setFavorites] = React.useState<Array<string>>(DEFAULT_FIELDS);
+  const saveFields = (fields: Array<string>) => {
+    // eslint-disable-next-line no-console
+    console.log(streams, fields);
+    setFavorites(fields);
+  };
 
-export { IconName };
+  return {
+    isLoading: false,
+    favoriteFields: favorites,
+    saveFields,
+  };
+};
+
+export default useMessageFavoriteFields;
