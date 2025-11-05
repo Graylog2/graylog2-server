@@ -24,6 +24,7 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LoggingHandler;
+import org.graylog.testing.RestoreSystemProperties;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
@@ -31,8 +32,6 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.junit.Rule;
-import org.junit.contrib.java.lang.system.RestoreSystemProperties;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -59,13 +58,11 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(RestoreSystemProperties.class)
 public class AbstractTcpTransportTest {
 
     @TempDir
     public File temporaryFolder;
-
-    @Rule
-    public final RestoreSystemProperties restoreSystemProperties = new RestoreSystemProperties();
 
     @Mock
     private MessageInput input;
