@@ -171,7 +171,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 
   return useMemo(
     () =>
-      [...(bulkSelectCol ? [bulkSelectCol] : []), ...(attributeCols ? attributeCols : []), actionsCol] as Array<
+      [...(bulkSelectCol ? [bulkSelectCol] : []), ...attributeCols, ...(actionsCol ? [actionsCol] : [])] as Array<
         ColumnDef<Entity, unknown>
       >,
     [bulkSelectCol, attributeCols, actionsCol],
