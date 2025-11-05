@@ -35,22 +35,22 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest
 import org.graylog.storage.opensearch3.testing.TestMultisearchResponse;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -64,14 +64,13 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedClientTestBase {
     private static Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = ImmutableMap.of(
             MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
                     new TestResultMessageFactory(), false)
     );
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     private IndexLookup indexLookup;
@@ -84,7 +83,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedCl
 
     private OpenSearchBackend backend;
 
-    @Before
+    @BeforeEach
     public void setupSUT() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulResponseWithSingleQuery.json");
         mockCancellableMSearch(response);
@@ -99,7 +98,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedCl
                 false);
     }
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         this.query = Query.builder()
                 .id("query1")
@@ -114,7 +113,7 @@ public class OpenSearchBackendUsingCorrectIndicesTest extends OpensearchMockedCl
         this.job = new SearchJob("job1", search, "admin", "test-node-id");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         // Some tests modify the time so we make sure to reset it after each test even if assertions fail
         DateTimeUtils.setCurrentMillisSystem();

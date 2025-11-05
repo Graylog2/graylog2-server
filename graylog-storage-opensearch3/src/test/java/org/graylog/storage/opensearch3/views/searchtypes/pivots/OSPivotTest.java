@@ -39,14 +39,15 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Date;
@@ -55,9 +56,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OSPivotTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Mock
     private SearchJob job;
     @Mock
@@ -74,13 +75,13 @@ public class OSPivotTest {
 
     private OSSearchTypeHandler<Pivot> esPivot;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.esPivot = new OSPivot(Collections.emptyMap(), Collections.emptyMap(), new EffectiveTimeRangeExtractor());
         when(pivot.id()).thenReturn("dummypivot");
     }
 
-    @After
+    @AfterEach
     public void tearDown() throws Exception {
         // Some tests modify the time so we make sure to reset it after each test even if assertions fail
         DateTimeUtils.setCurrentMillisSystem();

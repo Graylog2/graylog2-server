@@ -57,12 +57,13 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -77,17 +78,16 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
     private OpenSearchBackend backend;
     private UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
 
     @Mock
     private IndexLookup indexLookup;
 
-    @Before
+    @BeforeEach
     public void setup() {
         Map<String, Provider<OSSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
         handlers.put(MessageList.NAME, () -> new OSMessageList(new LegacyDecoratorProcessor.Fake(),
