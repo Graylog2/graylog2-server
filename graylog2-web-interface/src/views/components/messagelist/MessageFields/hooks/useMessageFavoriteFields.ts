@@ -14,8 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+import React from 'react';
 
-public interface ThrowingBiFunction<A1, A2, R, E extends Exception> {
-    R apply(A1 a1, A2 a2) throws E;
-}
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
+
+const useMessageFavoriteFields = (streams: Array<string>) => {
+  const [favorites, setFavorites] = React.useState<Array<string>>(DEFAULT_FIELDS);
+  const saveFields = (fields: Array<string>) => {
+    // eslint-disable-next-line no-console
+    console.log(streams, fields);
+    setFavorites(fields);
+  };
+
+  return {
+    isLoading: false,
+    favoriteFields: favorites,
+    saveFields,
+  };
+};
+
+export default useMessageFavoriteFields;
