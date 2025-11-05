@@ -1,0 +1,173 @@
+import { renderHook, act } from 'wrappedTestingLibrary';
+import { waitFor } from 'wrappedTestingLibrary/hooks';
+
+import { FavoriteFields } from '@graylog/server-api';
+
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
+import type { Stream } from 'logic/streams/types';
+import { StreamsActions } from 'views/stores/StreamsStore';
+import UserNotification from 'util/UserNotification';
+
+import useMessageFavoriteFieldsMutation from './useMessageFavoriteFieldsMutation';
+
+jest.mock('@graylog/server-api', () => ({
+  FavoriteFields: {
+    set: jest.fn(),
+    add: jest.fn(),
+    remove: jest.fn(),
+  },
+}));
+
+jest.mock('views/stores/StreamsStore', () => ({
+  StreamsActions: { refresh: jest.fn() },
+  StreamsStore: MockStore(['getInitialState', () => ({ streams: [{ id: 'streamId', title: 'Stream' }] })]),
+}));
+
+jest.mock('util/UserNotification', () => ({
+  error: jest.fn(),
+}));
+
+describe('useMessageFavoriteFieldsMutation', () => {
+  const streams: Array<Stream> = [
+    {
+      id: 's1',
+      title: 'S1',
+      matching_type: 'AND',
+      description: '',
+      disabled: false,
+      rules: [],
+      creator_user_id: null,
+      created_at: '',
+      alert_receivers: [],
+      favorite_fields: ['a'],
+    } as unknown as Stream,
+    {
+      id: 's2',
+      title: 'S2',
+      matching_type: 'AND',
+      description: '',
+      disabled: false,
+      rules: [],
+      creator_user_id: null,
+      created_at: '',
+      alert_receivers: [],
+      favorite_fields: [],
+    } as unknown as Stream,
+  ];
+
+  beforeEach(() => {
+    asMock(FavoriteFields.set).mockImplementation(() => Promise.resolve());
+    asMock(FavoriteFields.remove).mockImplementation(() => Promise.resolve());
+    asMock(FavoriteFields.add).mockImplementation(() => Promise.resolve());
+  });
+
+  it('saveFavoriteField: calls FavoriteFields.set with correct per-stream payload and toggles isLoading', async () => {
+    const initialFavoriteFields = ['a'];
+    const { result } = renderHook(() => useMessageFavoriteFieldsMutation(streams, initialFavoriteFields));
+
+    act(() => {
+      result.current.saveFavoriteField(['a', 'b']);
+    });
+
+    expect(result.current.isLoading).toBe(true);
+    const expectedPayload = {
+      fields: {
+        s1: ['a', 'b'], // stream had 'a' and newAddedFields includes 'b'
+        s2: ['b'],
+      },
+    };
+    expect(FavoriteFields.set).toHaveBeenCalledWith(expectedPayload);
+    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
+  it('saveFavoriteField: shows error notification when FavoriteFields.set rejects', async () => {
+    const initialFavoriteFields = ['a'];
+    asMock(FavoriteFields.set).mockImplementation(() => Promise.reject(new Error('saveFavoriteField error')));
+
+    const { result } = renderHook(() => useMessageFavoriteFieldsMutation(streams, initialFavoriteFields));
+
+    act(() => {
+      result.current.saveFavoriteField(['a', 'b']);
+    });
+
+    expect(result.current.isLoading).toBe(true);
+    await waitFor(() =>
+      expect(UserNotification.error).toHaveBeenCalledWith(
+        'Setting fields to favorites failed with error: Error: saveFavoriteField error',
+        'Could not set fields to favorites',
+      ),
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
+  it('toggleField: when field is already favorite -> calls FavoriteFields.remove for all streams', async () => {
+    const initialFavoriteFields = ['a'];
+    const { result } = renderHook(() => useMessageFavoriteFieldsMutation(streams, initialFavoriteFields));
+
+    act(() => {
+      result.current.toggleField('a');
+    });
+
+    expect(result.current.isLoading).toBe(true);
+
+    expect(FavoriteFields.remove).toHaveBeenCalledWith({ field: 'a', stream_ids: ['s1', 's2'] });
+    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
+  it('toggleField: when field is not favorite -> calls FavoriteFields.add for all streams', async () => {
+    const initialFavoriteFields = ['a'];
+    const { result } = renderHook(() => useMessageFavoriteFieldsMutation(streams, initialFavoriteFields));
+
+    act(() => {
+      result.current.toggleField('b');
+    });
+
+    expect(result.current.isLoading).toBe(true);
+
+    expect(FavoriteFields.add).toHaveBeenCalledWith({ field: 'b', stream_ids: ['s1', 's2'] });
+    await waitFor(() => expect(StreamsActions.refresh).toHaveBeenCalled());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
+  it('toggleField: shows error notification when FavoriteFields.add rejects', async () => {
+    const initialFavoriteFields = ['a'];
+    asMock(FavoriteFields.add).mockImplementation(() => Promise.reject(new Error('addField error')));
+
+    const { result } = renderHook(() => useMessageFavoriteFieldsMutation(streams, initialFavoriteFields));
+
+    act(() => {
+      result.current.toggleField('b');
+    });
+
+    expect(result.current.isLoading).toBe(true);
+    await waitFor(() =>
+      expect(UserNotification.error).toHaveBeenCalledWith(
+        'Adding field to favorites failed with error: Error: addField error',
+        'Could not add field to favorites',
+      ),
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
+  it('toggleField: shows error notification when FavoriteFields.remove rejects', async () => {
+    const initialFavoriteFields = ['a', 'b'];
+    asMock(FavoriteFields.remove).mockImplementation(() => Promise.reject(new Error('removeField error')));
+
+    const { result } = renderHook(() => useMessageFavoriteFieldsMutation(streams, initialFavoriteFields));
+
+    act(() => {
+      result.current.toggleField('a');
+    });
+
+    expect(result.current.isLoading).toBe(true);
+    await waitFor(() =>
+      expect(UserNotification.error).toHaveBeenCalledWith(
+        'Removing field from favorites failed with error: Error: removeField error',
+        'Could not remove field from favorites',
+      ),
+    );
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+});

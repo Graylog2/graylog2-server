@@ -62,7 +62,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
           .catch((errorThrown) =>
             UserNotification.error(
               `Removing field from favorites failed with error: ${errorThrown}`,
-              'Could not remove fields from favorites',
+              'Could not remove field from favorites',
             ),
           )
           .finally(() => setIsLoading(false));
