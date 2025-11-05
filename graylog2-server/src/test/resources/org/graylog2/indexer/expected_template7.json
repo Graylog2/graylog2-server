@@ -67,6 +67,9 @@
       },
       "streams" : {
         "type" : "keyword"
+      },
+      "alert_severity_level" : {
+        "type" : "integer"
       }
     }
   },
