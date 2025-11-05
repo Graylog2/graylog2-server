@@ -35,7 +35,6 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTimeZone;
-import org.junit.Rule;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;

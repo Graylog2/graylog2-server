@@ -27,7 +27,6 @@ import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.graylog.storage.opensearch3.views.export.OpenSearchExportITHelper;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
@@ -39,7 +38,6 @@ import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Arrays;

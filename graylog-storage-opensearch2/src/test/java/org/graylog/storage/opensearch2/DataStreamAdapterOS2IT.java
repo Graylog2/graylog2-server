@@ -25,7 +25,6 @@ import org.graylog2.indexer.datastream.policy.IsmPolicy;
 import org.graylog2.indexer.datastream.policy.IsmPolicyTest;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -23,7 +23,6 @@ import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesIT;
-import org.junit.Rule;
 
 import java.util.Map;
 
