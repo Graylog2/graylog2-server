@@ -121,7 +121,8 @@ public abstract class IndexMapping extends AbstractMapping {
                 .put(Message.GL2_SECOND_SORT_FIELD, aliasTo(FIELD_GL2_MESSAGE_ID))
                 .put(Message.FIELD_STREAMS, notAnalyzedString())
                 // to support wildcard searches in source we need to lowercase the content (wildcard search lowercases search term)
-                .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true));
+                .put(Message.FIELD_SOURCE, analyzedString("analyzer_keyword", true))
+                .put(Message.ALERT_SEVERITY_LEVEL, typeInteger());
 
 
         if (customFieldMappings != null) {

@@ -212,6 +212,11 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_SOURCE_NODE = "gl2_source_node";
 
     /**
+     * To fix event aggregation problems when this field was created as a string by accident, we pre-define it
+     */
+    public static final String ALERT_SEVERITY_LEVEL = "alert_severity_level";
+
+    /**
      * @deprecated This was used with the now removed radio system and contained the ID of a radio node.
      * TODO: Due to be removed in Graylog 3.x
      */
