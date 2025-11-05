@@ -19,6 +19,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import CommonSortIcon from 'components/common/SortIcon';
+import type { ColumnMetaContext, EntityBase } from 'components/common/EntityDataTable/types';
 
 const StyledCommonSortIcon = styled(CommonSortIcon)`
   display: inline-block;
@@ -37,14 +38,15 @@ const SORT_ORDER_NAMES = {
   desc: 'descending',
 };
 
-const SortIcon = ({ header }: { header: any }) => {
+const SortIcon = <Entity extends EntityBase>({ header }: { header: any }) => {
   const nextSortDirection = header.column.getNextSortingOrder();
+  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
 
   return (
     <StyledCommonSortIcon
       activeDirection={header.column.getIsSorted()}
       onChange={() => header.column.toggleSorting()}
-      title={`Sort ${header.column.columnDef.header()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
+      title={`Sort ${columnMeta.label.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
       ascId={SORT_DIRECTIONS.ASC}
       descId={SORT_DIRECTIONS.DESC}
     />
