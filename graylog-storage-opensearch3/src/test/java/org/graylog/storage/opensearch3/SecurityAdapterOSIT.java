@@ -40,7 +40,12 @@ class SecurityAdapterOSIT {
 
         Assertions.assertThat(adapter.getMappingForRole("all_access").users()).containsExactly("max.mustermann");
 
-        adapter.removeUserFromRoleMapping("all_access", "max.mustermann");
+        Assertions.assertThat(adapter.removeUserFromRoleMapping("all_access", "max.mustermann"))
+                        .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("'all_access' updated."));
+
+        Assertions.assertThat(adapter.removeUserFromRoleMapping("all_access", "max.mustermann"))
+                .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("No updates required"));
+
         Assertions.assertThat(adapter.getMappingForRole("all_access").users()).isEmpty();
     }
 }
