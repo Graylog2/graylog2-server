@@ -28,8 +28,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.apache.commons.io.IOUtils;
 import jakarta.ws.rs.ForbiddenException;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -167,14 +167,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.systemJobManager = systemJobManager;
         this.migrationLockService = migrationLockService;
-    }
-
-    @Override
-    public boolean isMigrationRunning(IndexSet indexSet) {
-        return reindexMigrationService.getLatestMigrationId()
-                .map(this::status)
-                .map(migration -> isIndexSetCurrentlyMigrated(indexSet, migration))
-                .orElse(false);
     }
 
     @Nonnull

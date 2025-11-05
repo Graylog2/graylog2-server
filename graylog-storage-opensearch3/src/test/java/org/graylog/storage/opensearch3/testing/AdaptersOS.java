@@ -23,10 +23,10 @@ import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
 import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS2;
 import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
-import org.graylog.storage.opensearch3.IndicesAdapterOS2;
+import org.graylog.storage.opensearch3.IndicesAdapterOS;
 import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.MessagesAdapterOS2;
-import org.graylog.storage.opensearch3.NodeAdapterOS2;
+import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.PlainJsonApi;
@@ -34,9 +34,9 @@ import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
-import org.graylog.storage.opensearch3.SortOrderMapper;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
+import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexToolsAdapter;
@@ -55,7 +55,7 @@ import java.util.List;
 
 import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
-public class AdaptersOS2 implements Adapters {
+public class AdaptersOS implements Adapters {
 
     @Deprecated
     private final OpenSearchClient client;
@@ -64,7 +64,7 @@ public class AdaptersOS2 implements Adapters {
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
 
-    public AdaptersOS2(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
+    public AdaptersOS(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
         this.client = client;
         this.officialOpensearchClient = officialOpensearchClient;
         this.featureFlags = featureFlags;
@@ -78,18 +78,20 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
-        return new IndicesAdapterOS2(client,
-                new org.graylog.storage.opensearch3.stats.StatsApi(objectMapper, client),
+        return new IndicesAdapterOS(client,
+                new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch3.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client)
+                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
+                new IndexStatisticsBuilder(),
+                objectMapper
         );
     }
 
     @Override
     public NodeAdapter nodeAdapter() {
-        return new NodeAdapterOS2(client, objectMapper);
+        return new NodeAdapterOS(officialOpensearchClient);
     }
 
     @Override
@@ -102,11 +104,10 @@ public class AdaptersOS2 implements Adapters {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final boolean allowHighlighting = true;
         final boolean allowLeadingWildcardSearches = true;
 
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         return new SearchesAdapterOS(client,
                 new Scroll(client,
                         scrollResultFactory,

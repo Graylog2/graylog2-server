@@ -16,20 +16,21 @@
  */
 package org.graylog.plugins.views.search.rest.scriptingapi.mapping;
 
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
 import org.graylog2.plugin.Message;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
-public class MessagesSpecToMessageListMapper implements Function<MessagesRequestSpec, MessageList> {
+public class MessagesSpecToMessageListMapper implements BiFunction<MessagesRequestSpec, SearchUser, MessageList> {
 
     public static final String MESSAGE_LIST_ID = "scripting_api_temporary_message_list";
 
     @Override
-    public MessageList apply(final MessagesRequestSpec messagesRequestSpec) {
+    public MessageList apply(final MessagesRequestSpec messagesRequestSpec, final SearchUser searchUser) {
         final MessageList.Builder messageListBuilder = MessageList.builder()
                 .id(MESSAGE_LIST_ID)
                 .sort(createSort(messagesRequestSpec))
