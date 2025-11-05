@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
-import { flexRender } from '@tanstack/react-table';
+import { flexRender, createColumnHelper, type ColumnDef } from '@tanstack/react-table';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -32,11 +32,19 @@ import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
-import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
 import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
+import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
+import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
+import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 
-import type { ColumnRenderers, ColumnSchema, EntityBase, ExpandedSectionRenderer } from './types';
+import type {
+  ColumnRenderers,
+  ColumnSchema,
+  EntityBase,
+  ExpandedSectionRenderer,
+  ColumnRenderersByAttribute,
+} from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import TableHead from './TableHead';
 import BulkActionsRow from './BulkActionsRow';
@@ -85,25 +93,6 @@ const Td = styled.td`
   word-break: break-word;
 `;
 
-const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
-  columnSchemas: Array<ColumnSchema>,
-  customColumnRenderers: ColumnRenderers<Entity, Meta>,
-) =>
-  useMemo(() => {
-    const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
-
-    return Object.fromEntries(
-      columnSchemas.map(({ id, type }) => {
-        const typeRenderer = renderers.types?.[type];
-        const attributeRenderer = renderers.attributes?.[id];
-
-        const columnRenderer = merge({}, typeRenderer, attributeRenderer);
-
-        return [id, columnRenderer];
-      }),
-    );
-  }, [columnSchemas, customColumnRenderers]);
-
 const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
   const currentUser = useCurrentUser();
 
@@ -123,6 +112,66 @@ const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
         return true;
       }),
     [columnSchemas, currentUser.permissions],
+  );
+};
+
+const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
+  columnSchemas: Array<ColumnSchema>,
+  customColumnRenderers: ColumnRenderers<Entity, Meta>,
+) =>
+  useMemo(() => {
+    const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
+
+    return Object.fromEntries(
+      columnSchemas.map(({ id, type }) => {
+        const typeRenderer = renderers.types?.[type];
+        const attributeRenderer = renderers.attributes?.[id];
+
+        const columnRenderer = merge({}, typeRenderer, attributeRenderer);
+
+        return [id, columnRenderer];
+      }),
+    );
+  }, [columnSchemas, customColumnRenderers]);
+
+const useColumnDefinitions = <Entity extends EntityBase, Meta>({
+  actionsColWidth,
+  actionsRef,
+  columnRenderersByAttribute,
+  columnSchemas,
+  columnWidths,
+  displayActionsCol,
+  displayBulkSelectCol,
+  entityActions,
+  entityAttributesAreCamelCase,
+  meta,
+}: {
+  actionsColWidth: number;
+  actionsRef: React.MutableRefObject<HTMLDivElement>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
+  columnSchemas: Array<ColumnSchema>;
+  columnWidths: { [attributeId: string]: number };
+  displayActionsCol: boolean;
+  displayBulkSelectCol: boolean;
+  entityActions?: (entity: Entity) => React.ReactNode;
+  entityAttributesAreCamelCase: boolean;
+  meta: Meta;
+}) => {
+  const columnHelper = createColumnHelper<Entity>();
+  const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol);
+  const actionsCol = useActionsColumnDefinition(displayActionsCol, actionsColWidth, entityActions, actionsRef);
+  const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
+    columnSchemas,
+    columnRenderersByAttribute,
+    columnWidths,
+    entityAttributesAreCamelCase,
+    meta,
+    columnHelper,
+  });
+
+  return useMemo(
+    () => [bulkSelectCol, ...attributeCols, actionsCol].filter(Boolean) as ColumnDef<Entity, unknown>[],
+    [bulkSelectCol, attributeCols, actionsCol],
   );
 };
 
