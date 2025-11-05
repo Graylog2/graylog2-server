@@ -22,9 +22,9 @@ export type EntityBase = {
   id: string;
 };
 
-export type Column = {
+export type ColumnSchema = {
   anyPermissions?: boolean;
-  // Inidicates that a column does not exist as an attribute in table data
+  // Indicates that a column does not exist as an attribute in table data
   isDerived?: boolean;
 } & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
 
@@ -78,6 +78,6 @@ export type DefaultLayout = {
   defaultPageSize: number;
 };
 
-export type ColumnMeta = {
+export type ColumnMetaContext = {
   label?: string;
 };

@@ -134,7 +134,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
     setQuery,
   });
 
-  const columnDefinitions = useMemo(
+  const columnSchemas = useMemo(
     () => [
       ...(paginatedEntities?.attributes ?? []),
       ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute })),
@@ -205,7 +205,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
               entityActions={entityActions}
               actionsCellWidth={actionsCellWidth}
               columnRenderers={columnRenderers}
-              columnDefinitions={columnDefinitions}
+              columnSchemas={columnSchemas}
               entityAttributesAreCamelCase={entityAttributesAreCamelCase}
               meta={meta}
             />

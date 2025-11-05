@@ -22,7 +22,7 @@ import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
-import type { Column } from 'components/common/EntityDataTable/types';
+import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 import EntityDataTable from './EntityDataTable';
@@ -34,7 +34,7 @@ describe('<EntityDataTable />', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);
   });
 
-  const columnDefinitions: Array<Column> = [
+  const columnSchemas: Array<ColumnSchema> = [
     { id: 'title', title: 'Title', type: 'STRING', sortable: true },
     { id: 'description', title: 'Description', type: 'STRING', sortable: true },
     { id: 'stream', title: 'Stream', type: 'STRING', sortable: true },
@@ -67,7 +67,7 @@ describe('<EntityDataTable />', () => {
         onColumnsChange={() => {}}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -89,7 +89,7 @@ describe('<EntityDataTable />', () => {
         onSortChange={() => {}}
         entityAttributesAreCamelCase
         onColumnsChange={() => {}}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -113,7 +113,7 @@ describe('<EntityDataTable />', () => {
             },
           },
         }}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -142,7 +142,7 @@ describe('<EntityDataTable />', () => {
             },
           },
         }}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -161,7 +161,7 @@ describe('<EntityDataTable />', () => {
         entityAttributesAreCamelCase
         onColumnsChange={() => {}}
         entityActions={(entity) => `Custom actions for ${entity.title}`}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -178,7 +178,7 @@ describe('<EntityDataTable />', () => {
         onSortChange={() => {}}
         entityAttributesAreCamelCase
         onColumnsChange={() => {}}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -198,7 +198,7 @@ describe('<EntityDataTable />', () => {
           attributeId: 'description',
           direction: 'asc',
         }}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -215,7 +215,7 @@ describe('<EntityDataTable />', () => {
         entityAttributesAreCamelCase
         onSortChange={onSortChange}
         onColumnsChange={() => {}}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -249,7 +249,7 @@ describe('<EntityDataTable />', () => {
         entityAttributesAreCamelCase
         onColumnsChange={() => {}}
         bulkSelection={{ actions: <BulkActions /> }}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -276,7 +276,7 @@ describe('<EntityDataTable />', () => {
         entityAttributesAreCamelCase
         onColumnsChange={() => {}}
         bulkSelection={{ actions: <div /> }}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -306,7 +306,7 @@ describe('<EntityDataTable />', () => {
         onSortChange={() => {}}
         entityAttributesAreCamelCase
         onColumnsChange={onColumnsChange}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 
@@ -342,7 +342,7 @@ describe('<EntityDataTable />', () => {
             },
           },
         }}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
       />,
     );
 

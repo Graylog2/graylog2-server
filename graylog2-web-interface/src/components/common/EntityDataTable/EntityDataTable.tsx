@@ -37,7 +37,7 @@ import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useCol
 import useElementsWidths from 'components/common/EntityDataTable/hooks/useElementsWidths';
 import useColumnOrder from 'components/common/EntityDataTable/hooks/useColumnOrder';
 
-import type { ColumnRenderers, Column, EntityBase, ExpandedSectionRenderer } from './types';
+import type { ColumnRenderers, ColumnSchema, EntityBase, ExpandedSectionRenderer } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import TableHead from './TableHead';
 import BulkActionsRow from './BulkActionsRow';
@@ -82,8 +82,8 @@ const LayoutConfigRow = styled.div`
   gap: 5px;
 `;
 
-const filterAccessibleColumns = (columns: Array<Column>, userPermissions: Immutable.List<string>) =>
-  columns.filter(({ permissions, anyPermissions, hidden }) => {
+const filterAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>, userPermissions: Immutable.List<string>) =>
+  columnSchemas.filter(({ permissions, anyPermissions, hidden }) => {
     if (hidden) {
       return false;
     }
@@ -96,13 +96,13 @@ const filterAccessibleColumns = (columns: Array<Column>, userPermissions: Immuta
   });
 
 const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(
-  columns: Array<Column>,
+  columnSchemas: Array<ColumnSchema>,
   customColumnRenderers: ColumnRenderers<Entity, Meta>,
 ) => {
   const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
 
   return Object.fromEntries(
-    columns.map(({ id, type }) => {
+    columnSchemas.map(({ id, type }) => {
       const typeRenderer = renderers.types?.[type];
       const attributeRenderer = renderers.attributes?.[id];
 
@@ -110,6 +110,15 @@ const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(
 
       return [id, columnRenderer];
     }),
+  );
+};
+
+const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
+  const currentUser = useCurrentUser();
+
+  return useMemo(
+    () => filterAuthorizedColumnSchemas(columnSchemas, currentUser.permissions),
+    [columnSchemas, currentUser.permissions],
   );
 };
 
@@ -137,7 +146,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
     isEntitySelectable?: (entity: Entity) => boolean;
   };
   /** List of all available columns. Column ids need to be snake case. */
-  columnDefinitions: Array<Column>;
+  columnSchemas: Array<ColumnSchema>;
   /** Custom cell and header renderer for a column. Column ids need to be snake case. */
   columnRenderers?: ColumnRenderers<Entity, Meta>;
   /** Define default columns order. Column ids need to be snake case. */
@@ -172,7 +181,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   activeSort = undefined,
   entityAttributesAreCamelCase,
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
-  columnDefinitions,
+  columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
   columnsOrder: attributeColumnsOder = [],
   entities,
@@ -185,12 +194,14 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   visibleColumns: visibleAttributeColumns,
   meta = undefined,
 }: Props<Entity, Meta>) => {
-  const currentUser = useCurrentUser();
+  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
+
   const displayActionsCol = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
-  const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
+
+  const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
 
   const visibleColumns = useMemo(
     () =>
@@ -215,19 +226,14 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     [displayBulkSelectCol, isEntitySelectable],
   );
 
-  const columns = useMemo(
-    () => filterAccessibleColumns(columnDefinitions, currentUser.permissions),
-    [columnDefinitions, currentUser.permissions],
-  );
-
   const columnRenderersByAttribute = useMemo(
-    () => mergeColumnsRenderers<Entity, Meta>(columns, customColumnRenderers),
-    [columns, customColumnRenderers],
+    () => mergeColumnsRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers),
+    [authorizedColumnSchemas, customColumnRenderers],
   );
 
   const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths<Entity, Meta>({
     columnRenderersByAttribute,
-    columns,
+    columnSchemas: authorizedColumnSchemas,
     displayBulkSelectCol,
     fixedActionsCellWidth,
     visibleColumns,
@@ -237,7 +243,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     actionsRef,
     actionsColWidth,
     columnRenderersByAttribute,
-    columns,
+    columnSchemas: authorizedColumnSchemas,
     columnsWidths,
     displayActionsCol,
     displayBulkSelectCol,
@@ -247,7 +253,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
-    columns: columnsDefinitions,
+    columnsDefinitions,
     columnOrder,
     entities,
     isEntitySelectable: _isEntitySelectable,

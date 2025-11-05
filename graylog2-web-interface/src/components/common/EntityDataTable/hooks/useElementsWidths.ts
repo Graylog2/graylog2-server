@@ -18,13 +18,13 @@
 import { useRef, useMemo } from 'react';
 
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
-import type { Column } from 'components/common/EntityDataTable';
+import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import useColumnsWidth from 'components/common/EntityDataTable/hooks/useColumnsWidth';
 
 type Props<Entity extends EntityBase, Meta> = {
-  columns: Array<Column>;
+  columnSchemas: Array<ColumnSchema>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   displayBulkSelectCol: boolean;
   fixedActionsCellWidth: number | undefined;
@@ -32,7 +32,7 @@ type Props<Entity extends EntityBase, Meta> = {
 };
 
 const useElementsWidths = <Entity extends EntityBase, Meta>({
-  columns,
+  columnSchemas,
   columnRenderersByAttribute,
   displayBulkSelectCol,
   fixedActionsCellWidth,
@@ -42,8 +42,8 @@ const useElementsWidths = <Entity extends EntityBase, Meta>({
   const actionsRef = useRef<HTMLDivElement>();
   const { width: tableWidth } = useElementDimensions(tableRef);
   const columnsIds = useMemo(
-    () => columns.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
-    [columns, visibleColumns],
+    () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
+    [columnSchemas, visibleColumns],
   );
   const actionsColInnerWidth = fixedActionsCellWidth ?? actionsRef.current?.offsetWidth ?? 0;
   const actionsColWidth = actionsColInnerWidth ? actionsColInnerWidth + CELL_PADDING * 2 : 0;

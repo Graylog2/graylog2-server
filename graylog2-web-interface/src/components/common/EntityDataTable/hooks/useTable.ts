@@ -24,7 +24,7 @@ import type { Sort } from 'stores/PaginationTypes';
 import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 
 type Props<Entity extends EntityBase> = {
-  columns: Array<ColumnDef<Entity>>;
+  columnsDefinitions: Array<ColumnDef<Entity>>;
   columnOrder: Array<string>;
   entities: ReadonlyArray<Entity>;
   isEntitySelectable: (entity: Entity) => boolean;
@@ -38,7 +38,7 @@ type Props<Entity extends EntityBase> = {
 };
 
 const useTable = <Entity extends EntityBase>({
-  columns,
+  columnsDefinitions,
   columnOrder,
   entities,
   isEntitySelectable,
@@ -62,8 +62,8 @@ const useTable = <Entity extends EntityBase>({
   );
 
   const columnVisibility = useMemo(
-    () => Object.fromEntries(columns.map(({ id }) => [id, visibleColumns.includes(id)])),
-    [columns, visibleColumns],
+    () => Object.fromEntries(columnsDefinitions.map(({ id }) => [id, visibleColumns.includes(id)])),
+    [columnsDefinitions, visibleColumns],
   );
 
   const onColumnVisibilityChange = useCallback(
@@ -99,7 +99,7 @@ const useTable = <Entity extends EntityBase>({
   );
 
   return useReactTable({
-    columns,
+    columns: columnsDefinitions,
     data,
     enableRowSelection: (row) => isEntitySelectable(row.original),
     enableSortingRemoval: false,

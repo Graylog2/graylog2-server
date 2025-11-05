@@ -21,7 +21,7 @@ import type { Column, Table } from '@tanstack/react-table';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Checkbox, DropdownButton, MenuItem } from 'components/bootstrap';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import type { EntityBase, ColumnMeta } from 'components/common/EntityDataTable/types';
+import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 
 const StyledDropdownButton = styled(DropdownButton)`
   ~ .dropdown-menu {
@@ -56,7 +56,7 @@ const ColumnTitle = styled(TextOverflowEllipsis)`
 `;
 
 const colLabel = <Entity extends EntityBase>(column: Column<Entity>) =>
-  (column.columnDef.meta as ColumnMeta)?.label ?? column.id;
+  (column.columnDef.meta as ColumnMetaContext)?.label ?? column.id;
 
 const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
   const isSelected = column.getIsVisible();

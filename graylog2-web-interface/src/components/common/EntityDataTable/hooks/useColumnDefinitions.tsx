@@ -22,7 +22,7 @@ import { createColumnHelper } from '@tanstack/react-table';
 import camelCase from 'lodash/camelCase';
 import styled from 'styled-components';
 
-import type { EntityBase, ColumnRenderersByAttribute, Column } from 'components/common/EntityDataTable/types';
+import type { EntityBase, ColumnRenderersByAttribute, ColumnSchema } from 'components/common/EntityDataTable/types';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import {
   BULK_SELECT_COLUMN_WIDTH,
@@ -107,14 +107,14 @@ const useActionsCol = <Entity extends EntityBase>(
 };
 
 const useAttributeCols = <Entity extends EntityBase, Meta>({
-  columns,
+  columnSchemas,
   columnRenderersByAttribute,
   columnsWidths,
   entityAttributesAreCamelCase,
   meta,
   columnHelper,
 }: {
-  columns: Array<Column>;
+  columnSchemas: Array<ColumnSchema>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnsWidths: { [attributeId: string]: number };
   entityAttributesAreCamelCase: boolean;
@@ -138,7 +138,7 @@ const useAttributeCols = <Entity extends EntityBase, Meta>({
 
   return useMemo(
     () =>
-      columns.map((col) => {
+      columnSchemas.map((col) => {
         const columnRenderer = columnRenderersByAttribute[col.id];
         const baseColDef = {
           id: col.id,
@@ -163,7 +163,15 @@ const useAttributeCols = <Entity extends EntityBase, Meta>({
           ...baseColDef,
         });
       }),
-    [columns, columnRenderersByAttribute, cell, header, columnsWidths, entityAttributesAreCamelCase, columnHelper],
+    [
+      columnSchemas,
+      columnRenderersByAttribute,
+      cell,
+      header,
+      columnsWidths,
+      entityAttributesAreCamelCase,
+      columnHelper,
+    ],
   );
 };
 
@@ -171,7 +179,7 @@ type Props<Entity extends EntityBase, Meta> = {
   actionsRef: React.MutableRefObject<HTMLDivElement>;
   actionsColWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
-  columns: Array<Column>;
+  columnSchemas: Array<ColumnSchema>;
   columnsWidths: { [attributeId: string]: number };
   displayActionsCol: boolean;
   displayBulkSelectCol: boolean;
@@ -184,7 +192,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   actionsRef,
   actionsColWidth,
   columnRenderersByAttribute,
-  columns,
+  columnSchemas,
   columnsWidths,
   displayActionsCol,
   displayBulkSelectCol,
@@ -196,7 +204,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   const bulkSelectCol = useBulkSelectCol(displayBulkSelectCol);
   const actionsCol = useActionsCol(displayActionsCol, actionsColWidth, entityActions, actionsRef);
   const attributeCols = useAttributeCols<Entity, Meta>({
-    columns,
+    columnSchemas,
     columnRenderersByAttribute,
     columnsWidths,
     entityAttributesAreCamelCase,
