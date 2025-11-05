@@ -68,7 +68,7 @@ class ContentPackParameterList extends React.Component<
 
     const entityIds = Object.keys(appliedParameter);
 
-    /* eslint-disable-next-line no-restricted-syntax, guard-for-in */
+    /* eslint-disable-next-line guard-for-in */
     for (const i in entityIds) {
       const params = appliedParameter[entityIds[i]];
 
