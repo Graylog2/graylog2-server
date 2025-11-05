@@ -33,7 +33,6 @@ import org.graylog.storage.opensearch2.Scroll;
 import org.graylog.storage.opensearch2.ScrollResultOS2;
 import org.graylog.storage.opensearch2.SearchRequestFactory;
 import org.graylog.storage.opensearch2.SearchesAdapterOS2;
-import org.graylog.storage.opensearch2.SortOrderMapper;
 import org.graylog.storage.opensearch2.fieldtypes.streams.StreamsForFieldRetrieverOS2;
 import org.graylog.storage.opensearch2.mapping.FieldMappingApi;
 import org.graylog.testing.elasticsearch.Adapters;
@@ -98,11 +97,10 @@ public class AdaptersOS2 implements Adapters {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final boolean allowHighlighting = true;
         final boolean allowLeadingWildcardSearches = true;
 
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         return new SearchesAdapterOS2(client,
                 new Scroll(client,
                         scrollResultFactory,
