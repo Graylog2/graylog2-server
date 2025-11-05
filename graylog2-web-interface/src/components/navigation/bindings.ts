@@ -21,6 +21,7 @@ import InputsDotBadge from 'components/inputs/InputsDotBadge';
 import Routes from 'routing/Routes';
 import filterMenuItems, { filterCloudMenuItems } from 'util/conditional/filterMenuItems';
 import AppConfig from 'util/AppConfig';
+import DocsHelper from 'util/DocsHelper';
 
 export const SYSTEM_DROPDOWN_TITLE = 'System';
 export const SEARCH_LINK_TITLE = 'Search';
@@ -101,6 +102,15 @@ const navigationBindings: PluginExports = {
           Routes.SYSTEM.AUTHENTICATION.BACKENDS.ACTIVE,
         ],
       ),
+    },
+  ],
+  helpMenu: [
+    { description: 'Documentation', externalLink: DocsHelper.versionedDocsHomePage() },
+    { description: 'Keyboard Shortcuts', action: ({ showHotkeysModal }) => showHotkeysModal() },
+    {
+      description: 'Cluster Global API browser',
+      externalLink: Routes.global_api_browser(),
+      permissions: 'api_browser:read',
     },
   ],
 };

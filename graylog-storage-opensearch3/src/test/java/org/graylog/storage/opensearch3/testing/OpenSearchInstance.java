@@ -37,7 +37,6 @@ import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OfficialOpensearchClientProvider;
 import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.RestClientProvider;
-import org.graylog.storage.opensearch3.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.FixtureImporter;
@@ -87,12 +86,13 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public OpenSearchInstance init() {
         super.init();
+        // TODO: Check if client creation can be aware of cache to avoid recreating the client for every test method
         RestHighLevelClient restHighLevelClient = buildRestClient();
         this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
         this.officialOpensearchClient = buildOfficialClient();
-        this.client = new ClientOS2(this.openSearchClient, featureFlags);
+        this.client = new ClientOS(this.openSearchClient, officialOpensearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient, officialOpensearchClient, featureFlags);
+        adapters = new AdaptersOS(openSearchClient, officialOpensearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         if (isFirstContainerStart) {
             afterContainerCreated();
@@ -101,20 +101,22 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     }
 
     private OfficialOpensearchClient buildOfficialClient() {
-        return new OfficialOpensearchClientProvider(ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())), IndexerJwtAuthToken.disabled()).get();
+        return new OfficialOpensearchClientProvider(
+                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                IndexerJwtAuthToken.disabled(),
+                createCredentialsProvider(), // no credentials!
+                getElasticsearchClientConfiguration()
+        ).get();
     }
 
+    private static org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider createCredentialsProvider() {
+        return new org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider();
+    }
+
+    @Deprecated
     private RestHighLevelClient buildRestClient() {
 
-        final ElasticsearchClientConfiguration config = buildconfig(Map.of(
-                "elasticsearch_connect_timeout", "60s",
-                "elasticsearch_socket_timeout", "60s",
-                "elasticsearch_idle_timeout", "60s",
-                "elasticsearch_max_total_connections", "1",
-                "elasticsearch_max_total_connections_per_route", "1",
-                "elasticsearch_max_retries", "1",
-                "elasticsearch_use_expect_continue", "false"
-        ));
+        final ElasticsearchClientConfiguration config = getElasticsearchClientConfiguration();
 
         return new RestClientProvider(
                 new GracefulShutdownService(),
@@ -126,6 +128,16 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
                 Collections.emptySet(),
                 Collections.emptySet())
                 .get();
+    }
+
+    private ElasticsearchClientConfiguration getElasticsearchClientConfiguration() {
+        return buildconfig(Map.of(
+                "elasticsearch_connect_timeout", "60s",
+                "elasticsearch_socket_timeout", "60s",
+                "elasticsearch_max_total_connections", "1",
+                "elasticsearch_max_total_connections_per_route", "1",
+                "elasticsearch_use_expect_continue", "false"
+        ));
     }
 
     private ElasticsearchClientConfiguration buildconfig(Map<String, String> properties) {

@@ -45,7 +45,7 @@ export default [
   jest.configs['flat/recommended'],
   testingLibrary.configs['flat/react'],
   importPlugin.flatConfigs.recommended,
-  reactHooks.configs['recommended-latest'],
+  reactHooks.configs.flat['recommended-latest'],
   jsxA11y.flatConfigs.recommended,
   reactQuery.configs['flat/recommended'],
   compat.configs['flat/recommended'],

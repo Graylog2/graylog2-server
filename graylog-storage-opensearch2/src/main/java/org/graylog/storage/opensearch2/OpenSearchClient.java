@@ -39,6 +39,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.errors.ResponseError;
+import org.graylog.storage.function.ThrowingBiFunction;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
