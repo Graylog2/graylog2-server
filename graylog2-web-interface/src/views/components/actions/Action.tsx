@@ -20,7 +20,6 @@ import { useCallback, useState } from 'react';
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import OverlayDropdown from 'components/common/OverlayDropdown';
 import useOverflowingComponents from 'views/hooks/useOverflowingComponents';
-import zIndices from 'theme/z-indices';
 
 import ActionDropdown from './ActionDropdown';
 
@@ -52,8 +51,7 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
         toggleChild={element}
         placement="right"
         onToggle={_onMenuToggle}
-        menuContainer={menuContainer}
-        dropdownZIndex={zIndices.dropdownMenu}>
+        menuContainer={menuContainer}>
         <ActionDropdown
           handlerArgs={handlerArgs}
           type={type}
