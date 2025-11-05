@@ -55,6 +55,8 @@ function Actions({ lut }: ActionsProps) {
 
   if (!scopePermissions.is_mutable) return null;
 
+  console.log(lut.id);
+
   return (
     <>
       <DropdownButton
@@ -84,9 +86,11 @@ function Actions({ lut }: ActionsProps) {
   );
 }
 
+const renderActions = (lut: LookupTableEntity) => <Actions lut={lut} />;
+
 function useActions() {
   return {
-    renderActions: (lut: LookupTableEntity) => <Actions lut={lut} />,
+    renderActions,
   };
 }
 
