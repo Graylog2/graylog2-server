@@ -14,12 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog.datanode.opensearch.cli;
 
-import type { MaterialSymbol as IconName } from '@material-symbols/font-700';
+import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 
-export type SizeProp = 'xs' | 'sm' | 'lg' | 'xl' | '2x' | '3x' | '4x' | '5x' | 'huge';
-export type RotateProp = 0 | 90 | 180 | 270;
-export type FlipProp = 'horizontal' | 'vertical' | 'both';
-export type IconType = 'regular' | 'solid';
+import java.nio.file.Path;
+import java.security.KeyStore;
+import java.util.function.Supplier;
 
-export { IconName };
+public class OpensearchCertificateFile  {
+
+    public static KeystoreConfigFile create(String filename, Supplier<KeyStore> supplier, char[] password) {
+        return new KeystoreConfigFile(Path.of(filename), new InMemoryKeystoreInformation(supplier.get(), password));
+    }
+}

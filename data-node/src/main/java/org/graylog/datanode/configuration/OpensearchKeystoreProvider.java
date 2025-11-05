@@ -24,14 +24,17 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
 import org.graylog.security.certutil.KeyStoreDto;
 import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.security.KeyStore;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 @Singleton
 public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeystoreProvider.Store, KeyStoreDto>> {
@@ -53,14 +56,17 @@ public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeysto
         try {
             keystores.put(Store.TRUSTSTORE, KeyStoreDto.fromKeyStore(event.config().trustStore()));
 
-            event.config().httpCertificate()
+            event.config().certificates()
+                    .map(OpensearchCertificates::getHttpKeystore)
+                    .map(Supplier::get)
                     .map(OpensearchKeystoreProvider::toDto)
                     .ifPresentOrElse(dto -> keystores.put(Store.HTTP, dto), () -> keystores.remove(Store.HTTP));
 
-            event.config().transportCertificate()
+            event.config().certificates()
+                    .map(OpensearchCertificates::getTransportKeystore)
+                    .map(Supplier::get)
                     .map(OpensearchKeystoreProvider::toDto)
                     .ifPresentOrElse(dto -> keystores.put(Store.TRANSPORT, dto), () -> keystores.remove(Store.TRANSPORT));
-
         } catch (Exception e) {
             log.error("Error reading truststore", e);
         }
@@ -69,7 +75,16 @@ public class OpensearchKeystoreProvider implements Provider<Map<OpensearchKeysto
     @Nonnull
     private static KeyStoreDto toDto(KeystoreInformation cert) {
         try {
-            return KeyStoreDto.fromKeyStore(cert.loadKeystore());
+            return toDto(cert.loadKeystore());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Nonnull
+    private static KeyStoreDto toDto(KeyStore keyStore) {
+        try {
+            return KeyStoreDto.fromKeyStore(keyStore);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
