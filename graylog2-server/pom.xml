@@ -751,8 +751,8 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
+            <groupId>org.itsallcode</groupId>
+            <artifactId>junit5-system-extensions</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
