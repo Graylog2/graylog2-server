@@ -37,17 +37,18 @@ public class InputsMetricsSupplier implements TelemetryMetricSupplier {
 
     @Override
     public Optional<TelemetryEvent> get() {
-        Map<String, Object> metrics = new HashMap<>(inputService.totalCountByType());
-        return Optional.of(TelemetryEvent.of(format(metrics)));
+        Map<String, Object> metrics = new HashMap<>(format(inputService.totalCountByType()));
+
+        return Optional.of(TelemetryEvent.of((metrics)));
     }
 
-    private Map<String, Object> format(Map<String, Object> map) {
+    private Map<String, Long> format(Map<String, Long> map) {
         return map.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         e -> TypeFormatter.format(e.getKey()),
                         Map.Entry::getValue,
-                        (v1, v2) -> v2,
+                        Long::sum,
                         LinkedHashMap::new
                 ));
     }

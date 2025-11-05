@@ -44,7 +44,9 @@ public class InputsMetricsSupplierTest {
     public void shouldReturnCountsByType() {
         final Map<String, Long> counts = Map.of(
                 "org.graylog.plugins.beats.Beats2Input", 2L,
-                "org.graylog2.inputs.gelf.tcp.GELFTCPInput", 3L
+                "org.graylog2.inputs.gelf.tcp.GELFTCPInput", 3L,
+                "org.graylog2.inputs.tcp.DuplicateInput", 1L,
+                "org.graylog2.inputs.udp.DuplicateInput", 1L
         );
         when(inputService.totalCountByType()).thenReturn(counts);
 
@@ -52,7 +54,8 @@ public class InputsMetricsSupplierTest {
 
         final Map<String, Long> expectedCounts = Map.of(
                 "beats_2_input", 2L,
-                "gelftcp_input", 3L
+                "gelftcp_input", 3L,
+                "duplicate_input", 2L
         );
         assertTrue(event.isPresent());
         assertEquals(expectedCounts, event.get().metrics());
