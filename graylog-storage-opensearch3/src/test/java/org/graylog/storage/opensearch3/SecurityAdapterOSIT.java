@@ -18,11 +18,14 @@ package org.graylog.storage.opensearch3;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog2.indexer.security.SecurityAdapter;
 import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 
 class SecurityAdapterOSIT {
 
+    public static final String TESTED_ROLE = "all_access";
+    public static final String USERNAME = "max.mustermann";
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.createSecured();
 
@@ -30,22 +33,32 @@ class SecurityAdapterOSIT {
     void testMappings() {
         final SecurityAdapterOS adapter = new SecurityAdapterOS(openSearchInstance.getOfficialOpensearchClient());
 
-        Assertions.assertThat(adapter.getMappingForRole("all_access").users()).isEmpty();
+        // initially there are no users for this role mapping
+        Assertions.assertThat(adapter.getMappingForRole(TESTED_ROLE).users()).isEmpty();
 
-        Assertions.assertThat(adapter.addUserToRoleMapping("all_access", "max.mustermann"))
-                        .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("'all_access' updated."));
+        // add one user and verify that updated
+        assertUsersModified(adapter.addUserToRoleMapping(TESTED_ROLE, USERNAME), "'all_access' updated.");
 
-        Assertions.assertThat(adapter.addUserToRoleMapping("all_access", "max.mustermann"))
-                .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("User already in mapping"));
+        // repeatedly add the same user, verify that no duplicates are there
+        assertUsersModified(adapter.addUserToRoleMapping(TESTED_ROLE, USERNAME), "User already in mapping");
 
-        Assertions.assertThat(adapter.getMappingForRole("all_access").users()).containsExactly("max.mustermann");
+        Assertions.assertThat(adapter.getMappingForRole(TESTED_ROLE).users())
+                .hasSize(1)
+                .containsExactly(USERNAME);
 
-        Assertions.assertThat(adapter.removeUserFromRoleMapping("all_access", "max.mustermann"))
-                        .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("'all_access' updated."));
+        // remove the user for the first time
+        assertUsersModified(adapter.removeUserFromRoleMapping(TESTED_ROLE, USERNAME), "'all_access' updated.");
 
-        Assertions.assertThat(adapter.removeUserFromRoleMapping("all_access", "max.mustermann"))
-                .satisfies(response -> Assertions.assertThat(response.message()).isEqualTo("No updates required"));
+        // and once again to check that this doesn't lead to any error
+        assertUsersModified(adapter.removeUserFromRoleMapping(TESTED_ROLE, USERNAME), "No updates required");
 
-        Assertions.assertThat(adapter.getMappingForRole("all_access").users()).isEmpty();
+        // the mapping should be empty at the end of the test
+        Assertions.assertThat(adapter.getMappingForRole(TESTED_ROLE).users()).isEmpty();
+    }
+
+    private static void assertUsersModified(SecurityAdapter.MappingResponse response, String expected) {
+        Assertions.assertThat(response)
+                .extracting(SecurityAdapter.MappingResponse::message)
+                .isEqualTo(expected);
     }
 }
