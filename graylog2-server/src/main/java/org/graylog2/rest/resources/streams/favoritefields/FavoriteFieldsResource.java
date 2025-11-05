@@ -17,14 +17,17 @@
 package org.graylog2.rest.resources.streams.favoritefields;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
@@ -68,27 +71,30 @@ public class FavoriteFieldsResource extends RestResource {
         request.fields().forEach(favoriteFieldsService::set);
     }
 
-    public record FavoriteFieldRequest(Set<String> streamIds, String field) {}
+    public record FavoriteFieldRequest(@JsonProperty("stream_ids") @NotNull Set<String> streamIds,
+                                       @JsonProperty("field") @NotBlank String field) {}
 
-    @PUT
+    @PATCH
     @Timed
     @ApiOperation(value = "Add favorite field for a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
-    public void add(@ApiParam(name = "JSON body", required = true) final FavoriteFieldRequest request) throws ValidationException {
+    @Path("/add")
+    public void add(@ApiParam(name = "JSON body", required = true) @Valid final FavoriteFieldRequest request) throws ValidationException {
         request.streamIds().forEach(streamId -> checkPermission(RestPermissions.STREAMS_EDIT, streamId));
 
         request.streamIds().forEach(streamId -> favoriteFieldsService.add(streamId, request.field()));
     }
 
-    @DELETE
+    @PATCH
     @Timed
     @ApiOperation(value = "Remove favorite field from a list of streams")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.FAVORITE_FIELDS_UPDATE)
-    public void remove(@ApiParam(name = "JSON body", required = true) final FavoriteFieldRequest request) throws ValidationException {
+    @Path("/remove")
+    public void remove(@ApiParam(name = "JSON body", required = true) @Valid final FavoriteFieldRequest request) throws ValidationException {
         request.streamIds().forEach(streamId -> checkPermission(RestPermissions.STREAMS_EDIT, streamId));
 
         request.streamIds().forEach(streamId -> favoriteFieldsService.remove(streamId, request.field()));
