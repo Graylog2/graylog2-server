@@ -26,6 +26,7 @@ import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 type Props<Entity extends EntityBase> = {
   columnsDefinitions: Array<ColumnDef<Entity>>;
   columnOrder: Array<string>;
+  displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
   isEntitySelectable: (entity: Entity) => boolean;
   onColumnsChange: (visibleColumns: Array<string>) => void;
@@ -38,17 +39,18 @@ type Props<Entity extends EntityBase> = {
 };
 
 const useTable = <Entity extends EntityBase>({
-  columnsDefinitions,
   columnOrder,
+  columnsDefinitions,
+  displayBulkSelectCol,
   entities,
   isEntitySelectable,
+  onChangeSelection,
   onColumnsChange,
   onSortChange,
-  sort,
-  visibleColumns,
   selectedEntities,
   setSelectedEntities,
-  onChangeSelection,
+  sort,
+  visibleColumns,
 }: Props<Entity>) => {
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
@@ -101,7 +103,7 @@ const useTable = <Entity extends EntityBase>({
   return useReactTable({
     columns: columnsDefinitions,
     data,
-    enableRowSelection: (row) => isEntitySelectable(row.original),
+    enableRowSelection: (row) => displayBulkSelectCol && !!isEntitySelectable?.(row.original),
     enableSortingRemoval: false,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,

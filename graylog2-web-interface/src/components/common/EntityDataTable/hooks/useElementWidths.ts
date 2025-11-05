@@ -21,7 +21,7 @@ import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/E
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
-import useColumnsWidth from 'components/common/EntityDataTable/hooks/useColumnsWidth';
+import useColumnWidths from 'components/common/EntityDataTable/hooks/useColumnWidths';
 
 type Props<Entity extends EntityBase, Meta> = {
   columnSchemas: Array<ColumnSchema>;
@@ -31,7 +31,7 @@ type Props<Entity extends EntityBase, Meta> = {
   visibleColumns: Array<string>;
 };
 
-const useElementsWidths = <Entity extends EntityBase, Meta>({
+const useElementWidths = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnRenderersByAttribute,
   displayBulkSelectCol,
@@ -41,22 +41,22 @@ const useElementsWidths = <Entity extends EntityBase, Meta>({
   const tableRef = useRef<HTMLTableElement>(null);
   const actionsRef = useRef<HTMLDivElement>();
   const { width: tableWidth } = useElementDimensions(tableRef);
-  const columnsIds = useMemo(
+  const columnIds = useMemo(
     () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
     [columnSchemas, visibleColumns],
   );
   const actionsColInnerWidth = fixedActionsCellWidth ?? actionsRef.current?.offsetWidth ?? 0;
   const actionsColWidth = actionsColInnerWidth ? actionsColInnerWidth + CELL_PADDING * 2 : 0;
 
-  const columnsWidths = useColumnsWidth<Entity>({
+  const columnWidths = useColumnWidths<Entity>({
     actionsColWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
     columnRenderersByAttribute,
-    columnsIds,
+    columnIds,
     tableWidth,
   });
 
-  return { tableRef, actionsRef, columnsWidths, actionsColWidth };
+  return { tableRef, actionsRef, columnWidths, actionsColWidth };
 };
 
-export default useElementsWidths;
+export default useElementWidths;

@@ -109,14 +109,14 @@ const useActionsCol = <Entity extends EntityBase>(
 const useAttributeCols = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnRenderersByAttribute,
-  columnsWidths,
+  columnWidths,
   entityAttributesAreCamelCase,
   meta,
   columnHelper,
 }: {
   columnSchemas: Array<ColumnSchema>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
-  columnsWidths: { [attributeId: string]: number };
+  columnWidths: { [attributeId: string]: number };
   entityAttributesAreCamelCase: boolean;
   meta: Meta;
   columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
@@ -144,7 +144,7 @@ const useAttributeCols = <Entity extends EntityBase, Meta>({
           id: col.id,
           cell,
           header,
-          size: columnsWidths[col.id],
+          size: columnWidths[col.id],
           enableHiding: true,
           meta: {
             label: col.title,
@@ -163,15 +163,7 @@ const useAttributeCols = <Entity extends EntityBase, Meta>({
           ...baseColDef,
         });
       }),
-    [
-      columnSchemas,
-      columnRenderersByAttribute,
-      cell,
-      header,
-      columnsWidths,
-      entityAttributesAreCamelCase,
-      columnHelper,
-    ],
+    [columnSchemas, columnRenderersByAttribute, cell, header, columnWidths, entityAttributesAreCamelCase, columnHelper],
   );
 };
 
@@ -180,7 +172,7 @@ type Props<Entity extends EntityBase, Meta> = {
   actionsColWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
-  columnsWidths: { [attributeId: string]: number };
+  columnWidths: { [attributeId: string]: number };
   displayActionsCol: boolean;
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
@@ -193,7 +185,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   actionsColWidth,
   columnRenderersByAttribute,
   columnSchemas,
-  columnsWidths,
+  columnWidths,
   displayActionsCol,
   displayBulkSelectCol,
   entityActions,
@@ -206,7 +198,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   const attributeCols = useAttributeCols<Entity, Meta>({
     columnSchemas,
     columnRenderersByAttribute,
-    columnsWidths,
+    columnWidths,
     entityAttributesAreCamelCase,
     meta,
     columnHelper,

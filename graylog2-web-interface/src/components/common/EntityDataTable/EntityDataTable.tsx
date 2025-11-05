@@ -15,9 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useCallback, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
-import type * as Immutable from 'immutable';
 import merge from 'lodash/merge';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
@@ -34,7 +33,7 @@ import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections
 import TableRow from 'components/common/EntityDataTable/TableRow';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
-import useElementsWidths from 'components/common/EntityDataTable/hooks/useElementsWidths';
+import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
 import useColumnOrder from 'components/common/EntityDataTable/hooks/useColumnOrder';
 
 import type { ColumnRenderers, ColumnSchema, EntityBase, ExpandedSectionRenderer } from './types';
@@ -82,42 +81,43 @@ const LayoutConfigRow = styled.div`
   gap: 5px;
 `;
 
-const filterAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>, userPermissions: Immutable.List<string>) =>
-  columnSchemas.filter(({ permissions, anyPermissions, hidden }) => {
-    if (hidden) {
-      return false;
-    }
-
-    if (permissions?.length) {
-      return anyPermissions ? isAnyPermitted(userPermissions, permissions) : isPermitted(userPermissions, permissions);
-    }
-
-    return true;
-  });
-
-const mergeColumnsRenderers = <Entity extends EntityBase, Meta = unknown>(
+const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
   columnSchemas: Array<ColumnSchema>,
   customColumnRenderers: ColumnRenderers<Entity, Meta>,
-) => {
-  const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
+) =>
+  useMemo(() => {
+    const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
 
-  return Object.fromEntries(
-    columnSchemas.map(({ id, type }) => {
-      const typeRenderer = renderers.types?.[type];
-      const attributeRenderer = renderers.attributes?.[id];
+    return Object.fromEntries(
+      columnSchemas.map(({ id, type }) => {
+        const typeRenderer = renderers.types?.[type];
+        const attributeRenderer = renderers.attributes?.[id];
 
-      const columnRenderer = merge({}, typeRenderer, attributeRenderer);
+        const columnRenderer = merge({}, typeRenderer, attributeRenderer);
 
-      return [id, columnRenderer];
-    }),
-  );
-};
+        return [id, columnRenderer];
+      }),
+    );
+  }, [columnSchemas, customColumnRenderers]);
 
 const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
   const currentUser = useCurrentUser();
 
   return useMemo(
-    () => filterAuthorizedColumnSchemas(columnSchemas, currentUser.permissions),
+    () =>
+      columnSchemas.filter(({ permissions, anyPermissions, hidden }) => {
+        if (hidden) {
+          return false;
+        }
+
+        if (permissions?.length) {
+          return anyPermissions
+            ? isAnyPermitted(currentUser.permissions, permissions)
+            : isPermitted(currentUser.permissions, permissions);
+        }
+
+        return true;
+      }),
     [columnSchemas, currentUser.permissions],
   );
 };
@@ -200,38 +200,21 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
-
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
 
   const visibleColumns = useMemo(
-    () =>
-      [
-        ...visibleAttributeColumns,
-        displayActionsCol ? ACTIONS_COL_ID : null,
-        displayBulkSelectCol ? BULK_SELECT_COL_ID : null,
-      ].filter(Boolean),
+    () => [
+      ...visibleAttributeColumns,
+      ...(displayActionsCol ? [ACTIONS_COL_ID] : []),
+      ...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []),
+    ],
     [displayActionsCol, displayBulkSelectCol, visibleAttributeColumns],
   );
 
   const columnOrder = useColumnOrder(visibleColumns, attributeColumnsOder);
+  const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
 
-  const _isEntitySelectable = useCallback(
-    (entity: Entity) => {
-      if (!displayBulkSelectCol) return false;
-
-      if (typeof isEntitySelectable === 'function') return isEntitySelectable(entity);
-
-      return true;
-    },
-    [displayBulkSelectCol, isEntitySelectable],
-  );
-
-  const columnRenderersByAttribute = useMemo(
-    () => mergeColumnsRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers),
-    [authorizedColumnSchemas, customColumnRenderers],
-  );
-
-  const { tableRef, actionsRef, actionsColWidth, columnsWidths } = useElementsWidths<Entity, Meta>({
+  const { tableRef, actionsRef, actionsColWidth, columnWidths } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     displayBulkSelectCol,
@@ -239,12 +222,14 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     visibleColumns,
   });
 
+  console.log(visibleColumns, columnOrder);
+
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsRef,
     actionsColWidth,
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
-    columnsWidths,
+    columnWidths,
     displayActionsCol,
     displayBulkSelectCol,
     entityActions,
@@ -253,17 +238,18 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
-    columnsDefinitions,
     columnOrder,
+    columnsDefinitions,
+    displayBulkSelectCol,
     entities,
-    isEntitySelectable: _isEntitySelectable,
+    isEntitySelectable,
     onChangeSelection,
     onColumnsChange,
     onSortChange,
-    sort: activeSort,
-    visibleColumns,
     selectedEntities,
     setSelectedEntities,
+    sort: activeSort,
+    visibleColumns,
   });
 
   return (
