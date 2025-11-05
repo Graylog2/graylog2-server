@@ -46,7 +46,8 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
                 """
                         List all Resources available in %1$s for one resource type out of the following: {stream,dashboard,event_definition}.
                         Returns: A list of tuples with both the GRN and name of each resource.
-                        """.formatted(toolContext.customizationConfig().productName()));
+                        """.formatted(toolContext.customizationConfig().productName()),
+                true);
         this.resourceProviders = resourceProviders;
     }
 

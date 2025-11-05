@@ -40,7 +40,8 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
                 new TypeReference<>() {},
                 NAME,
                 f("List all %s Streams", toolContext.customizationConfig().productName()),
-                f("List all available streams in the %s instance.", toolContext.customizationConfig().productName()));
+                f("List all available streams in the %s instance.", toolContext.customizationConfig().productName()),
+                true);
         this.streamService = streamService;
     }
 

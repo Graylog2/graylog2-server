@@ -16,6 +16,7 @@
  */
 package org.graylog.mcp.server;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -59,6 +60,9 @@ public abstract class Tool<P, O> {
     private final String description;
     private final McpSchema.JsonSchema inputSchema;
     private final Map<String, Object> outputSchema;
+    private final boolean readOnly;
+    private boolean enabled;
+    private OutputFormat outputFormatOverride;
 
     protected Tool(
             ToolContext context,
@@ -66,11 +70,13 @@ public abstract class Tool<P, O> {
             TypeReference<O> outputType,
             String name,
             String title,
-            String description) {
+            String description,
+            boolean readOnly) {
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
+        this.readOnly = readOnly;
 
         this.objectMapper = context.objectMapper();
         this.clusterConfigService = context.clusterConfigService();
@@ -92,16 +98,42 @@ public abstract class Tool<P, O> {
         } else {
             this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
         }
+
+        this.outputFormatOverride = OutputFormat.NO_OVERRIDE;
+        this.enabled = true;
     }
 
-    protected boolean isStructuredOutputSet() {
-        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES
-        ).useStructuredOutput();
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     protected boolean isOutputSchemaEnabled() {
-        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES
-        ).enableOutputSchema();
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
+                .enableOutputSchema();
+    }
+
+    public boolean isOutputFormatOverridden() {
+        return !outputFormatOverride.equals(OutputFormat.NO_OVERRIDE);
+    }
+
+    public void setOutputFormatOverride(OutputFormat outputFormatOverride) {
+        this.outputFormatOverride = outputFormatOverride;
+    }
+
+    protected boolean useStructuredOutput() {
+        return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
+                .useStructuredOutput();
+    }
+
+    public OutputFormat getOutputFormat() {
+        if (isOutputFormatOverridden()) {
+            return outputFormatOverride;
+        }
+        return useStructuredOutput() ? OutputFormat.JSON : OutputFormat.MARKDOWN;
     }
 
     protected ObjectMapper getObjectMapper() {
@@ -109,6 +141,24 @@ public abstract class Tool<P, O> {
     }
 
     public String getProductName() { return productName; }
+
+    public String getCategory() {
+        final String packageName = this.getClass().getPackageName();
+
+        if (packageName.equals("org.graylog.mcp.tools")) {
+            return "core";
+        }
+
+        if (packageName.startsWith("org.graylog.plugins.mcp.tools.")) {
+            return packageName.substring("org.graylog.plugins.mcp.tools.".length());
+        }
+
+        return "external";
+    }
+
+    public boolean isReadOnly() {
+        return readOnly;
+    }
 
     @JsonProperty
     public String name() {
@@ -132,7 +182,7 @@ public abstract class Tool<P, O> {
 
     @JsonProperty
     public Optional<Map<String, Object>> outputSchema() {
-        return isOutputSchemaEnabled() && isStructuredOutputSet() ? Optional.ofNullable(outputSchema) : Optional.empty();
+        return isOutputSchemaEnabled() ? Optional.ofNullable(outputSchema) : Optional.empty();
     }
 
     /**
@@ -143,8 +193,12 @@ public abstract class Tool<P, O> {
      * @return the return value of the tool call
      */
     public ToolResult<O> apply(PermissionHelper permissionHelper, Map<String, Object> parameterMap) {
+        if (!isEnabled()) {
+            throw new IllegalStateException("Tool is disabled");
+        }
+
         final P p = objectMapper.convertValue(parameterMap, parameterType);
-        if (!isStructuredOutputSet()) {
+        if (!useStructuredOutput()) {
             return new ToolResult.Text<>(applyAsText(permissionHelper, p));
         }
         return new ToolResult.Data<>(apply(permissionHelper, p));
@@ -167,5 +221,17 @@ public abstract class Tool<P, O> {
                 return value != null && !value.toString().isBlank() ? value.toString() : "{}";
             }
         }
+    }
+
+    public enum OutputFormat {
+        @JsonProperty("json")
+        @JsonAlias({"JSON", "Json", "Structured", "structured"})
+        JSON,
+        @JsonProperty("markdown")
+        @JsonAlias({"MARKDOWN", "Markdown", "String", "string"})
+        MARKDOWN,
+        @JsonProperty("default")
+        @JsonAlias({"DEFAULT", "Default", "NONE", "None", "none", "NULL", "Null", "null", ""})
+        NO_OVERRIDE
     }
 }

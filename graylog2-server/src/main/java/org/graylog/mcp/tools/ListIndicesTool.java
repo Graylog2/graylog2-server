@@ -66,7 +66,8 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
                         List all %s indices from the cluster. Returns comprehensive index information including status (open/closed),
                         document counts, storage size, and health metrics. Use this to understand data distribution, identify problematic indices,
                         or before performing queries to understand available data sources. No parameters required.
-                        """, toolContext.customizationConfig().productName()));
+                        """, toolContext.customizationConfig().productName()),
+                true);
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;
         this.indexSetRegistry = indexSetRegistry;

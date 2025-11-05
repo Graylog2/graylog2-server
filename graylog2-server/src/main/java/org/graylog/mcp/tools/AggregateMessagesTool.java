@@ -63,7 +63,8 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                         You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
                         For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
-                        """.formatted(toolContext.customizationConfig().productName()));
+                        """.formatted(toolContext.customizationConfig().productName()),
+                true);
         this.scriptingApiService = scriptingApiService;
     }
 

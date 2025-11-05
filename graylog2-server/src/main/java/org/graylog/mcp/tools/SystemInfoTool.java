@@ -28,7 +28,6 @@ import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.format.DateTimeFormat;
 
-import java.util.List;
 import java.util.Locale;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
@@ -51,7 +50,8 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
                 """
                         Returns system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """.formatted(toolContext.customizationConfig().productName()));
+                        """.formatted(toolContext.customizationConfig().productName()),
+                true);
         this.serverStatus = serverStatus;
         this.leaderElectionService = leaderElectionService;
     }

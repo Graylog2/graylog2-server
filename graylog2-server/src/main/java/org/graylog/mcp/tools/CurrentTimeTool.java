@@ -46,8 +46,8 @@ public class CurrentTimeTool extends Tool<CurrentTimeTool.Parameters, String> {
                 f(
                         "Return the current time from the %s server in ISO‑8601 UTC format.",
                         toolContext.customizationConfig().productName()
-                )
-        );
+                ),
+                true);
     }
 
     @Override

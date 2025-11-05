@@ -158,7 +158,7 @@ public class McpService {
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.debug("Listing available tools");
-                final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> {
+                final List<McpSchema.Tool> toolList = this.tools.values().stream().filter(Tool::isEnabled).map(tool -> {
                     var builder = McpSchema.Tool.builder()
                             .name(tool.name())
                             .title(tool.title())
@@ -179,8 +179,8 @@ public class McpService {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
                     try {
                         final Object result = tool.apply(permissionHelper, callToolRequest.arguments());
-                        if (tool.isStructuredOutputSet()) {
-                            // if we have an output schema we want to return structured content
+                        if (tool.useStructuredOutput()) {
+                            // we want to return [un]structured content (regardless of whether we have an output schema)
                             try {
                                 var structuredContent = objectMapper.convertValue(result,
                                         new TypeReference<Map<String, Object>>() {
@@ -197,7 +197,7 @@ public class McpService {
                                 throw new RuntimeException(e);
                             }
                         } else {
-                            // no schema, just return the string representation directly
+                            // we can also just return the string representation directly
                             auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                             return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
                         }
@@ -228,5 +228,9 @@ public class McpService {
 
         }
         throw new McpException("Unsupported request method: " + request.method());
+    }
+
+    public Map<String, Tool<?, ?>> getTools() {
+        return tools;
     }
 }
