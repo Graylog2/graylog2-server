@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
+import { flexRender } from '@tanstack/react-table';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -30,7 +31,6 @@ import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import TableRow from 'components/common/EntityDataTable/TableRow';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
@@ -79,6 +79,10 @@ const LayoutConfigRow = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
+`;
+
+const Td = styled.td`
+  word-break: break-word;
 `;
 
 const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
@@ -266,7 +270,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               <TableHead table={table} />
               {table.getRowModel().rows.map((row) => (
                 <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                  <TableRow<Entity> key={row.id} row={row} />
+                  <tr>
+                    {row.getVisibleCells().map((cell) => (
+                      <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
+                    ))}
+                  </tr>
                   <ExpandedSections
                     key={`expanded-sections-${row.id}`}
                     expandedSectionsRenderer={expandedSectionsRenderer}
