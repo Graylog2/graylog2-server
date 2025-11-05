@@ -572,10 +572,17 @@ public class IndicesAdapterOS implements IndicesAdapter {
         return c.execute(() -> {
             GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
                     .index(indexWildcard)
-                    .expandWildcards(status.stream().map(ExpandWildcard::valueOf).collect(Collectors.toList()))
+                    .expandWildcards(status.stream().map(this::resolveWildcard).collect(Collectors.toList()))
                     .ignoreUnavailable(true)));
             return result.result().keySet();
         }, "Couldn't get index list for index set <" + indexSetId + ">");
+    }
+
+    private ExpandWildcard resolveWildcard(String s) {
+        return Arrays.stream(ExpandWildcard.values())
+                .filter(w -> w.name().equalsIgnoreCase(s))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Unknown wildcard " + s));
     }
 
     @Override
