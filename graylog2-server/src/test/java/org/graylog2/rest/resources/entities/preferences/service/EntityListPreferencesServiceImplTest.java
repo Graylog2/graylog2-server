@@ -17,11 +17,7 @@
 package org.graylog2.rest.resources.entities.preferences.service;
 
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
-import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
@@ -37,7 +33,6 @@ import static org.graylog2.rest.resources.entities.preferences.model.SortPrefere
 import static org.graylog2.rest.resources.entities.preferences.model.SortPreferences.SortOrder.DESC;
 
 @ExtendWith(MongoDBExtension.class)
-@ExtendWith(MongoJackExtension.class)
 public class EntityListPreferencesServiceImplTest {
     private static final StoredEntityListPreferencesId existingId = StoredEntityListPreferencesId.builder()
             .entityListId("list")
@@ -52,9 +47,8 @@ public class EntityListPreferencesServiceImplTest {
     private EntityListPreferencesService toTest;
 
     @BeforeEach
-    public void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
-        this.toTest = new EntityListPreferencesServiceImpl(new MongoCollections(mongoJackObjectMapperProvider, mongoConnection));
+    public void setUp(MongoCollections mongoCollections) {
+        this.toTest = new EntityListPreferencesServiceImpl(mongoCollections);
     }
 
     @Test
