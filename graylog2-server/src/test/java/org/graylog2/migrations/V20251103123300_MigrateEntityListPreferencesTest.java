@@ -35,8 +35,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
-import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -141,7 +139,7 @@ class V20251103123300_MigrateEntityListPreferencesTest {
     }
 
     private String getPreference(String user, String table) throws JsonProcessingException {
-        final var document = collection.find(Filters.eq(Map.of("user_id", user, "entity_list_id", table))).first();
+        final var document = collection.find(Filters.and(Filters.eq("_id.user_id", user), Filters.eq("_id.entity_list_id", table))).first();
         assertThat(document).isNotNull();
         return objectMapper.writeValueAsString(document);
     }
