@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.cluster;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -52,7 +52,7 @@ import java.util.concurrent.ExecutorService;
 import static jakarta.ws.rs.core.Response.Status.BAD_GATEWAY;
 
 @RequiresAuthentication
-@Api(value = "Cluster/LoadBalancers", description = "Cluster-wide status propagation for LB")
+@Tag(name = "Cluster/LoadBalancers", description = "Cluster-wide status propagation for LB")
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/cluster/{nodeId}/lbstatus")
 public class ClusterLoadBalancerStatusResource extends ProxiedResource {
@@ -70,13 +70,13 @@ public class ClusterLoadBalancerStatusResource extends ProxiedResource {
     @Timed
     @RequiresAuthentication
     @RequiresPermissions(RestPermissions.LBSTATUS_CHANGE)
-    @ApiOperation(value = "Override load balancer status of this graylog-server node. Next lifecycle " +
+    @Operation(summary = "Override load balancer status of this graylog-server node. Next lifecycle " +
             "change will override it again to its default. Set to ALIVE, DEAD, or THROTTLED.")
     @Path("/override/{status}")
     @NoAuditEvent("this is a proxy resource, the audit event will be emitted on the target node")
-    public void override(@ApiParam(name = "nodeId", value = "The id of the node whose LB status will be changed", required = true)
+    public void override(@Parameter(name = "nodeId", description = "The id of the node whose LB status will be changed", required = true)
                          @PathParam("nodeId") String nodeId,
-                         @ApiParam(name = "status") @PathParam("status") String status) throws IOException, NodeNotFoundException {
+                         @Parameter(name = "status") @PathParam("status") String status) throws IOException, NodeNotFoundException {
         final Node targetNode = nodeService.byNodeId(nodeId);
 
         RemoteLoadBalancerStatusResource remoteLoadBalancerStatusResource = remoteInterfaceProvider.get(targetNode,

@@ -23,6 +23,7 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 
 import java.util.Collections;
@@ -38,12 +39,13 @@ public class PreflightObjectMapperProvider implements Provider<ObjectMapper> {
     @Inject
     public PreflightObjectMapperProvider(@GraylogClassLoader ClassLoader classLoader, EncryptedValueService encryptedValueService) {
         delegate = new ObjectMapperProvider(
-                classLoader,
-                Collections.emptySet(),
-                encryptedValueService,
-                GRNRegistry.createWithBuiltinTypes(),
-                InputConfigurationBeanDeserializerModifier.withoutConfig()
-        );
+                new ObjectMapperConfiguration(
+                        classLoader,
+                        Collections.emptySet(),
+                        encryptedValueService,
+                        GRNRegistry.createWithBuiltinTypes(),
+                        InputConfigurationBeanDeserializerModifier.withoutConfig()
+                ));
     }
 
     @Override

@@ -112,6 +112,11 @@ const navigationBindings: PluginExports = {
       externalLink: Routes.global_api_browser(),
       permissions: 'api_browser:read',
     },
+    {
+      description: 'OpenAPI browser',
+      externalLink: Routes.openapi_browser(),
+      permissions: 'api_browser:read',
+    },
   ],
 };
 

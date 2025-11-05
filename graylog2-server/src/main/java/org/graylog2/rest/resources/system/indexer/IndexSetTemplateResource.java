@@ -17,9 +17,10 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.validation.Validator;
@@ -49,6 +50,7 @@ import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequir
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirementsChecker;
 import org.graylog2.indexer.indexset.template.rest.IndexSetTemplateResponse;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -58,11 +60,11 @@ import java.util.Objects;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_TEMPLATE_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
-@Api(value = "System/IndexSets/Templates", description = "Index-set Configuration Template Management", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/IndexSets/Templates", description = "Index-set Configuration Template Management")
 @Path("/system/indices/index_sets/templates")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -89,8 +91,8 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/{template_id}")
     @Timed
-    @ApiOperation(value = "Gets template by id")
-    public IndexSetTemplateResponse retrieveById(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) {
+    @Operation(summary = "Gets template by id")
+    public IndexSetTemplateResponse retrieveById(@Parameter(name = "template_id") @PathParam("template_id") String templateId) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ, templateId);
         return getIndexSetTemplate(templateId);
     }
@@ -98,7 +100,7 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/default_config")
     @Timed
-    @ApiOperation(value = "Gets default template")
+    @Operation(summary = "Gets default template")
     public IndexSetTemplateConfig getDefaultConfig() {
         return indexSetDefaultTemplateService.getOrCreateDefaultConfig();
     }
@@ -106,17 +108,18 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/paginated")
     @Timed
-    @ApiOperation(value = "Gets template by id")
-    public PageListResponse<IndexSetTemplateResponse> getPage(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                                              @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                                              @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                                              @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
-                                                              @ApiParam(name = "sort",
-                                                                        value = "The field to sort the result on",
+    @Operation(summary = "Gets template by id")
+    public PageListResponse<IndexSetTemplateResponse> getPage(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                                              @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                              @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                              @Parameter(name = "filters") @QueryParam("filters") List<String> filters,
+                                                              @Parameter(name = "sort",
+                                                                        description = "The field to sort the result on",
                                                                         required = true,
-                                                                        allowableValues = "name")
+                                                                        schema = @Schema(allowableValues = {"id", "title", "description"}))
                                                               @DefaultValue(IndexSetTemplate.TITLE_FIELD_NAME) @QueryParam("sort") String sort,
-                                                              @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                              @Parameter(name = "order", description = "The sort direction",
+                                                                        schema = @Schema(allowableValues = {"asc", "desc"}))
                                                               @DefaultValue("asc") @QueryParam("order") String order) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
         return toPaginatedResponse(templateService.getPaginated(query, filters, page, perPage, sort, order));
@@ -125,8 +128,8 @@ public class IndexSetTemplateResource extends RestResource {
     @GET
     @Path("/built-in")
     @Timed
-    @ApiOperation(value = "Gets built-in templates")
-    public List<IndexSetTemplateResponse> builtIns(@ApiParam(name = "warm_tier_enabled")
+    @Operation(summary = "Gets built-in templates")
+    public List<IndexSetTemplateResponse> builtIns(@Parameter(name = "warm_tier_enabled")
                                                    @QueryParam("warm_tier_enabled") boolean warmTierEnabled) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_READ);
         return toResponse(templateService.getBuiltIns(warmTierEnabled));
@@ -135,8 +138,8 @@ public class IndexSetTemplateResource extends RestResource {
     @POST
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_CREATE)
-    @ApiOperation(value = "Creates a new editable template")
-    public IndexSetTemplateResponse create(@ApiParam(name = "request") IndexSetTemplateRequest templateData) {
+    @Operation(summary = "Creates a new editable template")
+    public IndexSetTemplateResponse create(@Parameter(name = "request") IndexSetTemplateRequest templateData) {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_CREATE);
         validateConfig(templateData.indexSetConfig());
 
@@ -147,10 +150,10 @@ public class IndexSetTemplateResource extends RestResource {
     @Path("{id}")
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_UPDATE)
-    @ApiOperation(value = "Updates existing template")
-    public void update(@ApiParam(name = "id", required = true)
+    @Operation(summary = "Updates existing template")
+    public void update(@Parameter(name = "id", required = true)
                        @PathParam("id") String id,
-                       @ApiParam(name = "request")
+                       @Parameter(name = "request")
                        @NotNull IndexSetTemplateRequest template) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_EDIT, id);
         checkReadOnly(getIndexSetTemplate(id));
@@ -166,8 +169,8 @@ public class IndexSetTemplateResource extends RestResource {
     @Path("/{template_id}")
     @Timed
     @AuditEvent(type = INDEX_SET_TEMPLATE_DELETE)
-    @ApiOperation(value = "Removes a template")
-    public void delete(@ApiParam(name = "template_id") @PathParam("template_id") String templateId) throws IllegalAccessException {
+    @Operation(summary = "Removes a template")
+    public void delete(@Parameter(name = "template_id") @PathParam("template_id") String templateId) throws IllegalAccessException {
         checkPermission(RestPermissions.INDEX_SET_TEMPLATES_DELETE, templateId);
         final IndexSetTemplateResponse template = getIndexSetTemplate(templateId);
         checkReadOnly(template);
