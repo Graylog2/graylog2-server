@@ -66,7 +66,7 @@ const MessageFieldsEditModeList = ({
           displayOverlayInPortal
           alignItemContent="center"
           customContentRender={customContentRender}
-          disableDragging={!isFavorite}
+          // disableDragging={!isFavorite}
         />
       </Container>
     </>

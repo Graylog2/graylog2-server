@@ -262,6 +262,8 @@ export interface ActionContexts {
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
   fieldTypes?: FieldTypeMappingsList;
+  toggleFavoriteField?: (field: string) => void;
+  favoriteFields?: Array<string>;
 }
 
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];

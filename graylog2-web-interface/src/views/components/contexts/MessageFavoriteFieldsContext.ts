@@ -23,18 +23,18 @@ import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Message } from 'views/components/messagelist/Types';
 
 export type MessageFavoriteFieldsContextState = {
-  isLoadingFavoriteFields: boolean;
   favoriteFields: Array<string>;
   saveFavoriteField: (favorites: Array<string>) => void;
   messageFields: FieldTypeMappingsList;
+  toggleField: (field: string) => void;
   message: Message;
 };
 
 const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsContextState>({
-  isLoadingFavoriteFields: false,
   favoriteFields: [],
   saveFavoriteField: () => {},
   messageFields: Immutable.List([]),
+  toggleField: () => {},
   message: undefined,
 });
 
