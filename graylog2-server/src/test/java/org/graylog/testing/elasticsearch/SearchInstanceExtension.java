@@ -30,6 +30,9 @@ import java.util.Set;
 
 /**
  * JUnit extension to track testable search instances, so we can call their cleanup methods after the test has run.
+ *
+ * We put the TestableSearchInstances into our context, and as they are AutoClosable, the will be properly disposed of
+ * at the end of the test class.
  */
 public class SearchInstanceExtension implements TestInstancePostProcessor, AfterTestExecutionCallback {
     private static final Logger LOG = LoggerFactory.getLogger(SearchInstanceExtension.class);
