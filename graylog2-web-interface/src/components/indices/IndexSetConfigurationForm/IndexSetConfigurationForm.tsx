@@ -144,6 +144,7 @@ const IndexSetConfigurationForm = ({
   }, [indexSet]);
 
   const isDataTieringImmutable = useMemo(() => immutableFields.includes('data_tiering'), [immutableFields]);
+  const isDataTieringLocked = isDataTieringImmutable && !ignoreFieldRestrictions;
 
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
@@ -173,11 +174,7 @@ const IndexSetConfigurationForm = ({
 
       const configWithDataTiering = {
         ...indexSetValues,
-        data_tiering: prepareDataTieringConfig(
-          values.data_tiering,
-          PluginStore,
-          isDataTieringImmutable && !ignoreFieldRestrictions,
-        ),
+        data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore, isDataTieringLocked),
       };
 
       if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults)
@@ -199,8 +196,7 @@ const IndexSetConfigurationForm = ({
       selectedRetentionSegment,
       enableDataTieringCloud,
       isCloud,
-      isDataTieringImmutable,
-      ignoreFieldRestrictions,
+      isDataTieringLocked,
     ],
   );
 
@@ -242,11 +238,7 @@ const IndexSetConfigurationForm = ({
     if (indexSet.data_tiering) {
       return {
         ...indexSet,
-        data_tiering: prepareDataTieringInitialValues(
-          indexSet.data_tiering,
-          PluginStore,
-          isDataTieringImmutable && !ignoreFieldRestrictions,
-        ),
+        data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore, isDataTieringLocked),
       };
     }
 
