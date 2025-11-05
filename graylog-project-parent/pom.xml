@@ -513,12 +513,6 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.itsallcode</groupId>
-                <artifactId>junit5-system-extensions</artifactId>
-                <version>${junit5-system-extensions}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>mockwebserver</artifactId>
                 <version>${okhttp.version}</version>
