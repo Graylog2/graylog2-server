@@ -190,7 +190,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         config.put("plugins.security.disabled", "false");
 
-        config.put("plugins.security.ssl.certificates_hot_reload.enabled", "true");
+        config.put("plugins.security.ssl_cert_reload_enabled", "true");
 
         config.put("plugins.security.nodes_dn", "CN=*");
         config.put("plugins.security.allow_default_init_securityindex", "true");
