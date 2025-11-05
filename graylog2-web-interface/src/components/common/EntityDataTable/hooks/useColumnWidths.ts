@@ -105,6 +105,7 @@ const useColumnWidths = <Entity extends EntityBase>({
       tableWidth,
     });
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setColumnWidths(
       calculateColumnWidths({
         assignableWidth,

@@ -55,8 +55,6 @@ function Actions({ lut }: ActionsProps) {
 
   if (!scopePermissions.is_mutable) return null;
 
-  console.log(lut.id);
-
   return (
     <>
       <DropdownButton

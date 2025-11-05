@@ -98,6 +98,7 @@ const useTable = <Entity extends EntityBase>({
     [entities, onChangeSelection, selectedEntities, setSelectedEntities],
   );
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   return useReactTable({
     columns: columnsDefinitions,
     data,
