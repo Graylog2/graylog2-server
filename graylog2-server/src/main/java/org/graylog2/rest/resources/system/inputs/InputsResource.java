@@ -45,7 +45,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
@@ -102,7 +102,7 @@ public class InputsResource extends AbstractInputsResource {
     private final PipelineService pipelineService;
     private final MessageInputFactory messageInputFactory;
     private final Configuration config;
-    private final MongoDbPipelineMetadataService metadataService;
+    private final MongoDbInputsMetadataService metadataService;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
@@ -113,7 +113,7 @@ public class InputsResource extends AbstractInputsResource {
                           PipelineService pipelineService,
                           MessageInputFactory messageInputFactory,
                           Configuration config,
-                          MongoDbPipelineMetadataService metadataService,
+                          MongoDbInputsMetadataService metadataService,
                           ClusterEventBus clusterEventBus) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;

@@ -22,6 +22,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -29,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.processors.PipelineAnalyzer;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolver;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineResolverConfig;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +38,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
-import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService.INPUTS_COLLECTION_NAME;
+import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService.INPUTS_COLLECTION_NAME;
 import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService.RULES_COLLECTION_NAME;
 
 /**
@@ -46,22 +49,29 @@ import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMe
  */
 public class V20251021083100_CreatePipelineMetadata extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20251021083100_CreatePipelineMetadata.class);
+
+    private final ClusterConfigService configService;
     private final MongoDatabase db;
     private final PipelineResolver pipelineResolver;
     private final PipelineAnalyzer pipelineAnalyzer;
-    private final MongoDbPipelineMetadataService metadataService;
+    private final MongoDbPipelineMetadataService pipelineMetadataService;
+    private final MongoDbInputsMetadataService inputsMetadataService;
 
     @Inject
-    public V20251021083100_CreatePipelineMetadata(MongoConnection mongoConnection,
+    public V20251021083100_CreatePipelineMetadata(ClusterConfigService configService,
+                                                  MongoConnection mongoConnection,
                                                   MongoDbRuleService ruleService,
-                                                  MongoDbPipelineMetadataService metadataService,
+                                                  MongoDbPipelineMetadataService pipelineMetadataService,
+                                                  MongoDbInputsMetadataService inputsMetadataService,
                                                   PipelineService pipelineService,
                                                   PipelineAnalyzer pipelineAnalyzer,
                                                   PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                                   PipelineRuleParser pipelineRuleParser,
                                                   PipelineResolver.Factory pipelineResolverFactory) {
+        this.configService = configService;
         this.db = mongoConnection.getMongoDatabase();
-        this.metadataService = metadataService;
+        this.pipelineMetadataService = pipelineMetadataService;
+        this.inputsMetadataService = inputsMetadataService;
         this.pipelineAnalyzer = pipelineAnalyzer;
         this.pipelineResolver = pipelineResolverFactory.create(
                 PipelineResolverConfig.of(
@@ -80,29 +90,15 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
 
     @Override
     public void upgrade() {
-        if (anyMissing(Set.of(RULES_COLLECTION_NAME, INPUTS_COLLECTION_NAME))) {
-            // rebuild all metadata collections from scratch
-            db.getCollection(RULES_COLLECTION_NAME).drop();
-            db.getCollection(INPUTS_COLLECTION_NAME).drop();
-
-            createMetadata();
+        if (migrationAlreadyApplied()) {
+            return;
         }
-    }
 
-    /**
-     * Check if any of the specified collection candidates is missing.
-     *
-     * @param candidates check for existence of these collections
-     * @return false, if all collections exist; true, if any collection is missing
-     */
-    private boolean anyMissing(Set<String> candidates) {
-        final List<String> collections = db.listCollectionNames().into(new ArrayList<>());
-        for (String name : candidates) {
-            if (!collections.contains(name)) {
-                return true;
-            }
-        }
-        return false;
+        db.getCollection(RULES_COLLECTION_NAME).drop();
+        db.getCollection(INPUTS_COLLECTION_NAME).drop();
+        createMetadata();
+
+        markMigrationApplied();
     }
 
     private void createMetadata() {
@@ -111,7 +107,17 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
         final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions =
                 pipelineAnalyzer.analyzePipelines(pipelineResolver, ruleRecords);
 
-        metadataService.saveRulesMetadata(ruleRecords, false);
-        metadataService.saveInputsMetadata(inputMentions, false);
+        pipelineMetadataService.save(ruleRecords, false);
+        inputsMetadataService.save(inputMentions, false);
     }
+
+    private boolean migrationAlreadyApplied() {
+        return Objects.nonNull(configService.get(V20251021083100_CreatePipelineMetadata.MigrationCompleted.class));
+    }
+
+    private void markMigrationApplied() {
+        configService.write(new V20251021083100_CreatePipelineMetadata.MigrationCompleted());
+    }
+
+    public record MigrationCompleted() {}
 }

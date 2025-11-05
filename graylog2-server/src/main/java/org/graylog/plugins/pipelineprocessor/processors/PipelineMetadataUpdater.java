@@ -26,52 +26,76 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
+import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+/**
+ * When a pipeline, rule or input is updated or deleted, recalculate the metadata:
+ * - for every deleted input: delete the corresponding input metadata record
+ * - for every deleted pipeline: delete the corresponding pipeline rules metadata record
+ * - for every updated pipeline: rebuild pipeline metadata from scratch and replace the existing record
+ * - for every deleted or updated rule:
+ * -- delete the input mentions for that rule
+ * -- for every pipeline affected by the deleted or updated rule: rebuild the pipeline metadata
+ * - for every updated rule: rebuild the input metadata. The rule may no longer reference the same input - or any
+ * input - so it's easiest to rebuild from scratch.
+ */
 @Singleton
 public class PipelineMetadataUpdater {
 
-    private final MongoDbPipelineMetadataService metadataService;
+    private final MongoDbPipelineMetadataService pipelineMetadataService;
+    private final MongoDbInputsMetadataService inputsMetadataService;
     private final PipelineAnalyzer pipelineAnalyzer;
     private final PipelineService pipelineService;
-    private final RuleService ruleService;
+    protected final EventBus eventBus;
 
     @Inject
-    public PipelineMetadataUpdater(MongoDbPipelineMetadataService metadataService,
+    public PipelineMetadataUpdater(MongoDbPipelineMetadataService pipelineMetadataService,
+                                   MongoDbInputsMetadataService inputsMetadataService,
                                    PipelineAnalyzer pipelineAnalyzer,
                                    PipelineService pipelineService,
-                                   RuleService ruleService,
                                    EventBus eventBus) {
-        this.metadataService = metadataService;
+        this.pipelineMetadataService = pipelineMetadataService;
+        this.inputsMetadataService = inputsMetadataService;
         this.pipelineAnalyzer = pipelineAnalyzer;
         this.pipelineService = pipelineService;
-        this.ruleService = ruleService;
+        this.eventBus = eventBus;
 
         eventBus.register(this);
     }
 
     public void handlePipelineChanges(PipelinesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
+        deletePipelineEntries(event);
         Set<PipelineDao> pipelineDaos = affectedPipelines(event);
         handleUpdates(pipelineDaos, state, resolver, metricRegistry);
-        handlePipelineDeletions(event);
+    }
+
+    public void handleConnectionChanges(PipelineConnectionsChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
+        Set<PipelineDao> pipelineDaos = affectedPipelines(event);
+        handleUpdates(pipelineDaos, state, resolver, metricRegistry);
     }
 
     public void handleRuleChanges(RulesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
-        Set<RuleDao> ruleDaos = affectedRules(event);
-        Set<PipelineDao> pipelineDaos = affectedPipelines(ruleDaos);
-        handleUpdates(pipelineDaos, state, resolver, metricRegistry);
+        deleteInputMentionsForRules(event);
+        handleUpdates(affectedPipelines(event), state, resolver, metricRegistry);
+    }
+
+    private void deleteInputMentionsForRules(RulesChangedEvent event) {
+        Stream.concat(event.deletedRules().stream(), event.updatedRules().stream())
+                .forEach(ref -> inputsMetadataService.deleteInputMentionsByRuleId(ref.id()));
     }
 
     private void handleUpdates(Set<PipelineDao> pipelineDaos,
@@ -83,39 +107,12 @@ public class PipelineMetadataUpdater {
         List<PipelineRulesMetadataDao> ruleRecords = new ArrayList<>();
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions = pipelineAnalyzer.analyzePipelines(pipelines, functions, ruleRecords);
 
-        metadataService.saveRulesMetadata(ruleRecords, true);
-        metadataService.saveInputsMetadata(inputMentions, true);
+        inputsMetadataService.save(inputMentions, true);
+        pipelineMetadataService.save(ruleRecords, true);
     }
 
-    private void handlePipelineDeletions(PipelinesChangedEvent event) {
-        metadataService.deleteRulesMetadataByPipelineId(event.deletedPipelineIds());
-    }
-
-    private Set<RuleDao> affectedRules(RulesChangedEvent event) {
-        Set<String> ruleIds = event.updatedRules().stream()
-                .map(RulesChangedEvent.Reference::id)
-                .collect(Collectors.toSet());
-
-        return ruleIds.stream()
-                .map(id -> {
-                    try {
-                        return ruleService.load(id);
-                    } catch (NotFoundException e) {
-                        return null;
-                    }
-                })
-                .collect(Collectors.toSet());
-    }
-
-    private Set<PipelineDao> affectedPipelines(Set<RuleDao> rules) {
-        return rules.stream()
-                .map(RuleDao::title)
-                .flatMap(title -> pipelineService.loadBySourcePattern(title).stream())
-                .collect(Collectors.toSet());
-    }
-
-    private Set<PipelineDao> affectedPipelines(PipelinesChangedEvent event) {
-        return event.updatedPipelineIds().stream()
+    private Set<PipelineDao> loadPipelineDaos(Set<String> ids) {
+        return ids.stream()
                 .map(id -> {
                     try {
                         return pipelineService.load(id);
@@ -124,6 +121,22 @@ public class PipelineMetadataUpdater {
                     }
                 })
                 .collect(Collectors.toSet());
+    }
+
+    private Set<PipelineDao> affectedPipelines(RulesChangedEvent event) {
+        Set<String> ruleIds = event.updatedRules().stream()
+                .map(RulesChangedEvent.Reference::id)
+                .collect(Collectors.toSet());
+        Set<String> pipelineIds = pipelineMetadataService.getPipelinesByRules(ruleIds);
+        return loadPipelineDaos(pipelineIds);
+    }
+
+    private Set<PipelineDao> affectedPipelines(PipelinesChangedEvent event) {
+        return loadPipelineDaos(event.updatedPipelineIds());
+    }
+
+    private Set<PipelineDao> affectedPipelines(PipelineConnectionsChangedEvent event) {
+        return loadPipelineDaos(event.pipelineIds());
     }
 
     private ImmutableMap<String, Pipeline> affectedPipelinesAsMap(Set<PipelineDao> pipelineDaos, PipelineInterpreter.State state) {
@@ -137,8 +150,35 @@ public class PipelineMetadataUpdater {
         return builder.build();
     }
 
+    /**
+     * When a pipeline is deleted, remove the metadata record for that pipeline
+     */
+    private void deletePipelineEntries(PipelinesChangedEvent event) {
+        pipelineMetadataService.delete(event.deletedPipelineIds());
+    }
+
+    /**
+     * When an input is deleted, remove the metadata record for that input
+     */
     @Subscribe
-    public void handleInputDeleted(InputDeletedEvent event) {
-        metadataService.deleteByInputId(event.inputId());
+    public void deleteInputEntries(InputDeletedEvent event) {
+        inputsMetadataService.deleteInput(event.inputId());
+    }
+
+    /**
+     * When an input is renamed, rules that previously referenced the input by name are no longer applicable; and
+     * rules that reference the new name now apply.
+     * Unfortunately, we don't have an exact mapping of rules by referenced input name. So we find all the rules
+     * that reference any inputs by name and fire an update event for those rules.
+     * Note: we also don't have an exact mapping of functions to rules, so we just trigger for all the rules included
+     * in pipelines that reference inputs in any way.
+     */
+    @Subscribe
+    public void handleInputRename(InputRenamedEvent event) {
+        Set<RulesChangedEvent.Reference> updated = pipelineMetadataService.getReferencingPipelines().stream()
+                .flatMap(dao -> dao.rules().stream())
+                .map(ruleId -> new RulesChangedEvent.Reference(ruleId, ruleId))
+                .collect(Collectors.toSet());
+        eventBus.post(new RulesChangedEvent(updated, Set.of()));
     }
 }

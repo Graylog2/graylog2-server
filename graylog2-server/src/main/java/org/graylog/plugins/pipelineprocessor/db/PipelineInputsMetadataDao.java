@@ -20,10 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -31,22 +28,15 @@ import java.util.Set;
 @JsonDeserialize(builder = AutoValue_PipelineInputsMetadataDao.Builder.class)
 @AutoValue
 public abstract class PipelineInputsMetadataDao implements BuildableMongoEntity<PipelineInputsMetadataDao, PipelineInputsMetadataDao.Builder> {
-    private static final String FIELD_ID = "id";
     public static final String FIELD_INPUT_ID = "input_id";
     private static final String FIELD_MENTIONED_IN = "mentioned_in";
+    public static final String PATH_RULE_ID = "mentioned_in.rule_id";
 
     public record MentionedInEntry(
             @JsonProperty("pipeline_id") String pipelineId,
             @JsonProperty("rule_id") String ruleId,
-            @JsonProperty("stages") Set<Integer> stages,
             @JsonProperty("connected_streams") Set<String> connectedStreams
     ) {}
-
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @JsonProperty(FIELD_INPUT_ID)
     public abstract String inputId();
@@ -62,10 +52,6 @@ public abstract class PipelineInputsMetadataDao implements BuildableMongoEntity<
 
     @AutoValue.Builder
     public abstract static class Builder implements BuildableMongoEntity.Builder<PipelineInputsMetadataDao, Builder> {
-        @Id
-        @ObjectId
-        @JsonProperty(FIELD_ID)
-        public abstract Builder id(@Nullable String id);
 
         @JsonProperty(FIELD_INPUT_ID)
         public abstract Builder inputId(String pipelineId);

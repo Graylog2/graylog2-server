@@ -36,7 +36,8 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
-import org.graylog2.shared.inputs.InputRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -51,21 +52,25 @@ import static org.graylog.plugins.pipelineprocessor.functions.FromInput.NAME_ARG
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
 public class PipelineAnalyzer {
+    private static final Logger LOG = LoggerFactory.getLogger(PipelineAnalyzer.class);
+
+    public static final Set<String> REFERENCING_FUNCTIONS = Set.of(
+            "from_forwarder_input",
+            "from_input"
+    );
+
     private final PipelineStreamConnectionsService connectionsService;
     private final InputService inputService;
-    private final InputRegistry inputRegistry;
     private final PipelineMetricRegistry pipelineMetricRegistry;
 
     @Inject
     public PipelineAnalyzer(
             PipelineStreamConnectionsService connectionsService,
             InputService inputService,
-            InputRegistry inputRegistry,
             MetricRegistry metricRegistry
     ) {
         this.connectionsService = connectionsService;
         this.inputService = inputService;
-        this.inputRegistry = inputRegistry;
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
     }
 
@@ -85,48 +90,58 @@ public class PipelineAnalyzer {
 
         pipelines.values().forEach(pipeline -> {
             PipelineRulesMetadataDao.Builder rulesBuilder = PipelineRulesMetadataDao.builder().pipelineId(pipeline.id());
-            Set<Stage> stages = functions.get(pipeline.id()).stages();
+            Set<String> ruleSet = new HashSet<>();
+            Set<String> functionSet = new HashSet<>();
+            Set<String> deprecatedFunctionSet = new HashSet<>();
+            boolean hasInputReferences = false;
 
             Set<String> connectedStreams = connectionsService.loadByPipelineId(pipeline.id())
                     .stream()
                     .map(PipelineConnections::streamId)
                     .collect(Collectors.toSet());
 
-            Set<String> ruleSet = new HashSet<>();
-            Set<String> functionSet = new HashSet<>();
-            Set<String> deprecatedFunctionSet = new HashSet<>();
-
+            Set<Stage> stages = functions.get(pipeline.id()).stages();
             if (stages != null) {
-                stages.forEach(stage -> {
-                    final List<Rule> rules = stage.getRules();
-                    if (rules != null) {
-                        rules.forEach(rule -> {
-                            if (rule != null) {
-                                ruleSet.add(rule.id());
-                                analyzeRule(pipeline, connectedStreams, stage, rule, functionSet, deprecatedFunctionSet, inputMentions);
-                            }
-                        });
+                for (Stage stage : stages) {
+                    List<Rule> rules = stage.getRules();
+                    if (rules == null) continue;
+                    for (Rule rule : rules) {
+                        if (rule == null) continue;
+                        ruleSet.add(rule.id());
+                        hasInputReferences = analyzeRule(pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, inputMentions);
                     }
-                });
+                }
             }
-            rulesBuilder
+            ruleRecords.add(rulesBuilder
                     .rules(ruleSet)
                     .streams(connectedStreams)
                     .functions(functionSet)
-                    .deprecatedFunctions(deprecatedFunctionSet);
-            ruleRecords.add(rulesBuilder.build());
+                    .deprecatedFunctions(deprecatedFunctionSet)
+                    .hasInputReferences(hasInputReferences)
+                    .build());
         });
         return inputMentions;
     }
 
-    private void analyzeRule(Pipeline pipeline, Set<String> connectedStreams,
-                             Stage stage, Rule rule,
+    /**
+     * Analyzes a rule for input references and function usage.
+     *
+     * @param pipeline               the pipeline the rule belongs to
+     * @param connectedStreams       the streams connected to the pipeline
+     * @param rule                   the rule to analyze
+     * @param functions              return set of functions used in the rule
+     * @param deprecatedFunctionList return set of deprecated functions used in the rule
+     * @param inputMentions          map to collect input mentions
+     * @return true if the rule references any inputs, false otherwise
+     */
+    private boolean analyzeRule(Pipeline pipeline, Set<String> connectedStreams, Rule rule,
                              Set<String> functions, Set<String> deprecatedFunctionList,
                              Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
-        MetaDataListener ruleListener = new MetaDataListener(pipeline, connectedStreams, stage, rule, inputMentions);
+        MetaDataListener ruleListener = new MetaDataListener(pipeline, connectedStreams, rule, inputMentions);
         new RuleAstWalker().walk(ruleListener, rule);
         functions.addAll(ruleListener.getFunctions());
         deprecatedFunctionList.addAll(ruleListener.getDeprecatedFunctions());
+        return ruleListener.hasInputReference();
     }
 
     protected boolean isValidInputId(String inputId) {
@@ -137,20 +152,31 @@ public class PipelineAnalyzer {
         }
     }
 
+    protected String getInputId(String inputName) {
+        final List<String> inputIds = inputService.findIdsByTitle(inputName);
+        if (inputIds.isEmpty()) {
+            LOG.warn("Could not find input with name '{}'", inputName);
+            return null;
+        }
+        if (inputIds.size() > 1) {
+            LOG.warn("Multiple inputs found with name '{}', using the first one with id '{}'", inputName, inputIds.getFirst());
+        }
+        return inputIds.getFirst();
+    }
+
     class MetaDataListener extends RuleAstBaseListener {
         private final Set<String> functions = new HashSet<>();
         private final Set<String> deprecatedFunctions = new HashSet<>();
+        private boolean hasInputReference = false;
         private final Pipeline pipeline;
         private final Set<String> connectedStreams;
-        private final Stage stage;
         private final Rule rule;
         private final Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions;
 
-        MetaDataListener(Pipeline pipeline, Set<String> connectedStreams, Stage stage, Rule rule,
+        MetaDataListener(Pipeline pipeline, Set<String> connectedStreams, Rule rule,
                          Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
             this.pipeline = pipeline;
             this.connectedStreams = connectedStreams;
-            this.stage = stage;
             this.rule = rule;
             this.inputMentions = inputMentions;
         }
@@ -186,12 +212,12 @@ public class PipelineAnalyzer {
         }
 
         private void analyzeInputs(FunctionDescriptor<?> descriptor, FunctionArgs args) {
-            if (descriptor.name().equals("from_forwarder_input") || descriptor.name().equals("from_input")) {
+            if (REFERENCING_FUNCTIONS.contains(descriptor.name())) {
                 String inputId = null;
                 if (args.getPreComputedValue(ID_ARG) != null) {
                     inputId = args.getPreComputedValue(ID_ARG).toString();
                 } else if (args.getPreComputedValue(NAME_ARG) != null) {
-                    inputId = inputRegistry.getIdByTitle(args.getPreComputedValue(NAME_ARG).toString());
+                    inputId = getInputId(args.getPreComputedValue(NAME_ARG).toString());
                 }
                 if (inputId != null) {
                     createOrUpdateMention(inputId);
@@ -200,10 +226,12 @@ public class PipelineAnalyzer {
         }
 
         private void createOrUpdateMention(String inputId) {
+            hasInputReference = true;
             if (inputMentions.get(inputId) == null) {
                 // first mention of this input
-                final Set<PipelineInputsMetadataDao.MentionedInEntry> mentionedInEntries = Set.of(new PipelineInputsMetadataDao.MentionedInEntry(
-                        pipeline.id(), rule.id(), Set.of(stage.stage()), connectedStreams));
+                final Set<PipelineInputsMetadataDao.MentionedInEntry> mentionedInEntries = new HashSet<>();
+                mentionedInEntries.add(new PipelineInputsMetadataDao.MentionedInEntry(
+                        pipeline.id(), rule.id(), connectedStreams));
                 inputMentions.put(inputId, mentionedInEntries);
             } else {
                 // update existing mention
@@ -213,10 +241,9 @@ public class PipelineAnalyzer {
                         .findFirst();
                 if (optMention.isPresent()) {
                     optMention.get().connectedStreams().addAll(connectedStreams);
-                    optMention.get().stages().add(stage.stage());
                 } else {
                     mentionedInEntries.add(new PipelineInputsMetadataDao.MentionedInEntry(
-                            pipeline.id(), rule.id(), Set.of((stage.stage())), connectedStreams));
+                            pipeline.id(), rule.id(), connectedStreams));
                 }
             }
         }
@@ -227,6 +254,10 @@ public class PipelineAnalyzer {
 
         public Set<String> getDeprecatedFunctions() {
             return deprecatedFunctions;
+        }
+
+        public boolean hasInputReference() {
+            return hasInputReference;
         }
     }
 

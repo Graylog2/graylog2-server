@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.subject.Subject;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbInputsMetadataService;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -75,7 +75,7 @@ public class InputsResourceMaskingPasswordsTest {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
             super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
                     mock(PipelineService.class), messageInputFactory, new Configuration(),
-                    mock(MongoDbPipelineMetadataService.class), mock(ClusterEventBus.class));
+                    mock(MongoDbInputsMetadataService.class), mock(ClusterEventBus.class));
         }
 
         @Override

@@ -20,28 +20,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
-import org.mongojack.Id;
-import org.mongojack.ObjectId;
 
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.Set;
 
 @JsonDeserialize(builder = AutoValue_PipelineRulesMetadataDao.Builder.class)
 @AutoValue
 public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<PipelineRulesMetadataDao, PipelineRulesMetadataDao.Builder> {
-    private static final String FIELD_ID = "id";
     public static final String FIELD_PIPELINE_ID = "pipeline_id";
     public static final String FIELD_RULES = "rules";
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_FUNCTIONS = "functions";
     private static final String FIELD_DEPRECATED_FUNCTIONS = "deprecated_functions";
-
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
+    public static final String FIELD_HAS_INPUT_REFERENCES = "has_input_references";
 
     @JsonProperty(FIELD_PIPELINE_ID)
     public abstract String pipelineId();
@@ -55,9 +46,11 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     @JsonProperty(FIELD_FUNCTIONS)
     public abstract Set<String> functions();
 
-
     @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
     public abstract Set<String> deprecatedFunctions();
+
+    @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
+    public abstract Boolean hasInputReferences();
 
     public static Builder builder() {
         return new AutoValue_PipelineRulesMetadataDao.Builder()
@@ -65,15 +58,12 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
                 .rules(new HashSet<>())
                 .streams(new HashSet<>())
                 .functions(new HashSet<>())
-                .deprecatedFunctions(new HashSet<>());
+                .deprecatedFunctions(new HashSet<>())
+                .hasInputReferences(false);
     }
 
     @AutoValue.Builder
     public abstract static class Builder implements BuildableMongoEntity.Builder<PipelineRulesMetadataDao, Builder> {
-        @Id
-        @ObjectId
-        @JsonProperty(FIELD_ID)
-        public abstract Builder id(@Nullable String id);
 
         @JsonProperty(FIELD_PIPELINE_ID)
         public abstract Builder pipelineId(String pipelineId);
@@ -89,5 +79,8 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
         @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
         public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
+
+        @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
+        public abstract Builder hasInputReferences(Boolean hasInputReferences);
     }
 }

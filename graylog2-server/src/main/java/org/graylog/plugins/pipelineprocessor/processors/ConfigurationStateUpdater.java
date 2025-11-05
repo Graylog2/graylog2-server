@@ -127,6 +127,14 @@ public class ConfigurationStateUpdater {
         return state;
     }
 
+    private PipelineInterpreter.State reloadAndSave(PipelineConnectionsChangedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            metadataUpdater.handleConnectionChanges(event, state, pipelineResolver, pipelineMetricRegistry);
+        }
+        return state;
+    }
+
     /**
      * Can be used to inspect or use the current state of the pipeline system.
      * For example, the interpreter
@@ -161,7 +169,7 @@ public class ConfigurationStateUpdater {
     @Subscribe
     public void handlePipelineConnectionChanges(PipelineConnectionsChangedEvent event) {
         log.debug("Pipeline stream connection changed: {}", event);
-        scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
