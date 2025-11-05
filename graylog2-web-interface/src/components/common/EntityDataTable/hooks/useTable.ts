@@ -80,10 +80,11 @@ const useTable = <Entity extends EntityBase>({
     [columnVisibility, onColumnsChange],
   );
 
+  const rowSelection = useMemo(() => Object.fromEntries(selectedEntities.map((id) => [id, true])), [selectedEntities]);
+
   const onRowSelectionChange = useCallback(
     (updater: Updater<Record<string, boolean>>) => {
-      const newRowSelection =
-        updater instanceof Function ? updater(Object.fromEntries(selectedEntities.map((id) => [id, true]))) : updater;
+      const newRowSelection = updater instanceof Function ? updater(rowSelection) : updater;
 
       const newSelection = Object.entries(newRowSelection)
         .filter(([_id, isSelected]) => isSelected)
@@ -95,7 +96,7 @@ const useTable = <Entity extends EntityBase>({
         onChangeSelection(newSelection, entities);
       }
     },
-    [entities, onChangeSelection, selectedEntities, setSelectedEntities],
+    [entities, onChangeSelection, rowSelection, setSelectedEntities],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -115,7 +116,7 @@ const useTable = <Entity extends EntityBase>({
       columnOrder: visibleColumnOrder,
       columnVisibility,
       sorting,
-      rowSelection: Object.fromEntries(selectedEntities.map((id) => [id, true])),
+      rowSelection,
     },
   });
 };

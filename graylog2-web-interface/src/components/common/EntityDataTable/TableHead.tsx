@@ -43,7 +43,7 @@ const TableHead = <Entity extends EntityBase>({ table }: { table: Table<Entity> 
         {headerGroup.headers.map((header) => (
           <Th $width={header.getSize()} colSpan={header.colSpan} key={header.id}>
             {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-            {header.column.getCanSort() && <SortIcon header={header} />}
+            {header.column.getCanSort() && <SortIcon<Entity> header={header} />}
             {/*{header.column.getCanResize() && <div>Resize handle</div>}*/}
           </Th>
         ))}

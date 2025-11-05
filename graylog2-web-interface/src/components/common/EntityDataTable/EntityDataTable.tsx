@@ -170,7 +170,10 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   });
 
   return useMemo(
-    () => [bulkSelectCol, ...attributeCols, actionsCol].filter(Boolean) as ColumnDef<Entity, unknown>[],
+    () =>
+      [...(bulkSelectCol ? [bulkSelectCol] : []), ...(attributeCols ? attributeCols : []), actionsCol] as Array<
+        ColumnDef<Entity, unknown>
+      >,
     [bulkSelectCol, attributeCols, actionsCol],
   );
 };
