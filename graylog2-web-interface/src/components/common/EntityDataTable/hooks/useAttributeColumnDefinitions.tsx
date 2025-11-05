@@ -15,21 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import type { createColumnHelper, Row, Column, HeaderContext } from '@tanstack/react-table';
+import type { createColumnHelper, Row, Column, HeaderContext, CellContext } from '@tanstack/react-table';
 import { useCallback, useMemo } from 'react';
 import camelCase from 'lodash/camelCase';
-import type { CellContext } from '@tanstack/table-core/src/core/cell';
 
-import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
+import type {
+  EntityBase,
+  ColumnRenderersByAttribute,
+  ColumnMetaContext,
+} from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 
 const AttributeHeader = <Entity extends EntityBase>(ctx: HeaderContext<Entity, unknown>) => {
   if (!ctx) {
     return null;
   }
-  const columnDefMeta = ctx.column.columnDef.meta;
+  const columnDefMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
 
-  return columnDefMeta.renderHeader?.(columnDefMeta.label) ?? columnDefMeta.label;
+  return columnDefMeta?.columnRenderer?.renderHeader?.(columnDefMeta.label) ?? columnDefMeta.label;
 };
 
 const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
@@ -56,7 +59,11 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
       row: Row<Entity>;
       getValue: CellContext<Entity, unknown>['getValue'];
       column: Column<Entity>;
-    }) => column.columnDef.meta.columnRenderer?.renderCell?.(getValue(), row.original, meta) ?? getValue(),
+    }) => {
+      const columnDefMeta = column.columnDef.meta as ColumnMetaContext<Entity>;
+
+      return columnDefMeta?.columnRenderer?.renderCell?.(getValue(), row.original, meta) ?? getValue();
+    },
     [meta],
   );
 

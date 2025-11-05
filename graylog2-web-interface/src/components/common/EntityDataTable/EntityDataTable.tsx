@@ -310,7 +310,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 {displayPageSizeSelect && (
                   <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
                 )}
-                <ColumnsVisibilitySelect table={table} />
+                <ColumnsVisibilitySelect<Entity> table={table} />
               </ButtonGroup>
             </LayoutConfigRow>
           </ActionsRow>

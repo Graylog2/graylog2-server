@@ -56,12 +56,12 @@ const ColumnTitle = styled(TextOverflowEllipsis)`
 `;
 
 const colLabel = <Entity extends EntityBase>(column: Column<Entity>) =>
-  (column.columnDef.meta as ColumnMetaContext)?.label ?? column.id;
+  (column.columnDef.meta as ColumnMetaContext<Entity>)?.label ?? column.id;
 
 const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
   const isSelected = column.getIsVisible();
   const toggleVisibility = () => column.toggleVisibility();
-  const label = colLabel(column);
+  const label = colLabel<Entity>(column);
 
   return (
     <MenuItem onSelect={toggleVisibility} title={`${isSelected ? 'Hide' : 'Show'} ${label}`}>
@@ -91,7 +91,7 @@ const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table }: Props<Ent
       .filter((column) => column.getCanHide())
       .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
       .map((column) => (
-        <ColumnListItem column={column} key={column.id} />
+        <ColumnListItem<Entity> column={column} key={column.id} />
       ))}
   </StyledDropdownButton>
 );
