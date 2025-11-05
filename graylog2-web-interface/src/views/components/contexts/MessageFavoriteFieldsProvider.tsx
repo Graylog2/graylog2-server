@@ -78,16 +78,16 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
               'Could not remove fields from favorites',
             ),
           );
+      } else {
+        FavoriteFields.add({ field, stream_ids: streamIds })
+          .then(() => StreamsActions.refresh())
+          .catch((errorThrown) =>
+            UserNotification.error(
+              `Adding field to favorites failed with error: ${errorThrown}`,
+              'Could not add field to favorites',
+            ),
+          );
       }
-
-      FavoriteFields.add({ field, stream_ids: streamIds })
-        .then(() => StreamsActions.refresh())
-        .catch((errorThrown) =>
-          UserNotification.error(
-            `Adding field to favorites failed with error: ${errorThrown}`,
-            'Could not add field to favorites',
-          ),
-        );
     },
     [initialFavoriteFields, streams],
   );
