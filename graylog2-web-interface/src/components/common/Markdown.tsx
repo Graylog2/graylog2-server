@@ -22,6 +22,10 @@ import parse from 'html-react-parser';
 import type { HTMLReactParserOptions } from 'html-react-parser';
 
 import usePluginEntities from 'hooks/usePluginEntities';
+import useMarkdownConfig from 'components/common/useMarkdownConfig';
+import Spinner from 'components/common/Spinner';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 type Props = {
   text: string;
@@ -35,7 +39,10 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
   }
 });
 
-const HTML = ({ html }: { html: string }) => parse(html);
+type Transformer = Parameters<typeof parse>[1]['replace'];
+type Renderer = ({ html, transformer }: { html: string; transformer?: Transformer }) => ReturnType<typeof parse>;
+
+const HTML: Renderer = ({ html, transformer }) => parse(html, { replace: transformer });
 
 const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   const components = usePluginEntities('markdown.augment.components');
@@ -74,20 +81,63 @@ const useMarkdownTransformer = (): HTMLReactParserOptions['replace'] => {
   }, [components]);
 };
 
-const Augment = ({ html }: { html: string }) => {
-  const transformer = useMarkdownTransformer();
+const mergeTransformer =
+  (transformers: Array<Transformer>): Transformer =>
+  (domNode, idx) => {
+    for (const transformer of transformers) {
+      const result = transformer(domNode, idx);
+      if (result) {
+        return result;
+      }
+    }
 
-  return parse(html, { replace: transformer });
+    return undefined;
+  };
+
+const Augment: Renderer = ({ html, transformer }) => {
+  const markdownTransformer = useMarkdownTransformer();
+  const replace = useMemo(
+    () => (transformer ? mergeTransformer([markdownTransformer, transformer]) : markdownTransformer),
+    [markdownTransformer, transformer],
+  );
+
+  return parse(html, { replace });
+};
+
+const UnsupportedImageWarning = () => (
+  <span>
+    Images are not supported for security reasons. Please enable allowed sources{' '}
+    <Link to={Routes.SYSTEM.configurationsSection('Markdown')}>here</Link>
+  </span>
+);
+
+const imageWarningTransformer: Transformer = (domNode) => {
+  if ('name' in domNode && domNode.name === 'img') {
+    return <UnsupportedImageWarning />;
+  }
+
+  return undefined;
 };
 
 const Markdown = ({ augment = false, text }: Props) => {
+  const { isInitialLoading, data: markdownConfig } = useMarkdownConfig();
   // Remove dangerous HTML
   const sanitizedText = DOMPurify.sanitize(text ?? '', { USE_PROFILES: { html: false } });
 
   // Remove dangerous markdown
   const html = useMemo(() => DOMPurify.sanitize(marked(sanitizedText, { async: false })), [sanitizedText]);
+  const transformer =
+    markdownConfig?.allow_all_image_sources == true || markdownConfig?.allowed_image_sources
+      ? undefined
+      : imageWarningTransformer;
 
-  return augment ? <Augment html={html} /> : <HTML html={html} />;
+  const RendererComponent = augment ? Augment : HTML;
+
+  if (isInitialLoading) {
+    return <Spinner />;
+  }
+
+  return <RendererComponent html={html} transformer={transformer} />;
 };
 
 export default Markdown;

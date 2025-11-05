@@ -28,12 +28,7 @@ import type { Pagination } from 'stores/PaginationTypes';
 import type { MetricsConfigType, PaginatedRules, RuleType } from 'stores/rules/RulesStore';
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePaginationQueryParameter from 'hooks/usePaginationQueryParameter';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
-import useHistory from 'routing/useHistory';
-import Routes from 'routing/Routes';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import CreateButton from 'components/common/CreateButton';
 
 const Flex = styled.div`
   display: flex;
@@ -46,7 +41,11 @@ const SpinnerWrapper = styled.div(
   `,
 );
 
-const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
+const _loadData = (
+  pagination: Pagination,
+  setIsLoading: (isLoading: boolean) => void,
+  setPaginatedRules: (paginatedRules: PaginatedRules) => void,
+) => {
   setIsLoading(true);
 
   RulesActions.listPaginated(pagination).then((paginatedRules) => {
@@ -55,7 +54,7 @@ const _loadData = (pagination: Pagination, setIsLoading, setPaginatedRules) => {
   });
 };
 
-const _loadRuleMetricData = (setMetricsConfig) => {
+const _loadRuleMetricData = (setMetricsConfig: (metricsConfig: MetricsConfigType) => void) => {
   RulesActions.loadMetricsConfig().then((metricsConfig: MetricsConfigType) => {
     setMetricsConfig(metricsConfig);
   });
@@ -63,9 +62,6 @@ const _loadRuleMetricData = (setMetricsConfig) => {
 
 const RulesPage = () => {
   const { page, pageSize: perPage, resetPage, setPagination } = usePaginationQueryParameter();
-  const { pathname } = useLocation();
-  const history = useHistory();
-  const sendTelemetry = useSendTelemetry();
   const [query, setQuery] = useState('');
   const [isDataLoading, setIsDataLoading] = useState<boolean>(false);
   const [openMetricsConfig, toggleMetricsConfig] = useState<boolean>(false);
@@ -81,7 +77,7 @@ const RulesPage = () => {
     _loadRuleMetricData(setMetricsConfig);
   }, []);
 
-  const handleSearch = (nextQuery) => {
+  const handleSearch = (nextQuery: string) => {
     resetPage();
     setQuery(nextQuery);
   };
@@ -117,19 +113,7 @@ const RulesPage = () => {
   // eslint-disable-next-line react/no-unstable-nested-components
   const RulesButtonToolbar = () => (
     <ButtonToolbar className="pull-right">
-      <Button
-        bsStyle="success"
-        onClick={() => {
-          sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.CREATE_RULE_CLICKED, {
-            app_pathname: getPathnameWithoutId(pathname),
-            app_section: 'pipeline-rules',
-            app_action_value: 'create-rule-button',
-          });
-
-          history.push(`${Routes.SYSTEM.PIPELINES.RULE('new')}?rule_builder=true`);
-        }}>
-        Create Rule
-      </Button>
+      <CreateButton entityKey="Pipeline Rule" />
       {renderDebugMetricsButton()}
     </ButtonToolbar>
   );

@@ -73,6 +73,7 @@ public class FieldTypes implements GraylogRestApi {
             LOG.error("FieldTypes we're waiting for: {}", String.join(", ", expectedFields));
             final List<MappedFieldTypeDTO> knownTypes = getFieldTypes(streams);
             LOG.error("FieldTypes we found: {}", String.join(", ", knownTypes.stream().map(MappedFieldTypeDTO::name).collect(Collectors.toSet())));
+            api.log();
             throw error;
         }
     }

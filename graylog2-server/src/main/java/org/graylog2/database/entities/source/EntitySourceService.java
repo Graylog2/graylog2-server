@@ -44,4 +44,8 @@ public class EntitySourceService {
     public void bulkDeleteByEntityId(Set<String> entityIds) {
         dbEntitySourceService.bulkDeleteByEntityId(entityIds);
     }
+
+    public boolean existsForTypeAndSource(String entityType, String source) {
+        return dbEntitySourceService.existsForTypeAndSource(entityType, source);
+    }
 }

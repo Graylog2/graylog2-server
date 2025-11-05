@@ -21,11 +21,12 @@ import com.google.common.collect.ImmutableSet;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
+import org.graylog.security.UserContext;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
@@ -75,6 +76,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
@@ -99,12 +101,10 @@ public class UsersResourceTest {
     private static final String TOKEN_NAME = "tokenName";
 
     private static final String ADMIN_OBJECT_ID = new ObjectId().toHexString();
+    public static final String ALLOWED_ROLE_LOWER_CASE = TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US);
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     @Mock
     private UsersResource usersResource;
@@ -141,6 +141,7 @@ public class UsersResourceTest {
                 roleService, sessionService, new HttpConfiguration(), subject,
                 sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, userService);
         lenient().when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
+        lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
     }
 
     /**
@@ -151,7 +152,9 @@ public class UsersResourceTest {
     public void createSuccess() throws ValidationException, NotFoundException {
         Role role = mock(Role.class);
         when(role.getId()).thenReturn(new ObjectId().toHexString());
-        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US), role));
+        when(role.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, role));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
 
@@ -165,11 +168,55 @@ public class UsersResourceTest {
     }
 
     @Test
-    public void createFailureOnMissingRoleAssignPermission() {
+    public void failOnUnallowedRoleAssignment() throws NotFoundException {
+        Role readerRole = mock(Role.class);
+        when(readerRole.getId()).thenReturn(new ObjectId().toHexString());
+        when(readerRole.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+
+        String forbiddenRole = "ADMIN";
+        Role adminRole = mock(Role.class);
+        when(adminRole.getId()).thenReturn(new ObjectId().toHexString());
+        when(adminRole.getName()).thenReturn("admin");
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
+        when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
+        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <admin>"));
+    }
+
+    @Test
+    public void failOnUnallowedRoleUnAssignment() throws NotFoundException {
+        Role readerRole = mock(Role.class);
+        ObjectId readerRoleId = new ObjectId();
+        when(readerRole.getId()).thenReturn(readerRoleId.toHexString());
+        when(readerRole.getName()).thenReturn(TestUsersResource.ALLOWED_ROLE);
+
+        Role adminRole = mock(Role.class);
+        ObjectId adminRoleId = new ObjectId();
+        when(adminRole.getId()).thenReturn(adminRoleId.toHexString());
+        when(adminRole.getName()).thenReturn("ADMIN");
+
+        when(roleService.loadAllLowercaseNameMap()).thenReturn(Map.of(ALLOWED_ROLE_LOWER_CASE, readerRole, "admin", adminRole));
+
+        when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of(UserImpl.ROLES, List.of(readerRoleId, adminRoleId))));
+
+        final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
+        when(userService.loadById("creator")).thenReturn(creator);
+        when(subject.getPrincipal()).thenReturn(creator.getName());
+
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD)));
+        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
+    }
+
+    @Test
+    public void createFailureOnWrongRoleAssignPermission() {
         String testRole = "forbiddenRole";
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-        assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
     }
 
     @Test
@@ -226,7 +273,6 @@ public class UsersResourceTest {
             assertEquals(expected, actual);
         } finally {
             verify(subject).isPermitted(USERS_TOKENCREATE + ":" + USERNAME);
-            //Before calling the service, the configuration for the default TTL is already loaded in the resource:
             verify(accessTokenService).create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)));
             verify(clusterConfigService).getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES);
             verifyNoMoreInteractions(clusterConfigService, accessTokenService);
@@ -296,6 +342,45 @@ public class UsersResourceTest {
         }
     }
 
+    @Test
+    public void getByIdUserWithAdditionalUserIdPermissions() {
+        String alice = "alice";
+        String bob = "bob";
+        String unknown = "unknown";
+        List<WildcardPermission> permissions = List.of(
+                new WildcardPermission(RestPermissions.USERS_EDIT + ":" + alice),
+                new WildcardPermission(RestPermissions.USERS_EDIT + ":" + bob),
+                new WildcardPermission(RestPermissions.USERS_EDIT + ":" + unknown),
+                new WildcardPermission("streams:read:12345"),
+                new WildcardPermission("streams:read")
+        );
+        User userAlice = setupUser(alice, permissions);
+        User userBob = userImplFactory.create(Map.of(UserImpl.USERNAME, bob));
+        when(userManagementService.load(bob)).thenReturn(userBob);
+
+        assertThat(usersResource.getbyId(userAlice.getId(), new UserContext(userAlice.getId(), subject, userService)).permissions().stream()
+                .map(Object::toString).toList())
+                .contains("users:edit:" + alice,
+                        "users:edit:" + bob,
+                        "users:edit:" + unknown,
+                        "streams:read:12345",
+                        "streams:read",
+                        "users:edit:" + userAlice.getId(),
+                        "users:edit:" + userBob.getId())
+                .hasSize(permissions.size() + 2);
+    }
+
+    private User setupUser(String username, List<WildcardPermission> basePerms) {
+        User user = userImplFactory.create(Map.of(UserImpl.USERNAME, username));
+        String userId = user.getId();
+        when(subject.isPermitted(RestPermissions.USERS_EDIT + ":" + username)).thenReturn(true);
+        when(userManagementService.loadById(userId)).thenReturn(user);
+        when(userService.loadById(userId)).thenReturn(user);
+        when(userManagementService.getWildcardPermissionsForUser(user)).thenReturn(basePerms);
+        when(userManagementService.getGRNPermissionsForUser(user)).thenReturn(List.of());
+        return user;
+    }
+
     private CreateUserRequest buildCreateUserRequest(List<String> roles, String password) {
         return CreateUserRequest.create(USERNAME, password, EMAIL,
                 FIRST_NAME, LAST_NAME, Collections.singletonList(""),
@@ -359,7 +444,7 @@ public class UsersResourceTest {
      */
     public static class TestUsersResource extends UsersResource {
 
-        private static final String ALLOWED_ROLE = "allowed_role";
+        private static final String ALLOWED_ROLE = "READER";
         private final Subject subject;
 
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
@@ -382,7 +467,7 @@ public class UsersResourceTest {
 
         @Override
         protected void checkPermission(String permission, String instanceId) {
-            if (permission.equals(RestPermissions.ROLES_EDIT) && instanceId.equals(ALLOWED_ROLE)) {
+            if (permission.equals(RestPermissions.ROLES_ASSIGN) && instanceId.equals(ALLOWED_ROLE)) {
                 return;
             }
             super.checkPermission(permission, instanceId);

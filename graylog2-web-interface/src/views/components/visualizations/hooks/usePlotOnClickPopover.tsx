@@ -25,7 +25,7 @@ import type { Rel, ClickPoint } from 'views/components/visualizations/OnClickPop
 import type { OnClickMarkerEvent } from 'views/components/visualizations/GenericPlot';
 import OnClickPopoverWrapper from 'views/components/visualizations/OnClickPopover/OnClickPopoverWrapper';
 import CartesianOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/CartesianOnClickPopoverDropdown';
-import HeatmapOnClickPopover from 'views/components/visualizations/heatmap/HeatmapOnClickPopover';
+import HeatmapOnClickPopover from 'views/components/visualizations/OnClickPopover/HeatmapOnClickPopover';
 import PieOnClickPopoverDropdown from 'views/components/visualizations/OnClickPopover/PieOnClickPopoverDropdown';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import { CANDIDATE_PICK_RADIUS } from 'views/components/visualizations/Constants';
@@ -117,6 +117,17 @@ const projectT = (P: Px, A: Px, B: Px) => {
   // Dot product projection formula
   return (wx * vx + wy * vy) / len2;
 };
+const distToRect = (rect: DOMRect, { x, y }: Px) => {
+  let dx = 0;
+  if (x < rect.left) dx = rect.left - x;
+  else if (x > rect.right) dx = x - rect.right;
+  let dy = 0;
+  if (y < rect.top) dy = rect.top - y;
+  else if (y > rect.bottom) dy = y - rect.bottom;
+
+  return Math.hypot(dx, dy);
+};
+
 /**
  * Convert a data-space coordinate (xVal, yVal) to **page pixel coordinates**
  * so we can compare against mouse clicks.
@@ -163,13 +174,7 @@ const pickNearestElementAnchor = (
 
   const candidatesWithDistances = candidates.map((candidate) => {
     const rect = candidate.rect as DOMRect;
-    let dx = 0;
-    if (clientX < rect.left) dx = rect.left - clientX;
-    else if (clientX > rect.right) dx = clientX - rect.right;
-    let dy = 0;
-    if (clientY < rect.top) dy = rect.top - clientY;
-    else if (clientY > rect.bottom) dy = clientY - rect.bottom;
-    const d = Math.hypot(dx, dy);
+    const d = distToRect(rect, { x: clientX, y: clientY });
 
     return { d, candidate };
   });
@@ -228,6 +233,28 @@ interface PlotlyHTMLElementWithInternals extends PlotlyHTMLElement {
   _fullLayout?: any;
 }
 
+function pickNearestLinesElementForTrace(gd: PlotlyHTMLElement, pt: ClickPoint, click: Px): Element | null {
+  const uid = pt.fullData?.uid;
+  if (!uid) return null;
+
+  const trace = gd.querySelector<HTMLElement>(`.scatterlayer .trace.trace${uid}`);
+  if (!trace) return null;
+
+  const linesGroups = Array.from(trace.querySelectorAll<SVGGElement>('.lines path.js-line'));
+  if (!linesGroups.length) return null;
+
+  const candidates = linesGroups.map((line) => {
+    const r = line.getBoundingClientRect();
+    const { x, y } = click;
+
+    return { el: line, d: distToRect(r, { x, y }) };
+  });
+
+  const best: { el: SVGGElement; d: number } = minBy(candidates, 'd');
+
+  return best?.el;
+}
+
 const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint) => {
   // Get the full data for this trace (array of x/y values)
   const fd: PlotData = pt.data ?? (gd as PlotlyHTMLElementWithInternals)._fullData?.[pt.curveNumber];
@@ -255,12 +282,8 @@ const getScatterLineElements = (gd: PlotlyHTMLElement, click: Px, pt: ClickPoint
 
     // Distance from click to this projected point
     const d = Math.hypot(click.x - px, click.y - py);
-
     // Find the actual <path> element for the line
-    const el = (gd.querySelectorAll('.scatterlayer .trace')[pt.curveNumber] as HTMLElement)?.querySelector(
-      '.lines path.js-line',
-    ) as Element | null;
-
+    const el = pickNearestLinesElementForTrace(gd, pt, click);
     // The actual data point's pixel coordinates
     const { x: valuePx, y: valuePy } = dataToPagePx(gd, pt, xs[i], ys[i]);
 
@@ -346,6 +369,8 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     gdRef.current = gd;
   };
 
+  const onPopoverClose = () => setAnchor(null);
+
   const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
     const gd =
       gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
@@ -356,7 +381,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
   };
 
   const onPopoverChange = (isOpen: boolean) => {
-    if (!isOpen) setAnchor(null);
+    if (!isOpen) onPopoverClose();
   };
 
   const isPopoverOpen = !!anchor;
@@ -374,6 +399,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
         clickPoint={anchor?.pt}
         config={config}
         clickPointsInRadius={anchor?.pointsInRadius}
+        onPopoverClose={onPopoverClose}
       />
     </OnClickPopoverWrapper>
   );

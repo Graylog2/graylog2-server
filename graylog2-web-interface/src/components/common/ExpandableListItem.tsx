@@ -55,6 +55,7 @@ const StyledAccordionItem = styled(Accordion.Item)(
 
     .mantine-Accordion-content {
       padding-left: 11px;
+      padding-right: 0;
     }
 
     .mantine-Accordion-label {
@@ -63,6 +64,10 @@ const StyledAccordionItem = styled(Accordion.Item)(
     }
   `,
 );
+
+const StyledAccordionControl = styled(Accordion.Control)`
+  padding-right: 0;
+`;
 
 type Props = React.PropsWithChildren<{
   header: React.ReactNode;
@@ -90,10 +95,10 @@ const ExpandableListItem = ({
 
   return (
     <StyledAccordionItem value={value}>
-      <Accordion.Control>
+      <StyledAccordionControl>
         {header}
         {subheader && <Subheader>{subheader}</Subheader>}
-      </Accordion.Control>
+      </StyledAccordionControl>
       <Accordion.Panel>
         <ContentContainer>{children}</ContentContainer>
       </Accordion.Panel>

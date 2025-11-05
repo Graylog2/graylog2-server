@@ -19,11 +19,10 @@ package org.graylog.storage.elasticsearch7.stats;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
+import jakarta.inject.Inject;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Request;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.storage.elasticsearch7.ElasticsearchClient;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -39,10 +38,6 @@ public class StatsApi {
                     ElasticsearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
-    }
-
-    public JsonNode indexStats(String index) {
-        return stats(index);
     }
 
     public JsonNode indexStatsWithShardLevel(String index) {

@@ -20,23 +20,21 @@ import com.github.joschi.jadconfig.util.Duration;
 import jakarta.annotation.Nonnull;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackend;
 import org.graylog.testing.completebackend.DefaultMavenProjectDirProvider;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.datanode.DatanodeDockerHooks;
 import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.security.JwtSecret;
-import org.testcontainers.containers.BindMode;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.security.jwt.IndexerJwtAuthTokenProvider;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-
 import java.time.Clock;
+import java.util.List;
 
 public class DatanodeContainerizedBackend {
     public static final String IMAGE_WORKING_DIR = "/usr/share/graylog/datanode";
@@ -72,7 +70,7 @@ public class DatanodeContainerizedBackend {
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, this.network);
+        this.mongoDBTestService = MongoDBTestService.create(this.network);
         this.mongoDBTestService.start();
 
         // we have created these resources, we have to close them.

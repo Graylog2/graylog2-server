@@ -26,12 +26,11 @@ import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.apache.http.client.utils.URIBuilder;
 import org.graylog.events.event.EventDto;
 
 import java.util.Collections;
 import java.util.Map;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 /**
  * Redirects the frontend to an existing dashboard.
@@ -75,24 +74,20 @@ public class GoToDashboard extends Action {
 
         @JsonIgnore
         @Override
-        public String toText(EventDto event) {
-            return getLink();
+        public URIBuilder getLink(EventDto event) {
+            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
+            uriBuilder.setPath("dashboards/" + dashboardId());
+            uriBuilder.setParameters(parameters());
+            return uriBuilder.build().getLinkPath();
         }
 
         @JsonIgnore
         @Override
-        public String toHtml(EventDto event) {
-            return f("""
-                    <td><a href="%s" target="_blank">Go to Dashboard</a></td>
-                    """, getLink());
-        }
-
-        @JsonIgnore
-        private String getLink() {
-            final TemplateURI.Builder uriBuilder = new TemplateURI.Builder();
-            uriBuilder.setPath("dashboards/" + dashboardId());
-            uriBuilder.setParameters(parameters());
-            return uriBuilder.build().getLink();
+        public String validate() {
+            if (dashboardId() == null || dashboardId().isEmpty()) {
+                return "Dashboard cannot be empty";
+            }
+            return null;
         }
 
         @AutoValue.Builder

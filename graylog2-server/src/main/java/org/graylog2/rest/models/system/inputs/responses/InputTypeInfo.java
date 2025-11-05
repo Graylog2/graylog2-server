@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 
 import java.util.Map;
 
@@ -35,6 +36,10 @@ public abstract class InputTypeInfo {
     @JsonProperty("name")
     public abstract String name();
 
+    @JsonProperty("description")
+    @Nullable
+    public abstract String description();
+
     @JsonProperty("is_exclusive")
     public abstract boolean isExclusive();
 
@@ -47,9 +52,10 @@ public abstract class InputTypeInfo {
     @JsonCreator
     public static InputTypeInfo create(@JsonProperty("type") String type,
                                        @JsonProperty("name") String name,
+                                       @Nullable @JsonProperty("description") String description,
                                        @JsonProperty("is_exclusive") boolean isExclusive,
                                        @JsonProperty("requested_configuration") Map<String, Map<String, Object>> requestedConfiguration,
                                        @JsonProperty("link_to_docs") String linkToDocs) {
-        return new AutoValue_InputTypeInfo(type, name, isExclusive, requestedConfiguration, linkToDocs);
+        return new AutoValue_InputTypeInfo(type, name, description, isExclusive, requestedConfiguration, linkToDocs);
     }
 }
