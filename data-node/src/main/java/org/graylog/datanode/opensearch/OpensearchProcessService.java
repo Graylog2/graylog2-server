@@ -24,6 +24,7 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bootstrap.preflight.DatanodeDirectoriesLockfileCheck;
+import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
 import org.graylog.datanode.configuration.OpensearchConfigurationService;
 import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.opensearch.statemachine.OpensearchEvent;
@@ -102,6 +103,11 @@ public class OpensearchProcessService extends AbstractIdleService implements Pro
                 }
             }
         }
+    }
+
+    @Subscribe
+    public void handleCertificateChangeEvent(DatanodeCertificateRenewedEvent event) {
+        stateMachine.fire(OpensearchEvent.CERTIFICATES_RELOAD);
     }
 
     private void checkWritePreflightFinishedOnInsecureStartup() {
