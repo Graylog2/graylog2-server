@@ -28,6 +28,7 @@ import com.mongodb.MongoException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -340,7 +341,7 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_CREATE)
     @Operation(summary = "Create a new lookup table")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
-    public LookupTableApi createTable(@Parameter LookupTableApi lookupTable) {
+    public LookupTableApi createTable(@RequestBody LookupTableApi lookupTable) {
         try {
             LookupTableDto saved = dbTableService.saveAndPostEvent(lookupTable.toDto());
 
@@ -358,7 +359,7 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_UPDATE)
     @Operation(summary = "Update the given lookup table")
     public LookupTableApi updateTable(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                      @Valid @Parameter LookupTableApi toUpdate) {
+                                      @Valid @RequestBody LookupTableApi toUpdate) {
         checkLookupTableId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         LookupTableDto saved = dbTableService.saveAndPostEvent(toUpdate.toDto());
@@ -387,7 +388,7 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate the lookup table config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateTable(@Parameter LookupTableApi toValidate) {
+    public ValidationResult validateTable(@RequestBody LookupTableApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
         validator.validate(toValidate).stream().forEach(v ->
@@ -583,7 +584,7 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_CREATE)
     @Operation(summary = "Create a new data adapter")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
-    public DataAdapterApi createAdapter(@Valid @Parameter DataAdapterApi newAdapter) {
+    public DataAdapterApi createAdapter(@Valid @RequestBody DataAdapterApi newAdapter) {
         try {
             DataAdapterDto dto = newAdapter.toDto();
             if (configuration.isCloud() && !dto.config().isCloudCompatible()) {
@@ -629,7 +630,7 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_UPDATE)
     @Operation(summary = "Update the given data adapter settings")
     public DataAdapterApi updateAdapter(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                        @Valid @Parameter DataAdapterApi toUpdate) {
+                                        @Valid @RequestBody DataAdapterApi toUpdate) {
         checkLookupAdapterId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         DataAdapterDto saved = dbDataAdapterService.saveAndPostEvent(toUpdate.toDto());
@@ -642,7 +643,7 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate the data adapter config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateAdapter(@Parameter DataAdapterApi toValidate) {
+    public ValidationResult validateAdapter(@RequestBody DataAdapterApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
         validator.validate(toValidate).stream().forEach(v ->
@@ -746,7 +747,7 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_CREATE)
     @Operation(summary = "Create a new cache")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
-    public CacheApi createCache(@Parameter CacheApi newCache) {
+    public CacheApi createCache(@RequestBody CacheApi newCache) {
         try {
             final CacheDto saved = dbCacheService.saveAndPostEvent(newCache.toDto());
             return CacheApi.fromDto(saved);
@@ -786,7 +787,7 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_UPDATE)
     @Operation(summary = "Update the given cache settings")
     public CacheApi updateCache(@Parameter(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
-                                @Parameter CacheApi toUpdate) {
+                                @RequestBody CacheApi toUpdate) {
         checkLookupCacheId(idOrName, toUpdate);
         checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         CacheDto saved = dbCacheService.saveAndPostEvent(toUpdate.toDto());
@@ -798,7 +799,7 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate the cache config")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
-    public ValidationResult validateCache(@Parameter CacheApi toValidate) {
+    public ValidationResult validateCache(@RequestBody CacheApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
         validator.validate(toValidate).stream().forEach(v ->

@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -131,7 +132,7 @@ public class StreamOutputResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_ASSIGNMENT_CREATE)
     public Response add(@Parameter(name = "streamid", description = "The id of the stream whose outputs we want.", required = true)
                         @PathParam("streamid") String streamid,
-                        @Parameter(name = "JSON body", required = true)
+                        @RequestBody(required = true)
                         @Valid @NotNull AddOutputRequest aor) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);

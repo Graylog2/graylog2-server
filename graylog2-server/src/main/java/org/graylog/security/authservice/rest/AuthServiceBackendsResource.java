@@ -21,7 +21,26 @@ import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresGuest;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -45,27 +64,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.UserOverviewDTO;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.BeanParam;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.util.Collections;
 import java.util.List;
@@ -151,7 +149,7 @@ public class AuthServiceBackendsResource extends RestResource {
     @Operation(summary = "Creates a new authentication service backend")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_BACKEND_CREATE)
     @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_BACKEND_CREATE)
-    public Response create(@Parameter(name = "JSON body", required = true) @NotNull AuthServiceBackendDTO newConfig) {
+    public Response create(@RequestBody(required = true) @NotNull AuthServiceBackendDTO newConfig) {
         validateConfig(newConfig);
 
         return toResponse(dbService.save(newConfig));
@@ -162,7 +160,7 @@ public class AuthServiceBackendsResource extends RestResource {
     @Operation(summary = "Updates an existing authentication service backend")
     @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_BACKEND_UPDATE)
     public Response update(@Parameter(name = "backendId", required = true) @PathParam("backendId") @NotBlank String backendId,
-                           @Parameter(name = "JSON body", required = true) @NotNull AuthServiceBackendDTO updatedConfig) {
+                           @RequestBody(required = true) @NotNull AuthServiceBackendDTO updatedConfig) {
         checkPermission(RestPermissions.AUTH_SERVICE_BACKEND_EDIT, backendId);
         validateConfig(updatedConfig);
 

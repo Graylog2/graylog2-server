@@ -17,20 +17,10 @@
 package org.graylog.security.authservice.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog.security.SecurityAuditEventTypes;
-import org.graylog.security.authservice.GlobalAuthServiceConfig;
-import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
-
 import jakarta.inject.Inject;
-
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
@@ -38,6 +28,13 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.security.SecurityAuditEventTypes;
+import org.graylog.security.authservice.GlobalAuthServiceConfig;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Collections;
 
@@ -65,7 +62,7 @@ public class GlobalAuthServiceConfigResource extends RestResource {
     @Operation(summary = "Update global authentication services configuration")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_GLOBAL_CONFIG_EDIT)
     @AuditEvent(type = SecurityAuditEventTypes.AUTH_SERVICE_GLOBAL_CONFIG_UPDATE)
-    public Response update(@Parameter(name = "JSON body", required = true) @NotNull GlobalAuthServiceConfig.Data body) {
+    public Response update(@RequestBody(required = true) @NotNull GlobalAuthServiceConfig.Data body) {
         return toResponse(authServiceConfig.updateConfiguration(body));
     }
 

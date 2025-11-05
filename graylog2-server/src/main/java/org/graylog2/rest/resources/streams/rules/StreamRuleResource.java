@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.streams.rules;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -82,7 +83,7 @@ public class StreamRuleResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_RULE_CREATE)
     public Response create(@Parameter(name = "streamid", description = "The stream id this new rule belongs to.", required = true)
                            @PathParam("streamid") String streamId,
-                           @Parameter(name = "JSON body", required = true)
+                           @RequestBody(required = true)
                            @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkNotEditable(streamId, "Cannot add stream rules to non-editable streams.");
@@ -117,7 +118,7 @@ public class StreamRuleResource extends RestResource {
                                                   @PathParam("streamid") String streamid,
                                                   @Parameter(name = "streamRuleId", description = "The stream rule id we are updating", required = true)
                                                   @PathParam("streamRuleId") String streamRuleId,
-                                                  @Parameter(name = "JSON body", required = true)
+                                                  @RequestBody(required = true)
                                                   @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
         checkNotEditable(streamid, "Cannot update stream rules on non-editable streams.");

@@ -34,6 +34,7 @@ import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -716,6 +717,16 @@ public class Generator {
                         final List<String> allowableValues = Arrays.asList(schema.allowableValues());
                         param.setAllowableValues(allowableValues);
                     }
+                }
+
+                // Support OpenAPI 3.x @RequestBody annotation for body parameters (semantically correct)
+                if (annotation instanceof RequestBody requestBodyAnnotation) {
+                    param.setName("JSON body");
+                    param.setDescription(requestBodyAnnotation.description());
+                    param.setIsRequired(requestBodyAnnotation.required());
+
+                    final TypeSchema parameterSchema = typeSchema(method.getGenericParameterTypes()[i]);
+                    param.setTypeSchema(parameterSchema);
                 }
 
                 if (annotation instanceof DefaultValue) {

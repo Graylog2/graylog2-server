@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.search;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -94,7 +95,7 @@ public class DecoratorResource extends RestResource {
     @Timed
     @Operation(summary = "Creates a message decoration configuration")
     @AuditEvent(type = AuditEventTypes.MESSAGE_DECORATOR_CREATE)
-    public Decorator create(@Parameter(name = "JSON body", required = true) @Valid @NotNull DecoratorImpl decorator) {
+    public Decorator create(@RequestBody(required = true) @Valid @NotNull DecoratorImpl decorator) {
         checkPermission(RestPermissions.DECORATORS_CREATE);
         if (decorator.stream().isPresent()) {
             checkPermission(RestPermissions.STREAMS_EDIT, decorator.stream().get());
@@ -124,7 +125,7 @@ public class DecoratorResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.MESSAGE_DECORATOR_UPDATE)
     public Decorator update(@Parameter(name = "decorator id", required = true)
                             @PathParam("decoratorId") final String decoratorId,
-                            @Parameter(name = "JSON body", required = true)
+                            @RequestBody(required = true)
                             @Valid @NotNull DecoratorImpl decorator) throws NotFoundException {
         final Decorator originalDecorator = decoratorService.findById(decoratorId);
         checkPermission(RestPermissions.DECORATORS_CREATE);

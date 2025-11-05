@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -91,7 +92,7 @@ public class UrlAllowlistResource extends RestResource {
     @NoAuditEvent("Validation only")
     @Consumes(MediaType.APPLICATION_JSON)
     // Checking can be done without any special permission.
-    public AllowlistCheckResponse check(@Parameter(name = "JSON body", required = true)
+    public AllowlistCheckResponse check(@RequestBody(required = true)
                                         @Valid @NotNull final AllowlistCheckRequest checkRequest) {
         final boolean isAllowlisted = urlAllowlistService.isAllowlisted(checkRequest.url());
         return AllowlistCheckResponse.create(checkRequest.url(), isAllowlisted);
@@ -103,7 +104,7 @@ public class UrlAllowlistResource extends RestResource {
     @Operation(summary = "Generates a regex that can be used as a value for a allowlist entry.")
     @NoAuditEvent("Utility function only.")
     @Consumes(MediaType.APPLICATION_JSON)
-    public AllowlistRegexGenerationResponse generateRegex(@Parameter(name = "JSON body", required = true)
+    public AllowlistRegexGenerationResponse generateRegex(@RequestBody(required = true)
                                                           @Valid @NotNull final AllowlistRegexGenerationRequest generationRequest) {
         final String regex;
         if (generationRequest.placeholder() == null) {

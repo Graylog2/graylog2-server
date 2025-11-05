@@ -18,6 +18,7 @@ package org.graylog.plugins.sidecar.rest.resources;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -102,7 +103,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Create new configuration variable")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_CREATE)
-    public Response createConfigurationVariable(@Parameter(name = "JSON body", required = true)
+    public Response createConfigurationVariable(@RequestBody(required = true)
                                                 @Valid @NotNull ConfigurationVariable request) {
         ValidationResult validationResult = validateConfigurationVariableHelper(request);
         if (validationResult.failed()) {
@@ -120,7 +121,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_VARIABLE_UPDATE)
     public Response updateConfigurationVariable(@Parameter(name = "id", required = true)
                                                 @PathParam("id") String id,
-                                                @Parameter(name = "JSON body", required = true)
+                                                @RequestBody(required = true)
                                                 @Valid @NotNull ConfigurationVariable request) {
         final ConfigurationVariable previousConfigurationVariable = findVariableOrFail(id);
 
@@ -142,7 +143,7 @@ public class ConfigurationVariableResource extends RestResource implements Plugi
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate a configuration variable")
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
-    public ValidationResult validateConfigurationVariable(@Parameter(name = "JSON body", required = true)
+    public ValidationResult validateConfigurationVariable(@RequestBody(required = true)
                                                           @Valid @NotNull ConfigurationVariable toValidate) {
         return validateConfigurationVariableHelper(toValidate);
     }

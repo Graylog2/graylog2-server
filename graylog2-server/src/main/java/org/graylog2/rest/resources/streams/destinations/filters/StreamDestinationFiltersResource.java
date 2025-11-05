@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.streams.destinations.filters;
 import com.mongodb.client.model.Sorts;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -141,7 +142,7 @@ public class StreamDestinationFiltersResource extends RestResource {
     @Operation(summary = "Create new filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_CREATE)
     public Response createFilter(@Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @Parameter(name = "JSON Body", required = true) @Valid StreamDestinationFilterRuleDTO dto) {
+                                 @RequestBody(required = true) @Valid StreamDestinationFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_CREATE);
         checkStream(streamId);
@@ -160,7 +161,7 @@ public class StreamDestinationFiltersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_UPDATE)
     public Response updateFilter(@Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
                                  @Parameter(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId,
-                                 @Parameter(name = "JSON Body", required = true) @Valid StreamDestinationFilterRuleDTO dto) {
+                                 @RequestBody(required = true) @Valid StreamDestinationFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_EDIT, filterId);
         checkStream(streamId);

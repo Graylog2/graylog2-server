@@ -23,6 +23,7 @@ import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -247,7 +248,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @RequiresPermissions(SidecarRestPermissions.CONFIGURATIONS_READ)
     @Operation(summary = "Render preview of a configuration template")
     @NoAuditEvent("this is not changing any data")
-    public ConfigurationPreviewRenderResponse renderConfiguration(@Parameter(name = "JSON body", required = true)
+    public ConfigurationPreviewRenderResponse renderConfiguration(@RequestBody(required = true)
                                                                   @Valid @NotNull ConfigurationPreviewRequest request) {
         try {
             String preview = this.configurationService.renderPreview(request.template());
@@ -262,7 +263,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Create new configuration")
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_CREATE)
-    public Response createConfiguration(@Parameter(name = "JSON body", required = true)
+    public Response createConfiguration(@RequestBody(required = true)
                                         @Valid @NotNull Configuration request) {
         final Configuration configuration = configurationFromRequest(null, request);
         final ValidationResult validationResult = validate(configuration);
@@ -307,7 +308,7 @@ public class ConfigurationResource extends RestResource implements PluginRestRes
     @AuditEvent(type = SidecarAuditEventTypes.CONFIGURATION_UPDATE)
     public Response updateConfiguration(@Parameter(name = "id", required = true)
                                         @PathParam("id") String id,
-                                        @Parameter(name = "JSON body", required = true)
+                                        @RequestBody(required = true)
                                         @Valid @NotNull Configuration request) {
         final Configuration previousConfiguration = configurationService.find(id);
         if (previousConfiguration == null) {

@@ -19,6 +19,7 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -124,7 +125,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
-    public ChunkedOutput<SimpleMessageChunk> retrieve(@Parameter @Valid MessagesRequest rawrequest,
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@RequestBody @Valid MessagesRequest rawrequest,
                                                       @Context SearchUser searchUser) {
 
         final MessagesRequest request = fillInIfNecessary(rawrequest, searchUser);

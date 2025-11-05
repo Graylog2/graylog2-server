@@ -26,6 +26,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -518,7 +519,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate an event definition")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_CREATE)
-    public ValidationResult validate(@Parameter(name = "JSON body", required = true)
+    public ValidationResult validate(@RequestBody(required = true)
                                          @Valid @NotNull EventDefinitionDto toValidate,
                                      @Context UserContext userContext) {
         EventProcessorConfig oldConfig = dbService.get(toValidate.id()).map(EventDefinition::config).orElse(null);
@@ -532,7 +533,7 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
     @NoAuditEvent("Validation only")
     @Operation(summary = "Validate a cron expression")
     @RequiresPermissions(RestPermissions.EVENT_DEFINITIONS_READ)
-    public CronValidationResponse validate(@Parameter(name = "JSON body", required = true)
+    public CronValidationResponse validate(@RequestBody(required = true)
                                            @Valid @NotNull CronValidationRequest toValidate) {
         try {
             CronUtils.validateExpression(toValidate.expression());

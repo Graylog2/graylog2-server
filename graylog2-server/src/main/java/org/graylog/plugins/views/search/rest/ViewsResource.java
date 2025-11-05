@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -242,7 +243,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @POST
     @Operation(summary = "Create a new view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
-    public ViewDTO create(@Parameter @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
+    public ViewDTO create(@RequestBody @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
                           @Context UserContext userContext,
                           @Context SearchUser searchUser) {
         return createView(createEntityRequest, userContext, searchUser);
@@ -253,7 +254,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_CREATE)
     @Path("{id}")
     public ViewDTO duplicate(@Parameter(name = "id") @PathParam("id") @NotEmpty String existingViewId,
-                             @Parameter @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
+                             @RequestBody @Valid @NotNull(message = "View is mandatory") CreateEntityRequest<ViewDTO> createEntityRequest,
                              @Context UserContext userContext,
                              @Context SearchUser searchUser) {
         final ViewDTO dto = createView(createEntityRequest, userContext, searchUser);
@@ -390,7 +391,7 @@ public class ViewsResource extends RestResource implements PluginRestResource {
     @Operation(summary = "Update view")
     @AuditEvent(type = ViewsAuditEventTypes.VIEW_UPDATE)
     public ViewDTO update(@Parameter(name = "id") @PathParam("id") @NotEmpty String id,
-                          @Parameter @Valid CreateEntityRequest<ViewDTO> createEntityRequest,
+                          @RequestBody @Valid CreateEntityRequest<ViewDTO> createEntityRequest,
                           @Context SearchUser searchUser) {
         final ViewDTO dto = createEntityRequest.entity();
         final ViewDTO updatedDTO = dto.toBuilder().id(id).build();

@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -65,7 +66,7 @@ public class EntityListPreferencesResource {
     @Operation(summary = "Create or update user preferences for certain entity list")
     @Consumes(MediaType.APPLICATION_JSON)
     @NoAuditEvent("Audit logs are not stored for entity list preferences")
-    public Response create(@Parameter(name = "JSON body", required = true) EntityListPreferences entityListPreferences,
+    public Response create(@RequestBody(required = true) EntityListPreferences entityListPreferences,
                            @Parameter(name = "entity_list_id", required = true) @PathParam("entity_list_id") @NotEmpty String entityListId,
                            @Context UserContext userContext) throws ValidationException {
 

@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -117,7 +118,7 @@ public class RolesResource extends RestResource {
     @RequiresPermissions(RestPermissions.ROLES_CREATE)
     @Operation(summary = "Create a new role")
     @AuditEvent(type = AuditEventTypes.ROLE_CREATE)
-    public Response create(@Parameter(name = "JSON body", description = "The new role to create", required = true) @Valid @NotNull RoleResponse roleResponse) {
+    public Response create(@RequestBody(description = "The new role to create", required = true) @Valid @NotNull RoleResponse roleResponse) {
         if (roleService.exists(roleResponse.name())) {
             throw new BadRequestException("Role " + roleResponse.name() + " already exists.");
         }
@@ -150,7 +151,7 @@ public class RolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_UPDATE)
     public RoleResponse update(
             @Parameter(name = "rolename", required = true) @PathParam("rolename") String name,
-            @Parameter(name = "JSON Body", description = "The new representation of the role", required = true) RoleResponse roleRepresentation) throws NotFoundException {
+            @RequestBody(description = "The new representation of the role", required = true) RoleResponse roleRepresentation) throws NotFoundException {
         checkPermission(RestPermissions.ROLES_EDIT, name);
 
         final Role role = roleService.load(name);
@@ -252,7 +253,7 @@ public class RolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     public Response addMember(@Parameter(name = "rolename") @PathParam("rolename") String rolename,
                               @Parameter(name = "username") @PathParam("username") String username,
-                              @Parameter(name = "JSON Body", description = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.") String body) throws NotFoundException {
+                              @RequestBody(description = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.") String body) throws NotFoundException {
         checkPermission(RestPermissions.USERS_EDIT, username);
         checkPermission(RestPermissions.ROLES_ASSIGN, rolename);
 

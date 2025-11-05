@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -204,7 +205,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Create a new collector")
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_CREATE)
-    public Response createCollector(@Parameter(name = "JSON body", required = true)
+    public Response createCollector(@RequestBody(required = true)
                                     @Valid @NotNull Collector request) throws BadRequestException {
         return saveCollector(collectorService.fromRequest(request));
     }
@@ -217,7 +218,7 @@ public class CollectorResource extends RestResource implements PluginRestResourc
     @AuditEvent(type = SidecarAuditEventTypes.COLLECTOR_UPDATE)
     public Response updateCollector(@Parameter(name = "id", required = true)
                                     @PathParam("id") String id,
-                                    @Parameter(name = "JSON body", required = true)
+                                    @RequestBody(required = true)
                                     @Valid @NotNull Collector request) throws BadRequestException {
         return saveCollector(collectorService.fromRequest(id, request));
     }

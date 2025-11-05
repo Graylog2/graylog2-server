@@ -19,12 +19,24 @@ package org.graylog2.rest.resources.system.outputs;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -41,19 +53,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.OutputService;
 import org.graylog2.utilities.ConfigurationMapConverter;
 import org.joda.time.DateTime;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -123,7 +122,7 @@ public class OutputResource extends RestResource {
             @ApiResponse(responseCode = "400", description = "Invalid output specification in input.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_CREATE)
-    public Response create(@Parameter(name = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
+    public Response create(@RequestBody(required = true) CreateOutputRequest csor) throws ValidationException {
         checkPermission(RestPermissions.OUTPUTS_CREATE);
         final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type());
 
@@ -194,7 +193,7 @@ public class OutputResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_UPDATE)
     public Output update(@Parameter(name = "outputId", description = "The id of the output that should be deleted", required = true)
                          @PathParam("outputId") String outputId,
-                         @Parameter(name = "JSON body", required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {
+                         @RequestBody(required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_EDIT, outputId);
         final Output oldOutput = outputService.load(outputId);
         final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(oldOutput.getType());

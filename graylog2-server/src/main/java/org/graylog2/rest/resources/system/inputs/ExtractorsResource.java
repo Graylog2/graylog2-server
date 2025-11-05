@@ -20,9 +20,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -118,7 +119,7 @@ public class ExtractorsResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.EXTRACTOR_CREATE)
     public Response create(@Parameter(name = "inputId", required = true)
                            @PathParam("inputId") String inputId,
-                           @Parameter(name = "JSON body", required = true)
+                           @RequestBody(required = true)
                            @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
@@ -165,7 +166,7 @@ public class ExtractorsResource extends RestResource {
                                    @PathParam("inputId") String inputId,
                                    @Parameter(name = "extractorId", required = true)
                                    @PathParam("extractorId") String extractorId,
-                                   @Parameter(name = "JSON body", required = true)
+                                   @RequestBody(required = true)
                                    @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
@@ -285,7 +286,7 @@ public class ExtractorsResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.EXTRACTOR_ORDER_UPDATE)
     public void order(@Parameter(name = "inputId", description = "Persist ID (!) of input.", required = true)
                       @PathParam("inputId") String inputPersistId,
-                      @Parameter(name = "JSON body", required = true) OrderExtractorsRequest oer) throws NotFoundException {
+                      @RequestBody(required = true) OrderExtractorsRequest oer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputPersistId);
 
         final Input mongoInput = inputService.find(inputPersistId);

@@ -21,6 +21,7 @@ import com.eaio.uuid.UUID;
 import com.google.common.net.InetAddresses;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -146,7 +147,7 @@ public class MessageResource extends RestResource {
             @ApiResponse(responseCode = "400", description = "Could not decode message.")
     })
     @NoAuditEvent("only used to parse a test message")
-    public ResultMessage parse(@Parameter(name = "JSON body", required = true) MessageParseRequest request) {
+    public ResultMessage parse(@RequestBody(required = true) MessageParseRequest request) {
         Codec codec;
         try {
             final Configuration configuration = new Configuration(request.configuration());

@@ -26,6 +26,7 @@ import com.google.common.collect.Sets;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -377,7 +378,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(responseCode = "400", description = "Missing or invalid user details.")
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
-    public Response create(@Parameter(name = "JSON body", description = "Must contain username, full_name, email, password and a list of permissions.", required = true)
+    public Response create(@RequestBody(description = "Must contain username, full_name, email, password and a list of permissions.", required = true)
                            @Valid @NotNull CreateUserRequest cr) throws ValidationException {
         if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
@@ -522,7 +523,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_UPDATE)
     public void changeUser(@Parameter(name = "userId", description = "The ID of the user to modify.", required = true)
                            @PathParam("userId") String userId,
-                           @Parameter(name = "JSON body", description = "Updated user information.", required = true)
+                           @RequestBody(description = "Updated user information.", required = true)
                            @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
 
         final User user = loadUserById(userId);
@@ -655,7 +656,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_UPDATE)
     public void editPermissions(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
-                                @Parameter(name = "JSON body", description = "The list of permissions to assign to the user.", required = true)
+                                @RequestBody(description = "The list of permissions to assign to the user.", required = true)
                                 @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
         final User user = userManagementService.load(username);
         if (user == null) {
@@ -675,7 +676,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_PREFERENCES_UPDATE)
     public void savePreferences(@Parameter(name = "username", description = "The name of the user to modify.", required = true)
                                 @PathParam("username") String username,
-                                @Parameter(name = "JSON body", description = "The map of preferences to assign to the user.", required = true)
+                                @RequestBody(description = "The map of preferences to assign to the user.", required = true)
                                 UpdateUserPreferences preferencesRequest) throws ValidationException {
         final User user = userManagementService.load(username);
         checkPermission(USERS_EDIT, username);
@@ -719,7 +720,7 @@ public class UsersResource extends RestResource {
     public void changePassword(
             @Parameter(name = "userId", description = "The id of the user whose password to change.", required = true)
             @PathParam("userId") String userId,
-            @Parameter(name = "JSON body", description = "The old and new passwords.", required = true)
+            @RequestBody(description = "The old and new passwords.", required = true)
             @Valid ChangePasswordRequest cr) throws ValidationException {
 
         final User user = loadUserById(userId);
@@ -825,7 +826,7 @@ public class UsersResource extends RestResource {
     public Token generateNewToken(
             @Parameter(name = "userId", required = true) @PathParam("userId") String userId,
             @Parameter(name = "name", description = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
-            @Parameter(name = "JSON Body", description = "Can optionally contain the token's TTL.") GenerateTokenTTL body) {
+            @RequestBody(description = "Can optionally contain the token's TTL.") GenerateTokenTTL body) {
         final User futureOwner = loadUserById(userId);
 
         if (!isPermitted(USERS_TOKENCREATE, futureOwner.getName())) {

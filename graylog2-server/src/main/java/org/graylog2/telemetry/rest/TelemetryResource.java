@@ -18,7 +18,7 @@ package org.graylog2.telemetry.rest;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -83,7 +83,7 @@ public class TelemetryResource extends RestResource {
     @Operation(summary = "Update a user's telemetry settings.")
     @ApiResponses({@ApiResponse(responseCode = "404", description = "Current user not found.")})
     @NoAuditEvent("Audit event is sent manually.")
-    public void saveTelemetryUserSettings(@Parameter(name = "JSON body", description = "The telemetry settings to assign to the user.", required = true)
+    public void saveTelemetryUserSettings(@RequestBody(description = "The telemetry settings to assign to the user.", required = true)
                                           @Valid @NotNull TelemetryUserSettings telemetryUserSettings) {
 
         User currentUser = getCurrentUserOrThrow();

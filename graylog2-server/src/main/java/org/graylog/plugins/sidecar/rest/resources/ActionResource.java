@@ -19,6 +19,7 @@ package org.graylog.plugins.sidecar.rest.resources;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -89,7 +90,7 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = SidecarAuditEventTypes.ACTION_UPDATE)
     public Response setAction(@Parameter(name = "sidecarId", description = "The id this Sidecar is registering as.", required = true)
                               @PathParam("sidecarId") @NotEmpty String sidecarId,
-                              @Parameter(name = "JSON body", required = true)
+                              @RequestBody(required = true)
                               @Valid @NotNull List<CollectorAction> request) {
         final CollectorActions collectorActions = actionService.fromRequest(sidecarId, request);
         actionService.saveAction(collectorActions);

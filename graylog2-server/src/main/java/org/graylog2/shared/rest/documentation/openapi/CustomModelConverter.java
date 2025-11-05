@@ -54,6 +54,9 @@ public class CustomModelConverter extends ModelResolver {
     @Override
     public Schema<?> resolve(AnnotatedType annotatedType, ModelConverterContext context, Iterator<ModelConverter> next) {
         Schema<?> baseSchema = super.resolve(annotatedType, new CustomConverterContext(context), next);
+        if (true) {
+            return baseSchema;
+        }
         if (baseSchema == null) {
             return null;
         }

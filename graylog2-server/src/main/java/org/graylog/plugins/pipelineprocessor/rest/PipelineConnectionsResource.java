@@ -20,6 +20,7 @@ import com.google.common.collect.Sets;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
@@ -82,7 +83,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @Path("/to_stream")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
-    public PipelineConnections connectPipelines(@Parameter(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
+    public PipelineConnections connectPipelines(@RequestBody(required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
 
         // verify the stream exists and is readable
@@ -103,7 +104,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @Path("/to_pipeline")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
-    public Set<PipelineConnections> connectStreams(@Parameter(name = "Json body", required = true) @NotNull PipelineReverseConnections connection) throws NotFoundException {
+    public Set<PipelineConnections> connectStreams(@RequestBody(required = true) @NotNull PipelineReverseConnections connection) throws NotFoundException {
         final String pipelineId = connection.pipelineId();
         final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
 

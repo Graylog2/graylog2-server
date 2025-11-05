@@ -20,6 +20,7 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -130,7 +131,7 @@ public class IndexSetsMappingResource extends RestResource {
     @Timed
     @NoAuditEvent("No change to the DB")
     @Operation(summary = "Get field type summaries for given index sets and field")
-    public PageListResponse<IndexSetFieldTypeSummary> fieldTypeSummaries(@Parameter(name = "JSON body", required = true)
+    public PageListResponse<IndexSetFieldTypeSummary> fieldTypeSummaries(@RequestBody(required = true)
                                                                          @Valid @NotNull FieldTypeSummaryRequest request,
                                                                          @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                                                          @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,

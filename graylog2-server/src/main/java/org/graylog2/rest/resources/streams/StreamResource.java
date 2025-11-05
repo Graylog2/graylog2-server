@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -222,7 +223,7 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
-    public Response create(@Parameter(name = "JSON body", required = true) final CreateEntityRequest<CreateStreamRequest> createEntityRequest,
+    public Response create(@RequestBody(required = true) final CreateEntityRequest<CreateStreamRequest> createEntityRequest,
                            @Context UserContext userContext) throws ValidationException {
         final CreateStreamRequest cr = createEntityRequest.entity();
         // Create stream.
@@ -382,7 +383,7 @@ public class StreamResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
     public StreamResponse update(@Parameter(name = "streamId", required = true)
                                  @PathParam("streamId") String streamId,
-                                 @Parameter(name = "JSON body", required = true)
+                                 @RequestBody(required = true)
                                  @Valid @NotNull UpdateStreamRequest request,
                                  @Context UserContext userContext) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
@@ -551,7 +552,7 @@ public class StreamResource extends RestResource {
     @NoAuditEvent("only used for testing stream matches")
     public TestMatchResponse testMatch(@Parameter(name = "streamId", required = true)
                                        @PathParam("streamId") String streamId,
-                                       @Parameter(name = "JSON body", required = true)
+                                       @RequestBody(required = true)
                                        @NotNull Map<String, Map<String, Object>> serialisedMessage) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
@@ -593,7 +594,7 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
     public Response cloneStream(@Parameter(name = "streamId", required = true) @PathParam("streamId") String streamId,
-                                @Parameter(name = "JSON body", required = true) @Valid @NotNull CloneStreamRequest cr,
+                                @RequestBody(required = true) @Valid @NotNull CloneStreamRequest cr,
                                 @Context UserContext userContext) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
@@ -700,7 +701,7 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
     public Response assignToIndexSet(@Parameter(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
-                                     @Parameter(name = "JSON body", required = true) @Valid @NotNull List<String> streamIds) {
+                                     @RequestBody(required = true) @Valid @NotNull List<String> streamIds) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         streamIds.forEach(streamId -> {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);

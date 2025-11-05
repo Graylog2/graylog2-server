@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -215,7 +216,7 @@ public class InputsResource extends AbstractInputsResource {
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_CREATE)
     public Response create(@Parameter @QueryParam("setup_wizard") @DefaultValue("false") boolean isSetupWizard,
-                           @Parameter(name = "JSON body", required = true)
+                           @RequestBody(required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
             throwBadRequestIfNotGlobal(lr);
@@ -274,7 +275,7 @@ public class InputsResource extends AbstractInputsResource {
             @ApiResponse(responseCode = "400", description = "Missing or invalid input configuration.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_UPDATE)
-    public Response update(@Parameter(name = "JSON body", required = true) @Valid @NotNull InputCreateRequest lr,
+    public Response update(@RequestBody(required = true) @Valid @NotNull InputCreateRequest lr,
                            @Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
 
         throwBadRequestIfNotGlobal(lr);

@@ -18,6 +18,7 @@ package org.graylog2.contentstream.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -83,7 +84,7 @@ public class ContentStreamResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.CONTENT_STREAM_USER_SETTINGS_UPDATE)
     public ContentStreamSettings setContentStreamUserSettings(
             @Parameter(name = "username") @PathParam("username") String username,
-            @Parameter(name = "JSON body", description = "Content Stream settings for the specified user.", required = true)
+            @RequestBody(description = "Content Stream settings for the specified user.", required = true)
             @Valid @NotNull ContentStreamSettings settings
     ) throws NotFoundException {
         if (isPermitted(USERS_EDIT, username)) {

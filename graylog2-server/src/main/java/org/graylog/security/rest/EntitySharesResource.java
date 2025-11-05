@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -115,7 +116,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @Path("entities/{entityGRN}/prepare")
     @NoAuditEvent("This does not change any data")
     public EntityShareResponse prepareShare(@Parameter(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN,
-                                            @Parameter(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
+                                            @RequestBody(required = true) @NotNull @Valid EntityShareRequest request) {
         final GRN grn = grnRegistry.parse(entityGRN);
         checkOwnership(grn);
 
@@ -157,7 +158,7 @@ public class EntitySharesResource extends RestResourceWithOwnerCheck {
     @Path("entities/{entityGRN}")
     @NoAuditEvent("Audit events are created within EntitySharesService")
     public Response updateEntityShares(@Parameter(name = "entityGRN", required = true) @PathParam("entityGRN") @NotBlank String entityGRN,
-                                       @Parameter(name = "JSON Body", required = true) @NotNull @Valid EntityShareRequest request) {
+                                       @RequestBody(required = true) @NotNull @Valid EntityShareRequest request) {
         final GRN entity = grnRegistry.parse(entityGRN);
         checkOwnership(entity);
 

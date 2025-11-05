@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.inputs;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -81,7 +82,7 @@ public class StaticFieldsResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STATIC_FIELD_CREATE)
     public Response create(@Parameter(name = "inputId", required = true)
                            @PathParam("inputId") String inputId,
-                           @Parameter(name = "JSON body", required = true)
+                           @RequestBody(required = true)
                            @Valid @NotNull CreateStaticFieldRequest csfr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 

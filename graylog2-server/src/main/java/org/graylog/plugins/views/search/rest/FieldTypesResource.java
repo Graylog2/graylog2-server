@@ -18,7 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -71,7 +71,7 @@ public class FieldTypesResource extends RestResource implements PluginRestResour
     @POST
     @Operation(summary = "Retrieve the field list of a given set of streams")
     @NoAuditEvent("This is not changing any data")
-    public Set<MappedFieldTypeDTO> byStreams(@Parameter(name = "JSON body", required = true)
+    public Set<MappedFieldTypeDTO> byStreams(@RequestBody(required = true)
                                              @Valid @NotNull FieldTypesForStreamsRequest request,
                                              @Context SearchUser searchUser) {
         final ImmutableSet<String> streams = searchUser.streams().readableOrAllIfEmpty(request.streams());

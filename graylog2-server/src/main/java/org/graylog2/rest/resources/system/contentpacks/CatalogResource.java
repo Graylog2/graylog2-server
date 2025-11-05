@@ -19,7 +19,7 @@ package org.graylog2.rest.resources.system.contentpacks;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -80,7 +80,7 @@ public class CatalogResource extends RestResource {
     @RequiresPermissions(RestPermissions.CATALOG_RESOLVE)
     @NoAuditEvent("this is not changing any data")
     public CatalogResolveResponse resolveEntities(
-            @Parameter(name = "JSON body", required = true)
+            @RequestBody(required = true)
             @Valid @NotNull CatalogResolveRequest request) {
         final Set<EntityDescriptor> requestedEntities = request.entities();
         final Set<EntityDescriptor> resolvedEntities = contentPackEntityResolver.resolveEntities(requestedEntities);
@@ -95,7 +95,7 @@ public class CatalogResource extends RestResource {
     @NoAuditEvent("This endpoint does not change any data")
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/entities/titles")
-    public EntitiesTitleResponse getTitles(@Parameter(name = "JSON body", required = true) final EntityTitleRequest request, @Context SearchUser searchUser) {
+    public EntitiesTitleResponse getTitles(@RequestBody(required = true) final EntityTitleRequest request, @Context SearchUser searchUser) {
         return entityTitleService.getTitles(request, searchUser);
     }
 }

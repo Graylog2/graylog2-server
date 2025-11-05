@@ -18,6 +18,7 @@ package org.graylog.plugins.views.search.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -53,7 +54,7 @@ public class ExportJobsResource extends RestResource {
     @Operation(summary = "Create job to export a defined set of messages")
     @POST
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
-    public String create(@Parameter @Valid MessagesRequest rawrequest) {
+    public String create(@RequestBody @Valid MessagesRequest rawrequest) {
         return exportJobService.save(exportJobFactory.fromMessagesRequest(rawrequest));
     }
 

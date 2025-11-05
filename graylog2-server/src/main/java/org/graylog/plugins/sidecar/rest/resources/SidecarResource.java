@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -217,7 +218,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @NoAuditEvent("this is only a ping from Sidecars, and would overflow the audit log")
     public Response register(@Parameter(name = "sidecarId", description = "The id this Sidecar is registering as.", required = true)
                              @PathParam("sidecarId") @NotEmpty String nodeId,
-                             @Parameter(name = "JSON body", required = true)
+                             @RequestBody(required = true)
                              @Valid @NotNull RegistrationRequest request,
                              @HeaderParam(value = "If-None-Match") String ifNoneMatch,
                              @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) throws JsonProcessingException {
@@ -273,7 +274,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Operation(summary = "Assign configurations to sidecars")
     @RequiresPermissions({SidecarRestPermissions.SIDECARS_READ, SidecarRestPermissions.SIDECARS_UPDATE})
     @AuditEvent(type = SidecarAuditEventTypes.SIDECAR_UPDATE)
-    public Response assignConfiguration(@Parameter(name = "JSON body", required = true)
+    public Response assignConfiguration(@RequestBody(required = true)
                                         @Valid @NotNull NodeConfigurationRequest request) throws NotFoundException {
         List<String> nodeIdList = request.nodes().stream()
                 .filter(distinctByKey(NodeConfiguration::nodeId))
