@@ -27,7 +27,7 @@ type Props<Entity extends EntityBase> = {
   columnsDefinitions: Array<ColumnDef<Entity>>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
-  isEntitySelectable: (entity: Entity) => boolean;
+  isEntitySelectable: (entity: Entity) => boolean | undefined;
   onColumnsChange: (visibleColumns: Array<string>) => void;
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
@@ -41,7 +41,7 @@ const useTable = <Entity extends EntityBase>({
   columnsDefinitions,
   displayBulkSelectCol,
   entities,
-  isEntitySelectable,
+  isEntitySelectable = () => true,
   onChangeSelection,
   onColumnsChange,
   onSortChange,
@@ -101,7 +101,7 @@ const useTable = <Entity extends EntityBase>({
   return useReactTable({
     columns: columnsDefinitions,
     data,
-    enableRowSelection: (row) => displayBulkSelectCol && !!isEntitySelectable?.(row.original),
+    enableRowSelection: (row) => displayBulkSelectCol && isEntitySelectable(row.original),
     enableSortingRemoval: false,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
