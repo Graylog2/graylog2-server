@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cat.NodeResponse;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.cluster.ClusterIT;
@@ -31,7 +32,7 @@ import java.util.List;
 import java.util.Optional;
 
 public class ClusterES7IT extends ClusterIT {
-    @Rule
+    @SearchInstance
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     @Override
