@@ -25,6 +25,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.slice.SliceBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
@@ -42,17 +43,14 @@ import static org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.Qu
 
 public class SearchRequestFactory {
     private static final Sorting DEFAULT_SORTING = new Sorting("_doc", Sorting.Direction.ASC);
-    private final SortOrderMapper sortOrderMapper;
     private final boolean allowHighlighting;
     private final boolean allowLeadingWildcardSearches;
     private final UsedSearchFiltersToQueryStringsMapper searchFiltersMapper;
 
     @Inject
-    public SearchRequestFactory(SortOrderMapper sortOrderMapper,
-                                @Named("allow_highlighting") boolean allowHighlighting,
+    public SearchRequestFactory(@Named("allow_highlighting") boolean allowHighlighting,
                                 @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches,
                                 UsedSearchFiltersToQueryStringsMapper searchFiltersMapper) {
-        this.sortOrderMapper = sortOrderMapper;
         this.allowHighlighting = allowHighlighting;
         this.allowLeadingWildcardSearches = allowLeadingWildcardSearches;
         this.searchFiltersMapper = searchFiltersMapper;
@@ -158,8 +156,8 @@ public class SearchRequestFactory {
     }
 
     private void applySortingIfPresent(SearchSourceBuilder searchSourceBuilder, SearchCommand command) {
-        final Sorting sort = command.sorting().orElse(DEFAULT_SORTING);
-        searchSourceBuilder.sort(sort.getField(), sortOrderMapper.fromSorting(sort));
+        final Sorting sorting = command.sorting().orElse(DEFAULT_SORTING);
+        searchSourceBuilder.sort(sorting.getField(), SortOrder.valueOf(sorting.getUppercasedDirection()));
     }
 
 
