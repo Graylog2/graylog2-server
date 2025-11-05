@@ -29,6 +29,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRe
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.storage.opensearch3.views.export.OpenSearchExportITHelper;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.indexer.ElasticsearchException;
@@ -64,7 +65,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
         return "graylog_*";
     }
 
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
