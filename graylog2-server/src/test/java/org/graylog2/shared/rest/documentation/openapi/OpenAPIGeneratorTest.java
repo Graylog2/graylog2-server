@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -166,15 +165,13 @@ class OpenAPIGeneratorTest {
         final var childType1 = mapper.readValue("{\"type\":\"child-type-1\",\"age\":5}", ParentType.class);
         final var childType2 = mapper.readValue("{\"type\":\"child-type-2\",\"age\":5}", ParentType.class);
 
-
         assertThat(childType1).isInstanceOf(ChildType1.class);
         assertThat(childType2).isInstanceOf(ChildType2.class);
 
         final var openAPI = generator.generateOpenApiSpec();
 
-        System.out.println(Json.pretty(openAPI));
-
-        assertThat(openAPI.getComponents().getSchemas()).isEmpty();
+        assertThat(openAPI.getComponents().getSchemas()).isNotEmpty();
+        // TODO test generated schema
     }
 
     @PublicCloudAPI
