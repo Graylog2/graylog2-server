@@ -138,8 +138,7 @@ const MessageDetail = ({
     <MessageFavoriteFieldsProvider
       message={message}
       messageFields={messageFields}
-      isFeatureEnabled={isFavoriteFieldsEnabled}
-      streams={messageStreams}>
+      isFeatureEnabled={isFavoriteFieldsEnabled}>
       <MessageDetailAdditionalContextProvider isLocalNode={isLocalNode}>
         <MessageDetailProviders message={message}>
           <>

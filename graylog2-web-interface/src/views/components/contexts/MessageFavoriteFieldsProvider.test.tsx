@@ -20,9 +20,9 @@ import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
 
+import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import { asMock } from 'helpers/mocking';
 import useMessageFavoriteFieldsMutation from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation';
 import { Button } from 'components/bootstrap';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
@@ -31,7 +31,6 @@ import { StreamsActions } from 'views/stores/StreamsStore';
 import mockAction from 'helpers/mocking/MockAction';
 import type { Stream } from 'logic/streams/types';
 
-// Mocks for useMessageFavoriteFields and DEFAULT_FIELDS
 const mockSaveFields = jest.fn();
 const mockToggleField = jest.fn();
 
@@ -40,6 +39,19 @@ jest.mock('views/stores/StreamsStore');
 jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation', () => ({
   __esModule: true,
   default: jest.fn(),
+}));
+
+jest.mock('views/stores/StreamsStore', () => ({
+  StreamsActions: { refresh: jest.fn() },
+  StreamsStore: MockStore([
+    'getInitialState',
+    () => ({
+      streams: [
+        { favorite_fields: ['field1'], id: 'stream1' },
+        { favorite_fields: ['field2'], id: 'stream2' },
+      ] as Array<Stream>,
+    }),
+  ]),
 }));
 
 const Consumer = () => {
@@ -57,12 +69,6 @@ const Consumer = () => {
 const renderComponent = () =>
   render(
     <MessageFavoriteFieldsProvider
-      streams={
-        [
-          { favorite_fields: ['field1'], id: 'stream1' },
-          { favorite_fields: ['field2'], id: 'stream2' },
-        ] as Array<Stream>
-      }
       isFeatureEnabled
       message={{ id: 'id', index: 'index', fields: { streams: ['stream1', 'stream2'] } }}
       messageFields={Immutable.List([

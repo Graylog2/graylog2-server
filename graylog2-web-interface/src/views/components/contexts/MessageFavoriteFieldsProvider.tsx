@@ -23,16 +23,25 @@ import flattenDeep from 'lodash/flattenDeep';
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import type { Stream } from 'logic/streams/types';
 import useMessageFavoriteFieldsMutation from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation';
+import { useStore } from 'stores/connect';
+import { StreamsStore } from 'views/stores/StreamsStore';
+import type { Stream } from 'logic/streams/types';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;
   messageFields: FieldTypeMappingsList;
-  streams: Array<Stream>;
 }>;
 
-const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields, streams }: OriginalProps) => {
+const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
+  const { streams: streamsList = [] } = useStore(StreamsStore);
+  const streams = useMemo<Array<Stream>>(() => {
+    const messageStreamIds: Array<string> = message.fields.streams;
+    const streamsById = Object.fromEntries(streamsList.map((stream) => [stream.id, stream]));
+
+    return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
+  }, [message.fields.streams, streamsList]);
+
   const initialFavoriteFields = useMemo(
     () => uniq(flattenDeep(zip(streams.map((stream) => stream.favorite_fields)))),
     [streams],
@@ -62,12 +71,11 @@ const MessageFavoriteFieldsProvider = ({
   message,
   messageFields,
   isFeatureEnabled,
-  streams,
 }: OriginalProps & { isFeatureEnabled: boolean }) => {
   if (!isFeatureEnabled) return children;
 
   return (
-    <OriginalMessageFavoriteFieldsProvider message={message} messageFields={messageFields} streams={streams}>
+    <OriginalMessageFavoriteFieldsProvider message={message} messageFields={messageFields}>
       {children}
     </OriginalMessageFavoriteFieldsProvider>
   );
