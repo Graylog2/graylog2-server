@@ -114,6 +114,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
@@ -185,27 +186,29 @@ public class ContentPackServiceTest {
     @Mock
     private ContentPackInstallationPersistenceService contentPackInstallService;
     @Mock
-    InputService inputService;
+    private InputService inputService;
     @Mock
-    InputRegistry inputRegistry;
+    private InputRegistry inputRegistry;
     @Mock
-    DBLookupTableService lookupTableService;
+    private DBLookupTableService lookupTableService;
     @Mock
-    GrokPatternService grokPatternService;
+    private GrokPatternService grokPatternService;
     @Mock
-    MessageInputFactory messageInputFactory;
+    private MessageInputFactory messageInputFactory;
     @Mock
-    ExtractorFactory extractorFactory;
+    private ExtractorFactory extractorFactory;
     @Mock
-    ConverterFactory converterFactory;
+    private ConverterFactory converterFactory;
     @Mock
-    ServerStatus serverStatus;
+    private ServerStatus serverStatus;
     @Mock
-    Configuration configuration;
+    private Configuration configuration;
     @Mock
-    EntityRegistrar entityRegistrar;
+    private EntityRegistrar entityRegistrar;
     @Mock
-    EntitySharesService entitySharesService;
+    private EntitySharesService entitySharesService;
+    @Mock
+    private FavoriteFieldsService favoriteFieldsService;
 
     private ContentPackService contentPackService;
 
@@ -225,7 +228,7 @@ public class ContentPackServiceTest {
         final Map<String, MessageOutput.Factory2<? extends MessageOutput>> outputFactories2 = new HashMap<>();
         final Map<ModelType, EntityWithExcerptFacade<?, ?>> entityFacades = ImmutableMap.of(
                 ModelTypes.GROK_PATTERN_V1, new GrokPatternFacade(objectMapper, patternService),
-                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService),
+                ModelTypes.STREAM_V1, new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService),
                 ModelTypes.OUTPUT_V1, new OutputFacade(objectMapper, outputService, pluginMetaData, outputFactories, outputFactories2),
                 ModelTypes.SEARCH_V1, new SearchFacade(objectMapper, searchDbService, viewService, viewSummaryService, userService, entityRegistrar),
                 ModelTypes.EVENT_DEFINITION_V1, new EventDefinitionFacade(objectMapper, eventDefinitionHandler, pluginMetaData, jobDefinitionService, eventDefinitionService, userService, entityRegistrar),
