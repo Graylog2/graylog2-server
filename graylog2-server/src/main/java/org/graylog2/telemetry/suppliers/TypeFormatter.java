@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 public class TypeFormatter {
     private static final List<String> PACKAGE_PREFIXES = List.of(
+            "org.graylog2.outputs",
             "org.graylog2.inputs",
             "org.graylog.plugins",
             "org.graylog.aws.inputs",
