@@ -96,6 +96,16 @@ public class PipelineMetadataUpdater {
         handleUpdates(affectedPipelines(event), state, resolver, metricRegistry);
     }
 
+    /**
+     * When an input is deleted:
+     * - remove the metadata record for that input
+     * - pipelines that referenced that input need to be re-analyzed to potentially reset the has_input_references flag
+     */
+    public void handleInputDeleted(InputDeletedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
+        handleUpdates(affectedPipelines(event), state, resolver, metricRegistry);
+        inputsMetadataService.deleteInput(event.inputId());
+    }
+
     private void deleteInputMentionsForPipelines(PipelinesChangedEvent event) {
         Stream.concat(event.deletedPipelineIds().stream(), event.updatedPipelineIds().stream())
                 .forEach(inputsMetadataService::deleteInputMentionsByPipelineId);
@@ -148,6 +158,19 @@ public class PipelineMetadataUpdater {
         return loadPipelineDaos(event.pipelineIds());
     }
 
+    private Set<PipelineDao> affectedPipelines(InputDeletedEvent event) {
+        PipelineInputsMetadataDao inputDao;
+        try {
+            inputDao = inputsMetadataService.getByInputId(event.inputId());
+        } catch (NotFoundException e) {
+            return Set.of();
+        }
+        Set<String> affectedPipelineIds = inputDao.mentionedIn().stream()
+                .map(PipelineInputsMetadataDao.MentionedInEntry::pipelineId)
+                .collect(Collectors.toSet());
+        return loadPipelineDaos(affectedPipelineIds);
+    }
+
     private ImmutableMap<String, Pipeline> affectedPipelinesAsMap(Set<PipelineDao> pipelineDaos, PipelineInterpreter.State state) {
         ImmutableMap.Builder<String, Pipeline> builder = ImmutableMap.builder();
         for (PipelineDao pipelineDao : pipelineDaos) {
@@ -164,14 +187,6 @@ public class PipelineMetadataUpdater {
      */
     private void deletePipelineEntries(PipelinesChangedEvent event) {
         pipelineMetadataService.delete(event.deletedPipelineIds());
-    }
-
-    /**
-     * When an input is deleted, remove the metadata record for that input
-     */
-    @Subscribe
-    public void deleteInputEntries(InputDeletedEvent event) {
-        inputsMetadataService.deleteInput(event.inputId());
     }
 
     /**

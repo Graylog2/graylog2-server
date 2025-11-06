@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.events.RuleMetricsConfigChangedEven
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.Configuration;
+import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -135,6 +136,14 @@ public class ConfigurationStateUpdater {
         return state;
     }
 
+    private PipelineInterpreter.State reloadAndSave(InputDeletedEvent event) {
+        final PipelineInterpreter.State state = reloadAndSave();
+        if (configuration.isLeader()) { // avoid duplicate work and possible inconsistencies
+            metadataUpdater.handleInputDeleted(event, state, pipelineResolver, pipelineMetricRegistry);
+        }
+        return state;
+    }
+
     /**
      * Can be used to inspect or use the current state of the pipeline system.
      * For example, the interpreter
@@ -181,5 +190,11 @@ public class ConfigurationStateUpdater {
     public void handleRuleMetricsConfigChange(RuleMetricsConfigChangedEvent event) {
         log.debug("Rule metrics config changed: {}", event);
         scheduler.schedule(() -> serverEventBus.post(reloadAndSave()), 0, TimeUnit.SECONDS);
+    }
+
+    @Subscribe
+    public void handleInputDeleted(InputDeletedEvent event) {
+        log.debug("Input deleted: {}", event);
+        scheduler.schedule(() -> serverEventBus.post(reloadAndSave(event)), 0, TimeUnit.SECONDS);
     }
 }

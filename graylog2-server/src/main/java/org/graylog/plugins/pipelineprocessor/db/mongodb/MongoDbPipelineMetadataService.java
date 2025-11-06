@@ -85,7 +85,7 @@ public class MongoDbPipelineMetadataService {
 
     public void save(List<PipelineRulesMetadataDao> ruleRecords, boolean upsert) {
         if (!ruleRecords.isEmpty()) {
-            LOG.info("Inserting/Updating {} pipeline rules metadata records.", ruleRecords.size());
+            LOG.debug("Inserting/Updating {} pipeline rules metadata records.", ruleRecords.size());
             if (upsert) {
                 List<ReplaceOneModel<PipelineRulesMetadataDao>> ops = ruleRecords.stream()
                         .map(ruleRecord -> new ReplaceOneModel<>(
@@ -106,7 +106,7 @@ public class MongoDbPipelineMetadataService {
         if (deleteResult.getDeletedCount() == 0) {
             LOG.warn("No pipeline rules metadata records found for pipelines {}", pipelineIds);
         } else {
-            LOG.info("Deleted {} pipeline rules metadata records.", deleteResult.getDeletedCount());
+            LOG.debug("Deleted {} pipeline rules metadata records.", deleteResult.getDeletedCount());
         }
     }
 }
