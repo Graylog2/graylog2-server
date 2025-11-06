@@ -177,7 +177,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void pollIndex() throws Exception {
+    public void pollIndex() {
         IndexFieldTypesDTO dto = pollerWithoutStreamAwareness.pollIndex(graylog_0, indexSetId).orElse(null);
         final List<FieldTypeDTO> expectedFieldDTOs = new ArrayList<>();
         expectedFieldDTOs.addAll(getAlwaysPresentFieldDTOs(Set.of()));
@@ -196,7 +196,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void streamAwarePollIndex() throws Exception {
+    public void streamAwarePollIndex() {
         IndexFieldTypesDTO dto = pollerWithStreamAwareness.pollIndex(graylog_0, indexSetId).orElse(null);
         final List<FieldTypeDTO> expectedFieldDTOs = new ArrayList<>();
         expectedFieldDTOs.addAll(getAlwaysPresentFieldDTOs(allStreamCollection));
@@ -252,6 +252,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
 
     private List<FieldTypeDTO> getNeverPresentFieldDTOs() {
         return List.of(
+                FieldTypeDTO.builder().fieldName("alert_severity_level").physicalType("integer").build(),
                 FieldTypeDTO.builder().fieldName("full_message").physicalType("text").build(),
                 FieldTypeDTO.builder().fieldName("gl2_receive_timestamp").physicalType("date").build(),
                 FieldTypeDTO.builder().fieldName("gl2_original_timestamp").physicalType("date").build(),
