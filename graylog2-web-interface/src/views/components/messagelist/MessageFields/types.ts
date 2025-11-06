@@ -14,10 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
 
-public class RemoteReindexNotAllowedException extends IllegalStateException {
-    public RemoteReindexNotAllowedException(String message) {
-        super(message);
-    }
-}
+import type FieldType from 'views/logic/fieldtypes/FieldType';
+import type { Message } from 'views/components/messagelist/Types';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+
+export type FormattedField = {
+  value: any;
+  type: FieldType;
+  field: string;
+  id: string;
+};
+
+export type MessageFieldsListProps = {
+  fields: Array<FormattedField>;
+  message: Message;
+  isFavorite: boolean;
+  reorderFavoriteFields?: (fields: Array<FormattedField>) => void;
+  onFavoriteToggle?: (field: string) => void;
+};
+
+export type MessageFieldsComponentProps = {
+  message: Message;
+  fields: FieldTypeMappingsList;
+};
