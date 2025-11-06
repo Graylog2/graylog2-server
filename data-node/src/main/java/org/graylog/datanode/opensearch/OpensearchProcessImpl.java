@@ -194,7 +194,7 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
 
     @Override
     public String getDatanodeRestApiUrl() {
-        final boolean secured = opensearchConfiguration.flatMap(OpensearchConfiguration::httpCertificate).isPresent();
+        final boolean secured = opensearchConfiguration.map(OpensearchConfiguration::isHttpsEnabled).orElse(false);
         String protocol = secured ? "https" : "http";
         String host = configuration.getHostname();
         final int port = configuration.getDatanodeHttpPort();
@@ -381,6 +381,13 @@ public class OpensearchProcessImpl implements OpensearchProcess, ProcessListener
         stop();
         configure();
         start();
+    }
+
+    @Override
+    public void reloadCertificates() {
+        if(commandLineProcess != null) {
+            commandLineProcess.hotReload();
+        }
     }
 
     @Override
