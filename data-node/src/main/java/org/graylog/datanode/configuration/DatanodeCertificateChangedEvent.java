@@ -14,8 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.datanode.configuration;
 
-public interface ThrowingBiFunction<A1, A2, R, E extends Exception> {
-    R apply(A1 a1, A2 a2) throws E;
+/**
+ * This event will be triggered every time a datanode private key or certificate changes. Other parts of the system,
+ * that use the keystore (opensearch process, jersey) should react to this event and refresh their security setups
+ */
+public record DatanodeCertificateChangedEvent() {
 }

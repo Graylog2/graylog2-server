@@ -25,7 +25,7 @@ const parseNestedObject = (fieldQueryString: string) => {
 };
 
 const NestedObjectParam = {
-  encode: (object: Object | null | undefined) => encodeURIComponent(JSON.stringify(object)),
+  encode: (object: object | null | undefined) => encodeURIComponent(JSON.stringify(object)),
   decode: (objectStr: string | null | undefined) => parseNestedObject(objectStr),
 };
 

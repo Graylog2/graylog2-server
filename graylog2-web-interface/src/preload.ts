@@ -14,10 +14,4 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
-
-public class RemoteReindexNotAllowedException extends IllegalStateException {
-    public RemoteReindexNotAllowedException(String message) {
-        super(message);
-    }
-}
+import '@material-symbols/font-700/rounded.css';
