@@ -41,7 +41,6 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -69,6 +68,8 @@ import org.mockito.junit.MockitoRule;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -217,15 +218,21 @@ public class StreamCatalogTest {
 
     @Test
     public void exportEntity_descriptionNull() {
-        Stream stream = StreamImpl.builder()
-                .id(Stream.DEFAULT_STREAM_ID)
-                .title("Stream Title")
-                .description(null)
-                .indexSetId(new ObjectId().toHexString())
-                .creatorUserId(new ObjectId().toHexString())
-                .createdAt(Tools.nowUTC())
-                .disabled(false)
-                .build();
+        final Map<String, Object> streamFields = Map.of(
+                StreamImpl.FIELD_TITLE, "Stream Title",
+                StreamImpl.FIELD_DISABLED, false
+        );
+        final Map<String, Object> streamRuleFields = Map.of(
+                "_id", Stream.DEFAULT_STREAM_ID,
+                StreamRuleImpl.FIELD_TYPE, StreamRuleType.EXACT.getValue(),
+                StreamRuleImpl.FIELD_FIELD, "field",
+                StreamRuleImpl.FIELD_VALUE, "value",
+                StreamRuleImpl.FIELD_INVERTED, false,
+                StreamRuleImpl.FIELD_STREAM_ID, Stream.DEFAULT_STREAM_ID
+        );
+        final List<StreamRule> streamRules = List.of(new StreamRuleMock(streamRuleFields));
+
+        Stream stream = new StreamImpl(new ObjectId(), streamFields, streamRules, Set.of(), null);
 
         final EntityDescriptor descriptor = EntityDescriptor.create(stream.getId(), ModelTypes.STREAM_V1);
         final Entity entity = facade.exportNativeEntity(stream, EntityDescriptorIds.of(descriptor));
