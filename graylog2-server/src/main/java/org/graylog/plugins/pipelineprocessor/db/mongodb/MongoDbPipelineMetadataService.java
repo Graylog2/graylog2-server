@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.google.common.collect.ImmutableList;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOneModel;
@@ -101,7 +102,7 @@ public class MongoDbPipelineMetadataService {
     }
 
     public void delete(Collection<String> pipelineIds) {
-        final DeleteResult deleteResult = collection.deleteMany(eq(FIELD_PIPELINE_ID, pipelineIds));
+        final DeleteResult deleteResult = collection.deleteMany(Filters.in(FIELD_PIPELINE_ID, pipelineIds));
         if (deleteResult.getDeletedCount() == 0) {
             LOG.warn("No pipeline rules metadata records found for pipelines {}", pipelineIds);
         } else {

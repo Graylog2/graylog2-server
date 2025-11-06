@@ -108,7 +108,7 @@ public class PipelineAnalyzer {
                     for (Rule rule : rules) {
                         if (rule == null) continue;
                         ruleSet.add(rule.id());
-                        hasInputReferences = analyzeRule(pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, inputMentions);
+                        hasInputReferences = hasInputReferences || analyzeRule(pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, inputMentions);
                     }
                 }
             }
@@ -227,7 +227,7 @@ public class PipelineAnalyzer {
 
         private void createOrUpdateMention(String inputId) {
             hasInputReference = true;
-            if (inputMentions.get(inputId) == null) {
+            if (!inputMentions.containsKey(inputId)) {
                 // first mention of this input
                 final Set<PipelineInputsMetadataDao.MentionedInEntry> mentionedInEntries = new HashSet<>();
                 mentionedInEntries.add(new PipelineInputsMetadataDao.MentionedInEntry(

@@ -38,14 +38,16 @@ import org.graylog2.rest.resources.system.inputs.InputRenamedEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * When a pipeline, rule or input is updated or deleted, recalculate the metadata:
+ * Update the metadata when a pipeline, connection, rule or input is changed:
  * - for every deleted input: delete the corresponding input metadata record
- * - for every deleted pipeline: delete the corresponding pipeline rules metadata record
+ * - for every deleted pipeline: delete the corresponding pipeline rules metadata record and update any input
+ * metadata that referenced that pipeline
  * - for every updated pipeline: rebuild pipeline metadata from scratch and replace the existing record
  * - for every deleted or updated rule:
  * -- delete the input mentions for that rule
@@ -79,6 +81,7 @@ public class PipelineMetadataUpdater {
 
     public void handlePipelineChanges(PipelinesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
         deletePipelineEntries(event);
+        deleteInputMentionsForPipelines(event);
         Set<PipelineDao> pipelineDaos = affectedPipelines(event);
         handleUpdates(pipelineDaos, state, resolver, metricRegistry);
     }
@@ -91,6 +94,11 @@ public class PipelineMetadataUpdater {
     public void handleRuleChanges(RulesChangedEvent event, PipelineInterpreter.State state, PipelineResolver resolver, PipelineMetricRegistry metricRegistry) {
         deleteInputMentionsForRules(event);
         handleUpdates(affectedPipelines(event), state, resolver, metricRegistry);
+    }
+
+    private void deleteInputMentionsForPipelines(PipelinesChangedEvent event) {
+        Stream.concat(event.deletedPipelineIds().stream(), event.updatedPipelineIds().stream())
+                .forEach(inputsMetadataService::deleteInputMentionsByPipelineId);
     }
 
     private void deleteInputMentionsForRules(RulesChangedEvent event) {
@@ -120,6 +128,7 @@ public class PipelineMetadataUpdater {
                         return null;
                     }
                 })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 

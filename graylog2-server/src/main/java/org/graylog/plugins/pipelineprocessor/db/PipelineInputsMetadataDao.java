@@ -31,6 +31,7 @@ public abstract class PipelineInputsMetadataDao implements BuildableMongoEntity<
     public static final String FIELD_INPUT_ID = "input_id";
     private static final String FIELD_MENTIONED_IN = "mentioned_in";
     public static final String PATH_RULE_ID = "mentioned_in.rule_id";
+    public static final String PATH_PIPELINE_ID = "mentioned_in.pipeline_id";
 
     public record MentionedInEntry(
             @JsonProperty("pipeline_id") String pipelineId,
