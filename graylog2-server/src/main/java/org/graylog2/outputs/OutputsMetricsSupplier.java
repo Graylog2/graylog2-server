@@ -24,10 +24,8 @@ import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import org.graylog2.telemetry.suppliers.TypeFormatter;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Singleton
 public class OutputsMetricsSupplier implements TelemetryMetricSupplier {
@@ -41,20 +39,9 @@ public class OutputsMetricsSupplier implements TelemetryMetricSupplier {
     @Override
     public Optional<TelemetryEvent> get() {
         //Converting the result of "countByType" to Map<String, Object>:
-        final Map<String, Object> countByType = new HashMap<>(format(outputService.countByType()));
+        final Map<String, Object> countByType = new HashMap<>(TypeFormatter.formatAll(outputService.countByType()));
 
         return Optional.of(TelemetryEvent.of(countByType));
-    }
-
-    private Map<String, Long> format(Map<String, Long> map) {
-        return map.entrySet()
-                .stream()
-                .collect(Collectors.toMap(
-                        e -> TypeFormatter.format(e.getKey()),
-                        Map.Entry::getValue,
-                        Long::sum,
-                        LinkedHashMap::new
-                ));
     }
 
 }

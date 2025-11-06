@@ -16,9 +16,12 @@
  */
 package org.graylog2.telemetry.suppliers;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class TypeFormatter {
     private static final List<String> PACKAGE_PREFIXES = List.of(
@@ -46,23 +49,49 @@ public class TypeFormatter {
      */
     private static final Pattern LETTER_BEFORE_DIGIT = Pattern.compile("([A-Za-z])(\\d)");
 
+    private static final String REPLACEMENT = "$1_$2";
+
+    private TypeFormatter() {
+        //Nothing to see here, please move on!
+    }
+
     /**
      * Formats fully qualified class names from known packages into snake_case.
      * Examples:
-     *  - org.graylog.plugins.beats.Beats2Input -> beats_2_input
-     *  - org.graylog2.inputs.gelf.http.GELFHttpInput -> gelf_http_input
-     *  - org.graylog2.inputs.beats.kafka.BeatsKafkaInput -> beats_kafka_input
+     * - org.graylog.plugins.beats.Beats2Input -> beats_2_input
+     * - org.graylog2.inputs.gelf.http.GELFHttpInput -> gelf_http_input
+     * - org.graylog2.inputs.beats.kafka.BeatsKafkaInput -> beats_kafka_input
      */
     public static String format(String type) {
         for (String prefix : PACKAGE_PREFIXES) {
             if (type.startsWith(prefix + ".")) {
                 String result = type.substring(type.lastIndexOf('.') + 1);
-                result = LOWER_OR_DIGIT_BEFORE_UPPER.matcher(result).replaceAll("$1_$2");
-                result = ACRONYM_BEFORE_LETTER.matcher(result).replaceAll("$1_$2");
-                result = LETTER_BEFORE_DIGIT.matcher(result).replaceAll("$1_$2");
+                result = LOWER_OR_DIGIT_BEFORE_UPPER.matcher(result).replaceAll(REPLACEMENT);
+                result = ACRONYM_BEFORE_LETTER.matcher(result).replaceAll(REPLACEMENT);
+                result = LETTER_BEFORE_DIGIT.matcher(result).replaceAll(REPLACEMENT);
                 return result.toLowerCase(Locale.ENGLISH);
             }
         }
         return type;
     }
+
+    /**
+     * Formats all keys in the given {@code metrics}-map.
+     * Internally, {@link #format(String)} is being called for each entry.
+     * In case a key already exists after formatting, the associated value will be summed.
+     *
+     * @param metrics A {@code Map<String, Long>} where the keys will be formatted using {@link #format(String)}.
+     * @return A new map containing formatted keys and possibly summed values.
+     */
+    public static Map<String, Long> formatAll(Map<String, Long> metrics) {
+        return metrics.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        e -> TypeFormatter.format(e.getKey()),
+                        Map.Entry::getValue,
+                        Long::sum,
+                        LinkedHashMap::new
+                ));
+    }
+
 }
