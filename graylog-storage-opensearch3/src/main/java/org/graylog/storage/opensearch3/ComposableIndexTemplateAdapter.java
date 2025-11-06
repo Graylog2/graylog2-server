@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.inject.Inject;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.ComposableIndexTemplateExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
@@ -25,12 +26,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Composable
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog2.indexer.indices.Template;
 
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 
 public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {
-    private final OpenSearchClient client;
+    private final OpenSearchClient client; //TODO when replacing this, also replace composable index usage in DataStreamAdapterOS
 
     private final ObjectMapper objectMapper;
 

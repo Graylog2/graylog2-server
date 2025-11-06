@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DataStream;
 import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
@@ -26,6 +25,7 @@ import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
+import org.opensearch.client.opensearch.indices.DataStream;
 
 import java.util.List;
 import java.util.Map;

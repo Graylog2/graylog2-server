@@ -17,34 +17,27 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.CreateDataStreamRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteDataStreamRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetDataStreamResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
 import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
-import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
 import org.graylog2.indexer.indices.Template;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.indices.CreateDataStreamRequest;
+import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -55,10 +48,12 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
     private final OpenSearchClient client;
     private final ObjectMapper objectMapper;
     private final IsmApi ismApi;
+    private final OpenSearchIndicesClient indicesClient;
 
     @Inject
     public DataStreamAdapterOS2(OfficialOpensearchClient opensearchClient, OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi) {
         this.opensearchClient = opensearchClient;
+        this.indicesClient = opensearchClient.sync().indices();
         this.client = client;
         this.objectMapper = objectMapper;
         this.ismApi = ismApi;
@@ -88,26 +83,30 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
         return result.isAcknowledged();
     }
 
-    protected boolean deleteDataStreamTemplate(@Nonnull String templateName) {
-        final DeleteComposableIndexTemplateRequest request = new DeleteComposableIndexTemplateRequest(templateName);
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteIndexTemplate(request, requestOptions),
-                "Unable to delete data stream template " + templateName);
-        return result.isAcknowledged();
+    @VisibleForTesting
+    boolean deleteDataStreamTemplate(@Nonnull String templateName) {
+        return opensearchClient.execute(() -> indicesClient.deleteIndexTemplate(r -> r.name(templateName)).acknowledged(),
+                "Error deleting data stream template " + templateName);
     }
 
     @Override
     public void createDataStream(@Nonnull String dataStreamName) {
-        CreateDataStreamRequest createDataStreamRequest = new CreateDataStreamRequest(dataStreamName);
-        try {
-            client.execute((c, requestOptions) -> c.indices().createDataStream(createDataStreamRequest, requestOptions));
-        } catch (OpenSearchException e) {
-            if (e.getDetailedMessage().contains("resource_already_exists_exception")) {
-                // this is expected, ignore the exception
-                log.debug("Data stream {} already exists, won't be created again", createDataStreamRequest.getName());
-            } else {
-                throw e;
+        CreateDataStreamRequest request = CreateDataStreamRequest.of(r -> r
+                .name(dataStreamName)
+        );
+        opensearchClient.execute(() -> {
+            try {
+                indicesClient.createDataStream(request);
+            } catch (org.opensearch.client.opensearch._types.OpenSearchException e) {
+                if (e.response().error().type().equals("resource_already_exists_exception")) {
+                    // this is expected, ignore the exception
+                    log.debug("Data stream {} already exists, won't be created again", dataStreamName);
+                } else {
+                    throw e;
+                }
             }
-        }
+            return null;
+        }, "");
     }
 
     /**
@@ -117,54 +116,59 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
      * @param replicas       number of replicas for indices
      */
     public void setNumberOfReplicas(@Nonnull String dataStreamName, int replicas) {
-        final UpdateSettingsRequest req = new UpdateSettingsRequest().indices(".opendistro-ism*");
-        req.settings(Map.of("number_of_replicas", replicas));
         try {
-            client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
+            indicesClient.putSettings(r -> r
+                    .index(".opendistro-ism*")
+                    .settings(s -> s.numberOfReplicas(replicas))
+            );
         } catch (Exception e) {
             log.debug("Could not set replicas for .opendistro-ism system indices");
         }
-        req.indices(".opendistro-job-scheduler-lock");
+
         try {
-            client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
+            indicesClient.putSettings(r -> r
+                    .index(".opendistro-job-scheduler-lock")
+                    .settings(s -> s.numberOfReplicas(replicas))
+            );
         } catch (Exception e) {
             log.debug("Could not set replicas for .opendistro-job-scheduler-lock system index. It might not exist yet.");
         }
-        req.indices(dataStreamName);
 
-        PutIndexTemplateRequest templateRequest = new PutIndexTemplateRequest("data-stream-system-indices");
-        templateRequest.patterns(List.of(".opendistro-job-scheduler-lock"));
-        templateRequest.settings(Settings.builder().put("number_of_replicas", replicas).build());
         try {
-            client.execute((c, requestOptions) -> c.indices().putTemplate(templateRequest, requestOptions));
+            indicesClient.putTemplate(r -> r
+                    .indexPatterns(List.of(".opendistro-job-scheduler-lock"))
+                    .settings("number_of_replicas", JsonData.of(replicas))
+            );
         } catch (Exception e) {
             log.debug("Could not set replicas for data stream system indices");
         }
 
-        ClusterUpdateSettingsRequest settingsRequest = new ClusterUpdateSettingsRequest();
-        settingsRequest.persistentSettings(Settings.builder().put("opendistro.index_state_management.history.number_of_replicas", replicas).build());
         try {
-            client.execute((c, requestOptions) -> c.cluster().putSettings(settingsRequest, requestOptions));
+            opensearchClient.sync().cluster().putSettings(s ->
+                    s.persistent("opendistro.index_state_management.history.number_of_replicas", JsonData.of(replicas))
+            );
         } catch (Exception e) {
             log.debug("Could not set default replicas for ism history");
         }
 
         try {
-            client.execute((c, requestOptions) -> c.indices().putSettings(req, requestOptions));
+            indicesClient.putSettings(r -> r
+                    .index(dataStreamName)
+                    .settings(s -> s.numberOfReplicas(replicas))
+            );
         } catch (Exception e) {
             log.debug("Could not set replicas for data stream {}", dataStreamName);
         }
     }
 
     public boolean deleteDataStream(@Nonnull String dataStreamName) {
-        return client.execute((c, requestOptions) ->
-                c.indices().deleteDataStream(new DeleteDataStreamRequest(dataStreamName), requestOptions)).isAcknowledged();
+        return opensearchClient.execute(() -> indicesClient.deleteDataStream(r -> r.name(dataStreamName)).acknowledged(),
+                "Error deleting data stream " + dataStreamName);
     }
 
-    protected List<org.graylog.shaded.opensearch2.org.opensearch.client.indices.DataStream> getDataStream(@Nonnull String dataStreamName) {
-        final GetDataStreamResponse dataStream = client.execute((c, requestOptions) ->
-                c.indices().getDataStream(new GetDataStreamRequest(dataStreamName), requestOptions));
-        return dataStream.getDataStreams();
+    @VisibleForTesting
+    List<org.opensearch.client.opensearch.indices.DataStream> getDataStream(@Nonnull String dataStreamName) {
+        return opensearchClient.execute(() -> indicesClient.getDataStream().dataStreams(), "Error getting data streams");
     }
 
     @Override
