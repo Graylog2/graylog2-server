@@ -87,7 +87,7 @@ public class StreamReferenceFacade extends StreamFacade {
         }
 
         try {
-            final Stream stream = streamService.load(modelId.id());
+            final Stream stream = streamService.loadAll().stream().filter(s -> s.getTitle().equals(modelId.id())).findFirst().orElseThrow(NotFoundException::new);
             return Optional.of(exportNativeEntity(stream, entityDescriptorIds));
         } catch (NotFoundException e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
