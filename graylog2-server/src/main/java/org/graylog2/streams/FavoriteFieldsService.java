@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+package org.graylog2.streams;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
-import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.database.NotFoundException;
 
-import java.util.Locale;
+import java.util.List;
 
-public class SortOrderMapper {
-    public SortOrder fromSorting(Sorting sorting) {
-        return SortOrder.valueOf(sorting.getDirection().toString().toUpperCase(Locale.ENGLISH));
-    }
+public interface FavoriteFieldsService {
+    List<String> get(String streamId) throws NotFoundException;
+
+    boolean set(String streamId, List<String> fields);
+
+    boolean add(String streamId, String field);
+
+    boolean remove(String streamId, String field);
 }
