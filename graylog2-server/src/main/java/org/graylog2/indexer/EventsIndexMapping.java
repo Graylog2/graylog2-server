@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indices.Template;

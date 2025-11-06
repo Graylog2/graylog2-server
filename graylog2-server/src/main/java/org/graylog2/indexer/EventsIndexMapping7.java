@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 
+import static org.graylog2.plugin.Message.ALERT_SEVERITY_LEVEL;
 import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
 
 public class EventsIndexMapping7 extends EventsIndexMapping {
@@ -28,6 +29,9 @@ public class EventsIndexMapping7 extends EventsIndexMapping {
                 .put(FIELD_GL2_MESSAGE_ID, map()
                         .put("type", "alias")
                         .put("path", "id")
+                        .build())
+                .put(ALERT_SEVERITY_LEVEL,  map()
+                        .put("type", "integer")
                         .build())
                 .build();
     }
