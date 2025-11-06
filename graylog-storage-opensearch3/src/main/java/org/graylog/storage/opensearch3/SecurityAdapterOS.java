@@ -24,8 +24,8 @@ import org.opensearch.client.opensearch.security.GetRoleMappingResponse;
 import org.opensearch.client.opensearch.security.PatchRoleMappingResponse;
 import org.opensearch.client.opensearch.security.RoleMapping;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * see: https://opensearch.org/docs/latest/security/access-control/api/
@@ -41,13 +41,9 @@ public class SecurityAdapterOS implements SecurityAdapter {
 
     @Override
     public Mapping getMappingForRole(final String role) {
-        try {
-            final GetRoleMappingResponse response = client.sync().security().getRoleMapping(r -> r.role(role));
-            final RoleMapping roleMapping = response.get(role);
-            return new Mapping(roleMapping.backendRoles(), roleMapping.hosts(), roleMapping.users());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final GetRoleMappingResponse response = client.sync((c) -> c.security().getRoleMapping(r -> r.role(role)), "Unable to retrieve role mapping for role " + role);
+        final RoleMapping roleMapping = response.get(role);
+        return new Mapping(roleMapping.backendRoles(), roleMapping.hosts(), roleMapping.users());
     }
 
     public MappingResponse addUserToRoleMapping(final String role, final String user) {
@@ -64,11 +60,7 @@ public class SecurityAdapterOS implements SecurityAdapter {
 
     @Nonnull
     private MappingResponse patchRoleUsers(String role, String operation, String user) {
-        try {
-            final PatchRoleMappingResponse response = client.sync().security().patchRoleMapping(r -> r.role(role).operations(op -> op.path("/users").op(operation).value(JsonData.of(List.of(user)))));
-            return new MappingResponse(response.status(), response.message());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        final PatchRoleMappingResponse response = client.sync(c -> c.security().patchRoleMapping(r -> r.role(role).operations(op -> op.path("/users").op(operation).value(JsonData.of(List.of(user))))), String.format(Locale.ROOT, "Could not %s user %s in role %s", operation, user, role));
+        return new MappingResponse(response.status(), response.message());
     }
 }
