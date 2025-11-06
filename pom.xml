@@ -211,7 +211,6 @@
         <equalsverifier.version>4.2.1</equalsverifier.version>
         <jukito.version>1.5</jukito.version>
         <guice-extension.version>1.2.1</guice-extension.version>
-        <junit.version>4.13.2</junit.version>
         <junit-jupiter.version>6.0.0</junit-jupiter.version>
         <mockito.version>5.20.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
