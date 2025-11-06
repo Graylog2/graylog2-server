@@ -54,6 +54,7 @@ import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
@@ -74,6 +75,7 @@ import org.mockito.junit.MockitoRule;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -102,6 +104,8 @@ public class StreamCatalogTest {
     private EntityRegistrar entityRegistrar;
     @Mock
     private UserService userService;
+    @Mock
+    private FavoriteFieldsService favoriteFieldsService;
     private StreamFacade facade;
 
     @Before
@@ -125,7 +129,7 @@ public class StreamCatalogTest {
                 OutputImpl.create("5adf239e4b900a0fdb4e5197", "Title", "Type", "admin", Collections.emptyMap(), new Date(1524654085L), null)
         );
 
-        facade = new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService);
+        facade = new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService);
     }
 
     @Test
@@ -259,7 +263,8 @@ public class StreamCatalogTest {
                         ImmutableList.of(),
                         ImmutableSet.of(),
                         ValueReference.of(false),
-                        ValueReference.of(true)
+                        ValueReference.of(true),
+                        List.of()
                 ), JsonNode.class))
                 .build();
         final IndexSetConfig defaultIndexSetConfig = IndexSetConfig.builder()
