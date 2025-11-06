@@ -101,4 +101,9 @@ public class TelemetrySubmissionPeriodical extends Periodical {
     protected Logger getLogger() {
         return LOG;
     }
+
+    @Override
+    public boolean leaderOnly() {
+        return true;
+    }
 }
