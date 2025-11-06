@@ -212,7 +212,7 @@ public class Message implements Messages, Indexable, Acknowledgeable {
     public static final String FIELD_GL2_SOURCE_NODE = "gl2_source_node";
 
     /**
-     * To fix event aggregation problems when this field was created as a string by accident, we pre-define it
+     * pre-defining this fiels to prevent aggregation problems when this field get's created as a string by accident during the first message in ingestion that defines it
      */
     public static final String ALERT_SEVERITY_LEVEL = "alert_severity_level";
 
