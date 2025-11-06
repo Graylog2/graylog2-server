@@ -1,0 +1,5 @@
+type = "f"
+message = "Use the correct ID on Stream Reference Excerpts for Content Pack Generation."
+
+issues = ["24106"]
+pulls = ["24149"]
