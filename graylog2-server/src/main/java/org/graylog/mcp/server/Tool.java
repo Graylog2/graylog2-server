@@ -124,16 +124,16 @@ public abstract class Tool<P, O> {
         this.outputFormatOverride = outputFormatOverride;
     }
 
-    protected boolean useStructuredOutput() {
+    protected boolean useStringOutput() {
         return clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
-                .useStructuredOutput();
+                .useStringOutput();
     }
 
     public OutputFormat getOutputFormat() {
         if (isOutputFormatOverridden()) {
             return outputFormatOverride;
         }
-        return useStructuredOutput() ? OutputFormat.JSON : OutputFormat.MARKDOWN;
+        return useStringOutput() ? OutputFormat.MARKDOWN : OutputFormat.JSON;
     }
 
     protected ObjectMapper getObjectMapper() {
@@ -198,7 +198,7 @@ public abstract class Tool<P, O> {
         }
 
         final P p = objectMapper.convertValue(parameterMap, parameterType);
-        if (!useStructuredOutput()) {
+        if (useStringOutput()) {
             return new ToolResult.Text<>(applyAsText(permissionHelper, p));
         }
         return new ToolResult.Data<>(apply(permissionHelper, p));

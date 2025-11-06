@@ -17,9 +17,6 @@
 package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -42,7 +39,9 @@ import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -52,8 +51,6 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 public class McpApiRestResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(McpApiRestResource.class);
 
-    private final ObjectMapper objectMapper;
-
     private final McpService mcpService;
 
     private final SecurityContext securityContext;
@@ -61,10 +58,9 @@ public class McpApiRestResource extends RestResource {
     private final ClusterConfigService clusterConfig;
 
     @Inject
-    public McpApiRestResource(final ClusterConfigService clusterConfig, final McpService mcpService, final ObjectMapper objectMapper, final SecurityContext securityContext) {
+    public McpApiRestResource(final ClusterConfigService clusterConfig, final McpService mcpService, final SecurityContext securityContext) {
         this.clusterConfig = clusterConfig;
         this.mcpService = mcpService;
-        this.objectMapper = objectMapper;
         this.securityContext = securityContext;
     }
 
@@ -79,10 +75,11 @@ public class McpApiRestResource extends RestResource {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
                 McpConfiguration.DEFAULT_VALUES);
 
-        JsonNode payload = objectMapper.createObjectNode()
-                .put("remote_access_enabled",  mcpConfig.enableRemoteAccess());
+        var payload = Map.of(
+                "remote_access_enabled",  mcpConfig.enableRemoteAccess()
+        );
 
-        return Response.ok(payload.toString()).build();
+        return Response.ok().entity(payload).build();
     }
 
     @GET
@@ -93,18 +90,16 @@ public class McpApiRestResource extends RestResource {
     @NoAuditEvent("prototype")
     @ApiOperation("List available tools")
     public Response getTools() {
-        final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
-                McpConfiguration.DEFAULT_VALUES);
-        if (!mcpConfig.enableRemoteAccess()) {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        var tools = mcpService.getTools().values().stream().map(tool -> Map.of(
+                "name", tool.name(),
+                "enabled", tool.isEnabled(),
+                "output_format", tool.getOutputFormat().toString(),
+                "format_overridden", tool.isOutputFormatOverridden(),
+                "category", tool.getCategory(),
+                "read_only", tool.isReadOnly()
+        )).toList();
 
-        ArrayNode tools = objectMapper.createArrayNode();
-        mcpService.getTools().forEach((name, tool) -> tools.add(jsonTool(tool)));
-
-        JsonNode payload = objectMapper.createObjectNode().set("tools", tools);
-
-        return Response.ok(payload.toString()).build();
+        return Response.ok().entity(Map.of("tools", tools)).build();
     }
 
     @POST
@@ -115,13 +110,11 @@ public class McpApiRestResource extends RestResource {
     @NoAuditEvent("prototype")
     @ApiOperation("Updates multiple tools")
     public Response updateTools(@ApiParam(value = "tools", required = true) List<ToolPatch> payload) {
-        final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
-                McpConfiguration.DEFAULT_VALUES);
-        if (!mcpConfig.enableRemoteAccess()) {
-            return Response.status(Response.Status.FORBIDDEN).build();
+        if (!getMcpConfig().enableRemoteAccess()) {
+            return Response.status(Response.Status.SERVICE_UNAVAILABLE).build();
         }
 
-        ArrayNode errors = objectMapper.createArrayNode();
+        List<String> errors = new ArrayList<>();
         for (ToolPatch receivedPatch : payload) {
             try {
                 applyPatch(receivedPatch);
@@ -131,7 +124,7 @@ public class McpApiRestResource extends RestResource {
         }
 
         return (errors.isEmpty() ? Response.ok() : Response.status(Response.Status.INTERNAL_SERVER_ERROR))
-                .entity(objectMapper.createObjectNode().set("errors", errors)).build();
+                .entity(Map.of("errors", errors)).build();
     }
 
     private void applyPatch(ToolPatch payload) {
@@ -150,18 +143,12 @@ public class McpApiRestResource extends RestResource {
         }
     }
 
+    private McpConfiguration getMcpConfig() {
+        return clusterConfig.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES);
+    }
+
     public record ToolPatch(@JsonProperty("name") String name,
                             @JsonProperty("enabled") Boolean enabled,
                             @JsonProperty("output_format") Tool.OutputFormat outputFormat
     ) {}
-
-    private JsonNode jsonTool(Tool<?, ?> tool) {
-        return objectMapper.createObjectNode()
-                .put("name", tool.name())
-                .put("enabled", tool.isEnabled())
-                .put("output_format", tool.getOutputFormat().toString())
-                .put("format_overridden", tool.isOutputFormatOverridden())
-                .put("category", tool.getCategory())
-                .put("read_only",  tool.isReadOnly());
-    }
 }

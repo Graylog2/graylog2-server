@@ -35,7 +35,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 type McpConfigState = {
   enable_remote_access: boolean;
-  use_structured_output: boolean;
+  use_simple_output: boolean;
   enable_output_schema: boolean;
 };
 
@@ -50,17 +50,15 @@ type McpToolState = {
 
 type McpTools = Record<string, McpToolState>;
 
-const fetchTools = () => {
-  const url = "/mcp/api/tools";
+const fetchTools = async () => {
+  const url = '/mcp/api/tools';
+  const { tools } = await fetch<{ tools: McpToolState[] }>('GET', qualifyUrl(url));
 
-  return fetch<{ tools: McpToolState[] }>('GET', qualifyUrl(url)).then(
-    ({ tools }) => tools
-  );
+  return tools;
 };
 
-const patchTools = (states: McpTools) => {
+const patchTools = async (states: McpTools) => {
   const url = `/mcp/api/tools`;
-
   const payload: { name: string; enabled: boolean; output_format: string }[] = Object.entries(states).map(
     ([name, { enabled, output_format }]) => ({ name, enabled, output_format })
   );
@@ -125,7 +123,7 @@ const McpConfig = () => {
     const is_structured: boolean = outputValue === "json";
     setModalConfig({
       ...modalConfig,
-      use_structured_output: is_structured,
+      use_simple_output: is_structured,
       enable_output_schema: is_structured && modalConfig.enable_output_schema });
   };
 
@@ -145,12 +143,14 @@ const McpConfig = () => {
   const onModalSave = () => {
     ConfigurationsActions.update(ConfigurationType.MCP_CONFIG, { ...modalConfig })
       .then(() => {
-        patchTools(modalTools).then(fetchTools).then((data) => {
-          setTools(data);
-          setModalTools(toRecordMap(data))
-        });
+        if (modalConfig.enable_remote_access) {
+          patchTools(modalTools).then(fetchTools).then((data) => {
+            setTools(data);
+            setModalTools(toRecordMap(data))
+          });
+        }
       })
-      .then(() => {
+      .finally(() => {
         setShowConfigModal(false);
       });
   };
@@ -182,7 +182,7 @@ const McpConfig = () => {
         <dd>{viewConfig.enable_remote_access ? 'Enabled' : 'Disabled'}</dd>
         <br />
         <dt>Default output format</dt>
-        <dd>{viewConfig.use_structured_output ? 'JSON Structured Content' : 'Markdown'}</dd>
+        <dd>{viewConfig.use_simple_output ? 'Markdown' : 'JSON Structured Content' }</dd>
         <br />
         <dt>Output schema</dt>
         <dd>{viewConfig.enable_output_schema ? 'Enabled' : 'Disabled'}</dd>
@@ -215,8 +215,8 @@ const McpConfig = () => {
       {/*    { id: 'status', title: 'Status'}*/}
       {/*  ]}*/}
       {/*  entityAttributesAreCamelCase={false}*/}
-      {/*  onColumnsChange={() => {}}*/}
-      {/*  onSortChange={() => {}}*/}
+      {/*  onColumnsChange={(newCols) => {console.log(newCols)}}*/}
+      {/*  onSortChange={(newSort) => {console.log(newSort)}}*/}
       {/*/>*/}
 
       <Table striped bordered condensed className="top-margin">
@@ -238,7 +238,7 @@ const McpConfig = () => {
               <td>{tool.category}</td>
               <td>{tool.read_only ? 'Read Only' : <b>Read/Write</b>}</td>
               <td>{tool.output_format + (tool.format_overridden ? '*' : '')}</td>
-              <td>{tool.enabled ? '🟢 enabled' : '🔴 disabled'}</td>
+              <td>{!viewConfig.enable_remote_access && '⚪ disabled' || tool.enabled && '🟢 enabled'  || '🔴 disabled'}</td>
             </tr>
           ))}
         </tbody>
@@ -264,7 +264,7 @@ const McpConfig = () => {
             />
             <Input
               id="enable-output-schema-checkbox"
-              disabled={!modalConfig.enable_remote_access || !modalConfig.use_structured_output}
+              disabled={!modalConfig.enable_remote_access || modalConfig.use_simple_output}
               type="checkbox"
               label="Enable Output Schema generation"
               name="output-schema-enabled"
@@ -276,7 +276,7 @@ const McpConfig = () => {
                 id="output-format-dropdown"
                 disabled={!modalConfig.enable_remote_access}
                 options={outputFormatOptions}
-                value={outputFormatOptions.at(!modalConfig.use_structured_output ? 0 : 1).label}
+                value={outputFormatOptions.at(modalConfig.use_simple_output ? 0 : 1).label}
                 onChange={onModalSetOutputFormat}
               />
             </Input>

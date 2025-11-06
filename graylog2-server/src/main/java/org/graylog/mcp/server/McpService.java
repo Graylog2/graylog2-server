@@ -179,27 +179,26 @@ public class McpService {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
                     try {
                         final Object result = tool.apply(permissionHelper, callToolRequest.arguments());
-                        if (tool.useStructuredOutput()) {
-                            // we want to return [un]structured content (regardless of whether we have an output schema)
-                            try {
-                                var structuredContent = objectMapper.convertValue(result,
-                                        new TypeReference<Map<String, Object>>() {
-                                        });
-                                auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
-                                        auditContext);
-                                return Optional.of(new McpSchema.CallToolResult(
-                                        List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
-                                        false,
-                                        structuredContent));
-                            } catch (JsonProcessingException e) {
-                                auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
-                                        auditContext);
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            // we can also just return the string representation directly
+                        if (tool.useStringOutput()) {
+                            // we can just return the string representation directly
                             auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                             return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                        }
+                        // but we normally want to return [un]structured content (regardless of the tool output schema)
+                        try {
+                            var structuredContent = objectMapper.convertValue(result,
+                                    new TypeReference<Map<String, Object>>() {
+                                    });
+                            auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
+                                    auditContext);
+                            return Optional.of(new McpSchema.CallToolResult(
+                                    List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
+                                    false,
+                                    structuredContent));
+                        } catch (JsonProcessingException e) {
+                            auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
+                                    auditContext);
+                            throw new RuntimeException(e);
                         }
                     } catch (Exception e) {
                         auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
