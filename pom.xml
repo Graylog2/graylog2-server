@@ -118,7 +118,7 @@
         <caffeine.version>3.2.3</caffeine.version>
         <cef-parser.version>0.0.1.10</cef-parser.version>
         <classgraph.version>4.8.184</classgraph.version>
-        <commons-codec.version>1.19.0</commons-codec.version>
+        <commons-codec.version>1.20.0</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
         <commons-exec.version>1.5.0</commons-exec.version>
@@ -180,7 +180,7 @@
         <reflections.version>0.10.2</reflections.version>
         <retrofit.version>3.0.0</retrofit.version>
         <semver4j.version>2.2.0-graylog.1</semver4j.version>
-        <shiro.version>2.0.5</shiro.version>
+        <shiro.version>2.0.6</shiro.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
         <oshi.version>6.9.1</oshi.version>
