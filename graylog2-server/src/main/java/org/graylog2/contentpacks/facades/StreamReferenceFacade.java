@@ -42,6 +42,7 @@ import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -62,8 +63,9 @@ public class StreamReferenceFacade extends StreamFacade {
     private final StreamService streamService;
 
     @Inject
-    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService, IndexSetService indexSetService, UserService userService) {
-        super(objectMapper, streamService, streamRuleService, indexSetService, userService);
+    public StreamReferenceFacade(ObjectMapper objectMapper, StreamService streamService, StreamRuleService streamRuleService,
+                                 IndexSetService indexSetService, UserService userService, FavoriteFieldsService favoriteFieldsService) {
+        super(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService);
         this.objectMapper = objectMapper;
         this.streamService = streamService;
     }
