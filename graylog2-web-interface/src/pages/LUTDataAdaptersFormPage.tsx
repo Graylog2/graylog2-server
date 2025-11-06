@@ -28,6 +28,7 @@ function LUTDataAdaptersFormPage() {
   const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(adapterIdOrName);
   const navigate = useNavigate();
+  const navigateBack = () => navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -36,7 +37,7 @@ function LUTDataAdaptersFormPage() {
         pageTitle="Create Data Adapters for Lookup Tables"
         pageDescription="Data adapters provide the actual values for lookup tables."
         actions={
-          <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW)}>
+          <Button bsStyle="primary" onClick={navigateBack}>
             Back to list
           </Button>
         }>
@@ -45,7 +46,7 @@ function LUTDataAdaptersFormPage() {
             {loadingDataAdapter ? (
               <Spinner text="Loading Data Adapter" />
             ) : (
-              <DataAdapterCreate onCancel={() => {}} saved={(resp: any) => console.log(resp)} adapter={dataAdapter} />
+              <DataAdapterCreate onCancel={navigateBack} saved={navigateBack} adapter={dataAdapter} />
             )}
           </Col>
         </Row>

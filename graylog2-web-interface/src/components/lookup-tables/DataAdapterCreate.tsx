@@ -27,7 +27,7 @@ import { useFetchDataAdapterTypes } from 'components/lookup-tables/hooks/useLook
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type DataAdapterCreateProps = {
-  saved: (adapterObj: LookupTableAdapter) => void;
+  saved?: (adapterObj: LookupTableAdapter) => void;
   onCancel: () => void;
   adapter?: LookupTableAdapter;
 };
@@ -38,7 +38,7 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const DataAdapterCreate = ({ saved, onCancel, adapter = undefined }: DataAdapterCreateProps) => {
+const DataAdapterCreate = ({ saved = undefined, onCancel, adapter = undefined }: DataAdapterCreateProps) => {
   const [type, setType] = React.useState<string | undefined>(adapter?.config?.type);
   const [dataAdapter, setDataAdapter] = React.useState<LookupTableAdapter>(adapter);
   const { types, fetchingDataAdapterTypes } = useFetchDataAdapterTypes();
@@ -118,14 +118,13 @@ const DataAdapterCreate = ({ saved, onCancel, adapter = undefined }: DataAdapter
             id="data-adapter-type-select"
             label="Data Adapter Type"
             required
-            autoFocus
             help="The type of data adapter to configure.">
             <Select
               placeholder="Select Data Adapter Type"
               clearable={false}
               options={sortedAdapters}
               onChange={handleTypeSelect}
-              value={null}
+              value={dataAdapter ? dataAdapter.config.type : null}
             />
           </Input>
         </Col>
