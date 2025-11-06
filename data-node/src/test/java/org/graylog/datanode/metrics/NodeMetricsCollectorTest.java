@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.metrics;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpEntity;
 import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
 import org.graylog.shaded.opensearch2.org.opensearch.client.RestClient;
@@ -46,6 +47,8 @@ public class NodeMetricsCollectorTest {
     NodeMetricsCollector collector;
     @Mock
     RestHighLevelClient client;
+    @Mock
+    MetricRegistry metricRegistry;
 
     @BeforeEach
     public void setUp() throws IOException {
@@ -56,7 +59,7 @@ public class NodeMetricsCollectorTest {
         RestClient lowLevelClient = mock(RestClient.class);
         when(client.getLowLevelClient()).thenReturn(lowLevelClient);
         when(lowLevelClient.performRequest(any())).thenReturn(response);
-        this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get());
+        this.collector = new NodeMetricsCollector(client, new ObjectMapperProvider().get(), metricRegistry);
     }
 
     @Test
