@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-public class DataStreamAdapterOS2 implements DataStreamAdapter {
+public class DataStreamAdapterOS implements DataStreamAdapter {
 
-    private final Logger log = LoggerFactory.getLogger(DataStreamAdapterOS2.class);
+    private final Logger log = LoggerFactory.getLogger(DataStreamAdapterOS.class);
     private final OfficialOpensearchClient opensearchClient;
     private final OpenSearchClient client;
     private final ObjectMapper objectMapper;
@@ -51,7 +51,7 @@ public class DataStreamAdapterOS2 implements DataStreamAdapter {
     private final OpenSearchIndicesClient indicesClient;
 
     @Inject
-    public DataStreamAdapterOS2(OfficialOpensearchClient opensearchClient, OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi) {
+    public DataStreamAdapterOS(OfficialOpensearchClient opensearchClient, OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi) {
         this.opensearchClient = opensearchClient;
         this.indicesClient = opensearchClient.sync().indices();
         this.client = client;

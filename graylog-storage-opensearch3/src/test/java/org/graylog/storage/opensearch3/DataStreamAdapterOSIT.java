@@ -32,14 +32,14 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DataStreamAdapterOS2IT {
+public class DataStreamAdapterOSIT {
 
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    DataStreamAdapterOS2 dataStreamAdapter = new DataStreamAdapterOS2(openSearchInstance.getOfficialOpensearchClient(), openSearchInstance.openSearchClient(),
+    DataStreamAdapterOS dataStreamAdapter = new DataStreamAdapterOS(openSearchInstance.getOfficialOpensearchClient(), openSearchInstance.openSearchClient(),
             objectMapper, new IsmApi(openSearchInstance.getOfficialOpensearchClient(), objectMapper));
 
 

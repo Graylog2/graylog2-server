@@ -71,7 +71,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS.class);
-        bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
+        bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS.class);
         bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterOS.class);
         if (useComposableIndexTemplates) {
             bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
