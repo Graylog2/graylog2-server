@@ -1,0 +1,4 @@
+type = "f"
+message = "Fixed issue preventing installing Stream entities from Content Packs."
+
+pulls = ["24150"]
