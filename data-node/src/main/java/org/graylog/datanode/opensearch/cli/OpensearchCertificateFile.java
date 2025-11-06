@@ -14,15 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.datanode.opensearch.cli;
 
-import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
-import org.graylog2.indexer.searches.Sorting;
+import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
 
-import java.util.Locale;
+import java.nio.file.Path;
+import java.security.KeyStore;
+import java.util.function.Supplier;
 
-public class SortOrderMapper {
-    public SortOrder fromSorting(Sorting sorting) {
-        return SortOrder.valueOf(sorting.getDirection().toString().toUpperCase(Locale.ENGLISH));
+public class OpensearchCertificateFile  {
+
+    public static KeystoreConfigFile create(String filename, Supplier<KeyStore> supplier, char[] password) {
+        return new KeystoreConfigFile(Path.of(filename), new InMemoryKeystoreInformation(supplier.get(), password));
     }
 }
