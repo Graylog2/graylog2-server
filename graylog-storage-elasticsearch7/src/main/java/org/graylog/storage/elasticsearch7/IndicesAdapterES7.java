@@ -358,16 +358,6 @@ public class IndicesAdapterES7 implements IndicesAdapter {
                 "Unable to close index " + index);
     }
 
-    @Override
-    public long numberOfMessages(String index) {
-        final JsonNode result = statsApi.indexStats(index);
-        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
-        if (count.isMissingNode()) {
-            throw new RuntimeException("Unable to extract count from response.");
-        }
-        return count.asLong();
-    }
-
     private GetSettingsResponse settingsFor(String indexOrAlias) {
         final GetSettingsRequest request = new GetSettingsRequest().indices(indexOrAlias)
                 .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN_CLOSED);

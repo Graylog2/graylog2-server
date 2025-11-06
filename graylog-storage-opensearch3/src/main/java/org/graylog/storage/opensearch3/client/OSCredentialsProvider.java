@@ -34,6 +34,11 @@ import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * This credentials provider is used for opensearch 2 client and should be removed together with opensearch2 client.
+ * @see OpensearchCredentialsProvider for opensearch3 replacement.
+ */
+@Deprecated(forRemoval = true)
 public class OSCredentialsProvider implements Provider<CredentialsProvider> {
     private final List<URI> openSearchHosts;
     private final String defaultUserForDiscoveredNodes;
