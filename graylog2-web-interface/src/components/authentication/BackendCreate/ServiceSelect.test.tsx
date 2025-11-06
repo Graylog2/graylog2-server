@@ -17,12 +17,13 @@
 import * as React from 'react';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
 
-import 'components/authentication/bindings'; // Bind all authentication plugins
+import authBindings from 'components/authentication/bindings';
 import Routes from 'routing/Routes';
 import useHistory from 'routing/useHistory';
 import { asMock } from 'helpers/mocking';
 import mockHistory from 'helpers/mocking/mockHistory';
 import selectEvent from 'helpers/selectEvent';
+import { usePluginExports } from 'views/test/testPlugins';
 
 import ServiceSelect from './ServiceSelect';
 
@@ -30,6 +31,8 @@ jest.mock('routing/useHistory');
 
 describe('ServiceSelect', () => {
   let history;
+
+  usePluginExports(authBindings);
 
   beforeEach(() => {
     history = mockHistory();
