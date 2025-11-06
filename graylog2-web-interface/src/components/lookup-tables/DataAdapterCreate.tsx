@@ -23,13 +23,13 @@ import { Select } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
 import { DataAdapterForm } from 'components/lookup-tables';
 import ObjectUtils from 'util/ObjectUtils';
-import { useFetchDataAdapterTypes, useValidateDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { useFetchDataAdapterTypes } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type DataAdapterCreateProps = {
   saved: (adapterObj: LookupTableAdapter) => void;
   onCancel: () => void;
-  validationErrors?: any;
+  adapter?: LookupTableAdapter;
 };
 
 const StyledRow = styled(Row)`
@@ -38,11 +38,10 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const DataAdapterCreate = ({ saved, onCancel, validationErrors = {} }: DataAdapterCreateProps) => {
-  const [type, setType] = React.useState<string | undefined>(undefined);
-  const [dataAdapter, setDataAdapter] = React.useState<any>(undefined);
+const DataAdapterCreate = ({ saved, onCancel, adapter = undefined }: DataAdapterCreateProps) => {
+  const [type, setType] = React.useState<string | undefined>(adapter?.config?.type);
+  const [dataAdapter, setDataAdapter] = React.useState<LookupTableAdapter>(adapter);
   const { types, fetchingDataAdapterTypes } = useFetchDataAdapterTypes();
-  const { validateDataAdapter } = useValidateDataAdapter();
 
   const adapterPlugins = React.useMemo(() => {
     const plugins = {};
@@ -111,10 +110,6 @@ const DataAdapterCreate = ({ saved, onCancel, validationErrors = {} }: DataAdapt
     [types],
   );
 
-  const validate = (adapter) => {
-    validateDataAdapter(adapter);
-  };
-
   return (
     <div>
       <StyledRow>
@@ -141,10 +136,8 @@ const DataAdapterCreate = ({ saved, onCancel, validationErrors = {} }: DataAdapt
             <DataAdapterForm
               dataAdapter={dataAdapter}
               type={type}
-              create
+              create={!dataAdapter?.id}
               title="Configure Adapter"
-              validate={validate}
-              validationErrors={validationErrors}
               saved={saved}
               onCancel={onCancel}
             />

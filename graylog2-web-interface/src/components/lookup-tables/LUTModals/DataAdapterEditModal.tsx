@@ -21,7 +21,6 @@ import connect from 'stores/connect';
 import { Row, Col, Modal } from 'components/bootstrap';
 import { DataAdapterForm } from 'components/lookup-tables';
 import { LookupTableDataAdaptersStore } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
-import { useValidateDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type Props = {
@@ -36,35 +35,25 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const DataAdapterEditModal = ({ onClose, title, dataAdapter, validationErrors }: Props & { validationErrors: any }) => {
-  const { validateDataAdapter } = useValidateDataAdapter();
-
-  const validate = (dataAdapterObj: LookupTableAdapter) => {
-    validateDataAdapter(dataAdapterObj);
-  };
-
-  return (
-    <Modal show fullScreen onHide={onClose}>
-      <Modal.Header>
-        <Modal.Title>{`Edit ${title}`}</Modal.Title>
-      </Modal.Header>
-      <StyledRow>
-        <Col lg={9}>
-          <DataAdapterForm
-            type={dataAdapter.config.type}
-            saved={onClose}
-            onCancel={onClose}
-            title={title}
-            validate={validate}
-            validationErrors={validationErrors}
-            create={false}
-            dataAdapter={dataAdapter}
-          />
-        </Col>
-      </StyledRow>
-    </Modal>
-  );
-};
+const DataAdapterEditModal = ({ onClose, title, dataAdapter }: Props) => (
+  <Modal show fullScreen onHide={onClose}>
+    <Modal.Header>
+      <Modal.Title>{`Edit ${title}`}</Modal.Title>
+    </Modal.Header>
+    <StyledRow>
+      <Col lg={9}>
+        <DataAdapterForm
+          type={dataAdapter.config.type}
+          saved={onClose}
+          onCancel={onClose}
+          title={title}
+          create={false}
+          dataAdapter={dataAdapter}
+        />
+      </Col>
+    </StyledRow>
+  </Modal>
+);
 
 export default connect(
   DataAdapterEditModal,

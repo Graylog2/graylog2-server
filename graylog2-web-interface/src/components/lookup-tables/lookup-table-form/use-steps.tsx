@@ -18,16 +18,10 @@ import * as React from 'react';
 
 import { CacheCreate, DataAdapterCreate } from 'components/lookup-tables';
 import LookupTableFormFields from 'components/lookup-tables/LookupTableFormFields';
-import type { LookupTableType } from 'components/lookup-tables/LookupTableForm';
 
-type Props = {
-  table: LookupTableType;
-  activeStepKey?: string;
-};
-
-function useSteps({
-  activeStepKey = 'lookup-tables',
-}: Props): [Array<any>, { activeStep: string; setActiveStep: (newStep: string) => void }] {
+function useSteps(
+  activeStepKey: string = 'lookup-tables',
+): [Array<any>, { activeStep: string; setActiveStep: (newStep: string) => void }] {
   const [activeStep, setActiveStep] = React.useState(activeStepKey);
 
   const onClose = () => {};
@@ -50,7 +44,7 @@ function useSteps({
     {
       key: 'data-adapter',
       title: 'Data Adapter',
-      component: <DataAdapterCreate saved={onClose} onCancel={onClose} validationErrors={{}} />,
+      component: <DataAdapterCreate saved={onClose} onCancel={onClose} />,
     },
   ];
 

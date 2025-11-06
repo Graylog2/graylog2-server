@@ -28,7 +28,7 @@ function LookupTableWizard() {
   const { lutIdOrName } = useParams<{ lutIdOrName: string }>();
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
   const initialValues = React.useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
-  const [steps, { activeStep, setActiveStep }] = useSteps({ isNew: true });
+  const [steps, { activeStep, setActiveStep }] = useSteps();
 
   const handleStepChange = (newStepKey: string) => {
     setActiveStep(newStepKey);

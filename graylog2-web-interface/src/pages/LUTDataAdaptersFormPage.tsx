@@ -45,7 +45,7 @@ function LUTDataAdaptersFormPage() {
             {loadingDataAdapter ? (
               <Spinner text="Loading Data Adapter" />
             ) : (
-              <DataAdapterCreate onCancel={() => {}} saved={(resp: any) => console.log(resp)} />
+              <DataAdapterCreate onCancel={() => {}} saved={(resp: any) => console.log(resp)} adapter={dataAdapter} />
             )}
           </Col>
         </Row>

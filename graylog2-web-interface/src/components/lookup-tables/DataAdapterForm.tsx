@@ -16,8 +16,6 @@
  */
 import React from 'react';
 import { Formik, Form } from 'formik';
-import type { FormikErrors } from 'formik';
-import isEmpty from 'lodash/isEmpty';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { FormSubmit } from 'components/common';
@@ -52,7 +50,6 @@ type Props = {
   onCancel: () => void;
   create?: boolean;
   dataAdapter?: LookupTableAdapter;
-  validate?: (arg: LookupTableAdapter) => void;
 };
 
 const INIT_ADAPTER = {
@@ -66,50 +63,15 @@ const INIT_ADAPTER = {
   config: {},
 };
 
-const DataAdapterForm = ({
-  type,
-  title,
-  saved,
-  onCancel,
-  create = true,
-  dataAdapter = INIT_ADAPTER,
-  validate = null,
-}: Props) => {
+const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAdapter = INIT_ADAPTER }: Props) => {
   const sendTelemetry = useSendTelemetry();
-  const configRef = React.useRef(null);
-  const [configReady, setConfigReady] = React.useState(false);
   const { createAdapter, creatingAdapter } = useCreateAdapter();
   const { updateAdapter, updatingAdapter } = useUpdateAdapter();
-
-  console.log(dataAdapter);
-
-  React.useEffect(() => {
-    setConfigReady(false);
-  }, [type]);
 
   const plugin = React.useMemo(() => PluginStore.exports('lookupTableAdapters').find((p) => p.type === type), [type]);
 
   const DocComponent = React.useMemo(() => plugin.documentationComponent, [plugin]);
   const pluginDisplayName = React.useMemo(() => plugin.displayName || type, [plugin, type]);
-
-  // const handleValidation = (values: LookupTableAdapter) => {
-  //   const errors: any = {};
-  //
-  //   if (!values.title) errors.title = 'Required';
-  //
-  //   if (!values.name) {
-  //     errors.name = 'Required';
-  //   } else {
-  //     validate(values);
-  //   }
-  //
-  //   if (values.config?.type !== 'none' && configReady) {
-  //     const confErrors = configRef.current?.validate?.() || {};
-  //     if (!isEmpty(confErrors)) errors.config = confErrors;
-  //   }
-  //
-  //   return errors;
-  // };
 
   const handleSubmit = (values: LookupTableAdapter) => {
     const promise = create ? createAdapter(values) : updateAdapter(values);

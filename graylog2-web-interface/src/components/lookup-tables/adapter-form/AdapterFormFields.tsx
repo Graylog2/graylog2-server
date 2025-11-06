@@ -42,7 +42,7 @@ function AdapterFormFields() {
         return acc;
       }, {});
 
-      const configErrors = configRef?.current?.validate() || {};
+      const configErrors = configRef?.current?.validate?.() || {};
       setErrors({ ...auxErrors, ...configErrors });
     });
   }, [validateDataAdapter, values, setErrors, errors]);

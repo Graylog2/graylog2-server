@@ -25,12 +25,12 @@ type Props = {
   onClose: () => void;
 };
 
-const DataAdapterCreateModal = ({ onClose, validationErrors }: Props & { validationErrors: any }) => (
+const DataAdapterCreateModal = ({ onClose }: Props) => (
   <Modal show fullScreen onHide={onClose}>
     <Modal.Header>
       <Modal.Title>Create Data Adapter</Modal.Title>
     </Modal.Header>
-    <DataAdapterCreate saved={onClose} onCancel={onClose} validationErrors={validationErrors} />
+    <DataAdapterCreate saved={onClose} onCancel={onClose} />
   </Modal>
 );
 
