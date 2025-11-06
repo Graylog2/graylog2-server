@@ -14,14 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.outputs;
+package org.graylog2.telemetry.suppliers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.streams.OutputService;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
-import org.graylog2.telemetry.suppliers.TypeFormatter;
 
 import java.util.HashMap;
 import java.util.Map;

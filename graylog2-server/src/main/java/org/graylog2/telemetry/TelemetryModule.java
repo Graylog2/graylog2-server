@@ -17,10 +17,10 @@
 package org.graylog2.telemetry;
 
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.outputs.OutputsMetricsSupplier;
 import org.graylog2.plugin.PluginModule;
-import org.graylog2.telemetry.suppliers.InputsMetricsSupplier;
 import org.graylog2.telemetry.scheduler.TelemetrySubmissionPeriodical;
+import org.graylog2.telemetry.suppliers.InputsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.OutputsMetricsSupplier;
 
 public class TelemetryModule extends PluginModule {
     @Override

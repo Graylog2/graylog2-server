@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.outputs;
+package org.graylog2.telemetry.suppliers;
 
 import org.graylog2.streams.OutputService;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
