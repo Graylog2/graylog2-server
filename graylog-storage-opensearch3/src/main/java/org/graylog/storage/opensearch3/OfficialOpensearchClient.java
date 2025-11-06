@@ -24,12 +24,14 @@ import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,7 +79,10 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
     public static RuntimeException mapException(Throwable t, String message) {
         if (t instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
-                return new IndexNotFoundException(t.getMessage());
+                return Optional.ofNullable(openSearchException.response().error())
+                        .map(ErrorCause::metadata)
+                        .map(metadata -> IndexNotFoundException.create(message + metadata.get("resource.id").toString(), metadata.get("index").toString()))
+                        .orElse(new IndexNotFoundException(t.getMessage()));
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
                 return new MasterNotDiscoveredException();

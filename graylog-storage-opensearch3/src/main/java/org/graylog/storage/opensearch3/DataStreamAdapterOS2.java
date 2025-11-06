@@ -51,12 +51,14 @@ import java.util.Optional;
 public class DataStreamAdapterOS2 implements DataStreamAdapter {
 
     private final Logger log = LoggerFactory.getLogger(DataStreamAdapterOS2.class);
+    private final OfficialOpensearchClient opensearchClient;
     private final OpenSearchClient client;
     private final ObjectMapper objectMapper;
     private final IsmApi ismApi;
 
     @Inject
-    public DataStreamAdapterOS2(OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi) {
+    public DataStreamAdapterOS2(OfficialOpensearchClient opensearchClient, OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi) {
+        this.opensearchClient = opensearchClient;
         this.client = client;
         this.objectMapper = objectMapper;
         this.ismApi = ismApi;

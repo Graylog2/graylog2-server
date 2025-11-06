@@ -39,8 +39,8 @@ public class DataStreamAdapterOS2IT {
 
     ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    DataStreamAdapterOS2 dataStreamAdapter = new DataStreamAdapterOS2(openSearchInstance.openSearchClient(),
-            objectMapper, new IsmApi(openSearchInstance.openSearchClient(), objectMapper));
+    DataStreamAdapterOS2 dataStreamAdapter = new DataStreamAdapterOS2(openSearchInstance.getOfficialOpensearchClient(), openSearchInstance.openSearchClient(),
+            objectMapper, new IsmApi(openSearchInstance.getOfficialOpensearchClient(), objectMapper));
 
 
     @Test

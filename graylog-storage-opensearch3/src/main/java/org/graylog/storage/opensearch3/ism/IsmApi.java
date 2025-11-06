@@ -21,31 +21,33 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-import org.graylog.shaded.opensearch2.org.opensearch.client.ResponseException;
-import org.graylog.storage.opensearch3.OpenSearchClient;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
+import org.opensearch.client.opensearch.generic.Body;
+import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
+import org.opensearch.client.opensearch.generic.Response;
 
-import java.io.IOException;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IsmApi {
 
     private final ObjectMapper objectMapper;
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient client;
+    private final OpenSearchGenericClient genericClient;
 
     @Inject
-    public IsmApi(OpenSearchClient client, ObjectMapper objectMapper) {
+    public IsmApi(OfficialOpensearchClient client, ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         this.client = client;
+        genericClient = client.sync().generic();
     }
 
     public Optional<IsmPolicy> getPolicy(String policyId) {
-        final Request request = request("GET", "policies/" + policyId, null);
+        Request request = os3request("GET", "policies/" + policyId, null);
         return perform(request, new TypeReference<>() {}, "Could not get ism policy");
     }
 
@@ -57,63 +59,62 @@ public class IsmApi {
             }
             policy = new IsmPolicy(policy.policy());
         }
-        final Request request = request("PUT", "policies/" + policyId, policy);
+        final Request request = os3request("PUT", "policies/" + policyId, policy);
         perform(request,
                 new TypeReference<IsmPolicy>() {},
                 "Unable to create ism policy");
     }
 
     public void addPolicyToIndex(String policyId, String index) {
-        final Request request = request("POST", "add/" + index, null);
-        request.setJsonEntity(f("{\"policy_id\":\"%s\"}", policyId));
+        final Request request = os3request("POST", "add/" + index, Map.of("policy_id", policyId));
         perform(request,
                 new TypeReference<JsonNode>() {},
                 "Unable to add policy to index");
     }
 
     public void removePolicyFromIndex(String index) {
-        final Request request = request("POST", "remove/" + index, null);
+        final Request request = os3request("POST", "remove/" + index, null);
         perform(request,
                 new TypeReference<JsonNode>() {},
                 "Unable to remove policy from index");
     }
 
     public void deletePolicy(String policyId) {
-        final Request request = request("DELETE", "policies/" + policyId, null);
+        final Request request = os3request("DELETE", "policies/" + policyId, null);
         perform(request,
                 new TypeReference<JsonNode>() {},
                 "Unable to delete policy");
     }
 
     private <R> Optional<R> perform(Request request, TypeReference<R> responseClass, String errorMessage) {
-        return client.execute((c, requestOptions) -> {
-            request.setOptions(requestOptions);
-
-            Response response;
-            try {
-                response = c.getLowLevelClient().performRequest(request);
-            } catch (ResponseException e) {
-                if (e.getResponse().getStatusLine().getStatusCode() == 404)
-                    return Optional.empty();
-                throw e;
+        return client.execute(() -> {
+            Response response = genericClient.execute(request);
+            if (response.getStatus() == 404) {
+                return Optional.empty();
             }
-            return Optional.of(returnType(response, responseClass));
+            return response.getBody()
+                    .map(Body::bodyAsString)
+                    .map(json -> {
+                        try {
+                            return objectMapper.readValue(json, responseClass);
+                        } catch (JsonProcessingException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
         }, errorMessage);
     }
 
-    private <R> R returnType(Response response, TypeReference<R> responseClass) throws IOException {
-        return objectMapper.readValue(response.getEntity().getContent(), responseClass);
-    }
-
-    private Request request(@SuppressWarnings("SameParameterValue") String method, String endpoint, Object body) {
-        final Request request = new Request(method, "/_plugins/_ism/" + endpoint);
-        request.addParameter("format", "json");
+    private Request os3request(String method, String endpoint, Object body) {
         try {
-            request.setJsonEntity(objectMapper.writeValueAsString(body));
+            return Requests.builder()
+                    .method(method)
+                    .endpoint("/_plugins/_ism/" + endpoint)
+                    .query(Map.of("format", "json"))
+                    .json(objectMapper.writeValueAsString(body))
+                    .build();
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
-        return request;
     }
 
 }
