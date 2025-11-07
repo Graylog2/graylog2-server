@@ -36,6 +36,8 @@ import FormatAssetList from 'views/components/messagelist/FormatAssetList';
 import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
+import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
+import useFeature from 'hooks/useFeature';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -86,6 +88,7 @@ const MessageDetail = ({
   showTimestamp = true,
   allStreams = Immutable.List(),
 }: Props) => {
+  const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
   const { config: searchesClusterConfig } = useSearchConfiguration();
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
@@ -147,62 +150,67 @@ const MessageDetail = ({
   return (
     <AdditionalContext.Provider value={additionalContext}>
       <MessageDetailProviders message={message}>
-        <>
-          <Row className="row-sm">
-            <Col md={12}>
-              <Header>
-                <MessageDetailsTitle>
-                  <Icon name="mail" />
-                  &nbsp;{messageTitle}
-                </MessageDetailsTitle>
-                <MessageActions
-                  index={index}
-                  id={id}
-                  fields={fields}
-                  decorationStats={decorationStats}
-                  disabled={disableMessageActions}
-                  disableSurroundingSearch={disableSurroundingSearch}
-                  disableTestAgainstStream={disableTestAgainstStream}
-                  showOriginal={showOriginal}
-                  toggleShowOriginal={_toggleShowOriginal}
-                  searchConfig={searchesClusterConfig}
-                  streams={allStreams}
-                />
-              </Header>
-            </Col>
-          </Row>
-          <Row id={`sticky-augmentations-boundary-${message.id}`}>
-            <Col md={3}>
-              <MessageMetadata
-                timestamp={timestamp}
-                index={index}
-                receivedBy={
-                  <FormatReceivedBy
-                    isLocalNode={isLocalNode}
-                    inputs={inputs}
-                    sourceNodeId={gl2_source_node}
-                    sourceInputId={gl2_source_input}
+        <MessageFavoriteFieldsProvider
+          message={message}
+          messageFields={messageFields}
+          isFeatureEnabled={isFavoriteFieldsEnabled}>
+          <>
+            <Row className="row-sm">
+              <Col md={12}>
+                <Header>
+                  <MessageDetailsTitle>
+                    <Icon name="mail" />
+                    &nbsp;{messageTitle}
+                  </MessageDetailsTitle>
+                  <MessageActions
+                    index={index}
+                    id={id}
+                    fields={fields}
+                    decorationStats={decorationStats}
+                    disabled={disableMessageActions}
+                    disableSurroundingSearch={disableSurroundingSearch}
+                    disableTestAgainstStream={disableTestAgainstStream}
+                    showOriginal={showOriginal}
+                    toggleShowOriginal={_toggleShowOriginal}
+                    searchConfig={searchesClusterConfig}
+                    streams={allStreams}
                   />
-                }
-                streams={streamsListItems}
-                assets={
-                  associated_assets ? (
-                    <FormatAssetList
-                      associated_assets={associated_assets}
-                      fieldType={findFieldType('associated_assets')?.type}
+                </Header>
+              </Col>
+            </Row>
+            <Row id={`sticky-augmentations-boundary-${message.id}`}>
+              <Col md={3}>
+                <MessageMetadata
+                  timestamp={timestamp}
+                  index={index}
+                  receivedBy={
+                    <FormatReceivedBy
+                      isLocalNode={isLocalNode}
+                      inputs={inputs}
+                      sourceNodeId={gl2_source_node}
+                      sourceInputId={gl2_source_input}
                     />
-                  ) : (
-                    <div />
-                  )
-                }
-              />
-              <MessageAugmentations message={message} />
-            </Col>
-            <Col md={9}>
-              <MessageFields message={message} fields={messageFields} />
-            </Col>
-          </Row>
-        </>
+                  }
+                  streams={streamsListItems}
+                  assets={
+                    associated_assets ? (
+                      <FormatAssetList
+                        associated_assets={associated_assets}
+                        fieldType={findFieldType('associated_assets')?.type}
+                      />
+                    ) : (
+                      <div />
+                    )
+                  }
+                />
+                <MessageAugmentations message={message} />
+              </Col>
+              <Col md={9}>
+                <MessageFields message={message} fields={messageFields} />
+              </Col>
+            </Row>
+          </>
+        </MessageFavoriteFieldsProvider>
       </MessageDetailProviders>
     </AdditionalContext.Provider>
   );
