@@ -16,29 +16,37 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
 import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.core.util.Json;
-import io.swagger.v3.oas.models.media.ComposedSchema;
+import io.swagger.v3.core.util.RefUtils;
+import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+/**
+ * Custom implementation of {@link ModelResolver} for OpenAPI schema generation.
+ * <p>
+ * This converter provides custom handling for resolving subtypes and discriminator mappings,
+ * especially for types annotated with {@link com.fasterxml.jackson.annotation.JsonSubTypes}.
+ * It also includes a workaround for handling Java primitive Optional types ({@link OptionalInt},
+ * {@link OptionalLong}, {@link OptionalDouble}) during schema generation.
+ */
 public class CustomModelConverter extends ModelResolver {
 
     @Inject
@@ -53,106 +61,37 @@ public class CustomModelConverter extends ModelResolver {
 
     @Override
     public Schema<?> resolve(AnnotatedType annotatedType, ModelConverterContext context, Iterator<ModelConverter> next) {
-        Schema<?> baseSchema = super.resolve(annotatedType, new CustomConverterContext(context), next);
-        if (true) {
-            return baseSchema;
-        }
-        if (baseSchema == null) {
-            return null;
-        }
-
-        // Determine the raw class of the annotated type
-        Class<?> baseClass;
-        try {
-            baseClass = com.fasterxml.jackson.databind.type.TypeFactory.rawClass(annotatedType.getType());
-        } catch (Exception e) {
-            return baseSchema;
-        }
-
-        // If the schema already has 'oneOf' entries (from annotations), skip this logic
-        if (baseSchema instanceof ComposedSchema composedSchema &&
-                composedSchema.getOneOf() != null &&
-                !composedSchema.getOneOf().isEmpty()) {
-            return baseSchema;
-        }
-
-        // --- BEGIN: Add subtype awareness using Jackson's SubtypeResolver ---
-        var serializationConfig = _mapper.getSerializationConfig();
-        var parentDescription = serializationConfig.introspectClassAnnotations(baseClass);
-
-        List<NamedType> resolvedSubtypes =
-                List.copyOf(
-                        _mapper.getSubtypeResolver()
-                                .collectAndResolveSubtypesByClass(
-                                        serializationConfig,
-                                        parentDescription.getClassInfo()
-                                ));
-
-        if (resolvedSubtypes.isEmpty()) {
-            return baseSchema;
-        }
-
-        List<Schema<?>> subtypeSchemas = new ArrayList<>();
-        Map<String, String> discriminatorMapping = new LinkedHashMap<>();
-
-        for (var namedSubtype : resolvedSubtypes) {
-            if (namedSubtype.getType() == baseClass) {
-                continue; // Skip the base class itself
-            }
-
-            // Generate a $ref schema for each registered subtype
-            Schema<?> subtypeRefSchema = context.resolve(
-                    new AnnotatedType()
-                            .type(namedSubtype.getType())
-                            .resolveAsRef(true)
-            );
-
-            if (subtypeRefSchema != null && subtypeRefSchema.get$ref() != null) {
-                subtypeSchemas.add(new Schema<>().$ref(subtypeRefSchema.get$ref()));
-
-                // Use registered name (if provided) for discriminator mapping
-                if (namedSubtype.hasName()) {
-                    discriminatorMapping.put(namedSubtype.getName(), subtypeRefSchema.get$ref());
-                }
-            }
-        }
-
-        if (subtypeSchemas.isEmpty()) {
-            return baseSchema;
-        }
-
-        // Create or augment a composed schema that includes 'oneOf' subtypes
-        ComposedSchema composedSchema =
-                (baseSchema instanceof ComposedSchema)
-                        ? (ComposedSchema) baseSchema
-                        : new ComposedSchema();
-
-        composedSchema.setOneOf(List.copyOf(subtypeSchemas));
-
-        // Determine discriminator property name
-        var jsonTypeInfoAnnotation =
-                parentDescription.getClassInfo().getAnnotation(com.fasterxml.jackson.annotation.JsonTypeInfo.class);
-
-        String discriminatorProperty =
-                (jsonTypeInfoAnnotation != null &&
-                        jsonTypeInfoAnnotation.use() == com.fasterxml.jackson.annotation.JsonTypeInfo.Id.NAME &&
-                        jsonTypeInfoAnnotation.property() != null &&
-                        !jsonTypeInfoAnnotation.property().isBlank())
-                        ? jsonTypeInfoAnnotation.property()
-                        : "type"; // Default fallback
-
-        // Add discriminator to the composed schema
-        io.swagger.v3.oas.models.media.Discriminator discriminator =
-                new io.swagger.v3.oas.models.media.Discriminator().propertyName(discriminatorProperty);
-
-        if (!discriminatorMapping.isEmpty()) {
-            discriminator.setMapping(discriminatorMapping);
-        }
-
-        composedSchema.setDiscriminator(discriminator);
-        return composedSchema;
+        // TODO: this would be the place to implement dynamic subtype resolving based on the subtypes registered
+        //   with the object mapper. ideally we want oneOf and allOf
+        return super.resolve(annotatedType, new CustomConverterContext(context), next);
     }
 
+    /**
+     * Resolves the OpenAPI {@link Discriminator} for the given Java type.
+     * <p>
+     * If the type is annotated with {@link com.fasterxml.jackson.annotation.JsonSubTypes} and the
+     * discriminator mapping is missing or empty, this method populates the mapping with subtype names
+     * and their corresponding schema references.
+     * <p>
+     * Without this custom implementation, the discriminator mapping would remain empty unless an explicit @{@link io.swagger.v3.oas.annotations.media.Schema}
+     * annotation was provided.
+     */
+    @Override
+    protected Discriminator resolveDiscriminator(JavaType type, ModelConverterContext context) {
+        final var wrappedContext = new CustomConverterContext(context);
+        final var discriminator = super.resolveDiscriminator(type, wrappedContext);
+        if (discriminator != null && discriminator.getPropertyName() != null &&
+                (discriminator.getMapping() == null || discriminator.getMapping().isEmpty())) {
+            final var jsonSubTypes = type.getRawClass().getDeclaredAnnotation(JsonSubTypes.class);
+            if (jsonSubTypes != null) {
+                Arrays.stream(jsonSubTypes.value()).forEach(subtype -> {
+                    discriminator.mapping(subtype.name(), RefUtils.constructRef(
+                            wrappedContext.resolve(new AnnotatedType().type(subtype.value())).getName()));
+                });
+            }
+        }
+        return discriminator;
+    }
 
     /**
      * Custom ModelConverterContext wrapper that implements a shortcut for resolving {@link OptionalInt},

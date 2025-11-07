@@ -17,10 +17,12 @@
 package org.graylog2.shared.rest.documentation.openapi;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import io.swagger.v3.core.util.Json;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -79,7 +81,7 @@ class OpenAPIGeneratorTest {
     }
 
     @Test
-    void generateOpenApiSpec_createsValidOpenAPIObject() {
+    void createsValidOpenAPIObject() {
         final var openAPI = generator.generateOpenApiSpec();
 
         assertThat(openAPI).isNotNull();
@@ -93,7 +95,7 @@ class OpenAPIGeneratorTest {
         assertThat(openAPI.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
 
         // Verify that paths and schemas are generated
-        assertThat(openAPI.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test", "/plugins/my.plugin.id/test2");
+        assertThat(openAPI.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test", "/plugins/my.plugin.id/subtypes");
         assertThat(openAPI.getComponents().getSchemas()).isNotEmpty();
     }
 
@@ -111,11 +113,6 @@ class OpenAPIGeneratorTest {
 
         // Verify that the /test path exists
         assertThat(generatedOpenAPI.getPaths()).containsKey("/plugins/my.plugin.id/test");
-
-        // Print the generated spec for debugging
-//        final var spec = Json.pretty(generatedOpenAPI);
-//        System.out.println("Generated OpenAPI spec:");
-//        System.out.println(spec);
 
         // Verify the schema contains our test endpoint
         final var postOperation = generatedOpenAPI.getPaths().get("/plugins/my.plugin.id/test").getPost();
@@ -159,7 +156,7 @@ class OpenAPIGeneratorTest {
     }
 
     @Test
-    void generateOpenApiSpec_withRegisteredJacksonSubtypes() throws Exception {
+    void handlesJacksonSubtypes() throws Exception {
         final var mapper = objectMapperConfiguration.configure(new ObjectMapper());
 
         final var childType1 = mapper.readValue("{\"type\":\"child-type-1\",\"age\":5}", ParentType.class);
@@ -170,8 +167,33 @@ class OpenAPIGeneratorTest {
 
         final var openAPI = generator.generateOpenApiSpec();
 
-        assertThat(openAPI.getComponents().getSchemas()).isNotEmpty();
-        // TODO test generated schema
+        try {
+            // Verify discriminator mapping uses type aliases, not FQ class names
+            final var parentTypeSchema = openAPI.getComponents().getSchemas().get("ParentType");
+            final var discriminatorMapping = parentTypeSchema.getDiscriminator().getMapping();
+            assertThat(discriminatorMapping)
+                    .containsEntry("child-type-1", "#/components/schemas/ChildType1")
+                    .containsEntry("child-type-2", "#/components/schemas/ChildType2");
+
+            // Verify ChildType1 has allOf with ParentType reference
+            final Schema<?> childType1Schema = openAPI.getComponents().getSchemas().get("ChildType1");
+            final var childType1HasParentRef = childType1Schema.getAllOf().stream()
+                    .map(s -> (Schema<?>) s)
+                    .anyMatch(schema -> "#/components/schemas/ParentType".equals(schema.get$ref()));
+            assertThat(childType1HasParentRef).isTrue();
+
+            // Verify ChildType2 has allOf with ParentType reference
+            final Schema<?> childType2Schema = openAPI.getComponents().getSchemas().get("ChildType2");
+            final var childType2HasParentRef = childType2Schema.getAllOf().stream()
+                    .map(s -> (Schema<?>) s)
+                    .anyMatch(schema -> "#/components/schemas/ParentType".equals(schema.get$ref()));
+            assertThat(childType2HasParentRef).isTrue();
+
+        } catch (AssertionError | NullPointerException e) {
+            System.err.println("Test failed. Full OpenAPI spec:");
+            System.err.println(Json.pretty(openAPI));
+            throw e;
+        }
     }
 
     @PublicCloudAPI
@@ -226,12 +248,12 @@ class OpenAPIGeneratorTest {
     }
 
     @PublicCloudAPI
-    @Path("/test2")
+    @Path("/subtypes")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     public static class TestResource2 implements PluginRestResource {
 
-        @NoAuditEvent("Test2")
+        @NoAuditEvent("Test")
         @GET
         public ParentType getTest() {
             if (Math.random() < 0.5) {
@@ -276,11 +298,14 @@ class OpenAPIGeneratorTest {
             OptionalDouble rate
     ) {}
 
+    // TODO: at the moment, subtypes are only correctly handled when they are statically annotated with @JsonSubTypes
+    //   We need this to work with subtypes that come from plugins and are registered with the ObjectMapper at runtime,
+    //   but this will require changes to the model resolver.
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
-//    @JsonSubTypes({
-//            @JsonSubTypes.Type(value = ChildType1.class, name = "child-type-1"),
-//            @JsonSubTypes.Type(value = ChildType2.class, name = "child-type-2"),
-//    })
+    @JsonSubTypes({
+            @JsonSubTypes.Type(value = ChildType1.class, name = "child-type-1"),
+            @JsonSubTypes.Type(value = ChildType2.class, name = "child-type-2"),
+    })
     public interface ParentType {
         String type();
     }
