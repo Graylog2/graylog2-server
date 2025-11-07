@@ -21,6 +21,10 @@ import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.configuration.ConfigurationException;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,10 +82,19 @@ public class V20251030000000_CloudTrailInputConfigMigration extends Migration {
                     }
 
                     if (needsUpdate) {
-                        inputService.save(input);
+                        final MessageInput messageInput = inputService.getMessageInput(input);
+                        messageInput.checkConfiguration();
+                        final Input reconstructedInput = inputService.create(messageInput.asMap());
+                        inputService.save(reconstructedInput);
                         LOG.info("Successfully migrated CloudTrail input [{}/{}].",
                                 input.getTitle(), input.getId());
                     }
+                } catch (NoSuchInputTypeException e) {
+                    LOG.error("Input type not found for CloudTrail input [{}/{}].",
+                            input.getTitle(), input.getId(), e);
+                } catch (ConfigurationException e) {
+                    LOG.error("Configuration validation failed for CloudTrail input [{}/{}].",
+                            input.getTitle(), input.getId(), e);
                 } catch (Exception e) {
                     LOG.error("An error occurred migrating CloudTrail input [{}/{}].",
                             input.getTitle(), input.getId(), e);
