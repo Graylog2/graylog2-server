@@ -108,7 +108,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       {!!savedSearches?.length && (
         <EntityDataTable<View>
           entities={savedSearches}
-          visibleColumnOrder={visibleColumns}
+          visibleColumns={visibleColumns}
           columnsOrder={columnsOrder}
           onColumnsChange={onColumnsChange}
           bulkSelection={{ actions: <BulkActions /> }}
