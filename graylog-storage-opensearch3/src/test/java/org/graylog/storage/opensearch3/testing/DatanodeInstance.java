@@ -41,7 +41,7 @@ public class DatanodeInstance extends OpenSearchInstance {
                             final List<String> featureFlags,
                             final Map<String, String> env,
                             final PluginJarsProvider pluginJarsProvider) {
-        super(cachedInstance, version, hostname, network, heapSize, featureFlags, env);
+        super(cachedInstance, version, hostname, network, heapSize, featureFlags, env, OpensearchSecurity.DISABLED);
         this.mongoDBUri = mongoDBUri;
         this.passwordSecret = passwordSecret;
         this.pluginJarsProvider = pluginJarsProvider;
