@@ -131,7 +131,7 @@ const getNodeDisplayName = (node: GraylogNode) => {
   return node.node_id ?? node.hostname ?? node.id;
 };
 
-export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput', 'health'] as const;
+export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput'] as const;
 
 export const createColumnDefinitions = (): Array<Column> => [
   { id: 'node', title: 'Node' },
@@ -141,8 +141,35 @@ export const createColumnDefinitions = (): Array<Column> => [
   { id: 'jvm', title: 'JVM' },
   { id: 'buffers', title: 'Buffers' },
   { id: 'throughput', title: 'Throughput' },
-  { id: 'health', title: 'Health' },
 ];
+
+const getHealthRows = (entity: GraylogNode): Array<HealthRow> => {
+  const rows: Array<HealthRow> = [];
+
+  if (entity.is_processing !== undefined && entity.is_processing !== null) {
+    const messageProcessingStatus = entity.is_processing ? 'ENABLED' : 'DISABLED';
+
+    rows.push({
+      key: 'message-processing',
+      label: 'Message Processing',
+      status: messageProcessingStatus,
+      bsStyle: entity.is_processing ? 'success' : 'warning',
+    });
+  }
+
+  const loadBalancersStatus = entity.lb_status?.toUpperCase();
+
+  if (loadBalancersStatus) {
+    rows.push({
+      key: 'load-balancer',
+      label: 'Load Balancer',
+      status: loadBalancersStatus,
+      bsStyle: loadBalancersStatus === 'ALIVE' ? 'success' : 'warning',
+    });
+  }
+
+  return rows;
+};
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
@@ -164,23 +191,43 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
       },
     },
     state: {
+      minWidth: 200,
       renderCell: (_value, entity) => {
         const lifecycleStatus = entity.lifecycle?.toUpperCase();
+        const healthRows = getHealthRows(entity);
 
-        if (!lifecycleStatus) {
+        if (!lifecycleStatus && !healthRows.length) {
           return null;
         }
 
         return (
-          <StyledLabel
-            bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
-            bsSize="xs"
-            title={lifecycleStatus}
-            aria-label={lifecycleStatus}>
-            {lifecycleStatus}
-          </StyledLabel>
+          <MetricsColumn>
+            {lifecycleStatus && (
+              <MetricsRow>
+                <StyledLabel
+                  bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
+                  bsSize="xs"
+                  title={lifecycleStatus}
+                  aria-label={lifecycleStatus}>
+                  {lifecycleStatus}
+                </StyledLabel>
+              </MetricsRow>
+            )}
+            {healthRows.map(({ key, label, status, bsStyle }) => (
+              <MetricsRow key={key}>
+                <span>{label}</span>
+                <StyledLabel
+                  bsStyle={bsStyle}
+                  bsSize="xs"
+                  aria-label={`${label} ${status}`}>
+                  {status}
+                </StyledLabel>
+              </MetricsRow>
+            ))}
+          </MetricsColumn>
         );
       },
+      
     },
     journal: {
       renderCell: (_value, entity) => {
@@ -284,53 +331,6 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         ];
 
         return <MetricsColumn>{rows.map(({ label, value }) => renderThroughputRow(label, value))}</MetricsColumn>;
-      },
-    },
-    health: {
-      renderCell: (_value, entity) => {
-        const rows: Array<HealthRow> = [];
-
-        if (entity.is_processing !== undefined && entity.is_processing !== null) {
-          const messageProcessingStatus = entity.is_processing ? 'ENABLED' : 'DISABLED';
-
-          rows.push({
-            key: 'message-processing',
-            label: 'Message Processing',
-            status: messageProcessingStatus,
-            bsStyle: entity.is_processing ? 'success' : 'warning',
-          });
-        }
-
-        const loadBalancersStatus = entity.lb_status?.toUpperCase();
-
-        if (loadBalancersStatus) {
-          rows.push({
-            key: 'load-balancer',
-            label: 'Load Balancer',
-            status: loadBalancersStatus,
-            bsStyle: loadBalancersStatus === 'ALIVE' ? 'success' : 'warning',
-          });
-        }
-
-        if (!rows.length) {
-          return null;
-        }
-
-        return (
-          <MetricsColumn>
-            {rows.map(({ key, label, status, bsStyle }) => (
-              <MetricsRow key={key}>
-                <span>{label}</span>
-                <StyledLabel
-                  bsStyle={bsStyle}
-                  bsSize="xs"
-                  aria-label={`${label} ${status}`}>
-                  {status}
-                </StyledLabel>
-              </MetricsRow>
-            ))}
-          </MetricsColumn>
-        );
       },
     },
   },
