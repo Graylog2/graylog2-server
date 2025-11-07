@@ -16,7 +16,9 @@
  */
 package org.graylog.aws.inputs.cloudtrail.api;
 
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
 import org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest;
@@ -41,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
+import java.net.URI;
 import java.util.HashMap;
 
 /**
@@ -53,19 +56,22 @@ public class CloudTrailDriver {
     private final NodeId nodeId;
     private final CloudTrailClientFactory cloudTrailClientFactory;
     private final AWSClientBuilderUtil awsUtils;
+    private final URI httpProxyUri;
 
     @Inject
     public CloudTrailDriver(InputService inputService,
                             MessageInputFactory messageInputFactory,
                             NodeId nodeId,
                             CloudTrailClientFactory cloudTrailClientFactory,
-                            AWSClientBuilderUtil awsUtils) {
+                            AWSClientBuilderUtil awsUtils,
+                            @Named("http_proxy_uri") @Nullable URI httpProxyUri) {
 
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
         this.nodeId = nodeId;
         this.cloudTrailClientFactory = cloudTrailClientFactory;
         this.awsUtils = awsUtils;
+        this.httpProxyUri = httpProxyUri;
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailDriver.class);
@@ -77,7 +83,7 @@ public class CloudTrailDriver {
                 .awsSecretAccessKey(request.secretAccessKey())
                 .assumeRoleArn(request.assumeRoleArn()).build();
         final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
-        return cloudTrailClientFactory.checkCredentials(request.sqsQueueName(), credentialsProvider, request.sqsRegion());
+        return cloudTrailClientFactory.checkCredentials(request.sqsQueueName(), credentialsProvider, request.sqsRegion(), httpProxyUri);
     }
 
     public Input saveInput(CloudTrailCreateInputRequest request, User user) throws Exception {

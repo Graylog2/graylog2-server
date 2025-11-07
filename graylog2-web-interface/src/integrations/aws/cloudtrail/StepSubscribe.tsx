@@ -33,18 +33,36 @@ const StepSubscribe = ({ onSubmit, onChange }: Props) => {
   const { formData } = useContext(FormDataContext);
   const [formError, setFormError] = useState<ErrorMessageType>(null);
 
-  const { pollingInterval } = formData;
+  const { pollingInterval, sqsMessageBatchSize } = formData;
 
   const handleSubmit = () => {
-    if (pollingInterval.value >= 1) {
-      setFormError(null);
-      onSubmit();
-    } else {
+    // Check if there's already a validation error (e.g., from batch size)
+    if (formError) {
+      return;
+    }
+
+    // Validate polling interval
+    if (pollingInterval.value < 1) {
       setFormError({
         full_message: 'Please provide valid polling interval',
         nice_message: 'Minimum allowable polling interval is 1 minute.',
       });
+
+      return;
     }
+
+    // Validate batch size if it has a value
+    if (sqsMessageBatchSize?.value && (sqsMessageBatchSize.value < 1 || sqsMessageBatchSize.value > 10)) {
+      setFormError({
+        full_message: 'Please provide valid SQS Message Batch Size.',
+        nice_message: 'Please select SQS Message Batch Size between 1 - 10.',
+      });
+
+      return;
+    }
+
+    setFormError(null);
+    onSubmit();
   };
 
   const handleSqsMessageBatchSizeChange = (errorMessage) => {

@@ -17,17 +17,18 @@
 package org.graylog.aws.inputs.cloudtrail.external;
 
 import com.google.common.annotations.VisibleForTesting;
+import jakarta.annotation.Nullable;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 
-import javax.annotation.Nullable;
 import java.net.URI;
 
 /**
@@ -45,8 +46,12 @@ public class CloudTrailClientFactory {
      * @return JSON string indicating whether the credentials are valid
      * @throws Exception if the credentials are invalid or an error occurs
      */
-    public String checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion) throws Exception {
+    public String checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion, @Nullable URI proxyUri) throws Exception {
         try {
+            ApacheHttpClient.Builder httpClientBuilder = ApacheHttpClient.builder();
+            if (proxyUri != null) {
+                httpClientBuilder.proxyConfiguration(CloudTrailS3Client.buildProxyConfiguration(proxyUri));
+            }
             try (SqsClient client = SqsClient.builder().
                     credentialsProvider(credentialsProvider)
                     .region(Region.of(awsRegion))
