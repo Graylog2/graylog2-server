@@ -71,11 +71,12 @@ public class SessionConverter {
     public static SimpleSession sessionDTOToSimpleSession(SessionDTO sessionDTO) {
         final var simpleSession = new SimpleSession();
         simpleSession.setId(sessionDTO.sessionId());
-        simpleSession.setHost(sessionDTO.host());
         simpleSession.setTimeout(sessionDTO.timeout());
         simpleSession.setStartTimestamp(Date.from(sessionDTO.startTimestamp()));
         simpleSession.setLastAccessTime(Date.from(sessionDTO.lastAccessTime()));
         simpleSession.setExpired(sessionDTO.expired());
+
+        sessionDTO.host().ifPresent(simpleSession::setHost);
 
         if (sessionDTO.userId().isPresent() && sessionDTO.authenticationRealm().isPresent()) {
             simpleSession.setAttribute(DefaultSubjectContext.PRINCIPALS_SESSION_KEY, new SimplePrincipalCollection(

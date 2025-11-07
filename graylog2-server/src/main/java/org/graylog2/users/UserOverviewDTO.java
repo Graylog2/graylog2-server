@@ -195,7 +195,7 @@ public abstract class UserOverviewDTO implements MongoEntity {
                 SessionDTO lastSession = session.get();
                 return sessionActive(true)
                         .lastActivity(Date.from(lastSession.lastAccessTime()))
-                        .clientAddress(lastSession.host());
+                        .clientAddress(lastSession.host().orElse(null));
             }
             return this;
         }

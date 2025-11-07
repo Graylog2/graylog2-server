@@ -128,7 +128,7 @@ public class SessionsResource extends RestResource {
         try {
             // Always create a brand-new session for an authentication attempt by ignoring any previous session ID.
             // This avoids a potential session fixation attack. (GHSA-3xf8-g8gr-g7rh)
-            Optional<Session> session = sessionCreator.login(null, host, authToken);
+            final Optional<Session> session = sessionCreator.login(host, authToken);
             if (session.isPresent()) {
                 final SessionResponse response = SessionResponseFactory.forSession(session.get());
                 return Response.ok()
@@ -195,10 +195,7 @@ public class SessionsResource extends RestResource {
             // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
             // user based on the trusted header and request a session to be created transparently. The UI will take the
             // session information from the response to perform subsequent requests to the backend using this session.
-            final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets);
-
-            return sessionCreator.create(subject, host)
-                    .orElseThrow(() -> new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\""));
+            return sessionCreator.createForSubject(subject);
         }
 
         return potentialSession;

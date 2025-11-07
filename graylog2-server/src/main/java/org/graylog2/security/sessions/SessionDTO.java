@@ -58,7 +58,7 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
     public abstract boolean expired();
 
     @JsonProperty(FIELD_HOST)
-    public abstract String host();
+    public abstract Optional<String> host();
 
     @JsonProperty(FIELD_AUTHENTICATION_REALM)
     public abstract Optional<String> authenticationRealm();
@@ -99,7 +99,7 @@ public abstract class SessionDTO implements BuildableMongoEntity<SessionDTO, Ses
         public abstract Builder expired(boolean expired);
 
         @JsonProperty(FIELD_HOST)
-        public abstract Builder host(String host);
+        public abstract Builder host(@Nullable String host);
 
         @JsonProperty(FIELD_AUTHENTICATION_REALM)
         public abstract Builder authenticationRealm(@Nullable String authenticationRealm);

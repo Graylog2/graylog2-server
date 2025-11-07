@@ -894,7 +894,7 @@ public class UsersResource extends RestResource {
                 final SessionDTO session = mongoDbSession.get();
                 sessionActive = true;
                 lastActivity = Date.from(session.lastAccessTime());
-                clientAddress = session.host();
+                clientAddress = session.host().orElse(null);
             }
         }
         List<WildcardPermission> wildcardPermissions;

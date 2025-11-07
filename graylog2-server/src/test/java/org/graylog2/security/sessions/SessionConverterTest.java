@@ -92,7 +92,7 @@ class SessionConverterTest {
         final var sessionDTO = SessionConverter.simpleSessionToSessionDTO(simpleSession);
 
         assertThat(sessionDTO.sessionId()).isEqualTo("session-id");
-        assertThat(sessionDTO.host()).isEqualTo("localhost");
+        assertThat(sessionDTO.host()).contains("localhost");
         assertThat(sessionDTO.timeout()).isEqualTo(10_000);
         assertThat(sessionDTO.startTimestamp()).isEqualTo(now.minusSeconds(10));
         assertThat(sessionDTO.lastAccessTime()).isEqualTo(now);
