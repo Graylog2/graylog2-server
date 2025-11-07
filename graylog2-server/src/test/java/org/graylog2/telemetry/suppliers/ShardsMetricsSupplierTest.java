@@ -27,10 +27,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,12 +58,14 @@ public class ShardsMetricsSupplierTest {
 
         Optional<TelemetryEvent> event = shardsMetricsSupplier.get();
 
-        assertTrue(event.isPresent());
-        assertEquals(minSize.getQuantity(), event.get().metrics().get("shard_min_size"));
-        assertEquals(maxSize.getQuantity(), event.get().metrics().get("shard_max_size"));
-        assertEquals(shardStatus.active(), event.get().metrics().get("shards_active"));
-        assertEquals(shardStatus.initializing(), event.get().metrics().get("shards_initializing"));
-        assertEquals(shardStatus.relocating(), event.get().metrics().get("shards_relocating"));
-        assertEquals(shardStatus.unassigned(), event.get().metrics().get("shards_unassigned"));
+        assertThat(event).isPresent();
+        assertThat(event.get().metrics()).isEqualTo(Map.<String, Object>of(
+                "shard_min_size", minSize.getQuantity(),
+                "shard_max_size", maxSize.getQuantity(),
+                "shards_active", shardStatus.active(),
+                "shards_initializing", shardStatus.initializing(),
+                "shards_relocating", shardStatus.relocating(),
+                "shards_unassigned", shardStatus.unassigned()
+        ));
     }
 }
