@@ -55,6 +55,12 @@ public class CustomReader extends Reader {
         }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
+    // We are synchronizing this method because the read process modifies the internal state of the Reader instance.
+    @Override
+    public synchronized OpenAPI read(Set<Class<?>> classes, Map<String, Object> resources) {
+        return super.read(classes, resources);
+    }
+
     /**
      * We are overriding the read method to add a prefix to the paths of plugin REST resources.
      * We do this by clearing the paths that the reader has added to the spec for each resource class and track the
@@ -62,8 +68,7 @@ public class CustomReader extends Reader {
      * our current state, so that the final OpenAPI spec contains all paths with the correct prefixes.
      */
     @Override
-    public OpenAPI read(Class<?> cls, String parentPath, String parentMethod, boolean isSubresource, RequestBody parentRequestBody, ApiResponses parentResponses, Set<String> parentTags, List<Parameter> parentParameters, Set<Class<?>> scannedResources) {
-        // TODO: synchronize to avoid concurrency issues? test this!
+    public synchronized OpenAPI read(Class<?> cls, String parentPath, String parentMethod, boolean isSubresource, RequestBody parentRequestBody, ApiResponses parentResponses, Set<String> parentTags, List<Parameter> parentParameters, Set<Class<?>> scannedResources) {
         final var pathPrefix = prefixes.get(cls);
 
         getPaths().clear();
