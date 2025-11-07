@@ -37,7 +37,6 @@ import org.graylog2.contentpacks.model.entities.EntityV1;
 import org.graylog2.contentpacks.model.entities.NativeEntity;
 import org.graylog2.contentpacks.model.entities.StreamReferenceEntity;
 import org.graylog2.contentpacks.model.entities.references.ValueReference;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.security.RestPermissions;
@@ -87,7 +86,7 @@ public class StreamReferenceFacade extends StreamFacade {
         try {
             final Stream stream = streamService.load(modelId.id());
             return Optional.of(exportNativeEntity(stream, entityDescriptorIds));
-        } catch (NotFoundException e) {
+        } catch (Exception e) {
             LOG.debug("Couldn't find stream {}", entityDescriptor, e);
             return Optional.empty();
         }
