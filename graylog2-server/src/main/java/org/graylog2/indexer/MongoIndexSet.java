@@ -24,7 +24,6 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
@@ -142,11 +141,6 @@ public class MongoIndexSet implements IndexSet {
     @Override
     public String getIndexWildcard() {
         return indexWildcard;
-    }
-
-    @Override
-    public BasicIndexSetConfig getBasicConfig() {
-        return getConfig();
     }
 
     @Override

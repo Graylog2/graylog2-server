@@ -278,10 +278,13 @@ public abstract class IndexSetConfig implements
             IndexTemplateNameFieldBuilder<Builder>,
             ScopedEntity.Builder<Builder> {
 
+        @JsonProperty(FIELD_REGULAR)
         public abstract Builder isRegular(@Nullable Boolean isRegular);
 
+        @JsonProperty(FIELD_INDEX_MATCH_PATTERN)
         public abstract Builder indexMatchPattern(String indexMatchPattern);
 
+        @JsonProperty(FIELD_INDEX_WILDCARD)
         public abstract Builder indexWildcard(String indexWildcard);
 
         public abstract IndexSetConfig build();

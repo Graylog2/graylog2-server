@@ -28,7 +28,7 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
+public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet<IndexSetConfig> {
     /**
      * Returns an array with all managed indices in this index set.
      * <p>
@@ -37,16 +37,6 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
      * @return array of index names
      */
     String[] getManagedIndices();
-
-    /**
-     * Returns the newest index.
-     * <p>
-     * Example: {@code "graylog_42"}
-     *
-     * @return the newest index
-     * @throws NoTargetIndexException if there are no indices in this index set yet
-     */
-    String getNewestIndex() throws NoTargetIndexException;
 
     /**
      * Returns the active write index.

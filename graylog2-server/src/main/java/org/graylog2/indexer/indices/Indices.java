@@ -191,8 +191,8 @@ public class Indices {
         return indicesAdapter.resolveAlias(alias);
     }
 
-    public void ensureIndexTemplate(BasicIndexSet indexSet) {
-        final BasicIndexSetConfig indexSetConfig = indexSet.getBasicConfig();
+    public void ensureIndexTemplate(BasicIndexSet<? extends BasicIndexSetConfig> indexSet) {
+        final BasicIndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
         try {
             var template = buildTemplate(indexSet, indexSetConfig);
@@ -216,7 +216,7 @@ public class Indices {
                 .toTemplate(indexSetMappingTemplate);
     }
 
-    Template buildTemplate(BasicIndexSet indexSet, BasicIndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
+    Template buildTemplate(BasicIndexSet<? extends BasicIndexSetConfig> indexSet, BasicIndexSetConfig indexSetConfig) throws IgnoreIndexTemplate {
         final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(indexSet, indexSetConfig, profileService);
         return indexMappingFactory.createIndexMapping(indexSetConfig)
                 .toTemplate(indexSetMappingTemplate, 0L);
@@ -231,12 +231,12 @@ public class Indices {
         }
     }
 
-    public boolean create(String indexName, BasicIndexSet indexSet) {
+    public boolean create(String indexName, BasicIndexSet<? extends BasicIndexSetConfig> indexSet) {
         return create(indexName, indexSet, null, null);
     }
 
     public boolean create(String indexName,
-                          BasicIndexSet indexSet,
+                          BasicIndexSet<? extends BasicIndexSetConfig> indexSet,
                           @Nullable Map<String, Object> indexMapping,
                           @Nullable Map<String, Object> indexSettings) {
         try {
@@ -244,11 +244,11 @@ public class Indices {
             ensureIndexTemplate(indexSet);
             Optional<IndexMappingTemplate> indexMappingTemplate = indexMapping(indexSet);
             IndexSettings settings = indexMappingTemplate
-                    .map(t -> t.indexSettings(indexSet.getBasicConfig(), indexSettings))
-                    .orElse(IndexMappingTemplate.createIndexSettings(indexSet.getBasicConfig()));
+                    .map(t -> t.indexSettings(indexSet.getConfig(), indexSettings))
+                    .orElse(IndexMappingTemplate.createIndexSettings(indexSet.getConfig()));
 
             Map<String, Object> mappings = indexMappingTemplate
-                    .map(t -> t.indexMappings(indexSet.getBasicConfig(), indexMapping))
+                    .map(t -> t.indexMappings(indexSet.getConfig(), indexMapping))
                     .orElse(null);
 
             indicesAdapter.create(indexName, settings, mappings);
@@ -265,16 +265,16 @@ public class Indices {
         return true;
     }
 
-    private Optional<IndexMappingTemplate> indexMapping(BasicIndexSet indexSet) {
+    private Optional<IndexMappingTemplate> indexMapping(BasicIndexSet<? extends BasicIndexSetConfig> indexSet) {
         try {
-            return Optional.of(indexMappingFactory.createIndexMapping(indexSet.getBasicConfig()));
+            return Optional.of(indexMappingFactory.createIndexMapping(indexSet.getConfig()));
         } catch (IgnoreIndexTemplate e) {
             return Optional.empty();
         }
     }
 
     public IndexSetMappingTemplate getTemplateIndexSetConfig(
-            final BasicIndexSet indexSet,
+            final BasicIndexSet<? extends BasicIndexSetConfig> indexSet,
             final BasicIndexSetConfig indexSetConfig,
             final IndexFieldTypeProfileService profileService) {
         final String profileId = indexSetConfig.fieldTypeProfile();
