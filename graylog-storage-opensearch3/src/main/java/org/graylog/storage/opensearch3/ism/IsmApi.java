@@ -87,6 +87,8 @@ public class IsmApi {
     }
 
     private <R> Optional<R> perform(Request request, TypeReference<R> responseClass, String errorMessage) {
+        // it would be nice if we could use the provided IsmClient, but this is currently not possible due to
+        // https://github.com/opensearch-project/opensearch-java/issues/1717 (fix submitted)
         return client.execute(() -> {
             Response response = genericClient.execute(request);
             if (response.getStatus() == 404) {
