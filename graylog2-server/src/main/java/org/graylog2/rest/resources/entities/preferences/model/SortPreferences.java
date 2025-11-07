@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 public record SortPreferences(@JsonProperty("field") String sortField,
                               @JsonProperty("order") SortOrder sortOrder) {
-    enum SortOrder {
+    public enum SortOrder {
         ASC("asc"), DESC("desc");
 
         private final String title;
