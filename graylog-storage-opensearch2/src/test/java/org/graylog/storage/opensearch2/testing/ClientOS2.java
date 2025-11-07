@@ -101,7 +101,7 @@ public class ClientOS2 implements Client {
 
     @Override
     public void createIndex(String index, int shards, int replicas) {
-        LOG.debug("Creating index " + index);
+        LOG.warn("Creating index " + index);
         final CreateIndexRequest createIndexRequest = new CreateIndexRequest(index);
         createIndexRequest.settings(
                 Settings.builder()
@@ -115,6 +115,7 @@ public class ClientOS2 implements Client {
     @Override
     public void deleteIndices(String... indices) {
         for (String index : indices) {
+            LOG.warn("Deleting index {}", index);
             if (indicesExists(index)) {
                 final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
                 client.execute((c, requestOptions) -> c.indices().delete(deleteIndexRequest, requestOptions));
@@ -327,7 +328,7 @@ public class ClientOS2 implements Client {
 
     @Override
     public void cleanUp() {
-        LOG.debug("Removing indices: " + String.join(",", existingIndices()));
+        LOG.warn("Removing indices: " + String.join(",", existingIndices()));
         deleteDataStreams();
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());

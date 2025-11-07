@@ -46,8 +46,7 @@ class EntitySourceLookupTest {
     private MongoCollection<ViewDTO> collection;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider objectMapperProvider) {
-        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongoDBTestService.mongoConnection());
+    void setUp(MongoCollections mongoCollections) {
         collection = mongoCollections.collection("views", ViewDTO.class);
     }
 

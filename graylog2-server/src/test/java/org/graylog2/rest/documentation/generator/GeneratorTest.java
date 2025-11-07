@@ -32,8 +32,8 @@ import jakarta.ws.rs.core.MediaType;
 import org.graylog2.rest.resources.HelloWorldResource;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.rest.documentation.generator.Generator;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
@@ -41,9 +41,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GeneratorTest {
 
@@ -67,7 +67,7 @@ public class GeneratorTest {
         }
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void init() {
         objectMapper = new ObjectMapper();
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

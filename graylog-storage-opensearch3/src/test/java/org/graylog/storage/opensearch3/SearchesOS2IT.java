@@ -17,12 +17,12 @@
 package org.graylog.storage.opensearch3;
 
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.searches.SearchesIT;
-import org.junit.Rule;
 
 public class SearchesOS2IT extends SearchesIT {
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override

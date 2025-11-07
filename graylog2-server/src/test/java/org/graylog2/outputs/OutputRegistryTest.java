@@ -33,12 +33,13 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamMock;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Date;
@@ -46,15 +47,18 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OutputRegistryTest {
     private static final long FAULT_COUNT_THRESHOLD = 5;
     private static final long FAULT_PENALTY_SECONDS = 30;
@@ -62,9 +66,6 @@ public class OutputRegistryTest {
     private static final String OUTPUT_ID2 = ObjectId.get().toHexString();
     private static final String OUTPUT_ID3 = ObjectId.get().toHexString();
     private static final String OUTPUT_ID4 = ObjectId.get().toHexString();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private MessageOutput messageOutput;
@@ -81,7 +82,7 @@ public class OutputRegistryTest {
 
     private OutputRegistry registry;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         registry = new OutputRegistry(messageOutput, outputService, messageOutputFactory, null,
                 null, eventBus, streamService, FAULT_COUNT_THRESHOLD, FAULT_PENALTY_SECONDS);
@@ -90,12 +91,13 @@ public class OutputRegistryTest {
     @Test
     public void testMessageOutputsIncludesDefault() {
         Set<MessageOutput> outputs = registry.getMessageOutputs();
-        assertSame("we should only have the default MessageOutput", Iterables.getOnlyElement(outputs, null), messageOutput);
+        assertSame(Iterables.getOnlyElement(outputs, null), messageOutput, "we should only have the default MessageOutput");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testThrowExceptionForUnknownOutputType() throws Exception {
-        registry.launchOutput(output, null);
+        assertThrows(IllegalArgumentException.class, () ->
+            registry.launchOutput(output, null));
     }
 
     @Test

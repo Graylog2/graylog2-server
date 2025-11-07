@@ -108,12 +108,12 @@ class V20230601104500_AddSourcesPageV2Test {
     }
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb) {
+    void setUp(MongoDBTestService mongodb, MongoCollections mongoCollections) {
         var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         var mongoConnection = mongodb.mongoConnection();
-        ContentPackPersistenceService contentPackPersistenceService = new ContentPackPersistenceService(mapperProvider, mongoConnection, streamService);
+        ContentPackPersistenceService contentPackPersistenceService = new ContentPackPersistenceService(mongoCollections, streamService);
         ContentPackInstallationPersistenceService contentPackInstallationPersistenceService =
-                new ContentPackInstallationPersistenceService(new MongoCollections(mapperProvider, mongoConnection));
+                new ContentPackInstallationPersistenceService(mongoCollections);
         ContentPackService contentPackService = new TestContentPackService();
         this.migration = new V20230601104500_AddSourcesPageV2(contentPackService, objectMapper, clusterConfigService,
                 contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService, configuration);

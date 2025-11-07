@@ -29,16 +29,16 @@ import org.graylog.plugins.views.search.engine.monitoring.collection.NoOpStatsCo
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchResponse;
 import org.graylog.storage.opensearch3.testing.TestMultisearchResponse;
-import org.graylog.storage.opensearch3.views.ViewsUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Set;
@@ -49,9 +49,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTestBase {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Mock
     protected IndexLookup indexLookup;
@@ -64,7 +64,7 @@ public class OpenSearchBackendErrorHandlingTest extends OpensearchMockedClientTe
     static abstract class DummyHandler implements OSSearchTypeHandler<SearchType> {
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.backend = new OpenSearchBackend(
                 ImmutableMap.of(

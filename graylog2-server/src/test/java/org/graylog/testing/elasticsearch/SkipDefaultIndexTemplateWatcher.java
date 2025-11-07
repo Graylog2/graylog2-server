@@ -16,28 +16,38 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import org.junit.rules.TestWatcher;
-import org.junit.runner.Description;
+import jakarta.annotation.Nonnull;
+import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
 
 /**
- * Checks if a test method is using the {@link SkipDefaultIndexTemplate} annotation and exposes that information
- * with the {@link #shouldSkip()} method.
+ * JUnit extension that checks for SkipDefaultIndexTemplate annotations on test methods and supports injecting
+ * a boolean parameter into lifecycle or test methods using the same annotation.
+ * This avoids exposing inner state of this extension and is a more idiomatic way to do this with the JUnit extension API.
  */
-public class SkipDefaultIndexTemplateWatcher extends TestWatcher {
-    private boolean skipIndexTemplateCreation = false;
+public class SkipDefaultIndexTemplateWatcher implements BeforeEachCallback, ParameterResolver {
+    private static final Namespace NAMESPACE = Namespace.create(SkipDefaultIndexTemplateWatcher.class);
 
     @Override
-    protected void starting(Description description) {
-        final SkipDefaultIndexTemplate skip = description.getAnnotation(SkipDefaultIndexTemplate.class);
-        this.skipIndexTemplateCreation = skip != null;
+    public void beforeEach(ExtensionContext context) throws Exception {
+        boolean hasAnnotation = context.getRequiredTestMethod().isAnnotationPresent(SkipDefaultIndexTemplate.class);
+        context.getStore(NAMESPACE).put(context.getUniqueId(), hasAnnotation);
     }
 
-    /**
-     * Returns true when the currently executed test method has the {@link SkipDefaultIndexTemplate} annotation.
-     *
-     * @return true when the current test method has the annotation, false otherwise
-     */
-    public boolean shouldSkip() {
-        return skipIndexTemplateCreation;
+    @Override
+    public boolean supportsParameter(ParameterContext parameterContext, @Nonnull ExtensionContext extensionContext) throws ParameterResolutionException {
+        return parameterContext.getParameter().getType() == boolean.class
+                && parameterContext.isAnnotated(SkipDefaultIndexTemplate.class);
+    }
+
+    @Override
+    public @Nullable Object resolveParameter(@Nonnull ParameterContext parameterContext, @Nonnull ExtensionContext extensionContext) throws ParameterResolutionException {
+        return extensionContext.getStore(NAMESPACE)
+                .getOrDefault(extensionContext.getUniqueId(), Boolean.class, false);
     }
 }

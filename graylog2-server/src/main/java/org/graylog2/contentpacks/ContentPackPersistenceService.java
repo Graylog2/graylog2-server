@@ -71,12 +71,10 @@ public class ContentPackPersistenceService {
     private final MongoCollection<ContentPack> collection;
 
     @Inject
-    public ContentPackPersistenceService(final MongoJackObjectMapperProvider mapperProvider,
-                                         final MongoConnection mongoConnection, final StreamService streamService) {
+    public ContentPackPersistenceService(final MongoCollections mongoCollections, final StreamService streamService) {
         this.streamService = streamService;
-        this.mongoConnection = mongoConnection;
-        this.collection = new MongoCollections(mapperProvider, mongoConnection)
-                .nonEntityCollection(COLLECTION_NAME, ContentPack.class);
+        this.mongoConnection = mongoCollections.connection();
+        this.collection = mongoCollections.nonEntityCollection(COLLECTION_NAME, ContentPack.class);
 
         try {
             collection.createIndex(

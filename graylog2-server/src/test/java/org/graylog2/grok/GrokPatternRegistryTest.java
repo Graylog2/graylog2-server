@@ -20,13 +20,13 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.krakens.grok.api.Grok;
 import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Set;
@@ -34,24 +34,22 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class GrokPatternRegistryTest {
     private static final GrokPattern GROK_PATTERN = GrokPattern.create("TESTNUM", "[0-9]+");
     private static final Set<GrokPattern> GROK_PATTERNS = Collections.singleton(GROK_PATTERN);
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     private GrokPatternRegistry grokPatternRegistry;
     private EventBus eventBus;
     @Mock
     private GrokPatternService grokPatternService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         eventBus = new EventBus("Test");
         final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("updater-%d").build());
@@ -76,15 +74,16 @@ public class GrokPatternRegistryTest {
 
     @Test
     public void cachedGrokForPatternThrowsRuntimeException() {
-        expectedException.expectMessage("No definition for key 'EMPTY' found, aborting");
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectCause(Matchers.any(IllegalArgumentException.class));
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
 
-        final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
-        when(grokPatternService.loadAll()).thenReturn(newPatterns);
-        eventBus.post(GrokPatternsUpdatedEvent.create(Collections.singleton("EMPTY")));
+            final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
+            when(grokPatternService.loadAll()).thenReturn(newPatterns);
+            eventBus.post(GrokPatternsUpdatedEvent.create(Collections.singleton("EMPTY")));
 
-        grokPatternRegistry.cachedGrokForPattern("%{EMPTY}");
+            grokPatternRegistry.cachedGrokForPattern("%{EMPTY}");
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("No definition for key 'EMPTY' found, aborting"));
+        assertThat(exception.getCause()).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -95,15 +94,16 @@ public class GrokPatternRegistryTest {
 
     @Test
     public void cachedGrokForPatternWithNamedCaptureOnlyThrowsRuntimeException() {
-        expectedException.expectMessage("No definition for key 'EMPTY' found, aborting");
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectCause(Matchers.any(IllegalArgumentException.class));
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
 
-        final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
-        when(grokPatternService.loadAll()).thenReturn(newPatterns);
-        eventBus.post(GrokPatternsUpdatedEvent.create(Collections.singleton("EMPTY")));
+            final Set<GrokPattern> newPatterns = Collections.singleton(GrokPattern.create("EMPTY", ""));
+            when(grokPatternService.loadAll()).thenReturn(newPatterns);
+            eventBus.post(GrokPatternsUpdatedEvent.create(Collections.singleton("EMPTY")));
 
-        grokPatternRegistry.cachedGrokForPattern("%{EMPTY}", true);
+            grokPatternRegistry.cachedGrokForPattern("%{EMPTY}", true);
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("No definition for key 'EMPTY' found, aborting"));
+        assertThat(exception.getCause()).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

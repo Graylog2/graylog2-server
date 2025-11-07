@@ -21,8 +21,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.jayway.jsonpath.JsonPath;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -43,7 +43,7 @@ public class HTTPJSONPathDataAdapterTest {
     private InputStream body;
     private InputStream emptyBody;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.body = new ByteArrayInputStream(new ObjectMapper().writeValueAsBytes(JSON));
         this.emptyBody = new ByteArrayInputStream(new ObjectMapper().writeValueAsBytes(Collections.emptyMap()));

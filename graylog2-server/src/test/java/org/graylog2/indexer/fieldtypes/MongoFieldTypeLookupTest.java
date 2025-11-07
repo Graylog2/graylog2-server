@@ -17,14 +17,11 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,23 +30,16 @@ import java.util.Set;
 import static com.google.common.collect.ImmutableSet.of;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class MongoFieldTypeLookupTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private IndexFieldTypesService dbService;
     private MongoFieldTypeLookup lookup;
 
-    @Before
-    public void setUp() throws Exception {
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        this.dbService = new IndexFieldTypesService(new MongoCollections(objectMapperProvider, mongodb.mongoConnection()));
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.dbService = new IndexFieldTypesService(mongoCollections);
         this.lookup = new MongoFieldTypeLookup(dbService, new FieldTypeMapper());
-    }
-
-    @After
-    public void tearDown() {
-        mongodb.mongoConnection().getMongoDatabase().drop();
     }
 
     private IndexFieldTypesDTO createDto(String indexName, String indexSetId, Set<FieldTypeDTO> fields) {

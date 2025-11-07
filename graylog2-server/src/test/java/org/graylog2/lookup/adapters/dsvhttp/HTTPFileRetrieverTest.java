@@ -21,24 +21,21 @@ import mockwebserver3.MockWebServer;
 import mockwebserver3.RecordedRequest;
 import okhttp3.Headers;
 import okhttp3.OkHttpClient;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class HTTPFileRetrieverTest {
     private MockWebServer server;
 
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
-
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         server = new MockWebServer();
     }
@@ -132,13 +129,14 @@ public class HTTPFileRetrieverTest {
 
         final HTTPFileRetriever httpFileRetriever = new HTTPFileRetriever(new OkHttpClient());
 
-        expectedException.expect(IOException.class);
-        expectedException.expectMessage("Request failed: Server Error");
+        Throwable exception = assertThrows(IOException.class, () -> {
 
-        final Optional<String> ignored = httpFileRetriever.fetchFileIfNotModified(server.url("/").toString());
+            final Optional<String> ignored = httpFileRetriever.fetchFileIfNotModified(server.url("/").toString());
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Request failed: Server Error"));
     }
 
-    @After
+    @AfterEach
     public void shutDown() throws IOException {
         if (server != null) {
             server.close();

@@ -418,12 +418,6 @@
 
             <!-- Test dependencies -->
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
                 <version>${assertj-core.version}</version>
@@ -467,6 +461,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>name.falgout.jeffrey.testing.junit5</groupId>
+                <artifactId>guice-extension</artifactId>
+                <version>${guice-extension.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>nl.jqno.equalsverifier</groupId>
                 <artifactId>equalsverifier</artifactId>
                 <version>${equalsverifier.version}</version>
@@ -505,12 +505,6 @@
                         <artifactId>api-ldap-schema-data</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>com.github.stefanbirkner</groupId>
-                <artifactId>system-rules</artifactId>
-                <version>${system-rules.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>

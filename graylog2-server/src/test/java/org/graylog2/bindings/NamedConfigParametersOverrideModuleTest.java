@@ -21,7 +21,7 @@ import com.google.inject.CreationException;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Key;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 

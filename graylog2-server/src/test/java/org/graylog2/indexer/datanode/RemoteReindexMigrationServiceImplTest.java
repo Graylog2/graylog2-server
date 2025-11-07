@@ -19,9 +19,7 @@ package org.graylog2.indexer.datanode;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.OptionalAssert;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.indexer.migration.LogEntry;
 import org.graylog2.indexer.migration.LogLevel;
@@ -41,9 +39,8 @@ class RemoteReindexMigrationServiceImplTest {
     private RemoteReindexMigrationService migrationService;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
-        migrationService = new RemoteReindexMigrationServiceImpl(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
+    void setUp(MongoCollections mongoCollections) {
+        migrationService = new RemoteReindexMigrationServiceImpl(mongoCollections);
     }
 
     @Test

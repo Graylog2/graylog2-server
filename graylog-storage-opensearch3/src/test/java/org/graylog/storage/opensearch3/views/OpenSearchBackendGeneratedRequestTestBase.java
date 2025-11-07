@@ -32,7 +32,6 @@ import org.graylog.plugins.views.search.searchtypes.pivot.series.Average;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.storage.opensearch3.views.ViewsUtils;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.EffectiveTimeRangeExtractor;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivot;
@@ -44,13 +43,10 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.streams.StreamService;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,8 +58,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 public class OpenSearchBackendGeneratedRequestTestBase extends OpensearchMockedClientTestBase {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     OpenSearchBackend openSearchBackend;
 
@@ -75,7 +69,7 @@ public class OpenSearchBackendGeneratedRequestTestBase extends OpensearchMockedC
     @Captor
     protected ArgumentCaptor<List<SearchRequest>> clientRequestCaptor;
 
-    @Before
+    @BeforeEach
     public void setUpSUT() {
         this.elasticSearchTypeHandlers = new HashMap<>();
         final Map<String, OSPivotBucketSpecHandler<? extends BucketSpec>> bucketHandlers = Collections.emptyMap();

@@ -39,11 +39,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;
@@ -54,13 +51,10 @@ import static org.graylog.storage.opensearch3.views.ViewsUtils.indicesOf;
 import static org.mockito.Mockito.when;
 
 public class OpenSearchBackendSearchTypeOverridesTest extends OpenSearchBackendGeneratedRequestTestBase {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
     private SearchJob searchJob;
     private Query query;
 
-    @Before
+    @BeforeEach
     public void setUpFixtures() throws InvalidRangeParametersException {
         final Set<SearchType> searchTypes = Set.of(
                 Pivot.builder()

@@ -19,9 +19,7 @@ package org.graylog2.rest.resources.entities.preferences.listeners;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.util.concurrent.MoreExecutors;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
@@ -50,11 +48,9 @@ class EntityListPreferencesCleanerOnUserDeletionTest {
     private EntityListPreferencesCleanerOnUserDeletion listener;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider objectMapperProvider) {
+    void setUp(MongoCollections mongoCollections) {
         this.eventBus = new AsyncEventBus(MoreExecutors.directExecutor());
-        this.service = Mockito.spy(new EntityListPreferencesServiceImpl(
-                new MongoCollections(objectMapperProvider, mongodb.mongoConnection())));
+        this.service = Mockito.spy(new EntityListPreferencesServiceImpl(mongoCollections));
         this.listener = new EntityListPreferencesCleanerOnUserDeletion(eventBus, service);
     }
 

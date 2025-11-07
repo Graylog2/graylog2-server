@@ -25,14 +25,14 @@ import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.PaginationOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.TestResultMessageFactory;
-import org.junit.Rule;
 
 public class MoreSearchAdapterOS2UsingPaginationIT extends MoreSearchAdapterIT {
 
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
