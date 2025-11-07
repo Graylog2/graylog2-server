@@ -49,7 +49,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.shared.users.UserService;
-import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamMock;
@@ -87,8 +86,6 @@ public class StreamFacadeTest {
     private IndexSetService indexSetService;
     @Mock
     private UserService userService;
-    @Mock
-    private FavoriteFieldsService favoriteFieldsService;
 
     private ObjectMapper objectMapper;
     private StreamFacade facade;
@@ -103,7 +100,7 @@ public class StreamFacadeTest {
         streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
                 mock(OutputService.class), indexSetService, mock(MongoIndexSet.Factory.class), mock(EntityRegistrar.class),
                 mock(ClusterEventBus.class), Set.of(), new EntityScopeService(entityScopes));
-        this.facade = new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService, favoriteFieldsService);
+        this.facade = new StreamFacade(objectMapper, streamService, streamRuleService, indexSetService, userService);
     }
 
     @Test
