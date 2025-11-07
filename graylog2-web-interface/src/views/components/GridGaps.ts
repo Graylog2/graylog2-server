@@ -57,7 +57,6 @@ const itemsOverlap = (items: Position[]) => {
 
   const grid = [];
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const item of items) {
     if (placeItemInGrid(grid, item, true)) {
       return true;

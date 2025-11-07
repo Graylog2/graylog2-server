@@ -85,19 +85,16 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private final ES7ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
-    private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
 
     @Inject
     public MoreSearchAdapterES7(ES7ResultMessageFactory resultMessageFactory,
                                 ElasticsearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
-                                SortOrderMapper sortOrderMapper,
                                 MultiChunkResultRetriever multiChunkResultRetriever) {
         this.resultMessageFactory = resultMessageFactory;
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.sortOrderMapper = sortOrderMapper;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
     }
 
@@ -252,7 +249,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     }
 
     private List<FieldSortBuilder> createSorting(Sorting sorting) {
-        final SortOrder order = sortOrderMapper.fromSorting(sorting);
+        final SortOrder order = SortOrder.valueOf(sorting.getUppercasedDirection());
         final List<FieldSortBuilder> sortBuilders;
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
             sortBuilders = List.of(

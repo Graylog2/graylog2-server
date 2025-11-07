@@ -32,11 +32,6 @@ public class UnsupportedRemoteReindexingMigrationAdapterES7 implements RemoteRei
     public static final String UNSUPPORTED_MESSAGE = "This operation should never be called. We remote-reindex into the DataNode that contains OpenSearch. This adapter only exists for API completeness";
 
     @Override
-    public boolean isMigrationRunning(IndexSet indexSet) {
-        return false; // we'll never run a remote reindex migration against elasticsearch target. It's always OS in datanode.
-    }
-
-    @Override
     public String start(RemoteReindexRequest request) {
         throw new UnsupportedOperationException(UNSUPPORTED_MESSAGE);
     }

@@ -119,6 +119,8 @@ public interface Stream {
 
     String getIndexSetId();
 
+    List<String> getFavoriteFields();
+
     /**
      * A hash code for the stream based on stream routing related fields to determine if
      * {@link org.graylog2.streams.StreamRouter} needs to reload its engine.
