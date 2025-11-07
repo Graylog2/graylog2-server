@@ -112,7 +112,7 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toSet());
         final StreamEntity streamEntity = StreamEntity.create(
                 ValueReference.of(stream.getTitle()),
-                ValueReference.of(stream.getDescription()),
+                ValueReference.ofNullable(stream.getDescription()),
                 ValueReference.of(stream.getDisabled()),
                 ValueReference.of(stream.getMatchingType()),
                 streamRules,
@@ -159,7 +159,7 @@ public class StreamFacade implements EntityFacade<Stream> {
         final StreamEntity streamEntity = objectMapper.convertValue(entity.data(), StreamEntity.class);
         final CreateStreamRequest createStreamRequest = CreateStreamRequest.create(
                 streamEntity.title().asString(parameters),
-                streamEntity.description().asString(parameters),
+                streamEntity.description() == null ? null : streamEntity.description().asString(parameters),
                 null, // ignored
                 null,
                 streamEntity.matchingType().asString(parameters),
