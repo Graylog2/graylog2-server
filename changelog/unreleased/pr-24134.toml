@@ -1,0 +1,5 @@
+type = "f"
+message = "Add alert_severity_level as numeric field in index templates to make sure that it's always numeric for aggregations."
+
+issues = ["graylog-plugin-enterprise#7588"]
+pulls = ["24134"]
