@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo } from 'react';
 import uniq from 'lodash/uniq';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
@@ -30,7 +30,6 @@ const useCheckboxStatus = <Entity extends EntityBase>(
   data: Readonly<Array<Entity>>,
   selectedEntityIds: Array<string>,
 ) => {
-  const checkboxRef = useRef<HTMLInputElement>();
   const checkboxStatus: CheckboxStatus = useMemo(() => {
     const selectedEntities = data.filter(({ id }) => selectedEntityIds.includes(id));
 
@@ -45,20 +44,7 @@ const useCheckboxStatus = <Entity extends EntityBase>(
     return 'PARTIAL';
   }, [data, selectedEntityIds]);
 
-  useEffect(() => {
-    if (checkboxRef.current) {
-      if (checkboxStatus === 'PARTIAL') {
-        checkboxRef.current.indeterminate = true;
-
-        return;
-      }
-
-      checkboxRef.current.indeterminate = false;
-    }
-  }, [checkboxStatus]);
-
   return {
-    checkboxRef,
     checkboxStatus,
   };
 };
@@ -76,7 +62,7 @@ export const BulkSelectHeadContent = <Entity extends EntityBase>({
   getTitle = getDefaultTitle,
 }: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
+  const { checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = getTitle(checkboxStatus);
 
   const onBulkSelect = () => {
@@ -93,9 +79,7 @@ export const BulkSelectHeadContent = <Entity extends EntityBase>({
 
   return (
     <RowCheckbox
-      inputRef={(ref) => {
-        checkboxRef.current = ref;
-      }}
+      indeterminate={checkboxStatus === 'PARTIAL'}
       onChange={onBulkSelect}
       checked={checkboxStatus === 'CHECKED'}
       title={title}

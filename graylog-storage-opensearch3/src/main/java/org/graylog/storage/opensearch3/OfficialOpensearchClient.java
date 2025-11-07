@@ -54,9 +54,27 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         }
     }
 
+    public <T> T sync(ThrowingFunction<T> operation, String errorMessage) {
+        try {
+            return operation.apply(sync);
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
     public <T> CompletableFuture<T> executeAsync(ThrowingSupplier<CompletableFuture<T>> operation, String errorMessage) {
         try {
             return operation.get().exceptionally(ex -> {
+                throw mapException(ex, errorMessage);
+            });
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    public <T> CompletableFuture<T> async(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage) {
+        try {
+            return operation.apply(async).exceptionally(ex -> {
                 throw mapException(ex, errorMessage);
             });
         } catch (Throwable t) {
@@ -92,6 +110,16 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
     @FunctionalInterface
     public interface ThrowingSupplier<T> {
         T get() throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface ThrowingFunction<T> {
+        T apply(OpenSearchClient syncClient) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface ThrowingAsyncFunction<T> {
+        T apply(OpenSearchAsyncClient syncClient) throws Exception;
     }
 
     public static RuntimeException mapException(Throwable t, String message) {

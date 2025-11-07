@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -143,6 +143,9 @@ const IndexSetConfigurationForm = ({
     setHiddenFields(tmpHidden);
   }, [indexSet]);
 
+  const isDataTieringImmutable = useMemo(() => immutableFields.includes('data_tiering'), [immutableFields]);
+  const isDataTieringLocked = isDataTieringImmutable && !ignoreFieldRestrictions;
+
   const prepareRetentionConfigBeforeSubmit = useCallback(
     (values: IndexSetFormValues): IndexSet => {
       const indexSetValues = values;
@@ -171,7 +174,7 @@ const IndexSetConfigurationForm = ({
 
       const configWithDataTiering = {
         ...indexSetValues,
-        data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore),
+        data_tiering: prepareDataTieringConfig(values.data_tiering, PluginStore, isDataTieringLocked),
       };
 
       if (loadingIndexSetTemplateDefaults || !indexSetTemplateDefaults)
@@ -193,6 +196,7 @@ const IndexSetConfigurationForm = ({
       selectedRetentionSegment,
       enableDataTieringCloud,
       isCloud,
+      isDataTieringLocked,
     ],
   );
 
@@ -232,7 +236,10 @@ const IndexSetConfigurationForm = ({
 
   const prepareInitialValues = () => {
     if (indexSet.data_tiering) {
-      return { ...indexSet, data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore) };
+      return {
+        ...indexSet,
+        data_tiering: prepareDataTieringInitialValues(indexSet.data_tiering, PluginStore, isDataTieringLocked),
+      };
     }
 
     return indexSet as unknown as IndexSetFormValues;
