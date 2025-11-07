@@ -70,6 +70,16 @@ public abstract class Tool<P, O> {
             TypeReference<O> outputType,
             String name,
             String title,
+            String description) {
+        this(context, parameterType, outputType, name, title, description, true);
+    }
+
+    protected Tool(
+            ToolContext context,
+            TypeReference<P> parameterType,
+            TypeReference<O> outputType,
+            String name,
+            String title,
             String description,
             boolean readOnly) {
         this.parameterType = parameterType;
