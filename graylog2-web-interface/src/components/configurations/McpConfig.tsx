@@ -123,7 +123,7 @@ const McpConfig = () => {
     const is_structured: boolean = outputValue === "json";
     setModalConfig({
       ...modalConfig,
-      use_simple_output: is_structured,
+      use_simple_output: !is_structured,
       enable_output_schema: is_structured && modalConfig.enable_output_schema });
   };
 
