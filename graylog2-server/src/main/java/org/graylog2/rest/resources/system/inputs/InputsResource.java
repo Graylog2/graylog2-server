@@ -52,6 +52,7 @@ import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -174,6 +175,7 @@ public class InputsResource extends AbstractInputsResource {
 
     @POST
     @ApiOperation(value = "Bulk retrieval of input metadata")
+    @NoAuditEvent("Test resource - doesn't change any data")
     @Path("meta/retrieve")
     public List<PipelineInputsMetadataDao> pipelineMetadataBulk(
             @NotNull @ApiParam(name = "JSON body", required = true) @NotNull List<String> inputIds) {
