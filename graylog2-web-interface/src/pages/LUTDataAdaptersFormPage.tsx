@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
@@ -23,6 +24,12 @@ import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { useFetchDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { DataAdapterCreate } from 'components/lookup-tables';
+
+const FlexCol = styled(Col)`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
 
 function LUTDataAdaptersFormPage() {
   const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
@@ -42,13 +49,13 @@ function LUTDataAdaptersFormPage() {
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
-          <Col md={12}>
+          <FlexCol md={12}>
             {loadingDataAdapter ? (
               <Spinner text="Loading Data Adapter" />
             ) : (
               <DataAdapterCreate onCancel={navigateBack} saved={navigateBack} adapter={dataAdapter} />
             )}
-          </Col>
+          </FlexCol>
         </Row>
       </LUTPageLayout>
     </div>

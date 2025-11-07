@@ -16,14 +16,9 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { Select } from 'components/common';
-import { Row, Col, Input } from 'components/bootstrap';
-import { DataAdapterForm } from 'components/lookup-tables';
-import ObjectUtils from 'util/ObjectUtils';
-import { useFetchDataAdapterTypes } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { Row, Col } from 'components/bootstrap';
+import { DataAdapterForm, DataAdapterTypeSelect } from 'components/lookup-tables';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 type DataAdapterCreateProps = {
@@ -38,113 +33,43 @@ const StyledRow = styled(Row)`
   justify-content: center;
 `;
 
-const DataAdapterCreate = ({ saved = undefined, onCancel, adapter = undefined }: DataAdapterCreateProps) => {
-  const [type, setType] = React.useState<string | undefined>(adapter?.config?.type);
+const FlexCol = styled(Col)`
+  display: flex;
+  flex-direction: column;
+`;
+
+const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined }: DataAdapterCreateProps) => {
   const [dataAdapter, setDataAdapter] = React.useState<LookupTableAdapter>(adapter);
-  const { types, fetchingDataAdapterTypes } = useFetchDataAdapterTypes();
-
-  const adapterPlugins = React.useMemo(() => {
-    const plugins = {};
-    PluginStore.exports('lookupTableAdapters').forEach((p) => {
-      plugins[p.type] = p;
-    });
-
-    return plugins;
-  }, []);
-
-  const sortedAdapters = React.useMemo(() => {
-    if (!fetchingDataAdapterTypes) {
-      return Object.keys(types)
-        .map((key) => {
-          const typeItem = types[key];
-
-          if (!adapterPlugins[typeItem.type]) {
-            // eslint-disable-next-line no-console
-            console.error(
-              `Plugin component for data adapter type ${typeItem.type} is missing - invalid or missing plugin?`,
-            );
-
-            return {
-              value: typeItem.type,
-              disabled: true,
-              label: `${typeItem.type} - missing or invalid plugin`,
-            };
-          }
-
-          return {
-            value: typeItem.type,
-            label: adapterPlugins[typeItem.type].displayName,
-          };
-        })
-        .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
-    }
-
-    return [];
-  }, [types, fetchingDataAdapterTypes, adapterPlugins]);
-
-  const getCorrectUserpasswd = (config: LookupTableAdapter['config']) => {
-    if (config.user_passwd.is_set) return { is_set: true, keep_value: true };
-
-    return { set_value: '' };
-  };
-
-  const handleTypeSelect = React.useCallback(
-    (adapterType: string) => {
-      const defaultConfig = ObjectUtils.clone(types[adapterType].default_config);
-      const isLDAP = defaultConfig.type === 'LDAP';
-
-      const configWithPassword = {
-        ...defaultConfig,
-        ...(isLDAP ? { user_passwd: getCorrectUserpasswd(defaultConfig) } : {}),
-      };
-
-      setType(adapterType);
-      setDataAdapter({
-        id: null,
-        title: '',
-        name: '',
-        description: '',
-        config: configWithPassword,
-      });
-    },
-    [types],
-  );
+  const isCreate = React.useMemo(() => !dataAdapter?.id, [dataAdapter]);
 
   return (
-    <div>
-      <StyledRow>
-        <Col lg={6}>
-          <Input
-            id="data-adapter-type-select"
-            label="Data Adapter Type"
-            required
-            help="The type of data adapter to configure.">
-            <Select
-              placeholder="Select Data Adapter Type"
-              clearable={false}
-              options={sortedAdapters}
-              onChange={handleTypeSelect}
-              value={dataAdapter ? dataAdapter.config.type : null}
-            />
-          </Input>
-        </Col>
-      </StyledRow>
-      {dataAdapter && (
+    <>
+      {isCreate && (
         <StyledRow>
-          <Col lg={9}>
-            <DataAdapterForm
-              dataAdapter={dataAdapter}
-              type={type}
-              create={!dataAdapter?.id}
-              title="Configure Adapter"
-              saved={saved}
-              onCancel={onCancel}
+          <Col lg={6}>
+            <DataAdapterTypeSelect
+              adapterConfigType={dataAdapter ? dataAdapter.config.type : null}
+              onAdapterChange={setDataAdapter}
             />
           </Col>
         </StyledRow>
       )}
-    </div>
+      {dataAdapter && (
+        <StyledRow style={{ flexGrow: 1 }}>
+          <FlexCol lg={9}>
+            <DataAdapterForm
+              dataAdapter={dataAdapter}
+              type={dataAdapter?.config?.type}
+              create={isCreate}
+              title="Configure Adapter"
+              saved={saved}
+              onCancel={onCancel}
+            />
+          </FlexCol>
+        </StyledRow>
+      )}
+    </>
   );
 };
 
-export default DataAdapterCreate;
+export default DataAdapterFormView;
