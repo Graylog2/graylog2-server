@@ -23,6 +23,7 @@ import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.slf4j.Logger;
@@ -81,7 +82,14 @@ public class V20251030000000_CloudTrailInputConfigMigration extends Migration {
                         needsUpdate = true;
                     }
 
+                    // Remove codec-level charset_name field if present (artifact from previous saves)
+                    if (config.containsKey(Codec.Config.CK_CHARSET_NAME)) {
+                        config.remove(Codec.Config.CK_CHARSET_NAME);
+                        needsUpdate = true;
+                    }
+
                     if (needsUpdate) {
+                        // Reconstruct the input to ensure clean configuration matching UI flow
                         final MessageInput messageInput = inputService.getMessageInput(input);
                         messageInput.checkConfiguration();
                         final Input reconstructedInput = inputService.create(messageInput.asMap());
