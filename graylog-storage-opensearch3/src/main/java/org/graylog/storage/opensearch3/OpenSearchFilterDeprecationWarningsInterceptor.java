@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3;
 
+import org.apache.hc.core5.http.EntityDetails;
 import org.graylog.shaded.opensearch2.org.apache.http.Header;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpException;
 import org.graylog.shaded.opensearch2.org.apache.http.HttpResponse;
@@ -29,8 +30,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 // TODO: check, if these messages still need filtering
-public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor {
-    private String[] messagesToFilter = {
+public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpResponseInterceptor, org.apache.hc.core5.http.HttpResponseInterceptor {
+    private final String[] messagesToFilter = {
             "setting was deprecated in OpenSearch",
             "but in a future major version, direct access to system indices and their aliases will not be allowed",
             "but in a future major version, direct access to system indices will be prevented by default",
@@ -45,11 +46,21 @@ public class OpenSearchFilterDeprecationWarningsInterceptor implements HttpRespo
         return false;
     }
 
+    /**
+     * OS2 Implementation, remove with the rest of OS2 client
+     */
+    @Deprecated(forRemoval = true)
     @Override
-    public void process(HttpResponse response, HttpContext context) throws
-            HttpException, IOException {
+    public void process(HttpResponse response, HttpContext context) {
         List<Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).collect(Collectors.toList());
         response.removeHeaders("Warning");
-        warnings.stream().forEach(header -> response.addHeader(header));
+        warnings.forEach(response::addHeader);
+    }
+
+    @Override
+    public void process(org.apache.hc.core5.http.HttpResponse response, EntityDetails entity, org.apache.hc.core5.http.protocol.HttpContext context) {
+        List<org.apache.hc.core5.http.Header> warnings = Arrays.stream(response.getHeaders("Warning")).filter(header -> !this.isDeprecationMessage(header.getValue())).toList();
+        response.removeHeaders("Warning");
+        warnings.forEach(response::addHeader);
     }
 }
