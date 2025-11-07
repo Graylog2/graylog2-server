@@ -16,32 +16,22 @@
  */
 
 import React from 'react';
-import styled, { css } from 'styled-components';
 
 import type { MessageFieldsListProps } from 'views/components/messagelist/MessageFields/types';
 import MessageField from 'views/components/messagelist/MessageField';
 import { MessageDetailsDL } from 'views/components/messagelist/MessageFields/MessageFields';
 
-const Container = styled.div(
-  ({ theme }) => css`
-    margin-left: ${theme.spacings.sm};
-  `,
-);
-
-const MessageFieldsViewModeList = ({ fields, message, isFavorite }: MessageFieldsListProps) => {
+const MessageFieldsViewModeList = ({ fields }: MessageFieldsListProps) => {
   if (!fields.length) return null;
 
   return (
-    <>
-      <h6>{isFavorite ? 'Favorites' : 'Details'}</h6>
-      <Container>
-        <MessageDetailsDL className="message-details-fields">
-          {fields.map(({ field, value, type }) => (
-            <MessageField key={field} fieldName={field} fieldType={type} message={message} value={value} />
-          ))}
-        </MessageDetailsDL>
-      </Container>
-    </>
+    <div>
+      <MessageDetailsDL className="message-details-fields">
+        {fields.map(({ field, value, type }) => (
+          <MessageField key={field} fieldName={field} fieldType={type} value={value} />
+        ))}
+      </MessageDetailsDL>
+    </div>
   );
 };
 

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import Field from 'views/components/Field';
@@ -22,6 +22,7 @@ import Value from 'views/components/Value';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 import { FULL_MESSAGE_FIELD } from 'views/Constants';
 import useActiveQueryId from 'views/hooks/useActiveQueryId';
+import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 
 import DecoratedValue from './decoration/DecoratedValue';
 import type { Message } from './Types';
@@ -33,7 +34,6 @@ const SPECIAL_FIELDS = [FULL_MESSAGE_FIELD, 'level'];
 type Props = {
   fieldName: string;
   fieldType: FieldType;
-  message: Message;
   value: any;
 };
 
@@ -107,15 +107,19 @@ export const MessageFieldValue = ({ message, fieldName, fieldType, value }: Mess
   );
 };
 
-const MessageField = ({ fieldName, fieldType, message, value }: Props) => (
-  <>
-    <dt data-testid={`message-field-name-${fieldName}`}>
-      <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
-    </dt>
-    <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
-      <MessageFieldValue value={value} fieldName={fieldName} fieldType={fieldType} message={message} />
-    </DefinitionDescription>
-  </>
-);
+const MessageField = ({ fieldName, fieldType, value }: Props) => {
+  const { message } = useContext(MessageFavoriteFieldsContext);
+
+  return (
+    <>
+      <dt data-testid={`message-field-name-${fieldName}`}>
+        <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
+      </dt>
+      <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
+        <MessageFieldValue value={value} fieldName={fieldName} fieldType={fieldType} message={message} />
+      </DefinitionDescription>
+    </>
+  );
+};
 
 export default MessageField;
