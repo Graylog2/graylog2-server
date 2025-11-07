@@ -245,4 +245,9 @@ public class StreamMock implements Stream {
     public IndexSet getIndexSet() {
         return indexSet;
     }
+
+    @Override
+    public List<String> getFavoriteFields() {
+        return List.of();
+    }
 }

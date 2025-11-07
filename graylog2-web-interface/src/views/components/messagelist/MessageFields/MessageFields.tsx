@@ -20,17 +20,12 @@ import styled, { css } from 'styled-components';
 import { MessageDetailsDefinitionList } from 'components/common';
 import MessageField from 'views/components/messagelist/MessageField';
 import FieldType from 'views/logic/fieldtypes/FieldType';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import useFeature from 'hooks/useFeature';
+import MessageFieldsViewMode from 'views/components/messagelist/MessageFields/MessageFieldsViewMode';
+import type { MessageFieldsComponentProps } from 'views/components/messagelist/MessageFields/types';
 
-import type { Message } from './Types';
-
-type Props = {
-  message: Message;
-  fields: FieldTypeMappingsList;
-};
-
-const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
+export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
     color: ${theme.colors.text.primary};
 
@@ -42,17 +37,25 @@ const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   `,
 );
 
-const MessageFields = ({ message, fields }: Props) => {
+export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
   const formattedFields = message.formatted_fields;
   const renderedFields = Object.keys(formattedFields)
     .sort()
     .map((key) => {
       const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
 
-      return <MessageField fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />;
+      return <MessageField key={key} fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />;
     });
 
   return <MessageDetailsDL className="message-details-fields">{renderedFields}</MessageDetailsDL>;
+};
+
+const MessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
+  const featureEnabled = useFeature('message_table_favorite_fields');
+
+  if (featureEnabled) return <MessageFieldsViewMode />;
+
+  return <DefaultMessageFields message={message} fields={fields} />;
 };
 
 export default MessageFields;
