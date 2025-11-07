@@ -200,7 +200,7 @@ const DataNodeUpgradePage = () => {
             {(data?.warnings?.length || 0) > 0 && (
               <Alert bsStyle="danger">
                 {data.warnings.map((warning) => (
-                  <p>{warning}</p>
+                  <p key={warning}>{warning}</p>
                 ))}
               </Alert>
             )}
