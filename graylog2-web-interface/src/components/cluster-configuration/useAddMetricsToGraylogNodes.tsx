@@ -36,6 +36,9 @@ const METRIC_NAMES = {
   bufferInputUsage: 'org.graylog2.buffers.input.usage',
   bufferOutputUsage: 'org.graylog2.buffers.output.usage',
   bufferProcessUsage: 'org.graylog2.buffers.process.usage',
+  bufferInputSize: 'org.graylog2.buffers.input.size',
+  bufferOutputSize: 'org.graylog2.buffers.output.size',
+  bufferProcessSize: 'org.graylog2.buffers.process.size',
   throughputIn: 'org.graylog2.throughput.input.1-sec-rate',
   throughputOut: 'org.graylog2.throughput.output.1-sec-rate',
 } as const;

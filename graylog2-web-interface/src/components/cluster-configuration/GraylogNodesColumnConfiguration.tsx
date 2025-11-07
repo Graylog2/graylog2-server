@@ -26,6 +26,13 @@ import NumberUtils from 'util/NumberUtils';
 import RatioIndicator from './RatioIndicator';
 import type { GraylogNode } from './useGraylogNodes';
 
+type HealthRow = {
+  key: string;
+  label: string;
+  status: string;
+  bsStyle: string;
+};
+
 const NodePrimary = styled.div`
   display: flex;
   flex-direction: column;
@@ -81,12 +88,21 @@ const renderRatioIndicator = (ratio: number | undefined | null, warning: number,
     <RatioIndicator ratio={ratio} warningThreshold={warning} dangerThreshold={danger} />
   );
 
-const renderBufferRow = (label: string, ratio: number | undefined | null) => (
-  <MetricsRow key={label}>
-    <span>{label}</span>
-    {renderRatioIndicator(ratio, BUFFER_WARNING_THRESHOLD, BUFFER_DANGER_THRESHOLD)}
-  </MetricsRow>
-);
+
+const renderBufferRow = (
+  label: string,
+  usage: number | undefined | null,
+  size: number | undefined | null,
+) => {
+  const ratioIndicator = renderRatioIndicator(computeRatio(usage, size), BUFFER_WARNING_THRESHOLD, BUFFER_DANGER_THRESHOLD);
+
+  return (
+    <MetricsRow key={label}>
+      <span>{label}</span>
+      {ratioIndicator}
+    </MetricsRow>
+  );
+};
 
 const formatThroughput = (value: number | undefined | null) => {
   if (value === undefined || value === null) {
@@ -115,7 +131,7 @@ const getNodeDisplayName = (node: GraylogNode) => {
   return node.node_id ?? node.hostname ?? node.id;
 };
 
-export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput', 'messageProcessing', 'loadBalancer'] as const;
+export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput', 'health'] as const;
 
 export const createColumnDefinitions = (): Array<Column> => [
   { id: 'node', title: 'Node' },
@@ -125,8 +141,7 @@ export const createColumnDefinitions = (): Array<Column> => [
   { id: 'jvm', title: 'JVM' },
   { id: 'buffers', title: 'Buffers' },
   { id: 'throughput', title: 'Throughput' },
-  { id: 'loadBalancer', title: 'Load Balancer' },
-  { id: 'messageProcessing', title: 'Message Processing' },
+  { id: 'health', title: 'Health' },
 ];
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
@@ -237,12 +252,28 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     buffers: {
       renderCell: (_value, entity) => {
         const rows = [
-          { label: 'Input', value: entity.metrics?.bufferInputUsage },
-          { label: 'Process', value: entity.metrics?.bufferProcessUsage },
-          { label: 'Output', value: entity.metrics?.bufferOutputUsage },
+          {
+            label: 'Input',
+            usage: entity.metrics?.bufferInputUsage,
+            size: entity.metrics?.bufferInputSize,
+          },
+          {
+            label: 'Process',
+            usage: entity.metrics?.bufferProcessUsage,
+            size: entity.metrics?.bufferProcessSize,
+          },
+          {
+            label: 'Output',
+            usage: entity.metrics?.bufferOutputUsage,
+            size: entity.metrics?.bufferOutputSize,
+          },
         ];
 
-        return <MetricsColumn>{rows.map(({ label, value }) => renderBufferRow(label, value))}</MetricsColumn>;
+        return (
+          <MetricsColumn>
+            {rows.map(({ label, usage, size }) => renderBufferRow(label, usage, size))}
+          </MetricsColumn>
+        );
       },
     },
     throughput: {
@@ -255,39 +286,50 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         return <MetricsColumn>{rows.map(({ label, value }) => renderThroughputRow(label, value))}</MetricsColumn>;
       },
     },
-    messageProcessing: {
+    health: {
       renderCell: (_value, entity) => {
-        if (entity.is_processing === undefined || entity.is_processing === null) {
-          return null;
+        const rows: Array<HealthRow> = [];
+
+        if (entity.is_processing !== undefined && entity.is_processing !== null) {
+          const messageProcessingStatus = entity.is_processing ? 'ENABLED' : 'DISABLED';
+
+          rows.push({
+            key: 'message-processing',
+            label: 'Message Processing',
+            status: messageProcessingStatus,
+            bsStyle: entity.is_processing ? 'success' : 'warning',
+          });
         }
 
-        const messageProcessingStatus = entity.is_processing ? 'ENABLED' : 'DISABLED';
-
-        return (
-          <StyledLabel
-            bsStyle={entity.is_processing ? 'success' : 'warning'}
-            bsSize="xs"
-            aria-label={`Message Processing ${messageProcessingStatus}`}>
-            {messageProcessingStatus}
-          </StyledLabel>
-        );
-      },
-    },
-    loadBalancer: {
-      renderCell: (_value, entity) => {
         const loadBalancersStatus = entity.lb_status?.toUpperCase();
 
-        if (!loadBalancersStatus) {
+        if (loadBalancersStatus) {
+          rows.push({
+            key: 'load-balancer',
+            label: 'Load Balancer',
+            status: loadBalancersStatus,
+            bsStyle: loadBalancersStatus === 'ALIVE' ? 'success' : 'warning',
+          });
+        }
+
+        if (!rows.length) {
           return null;
         }
 
         return (
-          <StyledLabel
-            bsStyle={loadBalancersStatus === 'ALIVE' ? 'success' : 'warning'}
-            bsSize="xs"
-            aria-label={`Load Balancers ${loadBalancersStatus}`}>
-            {loadBalancersStatus}
-          </StyledLabel>
+          <MetricsColumn>
+            {rows.map(({ key, label, status, bsStyle }) => (
+              <MetricsRow key={key}>
+                <span>{label}</span>
+                <StyledLabel
+                  bsStyle={bsStyle}
+                  bsSize="xs"
+                  aria-label={`${label} ${status}`}>
+                  {status}
+                </StyledLabel>
+              </MetricsRow>
+            ))}
+          </MetricsColumn>
         );
       },
     },

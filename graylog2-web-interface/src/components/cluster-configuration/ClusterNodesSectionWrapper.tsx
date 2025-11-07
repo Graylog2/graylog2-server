@@ -19,15 +19,20 @@ import styled, { css } from 'styled-components';
 
 import { Section } from 'components/common';
 
-const Container = styled.div`
-  > div {
-    border: none;
-  }
+const Container = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'hideBorder',
+})<{ hideBorder?: boolean }>(({ hideBorder, theme }) => css`
+  ${hideBorder &&
+  css`
+    > div {
+      border: none;
+    }
+  `}
 
   table thead,
   table thead tr,
   table thead th {
-    background-color: ${({ theme }) => theme.colors.section.filled} !important;
+    background-color: ${theme.colors.section.filled} !important;
   }
 
   table tbody {
@@ -43,17 +48,17 @@ const Container = styled.div`
   }
 
   table tbody:nth-of-type(odd) tr:first-of-type {
-    background-color: ${({ theme }) => theme.colors.table.row.background} !important;
+    background-color: ${theme.colors.table.row.background} !important;
   }
 
   table tbody:nth-of-type(even) tr:first-of-type {
-    background-color: ${({ theme }) => theme.colors.table.row.backgroundStriped} !important;
+    background-color: ${theme.colors.table.row.backgroundStriped} !important;
   }
 
   table tbody tr:hover:first-of-type {
-    background-color: ${({ theme }) => theme.colors.table.row.backgroundHover} !important;
+    background-color: ${theme.colors.table.row.backgroundHover} !important;
   }
-`;
+`);
 
 const TitleWrapper = styled.div`
   display: inline-flex;
@@ -78,21 +83,27 @@ const TitleCountButton = styled.button`
   }
 `;
 
-const TableWrapper = styled.div<{ $maxHeight?: string }>(
-  ({ $maxHeight, theme }) => css`
+const TableWrapper = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'maxHeight' && prop !== 'hideScrollbar',
+})<{ maxHeight?: string; hideScrollbar?: boolean }>(
+  ({ maxHeight, hideScrollbar, theme }) => css`
     margin-top: calc(-1 * ${theme.spacings.lg});
 
-    ${$maxHeight &&
+    ${maxHeight &&
     css`
       div#scroll-container {
-        max-height: ${$maxHeight};
+        max-height: ${maxHeight};
         overflow-y: auto;
-        scrollbar-width: none;
-        -ms-overflow-style: none;
 
-        &::-webkit-scrollbar {
-          display: none;
-        }
+        ${hideScrollbar &&
+        css`
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+        `}
       }
 
       div#scroll-container table thead {
@@ -125,6 +136,8 @@ type Props = React.PropsWithChildren<{
   headerLeftSection?: React.ReactNode;
   collapsible?: boolean;
   maxContentHeight?: number | string | null;
+  hideBorder?: boolean;
+  hideScrollbar?: boolean;
 }>;
 
 const ClusterNodesSectionWrapper = ({
@@ -136,6 +149,8 @@ const ClusterNodesSectionWrapper = ({
   headerLeftSection = undefined,
   collapsible = true,
   maxContentHeight = 400,
+  hideBorder = false,
+  hideScrollbar = false,
 }: Props) => {
   const renderHeader = () => {
     const hasCount = titleCount !== null && titleCount !== undefined;
@@ -169,14 +184,18 @@ const ClusterNodesSectionWrapper = ({
   };
 
   return (
-    <Container>
+    <Container hideBorder={hideBorder}>
       <Section
         title={title}
         header={renderHeader()}
         collapsible={collapsible}
         headerLeftSection={headerLeftSection}
         collapseButtonPosition="left">
-        <TableWrapper $maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
+        <TableWrapper
+          maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}
+          hideScrollbar={hideScrollbar}>
+          {children}
+        </TableWrapper>
       </Section>
     </Container>
   );
