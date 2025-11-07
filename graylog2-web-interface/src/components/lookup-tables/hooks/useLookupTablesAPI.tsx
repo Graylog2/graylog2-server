@@ -287,6 +287,28 @@ export function useFetchDataAdapters() {
   return { fetchPaginatedDataAdapters, dataAdaptersKeyFn };
 }
 
+export function useFetchAllDataAdapters() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['all-data-adapters'],
+    queryFn: () =>
+      defaultOnError(
+        fetchPaginatedDataAdapters({
+          page: 1,
+          pageSize: 10000,
+          query: null,
+          sort: { attributeId: 'name', direction: 'asc' },
+        }),
+        'Failed to fetch all data adapters',
+      ),
+    retry: false,
+  });
+
+  return {
+    allDataAdapters: data?.list || [],
+    loadingAllDataAdapters: isLoading,
+  };
+}
+
 export function useFetchDataAdapterTypes() {
   const { data, isLoading } = useQuery({
     queryKey: ['data-adapter-types'],
@@ -297,7 +319,7 @@ export function useFetchDataAdapterTypes() {
 }
 
 export function useFetchDataAdapter(idOrName: string) {
-  const { data, isLoading } = useQuery({
+  const { data, isFetching } = useQuery({
     queryKey: ['data-adapter-details', idOrName],
     queryFn: () => defaultOnError(fetchDataAdapter(idOrName), 'Failed to fetch data adapter'),
     retry: false,
@@ -306,7 +328,7 @@ export function useFetchDataAdapter(idOrName: string) {
 
   return {
     dataAdapter: data,
-    loadingDataAdapter: isLoading,
+    loadingDataAdapter: isFetching,
   };
 }
 

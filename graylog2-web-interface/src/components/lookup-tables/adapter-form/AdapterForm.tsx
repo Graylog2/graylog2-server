@@ -50,15 +50,6 @@ const Title = ({ title, typeName, create }: TitleProps) => {
   );
 };
 
-type Props = {
-  type: string;
-  title: string;
-  saved: (response: any) => void;
-  onCancel: () => void;
-  create?: boolean;
-  dataAdapter?: LookupTableAdapter;
-};
-
 const INIT_ADAPTER = {
   id: undefined,
   title: '',
@@ -68,6 +59,15 @@ const INIT_ADAPTER = {
   custom_error_ttl: null,
   custom_error_ttl_unit: null,
   config: {},
+};
+
+type Props = {
+  type: string;
+  title: string;
+  saved: (response: any) => void;
+  onCancel: () => void;
+  create?: boolean;
+  dataAdapter?: LookupTableAdapter;
 };
 
 const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAdapter = INIT_ADAPTER }: Props) => {
@@ -100,7 +100,7 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
     <>
       <Title title={title} typeName={pluginDisplayName} create={create} />
       <Formik initialValues={dataAdapter} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
-        {({ isSubmitting }) => (
+        {({ isSubmitting, isValid }) => (
           <FlexForm className="form form-horizontal">
             <Row style={{ flexGrow: 1 }}>
               <Col lg={6} style={{ marginTop: 10 }}>
@@ -114,7 +114,7 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
               <Col mdOffset={9} md={3}>
                 <FormSubmit
                   submitButtonText={create ? 'Create adapter' : 'Update adapter'}
-                  disabledSubmit={isSubmitting || creatingAdapter || updatingAdapter}
+                  disabledSubmit={isSubmitting || creatingAdapter || updatingAdapter || !isValid}
                   onCancel={onCancel}
                 />
               </Col>

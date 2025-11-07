@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { Row, Col, Button, Input, Label } from 'components/bootstrap';
 import { getValueFromInput } from 'util/FormsUtils';
 import { LookupTableDataAdaptersActions } from 'stores/lookup-tables/LookupTableDataAdaptersStore';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 import useScopePermissions from 'hooks/useScopePermissions';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 
 import type { DataAdapterPluginType } from './types';
 import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWrapper';
@@ -35,7 +36,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   const [lookupKey, setLookupKey] = React.useState('');
   const [lookupResult, setLookupResult] = React.useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
   const _onChange = (event: React.SyntheticEvent) => {
     setLookupKey(getValueFromInput(event.target));
@@ -50,9 +51,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
   };
 
   const handleEdit = () => {
-    setModal('DATA-ADAPTER-EDIT');
-    setTitle(dataAdapter.name);
-    setEntity(dataAdapter);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(dataAdapter.name));
   };
 
   const plugin = usePluginEntities('lookupTableAdapters').find(

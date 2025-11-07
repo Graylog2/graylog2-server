@@ -21,12 +21,6 @@ import { Row, Col } from 'components/bootstrap';
 import { DataAdapterForm, DataAdapterTypeSelect } from 'components/lookup-tables';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
-type DataAdapterCreateProps = {
-  saved?: (adapterObj: LookupTableAdapter) => void;
-  onCancel: () => void;
-  adapter?: LookupTableAdapter;
-};
-
 const StyledRow = styled(Row)`
   display: flex;
   width: 100%;
@@ -38,7 +32,13 @@ const FlexCol = styled(Col)`
   flex-direction: column;
 `;
 
-const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined }: DataAdapterCreateProps) => {
+type Props = {
+  saved?: (adapterObj: LookupTableAdapter) => void;
+  onCancel: () => void;
+  adapter?: LookupTableAdapter;
+};
+
+const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined }: Props) => {
   const [dataAdapter, setDataAdapter] = React.useState<LookupTableAdapter>(adapter);
   const isCreate = React.useMemo(() => !dataAdapter?.id, [dataAdapter]);
 

@@ -23,11 +23,6 @@ import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import { Input, Button } from 'components/bootstrap';
 import { Select } from 'components/common';
 
-type Props = {
-  onCreateClick: () => void;
-  dataAdapters?: LookupTableAdapter[];
-};
-
 const StyledSelect = styled(Select)`
   flex: 1 1 auto;
   min-width: 0;
@@ -38,6 +33,11 @@ const StyledButton = styled(Button)`
   margin-left: 0.5rem;
   white-space: nowrap;
 `;
+
+type Props = {
+  onCreateClick: () => void;
+  dataAdapters?: Array<LookupTableAdapter>;
+};
 
 const DataAdapterPicker = ({ onCreateClick, dataAdapters = [] }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');

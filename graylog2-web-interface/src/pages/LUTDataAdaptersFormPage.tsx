@@ -23,7 +23,7 @@ import { Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { useFetchDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { DataAdapterCreate } from 'components/lookup-tables';
+import { DataAdapterFormView } from 'components/lookup-tables';
 
 const FlexCol = styled(Col)`
   display: flex;
@@ -53,7 +53,7 @@ function LUTDataAdaptersFormPage() {
             {loadingDataAdapter ? (
               <Spinner text="Loading Data Adapter" />
             ) : (
-              <DataAdapterCreate onCancel={navigateBack} saved={navigateBack} adapter={dataAdapter} />
+              <DataAdapterFormView onCancel={navigateBack} saved={navigateBack} adapter={dataAdapter} />
             )}
           </FlexCol>
         </Row>

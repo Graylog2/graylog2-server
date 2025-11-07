@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 
-import { CacheCreate, DataAdapterCreate } from 'components/lookup-tables';
+import { CacheCreate } from 'components/lookup-tables';
+import { DataAdapterFormStep } from 'components/lookup-tables/adapter-form';
 import LookupTableFormFields from 'components/lookup-tables/LookupTableFormFields';
 
 function useSteps(
@@ -44,7 +45,7 @@ function useSteps(
     {
       key: 'data-adapter',
       title: 'Data Adapter',
-      component: <DataAdapterCreate saved={onClose} onCancel={onClose} />,
+      component: <DataAdapterFormStep />,
     },
   ];
 

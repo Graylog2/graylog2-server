@@ -15,14 +15,26 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
+import { Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
+import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+
+const FlexCol = styled(Col)`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
 
 function LUTDataAdaptersFormPage() {
+  const { cacheIdOrName } = useParams<{ cacheIdOrName: string }>();
+  const { cache, loadingCache } = useFetchCache(cacheIdOrName);
   const navigate = useNavigate();
+  const navigateBack = () => navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -31,14 +43,14 @@ function LUTDataAdaptersFormPage() {
         pageTitle="Create Caches for Lookup Tables"
         pageDescription="Caches provide the actual values for lookup tables."
         actions={
-          <Button bsStyle="primary" onClick={() => navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW)}>
+          <Button bsStyle="primary" onClick={navigateBack}>
             Back to list
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
-          <Col md={12}>
-            <div>Caches Form Placeholder</div>
-          </Col>
+          <FlexCol md={12}>
+            {loadingCache ? <Spinner text="Loading Cache" /> : <div>Caches Form Placeholder</div>}
+          </FlexCol>
         </Row>
       </LUTPageLayout>
     </div>
