@@ -48,7 +48,6 @@ import org.opensearch.client.opensearch.cluster.GetClusterSettingsRequest;
 import org.opensearch.client.opensearch.cluster.GetClusterSettingsResponse;
 import org.opensearch.client.opensearch.cluster.HealthRequest;
 import org.opensearch.client.opensearch.cluster.OpenSearchClusterClient;
-import org.opensearch.client.opensearch.nodes.OpenSearchNodesClient;
 
 import java.io.IOException;
 import java.util.List;
@@ -75,8 +74,6 @@ class ClusterAdapterOSTest {
     private OpenSearchCatClient catClient;
     @Mock
     private OpenSearchClusterClient clusterClient;
-    @Mock
-    private OpenSearchNodesClient nodesClient;
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     private ClusterAdapterOS clusterAdapter;
@@ -106,7 +103,6 @@ class ClusterAdapterOSTest {
         when(client.sync()).thenReturn(sync);
         when(sync.cat()).thenReturn(catClient);
         when(sync.cluster()).thenReturn(clusterClient);
-        when(sync.nodes()).thenReturn(nodesClient);
         this.clusterAdapter = new ClusterAdapterOS(client, Duration.seconds(1), jsonApi);
     }
 
