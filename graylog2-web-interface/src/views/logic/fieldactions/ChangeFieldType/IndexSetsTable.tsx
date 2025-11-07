@@ -30,6 +30,7 @@ import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/use
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
+import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const Container = styled.div`
   margin-top: 20px;
@@ -110,9 +111,9 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     [updateTableLayout],
   );
 
-  const onColumnsChange = useCallback(
-    (displayedAttributes: Array<string>) => {
-      updateTableLayout({ displayedAttributes });
+  const onColumnPreferencesChange = useCallback(
+    (newColumnPreferences: ColumnPreferences) => {
+      updateTableLayout({ attributes: newColumnPreferences });
     },
     [updateTableLayout],
   );
@@ -163,12 +164,12 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
             columnRenderers={columnRenderers}
             columnsOrder={DEFAULT_LAYOUT.columnsOrder}
             entities={list}
-            onColumnsChange={onColumnsChange}
+            onColumnPreferencesChange={onColumnPreferencesChange}
             onPageSizeChange={onPageSizeChange}
             entityAttributesAreCamelCase
             onSortChange={onSortChange}
             pageSize={layoutConfig.pageSize}
-            visibleColumns={layoutConfig.displayedAttributes}
+            columnPreferences={layoutConfig.columnPreferences}
           />
         )}
       </PaginatedList>

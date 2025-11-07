@@ -19,7 +19,7 @@ import { useMemo, useCallback } from 'react';
 import type { ColumnDef, SortingState, Updater, VisibilityState } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
-import type { EntityBase } from 'components/common/EntityDataTable/types';
+import type { EntityBase, ColumnPreferences } from 'components/common/EntityDataTable/types';
 import type { Sort } from 'stores/PaginationTypes';
 import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 
@@ -28,7 +28,7 @@ type Props<Entity extends EntityBase> = {
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
   isEntitySelectable: (entity: Entity) => boolean | undefined;
-  onColumnsChange: (visibleColumns: Array<string>) => void;
+  onColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
   visibleColumnOrder: Array<string>;
@@ -43,7 +43,7 @@ const useTable = <Entity extends EntityBase>({
   entities,
   isEntitySelectable = () => true,
   onChangeSelection,
-  onColumnsChange,
+  onColumnPreferencesChange,
   onSortChange,
   selectedEntities,
   setSelectedEntities,
@@ -70,14 +70,15 @@ const useTable = <Entity extends EntityBase>({
     (updater: Updater<VisibilityState>) => {
       const newColumnVisibility = updater instanceof Function ? updater(columnVisibility) : updater;
 
-      return onColumnsChange(
-        Object.entries(newColumnVisibility)
-          .filter(([_colId, isVisible]) => isVisible)
-          .map(([colId]) => colId)
-          .filter((colId) => !UTILITY_COLUMNS.has(colId)),
+      return onColumnPreferencesChange(
+        Object.fromEntries(
+          Object.entries(newColumnVisibility)
+            .filter(([colId]) => !UTILITY_COLUMNS.has(colId))
+            .map(([colId, isVisible]) => [colId, { status: isVisible ? 'show' : 'hide' }]),
+        ),
       );
     },
-    [columnVisibility, onColumnsChange],
+    [columnVisibility, onColumnPreferencesChange],
   );
 
   const rowSelection = useMemo(() => Object.fromEntries(selectedEntities.map((id) => [id, true])), [selectedEntities]);

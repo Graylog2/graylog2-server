@@ -16,31 +16,45 @@
  */
 import { useMemo } from 'react';
 
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { DefaultLayout, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
+const columnPreferences = (userColumnPreferneces: ColumnPreferences, defaultAttributes: Array<string>) => {
+  const result = defaultAttributes.reduce<ColumnPreferences>(
+    (acc, attr) => ({
+      ...acc,
+      [attr]: userColumnPreferneces?.[attr] ?? { status: 'show' }, // if there is no user preference for a default field, show it
+    }),
+    {},
+  );
+
+  if (userColumnPreferneces) {
+    for (const [attr, value] of Object.entries(userColumnPreferneces)) {
+      if (!(attr in result)) {
+        result[attr] = value;
+      }
+    }
+  }
+
+  return result;
+};
+
 const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDisplayedAttributes }: DefaultLayout) => {
   const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId);
+
+  const test = columnPreferences(userLayoutPreferences?.attributes, defaultDisplayedAttributes);
 
   return useMemo(
     () => ({
       layoutConfig: {
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
         sort: userLayoutPreferences.sort ?? defaultSort,
-        displayedAttributes: userLayoutPreferences?.displayedAttributes ?? defaultDisplayedAttributes,
+        columnPreferences: test,
       },
       isInitialLoading,
     }),
-    [
-      defaultDisplayedAttributes,
-      defaultPageSize,
-      defaultSort,
-      isInitialLoading,
-      userLayoutPreferences?.displayedAttributes,
-      userLayoutPreferences.perPage,
-      userLayoutPreferences.sort,
-    ],
+    [defaultPageSize, defaultSort, isInitialLoading, test, userLayoutPreferences.perPage, userLayoutPreferences.sort],
   );
 };
 

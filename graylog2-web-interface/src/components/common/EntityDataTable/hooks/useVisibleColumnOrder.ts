@@ -18,17 +18,22 @@
 import { useMemo } from 'react';
 
 import { BULK_SELECT_COL_ID, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const useVisibleColumnOrder = (
-  visibleAttributeColumns: Array<string>,
+  columnPreferences: ColumnPreferences,
   attributeColumnsOder: Array<string>,
   displayActionsCol: boolean,
   displayBulkSelectCol: boolean,
 ) =>
   useMemo(() => {
-    const visibleSet = new Set(visibleAttributeColumns);
+    const visibleAttributeColumns = Object.keys(columnPreferences).filter(
+      (key) => columnPreferences[key].status === 'show',
+    );
+
+    const visibleAttributesSet = new Set(visibleAttributeColumns);
     // Core order: visible attributes in the order defined by attributeColumnsOder
-    const coreOrder = attributeColumnsOder.filter((id) => visibleSet.has(id));
+    const coreOrder = attributeColumnsOder.filter((id) => visibleAttributesSet.has(id));
     // Additional: visible attributes not in attributeColumnsOder
     const additionalVisible = visibleAttributeColumns.filter((id) => !attributeColumnsOder.includes(id));
 
@@ -38,6 +43,6 @@ const useVisibleColumnOrder = (
       ...additionalVisible,
       ...(displayActionsCol ? [ACTIONS_COL_ID] : []),
     ];
-  }, [visibleAttributeColumns, displayActionsCol, displayBulkSelectCol, attributeColumnsOder]);
+  }, [columnPreferences, attributeColumnsOder, displayBulkSelectCol, displayActionsCol]);
 
 export default useVisibleColumnOrder;

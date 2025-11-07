@@ -60,7 +60,7 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: layoutPreferences.displayedAttributes,
+      attributes: layoutPreferences.attributes,
       sort: layoutPreferences.sort,
       pageSize: layoutPreferences.perPage,
     });
@@ -79,7 +79,7 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: defaultLayout.defaultDisplayedAttributes,
       sort: defaultLayout.defaultSort,
       pageSize: defaultLayout.defaultPageSize,
     });
@@ -101,7 +101,7 @@ describe('useUserSearchFilterQuery hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      displayedAttributes: defaultLayout.defaultDisplayedAttributes,
+      attributes: defaultLayout.defaultDisplayedAttributes,
       sort: defaultLayout.defaultSort,
       pageSize: layoutPreferences.perPage,
     });

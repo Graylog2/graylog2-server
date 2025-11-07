@@ -44,6 +44,7 @@ import type {
   EntityBase,
   ExpandedSectionRenderer,
   ColumnRenderersByAttribute,
+  ColumnPreferences,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import TableHead from './TableHead';
@@ -214,7 +215,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
     [sectionName: string]: ExpandedSectionRenderer<Entity>;
   };
   /** Function to handle changes of columns visibility */
-  onColumnsChange: (columnIds: Array<string>) => void;
+  onColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */
@@ -224,7 +225,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Which columns should be displayed. */
-  visibleColumns: Array<string>;
+  columnPreferences: ColumnPreferences;
   /** Meta data. */
   meta?: Meta;
 };
@@ -242,14 +243,15 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   columnsOrder: attributeColumnsOder = [],
   entities,
   expandedSectionsRenderer = undefined,
-  onColumnsChange,
+  onColumnPreferencesChange,
   onPageSizeChange = undefined,
   onSortChange,
   pageSize = undefined,
   entityActions = undefined,
-  visibleColumns: visibleAttributeColumns,
+  columnPreferences,
   meta = undefined,
 }: Props<Entity, Meta>) => {
+  console.log(columnPreferences);
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
 
   const displayActionsCol = typeof entityActions === 'function';
@@ -260,7 +262,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
 
   const visibleColumnOrder = useVisibleColumnOrder(
-    visibleAttributeColumns,
+    columnPreferences,
     attributeColumnsOder,
     displayActionsCol,
     displayBulkSelectCol,
@@ -293,7 +295,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     entities,
     isEntitySelectable,
     onChangeSelection,
-    onColumnsChange,
+    onColumnPreferencesChange,
     onSortChange,
     selectedEntities,
     setSelectedEntities,
