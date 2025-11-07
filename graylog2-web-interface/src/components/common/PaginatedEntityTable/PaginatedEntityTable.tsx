@@ -134,8 +134,11 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
     setQuery,
   });
 
-  const columnDefinitions = useMemo(
-    () => [...(paginatedEntities?.attributes ?? []), ...additionalAttributes],
+  const columnSchemas = useMemo(
+    () => [
+      ...(paginatedEntities?.attributes ?? []),
+      ...additionalAttributes.map((attribute) => ({ isDerived: true, ...attribute })),
+    ],
     [additionalAttributes, paginatedEntities?.attributes],
   );
 
@@ -190,7 +193,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
           ) : (
             <EntityDataTable<T, M>
               entities={list}
-              visibleColumns={layoutConfig.displayedAttributes}
+              visibleColumnOrder={layoutConfig.displayedAttributes}
               columnsOrder={columnsOrder}
               expandedSectionsRenderer={expandedSectionsRenderer}
               bulkSelection={bulkSelection}
@@ -202,7 +205,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
               entityActions={entityActions}
               actionsCellWidth={actionsCellWidth}
               columnRenderers={columnRenderers}
-              columnDefinitions={columnDefinitions}
+              columnSchemas={columnSchemas}
               entityAttributesAreCamelCase={entityAttributesAreCamelCase}
               meta={meta}
             />

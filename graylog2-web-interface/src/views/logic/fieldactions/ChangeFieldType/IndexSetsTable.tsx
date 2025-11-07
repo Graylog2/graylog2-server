@@ -159,7 +159,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
               actions: <BulkActionsDropdown />,
               isEntitySelectable,
             }}
-            columnDefinitions={attributes}
+            columnSchemas={attributes}
             columnRenderers={columnRenderers}
             columnsOrder={DEFAULT_LAYOUT.columnsOrder}
             entities={list}
@@ -168,7 +168,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
             entityAttributesAreCamelCase
             onSortChange={onSortChange}
             pageSize={layoutConfig.pageSize}
-            visibleColumns={layoutConfig.displayedAttributes}
+            visibleColumnOrder={layoutConfig.displayedAttributes}
           />
         )}
       </PaginatedList>
