@@ -144,7 +144,7 @@ public class PipelineMetadataUpdater {
                 .collect(Collectors.toSet());
     }
 
-    private Set<PipelineDao> affectedPipelines(RulesChangedEvent event) {
+    protected Set<PipelineDao> affectedPipelines(RulesChangedEvent event) {
         Set<String> ruleIds = event.updatedRules().stream()
                 .map(RulesChangedEvent.Reference::id)
                 .collect(Collectors.toSet());

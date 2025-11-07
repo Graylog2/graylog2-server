@@ -32,16 +32,16 @@ import org.graylog2.rest.resources.system.inputs.InputDeletedEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 
 import java.util.List;
 import java.util.Set;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,9 +57,6 @@ class PipelineMetadataUpdaterTest {
     private PipelineMetricRegistry metricRegistry = mock(PipelineMetricRegistry.class);
     private PipelineAnalyzer pipelineAnalyzer = mock(PipelineAnalyzer.class);
     private EventBus eventBus = mock(EventBus.class);
-
-    @Captor
-    ArgumentCaptor<Set<PipelineDao>> pipelineCaptor;
 
     @BeforeEach
     void setUp() throws NotFoundException {
@@ -77,7 +74,9 @@ class PipelineMetadataUpdaterTest {
         when(pipelineService.load("id2")).thenReturn(
                 PipelineDao.create("id2", DefaultEntityScope.NAME,
                         "title2", "description2", "source2", null, null));
-        when(updater.affectedPipelinesAsMap(any(), any())).thenReturn(ImmutableMap.of());
+
+        // stub lower level methods - we are only verifying that they are called with correct parameters
+        doReturn(ImmutableMap.of()).when(updater).affectedPipelinesAsMap(any(), any());
     }
 
     @Test
@@ -89,9 +88,10 @@ class PipelineMetadataUpdaterTest {
         updater.handlePipelineChanges(event, state, resolver, metricRegistry);
 
         verify(pipelineMetadataService).delete(Set.of("id1"));
-        verify(inputsMetadataService, atLeastOnce()).deleteInputMentionsByPipelineId("id1");
+        verify(inputsMetadataService, times(1)).deleteInputMentionsByPipelineId("id1");
 
-        verify(updater).handleUpdates(pipelineCaptor.capture(), state, resolver, metricRegistry);
+        ArgumentCaptor<Set<PipelineDao>> pipelineCaptor = ArgumentCaptor.forClass(Set.class);
+        verify(updater).handleUpdates(pipelineCaptor.capture(), any(), any(), any());
         assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("id2")));
     }
 
@@ -100,21 +100,31 @@ class PipelineMetadataUpdaterTest {
         PipelineConnectionsChangedEvent event = mock(PipelineConnectionsChangedEvent.class);
         when(event.pipelineIds()).thenReturn(Set.of("id1"));
 
+
         updater.handleConnectionChanges(event, state, resolver, metricRegistry);
 
-        verify(updater).handleUpdates(pipelineCaptor.capture(), state, resolver, metricRegistry);
-        assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("id2")));
+        ArgumentCaptor<Set<PipelineDao>> pipelineCaptor = ArgumentCaptor.forClass(Set.class);
+        verify(updater).handleUpdates(pipelineCaptor.capture(), any(), any(), any());
+        assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("id1")));
     }
 
     @Test
-    void testHandleRuleChangesDeletesMentionsAndUpdates() {
+    void testHandleRuleChanges() {
         RulesChangedEvent event = mock(RulesChangedEvent.class);
-        when(event.deletedRules()).thenReturn(Set.of());
-        when(event.updatedRules()).thenReturn(Set.of());
+        when(event.deletedRules()).thenReturn(Set.of(new RulesChangedEvent.Reference("rule1", "Rule 1")));
+        when(event.updatedRules()).thenReturn(Set.of(new RulesChangedEvent.Reference("rule2", "Rule 2")));
+        when(pipelineMetadataService.getPipelinesByRules(Set.of("rule2"))).thenReturn(Set.of("pipeline1"));
+        doReturn(Set.of(PipelineDao.create("pipeline1", DefaultEntityScope.NAME,
+                "title1", "description1", "source1", null, null)))
+                .when(updater).affectedPipelines(event);
 
         updater.handleRuleChanges(event, state, resolver, metricRegistry);
 
-        // No exception means success; further verification can be added for handleUpdates
+        verify(inputsMetadataService).deleteInputMentionsByRuleId("rule1");
+
+        ArgumentCaptor<Set<PipelineDao>> pipelineCaptor = ArgumentCaptor.forClass(Set.class);
+        verify(updater).handleUpdates(pipelineCaptor.capture(), any(), any(), any());
+        assertTrue(pipelineCaptor.getValue().stream().anyMatch(p -> p.id().equals("pipeline1")));
     }
 
     @Test
