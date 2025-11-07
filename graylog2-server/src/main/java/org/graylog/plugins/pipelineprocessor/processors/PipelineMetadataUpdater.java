@@ -48,7 +48,9 @@ import java.util.stream.Stream;
  * - for every deleted input: delete the corresponding input metadata record
  * - for every deleted pipeline: delete the corresponding pipeline rules metadata record and update any input
  * metadata that referenced that pipeline
- * - for every updated pipeline: rebuild pipeline metadata from scratch and replace the existing record
+ * - for every updated pipeline:
+ * -- rebuild pipeline metadata from scratch and replace the existing record
+ * -- for every input referenced by the pipeline: update the input metadata to include a mention of that pipeline
  * - for every deleted or updated rule:
  * -- delete the input mentions for that rule
  * -- for every pipeline affected by the deleted or updated rule: rebuild the pipeline metadata
@@ -116,7 +118,7 @@ public class PipelineMetadataUpdater {
                 .forEach(ref -> inputsMetadataService.deleteInputMentionsByRuleId(ref.id()));
     }
 
-    private void handleUpdates(Set<PipelineDao> pipelineDaos,
+    protected void handleUpdates(Set<PipelineDao> pipelineDaos,
                                PipelineInterpreter.State state,
                                PipelineResolver resolver,
                                PipelineMetricRegistry metricRegistry) {
@@ -171,7 +173,7 @@ public class PipelineMetadataUpdater {
         return loadPipelineDaos(affectedPipelineIds);
     }
 
-    private ImmutableMap<String, Pipeline> affectedPipelinesAsMap(Set<PipelineDao> pipelineDaos, PipelineInterpreter.State state) {
+    protected ImmutableMap<String, Pipeline> affectedPipelinesAsMap(Set<PipelineDao> pipelineDaos, PipelineInterpreter.State state) {
         ImmutableMap.Builder<String, Pipeline> builder = ImmutableMap.builder();
         for (PipelineDao pipelineDao : pipelineDaos) {
             Pipeline pipeline = state.getCurrentPipelines().get(pipelineDao.id());

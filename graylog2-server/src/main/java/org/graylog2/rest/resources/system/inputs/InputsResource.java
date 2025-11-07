@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.ImmutableList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -168,9 +169,22 @@ public class InputsResource extends AbstractInputsResource {
     public PipelineInputsMetadataDao pipelineMetadata(@ApiParam(name = "inputId", required = true)
                                                       @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
-        final PipelineInputsMetadataDao dao = metadataService.getByInputId(inputId);
+        return filterPipelines(metadataService.getByInputId(inputId));
+    }
 
-        // filter out entries the user is not allowed to see
+    @POST
+    @ApiOperation(value = "Bulk retrieval of input metadata")
+    @Path("meta/retrieve")
+    public List<PipelineInputsMetadataDao> pipelineMetadataBulk(
+            @NotNull @ApiParam(name = "JSON body", required = true) @NotNull List<String> inputIds) {
+        final ImmutableList<PipelineInputsMetadataDao> daoList = metadataService.getByInputIds(
+                inputIds.stream()
+                        .filter(inputId -> isPermitted(RestPermissions.INPUTS_READ, inputId))
+                        .toList());
+        return daoList.stream().map(this::filterPipelines).toList();
+    }
+
+    private PipelineInputsMetadataDao filterPipelines(PipelineInputsMetadataDao dao) {
         final PipelineInputsMetadataDao.Builder builder = PipelineInputsMetadataDao.builder()
                 .id(dao.id())
                 .inputId(dao.inputId());

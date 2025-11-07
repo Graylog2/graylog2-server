@@ -108,7 +108,8 @@ public class PipelineAnalyzer {
                     for (Rule rule : rules) {
                         if (rule == null) continue;
                         ruleSet.add(rule.id());
-                        hasInputReferences = hasInputReferences || analyzeRule(pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, inputMentions);
+                        boolean ruleHasReferences = analyzeRule(pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, inputMentions);
+                        hasInputReferences = hasInputReferences || ruleHasReferences;
                     }
                 }
             }

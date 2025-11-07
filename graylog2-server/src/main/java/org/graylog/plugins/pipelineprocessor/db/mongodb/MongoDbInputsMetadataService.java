@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
 import com.google.common.collect.ImmutableList;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.IndexOptions;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.ReplaceOneModel;
@@ -65,6 +66,10 @@ public class MongoDbInputsMetadataService {
             throw new NotFoundException("No input found with id: " + inputId);
         }
         return dao;
+    }
+
+    public ImmutableList<PipelineInputsMetadataDao> getByInputIds(List<String> inputIds) {
+        return ImmutableList.copyOf(collection.find(Filters.in(FIELD_INPUT_ID, inputIds)).into(new ArrayList<>()));
     }
 
     public void save(Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions, boolean merge) {
