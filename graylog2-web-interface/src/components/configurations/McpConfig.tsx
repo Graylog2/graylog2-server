@@ -23,8 +23,7 @@ import { ConfigurationsActions, ConfigurationsStore } from 'stores/configuration
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
 import { BootstrapModalForm, Button, Input, Table } from 'components/bootstrap';
-import { IfPermitted, Select } from 'components/common';
-// import { IfPermitted, Select, EntityDataTable} from 'components/common';
+import { IfPermitted, Select, EntityDataTable} from 'components/common';
 import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
 import { DocumentationLink } from 'components/support';
@@ -32,6 +31,9 @@ import DocsHelper from 'util/DocsHelper';
 import BetaBadge from 'components/common/BetaBadge';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import type {EntityBase} from 'components/common/EntityDataTable/types';
+import type {Sort} from 'stores/PaginationTypes';
+// import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 
 type McpConfigState = {
   enable_remote_access: boolean;
@@ -49,6 +51,23 @@ type McpToolState = {
 }
 
 type McpTools = Record<string, McpToolState>;
+
+type McpToolEntity = EntityBase & {
+  name: string;
+  package: string;
+  access: string;
+  format: string;
+  status: string;
+  description: string;
+}
+
+type toolTableView = {
+  entities: McpToolEntity[];
+  columns: (keyof McpToolEntity)[];
+  sort: Sort;
+}
+
+const TABLE_COLUMNS: (keyof McpToolEntity)[] = ['name', 'package', 'access', 'format', 'status'];
 
 const fetchTools = async () => {
   const url = '/mcp/api/tools';
@@ -71,16 +90,9 @@ const McpConfig = () => {
   const [modalConfig, setModalConfig] = useState<McpConfigState | undefined>(undefined);
   const [viewConfig, setViewConfig] = useState<McpConfigState | undefined>(undefined);
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
-  const [tools, setTools] = useState<McpToolState[]>([]);
+  const [toolsView, setToolsView] = useState<toolTableView>({entities: [], columns: TABLE_COLUMNS, sort: {attributeId: 'package', direction: 'asc'}});
   const [modalTools, setModalTools] = useState<McpTools>({});
-
-  useEffect(() => {
-    ConfigurationsActions.list(ConfigurationType.MCP_CONFIG).then(() => {
-      const config = getConfig(ConfigurationType.MCP_CONFIG, configuration);
-      setViewConfig(config);
-      setModalConfig(config);
-    });
-  }, [configuration]);
+  // const { toggleSection } = useExpandedSections();
 
   const toRecordMap = (toolArray: McpToolState[]) => Object.fromEntries(
     toolArray.map(
@@ -89,21 +101,44 @@ const McpConfig = () => {
     )
   ) as McpTools;
 
-  // const toEntity = (toolArray: McpToolState[]) => toolArray.map(
-  //   (tool) => ({
-  //     id: tool.name,
-  //     name: tool.name,
-  //     package: tool.category,
-  //     access: tool.read_only ? 'Read Only' : 'Read/Write',
-  //     output_format: tool.output_format + (tool.format_overridden ? '*' : ''),
-  //     status: tool.enabled ? '🟢 enabled' : '🔴 disabled',
-  //   })
-  // );
+  const toEntity = (toolArray: McpToolState[]) => toolArray.map(
+    (tool): McpToolEntity => ({
+      id: tool.name,
+      name: tool.name,
+      package: tool.category,
+      access: tool.read_only ? 'Read Only' : 'Read/Write',
+      format: tool.output_format + (tool.format_overridden ? '*' : ''),
+      status: tool.enabled && '🟢 enabled' || '🔴 disabled',
+      description: "nothing yet"
+    })
+  );
+
+  function getSorter(sort: Sort) {
+    return (a: McpToolEntity, b: McpToolEntity): number => {
+      let valueA: string = a[sort.attributeId];
+      let valueB: string = b[sort.attributeId];
+
+      if (sort.attributeId === 'package') {
+        valueA = (valueA === 'core' ? '_' : '') + valueA;
+        valueB = (valueB === 'core' ? '_' : '') + valueB;
+      }
+
+      if (valueA < valueB) return sort.direction === 'asc' ? -1 : 1;
+      if (valueA > valueB) return sort.direction === 'asc' ? 1 : -1;
+
+      return 0;
+    };
+  }
 
   useEffect(() => {
+    ConfigurationsActions.list(ConfigurationType.MCP_CONFIG).then(() => {
+      const config = getConfig(ConfigurationType.MCP_CONFIG, configuration);
+      setViewConfig(config);
+      setModalConfig(config);
+    });
     fetchTools().then((data) => {
-      setTools(data);
-      setModalTools(toRecordMap(data))
+      setModalTools(toRecordMap(data));
+      setToolsView((prev): toolTableView => ({...prev, entities: toEntity(data).toSorted(getSorter(prev.sort))}));
     });
   }, [configuration]);
 
@@ -145,8 +180,8 @@ const McpConfig = () => {
       .then(() => {
         if (modalConfig.enable_remote_access) {
           patchTools(modalTools).then(fetchTools).then((data) => {
-            setTools(data);
             setModalTools(toRecordMap(data))
+            setToolsView((prev): toolTableView => ({...prev, entities: toEntity(data).toSorted(getSorter(prev.sort))}))
           });
         }
       })
@@ -159,6 +194,13 @@ const McpConfig = () => {
     { value: "string", label: "(String) Markdown" },
     { value: "json", label: "(JSON) Structured Content" },
   ];
+
+  const expandedTool = (toolEntity: McpToolEntity) => (
+    <div>
+      <h3>{toolEntity.name}</h3>
+      <p>{toolEntity.description}</p>
+    </div>
+  );
 
   if (!viewConfig) {
     return <Spinner />;
@@ -204,45 +246,44 @@ const McpConfig = () => {
         the server.
       </p>
 
-      {/*<EntityDataTable*/}
-      {/*  visibleColumns={['name', 'package', 'access', 'output_format', 'status']}*/}
-      {/*  entities={toEntity(tools)}*/}
-      {/*  columnDefinitions={[*/}
-      {/*    { id: 'name', title: 'Name' },*/}
-      {/*    { id: 'package', title: 'Package' },*/}
-      {/*    { id: 'access', title: 'Access'},*/}
-      {/*    { id: 'output_format', title: 'Output Format'},*/}
-      {/*    { id: 'status', title: 'Status'}*/}
-      {/*  ]}*/}
-      {/*  entityAttributesAreCamelCase={false}*/}
-      {/*  onColumnsChange={(newCols) => {console.log(newCols)}}*/}
-      {/*  onSortChange={(newSort) => {console.log(newSort)}}*/}
-      {/*/>*/}
+      <EntityDataTable
+        visibleColumns={toolsView.columns}
+        columnsOrder={TABLE_COLUMNS}
+        entities={toolsView.entities}
+        activeSort={toolsView.sort}
+        columnDefinitions={[
+          { id: 'name', title: 'Name', sortable: true },
+          { id: 'package', title: 'Package', sortable: true },
+          { id: 'access', title: 'Access', sortable: true },
+          { id: 'format', title: 'Output Format', sortable: true },
+          { id: 'status', title: 'Status', sortable: true }
+        ]}
+        entityAttributesAreCamelCase={false}
+        onColumnsChange={(newCols: (keyof McpToolEntity)[]) => setToolsView((prev) => ({
+          ...prev,
+          columns: newCols
+        }))}
+        onSortChange={(newSort) => setToolsView((prev) => ({
+          ...prev,
+          entities: prev.entities.toSorted(getSorter(newSort)),
+          sort: newSort
+        }))}
+        columnRenderers={{
+          attributes: {
+            name: {
+              renderCell: (value: string) => <i>{value}</i>,
+              staticWidth: 300
+            }
+          }
+        }}
+        expandedSectionsRenderer={{
+          name: {
+            title: 'Tool Name',
+            content: expandedTool
+          }
+        }}
+      />
 
-      <Table striped bordered condensed className="top-margin">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Package</th>
-            <th>Access</th>
-            <th>Output Format</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tools.map((tool) => (
-            <tr key={tool.name}>
-              <td>
-                &nbsp;&nbsp;<i>{tool.name}</i>
-              </td>
-              <td>{tool.category}</td>
-              <td>{tool.read_only ? 'Read Only' : <b>Read/Write</b>}</td>
-              <td>{tool.output_format + (tool.format_overridden ? '*' : '')}</td>
-              <td>{!viewConfig.enable_remote_access && '⚪ disabled' || tool.enabled && '🟢 enabled'  || '🔴 disabled'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
       <br />
 
       {showConfigModal && modalConfig && (
