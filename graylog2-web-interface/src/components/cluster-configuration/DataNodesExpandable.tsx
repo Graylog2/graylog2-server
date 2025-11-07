@@ -36,7 +36,7 @@ const RoleLabel = styled(Label)`
   gap: 4px;
 `;
 
-const DEFAULT_VISIBLE_COLUMNS = ['node', 'type', 'role', 'state'] as const;
+const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'version', 'role'] as const;
 
 const getRoleLabels = (roles: Array<string>) =>
   roles.map((role) => (
@@ -74,9 +74,9 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
   const columnDefinitions = useMemo<Array<Column>>(
     () => [
       { id: 'node', title: 'Node' },
-      { id: 'type', title: 'Type' },
-      { id: 'role', title: 'Role' },
       { id: 'state', title: 'State' },
+      { id: 'version', title: 'Version' },
+      { id: 'role', title: 'Role' },
     ],
     [],
   );
@@ -96,8 +96,8 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
             return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
           },
         },
-        type: {
-          renderCell: (_value, _entity) => 'OpenSearch',
+        version: {
+          renderCell: (_value, entity) => entity.datanode_version ?? 'N/A',
         },
         role: {
           renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
