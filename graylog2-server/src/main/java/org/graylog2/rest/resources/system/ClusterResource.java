@@ -74,7 +74,7 @@ public class ClusterResource extends RestResource {
     private final ServerNodePaginatedService serverNodePaginatedService;
     private final SearchQueryParser searchQueryParser;
 
-    private static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+    public static final ImmutableMap<String, SearchQueryField> SERVER_NODE_ENTITY_SEARCH_MAPPINGS = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
             .put("hostname", SearchQueryField.create("hostname"))
             .build();
@@ -100,7 +100,7 @@ public class ClusterResource extends RestResource {
         this.nodeId = nodeId;
         this.clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create(UUID.nilUUID().toString()));
         this.serverNodePaginatedService = serverNodePaginatedService;
-        this.searchQueryParser = new SearchQueryParser(DEFAULT_SORT_FIELD, SEARCH_FIELD_MAPPING);
+        this.searchQueryParser = new SearchQueryParser(DEFAULT_SORT_FIELD, SERVER_NODE_ENTITY_SEARCH_MAPPINGS);
     }
 
     @GET
