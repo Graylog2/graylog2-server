@@ -321,7 +321,13 @@ describe('<EntityDataTable />', () => {
     userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
     userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
 
-    expect(onColumnsChange).toHaveBeenCalledWith(['title', 'description', 'status']);
+    expect(onColumnsChange).toHaveBeenCalledWith({
+      'created_at': { 'status': 'hide' },
+      'description': { 'status': 'show' },
+      'status': { 'status': 'show' },
+      'stream': { 'status': 'hide' },
+      'title': { 'status': 'show' },
+    });
   });
 
   it('should hande entities with camel case attributes', async () => {

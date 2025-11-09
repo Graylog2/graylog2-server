@@ -225,7 +225,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Which columns should be displayed. */
-  columnPreferences: ColumnPreferences;
+  columnPreferences?: ColumnPreferences;
   /** Meta data. */
   meta?: Meta;
 };
@@ -248,10 +248,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
   entityActions = undefined,
-  columnPreferences,
+  columnPreferences = {},
   meta = undefined,
 }: Props<Entity, Meta>) => {
-  console.log(columnPreferences);
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
 
   const displayActionsCol = typeof entityActions === 'function';
