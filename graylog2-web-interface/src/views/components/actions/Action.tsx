@@ -51,8 +51,7 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
         toggleChild={element}
         placement="right"
         onToggle={_onMenuToggle}
-        menuContainer={menuContainer}
-        dropdownZIndex={1031}>
+        menuContainer={menuContainer}>
         <ActionDropdown
           handlerArgs={handlerArgs}
           type={type}

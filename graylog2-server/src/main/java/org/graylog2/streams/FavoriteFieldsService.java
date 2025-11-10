@@ -14,10 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog2.streams;
 
-public class RemoteReindexNotAllowedException extends IllegalStateException {
-    public RemoteReindexNotAllowedException(String message) {
-        super(message);
-    }
+import org.graylog2.database.NotFoundException;
+
+import java.util.List;
+
+public interface FavoriteFieldsService {
+    List<String> get(String streamId) throws NotFoundException;
+
+    boolean set(String streamId, List<String> fields);
+
+    boolean add(String streamId, String field);
+
+    boolean remove(String streamId, String field);
 }
