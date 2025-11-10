@@ -16,6 +16,7 @@
  */
 package org.graylog2.commands;
 
+import com.github.joschi.jadconfig.documentation.DocumentedBeansService;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
@@ -130,7 +131,7 @@ import static org.graylog2.plugin.ServerStatus.Capability.MASTER;
 import static org.graylog2.plugin.ServerStatus.Capability.SERVER;
 
 @Command(name = "server", description = "Start the Graylog server")
-public class Server extends ServerBootstrap {
+public class Server extends ServerBootstrap implements DocumentedBeansService {
     protected static final Configuration configuration = new Configuration();
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
     private final HttpConfiguration httpConfiguration = new HttpConfiguration();
@@ -165,6 +166,11 @@ public class Server extends ServerBootstrap {
 
     public boolean isLocal() {
         return local;
+    }
+
+    @Override
+    public List<Object> getDocumentedConfigurationBeans() {
+        return getCommandConfigurationBeans();
     }
 
     @Override
