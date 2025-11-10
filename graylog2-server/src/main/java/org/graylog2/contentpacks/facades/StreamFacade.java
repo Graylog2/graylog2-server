@@ -57,6 +57,7 @@ import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.FavoriteFieldsService;
 import org.graylog2.streams.StreamGuardException;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
@@ -84,17 +85,20 @@ public class StreamFacade implements EntityFacade<Stream> {
     private final StreamRuleService streamRuleService;
     private final IndexSetService indexSetService;
     private final UserService userService;
+    private final FavoriteFieldsService favoriteFieldsService;
 
     @Inject
     public StreamFacade(ObjectMapper objectMapper,
                         StreamService streamService,
                         StreamRuleService streamRuleService,
-                        IndexSetService indexSetService, UserService userService) {
+                        IndexSetService indexSetService, UserService userService,
+                        FavoriteFieldsService favoriteFieldsService) {
         this.objectMapper = objectMapper;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.indexSetService = indexSetService;
         this.userService = userService;
+        this.favoriteFieldsService = favoriteFieldsService;
     }
 
     @VisibleForTesting
@@ -116,7 +120,8 @@ public class StreamFacade implements EntityFacade<Stream> {
                 Collections.emptyList(), // Kept for backwards compatibility
                 outputIds,
                 ValueReference.of(stream.isDefaultStream()),
-                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()));
+                ValueReference.of(stream.getRemoveMatchesFromDefaultStream()),
+                stream.getFavoriteFields());
 
         final JsonNode data = objectMapper.convertValue(streamEntity, JsonNode.class);
         return EntityV1.builder()
@@ -183,6 +188,10 @@ public class StreamFacade implements EntityFacade<Stream> {
                 .collect(Collectors.toSet());
         streamService.addOutputs(new ObjectId(savedStreamId), outputIds);
 
+        Optional.ofNullable(streamEntity.favoriteFields())
+                .filter(fields -> !fields.isEmpty())
+                .ifPresent(fields -> favoriteFieldsService.set(savedStreamId, fields));
+
         return NativeEntity.create(entity.id(), savedStreamId, TYPE_V1, stream.getTitle(), stream);
     }
 
@@ -237,7 +246,7 @@ public class StreamFacade implements EntityFacade<Stream> {
     private Optional<NativeEntity<Stream>> findExisting(EntityV1 entity, Map<String, ValueReference> parameters) {
         final String streamId = entity.id().id();
         // Always use the existing system stream
-        if (streamService.isSystemStream(streamId)) {
+        if (ObjectId.isValid(streamId) && streamService.isSystemStream(streamId)) {
             try {
                 final Stream stream = streamService.load(streamId);
                 return Optional.of(NativeEntity.create(entity.id(), streamId, ModelTypes.STREAM_V1, stream.getTitle(), stream));
