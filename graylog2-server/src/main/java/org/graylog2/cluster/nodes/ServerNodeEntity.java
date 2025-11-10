@@ -36,14 +36,19 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
     }
 
     public LoadBalancerStatus getLoadBalancerStatus() {
-        if (!fields.containsKey(ServerNodeDto.LOAD_BALANCER_STATUS_FIELD)) {
+        if (!fields.containsKey(ServerNodeDto.FIELD_LOAD_BALANCER_STATUS)) {
             return null;
         }
-        return LoadBalancerStatus.valueOf(fields.get(ServerNodeDto.LOAD_BALANCER_STATUS_FIELD).toString());
+        return LoadBalancerStatus.valueOf(fields.get(ServerNodeDto.FIELD_LOAD_BALANCER_STATUS).toString());
     }
 
     public boolean isProcessing() {
-        return fields.getOrDefault(ServerNodeDto.LOAD_BALANCER_STATUS_FIELD, "false").equals("true");
+        final Object value = fields.get(ServerNodeDto.FIELD_IS_PROCESSING);
+        if(value != null) {
+            return Boolean.parseBoolean(value.toString());
+        } else {
+            return false;
+        }
     }
 
     @Override

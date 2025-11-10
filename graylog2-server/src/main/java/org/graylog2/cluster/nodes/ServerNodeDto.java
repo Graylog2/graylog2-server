@@ -33,8 +33,8 @@ import java.util.Map;
 @JsonDeserialize(builder = ServerNodeDto.Builder.class)
 public abstract class ServerNodeDto extends NodeDto {
 
-    public static final String IS_PROCESSING_FIELD = "is_processing";
-    public static final String LOAD_BALANCER_STATUS_FIELD = "lb_status";
+    public static final String FIELD_IS_PROCESSING = "is_processing";
+    public static final String FIELD_LOAD_BALANCER_STATUS = "lb_status";
 
     @JsonProperty("is_processing")
     public abstract boolean isProcessing();
@@ -59,10 +59,10 @@ public abstract class ServerNodeDto extends NodeDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder extends NodeDto.Builder<Builder> {
 
-        @JsonProperty(IS_PROCESSING_FIELD)
+        @JsonProperty(FIELD_IS_PROCESSING)
         public abstract ServerNodeDto.Builder setProcessing(boolean isProcessing);
 
-        @JsonProperty(LOAD_BALANCER_STATUS_FIELD)
+        @JsonProperty(FIELD_LOAD_BALANCER_STATUS)
         public abstract Builder setLoadBalancerStatus(@Nullable LoadBalancerStatus loadBalancerStatus);
 
         @JsonCreator
