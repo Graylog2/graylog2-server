@@ -16,28 +16,26 @@
  */
 package org.graylog2.telemetry.suppliers;
 
+import com.mongodb.MongoClient;
 import jakarta.inject.Inject;
-import org.graylog2.inputs.InputService;
+import org.graylog2.database.MongoDBVersionCheck;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class InputsMetricsSupplier implements TelemetryMetricSupplier {
-    private final InputService inputService;
+public class MongoDBMetricsSupplier implements TelemetryMetricSupplier {
+    private final MongoClient mongoClient;
 
     @Inject
-    public InputsMetricsSupplier(InputService inputService) {
-        this.inputService = inputService;
+    public MongoDBMetricsSupplier(MongoClient mongoClient) {
+        this.mongoClient = mongoClient;
     }
 
     @Override
     public Optional<TelemetryEvent> get() {
-        Map<String, Object> metrics = new HashMap<>(TypeFormatter.formatAll(inputService.totalCountByType()));
-
-        return Optional.of(TelemetryEvent.of((metrics)));
+        return Optional.ofNullable(MongoDBVersionCheck.getVersion(mongoClient))
+                .map(version -> TelemetryEvent.of(Map.of("version", version.toString())));
     }
-
 }

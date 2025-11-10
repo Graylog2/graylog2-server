@@ -17,27 +17,27 @@
 package org.graylog2.telemetry.suppliers;
 
 import jakarta.inject.Inject;
-import org.graylog2.inputs.InputService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class InputsMetricsSupplier implements TelemetryMetricSupplier {
-    private final InputService inputService;
+public class LookupTablesSupplier implements TelemetryMetricSupplier {
+    private final DBLookupTableService dbLookupTableService;
 
     @Inject
-    public InputsMetricsSupplier(InputService inputService) {
-        this.inputService = inputService;
+    public LookupTablesSupplier(DBLookupTableService dbLookupTableService) {
+        this.dbLookupTableService = dbLookupTableService;
     }
 
     @Override
     public Optional<TelemetryEvent> get() {
-        Map<String, Object> metrics = new HashMap<>(TypeFormatter.formatAll(inputService.totalCountByType()));
+        Map<String, Object> metrics = Map.of(
+                "lookup_table_count", dbLookupTableService.count()
+        );
 
-        return Optional.of(TelemetryEvent.of((metrics)));
+        return Optional.of(TelemetryEvent.of(metrics));
     }
-
 }
