@@ -14,48 +14,77 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+
+import React, { useContext, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { MessageDetailsDefinitionList } from 'components/common';
-import MessageField from 'views/components/messagelist/MessageField';
-import FieldType from 'views/logic/fieldtypes/FieldType';
-import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
-import useFeature from 'hooks/useFeature';
-import MessageFieldsViewMode from 'views/components/messagelist/MessageFields/MessageFieldsViewMode';
-import type { MessageFieldsComponentProps } from 'views/components/messagelist/MessageFields/types';
+import MessageFieldsViewModeList from 'views/components/messagelist/MessageFields/MessageFieldsViewModeList';
+import useFormattedFields from 'views/components/messagelist/MessageFields/hooks/useFormattedFields';
+import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import { Icon } from 'components/common';
+import Store from 'logic/local-storage/Store';
 
-export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
+const Line = styled.div(
   ({ theme }) => css`
-    color: ${theme.colors.text.primary};
-
-    dd {
-      &:not(:last-child) {
-        border-bottom: 1px solid ${theme.colors.gray[90]};
-      }
-    }
+    border-top: 1px ${theme.colors.table.row.divider} solid;
+    flex-grow: 1;
+    height: 1px;
   `,
 );
 
-export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
-  const formattedFields = message.formatted_fields;
-  const renderedFields = Object.keys(formattedFields)
-    .sort()
-    .map((key) => {
-      const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
+const SeparatorContainer = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    align-items: center;
+    color: ${theme.colors.table.row.divider};
+    cursor: pointer;
+    padding: ${theme.spacings.xxs} 0;
+    font-size: ${theme.fonts.size.small};
+    gap: ${theme.spacings.xs};
+  `,
+);
 
-      return <MessageField key={key} fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />;
-    });
-
-  return <MessageDetailsDL className="message-details-fields">{renderedFields}</MessageDetailsDL>;
+type Props = {
+  onClick: () => void;
+  expanded: boolean;
+  restLength: number;
 };
+const IconSeparator = ({ expanded }: { expanded: boolean }) => (
+  <Icon size="xs" name={expanded ? 'collapse_all' : 'expand_all'} type="regular" />
+);
+const Separator = ({ onClick, expanded, restLength }: Props) => (
+  <SeparatorContainer onClick={onClick}>
+    <Line />
+    <IconSeparator expanded={expanded} />
+    <span>{`${expanded ? 'Hide' : 'Show'} rest ${restLength || ''} fields`}</span>
+    <IconSeparator expanded={expanded} />
+    <Line />
+  </SeparatorContainer>
+);
 
-const MessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
-  const featureEnabled = useFeature('message_table_favorite_fields');
+const SESSION_STORAGE_KEY = 'message_table_show_rest-fields';
 
-  if (featureEnabled) return <MessageFieldsViewMode />;
+const MessageFields = () => {
+  const [expanded, setExpanded] = useState(Store.sessionGet(SESSION_STORAGE_KEY) !== 'false');
+  const { favoriteFields } = useContext(MessageFavoriteFieldsContext);
+  const { formattedFavorites, formattedRest } = useFormattedFields(favoriteFields);
+  const toggleExpand = useCallback(() => {
+    if (expanded) {
+      Store.sessionSet(SESSION_STORAGE_KEY, 'false');
+      setExpanded(false);
+    } else {
+      Store.sessionDelete(SESSION_STORAGE_KEY);
+      setExpanded(true);
+    }
+  }, [expanded]);
 
-  return <DefaultMessageFields message={message} fields={fields} />;
+  return (
+    <>
+      <MessageFieldsViewModeList fields={formattedFavorites} />
+      <Separator onClick={toggleExpand} expanded={expanded} restLength={formattedRest?.length} />
+      {expanded && <MessageFieldsViewModeList fields={formattedRest} />}
+    </>
+  );
 };
 
 export default MessageFields;

@@ -37,7 +37,6 @@ import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
-import useFeature from 'hooks/useFeature';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -88,7 +87,6 @@ const MessageDetail = ({
   showTimestamp = true,
   allStreams = Immutable.List(),
 }: Props) => {
-  const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
   const { config: searchesClusterConfig } = useSearchConfiguration();
   const [showOriginal, setShowOriginal] = useState(false);
   const { fields, index, id, decoration_stats: decorationStats } = message;
@@ -150,10 +148,7 @@ const MessageDetail = ({
   return (
     <AdditionalContext.Provider value={additionalContext}>
       <MessageDetailProviders message={message}>
-        <MessageFavoriteFieldsProvider
-          message={message}
-          messageFields={messageFields}
-          isFeatureEnabled={isFavoriteFieldsEnabled}>
+        <MessageFavoriteFieldsProvider message={message} messageFields={messageFields} isFeatureEnabled>
           <>
             <Row className="row-sm">
               <Col md={12}>
@@ -206,7 +201,7 @@ const MessageDetail = ({
                 <MessageAugmentations message={message} />
               </Col>
               <Col md={9}>
-                <MessageFields message={message} fields={messageFields} />
+                <MessageFields />
               </Col>
             </Row>
           </>

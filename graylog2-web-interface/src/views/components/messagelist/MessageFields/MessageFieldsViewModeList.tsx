@@ -16,10 +16,23 @@
  */
 
 import React from 'react';
+import styled, { css } from 'styled-components';
 
 import type { MessageFieldsListProps } from 'views/components/messagelist/MessageFields/types';
 import MessageField from 'views/components/messagelist/MessageField';
-import { MessageDetailsDL } from 'views/components/messagelist/MessageFields/MessageFields';
+import { MessageDetailsDefinitionList } from 'components/common';
+
+const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
+  ({ theme }) => css`
+    color: ${theme.colors.text.primary};
+
+    dd {
+      &:not(:last-child) {
+        border-bottom: 1px solid ${theme.colors.table.row.divider};
+      }
+    }
+  `,
+);
 
 const MessageFieldsViewModeList = ({ fields }: MessageFieldsListProps) => {
   if (!fields.length) return null;
