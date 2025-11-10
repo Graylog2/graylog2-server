@@ -99,7 +99,7 @@ const formatRefreshInterval = (intervalInMs: number) => {
 const TemplateDetails = ({ template, showDescription = false }: Props) => {
   const dataTieringPlugins = usePluginEntities('dataTiering');
   const dataTieringPlugin = dataTieringPlugins.find((plugin) => plugin.type === DATA_TIERING_TYPE.HOT_WARM);
-  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore);
+  const dataTieringConfig = prepareDataTieringInitialValues(template.index_set_config.data_tiering, PluginStore, false);
 
   return (
     <Row>
