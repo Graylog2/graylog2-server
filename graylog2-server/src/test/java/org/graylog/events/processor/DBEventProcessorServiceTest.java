@@ -142,8 +142,9 @@ public class DBEventProcessorServiceTest {
     public void testCountBySource() {
         final Map<String, Long> counts = dbService.countBySource();
 
-        assertThat(counts)
-                .containsEntry("illuminate_event_definitions", 1L)
-                .containsEntry("user_event_definitions", 1L);
+        assertThat(counts).isEqualTo(Map.of(
+                "illuminate_event_definitions", 1L,
+                "user_event_definitions", 1L
+        ));
     }
 }
