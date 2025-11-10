@@ -20,6 +20,23 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.ServiceUnavailableException;
+import jakarta.ws.rs.container.ContainerRequestContext;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.mgt.DefaultSecurityManager;
@@ -44,28 +61,6 @@ import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.utilities.IpSubnet;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.InternalServerErrorException;
-import jakarta.ws.rs.NotAuthorizedException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.ServiceUnavailableException;
-import jakarta.ws.rs.container.ContainerRequestContext;
-import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.SecurityContext;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.Set;
@@ -83,7 +78,6 @@ public class SessionsResource extends RestResource {
     private final Request grizzlyRequest;
     private final SessionCreator sessionCreator;
     private final ActorAwareAuthenticationTokenFactory tokenFactory;
-    private final SessionResponseFactory sessionResponseFactory;
     private final CookieFactory cookieFactory;
 
     private static final String USERNAME = "username";
@@ -96,7 +90,6 @@ public class SessionsResource extends RestResource {
                             @Context Request grizzlyRequest,
                             SessionCreator sessionCreator,
                             ActorAwareAuthenticationTokenFactory tokenFactory,
-                            SessionResponseFactory sessionResponseFactory,
                             CookieFactory cookieFactory) {
         this.cookieFactory = cookieFactory;
         this.userService = userService;
@@ -106,7 +99,6 @@ public class SessionsResource extends RestResource {
         this.grizzlyRequest = grizzlyRequest;
         this.sessionCreator = sessionCreator;
         this.tokenFactory = tokenFactory;
-        this.sessionResponseFactory = sessionResponseFactory;
     }
 
     @POST
@@ -136,12 +128,12 @@ public class SessionsResource extends RestResource {
         try {
             // Always create a brand-new session for an authentication attempt by ignoring any previous session ID.
             // This avoids a potential session fixation attack. (GHSA-3xf8-g8gr-g7rh)
-            Optional<Session> session = sessionCreator.login(null, host, authToken);
+            final Optional<Session> session = sessionCreator.login(host, authToken);
             if (session.isPresent()) {
-                final SessionResponse token = sessionResponseFactory.forSession(session.get());
+                final SessionResponse response = SessionResponseFactory.forSession(session.get());
                 return Response.ok()
-                        .entity(token)
-                        .cookie(cookieFactory.createAuthenticationCookie(token, requestContext))
+                        .entity(response)
+                        .cookie(cookieFactory.createAuthenticationCookie(session.get(), requestContext))
                         .build();
             } else {
                 throw new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\"");
@@ -184,17 +176,13 @@ public class SessionsResource extends RestResource {
         final Optional<Session> optionalSession = Optional.ofNullable(retrieveOrCreateSession(subject));
 
         final User user = getCurrentUser();
-        return optionalSession.map(session -> {
-            final SessionResponse response = sessionResponseFactory.forSession(session);
-
-            return Response.ok(
-                            SessionValidationResponse.validWithNewSession(
-                                    String.valueOf(session.getId()),
-                                    String.valueOf(user.getName())
-                            ))
-                    .cookie(cookieFactory.createAuthenticationCookie(response, requestContext))
-                    .build();
-        }).orElseGet(() -> Response.ok(SessionValidationResponse.authenticatedWithNoSession(user.getName()))
+        return optionalSession.map(session -> Response.ok(
+                        SessionValidationResponse.validWithNewSession(
+                                String.valueOf(session.getId()),
+                                String.valueOf(user.getName())
+                        ))
+                .cookie(cookieFactory.createAuthenticationCookie(session, requestContext))
+                .build()).orElseGet(() -> Response.ok(SessionValidationResponse.authenticatedWithNoSession(user.getName()))
                 .cookie(cookieFactory.deleteAuthenticationCookie(requestContext))
                 .build());
     }
@@ -207,10 +195,7 @@ public class SessionsResource extends RestResource {
             // session exists, with a trusted header identifying the user. The authentication filter will authenticate the
             // user based on the trusted header and request a session to be created transparently. The UI will take the
             // session information from the response to perform subsequent requests to the backend using this session.
-            final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets);
-
-            return sessionCreator.create(subject, host)
-                    .orElseThrow(() -> new NotAuthorizedException("Invalid credentials.", "Basic realm=\"Graylog Server session\""));
+            return sessionCreator.createForSubject(subject);
         }
 
         return potentialSession;

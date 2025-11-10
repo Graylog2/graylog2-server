@@ -86,9 +86,9 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.MongoDBSessionService;
-import org.graylog2.security.MongoDbSession;
 import org.graylog2.security.UserSessionTerminationService;
+import org.graylog2.security.sessions.SessionDTO;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -150,7 +150,7 @@ public class UsersResource extends RestResource {
     private final PaginatedUserService paginatedUserService;
     private final AccessTokenService accessTokenService;
     private final RoleService roleService;
-    private final MongoDBSessionService sessionService;
+    private final SessionService sessionService;
     private final SearchQueryParser searchQueryParser;
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
@@ -169,7 +169,7 @@ public class UsersResource extends RestResource {
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
-                         MongoDBSessionService sessionService,
+                         SessionService sessionService,
                          UserSessionTerminationService sessionTerminationService,
                          DefaultSecurityManager securityManager,
                          GlobalAuthServiceConfig globalAuthServiceConfig,
@@ -889,12 +889,12 @@ public class UsersResource extends RestResource {
         String clientAddress = null;
         if (optSessions.isPresent()) {
             final AllUserSessions sessions = optSessions.get();
-            final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
+            final Optional<SessionDTO> mongoDbSession = sessions.forUser(user);
             if (mongoDbSession.isPresent()) {
-                final MongoDbSession session = mongoDbSession.get();
+                final SessionDTO session = mongoDbSession.get();
                 sessionActive = true;
-                lastActivity = session.getLastAccessTime();
-                clientAddress = session.getHost();
+                lastActivity = Date.from(session.lastAccessTime());
+                clientAddress = session.host().orElse(null);
             }
         }
         List<WildcardPermission> wildcardPermissions;
@@ -958,7 +958,7 @@ public class UsersResource extends RestResource {
                 .filter(rootUser -> isPermitted(USERS_READ, rootUser.getName()))
                 .map(rootUser -> {
                     final Set<String> adminRoles = userManagementService.getRoleNames(rootUser);
-                    final Optional<MongoDbSession> lastSession = sessions.forUser(rootUser);
+                    final Optional<SessionDTO> lastSession = sessions.forUser(rootUser);
                     return UserOverviewDTO.builder()
                             .username(rootUser.getName())
                             .fullName(rootUser.getFullName())
@@ -1010,31 +1010,32 @@ public class UsersResource extends RestResource {
     }
 
     private static class AllUserSessions {
-        private final Map<String, Optional<MongoDbSession>> sessions;
+        private final Map<String, Optional<SessionDTO>> sessions;
 
-        private AllUserSessions(Collection<MongoDbSession> sessions) {
+        public static AllUserSessions create(SessionService sessionService) {
+            try (var sessionDTOStream = sessionService.streamAll()) {
+                return new AllUserSessions(sessionDTOStream.toList());
+            }
+        }
+
+        private AllUserSessions(Collection<SessionDTO> sessions) {
             this.sessions = getLastSessionForUser(sessions);
         }
 
-        public static AllUserSessions create(MongoDBSessionService sessionService) {
-            return new AllUserSessions(sessionService.loadAll());
-        }
-
-        public Optional<MongoDbSession> forUser(User user) {
+        public Optional<SessionDTO> forUser(User user) {
             return sessions.getOrDefault(user.getId(), Optional.empty());
         }
 
-        public Optional<MongoDbSession> forUser(UserOverviewDTO user) {
+        public Optional<SessionDTO> forUser(UserOverviewDTO user) {
             return sessions.getOrDefault(user.id(), Optional.empty());
         }
 
         // Among all active sessions, find the last recently used for each user
-        private Map<String, Optional<MongoDbSession>> getLastSessionForUser(Collection<MongoDbSession> sessions) {
-            //noinspection OptionalGetWithoutIsPresent
+        private Map<String, Optional<SessionDTO>> getLastSessionForUser(Collection<SessionDTO> sessions) {
             return sessions.stream()
-                    .filter(s -> s.getUserIdAttribute().isPresent())
-                    .collect(groupingBy(s -> s.getUserIdAttribute().get(),
-                            maxBy(Comparator.comparing(MongoDbSession::getLastAccessTime))));
+                    .filter(s -> s.userId().isPresent())
+                    .collect(groupingBy(s -> s.userId().get(),
+                            maxBy(Comparator.comparing(SessionDTO::lastAccessTime))));
         }
     }
 }

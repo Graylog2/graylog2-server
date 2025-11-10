@@ -16,18 +16,15 @@
  */
 package org.graylog2.rest.resources.system;
 
-import org.apache.shiro.session.Session;
-import org.apache.shiro.subject.Subject;
-import org.graylog2.rest.models.system.sessions.responses.SessionResponseFactory;
-import org.graylog2.shared.security.ShiroPrincipal;
-
 import jakarta.inject.Inject;
-
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ContainerResponseContext;
 import jakarta.ws.rs.container.ContainerResponseFilter;
 import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.SecurityContext;
+import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
+import org.graylog2.shared.security.ShiroPrincipal;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -36,12 +33,10 @@ import static org.graylog2.security.realm.SessionAuthenticator.X_GRAYLOG_NO_SESS
 
 public class SlidingExpirationCookieFilter implements ContainerResponseFilter {
     private final CookieFactory cookieFactory;
-    private final SessionResponseFactory sessionResponseFactory;
 
     @Inject
-    public SlidingExpirationCookieFilter(CookieFactory cookieFactory, SessionResponseFactory sessionResponseFactory) {
+    public SlidingExpirationCookieFilter(CookieFactory cookieFactory) {
         this.cookieFactory = cookieFactory;
-        this.sessionResponseFactory = sessionResponseFactory;
     }
 
     @Override
@@ -51,8 +46,7 @@ public class SlidingExpirationCookieFilter implements ContainerResponseFilter {
         }
 
         sessionFromRequest(requestContext).ifPresent(session -> {
-            var response = sessionResponseFactory.forSession(session);
-            var cookie = cookieFactory.createAuthenticationCookie(response, requestContext);
+            var cookie = cookieFactory.createAuthenticationCookie(session, requestContext);
 
             setCookie(responseContext, cookie);
         });
