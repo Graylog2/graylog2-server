@@ -15,25 +15,11 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { CSSProperties } from 'react';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
-import type { Cell, ColumnDef } from '@tanstack/react-table';
-import { flexRender, createColumnHelper } from '@tanstack/react-table';
-import type { DragEndEvent } from '@dnd-kit/core';
-import {
-  DndContext,
-  useSensors,
-  useSensor,
-  MouseSensor,
-  TouchSensor,
-  KeyboardSensor,
-  closestCenter,
-} from '@dnd-kit/core';
-import { restrictToHorizontalAxis } from '@dnd-kit/modifiers';
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
@@ -52,6 +38,8 @@ import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVi
 import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
 import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
+import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
+import TableCell from 'components/common/EntityDataTable/TableCell';
 
 import type {
   ColumnRenderers,
@@ -103,10 +91,6 @@ const LayoutConfigRow = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
-`;
-
-const Td = styled.td`
-  word-break: break-word;
 `;
 
 const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
@@ -191,28 +175,6 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
         ColumnDef<Entity, unknown>
       >,
     [bulkSelectCol, attributeCols, actionsCol],
-  );
-};
-
-const TableCell = <Entity extends EntityBase>({ cell }: { cell: Cell<Entity, unknown> }) => {
-  const { isDragging, setNodeRef, transform } = useSortable({
-    id: cell.column.id,
-    disabled: !cell.column.columnDef.meta?.enableColumnOrdering,
-  });
-
-  const style: CSSProperties = {
-    opacity: isDragging ? 0.8 : 1,
-    position: 'relative',
-    transform: CSS.Translate.toString(transform), // translate instead of transform to avoid squishing
-    transition: 'width transform 0.2s ease-in-out',
-    width: cell.column.getSize(),
-    zIndex: isDragging ? 1 : 0,
-  };
-
-  return (
-    <Td ref={setNodeRef} style={style}>
-      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-    </Td>
   );
 };
 
@@ -342,20 +304,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     onColumnOrderChange: setColumnOrder,
   });
 
-  const sensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (active && over && active.id !== over.id) {
-      setColumnOrder((curColumnOrder) => {
-        const oldIndex = curColumnOrder.indexOf(active.id as string);
-        const newIndex = curColumnOrder.indexOf(over.id as string);
-
-        return arrayMove(curColumnOrder, oldIndex, newIndex); //this is just a splice util
-      });
-    }
-  };
-
   return (
     <MetaDataProvider<Meta> meta={meta}>
       <SelectedEntitiesProvider<Entity> table={table} selectedEntities={selectedEntities}>
@@ -372,36 +320,27 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               </ButtonGroup>
             </LayoutConfigRow>
           </ActionsRow>
-          <DndContext
-            collisionDetection={closestCenter}
-            modifiers={[restrictToHorizontalAxis]}
-            onDragEnd={handleDragEnd}
-            sensors={sensors}>
-            <SortableContext
-              // Todo: filter out utility columns based on type definitions
-              items={columnOrder.filter((id) => !['actions', 'bulk-select'].includes(id))}
-              strategy={horizontalListSortingStrategy}>
-              <ScrollContainer id="scroll-container" ref={tableRef}>
-                <StyledTable striped condensed hover>
-                  <TableHead table={table} />
-                  {table.getRowModel().rows.map((row) => (
-                    <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                      <tr>
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id} cell={cell} />
-                        ))}
-                      </tr>
-                      <ExpandedSections
-                        key={`expanded-sections-${row.id}`}
-                        expandedSectionsRenderer={expandedSectionsRenderer}
-                        entity={row.original}
-                      />
-                    </tbody>
-                  ))}
-                </StyledTable>
-              </ScrollContainer>
-            </SortableContext>
-          </DndContext>
+          <TableDndProvider columnOrder={columnOrder} onColumnOrderChange={setColumnOrder} table={table}>
+            <ScrollContainer id="scroll-container" ref={tableRef}>
+              <StyledTable striped condensed hover>
+                <TableHead table={table} />
+                {table.getRowModel().rows.map((row) => (
+                  <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
+                    <tr>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} cell={cell} />
+                      ))}
+                    </tr>
+                    <ExpandedSections
+                      key={`expanded-sections-${row.id}`}
+                      expandedSectionsRenderer={expandedSectionsRenderer}
+                      entity={row.original}
+                    />
+                  </tbody>
+                ))}
+              </StyledTable>
+            </ScrollContainer>
+          </TableDndProvider>
         </ExpandedSectionsProvider>
       </SelectedEntitiesProvider>
     </MetaDataProvider>

@@ -84,7 +84,10 @@ export type DefaultLayout = {
   defaultPageSize: number;
 };
 
-export type ColumnMetaContext<Entity extends EntityBase> = {
-  label?: string;
-  columnRenderer?: ColumnRenderer<Entity>;
-};
+export type ColumnMetaContext<Entity extends EntityBase> =
+  | {
+      label?: string;
+      columnRenderer?: ColumnRenderer<Entity>;
+      enableColumnOrdering?: boolean;
+    }
+  | undefined;

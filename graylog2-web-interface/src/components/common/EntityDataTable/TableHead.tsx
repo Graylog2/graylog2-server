@@ -25,7 +25,7 @@ import type { CSSProperties } from 'react';
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import Icon from 'components/common/Icon';
 
-import type { EntityBase } from './types';
+import type { EntityBase, ColumnMetaContext } from './types';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -52,9 +52,11 @@ const DragIcon = styled(Icon)`
 `;
 
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
+
   const { attributes, isDragging, listeners, setNodeRef, transform } = useSortable({
     id: header.column.id,
-    disabled: !header.column.columnDef.meta?.enableColumnOrdering,
+    disabled: !columnMeta?.enableColumnOrdering,
   });
 
   const style: CSSProperties = {
@@ -69,7 +71,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
 
   return (
     <Th $width={header.getSize()} colSpan={header.colSpan} key={header.id} ref={setNodeRef} style={style}>
-      {header.column.columnDef.meta?.enableColumnOrdering && (
+      {columnMeta?.enableColumnOrdering && (
         <DragHandle {...attributes} {...listeners} $isDragging={isDragging}>
           <DragIcon name="drag_indicator" />
         </DragHandle>
@@ -86,7 +88,7 @@ const TableHead = <Entity extends EntityBase>({ table }: { table: Table<Entity> 
     {table.getHeaderGroups().map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeaderCell key={header.id} header={header} table={table} />
+          <TableHeaderCell key={header.id} header={header} />
         ))}
       </tr>
     ))}
