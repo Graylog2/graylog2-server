@@ -99,7 +99,7 @@ public class UserServiceImplTest {
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
                 userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver);
 
-        lenient().when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
+        lenient().when(roleService.getAdminRoleObjectId()).thenReturn("deadbeefdeadbeefdeadbeef");
     }
 
     @Test
@@ -216,7 +216,7 @@ public class UserServiceImplTest {
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadAll() {
-        assertThat(userService.loadAll()).hasSize(5);
+        assertThat(userService.loadAll()).hasSize(6);
     }
 
     @Test
@@ -266,7 +266,7 @@ public class UserServiceImplTest {
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testCount() {
-        assertThat(userService.count()).isEqualTo(5L);
+        assertThat(userService.count()).isEqualTo(6L);
     }
 
     public static class UserImplFactory implements UserImpl.Factory {
@@ -361,5 +361,15 @@ public class UserServiceImplTest {
         assertThat(userService.getPermissionsForUser(user).stream().map(p -> p instanceof CaseSensitiveWildcardPermission ? p.toString() : p).collect(Collectors.toSet()))
                 .containsExactlyInAnyOrder("users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
                         "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
+    }
+
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testCountByPrivilege() {
+        final Map<String, Long> counts = userService.countByPrivilege();
+
+        assertThat(counts)
+                .containsEntry("admin_users", 2L)
+                .containsEntry("non_admin_users", 4L);
     }
 }
