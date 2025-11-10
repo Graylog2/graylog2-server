@@ -137,6 +137,7 @@
         <dependency>
             <groupId>org.graylog</groupId>
             <artifactId>jadconfig</artifactId>
+            <version>${jadconfig.version}</version>
         </dependency>
 
         <dependency>
