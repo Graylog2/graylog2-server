@@ -50,49 +50,72 @@ const DefinitionDescription = styled.dd(
 `,
 );
 
-const MessageField = ({ fieldName, fieldType, message, value }: Props) => {
-  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
+type MessageFieldNamePros = {
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+};
+
+type MessageFieldValueProps = {
+  fieldName: string;
+  fieldType: FieldType;
+  message: Message;
+  value: any;
+};
+
+export const MessageFieldName = ({ fieldName, fieldType, message }: MessageFieldNamePros) => {
   const activeQuery = useActiveQueryId();
-
-  const {
-    decoration_stats: decorationStats = {
-      added_fields: {},
-      changed_fields: {},
-      removed_fields: {},
-    },
-  } = message;
-
   const isDecoratedField =
-    decorationStats &&
-    (decorationStats.added_fields[fieldName] !== undefined || decorationStats.changed_fields[fieldName] !== undefined);
-
-  const ValueContext = isDecoratedField
-    ? ({ children }) => (
-        <InteractiveContext.Provider value={false}>
-          {children} <DecoratedField>(decorated)</DecoratedField>
-        </InteractiveContext.Provider>
-      )
-    : ({ children }) => children;
+    message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
 
   return (
-    <>
-      <dt data-testid={`message-field-name-${fieldName}`}>
-        <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
-          {fieldName}
-        </Field>
-      </dt>
-      <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
-        <ValueContext>
-          <Value
-            field={fieldName}
-            value={innerValue}
-            type={isDecoratedField ? FieldType.Decorated : fieldType}
-            render={DecoratedValue}
-          />
-        </ValueContext>
-      </DefinitionDescription>
-    </>
+    <Field queryId={activeQuery} name={fieldName} type={isDecoratedField ? FieldType.Decorated : fieldType}>
+      {fieldName}
+    </Field>
   );
 };
+
+const ValueContext = ({
+  isDecoratedField,
+  children = null,
+}: React.PropsWithChildren<{ isDecoratedField: boolean }>) => {
+  if (isDecoratedField)
+    return (
+      <InteractiveContext.Provider value={false}>
+        {children} <DecoratedField>(decorated)</DecoratedField>
+      </InteractiveContext.Provider>
+    );
+
+  return <>{children}</>;
+};
+
+export const MessageFieldValue = ({ message, fieldName, fieldType, value }: MessageFieldValueProps) => {
+  const isDecoratedField =
+    message?.decoration_stats?.added_fields?.[fieldName] || message?.decoration_stats?.changed_fields?.[fieldName];
+
+  const innerValue = SPECIAL_FIELDS.indexOf(fieldName) !== -1 ? message.fields[fieldName] : value;
+
+  return (
+    <ValueContext isDecoratedField={isDecoratedField}>
+      <Value
+        field={fieldName}
+        value={innerValue}
+        type={isDecoratedField ? FieldType.Decorated : fieldType}
+        render={DecoratedValue}
+      />
+    </ValueContext>
+  );
+};
+
+const MessageField = ({ fieldName, fieldType, message, value }: Props) => (
+  <>
+    <dt data-testid={`message-field-name-${fieldName}`}>
+      <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
+    </dt>
+    <DefinitionDescription data-testid={`message-field-value-${fieldName}`}>
+      <MessageFieldValue value={value} fieldName={fieldName} fieldType={fieldType} message={message} />
+    </DefinitionDescription>
+  </>
+);
 
 export default MessageField;
