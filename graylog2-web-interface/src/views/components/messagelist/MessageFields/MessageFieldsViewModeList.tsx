@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { MessageFieldsListProps } from 'views/components/messagelist/MessageFields/types';
 import MessageField from 'views/components/messagelist/MessageField';
 import { MessageDetailsDefinitionList } from 'components/common';
+import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 
 const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
@@ -35,13 +36,14 @@ const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
 );
 
 const MessageFieldsViewModeList = ({ fields }: MessageFieldsListProps) => {
+  const { message } = useContext(MessageFavoriteFieldsContext);
   if (!fields.length) return null;
 
   return (
     <div>
       <MessageDetailsDL className="message-details-fields">
         {fields.map(({ field, value, type }) => (
-          <MessageField key={field} fieldName={field} fieldType={type} value={value} />
+          <MessageField key={field} fieldName={field} fieldType={type} value={value} message={message} />
         ))}
       </MessageDetailsDL>
     </div>
