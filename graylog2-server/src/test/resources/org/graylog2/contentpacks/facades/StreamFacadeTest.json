@@ -1,0 +1,113 @@
+{
+  "streams": [
+    {
+      "_id": {
+        "$oid": "5f43a1e1e1e1e1e1e1e1e1e1"
+      },
+      "_scope": "DEFAULT",
+      "creator_user_id": "admin",
+      "outputs": [],
+      "matching_type": "AND",
+      "description": "Description of a regular stream",
+      "created_at": {
+        "$date": "2025-08-12T18:46:19.121Z"
+      },
+      "disabled": true,
+      "title": "A Regular Stream",
+      "remove_matches_from_default_stream": false,
+      "index_set_id": "6822101035a24c5405fde2c2",
+      "categories": [],
+      "is_default_stream": false,
+      "is_editable": true
+    },
+    {
+      "_id": {
+        "$oid": "000000000000000000000002"
+      },
+      "creator_user_id": "admin",
+      "is_default_stream": false,
+      "index_set_id": "6822101635a24c5405fde388",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": true,
+      "description": "Stream containing all events created",
+      "created_at": {
+        "$date": "2025-05-12T15:13:26.151Z"
+      },
+      "disabled": false,
+      "title": "All events",
+      "_scope": "GRAYLOG_IMMUTABLE_SCOPE"
+    },
+    {
+      "_id": {
+        "$oid": "000000000000000000000003"
+      },
+      "creator_user_id": "admin",
+      "is_default_stream": false,
+      "index_set_id": "6822101635a24c5405fde38b",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": true,
+      "description": "Stream containing all system events created",
+      "created_at": {
+        "$date": "2025-05-12T15:13:26.218Z"
+      },
+      "disabled": false,
+      "title": "All system events",
+      "_scope": "GRAYLOG_IMMUTABLE_SCOPE"
+    },
+    {
+      "_id": {
+        "$oid": "000000000000000000000004"
+      },
+      "creator_user_id": "admin",
+      "is_default_stream": false,
+      "index_set_id": "6822101735a24c5405fde39f",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": true,
+      "description": "Stream containing messages that failed to be processed or indexed",
+      "created_at": {
+        "$date": "2025-05-12T15:13:27.527Z"
+      },
+      "disabled": false,
+      "title": "Processing and Indexing Failures",
+      "_scope": "GRAYLOG_IMMUTABLE_SCOPE"
+    },
+    {
+      "_id": {
+        "$oid": "68cd7edce7af84633d9aca47"
+      },
+      "_scope": "GRAYLOG_IMMUTABLE_SCOPE",
+      "creator_user_id": "admin",
+      "outputs": [],
+      "matching_type": "AND",
+      "description": "External DL Connector",
+      "created_at": {
+        "$date": "2025-09-19T16:03:40.915Z"
+      },
+      "disabled": false,
+      "title": "External DL Connector",
+      "remove_matches_from_default_stream": true,
+      "index_set_id": "6822101035a24c5405fde2c2",
+      "categories": [],
+      "is_default_stream": false,
+      "is_editable": false
+    },
+    {
+      "_id": {
+        "$oid": "000000000000000000000001"
+      },
+      "creator_user_id": "local:admin",
+      "is_default_stream": true,
+      "index_set_id": "6822101035a24c5405fde2c2",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": false,
+      "description": "Contains messages that are not explicitly routed to other streams",
+      "created_at": {
+        "$date": "2025-05-12T15:13:20.93Z"
+      },
+      "disabled": false,
+      "title": "Default Stream",
+      "outputs": [],
+      "_scope": "GRAYLOG_NONDELETEABLE_SCOPE"
+    }
+  ]
+}
