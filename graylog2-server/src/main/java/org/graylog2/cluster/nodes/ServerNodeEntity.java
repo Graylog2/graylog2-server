@@ -19,6 +19,7 @@ package org.graylog2.cluster.nodes;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import org.bson.types.ObjectId;
 import org.graylog2.database.DbEntity;
+import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 
 import java.util.Map;
 
@@ -34,6 +35,17 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
         super(id, fields);
     }
 
+    public LoadBalancerStatus getLoadBalancerStatus() {
+        if (!fields.containsKey(ServerNodeDto.LOAD_BALANCER_STATUS_FIELD)) {
+            return null;
+        }
+        return LoadBalancerStatus.valueOf(fields.get(ServerNodeDto.LOAD_BALANCER_STATUS_FIELD).toString());
+    }
+
+    public boolean isProcessing() {
+        return fields.getOrDefault(ServerNodeDto.LOAD_BALANCER_STATUS_FIELD, "false").equals("true");
+    }
+
     @Override
     public ServerNodeDto toDto() {
         return ServerNodeDto.Builder.builder()
@@ -43,6 +55,8 @@ public class ServerNodeEntity extends AbstractNode<ServerNodeDto> {
                 .setLastSeen(this.getLastSeen())
                 .setHostname(this.getHostname())
                 .setLeader(this.isLeader())
+                .setProcessing(this.isProcessing())
+                .setLoadBalancerStatus(this.getLoadBalancerStatus())
                 .build();
     }
 

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import jakarta.annotation.Nullable;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 
 import java.util.Map;
@@ -38,6 +39,7 @@ public abstract class ServerNodeDto extends NodeDto {
     @JsonProperty("is_processing")
     public abstract boolean isProcessing();
 
+    @Nullable
     @JsonProperty("lb_status")
     public abstract LoadBalancerStatus getLoadBalancerStatus();
 
@@ -61,7 +63,7 @@ public abstract class ServerNodeDto extends NodeDto {
         public abstract ServerNodeDto.Builder setProcessing(boolean isProcessing);
 
         @JsonProperty(LOAD_BALANCER_STATUS_FIELD)
-        public abstract Builder setLoadBalancerStatus(LoadBalancerStatus loadBalancerStatus);
+        public abstract Builder setLoadBalancerStatus(@Nullable LoadBalancerStatus loadBalancerStatus);
 
         @JsonCreator
         public static Builder builder() {
