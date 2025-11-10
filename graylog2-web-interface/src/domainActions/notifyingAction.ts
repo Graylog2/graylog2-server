@@ -24,7 +24,7 @@ type Notification = {
 };
 
 const _displaySuccessNotification = <T, Args extends Array<T>>(
-  successNotification: (...Args) => Notification,
+  successNotification: (...args: Args) => Notification,
   ...args: Args
 ) => {
   const { message, title } = successNotification(...args);
@@ -32,7 +32,7 @@ const _displaySuccessNotification = <T, Args extends Array<T>>(
 };
 
 const _displayErrorNotification = <T, Args extends Array<T>>(
-  errorNotification: (error: string, ...Args) => Notification,
+  errorNotification: (error: string, ...args: Args) => Notification,
   error,
   ...args: Args
 ) => {

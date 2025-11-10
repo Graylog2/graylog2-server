@@ -94,8 +94,8 @@ public class InputTypesResource extends RestResource {
                 .filter(e -> isPermitted(RestPermissions.INPUT_TYPES_CREATE, e.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
             final InputDescription description = entry.getValue();
-            return InputTypeInfo.create(entry.getKey(), description.getName(), description.isExclusive(),
-                    description.getRequestedConfiguration(), description.getLinkToDocs());
+                    return InputTypeInfo.create(entry.getKey(), description.getName(), description.getDescription(),
+                            description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
         }));
     }
 
@@ -116,7 +116,8 @@ public class InputTypesResource extends RestResource {
             throwInputTypeNotFound(inputType);
         }
 
-        return InputTypeInfo.create(inputType, description.getName(), description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
+        return InputTypeInfo.create(inputType, description.getName(), description.getDescription(),
+                description.isExclusive(), description.getRequestedConfiguration(), description.getLinkToDocs());
     }
 
     private static void throwInputTypeNotFound(String inputType) {

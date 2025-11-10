@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useQuery } from '@tanstack/react-query';
 
+import { isPermitted } from 'util/PermissionsMixin';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -30,12 +31,11 @@ const useShowDatanodeMigration = (): {
   showDatanodeMigration: boolean;
 } => {
   const { permissions } = useCurrentUser();
-  const canStartDataNode = React.useMemo(
-    () => permissions.includes('datanode:start') || permissions.includes('*'),
-    [permissions],
-  );
+  const canStartDataNode = React.useMemo(() => isPermitted(permissions, 'datanode:start'), [permissions]);
 
-  const { data: isDatanodeConfiguredAndUsed } = useQuery(['show_datanode_migration'], fetchShowDatanodeMigration, {
+  const { data: isDatanodeConfiguredAndUsed } = useQuery({
+    queryKey: ['show_datanode_migration'],
+    queryFn: fetchShowDatanodeMigration,
     enabled: canStartDataNode,
   });
 

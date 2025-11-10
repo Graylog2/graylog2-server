@@ -71,7 +71,7 @@ class UntrustedCertificateExtractorTest {
 
         GuiceInjectorHolder.createInjector(Collections.emptyList());
 
-        String baseUri = "https://localhost:" + findFreePort();
+        String baseUri = "https://127.0.0.1:" + findFreePort();
 
         return GrizzlyHttpServerFactory.createHttpServer(URI.create(baseUri), rc, true, new SSLEngineConfigurator(sslCon).setClientMode(false).setNeedClientAuth(false));
     }
@@ -134,7 +134,7 @@ class UntrustedCertificateExtractorTest {
     @Nonnull
     private String getHttpHost() {
         final int port = httpsServer.getListeners().iterator().next().getPort();
-        return "https://localhost:" + port;
+        return "https://127.0.0.1:" + port;
     }
 
     @Nonnull

@@ -17,7 +17,7 @@
 /* This file contains configuration for React Styleguidist https://react-styleguidist.js.org/ */
 const path = require('path');
 
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 
 const webpackConfig = require('./webpack.config.js');
 

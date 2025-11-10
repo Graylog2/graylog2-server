@@ -24,7 +24,7 @@ type StyledBootstrapInputAddonProps = {
   className?: string;
 };
 
-const StyledBootstrapInputAddon = ({ className, ...rest }: StyledBootstrapInputAddonProps) => (
+const StyledBootstrapInputAddon = ({ className = undefined, ...rest }: StyledBootstrapInputAddonProps) => (
   <BootstrapInputGroup.Addon bsClass={className} {...rest} />
 );
 
@@ -42,7 +42,7 @@ type AddonProps = {
   children: React.ReactNode;
 };
 
-const Addon = ({ bsClass = 'input-group-addon', className, ...addonProps }: AddonProps) => (
+const Addon = ({ bsClass = 'input-group-addon', className = undefined, ...addonProps }: AddonProps) => (
   <StyledAddon className={classNames(bsClass, className)} {...addonProps} />
 );
 
@@ -52,7 +52,7 @@ type ButtonProps = {
   children: React.ReactNode;
 };
 
-const Button = ({ bsClass = 'input-group-btn', className, ...addonProps }: ButtonProps) => (
+const Button = ({ bsClass = 'input-group-btn', className = undefined, ...addonProps }: ButtonProps) => (
   <BootstrapInputGroup.Button bsClass={classNames(bsClass, className)} {...addonProps} />
 );
 
@@ -62,7 +62,7 @@ type InputGroupProps = React.ComponentProps<typeof BootstrapInputGroup> & {
   children: React.ReactNode;
 };
 
-const InputGroup = ({ bsClass = 'input-group', className, ...restProps }: InputGroupProps) => (
+const InputGroup = ({ bsClass = 'input-group', className = undefined, ...restProps }: InputGroupProps) => (
   <BootstrapInputGroup bsClass={classNames(bsClass, className)} {...restProps} />
 );
 

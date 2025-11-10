@@ -22,89 +22,93 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createReactError, createUnauthorizedError, createNotFoundError } from 'logic/errors/ReportedErrors';
 import FetchError from 'logic/errors/FetchError';
 import { Link } from 'components/common/router';
+import useProductName, { DEFAULT_PRODUCT_NAME } from 'brand-customization/useProductName';
+import asMock from 'helpers/mocking/AsMock';
 
 import ReportedErrorBoundary from './ReportedErrorBoundary';
 
 jest.mock('routing/withLocation', () => (Component) => (props) => (
   <Component {...props} location={{ pathname: '/' }} />
 ));
+jest.mock('brand-customization/useProductName');
+
+const triggerError: typeof ErrorsActions.report = async (error) => {
+  await suppressConsole(() => {
+    ErrorsActions.report(error);
+  });
+  await waitFor(() => expect(screen.queryByText('Hello World!')).toBeNull());
+};
 
 describe('ReportedErrorBoundary', () => {
-  it('displays child component if there is no error', async () => {
-    render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
-
-    await screen.findByText('Hello World!');
+  beforeEach(() => {
+    asMock(useProductName).mockReturnValue(DEFAULT_PRODUCT_NAME);
   });
 
-  it('displays runtime error page when react error got reported', async () => {
-    render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
+  describe('displays', () => {
+    beforeEach(async () => {
+      // eslint-disable-next-line testing-library/no-render-in-lifecycle
+      render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
 
-    await screen.findByText('Hello World!');
-
-    await suppressConsole(() => {
-      ErrorsActions.report(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
+      await screen.findByText('Hello World!');
     });
 
-    await waitFor(() => expect(screen.queryByText('Hello World!')).toBeNull());
+    it('displays runtime error page when react error got reported', async () => {
+      await triggerError(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
 
-    expect(screen.getByText('Something went wrong.')).not.toBeNull();
-    expect(screen.getByText('The error message')).not.toBeNull();
-  });
-
-  it('displays not found page when not found error got reported', async () => {
-    render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
-
-    await screen.findByText('Hello World!');
-
-    const response = { status: 404, body: { message: 'The request error message' } };
-
-    await suppressConsole(() => {
-      ErrorsActions.report(createNotFoundError(new FetchError('The request error message', response.status, response)));
+      await screen.findByText('Something went wrong.');
+      await screen.findByText('The error message');
     });
 
-    await waitFor(() => expect(screen.queryByText('Hello World!')).toBeNull());
+    it('displays not found page when not found error got reported', async () => {
+      const response = { status: 404, body: { message: 'The request error message' } };
 
-    expect(screen.getByText('Page not found')).not.toBeNull();
-    expect(screen.getByText('The party gorilla was just here, but had another party to rock.')).not.toBeNull();
-  });
+      await triggerError(createNotFoundError(new FetchError('The request error message', response.status, response)));
 
-  it('displays reported error with an unkown type', async () => {
-    render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
+      await screen.findByText('Page not found');
+      await screen.findByText(/The page you are looking for does not exist/i);
+    });
 
-    await screen.findByText('Hello World!');
+    it('displays reported error with an unknown type', async () => {
+      const response = { status: 404, body: { message: 'The error message' } };
 
-    const response = { status: 404, body: { message: 'The error message' } };
-
-    await suppressConsole(() => {
-      ErrorsActions.report({
+      await triggerError({
         ...createNotFoundError(new FetchError('The error message', response.status, response)),
-        type: 'UnkownReportedError',
+        type: 'UnknownReportedError',
       });
+
+      await screen.findByText('Something went wrong');
+      await screen.findByText(/The error message/);
     });
 
-    await waitFor(() => expect(screen.queryByText('Hello World!')).toBeNull());
+    it('displays unauthorized error page when unauthorized error got reported', async () => {
+      const response = { status: 403, body: { message: 'The request error message' } };
 
-    expect(screen.getByText('Something went wrong')).not.toBeNull();
-    expect(screen.getByText(/The error message/)).not.toBeNull();
-  });
-
-  it('displays unauthorized error page when unauthorized error got reported', async () => {
-    render(<ReportedErrorBoundary>Hello World!</ReportedErrorBoundary>);
-
-    await screen.findByText('Hello World!');
-
-    const response = { status: 403, body: { message: 'The request error message' } };
-
-    await suppressConsole(() => {
-      ErrorsActions.report(
+      await triggerError(
         createUnauthorizedError(new FetchError('The request error message', response.status, response)),
       );
+
+      await screen.findByText('Missing Permissions');
+
+      expect(screen.getByText(/The request error message/)).toBeInTheDocument();
     });
 
-    await screen.findByText('Missing Permissions');
+    it('displays helpful product sources', async () => {
+      await triggerError(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
 
-    expect(screen.queryByText('Hello World!')).toBeNull();
-    expect(screen.getByText(/The request error message/)).toBeInTheDocument();
+      await screen.findByText(/Do not hesitate to consult the Graylog community if your questions are not answered/i);
+    });
+
+    it('does not show support sources if product name is not default', async () => {
+      asMock(useProductName).mockReturnValue('AwesomeLog');
+
+      await triggerError(createReactError(new Error('The error message'), { componentStack: 'The component stack' }));
+
+      await screen.findByText(/Something went wrong/i);
+
+      expect(
+        screen.queryByText(/Do not hesitate to consult the Graylog community if your questions are not answered/i),
+      ).not.toBeInTheDocument();
+    });
   });
 
   it('resets error when navigation changes', async () => {
@@ -121,11 +125,7 @@ describe('ReportedErrorBoundary', () => {
 
     expect(screen.getByText('Hello World!')).not.toBeNull();
 
-    await suppressConsole(() => {
-      ErrorsActions.report(
-        createUnauthorizedError(new FetchError('The request error message', response.status, response)),
-      );
-    });
+    await triggerError(createUnauthorizedError(new FetchError('The request error message', response.status, response)));
 
     await screen.findByText('Missing Permissions');
 

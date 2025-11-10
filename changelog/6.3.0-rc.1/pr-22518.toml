@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Use provided password to encrypt private key in client certificate downloads in data node"
+
+issues = ["graylog-plugin-enterprise#10598"]
+pulls = ["22518"]

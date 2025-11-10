@@ -36,7 +36,7 @@ const mockView = createSearch({ queryId: 'somequery' })
 jest.mock(
   'views/pages/ShowViewPage',
   () =>
-    ({ children }: React.PropsWithChildren<{}>) =>
+    ({ children = undefined }: React.PropsWithChildren<{}>) =>
       children,
 );
 jest.mock('routing/withLocation', () => (x) => x);

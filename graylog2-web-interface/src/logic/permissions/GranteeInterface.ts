@@ -14,12 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { $PropertyType } from 'utility-types';
-
 import type Grantee from './Grantee';
 
 export interface GranteeInterface {
-  readonly title: $PropertyType<Grantee, 'title'>;
-  readonly id: $PropertyType<Grantee, 'id'>;
-  readonly type: $PropertyType<Grantee, 'type'>;
+  readonly title: Grantee['title'];
+  readonly id: Grantee['id'];
+  readonly type: Grantee['type'];
 }

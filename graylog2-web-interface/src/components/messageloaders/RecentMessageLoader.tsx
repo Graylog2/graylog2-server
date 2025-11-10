@@ -24,7 +24,7 @@ import InputDropdown from 'components/inputs/InputDropdown';
 import UserNotification from 'util/UserNotification';
 import type { Message } from 'views/components/messagelist/Types';
 import useForwarderMessageLoaders from 'components/messageloaders/useForwarderMessageLoaders';
-import { UniversalSearchStore } from 'stores/search/UniversalSearchStore';
+import universalSearch from 'stores/search/UniversalSearch';
 
 import type { Input as InputType } from './Types';
 
@@ -99,7 +99,7 @@ type Props = {
   selectedInputId?: string;
 };
 
-const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props) => {
+const RecentMessageLoader = ({ inputs = undefined, onMessageLoaded, selectedInputId = undefined }: Props) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { ForwarderInputDropdown } = useForwarderMessageLoaders();
 
@@ -114,7 +114,7 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
     }
   }, [inputs, selectedInputId]);
 
-  const onClick = (inputId: string) => {
+  const onClick = async (inputId: string) => {
     const input = inputs && inputs.get(inputId);
 
     if (selectedInputType === 'server' && !input) {
@@ -126,29 +126,29 @@ const RecentMessageLoader = ({ inputs, onMessageLoaded, selectedInputId }: Props
       return;
     }
 
-    setLoading(true);
-    const promise = UniversalSearchStore.search(
-      'relative',
-      `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
-      { range: 3600 },
-      undefined,
-      1,
-      undefined,
-      undefined,
-      undefined,
-      false,
-    );
+    try {
+      setLoading(true);
+      const response = await universalSearch(
+        'relative',
+        `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
+        { type: 'relative', range: 3600 },
+        undefined,
+        1,
+        undefined,
+        undefined,
+        undefined,
+        false,
+      );
 
-    promise.then((response) => {
       if (response.total_results > 0) {
         onMessageLoaded(response.messages[0]);
       } else {
         UserNotification.error('Input did not return a recent message.');
         onMessageLoaded(undefined);
       }
-    });
-
-    promise.finally(() => setLoading(false));
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (isCloud) {

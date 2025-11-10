@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { renderHook, act } from 'wrappedTestingLibrary/hooks';
+import { renderHook, act, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import asMock from 'helpers/mocking/AsMock';
 import fetch from 'logic/rest/FetchProvider';
@@ -24,13 +24,6 @@ import useSetIndexSetProfileMutation from 'components/indices/IndexSetFieldTypes
 
 const urlPrefix = '/system/indices/mappings/set_profile';
 
-const logger = {
-  // eslint-disable-next-line no-console
-  log: console.log,
-  // eslint-disable-next-line no-console
-  warn: console.warn,
-  error: () => {},
-};
 jest.mock('logic/rest/FetchProvider', () => jest.fn(() => Promise.resolve()));
 
 jest.mock('util/UserNotification', () => ({
@@ -55,7 +48,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
 
     it('should run fetch and display UserNotification', async () => {
       asMock(fetch).mockImplementation(() => Promise.resolve({}));
-      const { result, waitFor } = renderHook(() => useSetIndexSetProfileMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useSetIndexSetProfileMutation());
 
       act(() => {
         result.current.setIndexSetFieldTypeProfile(requestBody);
@@ -71,7 +64,7 @@ describe('useRemoveCustomFieldTypeMutation', () => {
     it('should display notification on fail', async () => {
       asMock(fetch).mockImplementation(() => Promise.reject(new Error('Error')));
 
-      const { result, waitFor } = renderHook(() => useSetIndexSetProfileMutation(), { queryClientOptions: { logger } });
+      const { result } = renderHook(() => useSetIndexSetProfileMutation());
 
       act(() => {
         result.current.setIndexSetFieldTypeProfile(requestBody).catch(() => {});

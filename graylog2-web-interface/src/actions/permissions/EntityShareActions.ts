@@ -31,7 +31,9 @@ export type PaginatedEntityShares = PaginatedList<SharedEntity> & {
 };
 
 export type EntitySharePayload = {
-  selected_grantee_capabilities: SelectedGranteeCapabilities;
+  selected_grantee_capabilities?: SelectedGranteeCapabilities;
+  prepare_request?: Array<GRN>;
+  selected_collections?: Array<GRN>;
 };
 
 export type EntityShare = {

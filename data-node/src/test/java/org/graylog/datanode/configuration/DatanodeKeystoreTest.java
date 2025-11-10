@@ -18,9 +18,9 @@ package org.graylog.datanode.configuration;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.security.certutil.CertRequest;
 import org.graylog.security.certutil.CertificateGenerator;
 import org.graylog.security.certutil.KeyPair;
@@ -40,7 +40,7 @@ import java.util.List;
 class DatanodeKeystoreTest {
 
     private EventBus eventBus;
-    private final List<DatanodeKeystoreChangedEvent> receivedEvents = new LinkedList<>();
+    private final List<Object> receivedEvents = new LinkedList<>();
 
     @BeforeEach
     void setUp() {
@@ -54,17 +54,23 @@ class DatanodeKeystoreTest {
     }
 
     @Subscribe
-    public void subscribe(DatanodeKeystoreChangedEvent event) {
+    public void subscribe(DatanodeCertificateChangedEvent event) {
+        // remember received events so we can verify them later
+        receivedEvents.add(event);
+    }
+
+    @Subscribe
+    public void subscribe(DatanodeCertificateRenewedEvent event) {
         // remember received events so we can verify them later
         receivedEvents.add(event);
     }
 
     @Test
     void testCreateRead(@TempDir Path tempDir) throws Exception {
-        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", this.eventBus);
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
         Assertions.assertThat(datanodeKeystore.exists()).isFalse();
 
-        final KeyPair keyPair = generateKeyPair();
+        final KeyPair keyPair = DatanodeTestUtils.generateKeyPair(Duration.ofDays(30));
 
         datanodeKeystore.create(keyPair);
         Assertions.assertThat(datanodeKeystore.exists()).isTrue();
@@ -90,10 +96,8 @@ class DatanodeKeystoreTest {
 
     @Test
     void testIntermediateCA(@TempDir Path tempDir) throws Exception {
-
-        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(new DatanodeDirectories(tempDir, tempDir, tempDir, tempDir), "foobar", this.eventBus);
-        datanodeKeystore.create(generateKeyPair());
-
+        final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", this.eventBus);
+        datanodeKeystore.create( DatanodeTestUtils.generateKeyPair(Duration.ofDays(30)));
 
         final KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("root")
                 .isCA(true)
@@ -116,13 +120,5 @@ class DatanodeKeystoreTest {
         datanodeKeystore.replaceCertificatesInKeystore(certChain);
 
         Assertions.assertThat(datanodeKeystore.hasSignedCertificate()).isTrue();
-    }
-
-    @Nonnull
-    private static KeyPair generateKeyPair() throws Exception {
-        final CertRequest certRequest = CertRequest.selfSigned(DatanodeKeystore.DATANODE_KEY_ALIAS)
-                .isCA(false)
-                .validity(Duration.ofDays(31));
-        return CertificateGenerator.generate(certRequest);
     }
 }

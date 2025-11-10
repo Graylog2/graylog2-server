@@ -57,16 +57,16 @@ const position = (pullRight: boolean, dropup: boolean): 'top' | 'bottom' | 'top-
 };
 
 const DropdownButton = ({
-  buttonTitle,
-  children,
+  buttonTitle = undefined,
+  children = undefined,
   closeOnItemClick = true,
-  dropup,
-  title,
-  onMouseDown,
-  onToggle,
-  pullRight,
-  noCaret,
-  keepMounted,
+  dropup = undefined,
+  title = undefined,
+  onMouseDown = undefined,
+  onToggle = undefined,
+  pullRight = undefined,
+  noCaret = undefined,
+  keepMounted = undefined,
   ...rest
 }: Props) => (
   <Menu

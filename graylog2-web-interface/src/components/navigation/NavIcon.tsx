@@ -24,6 +24,7 @@ import useNavigationCustomization from 'brand-customization/useNavigationCustomi
 import { Icon } from 'components/common';
 import type { IconName } from 'components/common/Icon';
 import type { Branding } from 'util/AppConfig';
+import { MAX_NAV_ICON_WIDTH } from 'theme/constants';
 
 type NavIconType = keyof Branding['navigation'];
 
@@ -32,11 +33,13 @@ const DEFAULT_ICONS: Record<NavIconType, IconName> = {
   'scratchpad': 'edit_square',
   'user_menu': 'person',
   'help': 'help',
+  'search': 'search',
 };
 
 const SvgContainer = styled.div`
   svg {
     width: 100%;
+    max-width: ${MAX_NAV_ICON_WIDTH};
     height: 22px;
     display: block;
     fill: currentColor;

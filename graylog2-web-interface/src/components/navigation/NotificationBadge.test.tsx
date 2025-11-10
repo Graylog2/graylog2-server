@@ -15,53 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, waitFor, act, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 
-import { MockStore, asMock } from 'helpers/mocking';
-import { NotificationsActions, NotificationsStore } from 'stores/notifications/NotificationsStore';
+import { asMock } from 'helpers/mocking';
+import useNotifications from 'components/notifications/useNotifications';
 
 import NotificationBadge from './NotificationBadge';
 
-jest.mock('stores/notifications/NotificationsStore', () => ({
-  NotificationsActions: { list: jest.fn() },
-  NotificationsStore: MockStore(),
-}));
-
 const BADGE_ID = 'notification-badge';
 
-type NotificationsStoreType = ReturnType<typeof NotificationsStore.getInitialState>;
+jest.mock('components/notifications/useNotifications');
 
-const setNotificationCount = (count: number) => {
-  asMock(NotificationsStore.getInitialState).mockReturnValue({ total: count } as NotificationsStoreType);
-};
+const notificationFixture = {
+  id: 'deadbeef',
+  details: {},
+  validations: {},
+  fields: {},
+  severity: 'urgent',
+  type: 'no_input_running',
+  key: 'test',
+  timestamp: '2022-12-12T10:55:55.014Z',
+  node_id: '3fcc3889-18a3-4a0d-821c-0fd560d152e7',
+} as const;
+
+const createNotifications = (count: number) => new Array(count).fill(notificationFixture);
+
+const setNotificationCount = (count: number) =>
+  asMock(useNotifications).mockReturnValue({
+    data: { total: count, notifications: createNotifications(count) },
+    isLoading: false,
+  });
 
 describe('NotificationBadge', () => {
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
-  beforeEach(() => {
-    jest.restoreAllMocks();
-    jest.clearAllMocks();
-  });
-
-  it('triggers update of notifications', async () => {
-    expect(NotificationsActions.list).not.toHaveBeenCalled();
-
-    render(<NotificationBadge />);
-
-    jest.advanceTimersByTime(3000);
-    await waitFor(() => {
-      expect(NotificationsActions.list).toHaveBeenCalled();
-    });
-  });
-
   it('renders nothing when there are no notifications', () => {
     setNotificationCount(0);
+
     render(<NotificationBadge />);
 
     expect(screen.queryByTestId(BADGE_ID)).not.toBeInTheDocument();
@@ -81,17 +69,15 @@ describe('NotificationBadge', () => {
   it('updates notification count when triggered by store', async () => {
     setNotificationCount(42);
 
-    render(<NotificationBadge />);
+    const { rerender } = render(<NotificationBadge />);
 
     const badgeBefore = await screen.findByTestId(BADGE_ID);
 
     expect(within(badgeBefore).getByText(42)).toBeInTheDocument();
 
-    const cb = asMock(NotificationsStore.listen).mock.calls[0][0];
+    setNotificationCount(23);
 
-    act(() => {
-      cb({ total: 23 } as NotificationsStoreType);
-    });
+    rerender(<NotificationBadge />);
 
     const badgeAfter = await screen.findByTestId(BADGE_ID);
 

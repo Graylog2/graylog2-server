@@ -64,6 +64,7 @@ public class CEFCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(CEFCodec.class);
 
     private static final Pattern SYSLOG_PREFIX = Pattern.compile("^<(?<pri>\\d+)>(?<msg>.*)$");
+    private static final Pattern CLEAN_PATTERN = Pattern.compile("^\\d+\\s+(\\S.*)");
 
     private static final String CK_TIMEZONE = "timezone";
     private static final String CK_LOCALE = "locale";
@@ -132,7 +133,8 @@ public class CEFCodec extends AbstractCodec {
 
     @Nonnull
     protected Message decodeCEF(@Nonnull RawMessage rawMessage, String s) {
-        final MappedMessage cef = new MappedMessage(parser.parse(s, timezone.toTimeZone(), locale), useFullNames);
+        String cleanedMsg = cleanMessage(s);
+        final MappedMessage cef = new MappedMessage(parser.parse(cleanedMsg, timezone.toTimeZone(), locale), useFullNames);
 
         // Build standard message.
         Message result = messageFactory.createMessage(buildMessageSummary(cef), decideSource(cef, rawMessage), new DateTime(cef.timestamp()));
@@ -149,6 +151,11 @@ public class CEFCodec extends AbstractCodec {
         result.addField("severity", cef.severity());
 
         return result;
+    }
+
+    private String cleanMessage(String message) {
+        Matcher matcher = CLEAN_PATTERN.matcher(message);
+        return matcher.find() ? matcher.group(1) : message;
     }
 
     protected String buildMessageSummary(com.github.jcustenborder.cef.Message cef) {

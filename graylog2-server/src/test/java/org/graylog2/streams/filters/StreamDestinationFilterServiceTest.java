@@ -304,7 +304,7 @@ class StreamDestinationFilterServiceTest {
         optionalDto = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0002");
         assertThat(optionalDto).isPresent();
 
-        eventBus.post(StreamDeletedEvent.create("54e3deadbeefdeadbeef1000"));
+        eventBus.post(new StreamDeletedEvent("54e3deadbeefdeadbeef1000", "Test Stream 1"));
 
         var afterDeletionEvent = service.findByIdForStream("54e3deadbeefdeadbeef1000", "54e3deadbeefdeadbeef0000");
         assertThat(afterDeletionEvent).isNotPresent();

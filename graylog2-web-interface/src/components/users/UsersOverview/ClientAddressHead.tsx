@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 
+import useDisclosure from 'util/hooks/useDisclosure';
 import { Icon, Tooltip } from 'components/common';
 import { Button } from 'components/bootstrap';
 

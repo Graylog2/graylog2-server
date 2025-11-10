@@ -48,7 +48,7 @@ jest.mock('util/AppConfig', () => ({
   gl2AppPathPrefix: jest.fn(() => ''),
   gl2ServerUrl: jest.fn(() => undefined),
   gl2DevMode: jest.fn(() => false),
-  isFeatureEnabled: jest.fn(() => false),
+  isFeatureEnabled: jest.fn(() => true),
   isCloud: jest.fn(() => false),
 }));
 
@@ -63,6 +63,8 @@ jest.mock('components/perspectives/hooks/useActivePerspective', () => ({
     activePerspective: mockDefaultPerspective,
   }),
 }));
+
+jest.mock('components/navigation/NotificationBadge', () => () => null);
 
 const AppRouterWithContext = () => (
   <HotkeysProvider>
@@ -86,7 +88,7 @@ const mockRoutes = (routes: PluginExports['routes']) => {
   const pluginExports: PluginExports = {
     routes,
   };
-  asMock(usePluginEntities).mockImplementation((key: keyof PluginExports) => pluginExports[key] ?? []);
+  asMock(usePluginEntities).mockImplementation((key: 'routes'): PluginExports['routes'] => pluginExports[key] ?? []);
 };
 
 describe('AppRouter', () => {

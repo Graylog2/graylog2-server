@@ -75,7 +75,7 @@ type Props = {
 };
 
 const SelectedColumnsList = ({
-  testPrefix,
+  testPrefix = undefined,
   selectedColumns,
   onChange,
   displayOverlayInPortal = false,

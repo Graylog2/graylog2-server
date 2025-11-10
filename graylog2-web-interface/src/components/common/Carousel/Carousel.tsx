@@ -62,7 +62,7 @@ const StyledDiv = styled.div`
   }
 `;
 
-const Carousel = ({ children, className, containerRef, carouselId }: Props) => {
+const Carousel = ({ children, className = undefined, containerRef = undefined, carouselId }: Props) => {
   const carouselRef = useCarouselRef(carouselId);
 
   return (

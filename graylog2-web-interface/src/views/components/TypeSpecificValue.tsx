@@ -46,7 +46,7 @@ const defaultComponent = ({ value }: ValueRendererProps) => value;
 
 const _formatValue = (field: string, value: any, truncate: boolean, render: ValueRenderer, type: FieldType) => {
   const stringified = isString(value) ? value : JSON.stringify(value);
-  const Component: ValueRenderer = render;
+  const Component = render;
 
   return trim(stringified) === '' ? (
     <EmptyValue />

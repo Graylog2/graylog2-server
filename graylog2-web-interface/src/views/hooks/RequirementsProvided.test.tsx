@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
@@ -99,6 +99,14 @@ describe('RequirementsProvided', () => {
       Component = component;
     }
 
-    expect(mount(<Component />)).toExist();
+    render(<Component />);
+
+    await screen.findByText(/unfortunately executing this is not possible/i);
+    await screen.findByText(/It uses the following capabilities which are not available/i);
+
+    await screen.findByText(/timetravel/i);
+    await screen.findByText(/hyperspeed/i);
+
+    expect(await screen.findAllByText(/Pandora's Box/i)).toHaveLength(2);
   });
 });

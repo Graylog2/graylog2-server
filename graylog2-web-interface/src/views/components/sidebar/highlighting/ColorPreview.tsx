@@ -50,12 +50,12 @@ export const GradientColorPreview = styled(ColorPreviewBase)<{ $gradient: string
   `;
 });
 
-type ColorPreviewProps = {
+type Props = {
   color: HighlightingColor;
   onClick?: () => void;
 };
 
-const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ color, onClick = () => {} }, ref) => {
+const ColorPreview = ({ color, onClick = () => {} }: Props, ref: React.ForwardedRef<HTMLDivElement>) => {
   if (color.type === 'static') {
     return (
       <StaticColorPreview
@@ -72,6 +72,6 @@ const ColorPreview = React.forwardRef<HTMLDivElement, ColorPreviewProps>(({ colo
   }
 
   throw new Error(`Invalid highlighting color type: ${color}`);
-});
+};
 
-export default ColorPreview;
+export default React.forwardRef(ColorPreview);

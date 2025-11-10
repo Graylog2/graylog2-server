@@ -25,7 +25,7 @@ type Props = {
   title?: string;
 };
 
-const GettingStarted = ({ title }: Props) => (
+const GettingStarted = ({ title = undefined }: Props) => (
   <Row className="content">
     <Col md={6} mdOffset={3}>
       <EmptyEntity title={title}>

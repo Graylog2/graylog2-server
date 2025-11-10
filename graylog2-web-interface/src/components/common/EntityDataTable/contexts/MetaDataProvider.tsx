@@ -23,7 +23,7 @@ type Props<M> = React.PropsWithChildren<{
   meta: M;
 }>;
 
-const MetaDataProvider = <Meta = unknown,>({ children, meta }: Props<Meta>) => {
+const MetaDataProvider = <Meta = unknown,>({ children = undefined, meta }: Props<Meta>) => {
   const contextValue = useMemo(() => ({ meta }), [meta]);
 
   return <MetaDataContext.Provider value={contextValue}>{children}</MetaDataContext.Provider>;

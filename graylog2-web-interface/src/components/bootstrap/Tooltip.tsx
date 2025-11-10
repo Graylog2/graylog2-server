@@ -64,7 +64,7 @@ const StyledTooltip = styled(BootstrapTooltip)(
     }
 
     .tooltip-inner {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
       background-color: ${theme.colors.global.contentBackground};
       max-width: 300px;
       opacity: 1;
@@ -117,10 +117,10 @@ const Tooltip = ({
   className = '',
   id,
   placement = 'right',
-  positionTop,
-  positionLeft,
-  arrowOffsetTop,
-  arrowOffsetLeft,
+  positionTop = undefined,
+  positionLeft = undefined,
+  arrowOffsetTop = undefined,
+  arrowOffsetLeft = undefined,
   show = true,
 }: TooltipProps) => (
   <StyledTooltip

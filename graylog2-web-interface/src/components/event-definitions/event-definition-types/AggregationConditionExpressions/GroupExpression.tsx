@@ -60,7 +60,11 @@ const GroupExpression = ({
 
   return (
     <>
-      <BooleanOperatorSelector operator={expression.operator} onOperatorChange={handleOperatorChange} />
+      <BooleanOperatorSelector
+        operator={expression.operator}
+        onOperatorChange={handleOperatorChange}
+        placeholder={`Boolean operator group ${level + 1}`}
+      />
       <Clearfix />
       <Group>
         <AggregationConditionExpression

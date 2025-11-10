@@ -58,6 +58,11 @@
     window.authorizations.add("csrf", new ApiKeyAuthorization("X-Requested-By", "Graylog API Browser", "header"));
 
     window.swaggerUi.load();
+
+    // close warning button
+    $('.close-btn').click(function() {
+      $(this).parent('.warning-box').fadeOut();
+    });
   });
 
   </script>
@@ -65,6 +70,7 @@
 
 <body>
 <div class="warning-box" style="visibility:hidden;">
+  <span class="close-btn">&times;</span>
   <h3>Attention</h3>
   <p>
   The API browser is running in global mode. API requests made against this URI will not be bound to a specific node,

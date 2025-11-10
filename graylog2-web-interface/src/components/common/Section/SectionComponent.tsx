@@ -16,12 +16,12 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useDisclosure } from '@mantine/hooks';
 import { Collapse } from '@mantine/core';
 
 import Spinner from 'components/common/Spinner';
 import { Row, Col, Button } from 'components/bootstrap';
 import Icon from 'components/common/Icon';
+import useDisclosure from 'util/hooks/useDisclosure';
 
 type Props = {
   children: React.ReactNode;
@@ -34,15 +34,18 @@ type Props = {
   disableCollapseButton?: boolean;
 };
 
-const Header = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
+const Header = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: ${theme.spacings.xs};
 
-  *:not(:first-child) {
-    margin-left: 10px;
-  }
-`;
+    *:not(:first-child) {
+      margin-left: 10px;
+    }
+  `,
+);
 
 export const Headline = styled.h2`
   margin-bottom: 5px;

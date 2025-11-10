@@ -16,11 +16,11 @@
  */
 import React from 'react';
 
-import { Label } from 'components/bootstrap';
+import { Label, Button } from 'components/bootstrap';
 import { RelativeTime, Icon } from 'components/common';
 import IndexSizeSummary from 'components/indices/IndexSizeSummary';
 
-type IndexSummaryProps = {
+type Props = {
   children: React.ReactNode;
   index: any;
   indexRange?: any;
@@ -28,13 +28,17 @@ type IndexSummaryProps = {
   name: string;
 };
 
-class IndexSummary extends React.Component<
-  IndexSummaryProps,
-  {
-    [key: string]: any;
+class IndexSummary extends React.Component<Props, { showDetails: boolean }> {
+  static defaultProps = {
+    indexRange: undefined,
+  };
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      showDetails: props.isDeflector,
+    };
   }
-> {
-  state = { showDetails: this.props.isDeflector };
 
   _formatLabels = (index) => {
     const labels = [];
@@ -124,7 +128,7 @@ class IndexSummary extends React.Component<
 
   _toggleShowDetails = (event) => {
     event.preventDefault();
-    this.setState({ showDetails: !this.state.showDetails });
+    this.setState((prevState) => ({ showDetails: !prevState.showDetails }));
   };
 
   render() {
@@ -136,9 +140,9 @@ class IndexSummary extends React.Component<
           {this.props.name}{' '}
           <small>
             {this._formatLabels(index)} {this._formatIndexRange()} <IndexSizeSummary index={index} />
-            <a onClick={this._toggleShowDetails} href="#">
+            <Button onClick={this._toggleShowDetails} bsStyle="link">
               {this._formatShowDetailsLink()}
-            </a>
+            </Button>
           </small>
         </h2>
 

@@ -196,7 +196,9 @@ const StreamDetails = ({ stream }: Props) => {
     (newStream: Stream) =>
       StreamsStore.update(stream.id, newStream, (response) => {
         UserNotification.success(`Stream '${newStream.title}' was updated successfully.`, 'Success');
-        queryClient.invalidateQueries(['stream', stream.id]);
+        queryClient.invalidateQueries({
+          queryKey: ['stream', stream.id],
+        });
 
         return response;
       }),
@@ -215,7 +217,7 @@ const StreamDetails = ({ stream }: Props) => {
 
             <h1>Stream: {stream.title}</h1>
 
-            <IfPermitted permissions="stream:edit">
+            <IfPermitted permissions={`streams:edit:${stream.id}`}>
               <DropdownButton title={<Icon name="more_horiz" />} id="stream-actions" noCaret bsSize="xs">
                 <MenuItem onClick={() => toggleUpdateModal()}>Edit</MenuItem>
               </DropdownButton>

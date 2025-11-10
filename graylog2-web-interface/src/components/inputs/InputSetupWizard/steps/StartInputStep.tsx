@@ -112,7 +112,7 @@ const StartInputStep = () => {
 
       const hasError = !!mutationsArray.find(([_, mutation]) => mutation.isError);
 
-      const haveAllSucceeded = mutationsArray.every(([_, mutation]) => !mutation.isLoading && mutation.isSuccess);
+      const haveAllSucceeded = mutationsArray.every(([_, mutation]) => !mutation.isPending && mutation.isSuccess);
 
       if (hasError) {
         setStartInputStatus('FAILED');

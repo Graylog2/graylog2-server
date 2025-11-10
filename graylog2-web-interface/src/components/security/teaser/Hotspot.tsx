@@ -80,7 +80,7 @@ type TooltipProps = React.PropsWithChildren<{
   index: number;
 }>;
 
-const Hotspot = ({ children, positionX, positionY, index }: TooltipProps) => {
+const Hotspot = ({ children = undefined, positionX, positionY, index }: TooltipProps) => {
   const [show, setShow] = useState(false);
   const target = useRef();
   const container = useRef();

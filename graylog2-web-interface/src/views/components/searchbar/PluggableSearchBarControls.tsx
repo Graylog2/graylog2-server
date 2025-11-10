@@ -53,8 +53,8 @@ const componentHasContent = ({
   showLeftControls,
   showRightControls,
   hasPluggableControls,
-  hasLeftColFallback,
-  hasRightColFallback,
+  hasLeftColFallback = undefined,
+  hasRightColFallback = undefined,
 }: {
   hidePluggableControlsPreview: boolean;
   showLeftControls: boolean;

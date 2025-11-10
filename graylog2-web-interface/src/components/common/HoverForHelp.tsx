@@ -81,13 +81,13 @@ const HoverForHelp = ({
   children,
   className = '',
   displayLeftMargin = false,
-  title,
+  title = undefined,
   id = 'help-popover',
   pullRight = true,
   placement = 'bottom',
-  testId,
+  testId = undefined,
   type = 'info',
-  iconSize,
+  iconSize = undefined,
   trigger = ['hover', 'focus'],
 }: Props) => (
   <OverlayTrigger

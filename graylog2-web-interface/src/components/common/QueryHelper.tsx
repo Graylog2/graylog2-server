@@ -97,7 +97,7 @@ const queryHelpPopover = (
 const QueryHelper = ({
   commonFields = ['id', 'title', 'description'],
   fieldMap = {},
-  example,
+  example = undefined,
   entityName = 'entity',
 }: Props) => (
   <OverlayTrigger

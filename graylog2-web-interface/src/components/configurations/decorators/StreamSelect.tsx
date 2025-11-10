@@ -50,7 +50,7 @@ const StreamSelect = ({ onChange, value, streams }: Props) => {
         options={options}
         clearable={false}
         placeholder="There are no decorators configured for any stream."
-        value={value}
+        value={options.map(({ value: id }) => id).includes(value) ? value : ''}
       />
     </SelectContainer>
   );

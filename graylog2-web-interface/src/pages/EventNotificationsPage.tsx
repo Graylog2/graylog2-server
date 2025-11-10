@@ -16,27 +16,20 @@
  */
 import React from 'react';
 
-import { LinkContainer } from 'components/common/router';
-import { Button, Col, Row } from 'components/bootstrap';
-import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
+import { Col, Row } from 'components/bootstrap';
+import { DocumentTitle, PageHeader } from 'components/common';
 import EventNotificationsContainer from 'components/event-notifications/event-notifications/EventNotificationsContainer';
-import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import PageDescription from 'components/event-notifications/PageDescription';
+import CreateButton from 'components/common/CreateButton';
 
 const EventNotificationsPage = () => (
   <DocumentTitle title="Notifications">
     <EventsPageNavigation />
     <PageHeader
       title="Notifications"
-      actions={
-        <IfPermitted permissions="eventnotifications:create">
-          <LinkContainer to={Routes.ALERTS.NOTIFICATIONS.CREATE}>
-            <Button bsStyle="success">Create notification</Button>
-          </LinkContainer>
-        </IfPermitted>
-      }
+      actions={<CreateButton entityKey="Event Notification" />}
       documentationLink={{
         title: 'Alerts documentation',
         path: DocsHelper.PAGES.ALERTS,

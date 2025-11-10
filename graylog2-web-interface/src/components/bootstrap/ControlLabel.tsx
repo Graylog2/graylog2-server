@@ -20,7 +20,7 @@ import { ControlLabel as BootstrapControlLabel } from 'react-bootstrap';
 
 const ControlLabel = styled(BootstrapControlLabel)(
   ({ theme }) => css`
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
     font-weight: bold;
     margin-bottom: 5px;
     display: inline-block;

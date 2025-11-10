@@ -25,7 +25,7 @@ type Props = React.PropsWithChildren<{
   style?: React.ComponentProps<typeof BootstrapListGroup>['style'];
 }>;
 
-const ListGroup = ({ className, children, ...props }: Props) => (
+const ListGroup = ({ className = undefined, children = undefined, ...props }: Props) => (
   <BootstrapListGroup bsClass={className} {...props}>
     {children}
   </BootstrapListGroup>

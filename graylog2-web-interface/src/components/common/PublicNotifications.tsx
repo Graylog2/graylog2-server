@@ -14,17 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 
-import type { PublicNotificationsHooks } from 'theme/types';
+import type { PublicNotificationsHooks, Notification } from 'theme/types';
 import usePluginEntities from 'hooks/usePluginEntities';
 import Alert from 'components/bootstrap/Alert';
 import Button from 'components/bootstrap/Button';
 import AppConfig from 'util/AppConfig';
+import useDisclosure from 'util/hooks/useDisclosure';
 
 interface Props {
-  readFromConfig?: boolean;
+  login?: boolean;
 }
 
 const FlexWrap = styled.div`
@@ -56,6 +57,12 @@ const Wrapper = styled.div`
   margin: 0 auto 15px;
 `;
 
+const AlertContainer = styled.div(
+  ({ theme }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+  `,
+);
+
 const defaultNotifications: PublicNotificationsHooks = {
   usePublicNotifications: () => ({
     notifications: undefined,
@@ -64,62 +71,74 @@ const defaultNotifications: PublicNotificationsHooks = {
   }),
 };
 
-const PublicNotifications = ({ readFromConfig = false }: Props) => {
-  const customizationHook = usePluginEntities('customization.publicNotifications');
-  const { usePublicNotifications } = customizationHook[0]?.hooks || defaultNotifications;
-  const [showReadMore, setShowReadMore] = useState<string>(undefined);
-  const { notifications, dismissedNotifications, onDismissPublicNotification } = usePublicNotifications();
+type PublicNotificationProps = {
+  notificationId: string;
+  notification: Notification;
+  onDismissPublicNotification: (id: string) => void;
+};
+const PublicNotification = ({ notificationId, notification, onDismissPublicNotification }: PublicNotificationProps) => {
+  const [showReadMore, { toggle: toggleReadMore }] = useDisclosure(false);
 
-  const allNotification = readFromConfig ? AppConfig.publicNotifications() : notifications;
+  const { variant, hiddenTitle, isActive, isDismissible, title, shortMessage, longMessage } = notification;
 
-  if (!allNotification && !dismissedNotifications && !onDismissPublicNotification) {
+  if (!isActive) {
     return null;
   }
 
-  const publicNotifications = Object.keys(allNotification)
-    .map((notificationId) => {
-      if (dismissedNotifications?.has(notificationId)) {
-        return null;
-      }
+  const _dismiss = () => onDismissPublicNotification(notificationId);
 
-      const toggleReadMore = () => {
-        setShowReadMore(showReadMore ? undefined : notificationId);
-      };
+  return (
+    <AlertContainer key={title}>
+      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} title={!hiddenTitle && title}>
+        <FlexWrap>
+          <ShortContent>{shortMessage}</ShortContent>
+          {longMessage && (
+            <Button bsStyle="link" onClick={toggleReadMore}>
+              Read {showReadMore ? 'Less' : 'More'}
+            </Button>
+          )}
+        </FlexWrap>
+        {longMessage && <LongContent $visible={showReadMore}>{longMessage}</LongContent>}
+      </StyledAlert>
+    </AlertContainer>
+  );
+};
 
-      const notification = allNotification[notificationId];
-      const { variant, hiddenTitle, isActive, isDismissible, title, shortMessage, longMessage } = notification;
+const PublicNotifications = ({ login = false }: Props) => {
+  const customizationHook = usePluginEntities('customization.publicNotifications');
+  const { usePublicNotifications } = customizationHook[0]?.hooks || defaultNotifications;
+  const { notifications, dismissedNotifications, onDismissPublicNotification } = usePublicNotifications();
 
-      if (!isActive) {
-        return null;
-      }
+  const allNotification = useMemo(
+    () => (login ? AppConfig.publicNotifications() : notifications),
+    [login, notifications],
+  );
 
-      const _dismiss = () => onDismissPublicNotification(notificationId);
+  const publicNotifications = useMemo(
+    () =>
+      Object.keys(allNotification ?? {})
+        .filter((notificationId) => !dismissedNotifications?.has(notificationId))
+        .filter((notificationId) => {
+          const notification = allNotification[notificationId];
 
-      return (
-        <StyledAlert
-          bsStyle={variant}
-          onDismiss={isDismissible ? _dismiss : undefined}
-          key={title}
-          title={!hiddenTitle && title}>
-          <FlexWrap>
-            <ShortContent>{shortMessage}</ShortContent>
-            {longMessage && (
-              <Button bsStyle="link" onClick={toggleReadMore}>
-                Read {showReadMore === notificationId ? 'Less' : 'More'}
-              </Button>
-            )}
-          </FlexWrap>
-          {longMessage && <LongContent $visible={showReadMore === notificationId}>{longMessage}</LongContent>}
-        </StyledAlert>
-      );
-    })
-    .filter((a) => a);
+          return login ? notification.atLogin : notification.isGlobal;
+        })
+        .map((notificationId) => {
+          const notification = allNotification[notificationId];
 
-  if (publicNotifications.length) {
-    return <Wrapper>{publicNotifications}</Wrapper>;
-  }
+          return (
+            <PublicNotification
+              key={notificationId}
+              notification={notification}
+              notificationId={notificationId}
+              onDismissPublicNotification={onDismissPublicNotification}
+            />
+          );
+        }),
+    [allNotification, dismissedNotifications, login, onDismissPublicNotification],
+  );
 
-  return null;
+  return publicNotifications.length ? <Wrapper>{publicNotifications}</Wrapper> : null;
 };
 
 export default PublicNotifications;

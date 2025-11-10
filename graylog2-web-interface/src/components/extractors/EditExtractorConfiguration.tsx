@@ -29,7 +29,7 @@ import {
 } from 'components/extractors/extractors_configuration';
 import ExtractorUtils from 'util/ExtractorUtils';
 
-type EditExtractorConfigurationProps = {
+type Props = {
   extractorType: any[];
   configuration: any;
   onChange: (...args: any[]) => void;
@@ -37,14 +37,21 @@ type EditExtractorConfigurationProps = {
 };
 
 class EditExtractorConfiguration extends React.Component<
-  EditExtractorConfigurationProps,
+  Props,
   {
-    [key: string]: any;
+    extractorPreview: any;
   }
 > {
-  state = {
-    extractorPreview: undefined,
+  static defaultProps = {
+    exampleMessage: undefined,
   };
+
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      extractorPreview: undefined,
+    };
+  }
 
   _onExtractorPreviewLoad = (extractorPreviewNode) => {
     this.setState({ extractorPreview: extractorPreviewNode });

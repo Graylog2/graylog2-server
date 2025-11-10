@@ -15,23 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled, { css } from 'styled-components';
-import type { $PropertyType } from 'utility-types';
+import styled from 'styled-components';
 
 import type UserOverview from 'logic/users/UserOverview';
-import { Icon } from 'components/common';
+import { StatusIcon } from 'components/common';
 import Tooltip from 'components/common/Tooltip';
 
 type Props = {
-  authServiceEnabled: $PropertyType<UserOverview, 'authServiceEnabled'>;
-  accountStatus: $PropertyType<UserOverview, 'accountStatus'>;
+  authServiceEnabled: UserOverview['authServiceEnabled'];
+  accountStatus: UserOverview['accountStatus'];
 };
-
-const Wrapper = styled.div<{ $enabled: boolean }>(
-  ({ theme, $enabled }) => css`
-    color: ${$enabled ? theme.colors.variant.success : theme.colors.variant.default};
-  `,
-);
 
 const Td = styled.td`
   width: 35px;
@@ -49,9 +42,9 @@ const StatusCell = ({ accountStatus, authServiceEnabled }: Props) => (
           {!authServiceEnabled ? ' (authentication service is disabled)' : ''}
         </>
       }>
-      <Wrapper $enabled={authServiceEnabled && accountStatus === 'enabled'}>
-        <Icon name={accountStatus === 'enabled' ? 'check_circle' : 'cancel'} />
-      </Wrapper>
+      <div>
+        <StatusIcon active={accountStatus === 'enabled'} />
+      </div>
     </Tooltip>
   </Td>
 );

@@ -21,12 +21,14 @@ import org.assertj.core.api.Assertions;
 import org.graylog.datanode.OpensearchDistribution;
 import org.graylog.datanode.configuration.OpensearchArchitecture;
 import org.graylog.datanode.configuration.OpensearchDistributionProvider;
+import org.graylog.datanode.process.Environment;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 class OpensearchKeystoreCommandLineIT {
 
@@ -49,7 +51,10 @@ class OpensearchKeystoreCommandLineIT {
 
     private OpensearchCli createCli(Path tempDir) throws URISyntaxException {
         final Path binDirPath = detectOpensearchBinDir();
-        return new OpensearchCli(new CliEnv(tempDir), binDirPath);
+        Environment env = new Environment(Map.of())
+                .withOpensearchJavaHome(Path.of(System.getProperty("java.home")))
+                .withOpensearchPathConf(tempDir);
+        return new OpensearchCli(env, binDirPath);
     }
 
     @Nonnull

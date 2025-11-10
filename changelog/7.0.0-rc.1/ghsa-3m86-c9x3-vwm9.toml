@@ -1,0 +1,2 @@
+type = "security"
+message = "Fix permission check for creating a new API-token. See [GHSA-3m86-c9x3-vwm9](https://github.com/Graylog2/graylog2-server/security/advisories/GHSA-3m86-c9x3-vwm9) for details."

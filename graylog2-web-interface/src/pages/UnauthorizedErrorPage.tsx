@@ -46,9 +46,9 @@ type Props = {
 
 const UnauthorizedErrorPage = ({
   error,
-  errorDetails,
+  errorDetails = undefined,
   title = 'Missing Permissions',
-  description,
+  description = undefined,
   location: { pathname },
 }: Props) => {
   const errorMessage = error?.message ?? JSON.stringify(error);

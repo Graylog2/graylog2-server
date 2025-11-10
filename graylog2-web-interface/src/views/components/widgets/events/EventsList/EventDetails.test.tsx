@@ -50,6 +50,7 @@ describe('EventDetails', () => {
           'views.components.eventActions': [],
           eventDefinitionTypes: [],
           perspectives: [defaultPerspective],
+          'views.components.eventProcedureSummary': [],
         })[entityKey],
     );
 

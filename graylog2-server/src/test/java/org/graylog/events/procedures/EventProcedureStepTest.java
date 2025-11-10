@@ -29,7 +29,6 @@ public class EventProcedureStepTest {
                 .title("title")
                 .description("description text <form></form>")
                 .action(ActionDto.builder()
-                        .title("title")
                         .config(GoToDashboard.Config.builder()
                                 .dashboardId("id")
                                 .build())

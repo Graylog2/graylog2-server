@@ -18,9 +18,11 @@ package org.graylog2.utilities;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.collections4.trie.PatriciaTrie;
+import org.graylog2.plugin.lookup.LookupPreview;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
@@ -190,6 +192,20 @@ public class CIDRPatriciaTrie {
         }
     }
 
+    // Gets a preview of the nodes in the trie. Since initial CIDR ranges have been converted to binary strings, the
+    // keys in the result map need to be converted back to their original format.
+    public LookupPreview getPreview(int size) {
+        final Map<Object, Object> result = new HashMap<>();
+        for (Map.Entry<String, Node> entry : trie.entrySet()) {
+            if (result.size() == size) {
+                break;
+            }
+            final String cidrRange = fromBinaryString(entry.getKey(), entry.getValue().rangeIsIPv6());
+            result.put(cidrRange, entry.getValue().rangeName);
+        }
+        return new LookupPreview(trie.size(), result);
+    }
+
     // Convert an IP address to a binary string (supports both IPv4 and IPv6)
     static String toBinaryString(String ip, int prefixLength) {
         final boolean isIPv6 = ip.contains(":");
@@ -232,6 +248,85 @@ public class CIDRPatriciaTrie {
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid IP address format: " + ip);
         }
+    }
+
+    static String fromBinaryString(String binary, boolean isIPv6) {
+        if (isIPv6) {
+            return fromBinaryIPv6(binary);
+        } else {
+            return fromBinaryIPv4(binary);
+        }
+    }
+
+    private static String fromBinaryIPv4(String binary) {
+        final int prefixLength = binary.length();
+        // Pad to 32 bits
+        binary = String.format(Locale.ROOT, "%-32s", binary).replace(' ', '0');
+        StringBuilder ip = new StringBuilder();
+        for (int i = 0; i < 32; i += 8) {
+            String octet = binary.substring(i, i + 8);
+            ip.append(Integer.parseInt(octet, 2));
+            if (i < 24) ip.append('.');
+        }
+        if (prefixLength == 32) {
+            return ip.toString();
+        }
+        return ip + "/" + prefixLength;
+    }
+
+    private static String fromBinaryIPv6(String binary) {
+        final int prefixLength = binary.length();
+        // Pad to 128 bits
+        binary = String.format(Locale.ROOT, "%-128s", binary).replace(' ', '0');
+        StringBuilder ip = new StringBuilder();
+        for (int i = 0; i < 128; i += 16) {
+            String hextet = binary.substring(i, i + 16);
+            ip.append(Integer.toHexString(Integer.parseInt(hextet, 2)));
+            if (i < 112) ip.append(':');
+        }
+
+        // Compress using "::" for longest run of zeros
+        String compressed = compressIPv6(ip.toString());
+        if (prefixLength == 128) {
+            return compressed;
+        }
+        return compressed + "/" + prefixLength;
+    }
+
+    // Utility to compress IPv6 address (e.g., turn "2001:0:0:0:0:0:0:1" into "2001::1")
+    private static String compressIPv6(String fullAddress) {
+        String[] parts = fullAddress.split(":");
+        int bestStart = -1, bestLen = 0;
+        int currStart = -1, currLen = 0;
+
+        for (int i = 0; i <= parts.length; i++) {
+            if (i < parts.length && parts[i].equals("0")) {
+                if (currStart == -1) currStart = i;
+                currLen++;
+            } else {
+                if (currLen > bestLen) {
+                    bestStart = currStart;
+                    bestLen = currLen;
+                }
+                currStart = -1;
+                currLen = 0;
+            }
+        }
+
+        if (bestLen > 1) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < bestStart; i++) {
+                sb.append(parts[i]).append(":");
+            }
+            sb.append("::");
+            for (int i = bestStart + bestLen; i < parts.length; i++) {
+                sb.append(parts[i]);
+                if (i < parts.length - 1) sb.append(":");
+            }
+            return sb.toString().replaceAll("(^:)|(:$)", "");
+        }
+
+        return fullAddress;
     }
 
     // Used only for testing purposes.

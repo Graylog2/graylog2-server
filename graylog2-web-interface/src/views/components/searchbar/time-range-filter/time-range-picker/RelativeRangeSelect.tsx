@@ -33,7 +33,7 @@ const RangeWrapper = styled.div`
   display: grid;
   grid-template-columns: max-content repeat(5, 1fr) max-content;
   grid-template-rows: repeat(2, 1fr) minmax(1.5em, auto);
-  grid-gap: 0;
+  gap: 0;
 `;
 
 const InputWrap = styled.div`
@@ -235,7 +235,7 @@ const RelativeRangeSelect = ({
   disabled = false,
   fieldName,
   limitDuration,
-  onUnsetRange,
+  onUnsetRange = undefined,
   title,
   unsetRangeLabel,
 }: Props) => (

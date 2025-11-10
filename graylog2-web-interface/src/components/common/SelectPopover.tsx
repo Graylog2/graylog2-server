@@ -27,8 +27,6 @@ import OverlayTrigger from 'components/common/OverlayTrigger';
 import style from './SelectPopover.css';
 
 type SelectPopoverProps = {
-  /** Provides an ID for this popover element. */
-  id: string;
   /** Indicates where the popover should appear. */
   placement?: 'top' | 'right' | 'bottom' | 'left';
   /** Title to use in the popover header. */

@@ -23,7 +23,7 @@ import CurrentUserPreferencesProvider from './CurrentUserPreferencesProvider';
 import CurrentUserProvider from './CurrentUserProvider';
 import UserDateTimeProvider from './UserDateTimeProvider';
 
-const ThemeAndUserProvider = ({ children }: React.PropsWithChildren<{}>) => (
+const ThemeAndUserProvider = ({ children = undefined }: React.PropsWithChildren<{}>) => (
   <CurrentUserProvider>
     <UserDateTimeProvider>
       <CurrentUserPreferencesProvider>

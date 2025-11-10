@@ -21,10 +21,11 @@ import userEvent from '@testing-library/user-event';
 import { exampleFormDataWithKeySecretAuth } from 'fixtures/aws/FormData.fixtures';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import fetch from 'logic/rest/FetchProvider';
-import { FormDataProvider } from 'integrations/aws/context/FormData';
 import { ApiContext } from 'integrations/aws/context/Api';
 
 import StepReview from './StepReview';
+
+import FormDataProvider from '../../contexts/FormDataProvider';
 
 jest.mock('stores/sessions/SessionStore', () => ({ SessionStore: MockStore(['isLoggedIn', jest.fn()]) }));
 jest.mock('stores/system/SystemStore', () => ({ SystemStore: MockStore() }));

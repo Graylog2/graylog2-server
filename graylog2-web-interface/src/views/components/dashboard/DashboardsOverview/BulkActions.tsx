@@ -57,7 +57,9 @@ const BulkActions = () => {
           UserNotification.error(`An error occurred while deleting dashboards. ${error}`);
         })
         .finally(() => {
-          queryClient.invalidateQueries(['dashboards', 'overview']);
+          queryClient.invalidateQueries({
+            queryKey: ['dashboards', 'overview'],
+          });
         });
     }
   }, [descriptor, queryClient, selectedItemsAmount, selectedEntities, setSelectedEntities]);

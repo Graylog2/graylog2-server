@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.sidecar.services;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.plugins.sidecar.rest.models.Collector;

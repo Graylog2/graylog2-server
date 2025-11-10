@@ -55,11 +55,11 @@ const ShowMetricsPage = () => {
   const productName = useProductName();
   const nodes = useStore(NodesStore, (state) => state.nodes);
   const nodeId = useNodeId(nodes);
-  const { data: names, isLoading } = useQuery(
-    ['metrics', 'names', nodeId],
-    () => ClusterNodeMetrics.byNamespace(nodeId, metricsNamespace).then(({ metrics }) => metrics as Metric[]),
-    { enabled: nodeId !== undefined },
-  );
+  const { data: names, isLoading } = useQuery({
+    queryKey: ['metrics', 'names', nodeId],
+    queryFn: () => ClusterNodeMetrics.byNamespace(nodeId, metricsNamespace).then(({ metrics }) => metrics as Metric[]),
+    enabled: nodeId !== undefined,
+  });
 
   const { filter } = useQueryParameters() as { filter: string };
 

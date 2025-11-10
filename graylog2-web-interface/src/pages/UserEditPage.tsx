@@ -67,7 +67,7 @@ const UserEditPage = ({ params }: Props) => {
       <UsersPageNavigation />
       <PageHeader
         title={<PageTitle fullName={fullName} />}
-        actions={<UserActionLinks userId={userId} userIsReadOnly={readOnly} />}
+        actions={<UserActionLinks userId={userId} username={loadedUser?.username ?? ''} userIsReadOnly={readOnly} />}
         documentationLink={{
           title: 'Permissions documentation',
           path: DocsHelper.PAGES.USERS_ROLES,

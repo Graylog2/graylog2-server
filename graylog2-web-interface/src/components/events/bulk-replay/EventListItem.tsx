@@ -56,7 +56,7 @@ type SummaryProps = {
 const Summary = styled.span<SummaryProps>(
   ({ theme, $done }) => css`
     margin: 10px;
-    color: ${$done ? theme.colors.global.textSecondary : theme.colors.global.textDefault};
+    color: ${$done ? theme.colors.text.secondary : theme.colors.text.primary};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

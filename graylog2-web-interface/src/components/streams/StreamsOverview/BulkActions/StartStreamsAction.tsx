@@ -31,7 +31,7 @@ type Props = {
   refetchStreams: () => void;
 };
 
-const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSelect }: Props) => {
+const StartStreamsActions = ({ handleFailures, refetchStreams, descriptor, onSelect = undefined }: Props) => {
   const { selectedEntities } = useSelectedEntities();
   const onStartStreams = useCallback(() => {
     if (typeof onSelect === 'function') {

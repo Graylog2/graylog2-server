@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useMemo } from 'react';
 
 // TODO: Fix typing
 export const SidebarContext = createContext<any>(undefined);
@@ -24,11 +24,13 @@ type SidebarProviderProps = {
 };
 
 export const SidebarProvider = ({ children }: SidebarProviderProps) => {
-  const [sidebar, setSidebar] = useState(<></>);
+  const [sidebar, setSidebar] = useState(null);
 
   const clearSidebar = () => {
-    setSidebar(<></>);
+    setSidebar(null);
   };
 
-  return <SidebarContext.Provider value={{ sidebar, clearSidebar, setSidebar }}>{children}</SidebarContext.Provider>;
+  const contextValue = useMemo(() => ({ sidebar, clearSidebar, setSidebar }), [sidebar]);
+
+  return <SidebarContext.Provider value={contextValue}>{children}</SidebarContext.Provider>;
 };

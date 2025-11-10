@@ -23,7 +23,10 @@ type ClosingRetentionStrategySummaryProps = {
   rotationStrategyClass?: string;
 };
 
-const ClosingRetentionStrategySummary = ({ config, rotationStrategyClass }: ClosingRetentionStrategySummaryProps) => (
+const ClosingRetentionStrategySummary = ({
+  config,
+  rotationStrategyClass = undefined,
+}: ClosingRetentionStrategySummaryProps) => (
   <div>
     <dl>
       <dt>Index retention strategy:</dt>

@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import defaultTo from 'lodash/defaultTo';
 
 import { MultiSelect } from 'components/common';
 import { Col, ControlLabel, FormGroup, HelpBlock, Row } from 'components/bootstrap';
@@ -32,16 +31,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import AggregationConditionsForm from './AggregationConditionsForm';
 
 import commonStyles from '../common/commonStyles.css';
-
-type EventDefinitionConfig = {
-  group_by: Array<string>;
-  streams: Array<string>;
-  stream_categories?: Array<string>;
-};
-
-type EventDefinition = {
-  config: EventDefinitionConfig;
-};
+import type { EventDefinition, EventProcessorConfig } from '../event-definitions-types';
 
 type Props = {
   eventDefinition: EventDefinition;
@@ -68,7 +58,7 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
   const sendTelemetry = useSendTelemetry();
 
   const propagateConfigChange = useCallback(
-    (update: Partial<EventDefinitionConfig>) => {
+    (update: Partial<EventProcessorConfig>) => {
       const nextConfig = { ...eventDefinition.config, ...update };
 
       onChange('config', nextConfig);
@@ -107,11 +97,10 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
             </ControlLabel>
             <MultiSelect
               id="group-by"
-              matchProp="label"
               onChange={handleGroupByChange}
               options={formattedFields}
               ignoreAccents={false}
-              value={defaultTo(eventDefinition.config.group_by, []).join(',')}
+              value={(eventDefinition.config.group_by ?? []).join(',')}
               allowCreate
             />
             <HelpBlock>

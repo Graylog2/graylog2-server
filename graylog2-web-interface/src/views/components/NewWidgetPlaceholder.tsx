@@ -66,27 +66,28 @@ type Props = {
   component: React.ComponentType<ChildProps>;
 };
 
-const NewWidgetPlaceholder = React.forwardRef<HTMLDivElement, Props>(
-  ({ style = {}, position, component: Component }, ref) => {
-    const [show, setShow] = useState(false);
-    const onCancel = useCallback(() => setShow(false), []);
-    const onClick = useCallback(() => setShow(true), []);
+const NewWidgetPlaceholder = (
+  { style = {}, position, component: Component }: Props,
+  ref: React.ForwardedRef<HTMLDivElement>,
+) => {
+  const [show, setShow] = useState(false);
+  const onCancel = useCallback(() => setShow(false), []);
+  const onClick = useCallback(() => setShow(true), []);
 
-    const containerStyle = {
-      ...style,
-      transition: 'none',
-    };
+  const containerStyle = {
+    ...style,
+    transition: 'none',
+  };
 
-    return (
-      <div style={containerStyle} ref={ref}>
-        <PlaceholderBox onClick={onClick}>
-          <HugeIcon name="add_circle" />
-          Create a new widget here
-        </PlaceholderBox>
-        {show && <Component onCancel={onCancel} position={position} />}
-      </div>
-    );
-  },
-);
+  return (
+    <div style={containerStyle} ref={ref}>
+      <PlaceholderBox onClick={onClick}>
+        <HugeIcon name="add_circle" />
+        Create a new widget here
+      </PlaceholderBox>
+      {show && <Component onCancel={onCancel} position={position} />}
+    </div>
+  );
+};
 
-export default NewWidgetPlaceholder;
+export default React.forwardRef(NewWidgetPlaceholder);

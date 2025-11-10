@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Prevent leaking OPENSEARCH_JAVA_HOME to opensearch in data node, always use bundled JDK"
+
+issues = []
+pulls = ["22534"]

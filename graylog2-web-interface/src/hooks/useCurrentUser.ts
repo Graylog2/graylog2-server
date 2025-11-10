@@ -18,10 +18,10 @@ import { useContext } from 'react';
 
 import CurrentUserContext from 'contexts/CurrentUserContext';
 
-const useCurrentUser = () => {
+const useCurrentUser = (failWithoutContext: boolean = true) => {
   const currentUser = useContext(CurrentUserContext);
 
-  if (!currentUser) {
+  if (!currentUser && failWithoutContext) {
     throw new Error('useCurrentUser hook needs to be used inside CurrentUserContext.Provider');
   }
 

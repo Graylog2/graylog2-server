@@ -39,7 +39,7 @@ const Error = styled.p(
   `,
 );
 
-const Errors = ({ objectWithErrors }: Props) => {
+const Errors = ({ objectWithErrors = undefined }: Props) => {
   if (!objectWithErrors) {
     return null;
   }

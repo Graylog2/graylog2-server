@@ -21,7 +21,6 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.graylog.datanode.testinfra.DatanodeContainerizedBackend;
 import org.graylog.security.certutil.csr.FilesystemKeystoreInformation;
-import org.graylog.testing.containermatrix.MongodbServer;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.DatanodeRestApiWait;
@@ -31,6 +30,7 @@ import org.graylog.testing.restoperations.RestOperationParameters;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class DatanodeClusterIT {
         final FilesystemKeystoreInformation httpNodeA = DatanodeSecurityTestUtils.generateHttpCert(tempDir, ca, hostnameNodeA);
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(MongodbServer.DEFAULT_VERSION, network);
+        this.mongoDBTestService = MongoDBTestService.create(network);
         this.mongoDBTestService.start();
 
         nodeA = createDatanodeContainer(

@@ -31,7 +31,11 @@ import useParams from 'routing/useParams';
 import useHistory from 'routing/useHistory';
 import useQuery from 'routing/useQuery';
 
-const useInput = (inputId: string) => useReactQuery(['inputs', inputId], () => SystemInputs.get(inputId));
+const useInput = (inputId: string) =>
+  useReactQuery({
+    queryKey: ['inputs', inputId],
+    queryFn: () => SystemInputs.get(inputId),
+  });
 
 type QueryParameters = {
   example_index: string;

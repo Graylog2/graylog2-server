@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import uniqWith from 'lodash/uniqWith';
 import isEqual from 'lodash/isEqual';
 
@@ -112,9 +112,10 @@ const useEventDefinition = (
   isLoading: boolean;
   isFetched: boolean;
 } => {
-  const { data, refetch, isLoading, isFetched } = useQuery(
-    ['event-definition-by-id', definitionId],
-    () =>
+  const { data, refetch, isLoading, isFetched } = useQuery({
+    queryKey: ['event-definition-by-id', definitionId],
+
+    queryFn: () =>
       onError(fetchDefinition(definitionId), (errorThrown: FetchError) => {
         if (onErrorHandler) onErrorHandler(errorThrown);
 
@@ -123,15 +124,15 @@ const useEventDefinition = (
           'Could not load event definition',
         );
       }),
-    {
-      keepPreviousData: true,
-      enabled: !!definitionId,
-      initialData: {
-        eventDefinition: null,
-        aggregations: [],
-      },
+
+    placeholderData: keepPreviousData,
+    enabled: !!definitionId,
+
+    initialData: {
+      eventDefinition: null,
+      aggregations: [],
     },
-  );
+  });
 
   return {
     data,

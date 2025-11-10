@@ -48,8 +48,8 @@ export const FORM_VALIDATION = {
 
 type Props = {
   formRef: React.Ref<FormikProps<WizardFormValues>>;
-  help: { [inputName: string]: React.ReactElement | string | null | undefined };
-  excludedFields: { [inputName: string]: boolean };
+  help?: { [inputName: string]: React.ReactElement | string | null | undefined };
+  excludedFields?: { [inputName: string]: boolean };
   roles: Immutable.List<Role>;
   onSubmit: () => void;
   onSubmitAll: () => Promise<void>;
@@ -224,7 +224,7 @@ const UserSyncStep = ({
               Finish & Save Identity Service
             </Button>
             <Button
-              bsStyle="success"
+              bsStyle="primary"
               disabled={isSubmitting}
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.AUTHENTICATION.DIRECTORY_NEXT_GROUP_SYNC_CLICKED, {

@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { $PropertyType } from 'utility-types/dist/utility-types';
 import type * as Immutable from 'immutable';
 
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
@@ -106,13 +105,13 @@ export interface OktaTeamSyncConfigJson {
 }
 
 export interface SharedBackendProps {
-  id: $PropertyType<AuthenticationBackend, 'id'>;
+  id: AuthenticationBackend['id'];
 
-  defaultRoles: $PropertyType<AuthenticationBackend, 'defaultRoles'>;
+  defaultRoles: AuthenticationBackend['defaultRoles'];
 
-  title: $PropertyType<AuthenticationBackend, 'title'>;
+  title: AuthenticationBackend['title'];
 
-  description: $PropertyType<AuthenticationBackend, 'description'>;
+  description: AuthenticationBackend['description'];
 }
 
 export interface OktaBackend extends SharedBackendProps {

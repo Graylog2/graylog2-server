@@ -95,7 +95,7 @@ describe('RuleForm', () => {
       const ruleInput = 'new_test';
 
       const PipelineRulesContextProvider = ({
-        children,
+        children = undefined,
         setRawMessage,
       }: React.PropsWithChildren<{ setRawMessage: (message: string) => void }>) => {
         const [rawMessageToSimulate, _setRawMessageToSimulate] = useState('');

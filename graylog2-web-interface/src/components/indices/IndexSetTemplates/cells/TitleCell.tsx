@@ -30,7 +30,7 @@ type Props = {
 
 const DisabledTitle = styled.span(
   ({ theme }) => css`
-    color: ${theme.colors.global.textSecondary};
+    color: ${theme.colors.text.secondary};
   `,
 );
 

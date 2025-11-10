@@ -52,16 +52,18 @@ const useInputReferences = (
   };
   isLoading: boolean;
 } => {
-  const { data, isLoading } = useQuery<ResponseData, FetchError>(
-    [INPUT_REFERENCES],
-    () =>
+  const { data, isLoading } = useQuery({
+    queryKey: [INPUT_REFERENCES],
+
+    queryFn: () =>
       onError(fetchInputReferences(inputId), (errorThrown: FetchError) => {
         if (!(errorThrown.status === 404)) {
           UserNotification.error(`Loading input references failed with: ${errorThrown}`);
         }
       }),
-    { enabled: !!inputId },
-  );
+
+    enabled: !!inputId,
+  });
 
   const inputReferencesData = data ?? DEFAULT_DATA;
 

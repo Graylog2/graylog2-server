@@ -36,7 +36,7 @@ type Props = React.PropsWithChildren<{
   description: React.ReactNode;
 }>;
 
-const DescriptionBox = ({ description, children }: Props) => (
+const DescriptionBox = ({ description, children = undefined }: Props) => (
   <StyledDescriptionBox>
     <div className="description">{description}</div>
     {children}

@@ -24,7 +24,7 @@ type Props = {
   operatingSystem?: string;
 };
 
-const CollectorIndicator = ({ collector, operatingSystem }: Props) => (
+const CollectorIndicator = ({ collector, operatingSystem = undefined }: Props) => (
   <span>
     <OperatingSystemIcon operatingSystem={operatingSystem} /> {collector}
     {operatingSystem && <span> on {upperFirst(operatingSystem)}</span>}

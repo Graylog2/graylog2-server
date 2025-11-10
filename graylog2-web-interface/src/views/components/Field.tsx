@@ -30,7 +30,14 @@ type Props = {
   type: FieldType;
 };
 
-const Field = ({ children = null, disabled = false, menuContainer = document.body, name, queryId, type }: Props) => (
+const Field = ({
+  children = null,
+  disabled = false,
+  menuContainer = document.body,
+  name,
+  queryId = undefined,
+  type,
+}: Props) => (
   <InteractiveContext.Consumer>
     {(interactive) =>
       interactive ? (

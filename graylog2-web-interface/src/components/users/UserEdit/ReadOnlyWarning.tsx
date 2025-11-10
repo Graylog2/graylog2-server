@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { $PropertyType } from 'utility-types';
 
 import { Alert, Col, Row } from 'components/bootstrap';
 import type User from 'logic/users/User';
 
 type Props = {
-  fullName: $PropertyType<User, 'fullName'>;
+  fullName: User['fullName'];
 };
 
 const ReadOnlyWarning = ({ fullName }: Props) => (

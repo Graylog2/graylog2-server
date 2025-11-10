@@ -25,6 +25,7 @@ import 'react-resizable/css/styles.css';
 import type { WidgetPositionJSON } from 'views/logic/widgets/WidgetPosition';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import { layoutToPositions, positionsToLayout } from 'views/logic/widgets/normalizeWidgetPositions';
+import { widgetDragHandleClass } from 'views/components/widgets/Constants';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
@@ -37,7 +38,7 @@ const WidthProvidedGridLayout = ({
 const StyledWidthProvidedGridLayout = styled(WidthProvidedGridLayout)(
   ({ theme }) => css`
     &.locked {
-      .widget-drag-handle {
+      .${widgetDragHandleClass} {
         display: none;
       }
     }
@@ -156,17 +157,17 @@ const removeGaps = (_layout: Layout) => {
  */
 const ReactGridContainer = ({
   children,
-  className,
+  className = undefined,
   columns = COLUMNS,
-  draggableHandle,
+  draggableHandle = undefined,
   isResizable = true,
   locked = false,
   measureBeforeMount = false,
   onPositionsChange,
-  onSyncLayout: _onSyncLayout,
+  onSyncLayout: _onSyncLayout = undefined,
   positions,
   rowHeight = ROW_HEIGHT,
-  width,
+  width = undefined,
 }: Props) => {
   const theme = useTheme();
   const cellMargin = theme.spacings.px.xs;

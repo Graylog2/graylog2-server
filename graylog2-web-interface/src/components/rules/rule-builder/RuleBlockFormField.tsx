@@ -43,7 +43,7 @@ const SupportedFieldTypes = [
 const RuleBlockFormField = ({
   param,
   functionName,
-  blockId,
+  blockId = undefined,
   order,
   outputVariableList = [],
   blockType,

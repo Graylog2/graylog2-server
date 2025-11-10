@@ -16,11 +16,9 @@
  */
 package org.graylog2.streams;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
@@ -181,19 +179,6 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
 
     private long streamRuleCount(ObjectId streamId) {
         return count(StreamRuleImpl.class, new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, streamId));
-    }
-
-    @Override
-    public Map<String, Long> streamRuleCountByStream() {
-        final ImmutableMap.Builder<String, Long> streamRules = ImmutableMap.builder();
-        try (DBCursor streamIds = collection(StreamImpl.class).find(new BasicDBObject(), new BasicDBObject("_id", 1))) {
-            for (DBObject keys : streamIds) {
-                final ObjectId streamId = (ObjectId) keys.get("_id");
-                streamRules.put(streamId.toHexString(), streamRuleCount(streamId));
-            }
-        }
-
-        return streamRules.build();
     }
 
     @SuppressWarnings("unchecked")

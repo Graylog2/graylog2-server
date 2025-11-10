@@ -16,21 +16,52 @@
  */
 import type { PropsWithChildren } from 'react';
 import React from 'react';
+import { Accordion } from '@mantine/core';
+import styled from 'styled-components';
 
-import style from './ExpandableList.css';
+import { nonInteractiveListItemClass } from 'components/common/ExpandableListItem';
+
+const StyledAccordion = styled(Accordion)`
+  .${nonInteractiveListItemClass} {
+    padding-left: 30px;
+  }
+
+  .mantine-Accordion-root {
+    .${nonInteractiveListItemClass} {
+      padding-left: 0;
+    }
+  }
+`;
 
 type Props = PropsWithChildren<{
   className?: string;
+  value?: string[];
+  defaultValue?: string[];
+  onChange?: (value: string[]) => void;
 }>;
 
 /**
- * The ExpandableList will take a array or one of ExpandableListItem to render
- * in list. This list can be expanded or flattened to give the user a overview
- * of categories. Inside the categories the user has the possibility of doing a selection.
- * The ExpandableList can be used nested.
+ * The ExpandableList will take an array or one of ExpandableListItem to render
+ * in list. This list can be expanded or flattened to give the user an overview
+ * of categories. The ExpandableList can be used nested.
  */
-const ExpandableList = ({ children, className = '' }: Props) => (
-  <ul className={className ? `${style.list} ${className}` : style.list}>{children}</ul>
+const ExpandableList = ({
+  children = undefined,
+  value = undefined,
+  defaultValue = undefined,
+  className = undefined,
+  onChange = undefined,
+}: Props) => (
+  <StyledAccordion
+    chevronPosition="left"
+    multiple
+    variant="unstyled"
+    onChange={onChange}
+    value={value}
+    defaultValue={defaultValue}
+    className={className}>
+    {children}
+  </StyledAccordion>
 );
 
 export default ExpandableList;

@@ -94,7 +94,7 @@ const disabledStyles = (themeColors: DefaultTheme['colors'], style: StyleProps) 
   const isSpecialStyle = isLinkStyle(style) || isTransparentStyle(style);
 
   const colors = isSpecialStyle
-    ? { color: themeColors.global.textDefault, background: 'transparent' }
+    ? { color: themeColors.text.primary, background: 'transparent' }
     : themeColors.disabled[style];
 
   return css`
@@ -122,14 +122,14 @@ const activeStyles = (themeColors: DefaultTheme['colors'], bsStyle: StyleProps) 
     case 'warning':
     case 'transparent':
       return css`
-        color: ${themeColors.global.textDefault};
+        color: ${themeColors.text.primary};
 
         &:hover {
-          color: ${themeColors.global.textDefault};
+          color: ${themeColors.text.primary};
         }
 
         &:focus {
-          color: ${themeColors.global.textDefault};
+          color: ${themeColors.text.primary};
         }
       `;
     default:
@@ -159,7 +159,7 @@ const textColor = (style: StyleProps, colors: DefaultTheme['colors']) => {
     case 'link':
       return colors.global.link;
     case 'transparent':
-      return colors.global.textDefault;
+      return colors.text.primary;
     default:
       return colors.button[style].color;
   }
@@ -229,80 +229,77 @@ type Props = React.PropsWithChildren<{
   type?: 'button' | 'reset' | 'submit';
 }>;
 
-const Button = React.forwardRef<HTMLButtonElement, Props>(
-  (
-    {
-      'aria-label': ariaLabel,
-      bsStyle = 'default',
-      bsSize,
-      className,
-      'data-testid': dataTestId,
-      id,
-      onClick,
-      disabled = false,
-      href,
-      title,
-      form,
-      target,
-      type,
-      rel,
-      role,
-      name,
-      tabIndex,
-      children,
-      active,
-    },
-    ref,
-  ) => {
-    const theme = useTheme();
-    const style = mapStyle(bsStyle);
-    const color =
-      isLinkStyle(style) || isTransparentStyle(style) ? 'transparent' : theme.colors.button[style].background;
+const Button = (
+  {
+    'aria-label': ariaLabel,
+    bsStyle = 'default',
+    bsSize = undefined,
+    className = undefined,
+    'data-testid': dataTestId,
+    id = undefined,
+    onClick = undefined,
+    disabled = false,
+    href = undefined,
+    title = undefined,
+    form = undefined,
+    target = undefined,
+    type = undefined,
+    rel = undefined,
+    role = undefined,
+    name = undefined,
+    tabIndex = undefined,
+    children = undefined,
+    active = undefined,
+  }: Props,
+  ref: React.ForwardedRef<HTMLButtonElement>,
+) => {
+  const theme = useTheme();
+  const style = mapStyle(bsStyle);
+  const color = isLinkStyle(style) || isTransparentStyle(style) ? 'transparent' : theme.colors.button[style].background;
 
-    const sharedProps = {
-      id,
-      'aria-label': ariaLabel,
-      className,
-      ...stylesProps(style),
-      $active: active,
-      $bsStyle: style,
-      $bsSize: bsSize,
-      variant: active ? 'outline' : 'filled',
-      color,
-      'data-testid': dataTestId,
-      disabled,
-      role,
-      size: sizeForMantine(bsSize),
-      tabIndex,
-      title,
-      type,
-    } as const;
+  const sharedProps = {
+    id,
+    'aria-label': ariaLabel,
+    className,
+    ...stylesProps(style),
+    $active: active,
+    $bsStyle: style,
+    $bsSize: bsSize,
+    variant: active ? 'outline' : 'filled',
+    color,
+    'data-testid': dataTestId,
+    disabled,
+    role,
+    size: sizeForMantine(bsSize),
+    tabIndex,
+    title,
+    type,
+  } as const;
 
-    if (href) {
-      return (
-        <StyledButton
-          component={Link}
-          to={href}
-          target={target}
-          rel={rel}
-          onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-          {...sharedProps}>
-          {children}
-        </StyledButton>
-      );
-    }
-
+  if (href) {
     return (
       <StyledButton
-        ref={ref}
-        form={form}
-        onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-        name={name}
+        component={Link}
+        to={href}
+        target={target}
+        rel={rel}
+        onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
         {...sharedProps}>
         {children}
       </StyledButton>
     );
-  },
-);
+  }
 
-export default Button;
+  return (
+    <StyledButton
+      ref={ref}
+      form={form}
+      onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+      name={name}
+      {...sharedProps}>
+      {children}
+    </StyledButton>
+  );
+};
+
+export default React.forwardRef(Button);

@@ -35,8 +35,8 @@ const CopyToDashboardForm = ({
   onCopyToDashboard,
   submitButtonText,
   submitLoadingText,
-  activeDashboardId,
-  onCreateNewDashboard,
+  activeDashboardId = undefined,
+  onCreateNewDashboard = undefined,
 }: Props) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDashboard, setSelectedDashboard] = useState<string | null>(null);
@@ -109,7 +109,10 @@ const CopyToDashboardForm = ({
   const showCreateNewDashboardCheckbox = typeof onCreateNewDashboard === 'function';
 
   return (
-    <Modal show onHide={() => {}}>
+    <Modal show onHide={onCancel}>
+      <Modal.Header>
+        <Modal.Title>Copy widget to dashboard</Modal.Title>
+      </Modal.Header>
       <Modal.Body>
         {isLoadingDashboards && <Spinner />}
         {!isLoadingDashboards && (

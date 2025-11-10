@@ -24,6 +24,7 @@ import Routes from 'routing/Routes';
 import type { StartPage } from 'logic/users/User';
 import ContentStreamContainer from 'components/content-stream/ContentStreamContainer';
 import useProductName from 'brand-customization/useProductName';
+import { hasAdminPermission } from 'util/PermissionsMixin';
 
 import LastOpenList from './LastOpenList';
 import FavoriteItemsList from './FavoriteItemsList';
@@ -62,7 +63,7 @@ const ChangeStartPageHelper = ({ readOnly, userId, startpage }: HelperProps) => 
 const Welcome = () => {
   const productName = useProductName();
   const { permissions, readOnly, id: userId, startpage } = useCurrentUser();
-  const isAdmin = permissions.includes('*');
+  const isAdmin = hasAdminPermission(permissions);
 
   return (
     <>

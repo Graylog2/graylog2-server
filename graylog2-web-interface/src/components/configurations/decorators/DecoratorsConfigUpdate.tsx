@@ -14,11 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import { Modal } from 'components/bootstrap';
+import { Modal, Alert } from 'components/bootstrap';
 import { IfPermitted, ModalSubmit } from 'components/common';
 import type { Stream } from 'stores/streams/StreamsStore';
 import DecoratorList from 'views/components/messagelist/decorators/DecoratorList';
@@ -67,6 +69,12 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   const [modifiedDecorators, setModifiedDecorators] = useState(decorators);
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
+  const { permissions } = useCurrentUser();
+
+  const canEditStream = useMemo(
+    () => isPermitted(permissions, `streams:edit:${currentStream}`) || currentStream === DEFAULT_SEARCH_ID,
+    [currentStream, permissions],
+  );
 
   const onCreate = useCallback(
     ({ stream, ...rest }: Decorator) =>
@@ -102,7 +110,9 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
   );
   const decoratorItems = currentDecorators
     .sort((d1, d2) => d1.order - d2.order)
-    .map((decorator) => formatDecorator(decorator, modifiedDecorators, types, setModifiedDecorators));
+    .map((decorator) =>
+      formatDecorator(decorator, modifiedDecorators, types, canEditStream ? setModifiedDecorators : undefined),
+    );
 
   const nextOrder = currentDecorators.reduce((currentMax, decorator) => Math.max(currentMax, decorator.order), 0) + 1;
 
@@ -120,7 +130,12 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
       </Modal.Header>
       <Modal.Body>
         <p>Select the stream for which you want to change the set of default decorators.</p>
+
         <StreamSelect onChange={setCurrentStream} value={currentStream} streams={streams} />
+
+        {!canEditStream && currentStream && (
+          <Alert bsStyle="warning">Read only access - you need permission to edit the selected stream</Alert>
+        )}
 
         <IfPermitted permissions="decorators:create">
           <p>Select the type to create a new decorator for this stream:</p>
@@ -130,6 +145,7 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
             decoratorTypes={types}
             onCreate={onCreate}
             showHelp={false}
+            disabled={!canEditStream}
           />
         </IfPermitted>
 
@@ -138,7 +154,12 @@ const DecoratorsConfigUpdate = ({ streams, decorators, types, show = false, onCa
         <DecoratorList decorators={decoratorItems} onReorder={onReorder} />
       </Modal.Body>
       <Modal.Footer>
-        <ModalSubmit onSubmit={onSubmit} onCancel={_onCancel} submitButtonText="Update configuration" />
+        <ModalSubmit
+          onSubmit={onSubmit}
+          onCancel={_onCancel}
+          submitButtonText="Update configuration"
+          disabledSubmit={!canEditStream}
+        />
       </Modal.Footer>
     </BootstrapModalWrapper>
   );

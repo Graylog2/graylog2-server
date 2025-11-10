@@ -40,12 +40,12 @@ type Props = {
 };
 
 const CreateStreamRuleButton = ({
-  bsSize,
-  bsStyle,
+  bsSize = undefined,
+  bsStyle = undefined,
   buttonText = 'Create Rule',
-  className,
+  className = undefined,
   disabled = false,
-  streamId,
+  streamId = undefined,
 }: Props) => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const queryClient = useQueryClient();
@@ -56,7 +56,9 @@ const CreateStreamRuleButton = ({
     (_streamRuleId: string, streamRule: StreamRule) =>
       StreamRulesStore.create(streamId, streamRule, () => {
         UserNotification.success('Stream rule was created successfully.', 'Success');
-        queryClient.invalidateQueries(['stream', streamId]);
+        queryClient.invalidateQueries({
+          queryKey: ['stream', streamId],
+        });
       }),
     [streamId, queryClient],
   );

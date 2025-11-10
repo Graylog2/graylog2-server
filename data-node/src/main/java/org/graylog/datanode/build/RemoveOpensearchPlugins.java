@@ -16,12 +16,13 @@
  */
 package org.graylog.datanode.build;
 
-import org.graylog.datanode.opensearch.cli.CliEnv;
 import org.graylog.datanode.opensearch.cli.OpensearchCli;
+import org.graylog.datanode.process.Environment;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Utility for correct removal of opensearch plugins from a maven build. This makes sure that no dependencies are
@@ -40,7 +41,10 @@ public class RemoveOpensearchPlugins {
         final Path binDir = opensearchDist.resolve("bin");
         final Path configDir = opensearchDist.resolve("config");
 
-        final CliEnv env = new CliEnv(configDir).javaHome(System.getProperty("java.home"));
+        Environment env = new Environment(Map.of())
+                .withOpensearchJavaHome(Path.of(System.getProperty("java.home")))
+                .withOpensearchPathConf(configDir);
+
         final OpensearchCli cli = new OpensearchCli(env, binDir);
 
         // TODO: implement batch removal of multiple plugins, if opensearch ever supports that (like ES does)

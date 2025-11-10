@@ -139,7 +139,7 @@ const Streams = ({ streams, streamIds, streamIdsWithMissingPermission }: Streams
   );
 };
 
-const FilterAggregationSummary = ({ config, currentUser, definitionId }: Props) => {
+const FilterAggregationSummary = ({ config, currentUser, definitionId = undefined }: Props) => {
   const streams = useContext(StreamsContext);
   const {
     query,

@@ -19,21 +19,20 @@ package org.graylog.grn;
 import com.google.common.collect.ImmutableSet;
 
 public class GRNTypes {
-    public static final GRNType BUILTIN_TEAM = GRNType.create("builtin-team", "XXX-NOT-A-REAL-TYPE-XXX:");
-    public static final GRNType DASHBOARD = GRNType.create("dashboard", "dashboards:");
-    public static final GRNType EVENT_DEFINITION = GRNType.create("event_definition", "eventdefinitions:");
-    public static final GRNType EVENT_NOTIFICATION = GRNType.create("notification", "eventnotifications:");
-    public static final GRNType GRANT = GRNType.create("grant", "grants:");
-    public static final GRNType OUTPUT = GRNType.create("output", "outputs:");
-    public static final GRNType ROLE = GRNType.create("role", "roles:");
-    public static final GRNType SEARCH = GRNType.create("search", "view:");
-    public static final GRNType STREAM = GRNType.create("stream", "streams:");
-    public static final GRNType TEAM = GRNType.create("team", "teams:");
-    public static final GRNType USER = GRNType.create("user", "users:");
-    public static final GRNType SEARCH_FILTER = GRNType.create("search_filter", "search_filters:");
-    public static final GRNType FAVORITE = GRNType.create("favorite", "favorites:");
-    public static final GRNType LAST_OPENED = GRNType.create("last_opened", "last_opened:");
-    public static final GRNType REPORT = GRNType.create("report", "report:");
+    public static final GRNType BUILTIN_TEAM = GRNType.create("builtin-team");
+    public static final GRNType DASHBOARD = GRNType.create("dashboard");
+    public static final GRNType EVENT_DEFINITION = GRNType.create("event_definition");
+    public static final GRNType EVENT_NOTIFICATION = GRNType.create("notification");
+    public static final GRNType GRANT = GRNType.create("grant");
+    public static final GRNType OUTPUT = GRNType.create("output");
+    public static final GRNType ROLE = GRNType.create("role");
+    public static final GRNType SEARCH = GRNType.create("search");
+    public static final GRNType STREAM = GRNType.create("stream");
+    public static final GRNType USER = GRNType.create("user");
+    public static final GRNType SEARCH_FILTER = GRNType.create("search_filter");
+    public static final GRNType FAVORITE = GRNType.create("favorite");
+    public static final GRNType LAST_OPENED = GRNType.create("last_opened");
+    public static final GRNType REPORT = GRNType.create("report");
 
     // TODO This is essentially the same as org.graylog2.contentpacks.model.ModelTypes
     // TODO find a way to unify these
@@ -47,7 +46,6 @@ public class GRNTypes {
             .add(ROLE)
             .add(SEARCH)
             .add(STREAM)
-            .add(TEAM)
             .add(USER)
             .add(SEARCH_FILTER)
             .add(FAVORITE)

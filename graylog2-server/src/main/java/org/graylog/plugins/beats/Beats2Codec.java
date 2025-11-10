@@ -193,7 +193,9 @@ public class Beats2Codec extends AbstractCodec {
                     CK_NO_BEATS_PREFIX,
                     "Do not add Beats type as prefix",
                     false,
-                    "Do not prefix each field with the Beats type, e. g. \"source\" -> \"filebeat_source\"."
+                    "Do not prefix each field with the Beats type, e. g. \"source\" -> \"filebeat_source\". " +
+                            "Warning: Removing the beats type prefix breaks Illuminate compatibility! " +
+                            "For Illuminate compatibility, the above checkbox should be UNCHECKED."
             ));
 
             return configurationRequest;

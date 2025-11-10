@@ -20,7 +20,7 @@ import { NavItem as BootstrapNavItem } from 'react-bootstrap';
 
 import NavItemStateIndicator from 'components/common/NavItemStateIndicator';
 
-const NavItem = ({ children, ...props }: React.ComponentProps<typeof NavItem>) => (
+const NavItem = ({ children = undefined, ...props }: React.ComponentProps<typeof NavItem>) => (
   <BootstrapNavItem {...props}>
     <NavItemStateIndicator>{children}</NavItemStateIndicator>
   </BootstrapNavItem>

@@ -33,6 +33,7 @@ import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.users.UserService;
@@ -82,7 +83,7 @@ class RolesToGrantsMigrationTest {
         this.grnRegistry = grnRegistry;
 
         roleService = new RoleServiceImpl(
-                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()), permissions, validator);
+                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()), permissions, validator, new ClusterEventBus());
 
         this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
         this.userService = userService;

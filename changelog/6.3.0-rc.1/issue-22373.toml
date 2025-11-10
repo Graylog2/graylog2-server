@@ -1,0 +1,7 @@
+type = "fixed"
+message = "Fix search validation. No warning when asterisk used in field names."
+
+issues = ["22373"]
+pulls = ["22824"]
+
+

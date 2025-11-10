@@ -24,7 +24,9 @@ const useIsStreamDataLakeEnabled = (streamId: string, enabled: boolean) => {
     data: status,
     isError,
     isLoading,
-  } = useQuery(['data-lake-config', streamId, 'enabled'], () => fetchStreamDataLakeStatus(streamId), {
+  } = useQuery({
+    queryKey: ['data-lake-config', streamId, 'enabled'],
+    queryFn: () => fetchStreamDataLakeStatus(streamId),
     enabled: fetchStreamDataLakeStatus && enabled,
   });
 

@@ -26,7 +26,7 @@ type Props = {
 /**
  * This component receives any date time and displays the relative time until now in a human-readable format.
  */
-const RelativeTime = ({ dateTime: dateTimeProp }: Props) => {
+const RelativeTime = ({ dateTime: dateTimeProp = undefined }: Props) => {
   const dateTime = dateTimeProp ?? new Date();
   const relativeTime = relativeDifference(dateTime);
   const dateTimeString = adjustFormat(dateTime, 'internal');

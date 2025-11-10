@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { ViewJson } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -23,6 +23,8 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import PaginationURL from 'util/PaginationURL';
 import { defaultOnError } from 'util/conditional/onError';
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -44,15 +46,12 @@ type Options = {
   enabled?: boolean;
 };
 
-type SearchParamsForDashboards = SearchParams & {
-  scope: 'read' | 'update';
-};
-
 export const fetchDashboards = (searchParams: SearchParamsForDashboards) => {
   const url = PaginationURL(dashboardsUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams.sort.attributeId,
     order: searchParams.sort.direction,
     scope: searchParams.scope,
+    filters: FiltersForQueryParams(searchParams.filters),
   });
 
   return fetch<PaginatedDashboardsResponse>('GET', qualifyUrl(url)).then(
@@ -76,19 +75,18 @@ const useDashboards = (
   refetch: () => void;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading } = useQuery(
-    keyFn(searchParams),
-    () =>
+  const { data, refetch, isInitialLoading } = useQuery({
+    queryKey: keyFn(searchParams),
+
+    queryFn: () =>
       defaultOnError(
         fetchDashboards(searchParams),
         'Loading dashboards failed with status',
         'Could not load dashboards',
       ),
-    {
-      keepPreviousData: true,
-      enabled,
-    },
-  );
+    placeholderData: keepPreviousData,
+    enabled,
+  });
 
   return {
     data: data ?? INITIAL_DATA,

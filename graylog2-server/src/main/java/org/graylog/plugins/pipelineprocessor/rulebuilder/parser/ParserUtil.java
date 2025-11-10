@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
-import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateNotFoundException;
@@ -25,8 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
-import org.graylog.plugins.pipelineprocessor.rulebuilder.db.RuleFragment;
-import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
 
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -78,14 +75,6 @@ public class ParserUtil {
             syntax += value;
         }
         return syntax;
-    }
-
-    static final Configuration initializeFragmentTemplates(SecureFreemarkerConfigProvider secureFreemarkerConfigProvider, Map<String, RuleFragment> fragments) {
-        final Configuration freemarkerConfiguration = secureFreemarkerConfigProvider.get();
-        StringTemplateLoader stringTemplateLoader = new StringTemplateLoader();
-        fragments.entrySet().stream().filter(c -> c.getValue().isFragment()).forEach(c -> stringTemplateLoader.putTemplate(c.getKey(), c.getValue().fragment()));
-        freemarkerConfiguration.setTemplateLoader(stringTemplateLoader);
-        return freemarkerConfiguration;
     }
 
     static final String generateForFragment(RuleBuilderStep step, Configuration configuration) {

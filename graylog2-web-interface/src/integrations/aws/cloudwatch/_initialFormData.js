@@ -32,6 +32,9 @@ const DEFAULT_SETTINGS = {
   awsCloudWatchAddFlowLogPrefix: {
     value: true, // We want to default to true on render, but never compare the default
   },
+  overrideSource: {
+    value: '',
+  },
 };
 
 export default DEFAULT_SETTINGS;

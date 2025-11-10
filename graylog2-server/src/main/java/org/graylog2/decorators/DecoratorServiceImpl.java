@@ -17,7 +17,7 @@
 package org.graylog2.decorators;
 
 import com.google.common.base.Strings;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.graylog2.database.DbEntity;

@@ -1,0 +1,5 @@
+type="f"
+message="On event definition overview page show link to the notification instead of plain text."
+
+pulls = ["22834"]
+issues = ["22758"]

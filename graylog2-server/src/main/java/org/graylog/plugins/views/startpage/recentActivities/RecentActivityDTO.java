@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.grn.GRN;
 import org.graylog2.database.MongoEntity;
 import org.joda.time.DateTime;
@@ -32,7 +31,6 @@ import javax.annotation.Nullable;
 
 @AutoValue
 @JsonDeserialize(builder = RecentActivityDTO.Builder.class)
-@WithBeanGetter
 public abstract class RecentActivityDTO implements MongoEntity {
     public static final String FIELD_ID = "id";
     public static final String FIELD_ACTIVITY_TYPE = "activity_type";
@@ -102,7 +100,7 @@ public abstract class RecentActivityDTO implements MongoEntity {
 
         @JsonCreator
         public static RecentActivityDTO.Builder create() {
-            return new $AutoValue_RecentActivityDTO.Builder().timestamp(new DateTime(DateTimeZone.UTC));
+            return new AutoValue_RecentActivityDTO.Builder().timestamp(new DateTime(DateTimeZone.UTC));
         }
 
         public abstract RecentActivityDTO build();

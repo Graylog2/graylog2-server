@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
@@ -48,19 +48,19 @@ const useIndexSetsList = (
   isSuccess: boolean;
   isInitialLoading: boolean;
 } => {
-  const { data, refetch, isInitialLoading, isSuccess } = useQuery<State>(
-    ['IndexSetsList', stats],
-    () =>
+  const { data, refetch, isInitialLoading, isSuccess } = useQuery({
+    queryKey: ['IndexSetsList', stats],
+
+    queryFn: () =>
       defaultOnError(
         fetchIndexSetsList(stats, only_open),
         'Loading index sets with list failed with status',
         'Could not load index sets list',
       ),
-    {
-      keepPreviousData: true,
-      refetchInterval,
-    },
-  );
+
+    placeholderData: keepPreviousData,
+    refetchInterval,
+  });
 
   return {
     data: data ?? initialData,

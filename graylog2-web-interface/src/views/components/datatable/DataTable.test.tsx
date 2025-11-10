@@ -15,14 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import { Form, Formik } from 'formik';
+import userEvent from '@testing-library/user-event';
 
 import AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Pivot from 'views/logic/aggregationbuilder/Pivot';
 import Series from 'views/logic/aggregationbuilder/Series';
-import type FieldType from 'views/logic/fieldtypes/FieldType';
 import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
 import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
 import DataTable from 'views/components/datatable';
@@ -167,12 +167,12 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = mount(<SimplifiedDataTable config={config} />);
+    const { container } = render(<SimplifiedDataTable config={config} />);
 
-    expect(wrapper.children()).toExist();
+    expect(container).not.toBeNull();
   });
 
-  it('should render with filled data with rollup', () => {
+  it('should render with filled data with rollup', async () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
       .columnPivots([columnPivot])
@@ -181,7 +181,7 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(true)
       .build();
-    const wrapper = mount(
+    render(
       <SimplifiedDataTable
         config={config}
         // @ts-expect-error
@@ -189,10 +189,10 @@ describe('DataTable', () => {
       />,
     );
 
-    expect(wrapper.children()).toExist();
+    await screen.findByRole('columnheader', { name: /hulud\.net/i });
   });
 
-  it('should render for legacy search result with id as key', () => {
+  it('should render for legacy search result with id as key', async () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
       .columnPivots([columnPivot])
@@ -202,7 +202,7 @@ describe('DataTable', () => {
       .rollup(true)
       .build();
 
-    const wrapper = mount(
+    render(
       <SimplifiedDataTable
         config={config}
         // @ts-expect-error
@@ -210,10 +210,10 @@ describe('DataTable', () => {
       />,
     );
 
-    expect(wrapper).toIncludeText('hulud.net');
+    await screen.findByRole('columnheader', { name: /hulud\.net/i });
   });
 
-  it('should render with filled data without rollup', () => {
+  it('should render with filled data without rollup', async () => {
     const config = AggregationWidgetConfig.builder()
       .rowPivots([rowPivot])
       .columnPivots([columnPivot])
@@ -222,7 +222,7 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = mount(
+    render(
       <SimplifiedDataTable
         config={config}
         // @ts-expect-error
@@ -230,10 +230,10 @@ describe('DataTable', () => {
       />,
     );
 
-    expect(wrapper.children()).toExist();
+    await screen.findByRole('columnheader', { name: /hulud\.net/i });
   });
 
-  it('renders column pivot header without offset when rollup is disabled', () => {
+  it('renders column pivot header without offset when rollup is disabled', async () => {
     const protocolPivot = Pivot.createValues(['nf_proto_name']);
     const protocolData = {
       chart: [
@@ -261,7 +261,7 @@ describe('DataTable', () => {
       .visualization('table')
       .rollup(false)
       .build();
-    const wrapper = mount(
+    render(
       <SimplifiedDataTable
         config={config}
         // @ts-expect-error
@@ -269,10 +269,10 @@ describe('DataTable', () => {
       />,
     );
 
-    expect(wrapper.children()).toExist();
+    await screen.findByRole('columnheader', { name: 'TCP' });
   });
 
-  it('passes inferred types to fields', () => {
+  it('passes inferred types to fields', async () => {
     const avgSeries = new Series('avg(bytes)');
     const maxTimestampSeries = new Series('max(timestamp)');
 
@@ -288,7 +288,7 @@ describe('DataTable', () => {
       FieldTypeMapping.create('bytes', FieldTypes.LONG()),
       FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
     ]);
-    const wrapper = mount(
+    render(
       <SimplifiedDataTable
         config={config}
         fields={fields}
@@ -297,17 +297,10 @@ describe('DataTable', () => {
       />,
     );
 
-    const expectFieldType = (elem, type) =>
-      expect((wrapper.find(elem).props() as { type: FieldType }).type).toEqual(type);
-
-    expectFieldType('Value[field="count()"]', FieldTypes.LONG());
-    expectFieldType('Field[name="count()"]', FieldTypes.LONG());
-
-    expectFieldType('Value[field="avg(bytes)"]', FieldTypes.LONG());
-    expectFieldType('Field[name="avg(bytes)"]', FieldTypes.LONG());
-
-    expectFieldType('Value[field="max(timestamp)"]', FieldTypes.DATE());
-    expectFieldType('Field[name="max(timestamp)"]', FieldTypes.DATE());
+    await screen.findByText('2018-10-04 11:43:50.000');
+    await screen.findByText('408');
+    await screen.findByText('1,430');
+    await screen.findByText('2019-03-29 13:30:02.136');
   });
 
   it('calls render completion callback after first render', () => {
@@ -321,7 +314,7 @@ describe('DataTable', () => {
       .build();
     const onRenderComplete = jest.fn();
 
-    mount(
+    render(
       <RenderCompletionCallback.Provider value={onRenderComplete}>
         <SimplifiedDataTable config={config} />
       </RenderCompletionCallback.Provider>,
@@ -348,9 +341,9 @@ describe('DataTable', () => {
       FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
     ]);
 
-    it('from inactive to asc', () => {
+    it('from inactive to asc', async () => {
       const config = getConfig({ sort: [] });
-      const wrapper = mount(
+      render(
         <WidgetContext.Provider value={widget}>
           <SimplifiedDataTable
             config={config}
@@ -361,10 +354,8 @@ describe('DataTable', () => {
         </WidgetContext.Provider>,
       );
 
-      const sortButton = wrapper
-        .find('FieldSortIcon[fieldName="timestamp"]')
-        .find('button[title="Sort timestamp Ascending"]');
-      sortButton.simulate('click');
+      const sortButton = await screen.findByRole('button', { name: /sort timestamp ascending/i });
+      await userEvent.click(sortButton);
 
       expect(updateWidgetConfig).toHaveBeenCalledWith(
         'deadbeef',
@@ -375,9 +366,9 @@ describe('DataTable', () => {
       );
     });
 
-    it('from asc to dsc', () => {
+    it('from asc to dsc', async () => {
       const config = getConfig({ sort: [new SortConfig('pivot', 'timestamp', Direction.Ascending)] });
-      const wrapper = mount(
+      render(
         <WidgetContext.Provider value={widget}>
           <SimplifiedDataTable
             config={config}
@@ -388,10 +379,8 @@ describe('DataTable', () => {
         </WidgetContext.Provider>,
       );
 
-      const sortButton = wrapper
-        .find('FieldSortIcon[fieldName="timestamp"]')
-        .find('button[title="Sort timestamp Descending"]');
-      sortButton.simulate('click');
+      const sortButton = await screen.findByRole('button', { name: /sort timestamp descending/i });
+      await userEvent.click(sortButton);
 
       expect(updateWidgetConfig).toHaveBeenCalledWith(
         'deadbeef',
@@ -402,9 +391,9 @@ describe('DataTable', () => {
       );
     });
 
-    it('from dsc to inactive', () => {
+    it('from dsc to inactive', async () => {
       const config = getConfig({ sort: [new SortConfig('pivot', 'timestamp', Direction.Descending)] });
-      const wrapper = mount(
+      render(
         <WidgetContext.Provider value={widget}>
           <SimplifiedDataTable
             config={config}
@@ -415,11 +404,8 @@ describe('DataTable', () => {
         </WidgetContext.Provider>,
       );
 
-      const sortButton = wrapper
-        .find('FieldSortIcon[fieldName="timestamp"]')
-        .find('button[title="Remove timestamp sort"]');
-
-      sortButton.simulate('click');
+      const sortButton = await screen.findByRole('button', { name: /remove timestamp sort/i });
+      await userEvent.click(sortButton);
 
       expect(updateWidgetConfig).toHaveBeenCalledWith('deadbeef', config.toBuilder().sort([]).build());
     });
@@ -445,9 +431,9 @@ describe('DataTable', () => {
       FieldTypeMapping.create('timestamp', FieldTypes.DATE()),
     ]);
 
-    it('from unpinned to pinned', () => {
+    it('from unpinned to pinned', async () => {
       const config = getConfig({ pinnedColumns: [] });
-      const wrapper = mount(
+      render(
         <WidgetContext.Provider value={getWidget({ config })}>
           <SimplifiedDataTable
             config={config}
@@ -458,8 +444,8 @@ describe('DataTable', () => {
         </WidgetContext.Provider>,
       );
 
-      const pinnedButton = wrapper.find('button[data-testid="pin-timestamp"]');
-      pinnedButton.simulate('click');
+      const pinnedButton = await screen.findByTestId('pin-timestamp');
+      await userEvent.click(pinnedButton);
 
       expect(updateWidgetConfig).toHaveBeenCalledWith(
         'deadbeef',
@@ -470,9 +456,9 @@ describe('DataTable', () => {
       );
     });
 
-    it('from pinned to unpinned', () => {
+    it('from pinned to unpinned', async () => {
       const config = getConfig({ pinnedColumns: ['timestamp', 'bytes'] });
-      const wrapper = mount(
+      render(
         <WidgetContext.Provider value={getWidget({ config })}>
           <SimplifiedDataTable
             config={config}
@@ -483,8 +469,8 @@ describe('DataTable', () => {
         </WidgetContext.Provider>,
       );
 
-      const pinnedButton = wrapper.find('button[data-testid="pin-timestamp"]');
-      pinnedButton.simulate('click');
+      const pinnedButton = await screen.findByTestId('pin-timestamp');
+      await userEvent.click(pinnedButton);
 
       expect(updateWidgetConfig).toHaveBeenCalledWith(
         'deadbeef',

@@ -1,0 +1,5 @@
+type = "c"
+message = "Minimum required version of MongoDB is now raised to 7.0."
+
+issues = ["23448"]
+pulls = [""]

@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import pickBy from 'lodash/pickBy';
 import keyBy from 'lodash/keyBy';
 
 import { fetchIndexSetFieldTypes, keyFn } from 'components/indices/IndexSetFieldTypes/hooks/useIndexSetFieldType';
 import useParams from 'routing/useParams';
-import { Icon, PaginatedEntityTable } from 'components/common';
+import { PaginatedEntityTable, StatusIcon } from 'components/common';
 import type { Sort } from 'stores/PaginationTypes';
 import FieldTypeActions from 'components/indices/IndexSetFieldTypes/FieldTypeActions';
 import expandedSections from 'components/indices/IndexSetFieldTypes/originExpandedSections/expandedSections';
@@ -45,17 +45,14 @@ export const DEFAULT_LAYOUT = {
 
 const COLUMNS_ORDER = ['field_name', 'type', 'origin', 'is_reserved'];
 
-const StyledIcon = styled(Icon)<{ $value: 'true' | 'false' }>(
-  ({ theme, $value }) => css`
-    color: ${$value === 'true' ? theme.colors.variant.success : theme.colors.variant.danger};
-    margin-right: 5px;
-  `,
-);
+const StyledStatusIcon = styled(StatusIcon)`
+  margin-right: 5px;
+`;
 const isEntitySelectable = (fieldType: IndexSetFieldType) => !fieldType.isReserved;
 const FilterValueRenderers = {
   is_reserved: (value: 'true' | 'false', title: string) => (
     <>
-      <StyledIcon name={value === 'true' ? 'check_circle' : 'cancel'} $value={value} />
+      <StyledStatusIcon active={value === 'true'} />
       {title}
     </>
   ),

@@ -727,7 +727,6 @@ public class StreamRouterEngineTest {
     @Test
     public void issue1396() throws Exception {
         final StreamMock stream = getStreamMock("GitHub issue #1396");
-        stream.setMatchingType(Stream.MatchingType.AND);
 
         final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.<String, Object>builder()
                 .put("_id", new ObjectId())

@@ -19,6 +19,7 @@ import styled, { css } from 'styled-components';
 
 import type { SearchPreferencesLayout } from 'views/components/contexts/SearchPagePreferencesContext';
 import { IconButton } from 'components/common';
+import zIndices from 'theme/z-indices';
 
 type Props = {
   children: React.ReactNode;
@@ -41,8 +42,7 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
     background: ${theme.colors.global.contentBackground};
     border-right: ${$sidebarIsPinned ? 'none' : `1px solid ${theme.colors.variant.light.default}`};
     box-shadow: ${$sidebarIsPinned ? `3px 3px 3px ${theme.colors.global.navigationBoxShadow}` : 'none'};
-
-    z-index: ${$sidebarIsPinned ? 1030 : 6};
+    z-index: ${zIndices.sidebar};
 
     ${$sidebarIsPinned &&
     css`
@@ -56,7 +56,6 @@ export const Container = styled.div<{ $sidebarIsPinned: boolean }>(
         border-top-left-radius: 50%;
         background: transparent;
         box-shadow: -6px -6px 0 3px ${theme.colors.global.contentBackground};
-        z-index: 5; /* to render over Sidebar ContentColumn */
       }
     `}
   `,
@@ -72,7 +71,7 @@ const ContentGrid = styled.div(
 
     padding: 5px 15px 0;
 
-    color: ${theme.colors.global.textDefault};
+    color: ${theme.colors.text.primary};
   `,
 );
 

@@ -28,7 +28,7 @@ type Props = {
 /**
  * Wrapper for the useElementDimensions hook.
  */
-const ElementDimensions = ({ children, className, resizeDelay }: Props) => {
+const ElementDimensions = ({ children, className = undefined, resizeDelay = undefined }: Props) => {
   const element = useRef(null);
   const dimensions = useElementDimensions(element, resizeDelay);
 

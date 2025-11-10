@@ -16,6 +16,8 @@
  */
 package org.graylog.datanode.opensearch.cli;
 
+import org.graylog.datanode.process.Environment;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -27,7 +29,7 @@ public class OpensearchPluginCli extends AbstractOpensearchCli {
 
     public static final String PLUGIN_BIN_NAME = "opensearch-plugin";
 
-    protected OpensearchPluginCli(Path binDir, CliEnv env) {
+    protected OpensearchPluginCli(Path binDir, Environment env) {
         super(binDir.resolve(PLUGIN_BIN_NAME), env);
     }
 

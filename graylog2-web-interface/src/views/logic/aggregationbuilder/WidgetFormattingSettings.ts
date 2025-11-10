@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 type Color = string;
 type ChartColors = { [key: string]: Color };
@@ -36,7 +35,7 @@ export type WidgetFormattingSettingsJSON = {
 export default class WidgetFormattingSettings {
   private readonly _value: InternalState;
 
-  constructor(chartColors: $PropertyType<InternalState, 'chartColors'>) {
+  constructor(chartColors: InternalState['chartColors']) {
     this._value = { chartColors };
   }
 
@@ -49,7 +48,7 @@ export default class WidgetFormattingSettings {
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(chartColors: $PropertyType<InternalState, 'chartColors'>) {
+  static create(chartColors: InternalState['chartColors']) {
     return new WidgetFormattingSettings(chartColors);
   }
 
@@ -96,7 +95,7 @@ class Builder {
     this.value = value;
   }
 
-  chartColors(value: $PropertyType<InternalState, 'chartColors'>) {
+  chartColors(value: InternalState['chartColors']) {
     return new Builder(this.value.set('chartColors', value));
   }
 

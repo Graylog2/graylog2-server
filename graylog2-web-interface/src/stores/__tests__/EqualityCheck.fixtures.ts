@@ -31,10 +31,12 @@ export const arrayOfMaps = (): Array<Map<string, number>> => [Map({ foo: 23 }), 
 export const mixedMapsAndObjects = (): MixedMapsAndObjects => ({ foo: Map({ bar: { baz: Map({ qux: 42 }) } }) });
 
 export class AlwaysEqual {
+  // eslint-disable-next-line class-methods-use-this
   equals = () => true;
 }
 
 export class NeverEqual {
+  // eslint-disable-next-line class-methods-use-this
   equals = () => false;
 }
 

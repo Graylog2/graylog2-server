@@ -28,40 +28,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import NavigationItem from 'components/navigation/NavigationItem';
 import { DEFAULT_SECURITY_NAV_ITEM } from 'components/security/bindings';
 import DEFAULT_ENTERPRISE_NAV_ITEM from 'components/navigation/DefaultEnterpriseNavItem';
+import sortNavigationItems from 'components/navigation/util/sortNavigationItems';
 
-const _existingDropdownItemIndex = (
-  existingNavigationItems: Array<PluginNavigation>,
-  newNavigationItem: PluginNavigation,
-) => {
-  if (!newNavigationItem.children) {
-    return -1;
-  }
-
-  return existingNavigationItems.findIndex(
-    ({ description, perspective, children }) =>
-      newNavigationItem.description === description && newNavigationItem.perspective === perspective && children,
-  );
-};
-
-const mergeDuplicateDropdowns = (navigationItems: Array<PluginNavigation>): Array<PluginNavigation> =>
-  navigationItems.reduce((result, current) => {
-    const existingDropdownItemIndex = _existingDropdownItemIndex(result, current);
-
-    if (existingDropdownItemIndex >= 0) {
-      const existingDropdownItem = result[existingDropdownItemIndex];
-      const newDropdownItem = {
-        ...current,
-        ...existingDropdownItem,
-        children: [...existingDropdownItem.children, ...current.children],
-      };
-      const newResult = [...result];
-      newResult[existingDropdownItemIndex] = newDropdownItem;
-
-      return newResult;
-    }
-
-    return [...result, current];
-  }, []);
+import mergeNavigationItems from './util/mergeNavigationItems';
 
 const pluginMenuItemExists = (navigationItems: Array<PluginNavigation>, description: string) => {
   if (!navigationItems?.length) {
@@ -75,37 +44,14 @@ const pluginLicenseValid = (navigationItems: Array<PluginNavigation>, descriptio
   if (!navigationItems?.length) return false;
   const menuItem = navigationItems.find((value) => value.description?.toLowerCase() === description.toLowerCase());
 
-  return menuItem && Object.keys(menuItem).includes('useIsValidLicense') ? menuItem.useIsValidLicense() : true;
-};
-
-const sortInAfterItems = (targetList: Array<PluginNavigation>, afterItems: Array<PluginNavigation>) => {
-  const result = [...targetList];
-
-  afterItems.forEach((afterItem) => {
-    const index = result.findIndex((targetItem) => targetItem.description === afterItem.position?.after);
-    if (index !== -1) {
-      result.splice(index + 1, 0, afterItem);
-    } else {
-      result.push(afterItem);
-    }
-  });
-
-  return result;
-};
-
-const sortItemsByPosition = (navigationItems: Array<PluginNavigation>) => {
-  const withoutPositionItems = navigationItems.filter((item) => !item.position);
-  const afterItems = navigationItems.filter((item) => !!item.position?.after);
-  const lastItems = navigationItems.filter((item) => !!item.position?.last);
-
-  return [...sortInAfterItems(withoutPositionItems, afterItems), ...lastItems];
+  return menuItem && Object.keys(menuItem).includes('useCondition') ? menuItem.useCondition() : true;
 };
 
 const useNavigationItems = () => {
   const { permissions } = useCurrentUser();
   const { activePerspective } = useActivePerspective();
   const allNavigationItems = usePluginEntities('navigation');
-  const navigationItems = useMemo(() => mergeDuplicateDropdowns(allNavigationItems), [allNavigationItems]);
+  const navigationItems = useMemo(() => mergeNavigationItems(allNavigationItems), [allNavigationItems]);
 
   const securityLicenseInvalid = !pluginLicenseValid(navigationItems, DEFAULT_SECURITY_NAV_ITEM.description);
 
@@ -134,7 +80,7 @@ const useNavigationItems = () => {
 
     const itemsForActivePerspective = filterByPerspective(navigationItems, activePerspective?.id);
 
-    return sortItemsByPosition(itemsForActivePerspective);
+    return sortNavigationItems<PluginNavigation>(itemsForActivePerspective);
   }, [activePerspective?.id, navigationItems, permissions, securityLicenseInvalid]);
 };
 

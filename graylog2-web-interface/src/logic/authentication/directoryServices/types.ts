@@ -14,8 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { $PropertyType } from 'utility-types';
-
 import type { AuthenticationBackendJSON } from 'logic/authentication/AuthenticationBackend';
 import type AuthenticationBackend from 'logic/authentication/AuthenticationBackend';
 
@@ -53,17 +51,17 @@ export type DirectoryServiceBackendConfigJson = {
 };
 
 export type DirectoryServiceBackend = {
-  id: $PropertyType<AuthenticationBackend, 'id'>;
-  defaultRoles: $PropertyType<AuthenticationBackend, 'defaultRoles'>;
-  title: $PropertyType<AuthenticationBackend, 'title'>;
-  description: $PropertyType<AuthenticationBackend, 'description'>;
+  id: AuthenticationBackend['id'];
+  defaultRoles: AuthenticationBackend['defaultRoles'];
+  title: AuthenticationBackend['title'];
+  description: AuthenticationBackend['description'];
   config: DirectoryServiceBackendConfig;
 };
 
 export type WizardSubmitPayload = {
-  title: $PropertyType<AuthenticationBackendJSON, 'title'>;
-  description: $PropertyType<AuthenticationBackendJSON, 'description'>;
-  default_roles: $PropertyType<AuthenticationBackendJSON, 'default_roles'>;
+  title: AuthenticationBackendJSON['title'];
+  description: AuthenticationBackendJSON['description'];
+  default_roles: AuthenticationBackendJSON['default_roles'];
   config: DirectoryServiceBackendConfigJson & {
     system_user_password:
       | (string | { keep_value: true } | { delete_value: true } | { set_value: string | undefined })

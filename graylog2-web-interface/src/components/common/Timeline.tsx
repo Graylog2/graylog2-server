@@ -25,7 +25,7 @@ type Props = React.PropsWithChildren<{
   color: string;
 }>;
 
-const Timeline = ({ children, bulletSize, color, active, className }: Props) => (
+const Timeline = ({ children = undefined, bulletSize, color, active, className = undefined }: Props) => (
   <MantineTimeline bulletSize={bulletSize} color={color} className={className} active={active}>
     {children}
   </MantineTimeline>

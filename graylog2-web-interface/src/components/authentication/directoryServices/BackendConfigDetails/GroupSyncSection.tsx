@@ -33,7 +33,7 @@ type Props = {
   roles: Immutable.List<Role>;
 };
 
-const GroupSyncSection = ({ authenticationBackend, roles, excludedFields }: Props) => {
+const GroupSyncSection = ({ authenticationBackend, roles, excludedFields = undefined }: Props) => {
   const enterpriseGroupSyncPlugin = getEnterpriseGroupSyncPlugin();
   const GroupSyncSectionPlugin = enterpriseGroupSyncPlugin?.components.GroupSyncSection;
 

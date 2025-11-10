@@ -23,15 +23,13 @@ import useThemes from 'theme/hooks/useThemes';
 
 import ColorSchemeContext from './ColorSchemeContext';
 
-import 'material-symbols/rounded.css';
-
 type Props = {
   children: React.ReactNode;
   initialThemeModeOverride?: ColorScheme;
   userIsLoggedIn: boolean;
 };
 
-const GraylogThemeProvider = ({ children, initialThemeModeOverride, userIsLoggedIn }: Props) => {
+const GraylogThemeProvider = ({ children, initialThemeModeOverride = undefined, userIsLoggedIn }: Props) => {
   const { scTheme, mantineTheme, colorScheme } = useThemes(initialThemeModeOverride, userIsLoggedIn);
 
   return (

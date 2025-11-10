@@ -17,7 +17,7 @@
 package org.graylog.plugins.views.search.jobs.periodical;
 
 import com.google.common.collect.Sets;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.db.SearchJobService;

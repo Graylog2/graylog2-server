@@ -89,8 +89,8 @@ type Props = {
   message: Message & { streams?: Array<Stream> };
   inputs?: Immutable.Map<string, Input>;
   streams?: Immutable.Map<string, Stream>;
-  renderForDisplay: (fieldName: string) => React.ReactNode;
-  customFieldActions?: React.ReactNode;
+  renderForDisplay: (fieldName: string) => React.ReactElement;
+  customFieldActions?: React.ReactElement;
 };
 
 const MessageDetail = ({

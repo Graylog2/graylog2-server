@@ -55,6 +55,7 @@ interface ConfigComponentProps extends SystemConfigurationComponentProps {
   jsonSchema: JsonSchema;
   updateConfig: (update: StrategyConfig) => void;
   useMaxNumberOfIndices?: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>];
+  disabled?: boolean;
 }
 
 type Props = {
@@ -63,6 +64,8 @@ type Props = {
   description?: string;
   selectPlaceholder: string;
   label: string;
+  immutableFields?: string[];
+  disabled?: boolean;
   pluginExports: Array<{
     type: string;
     displayName: string;
@@ -159,6 +162,7 @@ const getConfigurationComponent = (
   config: StrategyConfig,
   onConfigUpdate: (update: StrategyConfig) => void,
   useMaxNumberOfIndices: () => [number | undefined, React.Dispatch<React.SetStateAction<number>>],
+  disabled: boolean = false,
 ) => {
   if (!selectedStrategy || selectedStrategy.length < 1) {
     return null;
@@ -178,6 +182,7 @@ const getConfigurationComponent = (
     config: strategyConfig,
     jsonSchema: getStrategyJsonSchema(selectedStrategy, strategies),
     updateConfig: onConfigUpdate,
+    disabled: disabled,
   };
 
   if (selectedStrategy === ARCHIVE_RETENTION_STRATEGY) {
@@ -195,14 +200,18 @@ const getConfigurationComponent = (
 const IndexMaintenanceStrategiesConfiguration = ({
   title,
   name,
-  description,
+  description = undefined,
   selectPlaceholder,
   label,
   pluginExports,
   strategies,
+  immutableFields = [],
+  disabled = false,
+
   retentionStrategiesContext: { max_index_retention_period: maxRetentionPeriod } = {
     max_index_retention_period: undefined,
   },
+
   activeConfig: { strategy, config },
   getState,
 }: Props) => {
@@ -350,10 +359,10 @@ const IndexMaintenanceStrategiesConfiguration = ({
             <StyledSelect
               placeholder={selectPlaceholder}
               options={getAvailableSelectOptions()}
-              matchProp="label"
               value={getActiveSelection()}
               onChange={_onSelect}
               clearable={false}
+              disabled={disabled}
             />
           </Input>
         </Col>
@@ -370,6 +379,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
               rotationStrategy,
               _onIndexTimeSizeOptimizingUpdate,
               () => [maxNumberOfIndices, setMaxNumberOfIndices],
+              immutableFields.includes('legacy.rotation_strategy'),
             )}
           {shouldShowNormalRetentionForm &&
             getConfigurationComponent(
@@ -381,6 +391,7 @@ const IndexMaintenanceStrategiesConfiguration = ({
               config,
               _onConfigUpdate,
               () => [maxNumberOfIndices, setMaxNumberOfIndices],
+              disabled,
             )}
         </Col>
       </Row>

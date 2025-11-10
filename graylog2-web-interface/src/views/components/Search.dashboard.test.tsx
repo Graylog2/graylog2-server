@@ -57,7 +57,7 @@ jest.mock('views/hooks/useQueryTitles');
 
 const mockWidgetEditing = () => {
   asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(
-    ({ children }: React.PropsWithChildren<{}>) => (
+    ({ children = undefined }: React.PropsWithChildren<{}>) => (
       <WidgetFocusContext.Provider
         value={{
           focusedWidget: {
@@ -89,7 +89,7 @@ describe('Dashboard Search', () => {
     StreamsActions.refresh = mockAction();
 
     asMock(WidgetFocusProvider as React.FunctionComponent).mockImplementation(
-      ({ children }: React.PropsWithChildren<{}>) => (
+      ({ children = undefined }: React.PropsWithChildren<{}>) => (
         <WidgetFocusContext.Provider
           value={{
             focusedWidget: undefined,

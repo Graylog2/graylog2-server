@@ -18,7 +18,7 @@ const path = require('path');
 
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
@@ -41,6 +41,7 @@ const baseConfig = {
   mode,
   name: 'preflight',
   entry: {
+    preload: path.resolve(PREFLIGHT_PATH, '..', 'preload.ts'),
     preflight: PREFLIGHT_PATH,
   },
   output: {

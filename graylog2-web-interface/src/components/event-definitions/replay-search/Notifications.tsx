@@ -17,12 +17,11 @@
 import * as React from 'react';
 import { useEffect, useMemo } from 'react';
 
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import { useStore } from 'stores/connect';
 import { EventNotificationsStore, EventNotificationsActions } from 'stores/event-notifications/EventNotificationsStore';
 import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
+import EventNotificationLink from 'components/event-notifications/event-notifications/EventNotificationLink';
 
 import useAlertAndEventDefinitionData from './hooks/useAlertAndEventDefinitionData';
 
@@ -54,9 +53,7 @@ const Notifications = () => {
         return (
           <span key={id}>
             {prefix}
-            <Link target="_blank" to={Routes.ALERTS.NOTIFICATIONS.show(id)}>
-              {title}
-            </Link>
+            <EventNotificationLink id={id} title={title} />
           </span>
         );
       })}

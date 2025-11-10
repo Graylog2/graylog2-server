@@ -1,0 +1,5 @@
+type = "fixed" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Fix datanode upgrade list sorting, add server version warning"
+
+issues = ["graylog-plugin-enterprise#10529", "graylog-plugin-enterprise#10530"]
+pulls = ["22533"]

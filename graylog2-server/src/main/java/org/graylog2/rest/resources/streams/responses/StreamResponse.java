@@ -20,8 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
@@ -32,7 +30,6 @@ import java.util.List;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class StreamResponse {
     @JsonProperty("id")
@@ -84,6 +81,10 @@ public abstract class StreamResponse {
     @Nullable
     public abstract List<String> categories();
 
+    @JsonProperty("favorite_fields")
+    @Nullable
+    public abstract List<String> favoriteFields();
+
     @JsonCreator
     public static StreamResponse create(@JsonProperty("id") String id,
                                         @JsonProperty("creator_user_id") String creatorUserId,
@@ -98,7 +99,9 @@ public abstract class StreamResponse {
                                         @JsonProperty("is_default") @Nullable Boolean isDefault,
                                         @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
                                         @JsonProperty("index_set_id") String indexSetId,
-                                        @JsonProperty("categories") @Nullable List<String> categories) {
+                                        @JsonProperty("categories") @Nullable List<String> categories,
+                                        @JsonProperty("is_editable") boolean isEditable,
+                                        @JsonProperty("favorite_fields") List<String> favoriteFields) {
         return new AutoValue_StreamResponse(
                 id,
                 creatorUserId,
@@ -113,7 +116,8 @@ public abstract class StreamResponse {
                 firstNonNull(isDefault, false),
                 firstNonNull(removeMatchesFromDefaultStream, false),
                 indexSetId,
-                Stream.streamIsEditable(id),
-                categories);
+                isEditable,
+                categories,
+                favoriteFields);
     }
 }

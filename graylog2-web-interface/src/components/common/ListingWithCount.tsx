@@ -21,7 +21,7 @@ import CountBadge from './CountBadge';
 
 type Props = {
   count: number;
-  listing: React.ReactElement;
+  listing: React.ReactNode;
 };
 
 const Listing = styled.div`
@@ -32,7 +32,7 @@ const Listing = styled.div`
 
 const ListingWithCount = ({ count, listing }: Props) => (
   <Listing title={String(listing)}>
-    <CountBadge>{count}</CountBadge> {listing}
+    <CountBadge count={count} /> {listing}
   </Listing>
 );
 

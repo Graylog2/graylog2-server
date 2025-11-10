@@ -15,18 +15,31 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import styled from 'styled-components';
 import { useField } from 'formik';
 import type { LookupTableCache } from 'src/logic/lookup-tables/types';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { Input } from 'components/bootstrap';
+import { Button, Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 type Props = {
+  onCreateClick: () => void;
   caches?: LookupTableCache[];
 };
 
-const CachePicker = ({ caches = [] }: Props) => {
+const StyledSelect = styled(Select)`
+  flex: 1 1 auto;
+  min-width: 0;
+`;
+
+const StyledButton = styled(Button)`
+  flex: 0 0 auto;
+  margin-left: 0.5rem;
+  white-space: nowrap;
+`;
+
+const CachePicker = ({ onCreateClick, caches = [] }: Props) => {
   const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
   const sortedCaches = caches
     .map((cache) => ({ value: cache.id, label: `${cache.title} (${cache.name})` }))
@@ -42,18 +55,27 @@ const CachePicker = ({ caches = [] }: Props) => {
         required
         autoFocus
         bsStyle={errorMessage ? 'error' : undefined}
-        help={errorMessage || 'Select an existing cache'}
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9">
-        <Select
-          placeholder="Select a cache"
-          clearable={false}
-          options={sortedCaches}
-          matchProp="label"
-          onBlur={() => setTouched(true)}
-          onChange={setValue}
-          value={value}
-        />
+        labelClassName="d-block mb-1"
+        wrapperClassName="d-block"
+        formGroupClassName="mb-3">
+        <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
+          {errorMessage || 'Select an existing cache'}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <StyledSelect
+            placeholder="Select a cache"
+            clearable={false}
+            options={sortedCaches}
+            onBlur={() => setTouched(true)}
+            onChange={(v) => setValue(v)}
+            value={value}
+          />
+
+          <StyledButton type="button" aria-label="Create Cache" onClick={onCreateClick}>
+            Create Cache
+          </StyledButton>
+        </div>
       </Input>
     </fieldset>
   );

@@ -69,7 +69,7 @@ const CurrentUserDateTimeProvider = ({ children }: Omit<Props, 'tz'>) => {
   return <StaticTimezoneProvider tz={userTimezone}>{children}</StaticTimezoneProvider>;
 };
 
-const UserDateTimeProvider = ({ children, tz: tzOverride }: Props) =>
+const UserDateTimeProvider = ({ children, tz: tzOverride = undefined }: Props) =>
   tzOverride ? (
     <StaticTimezoneProvider tz={tzOverride}>{children}</StaticTimezoneProvider>
   ) : (

@@ -29,7 +29,7 @@ import com.mongodb.MongoWriteException;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcernResult;
 import com.mongodb.WriteError;
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import org.bson.BsonDocument;
 import org.bson.BsonString;
 import org.bson.RawBsonDocument;
@@ -157,47 +157,6 @@ class MongoUtilsTest {
         assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF)))).contains(a, b, c, d, e, f);
         assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF, missingId1, missingId2)))).hasSize(6);
         assertThat(collection.find(stringIdsIn(Set.of(idA, idB, idC, idD, idE, idF, missingId1, missingId2)))).contains(a, b, c, d, e, f);
-    }
-
-    @Test
-    void testGetOrCreate() {
-        final var id = new ObjectId().toHexString();
-        final var dto = new DTO(id, "test");
-
-        assertThat(utils.getById(id)).isEmpty();
-
-        assertThat(utils.getOrCreate(dto)).satisfies(result -> {
-            assertThat(result.id()).isEqualTo(id);
-            assertThat(result.name()).isEqualTo("test");
-            assertThat(result).isEqualTo(dto);
-        });
-
-        assertThat(utils.getById(id)).isPresent().get().satisfies(result -> {
-            assertThat(result.id()).isEqualTo(id);
-            assertThat(result.name()).isEqualTo("test");
-            assertThat(result).isEqualTo(dto);
-        });
-
-        // Using a different name in the DTO doesn't update the existing entry in the collection
-        assertThat(utils.getOrCreate(new DTO(id, "another"))).satisfies(result -> {
-            assertThat(result.id()).isEqualTo(id);
-            assertThat(result.name()).isEqualTo("test");
-            assertThat(result).isEqualTo(dto);
-        });
-    }
-
-    @Test
-    void testGetOrCreateWithNullEntity() {
-        assertThatThrownBy(() -> utils.getOrCreate(null))
-                .hasMessageContaining("entity cannot be null")
-                .isInstanceOf(NullPointerException.class);
-    }
-
-    @Test
-    void testGetOrCreateWithNullEntityID() {
-        assertThatThrownBy(() -> utils.getOrCreate(new DTO(null, "test")))
-                .hasMessageContaining("entity ID cannot be null")
-                .isInstanceOf(NullPointerException.class);
     }
 
     @Test

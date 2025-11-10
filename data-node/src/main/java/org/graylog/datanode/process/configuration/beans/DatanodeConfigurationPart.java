@@ -20,8 +20,8 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nullable;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.process.configuration.files.DatanodeConfigFile;
-import org.graylog.security.certutil.csr.KeystoreInformation;
 
 import java.security.KeyStore;
 import java.util.Collection;
@@ -39,18 +39,18 @@ public abstract class DatanodeConfigurationPart {
 
     public abstract List<String> javaOpts();
 
+    /**
+     * TODO: this is not used anywhere!
+     */
     public abstract Map<String, String> systemProperties();
-
-    @Nullable
-    public abstract KeystoreInformation httpCertificate();
-
-    @Nullable
-    public abstract KeystoreInformation transportCertificate();
 
     public abstract boolean securityConfigured();
 
     @Nullable
     public abstract KeyStore trustStore();
+
+    @Nullable
+    public abstract OpensearchCertificates opensearchCertificates();
 
     public abstract List<String> warnings();
 
@@ -89,7 +89,12 @@ public abstract class DatanodeConfigurationPart {
             return this;
         }
 
-        public abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+        abstract Builder configFiles(List<DatanodeConfigFile> configFiles);
+
+        public Builder withConfigFiles(Collection<DatanodeConfigFile> configFiles) {
+            configFilesBuilder().addAll(configFiles);
+            return this;
+        }
 
         abstract ImmutableList.Builder<DatanodeConfigFile> configFilesBuilder();
 
@@ -102,9 +107,7 @@ public abstract class DatanodeConfigurationPart {
 
         public abstract Builder properties(Map<String, String> properties);
 
-        public abstract Builder httpCertificate(KeystoreInformation httpCertificate);
-
-        public abstract Builder transportCertificate(KeystoreInformation httpCertificate);
+        public abstract Builder opensearchCertificates(OpensearchCertificates opensearchCertificates);
 
         @Deprecated
         public abstract Builder securityConfigured(boolean securityConfigured);
@@ -118,10 +121,12 @@ public abstract class DatanodeConfigurationPart {
             return systemPropertiesBuilder;
         }
 
+        @Deprecated
         abstract Builder systemProperties(Map<String, String> systemProperties); // not public
 
         abstract DatanodeConfigurationPart autoBuild(); // not public
 
+        @Deprecated
         public Builder systemProperty(String key, String value) {
             systemPropertiesBuilder().put(key, value);
             return this;

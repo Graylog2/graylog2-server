@@ -19,7 +19,6 @@ import React, { useEffect } from 'react';
 import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
-import useCurrentUser from 'hooks/useCurrentUser';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
@@ -28,7 +27,6 @@ import useProductName from 'brand-customization/useProductName';
 const isCloud = AppConfig.isCloud();
 
 const InputsPage = () => {
-  const currentUser = useCurrentUser();
   const productName = useProductName();
 
   useEffect(() => {
@@ -61,7 +59,7 @@ const InputsPage = () => {
             </span>
           )}
         </PageHeader>
-        <InputsList permissions={currentUser.permissions} />
+        <InputsList />
       </div>
     </DocumentTitle>
   );

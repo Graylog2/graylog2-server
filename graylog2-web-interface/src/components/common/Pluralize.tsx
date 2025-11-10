@@ -18,7 +18,7 @@ import React from 'react';
 
 import StringUtils from 'util/StringUtils';
 
-type PluralizeProps = {
+type Props = {
   /** Singular form of the word. */
   singular: string;
   /** Plural form of the word. */
@@ -30,15 +30,6 @@ type PluralizeProps = {
 /**
  * Component that will render a singular or plural text depending on a given value.
  */
-class Pluralize extends React.Component<
-  PluralizeProps,
-  {
-    [key: string]: any;
-  }
-> {
-  render() {
-    return <span>{StringUtils.pluralize(this.props.value, this.props.singular, this.props.plural)}</span>;
-  }
-}
+const Pluralize = ({ value, singular, plural }: Props) => <span>{StringUtils.pluralize(value, singular, plural)}</span>;
 
 export default Pluralize;

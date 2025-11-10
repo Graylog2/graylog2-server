@@ -173,12 +173,12 @@ public class InputsResource extends AbstractInputsResource {
     public InputReferences getReferences(@ApiParam(name = "inputId", required = true)
                                              @PathParam("inputId") String inputId) {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
-        checkPermission(RestPermissions.STREAMS_READ);
         checkPermission(PipelineRestPermissions.PIPELINE_READ);
 
         return new InputReferences(inputId,
                 streamRuleService.loadForInput(inputId).stream()
                         .map(StreamRule::getStreamId)
+                        .peek(streamId -> checkPermission(RestPermissions.STREAMS_READ, streamId))
                         .distinct()
                         .map(streamId -> new InputReference(streamId, streamService.streamTitleFromCache(streamId)))
                         .toList(),
@@ -306,8 +306,8 @@ public class InputsResource extends AbstractInputsResource {
     }
 
     private void throwBadRequestIfNotGlobal(InputCreateRequest lr) {
-        if (config.isCloud() && !lr.global()) {
-            throw new BadRequestException("Only global inputs are allowed in the cloud environment!");
+        if ((config.isCloud() || config.isGlobalInputsOnly()) && !lr.global()) {
+            throw new BadRequestException("Only global inputs are allowed!");
         }
     }
 }

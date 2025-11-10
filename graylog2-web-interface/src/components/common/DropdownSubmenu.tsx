@@ -53,7 +53,7 @@ const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<
     gap: 5px;
 
     > a {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
 
     > .dropdown-menu {
@@ -72,7 +72,7 @@ const StyledSubmenu: React.ComponentType<StyledSubmenuProps> = styled(Dropdown)<
   `,
 );
 
-const DropdownSubmenu = ({ children, left = false, title }: Props) => (
+const DropdownSubmenu = ({ children, left = false, title = undefined }: Props) => (
   <MenuItem>
     <StyledSubmenu $left={left} as="div">
       {title} <Caret />

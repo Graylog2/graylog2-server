@@ -74,8 +74,7 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
     @Override
     public List<User> loadByIds(Collection<String> ids) {
-        final DBObject query = new BasicDBObject("_id", new BasicDBObject("$in", ids));
-        final List<DBObject> result = query(UserImpl.class, query);
+        final DBObject query = new BasicDBObject("_id", new BasicDBObject("$in", ids.stream().map(ObjectId::new).toList()));
         return buildUserList(query);
     }
 
@@ -122,6 +121,11 @@ public class TestUserService extends PersistedServiceImpl implements UserService
 
     @Override
     public Optional<User> loadByAuthServiceUidOrUsername(String authServiceUid, String username) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public Optional<User> loadByAuthServiceUid(String authServiceUid) {
         throw new UnsupportedOperationException("Not implemented");
     }
 

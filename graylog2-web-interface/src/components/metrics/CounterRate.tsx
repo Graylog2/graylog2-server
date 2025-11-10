@@ -19,7 +19,7 @@ import numeral from 'numeral';
 
 import TimeHelper from 'util/TimeHelper';
 
-type CounterRateProps = {
+type Props = {
   metric?: any;
   showTotal?: boolean;
   prefix?: string;
@@ -29,9 +29,11 @@ type CounterRateProps = {
 };
 
 class CounterRate extends React.Component<
-  CounterRateProps,
+  Props,
   {
-    [key: string]: any;
+    prevMetric: any;
+    prevTs: any;
+    nowTs: number;
   }
 > {
   static defaultProps = {
@@ -40,13 +42,17 @@ class CounterRate extends React.Component<
     suffix: 'per second',
     hideOnZero: false,
     hideOnMissing: false,
+    metric: undefined,
   };
 
-  state = {
-    prevMetric: null,
-    prevTs: null,
-    nowTs: TimeHelper.nowInSeconds(),
-  };
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      prevMetric: null,
+      prevTs: null,
+      nowTs: TimeHelper.nowInSeconds(),
+    };
+  }
 
   UNSAFE_componentWillReceiveProps() {
     this.setState({

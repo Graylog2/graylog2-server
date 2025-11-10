@@ -17,6 +17,8 @@
 import React from 'react';
 
 import ErrorPage from 'components/errors/ErrorPage';
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 
 type Props = {
   displayPageLayout?: boolean;
@@ -25,8 +27,10 @@ type Props = {
 const NotFoundPage = ({ displayPageLayout = true }: Props) => {
   const description = (
     <>
-      <p>The party gorilla was just here, but had another party to rock.</p>
-      <p>Oh, party gorilla! How we miss you! Will we ever see you again?</p>
+      <p>The page you are looking for does not exist (anymore).</p>
+      <p>
+        You can head back to the <Link to={Routes.WELCOME}>Main Page</Link> and navigate from there.
+      </p>
     </>
   );
 

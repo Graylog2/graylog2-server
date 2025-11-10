@@ -61,6 +61,36 @@ class ContentPackEdit extends React.Component<
     };
   }
 
+  _stepChanged = (selectedStep) => {
+    switch (selectedStep) {
+      case 'parameters': {
+        const newContentPack = this.props.contentPack
+          .toBuilder()
+          .entities(this.props.fetchedEntities || [])
+          .build();
+
+        this.props.onStateChange({ contentPack: newContentPack });
+
+        if (Object.keys(this.props.selectedEntities).length > 0) {
+          this.props.onGetEntities(this.props.selectedEntities);
+        }
+
+        break;
+      }
+
+      case 'preview': {
+        this._prepareForPreview();
+        break;
+      }
+
+      default: {
+        break;
+      }
+    }
+
+    this.setState({ selectedStep: selectedStep });
+  };
+
   _disableParameters() {
     const content = this.props.contentPack;
     const { selectedEntities } = this.props;
@@ -96,36 +126,6 @@ class ContentPackEdit extends React.Component<
 
     this.props.onStateChange({ contentPack: newContentPack });
   }
-
-  _stepChanged = (selectedStep) => {
-    switch (selectedStep) {
-      case 'parameters': {
-        const newContentPack = this.props.contentPack
-          .toBuilder()
-          .entities(this.props.fetchedEntities || [])
-          .build();
-
-        this.props.onStateChange({ contentPack: newContentPack });
-
-        if (Object.keys(this.props.selectedEntities).length > 0) {
-          this.props.onGetEntities(this.props.selectedEntities);
-        }
-
-        break;
-      }
-
-      case 'preview': {
-        this._prepareForPreview();
-        break;
-      }
-
-      default: {
-        break;
-      }
-    }
-
-    this.setState({ selectedStep: selectedStep });
-  };
 
   render() {
     if (!this.props.contentPack) {

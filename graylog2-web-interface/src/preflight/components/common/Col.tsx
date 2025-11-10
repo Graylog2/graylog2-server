@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { Grid } from '@mantine/core';
 
-const Col = ({ children, ...props }: React.ComponentProps<typeof Grid.Col>) => (
+const Col = ({ children = undefined, ...props }: React.ComponentProps<typeof Grid.Col>) => (
   <Grid.Col {...props} style={{ ...props.style }}>
     {children}
   </Grid.Col>

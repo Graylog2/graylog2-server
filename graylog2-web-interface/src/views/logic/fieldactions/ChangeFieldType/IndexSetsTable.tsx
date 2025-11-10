@@ -34,6 +34,9 @@ import type { IndexSet } from 'stores/indices/IndexSetsStore';
 const Container = styled.div`
   margin-top: 20px;
 `;
+const StyledNoEntitiesExist = styled(NoEntitiesExist)`
+  margin-bottom: 20px;
+`;
 
 type Props = {
   field: string;
@@ -145,8 +148,9 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
         activePage={activePage}
         showPageSizeSelect={false}
         useQueryParameter={false}>
-        {!list?.length && <NoEntitiesExist>No index sets have been found.</NoEntitiesExist>}
-        {list.length && (
+        {!list?.length ? (
+          <StyledNoEntitiesExist>No index sets have been found.</StyledNoEntitiesExist>
+        ) : (
           <EntityDataTable<FieldTypeUsage>
             activeSort={layoutConfig.sort}
             bulkSelection={{

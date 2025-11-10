@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import { ltParamJSON, urlConfigWithAgg } from 'fixtures/createEventDefinitionFromValue';
 import useLocalStorageConfigData from 'views/logic/valueactions/createEventDefinition/hooks/useLocalStorageConfigData';
@@ -24,7 +24,7 @@ const wrapper = ({ children }) => <div>{children}</div>;
 
 describe('useUrlConfigData', () => {
   it('concat all query values correct and return rest', async () => {
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useLocalStorageConfigData({
           mappedData: {
@@ -60,7 +60,7 @@ describe('useUrlConfigData', () => {
   });
 
   it('ignore non-selected values', async () => {
-    const { result, waitFor } = renderHook(
+    const { result } = renderHook(
       () =>
         useLocalStorageConfigData({
           mappedData: {

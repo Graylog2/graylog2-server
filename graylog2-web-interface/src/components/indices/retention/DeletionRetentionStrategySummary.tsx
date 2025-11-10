@@ -23,7 +23,10 @@ type DeletionRetentionStrategySummaryProps = {
   rotationStrategyClass?: string;
 };
 
-const DeletionRetentionStrategySummary = ({ config, rotationStrategyClass }: DeletionRetentionStrategySummaryProps) => (
+const DeletionRetentionStrategySummary = ({
+  config,
+  rotationStrategyClass = undefined,
+}: DeletionRetentionStrategySummaryProps) => (
   <div>
     <dl>
       <dt>Index retention strategy:</dt>

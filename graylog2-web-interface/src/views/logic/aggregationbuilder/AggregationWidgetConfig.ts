@@ -17,7 +17,6 @@
 import * as Immutable from 'immutable';
 
 import isDeepEqual from 'stores/isDeepEqual';
-import { TIMESTAMP_FIELD } from 'views/Constants';
 import isEqualForSearch from 'views/stores/isEqualForSearch';
 import type { UnitsConfigJson } from 'views/logic/aggregationbuilder/UnitsConfig';
 import UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
@@ -48,7 +47,7 @@ type InternalState = {
   units: UnitsConfig;
 };
 
-type AggregationWidgetConfigJson = {
+export type AggregationWidgetConfigJson = {
   column_pivots: Array<PivotJson>;
   formatting_settings: WidgetFormattingSettingsJSON;
   rollup: boolean;
@@ -132,12 +131,7 @@ export default class AggregationWidgetConfig extends WidgetConfig {
   }
 
   get isTimeline() {
-    return (
-      this.rowPivots &&
-      this.rowPivots.length === 1 &&
-      this.rowPivots[0].type === DateType &&
-      this.rowPivots[0].fields?.[0] === TIMESTAMP_FIELD
-    );
+    return this.rowPivots?.length === 1 && this.rowPivots[0].type === DateType;
   }
 
   get isEmpty(): boolean {

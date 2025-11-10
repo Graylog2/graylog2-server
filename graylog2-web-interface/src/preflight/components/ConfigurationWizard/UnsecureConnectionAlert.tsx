@@ -24,7 +24,7 @@ type Props = {
   renderIfSecure?: React.ReactElement;
 };
 
-const UnsecureConnectionAlert = ({ renderIfSecure }: Props) => {
+const UnsecureConnectionAlert = ({ renderIfSecure = undefined }: Props) => {
   const connectionIsSecure = isSecureConnection();
 
   if (connectionIsSecure === 'YES') {

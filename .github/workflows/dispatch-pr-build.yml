@@ -2,11 +2,16 @@ name: Request dispatched PR Build
 
 on:
   pull_request:
-    types: [ opened, reopened, synchronize, edited ]
+    types: [ opened, reopened, synchronize, edited, labeled ]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+# The PR dispatch workflow runs should not cancel each other!
+# When opening a PR with labels (e.g., dependabot), we receive one "opened"
+# and one or more "labeled" events. If we would cancel the workflow run
+# for "opened" when receiving a "labeled", the PR build in
+# graylog-project-internal would not be triggered.
+#concurrency:
+#  group: ${{ github.workflow }}-${{ github.ref }}
+#  cancel-in-progress: true
 
 jobs:
   dispatchedPR:
@@ -33,8 +38,22 @@ jobs:
           OLD_PR_BODY: "${{ github.event.changes.body.from }}"
           NEW_PR_BODY: "${{ github.event.pull_request.body }}"
 
+      - name: Check e2e-tests label
+        id: e2e-tests
+        run: |
+          has_label="$(jq -r '.labels[].name | select(. == "e2e-tests")' <<< "$PR_EVENT")"
+          {
+            if [ -n "$has_label" ]; then
+              echo "run=true"
+            else
+              echo "run=false"
+            fi
+          } | tee -a "$GITHUB_OUTPUT"
+        env:
+          PR_EVENT: "${{ toJSON(github.event.pull_request) }}"
+
       - name: Dispatch job to graylog-project-internal
-        if: ${{ github.event.action != 'edited' || steps.pr-string-changed.outcome == 'success' }}
+        if: ${{ (github.event.action != 'edited' && (github.event.action != 'labeled' || github.event.label.name == 'e2e-tests')) || steps.pr-string-changed.outcome == 'success' }}
         run: >
           gh workflow run -R Graylog2/graylog-project-internal pr-build.yml --ref master
           -f caller_repo=${{ github.repository }}
@@ -43,6 +62,7 @@ jobs:
           -f caller_head_branch=${{ github.head_ref }}
           -f head_sha=${{ github.event.pull_request.head.sha }}
           -f initial_actor="${{ github.actor }}/${{ github.triggering_actor }}"
+          -f e2e_tests=${{ steps.e2e-tests.outputs.run }}
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_GRAYLOG_PROJECT_INTERNAL_WORKFLOW_RW }}
 

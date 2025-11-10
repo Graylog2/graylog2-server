@@ -30,7 +30,7 @@ type Props = React.PropsWithChildren<{
   }>;
 }>;
 
-const CarouselProvider = ({ carouselId, children, options = {} }: Props) => {
+const CarouselProvider = ({ carouselId, children = undefined, options = {} }: Props) => {
   const existingContextValue = useContext(CarouselContext);
   const [ref, api] = useEmblaCarousel(options);
 

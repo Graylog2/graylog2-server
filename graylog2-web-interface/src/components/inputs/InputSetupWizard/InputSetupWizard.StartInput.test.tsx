@@ -269,11 +269,7 @@ describe('InputSetupWizard Start Input', () => {
 
       fireEvent.click(selectStreamButton);
 
-      const streamSelect = await screen.findByLabelText(/Default Stream/i);
-
-      await selectEvent.openMenu(streamSelect);
-
-      await selectEvent.select(streamSelect, 'One Stream');
+      await selectEvent.chooseOption('Default Stream', 'One Stream');
 
       goToStartInputStep();
       startInput();
@@ -302,11 +298,7 @@ describe('InputSetupWizard Start Input', () => {
 
       fireEvent.click(selectStreamButton);
 
-      const streamSelect = await screen.findByLabelText(/Default Stream/i);
-
-      await selectEvent.openMenu(streamSelect);
-
-      await selectEvent.select(streamSelect, 'One Stream');
+      await selectEvent.chooseOption('Default Stream', 'One Stream');
 
       const removeFromDefaultCheckbox = await screen.findByRole('checkbox', {
         name: /remove matches from ‘default stream’/i,
@@ -364,7 +356,12 @@ describe('InputSetupWizard Start Input', () => {
       goToStartInputStep();
       startInput();
 
-      await waitFor(() => expect(Streams.create).toHaveBeenCalledWith(expect.objectContaining(newStreamConfig)));
+      await waitFor(() =>
+        expect(Streams.create).toHaveBeenCalledWith({
+          entity: expect.objectContaining(newStreamConfig),
+          share_request: undefined,
+        }),
+      );
     });
 
     it('should start the new stream', async () => {

@@ -1,8 +1,8 @@
 {
   "id":"pipelineSourceId1",
-  "title":"All Messages Routing",
-  "description":"GL generated pipeline",
-  "source":"pipeline \"All Messages Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName[inputId]_to_streamName\"\nend",
+  "title": "Default Routing",
+  "description": "System generated pipeline",
+  "source": "pipeline \"Default Routing\"\nstage 0 match EITHER\nrule \"gl_route_inputName[inputId]_to_streamName\"\nend",
   "stages": [
     {
       "stage": 0,

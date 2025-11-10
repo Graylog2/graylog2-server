@@ -43,12 +43,12 @@ type Props = {
  *
  */
 const Timestamp = ({
-  dateTime,
+  dateTime = undefined,
   field,
   format = 'default',
   render: Component = ({ value }: RenderProps) => <>{value}</>,
-  tz,
-  className,
+  tz = undefined,
+  className = undefined,
 }: Props) => {
   const { formatTime: formatWithUserTz } = useUserDateTime();
 

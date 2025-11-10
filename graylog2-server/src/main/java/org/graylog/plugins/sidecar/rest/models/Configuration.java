@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.MongoEntity;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -29,21 +28,13 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 public abstract class Configuration implements MongoEntity {
-    public static final String FIELD_ID = "id";
     public static final String FIELD_COLLECTOR_ID = "collector_id";
     public static final String FIELD_NAME = "name";
     public static final String FIELD_COLOR = "color";
     public static final String FIELD_TEMPLATE = "template";
     public static final String FIELD_TAGS = "tags";
-
-    @Id
-    @ObjectId
-    @Nullable
-    @JsonProperty(FIELD_ID)
-    public abstract String id();
 
     @JsonProperty(FIELD_COLLECTOR_ID)
     public abstract String collectorId();
@@ -61,7 +52,7 @@ public abstract class Configuration implements MongoEntity {
     public abstract Set<String> tags();
 
     @JsonCreator
-    public static Configuration create(@JsonProperty(FIELD_ID) String id,
+    public static Configuration create(@JsonProperty(FIELD_ID) @Id @ObjectId String id,
                                        @JsonProperty(FIELD_COLLECTOR_ID) String collectorId,
                                        @JsonProperty(FIELD_NAME) String name,
                                        @JsonProperty(FIELD_COLOR) String color,

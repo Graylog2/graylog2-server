@@ -39,13 +39,16 @@ const putRemoveProfileFromIndex = async ({ indexSetId, rotated }: RemoveProfileF
 const useRemoveProfileFromIndexMutation = () => {
   const queryClient = useQueryClient();
 
-  const put = useMutation(putRemoveProfileFromIndex, {
+  const put = useMutation({
+    mutationFn: putRemoveProfileFromIndex,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Removing profile from index failed with status: ${errorThrown}`,
         'Could not remove profile from index',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Removed profile from index successfully', 'Success!');
 
@@ -53,7 +56,7 @@ const useRemoveProfileFromIndexMutation = () => {
     },
   });
 
-  return { removeProfileFromIndex: put.mutateAsync, isLoading: put.isLoading };
+  return { removeProfileFromIndex: put.mutateAsync, isLoading: put.isPending };
 };
 
 export default useRemoveProfileFromIndexMutation;

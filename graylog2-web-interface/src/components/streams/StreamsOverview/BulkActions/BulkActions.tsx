@@ -44,7 +44,13 @@ const BulkActions = ({ indexSets }: Props) => {
   const [showIndexSetModal, setShowIndexSetModal] = useState(false);
   const selectedItemsAmount = selectedEntities?.length;
   const descriptor = StringUtils.pluralize(selectedItemsAmount, 'stream', 'streams');
-  const refetchStreams = useCallback(() => queryClient.invalidateQueries(['streams', 'overview']), [queryClient]);
+  const refetchStreams = useCallback(
+    () =>
+      queryClient.invalidateQueries({
+        queryKey: ['streams', 'overview'],
+      }),
+    [queryClient],
+  );
 
   const toggleAssignIndexSetModal = useCallback(() => {
     setShowIndexSetModal((cur) => !cur);

@@ -107,7 +107,7 @@ public class Searches {
     }
 
     @Deprecated
-    public ChunkedResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, int batchSize) {
+    public ChunkedResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter, Set<String> streams, int batchSize) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
                 .map(IndexSet::getIndexWildcard)
@@ -127,6 +127,7 @@ public class Searches {
         // limit > 0 instead of ScrollCommand.NO_LIMIT is a fix for #9817, the caller of this method are only in the legacy-API
         scrollCommandBuilder = limit > 0 ? scrollCommandBuilder.limit(limit) : scrollCommandBuilder;
         scrollCommandBuilder = batchSize != ChunkCommand.NO_BATCHSIZE ? scrollCommandBuilder.batchSize(batchSize) : scrollCommandBuilder;
+        scrollCommandBuilder = streams != null && !streams.isEmpty() ? scrollCommandBuilder.streams(streams) : scrollCommandBuilder;
 
         final ChunkedResult result = searchesAdapter.scroll(scrollCommandBuilder.build());
 

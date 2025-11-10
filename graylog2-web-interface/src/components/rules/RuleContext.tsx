@@ -67,7 +67,7 @@ type Props = {
   rule?: RuleType;
 };
 
-export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule }: Props) => {
+export const PipelineRulesProvider = ({ children, usedInPipelines = [], rule = undefined }: Props) => {
   const ruleSourceRef = useRef(undefined);
   const [, setAceLoaded] = useState(false);
   const [ruleSource, setRuleSource] = useState(rule?.source);

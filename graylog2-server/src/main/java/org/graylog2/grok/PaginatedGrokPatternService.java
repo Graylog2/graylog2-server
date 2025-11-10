@@ -16,7 +16,7 @@
  */
 package org.graylog2.grok;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import jakarta.inject.Inject;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;

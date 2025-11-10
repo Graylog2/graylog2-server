@@ -14,8 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
+import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
+
+import useDisclosure from 'util/hooks/useDisclosure';
 
 import styles from './EditableTitle.css';
 
@@ -51,84 +54,55 @@ type Props = {
   value: string;
 };
 
-type State = {
-  editing: boolean;
-  value: string;
+const EditableTitle = ({ disabled = false, value: propsValue, onChange }: Props) => {
+  const [value, setValue] = React.useState(propsValue);
+  const [editing, { toggle }] = useDisclosure(false);
+
+  const _toggleEditing = useCallback(() => {
+    if (!disabled) {
+      toggle();
+    }
+  }, [disabled, toggle]);
+
+  const _onChange = useCallback((evt: React.ChangeEvent<HTMLInputElement>) => {
+    evt.preventDefault();
+    setValue(evt.target.value);
+  }, []);
+
+  const _submitValue = useCallback(() => {
+    if (value !== '') {
+      onChange?.(value);
+    } else {
+      setValue(propsValue);
+    }
+  }, [onChange, propsValue, value]);
+
+  const _onBlur = useCallback(() => {
+    _toggleEditing();
+    _submitValue();
+  }, [_submitValue, _toggleEditing]);
+
+  const _onSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      _toggleEditing();
+      _submitValue();
+    },
+    [_submitValue, _toggleEditing],
+  );
+
+  return editing ? (
+    <span>
+      <form onSubmit={_onSubmit} className={styles.inlineForm}>
+        <StyledInput autoFocus type="text" value={value} onBlur={_onBlur} title="Edit title" onChange={_onChange} />
+      </form>
+    </span>
+  ) : (
+    <Title onDoubleClick={_toggleEditing} title={`${value} - Double click the title to edit it.`}>
+      {value}
+    </Title>
+  );
 };
 
-export default class EditableTitle extends React.Component<Props, State> {
-  static defaultProps = {
-    disabled: false,
-    onChange: () => {},
-  };
-
-  constructor(props: Props) {
-    super(props);
-    const { value } = props;
-
-    this.state = {
-      editing: false,
-      value,
-    };
-  }
-
-  _toggleEditing = () => {
-    const { disabled } = this.props;
-
-    if (!disabled) {
-      this.setState((state) => ({ editing: !state.editing }));
-    }
-  };
-
-  _onBlur = () => {
-    this._toggleEditing();
-    this._submitValue();
-  };
-
-  _onChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
-    evt.preventDefault();
-    this.setState({ value: evt.target.value });
-  };
-
-  _submitValue = () => {
-    const { value } = this.state;
-    const { onChange, value: propsValue } = this.props;
-
-    if (value !== '') {
-      onChange(value);
-    } else {
-      this.setState({ value: propsValue });
-    }
-  };
-
-  _onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    this._toggleEditing();
-    this._submitValue();
-  };
-
-  render() {
-    const { editing, value } = this.state;
-
-    return editing ? (
-      <span>
-        <form onSubmit={this._onSubmit} className={styles.inlineForm}>
-          {}
-          <StyledInput
-            autoFocus
-            type="text"
-            value={value}
-            onBlur={this._onBlur}
-            title="Edit title"
-            onChange={this._onChange}
-          />
-        </form>
-      </span>
-    ) : (
-      <Title onDoubleClick={this._toggleEditing} title={`${value} - Double click the title to edit it.`}>
-        {value}
-      </Title>
-    );
-  }
-}
+export default EditableTitle;

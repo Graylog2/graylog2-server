@@ -85,7 +85,7 @@ const ProtocolOptions = styled.div`
 
 type Props = {
   formRef: React.Ref<FormikProps<WizardFormValues>>;
-  help: { [inputName: string]: React.ReactElement | string | null | undefined };
+  help?: { [inputName: string]: React.ReactElement | string | null | undefined };
   onSubmit: () => void;
   onSubmitAll: () => Promise<void>;
   submitAllError: React.ReactNode | null | undefined;
@@ -232,14 +232,11 @@ const ServerConfigStep = ({ formRef, help = {}, onSubmit, onSubmitAll, submitAll
           <FormikFormGroup
             help={help.systemUserDn}
             error={backendValidationErrors?.systemUserDn}
-            label={
-              <>
-                System User DN <Opt />
-              </>
-            }
+            label="System User DN"
             name="systemUserDn"
             validate={validateField(FORM_VALIDATION.systemUserDn)}
             placeholder="System User DN"
+            required
           />
 
           {backendHasPassword && values.systemUserPassword === undefined ? (

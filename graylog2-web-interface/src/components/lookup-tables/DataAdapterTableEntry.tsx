@@ -42,7 +42,7 @@ type Props = {
   error: string;
 };
 
-const DataAdapterTableEntry = ({ adapter, error = null }: Props) => {
+const DataAdapterTableEntry = ({ adapter, error }: Props) => {
   const history = useHistory();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const sendTelemetry = useSendTelemetry();

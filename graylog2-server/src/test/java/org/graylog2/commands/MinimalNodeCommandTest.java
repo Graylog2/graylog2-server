@@ -22,13 +22,13 @@ import jakarta.annotation.Nonnull;
 import org.graylog2.GraylogNodeConfiguration;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.plugin.ServerStatus;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
@@ -40,25 +40,19 @@ import static org.mockito.Mockito.verify;
 public class MinimalNodeCommandTest {
 
     @Test
-    public void startMinimalNode() {
-        MinimalNode node = spy(new MinimalNode());
+    public void startMinimalNode(@TempDir Path tmpDir) throws Exception {
+        final var configFile = tmpDir.resolve("minimal-node.conf");
+        Files.write(configFile, List.of("password_secret = 1234567890123456"));
+        MinimalNode node = spy(new MinimalNode(configFile));
         node.run();
         verify(node, times(1)).startCommand();
     }
 
     static class MinimalNode extends AbstractNodeCommand {
 
-        public MinimalNode() {
+        public MinimalNode(Path configFile) {
             super(new MinimalNodeConfiguration());
-            URL resource = this.getClass().getResource("minimal-node.conf");
-            if (resource == null) {
-                Assertions.fail("Cannot read configuration file");
-            }
-            try {
-                setConfigFile(resource.toURI().getPath());
-            } catch (URISyntaxException e) {
-                Assertions.fail("Cannot read configuration file");
-            }
+            setConfigFile(configFile.toString());
         }
 
         @Override

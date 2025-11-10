@@ -35,7 +35,6 @@ import org.graylog.plugins.views.migrations.V20200730000000_AddGl2MessageIdField
 import org.graylog.plugins.views.migrations.V20240605120000_RemoveUnitFieldFromSearchDocuments;
 import org.graylog.plugins.views.migrations.V20240626143000_CreateDashboardsView;
 import org.graylog.plugins.views.migrations.V20240704100700_DashboardAddLastUpdated;
-import org.graylog.plugins.views.search.jobs.periodical.SearchJobStateCleanupOnStartup;
 import org.graylog.plugins.views.providers.ExportBackendProvider;
 import org.graylog.plugins.views.providers.QuerySuggestionsProvider;
 import org.graylog.plugins.views.search.SearchRequirements;
@@ -60,6 +59,7 @@ import org.graylog.plugins.views.search.filter.OrFilter;
 import org.graylog.plugins.views.search.filter.QueryStringFilter;
 import org.graylog.plugins.views.search.filter.StreamCategoryFilter;
 import org.graylog.plugins.views.search.filter.StreamFilter;
+import org.graylog.plugins.views.search.jobs.periodical.SearchJobStateCleanupOnStartup;
 import org.graylog.plugins.views.search.jobs.periodical.SearchJobStateCleanupPeriodical;
 import org.graylog.plugins.views.search.querystrings.LastUsedQueryStringsService;
 import org.graylog.plugins.views.search.querystrings.MongoLastUsedQueryStringsService;
@@ -133,6 +133,7 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSort
 import org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig;
 import org.graylog.plugins.views.search.views.widgets.events.EventsWidgetConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
+import org.graylog.plugins.views.search.views.widgets.text.TextWidgetConfigDTO;
 import org.graylog.plugins.views.startpage.StartPageResource;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityUpdatesListener;
 import org.graylog2.contentpacks.facades.DashboardEntityCreator;
@@ -323,6 +324,8 @@ public class ViewsBindings extends ViewsModule {
         registerJacksonSubtype(ValueConfigDTO.class);
 
         registerJacksonSubtype(EventsWidgetConfigDTO.class);
+
+        registerJacksonSubtype(TextWidgetConfigDTO.class);
     }
 
     private void registerVisualizationConfigSubtypes() {

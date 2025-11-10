@@ -47,7 +47,7 @@ public class PluggableSearchNormalization implements SearchNormalization {
                                         StreamService streamService) {
         this.pluggableNormalizers = pluggableNormalizers;
         this.postValidationNormalizers = postValidationNormalizers;
-        this.streamCategoryMapper = (categories) -> streamService.mapCategoriesToIds(categories).stream();
+        this.streamCategoryMapper = streamService::mapCategoriesToIds;
     }
 
     public PluggableSearchNormalization(Set<SearchNormalizer> pluggableNormalizers, StreamService streamService) {

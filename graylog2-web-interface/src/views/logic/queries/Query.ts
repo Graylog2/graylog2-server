@@ -307,7 +307,7 @@ class Builder {
     return new Builder(this.value.set('filter', Immutable.fromJS(value)));
   }
 
-  filters(value: FiltersType | null | undefined): Builder {
+  filters(value: FiltersType | null | undefined | SearchFilter[]): Builder {
     return new Builder(this.value.set('filters', value ? Immutable.List(value) : value));
   }
 

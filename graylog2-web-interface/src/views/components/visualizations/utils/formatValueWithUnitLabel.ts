@@ -18,7 +18,7 @@
 import getUnitTextLabel from 'views/components/visualizations/utils/getUnitTextLabel';
 import { formatNumber } from 'util/NumberFormatting';
 
-const formatValueWithUnitLabel = (value: number | string, abbrev: string) =>
-  `${formatNumber(Number(value), { minimumDigits: 1 })} ${getUnitTextLabel(abbrev)}`;
+const formatValueWithUnitLabel = (value: number | string, abbrev: string, minimumDigits = 1) =>
+  `${formatNumber(Number(value), { minimumDigits })} ${getUnitTextLabel(abbrev)}`;
 
 export default formatValueWithUnitLabel;

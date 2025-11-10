@@ -18,25 +18,19 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import { Button } from 'preflight/components/common';
 import fetch from 'logic/rest/FetchProvider';
 import useDataNodes from 'preflight/hooks/useDataNodes';
 import { qualifyUrl } from 'util/URLUtils';
+import Button from 'components/bootstrap/Button';
 import UserNotification from 'util/UserNotification';
 
 type Props = {
   setIsWaitingForStartup: React.Dispatch<React.SetStateAction<boolean>>;
   children?: React.ReactNode;
-  variant?: string;
   compact?: boolean;
 };
 
-const ResumeStartupButton = ({
-  setIsWaitingForStartup,
-  children = 'Resume startup',
-  variant = undefined,
-  compact = false,
-}: Props) => {
+const ResumeStartupButton = ({ setIsWaitingForStartup, children = 'Resume startup', compact = false }: Props) => {
   const { data: dataNodes } = useDataNodes();
 
   const onResumeStartup = useCallback(() => {
@@ -62,7 +56,7 @@ const ResumeStartupButton = ({
   }, [dataNodes?.length, setIsWaitingForStartup]);
 
   return (
-    <Button variant={variant} size={compact ? 'compact-xs' : 'xs'} onClick={onResumeStartup}>
+    <Button bsStyle="info" bsSize={compact ? 'xs' : 'small'} onClick={onResumeStartup}>
       {children}
     </Button>
   );

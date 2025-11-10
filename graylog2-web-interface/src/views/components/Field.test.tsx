@@ -26,7 +26,7 @@ import InteractiveContext from './contexts/InteractiveContext';
 
 type FieldProps = { interactive: boolean } & React.ComponentProps<typeof OriginalField>;
 
-const Field = ({ children, interactive, ...props }: FieldProps) => (
+const Field = ({ children = undefined, interactive, ...props }: FieldProps) => (
   <InteractiveContext.Provider value={interactive}>
     <TestStoreProvider>
       <OriginalField {...props}>{children}</OriginalField>

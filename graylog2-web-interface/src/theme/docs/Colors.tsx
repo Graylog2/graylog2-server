@@ -73,7 +73,7 @@ type ColorSwatchProps = {
   name?: string;
 };
 
-const ColorSwatch = ({ className, color, name = '', copyText }: ColorSwatchProps) => {
+const ColorSwatch = ({ className = undefined, color, name = '', copyText = undefined }: ColorSwatchProps) => {
   const [opened, setOpened] = useState(false);
 
   const copyCallback = useCallback(() => {

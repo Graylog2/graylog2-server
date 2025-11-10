@@ -67,7 +67,10 @@ export const isPermitted = (
   return _permissionPredicate(possessedPermissions, requiredPermissions);
 };
 
-export const isAnyPermitted = (possessedPermissions: UserPermissions, requiredPermissions: Permissions) => {
+export const isAnyPermitted = (
+  possessedPermissions: UserPermissions | Permissions,
+  requiredPermissions: Permissions,
+) => {
   if (!requiredPermissions || requiredPermissions.length === 0) {
     return true;
   }
@@ -82,6 +85,10 @@ export const isAnyPermitted = (possessedPermissions: UserPermissions, requiredPe
 
   return requiredPermissions.some((p) => _permissionPredicate(possessedPermissions, p));
 };
+
+const ADMIN_PERMISSION = '*';
+export const hasAdminPermission = (permissions: UserPermissions | Permissions) =>
+  permissions.includes(ADMIN_PERMISSION);
 
 const PermissionsMixin = { isPermitted, isAnyPermitted };
 

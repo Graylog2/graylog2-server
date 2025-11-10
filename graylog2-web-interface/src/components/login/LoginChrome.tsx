@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 import styled, { css } from 'styled-components';
+import DOMPurify from 'dompurify';
 
 import LoginBox from 'components/login/LoginBox';
 import PublicNotifications from 'components/common/PublicNotifications';
@@ -29,14 +30,13 @@ import useProductName from 'brand-customization/useProductName';
 
 const LogoContainer = styled.div`
   display: block;
-  height: 5rem;
   width: auto;
   margin: auto;
-  margin-bottom: 1.5rem;
 
   svg {
     width: 100%;
-    height: 75px;
+    min-height: 120px;
+    height: 8vh;
   }
 `;
 
@@ -95,21 +95,6 @@ const WelcomeMessage = styled.strong(
   `,
 );
 
-const Claim = styled.h1(
-  ({ theme }) => css`
-    color: #fcfcfc;
-    text-transform: uppercase;
-    font-size: ${theme.fonts.size.huge};
-    line-height: 1;
-    font-weight: 600;
-  `,
-);
-const Highlight = styled.span(
-  ({ theme }) => css`
-    color: ${theme.colors.brand.primary};
-  `,
-);
-
 const CustomLogo = styled.div`
   svg {
     width: 100%;
@@ -124,32 +109,35 @@ const CustomizableLogo = () => {
   return customLogo ? (
     <CustomLogo dangerouslySetInnerHTML={{ __html: customLogo }} />
   ) : (
-    <>
-      <LogoContainer>
-        <Logo color="#ffffff" />
-      </LogoContainer>
-      <Claim>
-        Data. Insights. <Highlight>Answers.</Highlight>
-      </Claim>
-    </>
+    <LogoContainer>
+      <Logo color="#03C3FF" />
+    </LogoContainer>
   );
 };
+
+const sanitize = (content: string) =>
+  DOMPurify.sanitize(content, { USE_PROFILES: { svg: true }, ADD_TAGS: ['use'], ADD_ATTR: ['xlink:href'] });
 
 type Props = {
   children: React.ReactNode;
 };
 
-const svgDataUrl = (content: string) => `data:image/svg+xml;utf-8,${encodeURIComponent(content)}`;
+const svgDataUrl = (content: string) => `data:image/svg+xml;base64,${Buffer.from(content).toString('base64')}`;
 const useLoginBackground = () =>
   useMemo(
     () =>
-      AppConfig.branding()?.login?.background ? svgDataUrl(AppConfig.branding()?.login?.background) : backgroundImage,
+      AppConfig.branding()?.login?.background
+        ? svgDataUrl(sanitize(AppConfig.branding()?.login?.background))
+        : backgroundImage,
     [],
   );
+
+const useShowLogo = () => useMemo(() => AppConfig.branding()?.login?.show_logo ?? true, []);
 
 const LoginChrome = ({ children }: Props) => {
   const productName = useProductName();
   const loginBackground = useLoginBackground();
+  const showLogo = useShowLogo();
 
   return (
     <LoginContainer>
@@ -159,12 +147,14 @@ const LoginChrome = ({ children }: Props) => {
       </LoginBox>
       <Background>
         <NotificationsContainer>
-          <PublicNotifications readFromConfig />
+          <PublicNotifications login />
         </NotificationsContainer>
         <BackgroundText $backgroundImage={loginBackground}>
-          <TextContainer>
-            <CustomizableLogo />
-          </TextContainer>
+          {showLogo && (
+            <TextContainer>
+              <CustomizableLogo />
+            </TextContainer>
+          )}
         </BackgroundText>
       </Background>
     </LoginContainer>

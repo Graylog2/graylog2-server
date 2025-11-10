@@ -56,7 +56,7 @@ public class CommandLineProcess {
         arguments.forEach(it -> cmdLine.addArgument(it, true));
 
         try {
-            createExecutor().execute(cmdLine, environment.getEnv(), listener);
+            createExecutor().execute(cmdLine, environment.env(), listener);
             listener.onStart();
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -84,7 +84,6 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        id="collector-filter"
         title="Filter by collector"
         triggerNode={
           <Button bsSize="small" bsStyle="link">
@@ -136,7 +135,6 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        id="configuration-filter"
         title="Filter by configuration"
         triggerNode={
           <Button bsSize="small" bsStyle="link">
@@ -165,7 +163,6 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        id="os-filter"
         title="Filter by OS"
         triggerNode={
           <Button bsSize="small" bsStyle="link">
@@ -191,7 +188,6 @@ const CollectorsAdministrationFilters = (props: Props) => {
 
     return (
       <SelectPopover
-        id="status-filter"
         title="Filter by collector status"
         triggerNode={
           <Button bsSize="small" bsStyle="link">

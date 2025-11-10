@@ -38,7 +38,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ExtendedBounds;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedAutoDateHistogram;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.histogram.ParsedDateHistogram;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.terms.ParsedTerms;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
@@ -85,19 +85,16 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     private final ES7ResultMessageFactory resultMessageFactory;
     private final ElasticsearchClient client;
     private final Boolean allowLeadingWildcard;
-    private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
 
     @Inject
     public MoreSearchAdapterES7(ES7ResultMessageFactory resultMessageFactory,
                                 ElasticsearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
-                                SortOrderMapper sortOrderMapper,
                                 MultiChunkResultRetriever multiChunkResultRetriever) {
         this.resultMessageFactory = resultMessageFactory;
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.sortOrderMapper = sortOrderMapper;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
     }
 
@@ -188,7 +185,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
 
         final SearchResponse searchResult = client.search(searchRequest, "Unable to perform search query");
 
-        final ParsedAutoDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
+        final ParsedDateHistogram histogramResult = searchResult.getAggregations().get(histogramAggregationName);
         final var histogramBuckets = histogramResult.getBuckets();
 
         final var alerts = new ArrayList<MoreSearch.Histogram.Bucket>(histogramBuckets.size());
@@ -252,7 +249,7 @@ public class MoreSearchAdapterES7 implements MoreSearchAdapter {
     }
 
     private List<FieldSortBuilder> createSorting(Sorting sorting) {
-        final SortOrder order = sortOrderMapper.fromSorting(sorting);
+        final SortOrder order = SortOrder.valueOf(sorting.getUppercasedDirection());
         final List<FieldSortBuilder> sortBuilders;
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
             sortBuilders = List.of(

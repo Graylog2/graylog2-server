@@ -35,7 +35,7 @@ type Props<Entity extends EntityBase> = React.PropsWithChildren<{
 }>;
 
 const SelectedEntitiesProvider = <Entity extends EntityBase>({
-  children,
+  children = undefined,
   initialSelection = [],
   onChangeSelection,
   entities,

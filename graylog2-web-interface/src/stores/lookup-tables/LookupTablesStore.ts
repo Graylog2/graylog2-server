@@ -167,8 +167,15 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
       return promise;
     },
 
-    searchPaginated(page: number, perPage: number, query: string = null, resolve: boolean = true) {
-      const url = this._url(PaginationURL('tables', page, perPage, query, { resolve }));
+    searchPaginated(
+      page: number,
+      perPage: number,
+      query: string = null,
+      resolve: boolean = true,
+      sort: string = 'title',
+      order: 'asc' | 'desc' = 'asc',
+    ) {
+      const url = this._url(PaginationURL('tables', page, perPage, query, { resolve, sort, order }));
       const promise = fetch('GET', url);
 
       promise.then(
@@ -253,6 +260,7 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
       return promise;
     },
 
+    // TODO: How to include the call to the get errors
     getErrors(
       tableNames: Array<string> | undefined,
       cacheNames: Array<string> | undefined,
@@ -367,7 +375,7 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
           if (error.additional.body[0].message_template) {
             return;
           }
-        } catch (e) {
+        } catch (_e) {
           // ignored
         }
 
@@ -375,7 +383,7 @@ export const LookupTablesStore = singletonStore('core.LookupTables', () =>
 
         try {
           errorMessage = error.additional.body.message;
-        } catch (e) {
+        } catch (_e) {
           errorMessage = error.message;
         }
 

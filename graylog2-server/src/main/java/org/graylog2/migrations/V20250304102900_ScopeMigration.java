@@ -16,7 +16,7 @@
  */
 package org.graylog2.migrations;
 
-import com.mongodb.client.MongoCollection;
+import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import org.graylog.events.processor.DBEventDefinitionService;

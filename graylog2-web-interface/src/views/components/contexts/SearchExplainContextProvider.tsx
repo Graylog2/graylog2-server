@@ -38,19 +38,18 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
     undefined,
   );
 
-  const { mutateAsync: onSearchExplain } = useMutation(
-    () =>
+  const { mutateAsync: onSearchExplain } = useMutation({
+    mutationFn: () =>
       fetch(
         'POST',
         qualifyUrl(`views/search/${view.search.id}/explain`),
         buildSearchExecutionState(searchTypesToSearch, executionState),
       ),
-    {
-      onSuccess: (result) => {
-        setSearchExplain(result);
-      },
+
+    onSuccess: (result) => {
+      setSearchExplain(result);
     },
-  );
+  });
 
   const searchExplainContextValue = useMemo(() => {
     const getExplainForWidget = (
@@ -58,7 +57,7 @@ const SearchExplainContextProvider = ({ children }: { children: React.ReactNode 
       widgetId: string,
       widgetMapping: WidgetMapping,
     ): WidgetExplain | undefined => {
-      const searchTypeId = widgetMapping?.get(widgetId).first();
+      const searchTypeId = widgetMapping?.get(widgetId)?.first();
 
       return searchExplain?.search?.queries?.[queryId]?.search_types?.[searchTypeId];
     };

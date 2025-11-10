@@ -25,19 +25,19 @@ export type Props<ItemType extends ListItemType> = {
   customListItemRender?: CustomListItemRender<ItemType>;
   disableDragging?: boolean;
   displayOverlayInPortal?: boolean;
-  items: Array<ItemType>;
+  items: Array<ItemType> | undefined;
 };
 
 const List = <ItemType extends ListItemType>({
-  alignItemContent,
-  customContentRender,
-  customListItemRender,
+  alignItemContent = undefined,
+  customContentRender = undefined,
+  customListItemRender = undefined,
   disableDragging = false,
   displayOverlayInPortal = false,
-  items = [],
+  items,
 }: Props<ItemType>) => (
   <>
-    {items.map((item, index) => (
+    {items?.map((item, index) => (
       <SortableListItem
         alignItemContent={alignItemContent}
         item={item}

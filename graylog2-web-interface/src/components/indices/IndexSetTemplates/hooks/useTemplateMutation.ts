@@ -63,13 +63,16 @@ const deleteProfile = async (id: string) => {
 const useTemplate = () => {
   const queryClient = useQueryClient();
 
-  const post = useMutation(postTemplate, {
+  const post = useMutation({
+    mutationFn: postTemplate,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Creating index set template failed with status: ${errorThrown}`,
         'Could not create index set template',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set template has been successfully created.', 'Success!');
 
@@ -77,28 +80,36 @@ const useTemplate = () => {
     },
   });
 
-  const put = useMutation(putTemplate, {
+  const put = useMutation({
+    mutationFn: putTemplate,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Updating index set template failed with status: ${errorThrown}`,
         'Could not update index set template',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set template has been successfully updated.', 'Success!');
-      queryClient.invalidateQueries(['indexSetTemplate']);
+      queryClient.invalidateQueries({
+        queryKey: ['indexSetTemplate'],
+      });
 
       return queryClient.refetchQueries({ queryKey: ['indexSetTemplates'], type: 'active' });
     },
   });
 
-  const setAsDefault = useMutation(putTemplateDefault, {
+  const setAsDefault = useMutation({
+    mutationFn: putTemplateDefault,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Setting template as default failed with status: ${errorThrown}`,
         'Could set template as default',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Template has successfully been set as default.', 'Success!');
 
@@ -106,13 +117,16 @@ const useTemplate = () => {
     },
   });
 
-  const remove = useMutation(deleteProfile, {
+  const remove = useMutation({
+    mutationFn: deleteProfile,
+
     onError: (errorThrown) => {
       UserNotification.error(
         `Deleting index set template failed with status: ${errorThrown}`,
         'Could not delete index set template',
       );
     },
+
     onSuccess: () => {
       UserNotification.success('Index set template has been successfully deleted.', 'Success!');
 
@@ -122,10 +136,10 @@ const useTemplate = () => {
 
   return {
     updateTemplate: put.mutateAsync,
-    isEditLoading: put.isLoading,
+    isEditLoading: put.isPending,
     createTemplate: post.mutateAsync,
-    isCreateLoading: post.isLoading,
-    isLoading: post.mutateAsync || post.isLoading || remove.isLoading,
+    isCreateLoading: post.isPending,
+    isLoading: post.mutateAsync || post.isPending || remove.isPending,
     deleteTemplate: remove.mutateAsync,
     setAsDefault: setAsDefault.mutateAsync,
   };

@@ -41,7 +41,7 @@ type Props = {
  * Component that renders a help and error message for an input.
  * It always displays both messages.
  */
-const InputDescription = ({ className, error, help }: Props) => {
+const InputDescription = ({ className = undefined, error = undefined, help = undefined }: Props) => {
   if (!help && !error) {
     return null;
   }

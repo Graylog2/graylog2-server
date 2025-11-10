@@ -198,14 +198,12 @@ class Output extends React.Component<
             </Col>
             <Col md={6}>
               <NodeRowInfo className="text-right pull-right">
-                <IfPermitted permissions="outputs:edit">
-                  <EditOutputButton
-                    disabled={this._typeNotAvailable()}
-                    output={output}
-                    onUpdate={onUpdate}
-                    getTypeDefinition={getTypeDefinition}
-                  />
-                </IfPermitted>
+                <EditOutputButton
+                  disabled={this._typeNotAvailable()}
+                  output={output}
+                  onUpdate={onUpdate}
+                  getTypeDefinition={getTypeDefinition}
+                />
                 {deleteFromStreamButton}
                 <IfPermitted permissions="outputs:terminate">
                   <Button bsStyle="danger" onClick={this._onDeleteGlobally}>

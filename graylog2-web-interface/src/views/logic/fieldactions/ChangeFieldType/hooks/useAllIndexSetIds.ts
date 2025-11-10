@@ -45,13 +45,16 @@ const useAllIndexSetIds = (
   isLoading: boolean;
   refetch: () => void;
 } => {
-  const { data, isLoading, refetch } = useQuery(['allIndexSetIds', ...streams], () =>
-    defaultOnError(
-      fetchAllIndexSetIds(streams),
-      'Loading index sets with field type change support failed with status',
-      'Could not load index sets with field type change support',
-    ),
-  );
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ['allIndexSetIds', ...streams],
+
+    queryFn: () =>
+      defaultOnError(
+        fetchAllIndexSetIds(streams),
+        'Loading index sets with field type change support failed with status',
+        'Could not load index sets with field type change support',
+      ),
+  });
 
   return {
     data: data ?? INITIAL_DATA,

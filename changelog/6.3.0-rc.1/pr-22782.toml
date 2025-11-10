@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix constant loading state when search execution fails."
+
+issues = ["Graylog2/graylog-plugin-enterprise#10973"]
+pulls = ["22782"]

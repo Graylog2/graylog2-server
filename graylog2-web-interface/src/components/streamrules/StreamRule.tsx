@@ -46,7 +46,7 @@ type Props = {
   streamRule: StreamRuleTypeDefinition;
 };
 
-const StreamRule = ({ matchData, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
+const StreamRule = ({ matchData = undefined, stream, streamRule, onSubmit = () => {}, onDelete = () => {} }: Props) => {
   const { permissions } = useCurrentUser();
   const [showStreamRuleForm, setShowStreamRuleForm] = useState(false);
   const { inputs } = useStore(StreamRulesInputsStore);

@@ -19,9 +19,13 @@ package org.graylog2.migrations;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.security.shares.EntityShareRequest;
+import org.graylog.security.shares.EntitySharesService;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
@@ -51,6 +55,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.migrations.V20230601104500_AddSourcesPageV2.MigrationCompleted;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -69,15 +74,18 @@ class V20230601104500_AddSourcesPageV2Test {
     @Mock
     private NotificationService notificationService;
 
+    @Mock
+    private Configuration configuration;
+
     private V20230601104500_AddSourcesPageV2 migration;
 
     static class TestContentPackService extends ContentPackService {
         public TestContentPackService() {
-            super(null, null, Map.of(), null, null);
+            super(null, null, Map.of(), null, null, null, null, mock(GRNRegistry.class), mock(EntitySharesService.class));
         }
 
         @Override
-        public ContentPackInstallation installContentPack(ContentPack contentPack, Map<String, ValueReference> parameters, String comment, String user) {
+        public ContentPackInstallation installContentPack(ContentPack contentPack, Map<String, ValueReference> parameters, String comment, String user, EntityShareRequest shareRequest) {
             return ContentPackInstallation.builder()
                     .contentPackId(contentPack.id())
                     .createdBy(user)
@@ -108,7 +116,7 @@ class V20230601104500_AddSourcesPageV2Test {
                 new ContentPackInstallationPersistenceService(new MongoCollections(mapperProvider, mongoConnection));
         ContentPackService contentPackService = new TestContentPackService();
         this.migration = new V20230601104500_AddSourcesPageV2(contentPackService, objectMapper, clusterConfigService,
-                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService);
+                contentPackPersistenceService, contentPackInstallationPersistenceService, mongoConnection, notificationService, configuration);
     }
 
     @Test
@@ -125,6 +133,7 @@ class V20230601104500_AddSourcesPageV2Test {
     void freshInstallInstallsNewSourcesPage() {
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();
@@ -140,6 +149,7 @@ class V20230601104500_AddSourcesPageV2Test {
         previousMigrationHasRun();
         thisMigrationHasNotRun();
 
+        when(configuration.getRootUsername()).thenReturn("admin");
         this.migration.upgrade();
 
         var migrationCompleted = expectMigrationCompleted();

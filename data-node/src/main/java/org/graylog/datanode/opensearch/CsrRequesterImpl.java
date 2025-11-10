@@ -16,19 +16,15 @@
  */
 package org.graylog.datanode.opensearch;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import jakarta.inject.Inject;
 import org.bouncycastle.pkcs.PKCS10CertificationRequest;
 import org.graylog.datanode.Configuration;
-import org.graylog.datanode.configuration.DatanodeConfiguration;
 import org.graylog.datanode.configuration.DatanodeKeystore;
 import org.graylog.datanode.configuration.DatanodeKeystoreException;
 import org.graylog.security.certutil.csr.exceptions.CSRGenerationException;
-import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.certificates.CertificateExchange;
 import org.graylog2.cluster.certificates.CertificateSigningRequest;
-import org.graylog2.cluster.nodes.DataNodeDto;
-import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
@@ -36,7 +32,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -50,10 +48,12 @@ public class CsrRequesterImpl implements CsrRequester {
 
     private final CertificateExchange certificateExchange;
     private final String hostname;
+    private final String nodeName;
 
     @Inject
     public CsrRequesterImpl(Configuration datanodeConfiguration, NodeId nodeId, DatanodeKeystore datanodeKeystore, CertificateExchange certificateExchange) {
         this.hostname = datanodeConfiguration.getHostname();
+        this.nodeName = datanodeConfiguration.getDatanodeNodeName();
         this.nodeId = nodeId;
         this.datanodeKeystore = datanodeKeystore;
         this.certificateExchange = certificateExchange;
@@ -61,10 +61,12 @@ public class CsrRequesterImpl implements CsrRequester {
 
     public void triggerCertificateSigningRequest() {
         try {
-            final var altNames = ImmutableList.<String>builder()
+            final Set<String> altNames = ImmutableSet.<String>builder()
+                    .add(nodeName)
+                    .add(hostname)
                     .addAll(determineAltNames())
                     .build();
-            final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest(hostname, altNames);
+            final PKCS10CertificationRequest csr = datanodeKeystore.createCertificateSigningRequest(hostname, new ArrayList<>(altNames));
             certificateExchange.requestCertificate(new CertificateSigningRequest(nodeId.getNodeId(), csr));
             LOG.info("Triggered certificate signing request for this datanode");
         } catch (CSRGenerationException | IOException | DatanodeKeystoreException ex) {

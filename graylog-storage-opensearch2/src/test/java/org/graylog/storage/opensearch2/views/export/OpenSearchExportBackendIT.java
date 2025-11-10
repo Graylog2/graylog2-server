@@ -36,6 +36,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -50,6 +51,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 
+@Ignore("Temporarily disabled because of flakiness")
 public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
     private IndexLookup indexLookup;

@@ -112,7 +112,7 @@ type Props = {
   toggleDropdownShow?: () => void;
 };
 
-const TimeRangeDisplay = ({ timerange, toggleDropdownShow }: Props) => (
+const TimeRangeDisplay = ({ timerange, toggleDropdownShow = undefined }: Props) => (
   <TimeRangeWrapper
     aria-label="Search Time Range, Opens Time Range Selector On Click"
     role="button"

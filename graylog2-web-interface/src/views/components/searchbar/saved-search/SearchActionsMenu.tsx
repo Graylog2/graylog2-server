@@ -21,7 +21,6 @@ import { useCallback, useState, useContext, useRef } from 'react';
 import { isPermitted } from 'util/PermissionsMixin';
 import { Button, ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
 import { Icon, ShareButton } from 'components/common';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import UserNotification from 'util/UserNotification';
 import View from 'views/logic/views/View';
 import onSaveView from 'views/logic/views/OnSaveViewAction';
@@ -51,6 +50,8 @@ import type { EntitySharePayload } from 'actions/permissions/EntityShareActions'
 import EntityShareDomain from 'domainActions/permissions/EntityShareDomain';
 import useHotkey from 'hooks/useHotkey';
 import { createGRN } from 'logic/permissions/GRN';
+import useSelectedStreamsGRN from 'views/hooks/useSelectedStreamsGRN';
+import { createView, deleteView } from 'views/api/views';
 
 import SavedSearchForm from './SavedSearchForm';
 
@@ -122,6 +123,7 @@ const SearchActionsMenu = () => {
   const currentTitle = view?.title ?? '';
   const dispatch = useViewsDispatch();
   const onUpdateView = useCallback((newView: View) => dispatch(updateView(newView)), [dispatch]);
+  const { selectedStreamsGRN } = useSelectedStreamsGRN();
 
   const loaded = isNew === false;
   const disableReset = !(dirty || loaded);
@@ -171,7 +173,7 @@ const SearchActionsMenu = () => {
 
       const newView = viewWithPluginData.toBuilder().newId().title(newTitle).type(View.Type.Search).build();
 
-      ViewManagementActions.create(newView, entityShare)
+      createView(newView, entityShare, view.id)
         .then((createdView) => {
           toggleFormModal();
 
@@ -188,7 +190,7 @@ const SearchActionsMenu = () => {
 
   const deleteSavedSearch = useCallback(
     (deletedView: View) =>
-      ViewManagementActions.delete(deletedView)
+      deleteView(deletedView)
         .then(() =>
           UserNotification.success(`Deleting saved search "${deletedView.title}" was successful!`, 'Success!'),
         )
@@ -232,6 +234,7 @@ const SearchActionsMenu = () => {
         isCreateNew={isNew || !isAllowedToEdit}
         toggleModal={toggleFormModal}
         value={currentTitle}
+        selectedStreamGRN={selectedStreamsGRN}
         viewId={!isNew && view.id}>
         <SaveViewButton title={title} ref={formTarget} onClick={toggleFormModal} />
       </SavedSearchForm>

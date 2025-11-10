@@ -63,7 +63,7 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
   activeDirection,
   onChange,
   title = 'Sort',
-  order,
+  order = undefined,
   ascId = 'Ascending',
   descId = 'Descending',
   className = '',

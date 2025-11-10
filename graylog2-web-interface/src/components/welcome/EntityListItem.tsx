@@ -51,12 +51,12 @@ type Props = {
   grn: string;
 };
 
-const EntityItem = ({ title, grn, timestamp }: Props) => {
+const EntityItem = ({ title, grn, timestamp = undefined }: Props) => {
   const { id, type } = getValuesFromGRN(grn);
   const hasReadPermission = useHasEntityPermissionByGRN(grn, 'read');
   const entityTypeTitle = useMemo(() => getTitleForEntityType(type, false) ?? 'unknown', [type]);
   const entityLink = useShowRouteFromGRN(grn);
-  const entityTitle = title || id;
+  const entityTitle = title ?? id;
   const showLink = !!entityLink && hasReadPermission;
 
   return (

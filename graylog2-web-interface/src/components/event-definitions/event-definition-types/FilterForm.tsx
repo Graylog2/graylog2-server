@@ -16,26 +16,20 @@
  */
 
 import * as React from 'react';
-import { useCallback, useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import camelCase from 'lodash/camelCase';
 import cloneDeep from 'lodash/cloneDeep';
 import debounce from 'lodash/debounce';
-import defaultTo from 'lodash/defaultTo';
-import get from 'lodash/get';
 import isEmpty from 'lodash/isEmpty';
 import merge from 'lodash/merge';
-import memoize from 'lodash/memoize';
-import max from 'lodash/max';
-import union from 'lodash/union';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
-import type { $PropertyType } from 'utility-types';
+import type * as Immutable from 'immutable';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import { isPermitted } from 'util/PermissionsMixin';
 import * as FormsUtils from 'util/FormsUtils';
-import { naturalSortIgnoreCase } from 'util/SortUtils';
 import FormWarningsContext from 'contexts/FormWarningsContext';
 import { useStore } from 'stores/connect';
 import Store from 'logic/local-storage/Store';
@@ -57,7 +51,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type User from 'logic/users/User';
 import useUserDateTime from 'hooks/useUserDateTime';
-import type { EventDefinition } from 'components/event-definitions/event-definitions-types';
+import type { EventDefinition, SearchFilter } from 'components/event-definitions/event-definitions-types';
 import type { Stream } from 'views/stores/StreamsStore';
 import type { QueryValidationState } from 'views/components/searchbar/queryvalidation/types';
 import { indicesInWarmTier, isSearchingWarmTier } from 'views/components/searchbar/queryvalidation/warmTierValidation';
@@ -71,10 +65,11 @@ import commonStyles from '../common/commonStyles.css';
 
 export const PLUGGABLE_CONTROLS_HIDDEN_KEY = 'pluggableSearchBarControlsAreHidden';
 export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
-type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
+export type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
   embryonic?: boolean;
 };
 const LOOKUP_PERMISSIONS = ['lookuptables:read'];
+const STREAM_PERMISSIONS = ['streams:read'];
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
@@ -84,7 +79,8 @@ const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => (
   title: 'new title',
 });
 
-type EventDefinitionConfig = $PropertyType<EventDefinition, 'config'>;
+type EventDefinitionConfig = EventDefinition['config'];
+type EventDefinitionConfigKeys = keyof EventDefinitionConfig;
 
 type Props = {
   currentUser: User;
@@ -92,6 +88,106 @@ type Props = {
   onChange: (name: string, config: EventDefinitionConfig) => void;
   streams: Array<Stream>;
   validation: EventDefinitionValidation;
+};
+
+const toTimeRange = (from: number): RelativeTimeRangeWithEnd => ({
+  type: 'relative',
+  from: from / 1000,
+});
+
+const WarmTierTimeStamp = () => {
+  const { warnings } = useContext(FormWarningsContext);
+  const validationState = warnings?.queryString as QueryValidationState;
+  const warmTierRanges = indicesInWarmTier(validationState);
+  const latestWarmTierRangeEnd = warmTierRanges.map((range) => range.end).sort((a, b) => b - a)[0];
+
+  return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
+};
+
+type StreamCategorySelectorProps = {
+  onChange: (value: string) => void;
+  value: string;
+  streams: Array<Stream>;
+};
+const StreamCategorySelector = ({ onChange, streams, value }: StreamCategorySelectorProps) => {
+  const streamCategoryOptions = useMemo(
+    () =>
+      [...new Set<string>(streams.flatMap((stream) => stream?.categories ?? []))]
+        .sort(defaultCompare)
+        .map((category) => ({ label: category, value: category })),
+    [streams],
+  );
+
+  if (!streamCategoryOptions || streamCategoryOptions.length === 0) return null;
+
+  return (
+    <FormGroup controlId="filter-stream-categories">
+      <ControlLabel>
+        Stream Categories <small className="text-muted">(Optional)</small>
+      </ControlLabel>
+      <MultiSelect id="filter-stream-categories" onChange={onChange} options={streamCategoryOptions} value={value} />
+      <HelpBlock>Select stream categories the search should include.</HelpBlock>
+    </FormGroup>
+  );
+};
+
+type QueryParametersProps = {
+  eventDefinition: EventDefinition;
+  onChange: (config: EventDefinitionConfig) => void;
+  userCanViewLookupTables: boolean;
+  validation: Props['validation'];
+};
+const QueryParameters = ({ eventDefinition, onChange, userCanViewLookupTables, validation }: QueryParametersProps) => {
+  const { tables = {} } = useStore(LookupTablesStore);
+  const queryParameters = eventDefinition?.config?.query_parameters ?? [];
+
+  const onChangeQueryParameters = useCallback(
+    (newQueryParameters: Array<LookupTableParameterJson>) => {
+      const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
+
+      return onChange(newConfig);
+    },
+    [eventDefinition.config, onChange],
+  );
+
+  if (!userCanViewLookupTables) {
+    return <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>;
+  }
+
+  const parameterButtons = queryParameters.map((queryParam) => (
+    <EditQueryParameterModal
+      key={queryParam.name}
+      queryParameter={LookupTableParameter.fromJSON(queryParam)}
+      embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
+      queryParameters={queryParameters}
+      lookupTables={Object.values(tables)}
+      onChange={onChangeQueryParameters}
+    />
+  ));
+
+  if (isEmpty(parameterButtons)) {
+    return null;
+  }
+
+  const hasEmbryonicParameters = !isEmpty(
+    queryParameters.filter((param: LookupTableParameterJsonEmbryonic) => param.embryonic),
+  );
+
+  return (
+    <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
+      <ControlLabel>Query Parameters</ControlLabel>
+      <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
+        <ButtonToolbar>{parameterButtons}</ButtonToolbar>
+      </Alert>
+      {hasEmbryonicParameters && (
+        <HelpBlock>
+          {validation.errors.query_parameters
+            ? validation?.errors.query_parameters[0]
+            : 'Please declare missing query parameters by clicking on the buttons above.'}
+        </HelpBlock>
+      )}
+    </FormGroup>
+  );
 };
 
 const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validation }: Props) => {
@@ -104,7 +200,6 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const validationState = warnings?.queryString as QueryValidationState;
   const warmTierRanges = indicesInWarmTier(validationState);
 
-  const { tables } = useStore(LookupTablesStore);
   const { pathname } = useLocation();
 
   const sendTelemetry = useSendTelemetry();
@@ -119,24 +214,14 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const [searchWithinMsDuration, setSearchWithinMsDuration] = useState<number>(searchWithin.duration);
   const [executeEveryMsDuration, setExecuteEveryMsDuration] = useState<number>(executeEvery.duration);
 
-  const userCanViewLookupTables = useCallback(
+  const userCanViewLookupTables = useMemo(
     () => isPermitted(currentUser.permissions, LOOKUP_PERMISSIONS),
     [currentUser.permissions],
   );
 
-  const streamCategoryOptions = React.useMemo(
-    () =>
-      streams
-        .reduce((acc: { label: string; value: string }[], stream: Stream) => {
-          stream.categories?.forEach((category: string) => {
-            if (!acc.find((option: { value: string }) => option.value === category))
-              acc.push({ label: category, value: category });
-          });
-
-          return acc;
-        }, [])
-        .sort((a, b) => defaultCompare(a.value, b.value)),
-    [streams],
+  const isStreamRequired = useMemo(
+    () => !isPermitted(currentUser.permissions, STREAM_PERMISSIONS),
+    [currentUser.permissions],
   );
 
   const [cronDescription, setCronDescription] = useState<string>(
@@ -167,14 +252,8 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     [setFieldWarning],
   );
 
-  const toTimeRange = (from) =>
-    ({
-      type: 'relative',
-      from: from / 1000,
-    }) as RelativeTimeRangeWithEnd;
-
   useEffect(() => {
-    if (userCanViewLookupTables()) {
+    if (userCanViewLookupTables) {
       LookupTablesActions.searchPaginated(1, 0, undefined, false);
     }
   }, [userCanViewLookupTables]);
@@ -195,306 +274,256 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
     validateQueryString,
   ]);
 
-  const getUpdatedConfig = (key, value) => {
-    const config = cloneDeep(eventDefinition.config);
-    config[key] = value;
-    setCurrentConfig(config);
+  const getUpdatedConfig = useCallback(
+    <K extends EventDefinitionConfigKeys>(key: K, value: EventDefinition['config'][K]) => {
+      const config = cloneDeep(eventDefinition.config);
+      config[key] = value;
+      setCurrentConfig(config);
 
-    return config;
-  };
-
-  const propagateChange = (config: EventDefinitionConfig) => {
-    onChange('config', config);
-  };
-
-  const formatStreamIds = memoize(
-    (streamIds) =>
-      streamIds
-        .map((streamId) => streams.find((s) => s.id === streamId) || streamId)
-        .map((streamOrId) => {
-          const stream = typeof streamOrId === 'object' ? streamOrId : { title: streamOrId, id: streamOrId };
-
-          return {
-            label: stream.title,
-            value: stream.id,
-          };
-        })
-        .sort((s1, s2) => naturalSortIgnoreCase(s1.label, s2.label)),
-    (streamIds) => streamIds.join('-'),
+      return config;
+    },
+    [eventDefinition.config],
   );
 
-  const syncParamsWithQuery = (paramsInQuery, config: EventDefinitionConfig) => {
-    const queryParameters = config?.query_parameters || [];
-    const keptParameters = [];
-    const staleParameters = {};
+  const propagateChange = useCallback(
+    (config: EventDefinitionConfig) => {
+      onChange('config', config);
+    },
+    [onChange],
+  );
 
-    queryParameters.forEach((p) => {
-      if (paramsInQuery.has(p.name)) {
-        keptParameters.push(p);
-      } else {
-        staleParameters[p.name] = p;
-      }
-    });
+  const syncParamsWithQuery = useCallback(
+    (paramsInQuery: Immutable.Set<string>, config: EventDefinitionConfig) => {
+      const queryParameters = config?.query_parameters || [];
+      const keptParameters = [];
+      const staleParameters = {};
 
-    const newParameters = [];
-
-    paramsInQuery.forEach((np) => {
-      if (!keptParameters.find((p) => p.name === np)) {
-        if (queryParameterStash[np]) {
-          newParameters.push(queryParameterStash[np]);
+      queryParameters.forEach((p) => {
+        if (paramsInQuery.has(p.name)) {
+          keptParameters.push(p);
         } else {
-          newParameters.push(buildNewParameter(np));
+          staleParameters[p.name] = p;
         }
+      });
+
+      const newParameters = [];
+
+      paramsInQuery.forEach((np) => {
+        if (!keptParameters.find((p) => p.name === np)) {
+          if (queryParameterStash[np]) {
+            newParameters.push(queryParameterStash[np]);
+          } else {
+            newParameters.push(buildNewParameter(np));
+          }
+        }
+      });
+
+      setQueryParameterStash(merge(queryParameterStash, staleParameters));
+
+      propagateChange({ ...config, query_parameters: keptParameters.concat(newParameters) });
+    },
+    [propagateChange, queryParameterStash],
+  );
+
+  const parseQuery = useCallback(
+    (queryString: string, config: EventDefinitionConfig, searchFilters = OrderedMap()) => {
+      if (!userCanViewLookupTables) {
+        return;
       }
-    });
 
-    setQueryParameterStash(merge(queryParameterStash, staleParameters));
+      const queryBuilder = Query.builder()
+        .id(queryId)
+        .query({ type: 'elasticsearch', query_string: queryString })
+        .timerange({ type: 'relative', range: 1000 })
+        .filters(searchFilters.toList() as FiltersType)
+        .searchTypes([
+          {
+            id: searchTypeId,
+            type: 'messages',
+            limit: 10,
+            offset: 0,
+            filter: undefined,
+            filters: undefined,
+            name: undefined,
+            query: undefined,
+            timerange: undefined,
+            streams: undefined,
+            stream_categories: undefined,
+            sort: [],
+            decorators: [],
+          },
+        ]);
 
-    onChange('config', { ...config, query_parameters: keptParameters.concat(newParameters) });
-  };
+      const query = queryBuilder.build();
 
-  const parseQuery = (queryString: string, config: EventDefinitionConfig, searchFilters = OrderedMap()) => {
-    if (!userCanViewLookupTables()) {
-      return;
-    }
+      const search = Search.create().toBuilder().queries([query]).build();
 
-    const queryBuilder = Query.builder()
-      .id(queryId)
-      .query({ type: 'elasticsearch', query_string: queryString })
-      .timerange({ type: 'relative', range: 1000 })
-      .filters(searchFilters.toList() as FiltersType)
-      .searchTypes([
-        {
-          id: searchTypeId,
-          type: 'messages',
-          limit: 10,
-          offset: 0,
-          filter: undefined,
-          filters: undefined,
-          name: undefined,
-          query: undefined,
-          timerange: undefined,
-          streams: undefined,
-          stream_categories: undefined,
-          sort: [],
-          decorators: [],
-        },
-      ]);
-
-    const query = queryBuilder.build();
-
-    const search = Search.create().toBuilder().queries([query]).build();
-
-    parseSearch(search).then((res) => {
-      syncParamsWithQuery(res.undeclared, config);
-    });
-  };
+      parseSearch(search).then((res) => {
+        syncParamsWithQuery(res.undeclared, config);
+      });
+    },
+    [queryId, searchTypeId, syncParamsWithQuery, userCanViewLookupTables],
+  );
 
   const debouncedParseQuery = debounce(parseQuery, 250);
 
-  const handleConfigChange = (name: string, config: EventDefinitionConfig) => {
-    if (name === '_is_scheduled') {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-definition-condition',
-        app_action_value: 'enable-checkbox',
-        is_scheduled: config._is_scheduled,
-      });
-    }
+  const handleConfigChange = useCallback(
+    (name: string, config: EventDefinitionConfig) => {
+      if (name === '_is_scheduled') {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTED_AUTOMATICALLY_TOGGLED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-condition',
+          app_action_value: 'enable-checkbox',
+          is_scheduled: config._is_scheduled,
+        });
+      }
 
-    propagateChange(config);
-  };
+      propagateChange(config);
+    },
+    [pathname, propagateChange, sendTelemetry],
+  );
 
-  const handleQueryChange = (event) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name, value);
-    handleConfigChange(name, newConfig);
-    debouncedParseQuery(value, newConfig);
-  };
+  const handleQueryChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
+      handleConfigChange(name, newConfig);
+      debouncedParseQuery(value, newConfig);
+    },
+    [debouncedParseQuery, getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleCronExpressionChange = (event) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name, value);
-    handleConfigChange(name, newConfig);
-  };
+  const handleCronExpressionChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
+      handleConfigChange(name, newConfig);
+    },
+    [getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleCronTimezoneChange = (tz) => {
-    const newConfig = getUpdatedConfig('cron_timezone', tz);
-    handleConfigChange('cron_timezone', newConfig);
-  };
+  const handleCronTimezoneChange = useCallback(
+    (tz: string) => {
+      const newConfig = getUpdatedConfig('cron_timezone', tz);
+      handleConfigChange('cron_timezone', newConfig);
+    },
+    [getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleSearchFiltersChange = (searchFilters) => {
-    const { query } = eventDefinition.config;
+  const handleSearchFiltersChange = useCallback(
+    (searchFilters: OrderedMap<string, SearchFilter>) => {
+      const { query } = eventDefinition.config;
 
-    const newConfig = getUpdatedConfig('filters', searchFilters.toArray());
-    propagateChange(newConfig);
+      const newConfig = getUpdatedConfig('filters', searchFilters.toArray());
+      propagateChange(newConfig);
 
-    debouncedParseQuery(query, newConfig);
-  };
+      debouncedParseQuery(query, newConfig);
+    },
+    [debouncedParseQuery, eventDefinition.config, getUpdatedConfig, propagateChange],
+  );
 
-  const handleEnabledChange = (event) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = getUpdatedConfig(name, value);
-    handleConfigChange(name, newConfig);
-  };
+  const handleEnabledChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = getUpdatedConfig(name as EventDefinitionConfigKeys, value);
+      handleConfigChange(name, newConfig);
+    },
+    [getUpdatedConfig, handleConfigChange],
+  );
 
-  const handleUseCronSchedulingChange = (event) => {
-    const { name } = event.target;
-    const value = FormsUtils.getValueFromInput(event.target);
-    const newConfig = cloneDeep(eventDefinition.config);
-    newConfig[name] = value;
+  const handleUseCronSchedulingChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const { name } = event.target;
+      const value = FormsUtils.getValueFromInput(event.target);
+      const newConfig = cloneDeep(eventDefinition.config);
+      newConfig[name] = value;
 
-    if (value) {
-      newConfig.cron_expression = '';
-      newConfig.cron_timezone = userTimezone;
-    } else {
-      newConfig.cron_expression = null;
-      newConfig.cron_timezone = null;
-    }
+      if (value) {
+        newConfig.cron_expression = '';
+        newConfig.cron_timezone = userTimezone;
+      } else {
+        newConfig.cron_expression = null;
+        newConfig.cron_timezone = null;
+      }
 
-    setCurrentConfig(newConfig);
-    propagateChange(newConfig);
-  };
+      setCurrentConfig(newConfig);
+      propagateChange(newConfig);
+    },
+    [eventDefinition.config, propagateChange, userTimezone],
+  );
 
-  const hideFiltersPreview = (value) => {
+  const hideFiltersPreview = useCallback((value: boolean) => {
     Store.set(PLUGGABLE_CONTROLS_HIDDEN_KEY, value);
     setSearchFiltersHidden(value);
-  };
+  }, []);
 
-  const handleStreamsChange = (nextValue) => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
-      app_pathname: getPathnameWithoutId(pathname),
-      app_section: 'event-definition-condition',
-      app_action_value: 'stream-select',
-    });
-
-    propagateChange(getUpdatedConfig('streams', nextValue));
-  };
-
-  const handleTimeRangeChange = (fieldName) => (nextValue, nextUnit) => {
-    if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
+  const handleStreamsChange = useCallback(
+    (nextValue: Array<string>) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_STREAM_SELECTED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: 'event-definition-condition',
-        app_action_value: 'searchWithinMsUnit-select',
-        new_unit: nextUnit,
+        app_action_value: 'stream-select',
       });
-    } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: 'event-definition-condition',
-        app_action_value: 'executeEveryMsUnit-select',
-        new_unit: nextUnit,
-      });
-    }
 
-    const durationInMs = moment.duration(max([nextValue, 1]), nextUnit).asMilliseconds();
+      propagateChange(getUpdatedConfig('streams', nextValue));
+    },
+    [getUpdatedConfig, pathname, propagateChange, sendTelemetry],
+  );
 
-    propagateChange(getUpdatedConfig(fieldName, durationInMs));
+  const handleTimeRangeChange = useCallback(
+    (fieldName: EventDefinitionConfigKeys) => (nextValue: number, nextUnit: 'hours' | 'minutes' | 'seconds') => {
+      if (fieldName === 'search_within_ms' && nextUnit !== searchWithinMsUnit) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_SEARCH_WITHIN_THE_LAST_UNIT_CHANGED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-condition',
+          app_action_value: 'searchWithinMsUnit-select',
+          new_unit: nextUnit,
+        });
+      } else if (fieldName === 'execute_every_ms' && nextUnit !== executeEveryMsUnit) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.EVENTDEFINITION_CONDITION.FILTER_EXECUTE_SEARCH_EVERY_UNIT_CHANGED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: 'event-definition-condition',
+          app_action_value: 'executeEveryMsUnit-select',
+          new_unit: nextUnit,
+        });
+      }
 
-    const stateFieldName = camelCase(fieldName);
+      const durationInMs = moment.duration(Math.max(nextValue, 1), nextUnit).asMilliseconds();
 
-    if (stateFieldName === 'searchWithinMs') {
-      setSearchWithinMsDuration(nextValue);
-      setSearchWithinMsUnit(nextUnit);
+      propagateChange(getUpdatedConfig(fieldName, durationInMs));
 
-      return;
-    }
+      const stateFieldName = camelCase(fieldName);
 
-    setExecuteEveryMsDuration(nextValue);
-    setExecuteEveryMsUnit(nextUnit);
-  };
+      if (stateFieldName === 'searchWithinMs') {
+        setSearchWithinMsDuration(nextValue);
+        setSearchWithinMsUnit(nextUnit);
 
-  const renderQueryParameters = () => {
-    const queryParameters = eventDefinition?.config?.query_parameters || [];
+        return;
+      }
 
-    const onChangeQueryParameters = (newQueryParameters) => {
-      const newConfig = { ...eventDefinition.config, query_parameters: newQueryParameters || [] };
-
-      return onChange('config', newConfig);
-    };
-
-    if (!userCanViewLookupTables()) {
-      return (
-        <Alert bsStyle="info">This account lacks permission to declare Query Parameters from Lookup Tables.</Alert>
-      );
-    }
-
-    const parameterButtons = queryParameters.map((queryParam) => (
-      <EditQueryParameterModal
-        key={queryParam.name}
-        queryParameter={LookupTableParameter.fromJSON(queryParam)}
-        embryonic={!!(queryParam as LookupTableParameterJsonEmbryonic).embryonic}
-        queryParameters={queryParameters}
-        lookupTables={Object.values(tables || {})}
-        onChange={onChangeQueryParameters}
-      />
-    ));
-
-    if (isEmpty(parameterButtons)) {
-      return null;
-    }
-
-    const hasEmbryonicParameters = !isEmpty(
-      queryParameters.filter((param: LookupTableParameterJsonEmbryonic) => param.embryonic),
-    );
-
-    return (
-      <FormGroup validationState={validation.errors.query_parameters ? 'error' : null}>
-        <ControlLabel>Query Parameters</ControlLabel>
-        <Alert bsStyle={hasEmbryonicParameters ? 'danger' : 'info'}>
-          <ButtonToolbar>{parameterButtons}</ButtonToolbar>
-        </Alert>
-        {hasEmbryonicParameters && (
-          <HelpBlock>
-            {validation.errors.query_parameters
-              ? get(validation, 'errors.query_parameters[0]')
-              : 'Please declare missing query parameters by clicking on the buttons above.'}
-          </HelpBlock>
-        )}
-      </FormGroup>
-    );
-  };
-
-  const streamCategorySelector = () => {
-    if (!streamCategoryOptions || streamCategoryOptions.length === 0) return null;
-
-    return (
-      <FormGroup controlId="filter-stream-categories">
-        <ControlLabel>
-          Stream Categories <small className="text-muted">(Optional)</small>
-        </ControlLabel>
-        <MultiSelect
-          id="filter-stream-categories"
-          matchProp="label"
-          onChange={(selected) =>
-            propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
-          }
-          options={streamCategoryOptions}
-          value={defaultTo(eventDefinition.config.stream_categories, []).join(',')}
-        />
-        <HelpBlock>Select stream categories the search should include.</HelpBlock>
-      </FormGroup>
-    );
-  };
-
-  const warmTierTimeStamp = () => {
-    const latestWarmTierRangeEnd = warmTierRanges.map((range) => range.end).sort((a, b) => b - a)[0];
-
-    return <RelativeTime dateTime={latestWarmTierRangeEnd} />;
-  };
+      setExecuteEveryMsDuration(nextValue);
+      setExecuteEveryMsUnit(nextUnit);
+    },
+    [executeEveryMsUnit, getUpdatedConfig, pathname, propagateChange, searchWithinMsUnit, sendTelemetry],
+  );
 
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   // Ensure deleted streams are still displayed in select
-  const allStreamIds = union(
-    streams.map((s) => s.id),
-    defaultTo(eventDefinition.config.streams, []),
+  const formattedStreams = useMemo(
+    () =>
+      [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
+        .map((streamId) => {
+          const stream = streams.find((s) => s.id === streamId);
+
+          return { label: stream?.title ?? streamId, value: streamId };
+        })
+        .sort((s1, s2) => defaultCompare(s1.label, s2.label)),
+    [eventDefinition?.config?.streams, streams],
   );
-  const formattedStreams = formatStreamIds(allStreamIds);
 
   return (
     <fieldset>
@@ -512,12 +541,19 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               declaring Query Parameters from Lookup Tables by using the <code>$newParameter$</code> syntax.
             </span>
           }
-          value={defaultTo(currentConfig.query, '')}
+          value={currentConfig.query ?? ''}
           onChange={handleQueryChange}
         />
       )}
 
-      {onlyFilters || renderQueryParameters()}
+      {onlyFilters || (
+        <QueryParameters
+          eventDefinition={eventDefinition}
+          onChange={propagateChange}
+          userCanViewLookupTables={userCanViewLookupTables}
+          validation={validation}
+        />
+      )}
 
       {!searchFiltersHidden && (
         <FormGroup controlId="search-filters">
@@ -537,25 +573,29 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
       {onlyFilters || (
         <>
           <FormGroup controlId="filter-streams">
-            <ControlLabel>
-              Streams <small className="text-muted">(Optional)</small>
-            </ControlLabel>
+            <ControlLabel>Streams{!isStreamRequired && <small className="text-muted"> (Optional)</small>}</ControlLabel>
             <MultiSelect
               id="filter-streams"
-              matchProp="label"
+              required={isStreamRequired}
               onChange={(selected) => handleStreamsChange(selected === '' ? [] : selected.split(','))}
               options={formattedStreams}
-              value={defaultTo(eventDefinition.config.streams, []).join(',')}
+              value={(eventDefinition.config.streams ?? []).join(',')}
             />
             <HelpBlock>Select streams the search should include. Searches in all streams if empty.</HelpBlock>
           </FormGroup>
-          {streamCategorySelector()}
+          <StreamCategorySelector
+            onChange={(selected) =>
+              propagateChange(getUpdatedConfig('stream_categories', selected === '' ? [] : selected.split(',')))
+            }
+            value={(eventDefinition.config.stream_categories ?? []).join(',')}
+            streams={streams}
+          />
           {isSearchingWarmTier(warmTierRanges) && (
             <Alert bsStyle="danger" title="Warm Tier Warning">
               The selected time range will include data stored in the Warm Tier. Events that must frequently retrieve
               data from the Warm Tier may cause performance problems. A value for{' '}
               <strong>Search within the last</strong> exceeding the following duration will fall into the Warm Tier:{' '}
-              {warmTierTimeStamp()}.
+              <WarmTierTimeStamp />.
             </Alert>
           )}
           <FormGroup controlId="search-within" validationState={validation.errors.search_within_ms ? 'error' : null}>
@@ -568,9 +608,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
               clearable
               required
             />
-            {validation.errors.search_within_ms && (
-              <HelpBlock>{get(validation, 'errors.search_within_ms[0]')}</HelpBlock>
-            )}
+            {validation.errors.search_within_ms && <HelpBlock>{validation.errors.search_within_ms[0]}</HelpBlock>}
           </FormGroup>
           <Input
             id="is-cron-checkbox"
@@ -578,7 +616,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             name="use_cron_scheduling"
             label="Use Cron Scheduling"
             help="Schedule this event with a Quartz cron expression"
-            checked={defaultTo(eventDefinition.config.use_cron_scheduling, false)}
+            checked={eventDefinition.config.use_cron_scheduling ?? false}
             onChange={handleUseCronSchedulingChange}
           />
           {currentConfig.use_cron_scheduling ? (
@@ -596,18 +634,16 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
                       {cronDescription || 'A Quartz cron expression to determine when the event should be run.'}
                     </span>
                   }
-                  value={defaultTo(currentConfig.cron_expression, '')}
+                  value={currentConfig.cron_expression ?? ''}
                   onBlur={() => setCronDescription(describeExpression(currentConfig.cron_expression))}
                   onChange={handleCronExpressionChange}
                 />
-                {validation.errors.cron_expression && (
-                  <HelpBlock>{get(validation, 'errors.cron_expression[0]')}</HelpBlock>
-                )}
+                {validation.errors.cron_expression && <HelpBlock>{validation.errors.cron_expression[0]}</HelpBlock>}
               </FormGroup>
               <FormGroup>
                 <ControlLabel>Cron Time Zone</ControlLabel>
                 <TimezoneSelect
-                  value={defaultTo(currentConfig.cron_timezone, userTimezone)}
+                  value={currentConfig.cron_timezone ?? userTimezone}
                   name="cron_timezone"
                   clearable={false}
                   onChange={handleCronTimezoneChange}
@@ -625,9 +661,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
                 clearable
                 required
               />
-              {validation.errors.execute_every_ms && (
-                <HelpBlock>{get(validation, 'errors.execute_every_ms[0]')}</HelpBlock>
-              )}
+              {validation.errors.execute_every_ms && <HelpBlock>{validation.errors.execute_every_ms[0]}</HelpBlock>}
             </FormGroup>
           )}
 
@@ -637,7 +671,7 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
             name="_is_scheduled"
             label="Enable"
             help="Should this event definition be executed automatically?"
-            checked={defaultTo(eventDefinition.config._is_scheduled, true)}
+            checked={eventDefinition.config._is_scheduled ?? true}
             onChange={handleEnabledChange}
           />
         </>

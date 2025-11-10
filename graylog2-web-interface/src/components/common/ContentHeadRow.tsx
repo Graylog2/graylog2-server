@@ -47,7 +47,7 @@ type Props = {
   className?: string;
 };
 
-const ContentHeadRow = ({ children, className, ...props }: Props) => (
+const ContentHeadRow = ({ children, className = undefined, ...props }: Props) => (
   <StyledRow className={classNames('content-head', className)} {...props}>
     {children}
   </StyledRow>

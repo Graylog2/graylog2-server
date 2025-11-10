@@ -41,10 +41,10 @@ const StyledListItem = styled(ListItem)<{ $isDragging: boolean }>(
 );
 
 const SortableListItem = <ItemType extends ListItemType>({
-  alignItemContent,
-  className,
-  customContentRender,
-  customListItemRender,
+  alignItemContent = undefined,
+  className = undefined,
+  customContentRender = undefined,
+  customListItemRender = undefined,
   disableDragging = false,
   displayOverlayInPortal,
   index,

@@ -18,6 +18,8 @@ import * as React from 'react';
 import { Notifications as MantineNotifications } from '@mantine/notifications';
 import styled, { css } from 'styled-components';
 
+import zIndices from 'theme/z-indices';
+
 const StyledNotifications = styled(MantineNotifications)(
   ({ theme }) => css`
     .mantine-Notification-root {
@@ -37,6 +39,6 @@ const StyledNotifications = styled(MantineNotifications)(
   `,
 );
 
-const Notifications = () => <StyledNotifications />;
+const Notifications = () => <StyledNotifications zIndex={zIndices.notifications} />;
 
 export default Notifications;

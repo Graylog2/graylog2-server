@@ -32,31 +32,31 @@ const useDataNodeLogs = (
   stdout: string[];
   stderr: string[];
 } => {
-  const { data: stdout } = useQuery(
-    ['datanode_stdout_logs'],
-    () =>
+  const { data: stdout } = useQuery({
+    queryKey: ['datanode_stdout_logs'],
+
+    queryFn: () =>
       defaultOnError(
         fetchDataNodeLogsStdout(hostname),
         'Loading Data Node stdout logs failed with status',
         'Could not load Data Node stdout logs',
       ),
-    {
-      enabled,
-    },
-  );
 
-  const { data: stderr } = useQuery(
-    ['datanode_stderr_logs'],
-    () =>
+    enabled,
+  });
+
+  const { data: stderr } = useQuery({
+    queryKey: ['datanode_stderr_logs'],
+
+    queryFn: () =>
       defaultOnError(
         fetchDataNodeLogsStderr(hostname),
         'Loading Data Node stderr logs failed with status',
         'Could not load Data Node stderr logs',
       ),
-    {
-      enabled,
-    },
-  );
+
+    enabled,
+  });
 
   return {
     stdout,

@@ -34,7 +34,7 @@ const Errors = styled.div(
   `,
 );
 
-const FormErrors = ({ errors = {} }: { errors: { [name: string]: string } }) => {
+const FormErrors = ({ errors }: { errors: { [name: string]: string } }) => {
   if (isEmpty(errors) || Object.values(errors).every((v) => !v)) return null;
 
   return (

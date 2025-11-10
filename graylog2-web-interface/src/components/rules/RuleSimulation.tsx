@@ -73,7 +73,7 @@ type Props = {
   onSaveMessage?: (message: string) => void;
 };
 
-const RuleSimulation = ({ rule: currentRule, onSaveMessage = () => {} }: Props) => {
+const RuleSimulation = ({ rule: currentRule = undefined, onSaveMessage = () => {} }: Props) => {
   const {
     rule,
     simulateRule,

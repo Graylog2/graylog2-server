@@ -28,7 +28,7 @@ type Props = {
   required?: boolean;
 };
 
-const FormikTextInput = ({ name, placeholder, label, type, required = false }: Props) => (
+const FormikTextInput = ({ name, placeholder = undefined, label, type = undefined, required = false }: Props) => (
   <Field name={name}>
     {({ field: { value, onChange, onBlur }, meta: { error: validationError } }) => (
       <TextInput

@@ -64,7 +64,13 @@ type Props = {
  * Component that let you render an entity item using a similar look and feel as other entities in Graylog.
  * This component is meant to use alongside `EntityList`. Look there for an example of how to use this component.
  */
-const EntityListItem = ({ actions, contentRow, description, title, titleSuffix }: Props) => {
+const EntityListItem = ({
+  actions = undefined,
+  contentRow = undefined,
+  description = undefined,
+  title,
+  titleSuffix = undefined,
+}: Props) => {
   const wrappedTitleSuffix = titleSuffix ? <small>{titleSuffix}</small> : null;
   const actionsContainer = <div className="item-actions text-right">{actions}</div>;
 

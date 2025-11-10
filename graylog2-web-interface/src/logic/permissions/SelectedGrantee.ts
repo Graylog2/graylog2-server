@@ -14,18 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { $PropertyType } from 'utility-types';
-
 import type { GranteeInterface } from './GranteeInterface';
 import type Grantee from './Grantee';
 import type Capability from './Capability';
 import type { ActiveShares } from './EntityShareState';
 
 type InternalState = {
-  id: $PropertyType<Grantee, 'id'>;
-  title: $PropertyType<Grantee, 'title'>;
-  type: $PropertyType<Grantee, 'type'>;
-  capabilityId: $PropertyType<Capability, 'id'>;
+  id: Grantee['id'];
+  title: Grantee['title'];
+  type: Grantee['type'];
+  capabilityId: Capability['id'];
 };
 
 export type CurrentState = 'new' | 'changed' | 'unchanged';
@@ -34,27 +32,27 @@ export default class SelectedGrantee implements GranteeInterface {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    title: $PropertyType<InternalState, 'title'>,
-    type: $PropertyType<InternalState, 'type'>,
-    capabilityId: $PropertyType<InternalState, 'capabilityId'>,
+    id: InternalState['id'],
+    title: InternalState['title'],
+    type: InternalState['type'],
+    capabilityId: InternalState['capabilityId'],
   ) {
     this._value = { id, title, type, capabilityId };
   }
 
-  get id(): $PropertyType<InternalState, 'id'> {
+  get id(): InternalState['id'] {
     return this._value.id;
   }
 
-  get title(): $PropertyType<InternalState, 'title'> {
+  get title(): InternalState['title'] {
     return this._value.title;
   }
 
-  get type(): $PropertyType<InternalState, 'type'> {
+  get type(): InternalState['type'] {
     return this._value.type;
   }
 
-  get capabilityId(): $PropertyType<InternalState, 'capabilityId'> {
+  get capabilityId(): InternalState['capabilityId'] {
     return this._value.capabilityId;
   }
 
@@ -69,10 +67,10 @@ export default class SelectedGrantee implements GranteeInterface {
   }
 
   static create(
-    id: $PropertyType<InternalState, 'id'>,
-    title: $PropertyType<InternalState, 'title'>,
-    type: $PropertyType<InternalState, 'type'>,
-    capabilityId: $PropertyType<InternalState, 'capabilityId'>,
+    id: InternalState['id'],
+    title: InternalState['title'],
+    type: InternalState['type'],
+    capabilityId: InternalState['capabilityId'],
   ) {
     return new SelectedGrantee(id, title, type, capabilityId);
   }

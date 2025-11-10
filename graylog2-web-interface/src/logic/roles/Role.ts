@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import type { $PropertyType } from 'utility-types';
 
 type InternalState = {
   id: string;
@@ -37,11 +36,11 @@ export default class Role {
   _value: InternalState;
 
   constructor(
-    id: $PropertyType<InternalState, 'id'>,
-    name: $PropertyType<InternalState, 'name'>,
-    description: $PropertyType<InternalState, 'description'>,
-    permissions: $PropertyType<InternalState, 'permissions'>,
-    readOnly: $PropertyType<InternalState, 'readOnly'>,
+    id: InternalState['id'],
+    name: InternalState['name'],
+    description: InternalState['description'],
+    permissions: InternalState['permissions'],
+    readOnly: InternalState['readOnly'],
   ) {
     this._value = {
       id,
@@ -88,11 +87,11 @@ export default class Role {
   }
 
   static create(
-    id: $PropertyType<InternalState, 'id'>,
-    name: $PropertyType<InternalState, 'name'>,
-    description: $PropertyType<InternalState, 'description'>,
-    permissions: $PropertyType<InternalState, 'permissions'>,
-    readOnly: $PropertyType<InternalState, 'readOnly'>,
+    id: InternalState['id'],
+    name: InternalState['name'],
+    description: InternalState['description'],
+    permissions: InternalState['permissions'],
+    readOnly: InternalState['readOnly'],
   ) {
     return new Role(id, name, description, permissions, readOnly);
   }
@@ -130,23 +129,23 @@ class Builder {
     this.value = value;
   }
 
-  id(value: $PropertyType<InternalState, 'id'>) {
+  id(value: InternalState['id']) {
     return new Builder(this.value.set('id', value));
   }
 
-  name(value: $PropertyType<InternalState, 'name'>) {
+  name(value: InternalState['name']) {
     return new Builder(this.value.set('name', value));
   }
 
-  description(value: $PropertyType<InternalState, 'description'>) {
+  description(value: InternalState['description']) {
     return new Builder(this.value.set('description', value));
   }
 
-  permissions(value: $PropertyType<InternalState, 'permissions'>) {
+  permissions(value: InternalState['permissions']) {
     return new Builder(this.value.set('permissions', value));
   }
 
-  readOnly(value: $PropertyType<InternalState, 'readOnly'>) {
+  readOnly(value: InternalState['readOnly']) {
     return new Builder(this.value.set('readOnly', value));
   }
 

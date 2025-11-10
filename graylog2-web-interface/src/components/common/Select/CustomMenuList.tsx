@@ -57,7 +57,7 @@ type WindowListProps = Partial<MenuListProps> & {
   onItemsRendered?: () => void;
 };
 
-export const WindowList = ({ children, listRef, ...rest }: WindowListProps) => {
+export const WindowList = ({ children, listRef = undefined, ...rest }: WindowListProps) => {
   const containerRef = useRef(null);
   const vListRef = useRef(null);
   const sizeMap = useRef({});

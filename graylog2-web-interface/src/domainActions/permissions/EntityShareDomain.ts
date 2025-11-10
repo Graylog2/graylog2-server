@@ -20,17 +20,17 @@ import notifyingAction from '../notifyingAction';
 
 const prepare = notifyingAction({
   action: EntityShareActions.prepare,
-  error: (error, entityName, entityType) => ({
+  error: (error, entityType, entityName) => ({
     message: `Preparing shares for ${entityType} "${entityName}" failed with status: ${error}`,
   }),
 });
 
 const update = notifyingAction({
   action: EntityShareActions.update,
-  error: (error, entityName, entityType) => ({
+  error: (error, entityType, entityName) => ({
     message: `Updating shares for ${entityType} "${entityName}" failed with status: ${error}`,
   }),
-  success: (entityName, entityType) => ({
+  success: (entityType, entityName) => ({
     message: `Shares for ${entityType} "${entityName}" updated successfully`,
   }),
 });

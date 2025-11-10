@@ -62,7 +62,7 @@ public class V20230523160600_PopulateEventDefinitionState extends Migration {
         // Collect a list of all event definitions with a defined job (ie, enabled event definitions) as well as all
         // system event definitions to be marked as enabled
         List<String> enabledEventDefinitionIds = new ArrayList<>();
-        try (var stream = dbEventDefinitionService.streamAll()) {
+        try (final var stream = dbEventDefinitionService.streamAll()) {
             stream.forEach(dto -> {
                 Optional<JobDefinitionDto> jobDefinition = dbJobDefinitionService.getByConfigField(EventDto.FIELD_EVENT_DEFINITION_ID, dto.id());
                 if (dto.scope().equals(NonDeletableSystemScope.NAME) || jobDefinition.isPresent()) {

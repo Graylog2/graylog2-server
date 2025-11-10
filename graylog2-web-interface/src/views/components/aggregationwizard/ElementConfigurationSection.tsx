@@ -90,7 +90,7 @@ const Header = styled.div<{ $isEmpty: boolean }>(
 const ElementTitle = styled.div<{ $isEmpty: boolean }>(
   ({ theme, $isEmpty }) => css`
     background-color: ${theme.colors.global.contentBackground};
-    color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.global.textDefault};
+    color: ${$isEmpty ? theme.colors.gray['70'] : theme.colors.text.primary};
     z-index: 1;
     padding-right: 8px;
   `,
@@ -106,7 +106,7 @@ const ElementActions = styled.div(
 
 const StyledIconButton = styled(IconButton)(
   ({ theme }) => `
-  color: ${theme.colors.global.textDefault};
+  color: ${theme.colors.text.primary};
 `,
 );
 
@@ -125,7 +125,7 @@ const ElementConfigurationSection = ({
   elementTitle,
   isEmpty = false,
   onCreate,
-  sectionTitle,
+  sectionTitle = undefined,
 }: Props) => {
   const title = sectionTitle ?? elementTitle;
 

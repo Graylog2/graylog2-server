@@ -106,7 +106,7 @@ const DropdownMenu = ({
   children,
   zIndex = 1050,
   onMenuItemSelect = () => {},
-  minWidth,
+  minWidth = undefined,
   ...restProps
 }: Props) => {
   const mappedChildren = closeOnChildrenSelect(children, 0, onMenuItemSelect);

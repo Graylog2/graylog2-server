@@ -87,7 +87,6 @@ const ServerInputSelect = ({ inputs, selectedInputId, onInputSelect }: Subtract<
         aria-label="Message input"
         placeholder="Select input"
         options={_formatInputSelectOptions()}
-        matchProp="label"
         onChange={onInputSelect}
         value={selectedInputId}
       />
@@ -399,7 +398,6 @@ const RawMessageLoader = ({
                 aria-label="Message codec"
                 placeholder="Select codec"
                 options={_formatSelectOptions()}
-                matchProp="label"
                 onChange={_onCodecSelect}
                 value={codec}
               />

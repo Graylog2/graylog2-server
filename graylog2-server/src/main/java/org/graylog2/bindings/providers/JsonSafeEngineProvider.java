@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.graylog2.jmte.NamedDateRenderer;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,6 +36,7 @@ public class JsonSafeEngineProvider implements Provider<Engine> {
     @Inject
     public JsonSafeEngineProvider() {
         engine = Engine.createEngine();
+        engine.registerNamedRenderer(new NamedDateRenderer());
         engine.registerRenderer(String.class, new JsonSafeRenderer());
         engine.registerRenderer(Map.class, new JsonSafeMapRenderer());
         engine.registerRenderer(Iterable.class, new JsonSafeIterableRenderer());

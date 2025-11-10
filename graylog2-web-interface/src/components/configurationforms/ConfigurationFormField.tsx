@@ -41,7 +41,7 @@ const ConfigurationFormField = ({
   typeName,
   configField,
   configKey,
-  configValue,
+  configValue = undefined,
   dirty = false,
   autoFocus = false,
   onChange,

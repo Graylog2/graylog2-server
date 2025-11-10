@@ -18,6 +18,7 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import * as URLUtils from 'util/URLUtils';
+import PaginationURL from 'util/PaginationURL';
 import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
@@ -50,6 +51,7 @@ export const LookupTableDataAdaptersActions = singletonActions('core.LookupTable
 type StoreState = {
   dataAdapters: LookupTableAdapter[];
   dataAdapter: LookupTableAdapter;
+  types: any;
   pagination: {
     page: number;
     per_page: number;
@@ -57,6 +59,7 @@ type StoreState = {
     count: number;
     query: string | null;
   };
+  validationErrors: any;
 };
 export const LookupTableDataAdaptersStore = singletonStore('core.LookupTableDataAdapters', () =>
   Reflux.createStore<StoreState>({
@@ -101,14 +104,8 @@ export const LookupTableDataAdaptersStore = singletonStore('core.LookupTableData
       return promise;
     },
 
-    searchPaginated(page, perPage, query) {
-      let url;
-
-      if (query) {
-        url = this._url(`adapters?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}`);
-      } else {
-        url = this._url(`adapters?page=${page}&per_page=${perPage}`);
-      }
+    searchPaginated(page, perPage, query, sort?: string, order?: 'asc' | 'desc') {
+      const url = this._url(PaginationURL('adapters', page, perPage, query, { sort, order }));
 
       const promise = fetch('GET', url);
 
@@ -274,7 +271,7 @@ export const LookupTableDataAdaptersStore = singletonStore('core.LookupTableData
 
         try {
           errorMessage = error.additional.body.message;
-        } catch (e) {
+        } catch (_e) {
           errorMessage = error.message;
         }
 

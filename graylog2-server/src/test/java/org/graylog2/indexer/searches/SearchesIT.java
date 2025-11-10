@@ -220,7 +220,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
                 "streams:" + STREAM_ID);
 
-        assertThat(result.count()).isEqualTo(5L);
+        assertThat(result.count()).isEqualTo(4L);
     }
 
     @Test
@@ -508,7 +508,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, NO_BATCHSIZE);
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of(), NO_BATCHSIZE);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.getQueryHash()).isNotEmpty();
@@ -527,7 +527,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, -1, 0, Collections.singletonList("source"), null, 2);
+        final ChunkedResult scrollResult = searches.scroll("*", range, -1, 0, Collections.singletonList("source"), null, Set.of(), 2);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
@@ -573,7 +573,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
-        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, 2);
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of(), 2);
 
         assertThat(scrollResult).isNotNull();
         assertThat(scrollResult.totalHits()).isEqualTo(10L);
@@ -588,5 +588,29 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
         }
 
         assertThat(resultMessages).hasSize(5);
+    }
+
+    @Test
+    public void scrollReturnsMultipleChunksRespectingLimitOnStream() throws Exception {
+        // Works like the test one up, but should generate other numbers because of the stream filter
+        importFixture("org/graylog2/indexer/searches/SearchesIT.json");
+
+        when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final ChunkedResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null, Set.of("000000000000000000000002"), 2);
+
+        assertThat(scrollResult).isNotNull();
+        assertThat(scrollResult.totalHits()).isEqualTo(1L);
+
+        ResultChunk scrollChunk = scrollResult.nextChunk();
+        assertThat(scrollChunk.isFirstChunk()).isTrue();
+
+        final Set<ResultMessage> resultMessages = new HashSet<>(5);
+        while (scrollChunk != null && !scrollChunk.messages().isEmpty()) {
+            resultMessages.addAll(scrollChunk.messages());
+            scrollChunk = scrollResult.nextChunk();
+        }
+
+        assertThat(resultMessages).hasSize(1);
     }
 }

@@ -25,7 +25,7 @@ type Props = {
   onChange?: (newDirection: Direction) => any;
 };
 
-const SortDirectionSelect = ({ direction, disabled = false, onChange = () => {} }: Props) => (
+const SortDirectionSelect = ({ direction = undefined, disabled = false, onChange = () => {} }: Props) => (
   <Select
     disabled={disabled}
     clearable={false}

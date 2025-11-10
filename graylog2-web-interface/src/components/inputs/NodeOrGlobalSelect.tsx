@@ -27,7 +27,7 @@ type Props = {
   onChange: (type: 'node' | 'global', value: boolean | string | undefined | null) => void;
 };
 
-const NodeOrGlobalSelect = ({ global = false, node, onChange }: Props) => {
+const NodeOrGlobalSelect = ({ global = false, node = undefined, onChange }: Props) => {
   const { nodes } = useStore(NodesStore);
   const [globalState, setGlobal] = useState(global);
   const [nodeState, setNode] = useState(node);

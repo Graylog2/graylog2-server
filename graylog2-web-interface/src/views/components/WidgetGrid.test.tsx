@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { mount } from 'wrappedEnzyme';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
-import Widget from 'views/components/widgets/Widget';
-import _Widget from 'views/logic/widgets/Widget';
+import Widget from 'views/logic/widgets/Widget';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import type View from 'views/logic/views/View';
@@ -28,7 +27,7 @@ import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTy
 
 import WidgetGrid from './WidgetGrid';
 
-jest.mock('./widgets/Widget', () => () => 'widget');
+jest.mock('./widgets/Widget', () => () => 'rendering widget');
 
 jest.mock('components/common/ReactGridContainer', () => ({ children }) => <span>{children}</span>);
 
@@ -51,34 +50,34 @@ describe('<WidgetGrid />', () => {
   useViewsPlugin();
 
   it('should render with minimal props', () => {
-    const wrapper = mount(<SimpleWidgetGrid />);
+    const { container } = render(<SimpleWidgetGrid />);
 
-    expect(wrapper).toExist();
+    expect(container).not.toBeNull();
   });
 
-  it('should render with widgets passed', () => {
-    const widgets = [_Widget.builder().type('dummy').id('widget1').build()];
+  it('should render with widgets passed', async () => {
+    const widgets = [Widget.builder().type('dummy').id('widget1').build()];
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
 
     const viewWithWidgets = createViewWithWidgets(widgets, positions);
 
-    const wrapper = mount(<SimpleWidgetGrid view={viewWithWidgets} />);
+    render(<SimpleWidgetGrid view={viewWithWidgets} />);
 
-    expect(wrapper.find(Widget)).toHaveLength(1);
+    expect(await screen.findAllByText('rendering widget')).toHaveLength(1);
   });
 
-  it('should render widget even if widget has no data', () => {
-    const widgets = [_Widget.builder().type('dummy').id('widget1').build()];
+  it('should render widget even if widget has no data', async () => {
+    const widgets = [Widget.builder().type('dummy').id('widget1').build()];
     const positions = {
       widget1: new WidgetPosition(1, 1, 1, 1),
     };
 
     const viewWithWidgets = createViewWithWidgets(widgets, positions);
 
-    const wrapper = mount(<SimpleWidgetGrid view={viewWithWidgets} />);
+    render(<SimpleWidgetGrid view={viewWithWidgets} />);
 
-    expect(wrapper.find(Widget)).toHaveLength(1);
+    expect(await screen.findAllByText('rendering widget')).toHaveLength(1);
   });
 });

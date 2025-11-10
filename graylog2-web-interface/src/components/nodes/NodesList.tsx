@@ -28,7 +28,7 @@ type Props = {
   nodes?: {};
 };
 
-const NodesList = ({ nodes }: Props) => {
+const NodesList = ({ nodes = undefined }: Props) => {
   const { clusterOverview } = useStore(ClusterOverviewStore);
 
   const _isLoading = !nodes || !clusterOverview;

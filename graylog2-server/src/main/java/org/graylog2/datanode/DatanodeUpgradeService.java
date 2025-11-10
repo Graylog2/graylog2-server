@@ -28,9 +28,11 @@ import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.plugin.Version;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -40,39 +42,52 @@ public class DatanodeUpgradeService {
 
     private final DatanodeUpgradeServiceAdapter upgradeService;
     private final NodeService<DataNodeDto> nodeService;
+    private final Version serverVersion;
 
     @Inject
-    public DatanodeUpgradeService(DatanodeUpgradeServiceAdapter upgradeService, NodeService<DataNodeDto> nodeService) {
+    public DatanodeUpgradeService(DatanodeUpgradeServiceAdapter upgradeService, NodeService<DataNodeDto> nodeService, Version serverVersion) {
         this.upgradeService = upgradeService;
         this.nodeService = nodeService;
+        this.serverVersion = serverVersion;
     }
 
     public DatanodeUpgradeStatus status() {
-        final Version serverVersion = Version.CURRENT_CLASSPATH;
 
         final ClusterState clusterState = upgradeService.getClusterState();
         final Collection<DataNodeDto> dataNodes = nodeService.allActive().values();
 
-        final List<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isVersionEqualIgnoreBuildMetadata(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toList());
+        final List<DataNodeDto> upToDateDataNodes = dataNodes.stream().filter(n -> isDatanodeUpToDate(n.getDatanodeVersion(), serverVersion)).collect(Collectors.toList());
         final List<DataNodeDto> toUpgradeDataNodes = dataNodes.stream().filter(n -> !upToDateDataNodes.contains(n)).collect(Collectors.toList());
 
         final boolean clusterHealthy = clusterState.status().equals("GREEN") && clusterState.relocatingShards() == 0;
         final boolean shardReplicationEnabled = clusterState.shardReplication() == ShardReplication.ALL;
         final boolean clusterReadyForUpgrade = clusterHealthy && shardReplicationEnabled;
 
+        List<String> warnings = new ArrayList<>();
+        warnings.addAll(datanodeVersionHigherThanServer(upToDateDataNodes, serverVersion));
+
         return new DatanodeUpgradeStatus(serverVersion,
                 clusterState,
                 clusterHealthy,
                 shardReplicationEnabled,
                 enrichData(upToDateDataNodes, clusterState, serverVersion, clusterReadyForUpgrade),
-                enrichData(toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade)
+                enrichData(toUpgradeDataNodes, clusterState, serverVersion, clusterReadyForUpgrade),
+                warnings
         );
+    }
+
+    private List<String> datanodeVersionHigherThanServer(List<DataNodeDto> upToDateDataNodes, Version serverVersion) {
+        return upToDateDataNodes.stream()
+                .filter(n -> serverVersion.getVersion().isLowerThan(com.github.zafarkhaja.semver.Version.parse(n.getDatanodeVersion())))
+                .map(n -> String.format(Locale.ROOT, "Your data node %s is running a newer version <%s> than your server <%s>. You should update your server first.", n.getHostname(), n.getDatanodeVersion(), serverVersion))
+                .collect(Collectors.toList());
     }
 
     private List<DataNodeInformation> enrichData(List<DataNodeDto> nodes, ClusterState clusterState, Version serverVersion, boolean clusterReadyForUpgrade) {
         final Comparator<DataNodeInformation> comparator = Comparator.comparing(DataNodeInformation::upgradePossible)
-                .reversed()
-                .thenComparing(DataNodeInformation::nodeName);
+                .reversed() // the one with upgradePossible==true should go first
+                .thenComparing(DataNodeInformation::managerNode) // from the rest, manager should go last
+                .thenComparing(DataNodeInformation::nodeName); // and everything in-between sorted by node name alphabetically
 
         AtomicInteger upgradeableCounter = new AtomicInteger(1);
 
@@ -92,9 +107,9 @@ public class DatanodeUpgradeService {
                 .map(n -> n.equals(clusterState.managerNode().name()))
                 .orElse(false);
 
-        final boolean isLatestVersion = isVersionEqualIgnoreBuildMetadata(node.getDatanodeVersion(), serverVersion);
+        final boolean isUpToDate = isDatanodeUpToDate(node.getDatanodeVersion(), serverVersion);
 
-        boolean upgradeTechnicallyPossible = clusterReadyForUpgrade && !isLatestVersion && (!managerNode || toUpgradeDataNodes.size() == 1);
+        boolean upgradeTechnicallyPossible = clusterReadyForUpgrade && !isUpToDate && (!managerNode || toUpgradeDataNodes.size() == 1);
         // we want to mark only one node as ready for upgrade, guiding the user one by one. The upgradeableCounter keeps the overview
         boolean upgradeEnabled = upgradeTechnicallyPossible && upgradeableCounter.getAndDecrement() == 1;
 
@@ -110,9 +125,9 @@ public class DatanodeUpgradeService {
                 managerNode);
     }
 
-    protected static boolean isVersionEqualIgnoreBuildMetadata(String datanodeVersion, Version serverVersion) {
+    protected static boolean isDatanodeUpToDate(String datanodeVersion, Version serverVersion) {
         final com.github.zafarkhaja.semver.Version datanode = com.github.zafarkhaja.semver.Version.parse(datanodeVersion);
-        return serverVersion.getVersion().compareToIgnoreBuildMetadata(datanode) == 0;
+        return datanode.isHigherThanOrEquivalentTo(serverVersion.getVersion());
     }
 
     public FlushResponse stopReplication() {

@@ -29,7 +29,7 @@ describe('<FormikInput />', () => {
     initialValues = {},
   }: {
     children: React.ReactNode;
-    onSubmit: (FormValues) => Promise<void>;
+    onSubmit: (formValues: FormValues) => Promise<void>;
     initialValues?: FormValues;
   }) => (
     <Formik onSubmit={(data) => onSubmit(data)} initialValues={initialValues}>

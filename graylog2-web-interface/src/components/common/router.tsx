@@ -43,6 +43,7 @@ type ChildrenProps = {
   href: string;
   disabled: boolean;
 };
+
 type Props = {
   children: React.ReactElement<ChildrenProps, React.ComponentType>;
   onClick?: () => unknown;
@@ -58,7 +59,7 @@ const isLeftClickEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
 const isModifiedEvent = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) =>
   !!(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey);
 
-const LinkContainer = ({ children, onClick, to: toProp, relativeActive = false, ...rest }: Props) => {
+const LinkContainer = ({ children, onClick = undefined, to: toProp, relativeActive = false, ...rest }: Props) => {
   const { pathname } = useLocation();
   const {
     props: { onClick: childrenOnClick, className, disabled },
@@ -69,6 +70,7 @@ const LinkContainer = ({ children, onClick, to: toProp, relativeActive = false, 
     () => _setActiveClassName(pathname, to, className, displayName, relativeActive),
     [pathname, to, className, displayName, relativeActive],
   );
+
   const handleClick = useLinkClickHandler(to);
   const _onClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {

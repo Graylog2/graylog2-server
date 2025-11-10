@@ -38,7 +38,12 @@ type Props = {
   className?: string;
 };
 
-const InactiveNavItem = ({ active: _active, className, children, ...props }: React.PropsWithChildren<Props>) => (
+const InactiveNavItem = ({
+  active: _active = undefined,
+  className = undefined,
+  children = undefined,
+  ...props
+}: React.PropsWithChildren<Props>) => (
   <StyledInactiveNav className={className} {...props}>
     {children}
   </StyledInactiveNav>

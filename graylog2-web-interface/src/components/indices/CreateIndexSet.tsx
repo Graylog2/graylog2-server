@@ -30,6 +30,8 @@ import { adjustFormat } from 'util/DateTime';
 import useHistory from 'routing/useHistory';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useCurrentUser from 'hooks/useCurrentUser';
+import { isPermitted } from 'util/PermissionsMixin';
 
 type Props = {
   showSelectTemplateModal: boolean;
@@ -41,6 +43,8 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
   const history = useHistory();
   const sendTelemetry = useSendTelemetry();
   const { retentionStrategies, rotationStrategies, retentionStrategiesContext } = useStore(IndicesConfigurationStore);
+
+  const currentUser = useCurrentUser();
 
   useEffect(() => {
     IndicesConfigurationActions.loadRotationStrategies();
@@ -79,7 +83,7 @@ const CreateIndexSet = ({ showSelectTemplateModal, setShowSelectTemplateModal }:
         cancelLink={Routes.SYSTEM.INDICES.LIST}
         onUpdate={_saveConfiguration}
       />
-      {!isCloud && showSelectTemplateModal && (
+      {!isCloud && isPermitted(currentUser.permissions, 'indexset_templates:read') && showSelectTemplateModal && (
         <SelectIndexSetTemplateModal
           show={showSelectTemplateModal}
           hideModal={() => setShowSelectTemplateModal(false)}

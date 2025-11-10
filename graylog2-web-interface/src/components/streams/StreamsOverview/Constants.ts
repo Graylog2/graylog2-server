@@ -18,11 +18,18 @@
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import type Immutable from 'immutable';
 
-import type { Sort } from 'stores/PaginationTypes';
+import type { Attribute, Sort } from 'stores/PaginationTypes';
 
 const getStreamDataLakeTableElements = PluginStore.exports('dataLake')?.[0]?.getStreamDataLakeTableElements;
 
-const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineColumnPermitted: boolean) => {
+const getStreamTableElements = (
+  permissions: Immutable.List<string>,
+  isPipelineColumnPermitted: boolean,
+  pluggableAttributes?: {
+    attributeNames?: Array<string>;
+    attributes?: Array<Attribute>;
+  },
+) => {
   const streamDataLakeTableElements = getStreamDataLakeTableElements?.(permissions);
 
   const defaultLayout = {
@@ -36,6 +43,7 @@ const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineC
       ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
       'rules',
       ...(isPipelineColumnPermitted ? ['pipelines'] : []),
+      ...(pluggableAttributes?.attributeNames || []),
       'outputs',
       'throughput',
       'disabled',
@@ -48,6 +56,7 @@ const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineC
     ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
     'rules',
     ...(isPipelineColumnPermitted ? ['pipelines'] : []),
+    ...(pluggableAttributes?.attributeNames || []),
     'outputs',
     'throughput',
     'disabled',
@@ -61,6 +70,7 @@ const getStreamTableElements = (permissions: Immutable.List<string>, isPipelineC
     { id: 'outputs', title: 'Outputs' },
     { id: 'archiving', title: 'Archiving' },
     ...(streamDataLakeTableElements?.attributes || []),
+    ...(pluggableAttributes?.attributes || []),
   ];
 
   return {

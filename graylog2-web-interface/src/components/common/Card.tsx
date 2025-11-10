@@ -41,7 +41,13 @@ type Props = React.PropsWithChildren<{
 /**
  * Simple card component.
  */
-const Card = ({ children, className, padding, id, tabIndex }: Props) => (
+const Card = ({
+  children = undefined,
+  className = undefined,
+  padding = undefined,
+  id = undefined,
+  tabIndex = undefined,
+}: Props) => (
   <Container className={className} shadow="sm" padding={padding} radius="md" withBorder tabIndex={tabIndex} id={id}>
     {children}
   </Container>

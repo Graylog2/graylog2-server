@@ -34,13 +34,14 @@ import {
 } from 'components/bootstrap';
 import type { ContentPackInstallation } from 'components/content-packs/Types';
 import type ContentPackRevisions from 'logic/content-packs/ContentPackRevisions';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
 
 type Props = {
   pack: ContentPackInstallation;
   contentPackRevisions: ContentPackRevisions;
   onDeletePack?: (id: string, rev: number) => void;
   onChange?: (id: string) => void;
-  onInstall?: (id: string, contentPackRev: string, parameters: unknown) => void;
+  onInstall?: (id: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => void;
 };
 
 const ContentPackVersionItem = ({
@@ -85,7 +86,8 @@ const ContentPackVersionItem = ({
       <td>{pack.rev}</td>
       <td className="text-right">
         <ButtonToolbar className="pull-right">
-          <Button bsStyle="success" bsSize="small" onClick={() => handleDownload()}>
+          {}
+          <Button bsStyle="primary" bsSize="small" onClick={() => handleDownload()}>
             Download
           </Button>
           <DropdownButton id={`action-${pack.rev}`} title="Actions" bsSize="small">

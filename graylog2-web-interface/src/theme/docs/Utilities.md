@@ -62,7 +62,7 @@ import ColorSwatch from './Colors';
 const { colors, utils } = useTheme();
 
 const { info, primary } = colors.variant;
-const { textDefault } = colors.global;
+const { primary: textPrimary } = colors.text;
 
 <>
   <div style={{ marginBottom: '5px' }}>
@@ -71,11 +71,11 @@ const { textDefault } = colors.global;
     <ColorSwatch name="info AA" color={utils.contrastingColor(info, 'AA')} />
   </div>
   <div style={{ marginBottom: '5px' }}>
-    <ColorSwatch name="textDefault AAALarge" color={utils.contrastingColor(textDefault, 'AAALarge')} />
-    <ColorSwatch name="textDefault AAA" color={utils.contrastingColor(textDefault)} />
-    <ColorSwatch name="textDefault" color={textDefault} />
-    <ColorSwatch name="textDefault AALarge" color={utils.contrastingColor(textDefault, 'AALarge')} />
-    <ColorSwatch name="textDefault AA" color={utils.contrastingColor(textDefault, 'AA')} />
+    <ColorSwatch name="default text AAALarge" color={utils.contrastingColor(textPrimary, 'AAALarge')} />
+    <ColorSwatch name="default text AAA" color={utils.contrastingColor(textPrimary)} />
+    <ColorSwatch name="default text" color={textPrimary} />
+    <ColorSwatch name="default text AALarge" color={utils.contrastingColor(textPrimary, 'AALarge')} />
+    <ColorSwatch name="default text AA" color={utils.contrastingColor(textPrimary, 'AA')} />
   </div>
   <div>
     <ColorSwatch name="primary AAA" color={utils.contrastingColor(primary)} />
@@ -108,7 +108,7 @@ import ColorSwatch from './Colors';
 const { colors, utils } = useTheme();
 
 const { info, primary } = colors.variant;
-const { textDefault } = colors.global;
+const { primary: textPrimary } = colors.text;
 
 <>
   <div style={{ marginBottom: '5px' }}>
@@ -116,8 +116,8 @@ const { textDefault } = colors.global;
     <ColorSwatch name="info readableColor" color={utils.readableColor(info)} />
   </div>
   <div style={{ marginBottom: '5px' }}>
-    <ColorSwatch name="textDefault" color={textDefault} />
-    <ColorSwatch name="textDefault readableColor" color={utils.readableColor(textDefault)} />
+    <ColorSwatch name="default text" color={textPrimary} />
+    <ColorSwatch name="default text readableColor" color={utils.readableColor(textPrimary)} />
   </div>
   <div>
     <ColorSwatch name="primary" color={primary} />

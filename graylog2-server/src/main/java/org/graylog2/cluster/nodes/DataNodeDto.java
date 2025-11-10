@@ -152,6 +152,10 @@ public abstract class DataNodeDto extends NodeDto {
 
     public abstract Builder toBuilder();
 
+    public static Builder builder() {
+        return Builder.builder();
+    }
+
     @AutoValue.Builder
     @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder extends NodeDto.Builder<Builder> {

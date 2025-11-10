@@ -30,7 +30,7 @@ const GlobalThemeStyles = createGlobalStyle(
 
     body {
       background-color: ${theme.colors.global.background};
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
       font-family: ${theme.fonts.family.body};
       font-size: ${theme.fonts.size.body};
       line-height: 1.25;
@@ -68,7 +68,7 @@ const GlobalThemeStyles = createGlobalStyle(
       font-weight: normal;
       padding: 0;
       margin: 0;
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
     }
 
     h1 {
@@ -148,7 +148,7 @@ const GlobalThemeStyles = createGlobalStyle(
     }
 
     legend small {
-      color: ${theme.colors.gray[60]};
+      color: ${theme.colors.text.secondary};
       margin-left: 5px;
     }
 
@@ -168,7 +168,7 @@ const GlobalThemeStyles = createGlobalStyle(
 
       p.description {
         margin-top: 3px;
-        color: ${theme.colors.gray[50]};
+        color: ${theme.colors.text.secondary};
       }
     }
 
@@ -564,14 +564,14 @@ const GlobalThemeStyles = createGlobalStyle(
     }
 
     .pill {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
       background-color: ${theme.colors.gray[90]};
       padding: 6px 12px;
     }
 
     .tag-remove,
     .pill-remove {
-      color: ${theme.colors.global.textDefault};
+      color: ${theme.colors.text.primary};
       cursor: pointer;
       margin-left: 5px;
     }
