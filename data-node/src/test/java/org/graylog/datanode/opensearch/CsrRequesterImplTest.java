@@ -54,6 +54,7 @@ class CsrRequesterImplTest {
         final Configuration configuration = DatanodeTestUtils.datanodeConfiguration(Map.of(
                 "node_name", "my-node-name",
                 "hostname", "my-datanode-machine",
+                "opensearch_logs_location", ".",
                 "node_id_file", "node-id"
         ));
 
