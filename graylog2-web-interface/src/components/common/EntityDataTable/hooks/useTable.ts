@@ -35,6 +35,7 @@ type Props<Entity extends EntityBase> = {
   selectedEntities: Array<Entity['id']>;
   setSelectedEntities: any;
   onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void;
+  onColumnOrderChange: any;
 };
 
 const useTable = <Entity extends EntityBase>({
@@ -44,6 +45,7 @@ const useTable = <Entity extends EntityBase>({
   isEntitySelectable = () => true,
   onChangeSelection,
   onColumnPreferencesChange,
+  onColumnOrderChange,
   onSortChange,
   selectedEntities,
   setSelectedEntities,
@@ -109,7 +111,7 @@ const useTable = <Entity extends EntityBase>({
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     manualSorting: true,
-    onColumnOrderChange: () => {},
+    onColumnOrderChange,
     onColumnVisibilityChange,
     onRowSelectionChange,
     onSortingChange,

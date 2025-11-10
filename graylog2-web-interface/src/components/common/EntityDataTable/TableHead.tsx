@@ -16,10 +16,14 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { Table } from '@tanstack/react-table';
+import type { Table, Header } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import type { CSSProperties } from 'react';
 
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
+import Icon from 'components/common/Icon';
 
 import type { EntityBase } from './types';
 
@@ -36,16 +40,53 @@ export const Th = styled.th<{ $width: number | undefined }>(
   `,
 );
 
+const DragHandle = styled.div<{ $isDragging: boolean }>(
+  ({ $isDragging }) => css`
+    display: inline-block;
+    cursor: ${$isDragging ? 'grabbing' : 'grab'};
+  `,
+);
+
+const DragIcon = styled(Icon)`
+  color: ${({ theme }) => theme.colors.text.secondary};
+`;
+
+const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+  const { attributes, isDragging, listeners, setNodeRef, transform } = useSortable({
+    id: header.column.id,
+    disabled: !header.column.columnDef.meta?.enableColumnOrdering,
+  });
+
+  const style: CSSProperties = {
+    opacity: isDragging ? 0.8 : 1,
+    position: 'relative',
+    transform: CSS.Translate.toString(transform), // translate instead of transform to avoid squishing
+    transition: 'width transform 0.2s ease-in-out',
+    whiteSpace: 'nowrap',
+    width: header.column.getSize(),
+    zIndex: isDragging ? 1 : 0,
+  };
+
+  return (
+    <Th $width={header.getSize()} colSpan={header.colSpan} key={header.id} ref={setNodeRef} style={style}>
+      {header.column.columnDef.meta?.enableColumnOrdering && (
+        <DragHandle {...attributes} {...listeners} $isDragging={isDragging}>
+          <DragIcon name="drag_indicator" />
+        </DragHandle>
+      )}
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+      {header.column.getCanSort() && <SortIcon<Entity> header={header} />}
+      {/*{header.column.getCanResize() && <div>Resize handle</div>}*/}
+    </Th>
+  );
+};
+
 const TableHead = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => (
   <Thead>
     {table.getHeaderGroups().map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <Th $width={header.getSize()} colSpan={header.colSpan} key={header.id}>
-            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-            {header.column.getCanSort() && <SortIcon<Entity> header={header} />}
-            {/*{header.column.getCanResize() && <div>Resize handle</div>}*/}
-          </Th>
+          <TableHeaderCell key={header.id} header={header} table={table} />
         ))}
       </tr>
     ))}
