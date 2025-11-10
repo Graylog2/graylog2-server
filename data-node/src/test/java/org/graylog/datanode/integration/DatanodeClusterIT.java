@@ -49,7 +49,6 @@ import java.util.stream.Stream;
 import static org.graylog.datanode.testinfra.DatanodeContainerizedBackend.IMAGE_WORKING_DIR;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Disabled("see https://github.com/Graylog2/graylog2-server/issues/23270")
 public class DatanodeClusterIT {
     private static final Logger LOG = LoggerFactory.getLogger(DatanodeClusterIT.class);
 
