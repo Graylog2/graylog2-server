@@ -107,7 +107,7 @@ export const MessageFieldValue = ({ message, fieldName, fieldType, value }: Mess
   );
 };
 
-const MessageField = ({ fieldName, fieldType, value, message }: Props) => (
+const MessageField = ({ fieldName, fieldType, message, value }: Props) => (
   <>
     <dt data-testid={`message-field-name-${fieldName}`}>
       <MessageFieldName message={message} fieldName={fieldName} fieldType={fieldType} />
