@@ -76,6 +76,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -234,8 +235,12 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
         final PaginatedList<PipelineDao> result = paginatedPipelineService
                 .findPaginated(searchQuery, filter, page, perPage, sort, order);
+        final Map<String, PipelineRulesMetadataDao> metadataDaos = metadataService.get(
+                result.stream().map(PipelineDao::id).collect(Collectors.toSet())
+        );
         final List<PipelineSource> pipelineList = result.stream()
-                .map(dao -> PipelineSource.fromDao(pipelineRuleParser, dao))
+                .map(dao -> PipelineSource.fromDao(
+                        pipelineRuleParser, dao, metadataDaos.get(dao.id()) != null ? metadataDaos.get(dao.id()).hasDeprecatedFunctions() : null))
                 .collect(Collectors.toList());
         final PaginatedList<PipelineSource> pipelines = new PaginatedList<>(pipelineList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());

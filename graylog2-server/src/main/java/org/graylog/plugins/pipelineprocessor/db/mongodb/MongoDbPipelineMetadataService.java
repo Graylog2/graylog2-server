@@ -31,9 +31,12 @@ import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -64,6 +67,13 @@ public class MongoDbPipelineMetadataService {
             throw new NotFoundException("No pipeline found with id: " + pipelineId);
         }
         return dao;
+    }
+
+    public Map<String, PipelineRulesMetadataDao> get(Set<String> pipelineIds) {
+        return collection.find(Filters.in(PipelineRulesMetadataDao.FIELD_PIPELINE_ID, pipelineIds))
+                .into(new ArrayList<>())
+                .stream()
+                .collect(Collectors.toMap(PipelineRulesMetadataDao::pipelineId, dao -> dao));
     }
 
     public Set<String> getPipelinesByRule(final String ruleId) {
@@ -107,6 +117,16 @@ public class MongoDbPipelineMetadataService {
             LOG.warn("No pipeline rules metadata records found for pipelines {}", pipelineIds);
         } else {
             LOG.debug("Deleted {} pipeline rules metadata records.", deleteResult.getDeletedCount());
+        }
+    }
+
+    @Nullable
+    public Boolean hasDeprecatedFunctions(String id) {
+        try {
+            final PipelineRulesMetadataDao dao = get(id);
+            return !(dao.deprecatedFunctions().isEmpty());
+        } catch (NotFoundException ignored) {
+            return null;
         }
     }
 }
