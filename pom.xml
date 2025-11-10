@@ -125,7 +125,7 @@
         <commons-lang3.version>3.19.0</commons-lang3.version>
         <commons-net.version>3.12.0</commons-net.version>
         <commons-validator.version>1.10.0</commons-validator.version>
-        <commons-io.version>2.20.0</commons-io.version>
+        <commons-io.version>2.21.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.44.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
