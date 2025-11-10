@@ -68,7 +68,7 @@ const PanelBody: React.ComponentType<React.ComponentProps<typeof Panel.Body> & {
 type Props = {
   currentStep: MigrationState;
   sortedMigrationSteps: MigrationStateItem[];
-  renderStepComponent: (step: MigrationStateItem, hideActions: boolean) => JSX.Element;
+  renderStepComponent: (step: MigrationStateItem, hideActions: boolean) => React.JSX.Element;
 };
 
 const MigrationStepsPanel = ({ currentStep, sortedMigrationSteps, renderStepComponent }: Props) => {

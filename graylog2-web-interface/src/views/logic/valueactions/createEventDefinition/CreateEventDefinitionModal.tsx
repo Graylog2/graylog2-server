@@ -92,20 +92,20 @@ const CreateEventDefinitionModal = ({
   const searchChecks = useMemo<Partial<Checked>>(() => pick(checked, searchGroup), [checked]);
   const restChecks = useMemo<Partial<Checked>>(() => omit(checked, [...searchGroup, ...aggregationGroup]), [checked]);
 
-  const aggregationLabels = useMemo<{ [name: string]: JSX.Element }>(
+  const aggregationLabels = useMemo<{ [name: string]: React.JSX.Element }>(
     () =>
       mapValues(pick(modalData, aggregationGroup), (value, key: ItemKey) => (
         <CheckboxLabel itemKey={key} value={value} />
       )),
     [modalData],
   );
-  const searchLabels = useMemo<{ [name: string]: JSX.Element }>(
+  const searchLabels = useMemo<{ [name: string]: React.JSX.Element }>(
     () =>
       mapValues(pick(modalData, searchGroup), (value, key: ItemKey) => <CheckboxLabel itemKey={key} value={value} />),
     [modalData],
   );
 
-  const restLabels = useMemo<{ [name: string]: JSX.Element }>(
+  const restLabels = useMemo<{ [name: string]: React.JSX.Element }>(
     () =>
       mapValues(omit(modalData, [...aggregationGroup, ...searchGroup]), (value, key: ItemKey) => (
         <CheckboxLabel itemKey={key} value={value} />
