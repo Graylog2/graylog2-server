@@ -630,7 +630,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .flush(true)
         );
 
-        c.execute(() -> OfficialOpensearchClient.withTimeout(indicesClient, timeout).forcemerge(request), "Unable to forcemerge index " + index);
+        c.executeWithTimeout(() -> c.async().indices().forcemerge(request), "Unable to forcemerge index " + index, timeout);
 
     }
 
