@@ -22,6 +22,7 @@ import org.graylog2.telemetry.scheduler.TelemetrySubmissionPeriodical;
 import org.graylog2.telemetry.suppliers.InputsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.OutputsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.ShardsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.SidecarsVersionSupplier;
 
 public class TelemetryModule extends PluginModule {
     @Override
@@ -35,5 +36,6 @@ public class TelemetryModule extends PluginModule {
         addTelemetryMetricProvider("Inputs Metrics", InputsMetricsSupplier.class);
         addTelemetryMetricProvider("Outputs Metrics", OutputsMetricsSupplier.class);
         addTelemetryMetricProvider("Shards Metrics", ShardsMetricsSupplier.class);
+        addTelemetryMetricProvider("Sidecars Version", SidecarsVersionSupplier.class);
     }
 }
