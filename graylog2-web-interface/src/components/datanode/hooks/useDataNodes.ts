@@ -158,7 +158,7 @@ export const rejoinDataNode = async (datanodeId: string) => {
   }
 };
 
-type Options = {
+export type UseDataNodesOptions = {
   enabled: boolean;
 };
 
@@ -199,7 +199,7 @@ const useDataNodes = (
     pageSize: 0,
     sort: undefined,
   },
-  { enabled }: Options = { enabled: true },
+  { enabled }: UseDataNodesOptions = { enabled: true },
   refetchInterval: number | false = 5000,
 ) => {
   const { data, refetch, isInitialLoading, error } = useQuery({

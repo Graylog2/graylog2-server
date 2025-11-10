@@ -15,38 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
 import { EntityDataTable, Spinner } from 'components/common';
-import { Link } from 'components/common/router';
-import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
-import Routes from 'routing/Routes';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
-import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
-import type { DataNode } from 'components/datanode/Types';
-import useDataNodes from 'components/datanode/hooks/useDataNodes';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
-
-const RoleLabel = styled(Label)`
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`;
-
-const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'version', 'role'] as const;
-
-const getRoleLabels = (roles: Array<string>) =>
-  roles.map((role) => (
-    <span key={role}>
-      <RoleLabel bsSize="xs">{role}</RoleLabel>&nbsp;
-    </span>
-  ));
-
-const getDataNodeRoles = (dataNode: DataNode) =>
-  dataNode.opensearch_roles?.map((currentRole) => currentRole.trim()).filter(Boolean) ?? [];
+import {
+  DEFAULT_VISIBLE_COLUMNS,
+  createColumnDefinitions,
+  createColumnRenderers,
+} from './DataNodesColumnConfiguration';
+import useClusterDataNodes, { type ClusterDataNode } from './useClusterDataNodes';
 
 const DEFAULT_SEARCH_PARAMS: SearchParams = {
   query: '',
@@ -69,46 +49,10 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
     data: dataNodesResponse,
     refetch,
     isInitialLoading,
-  } = useDataNodes(searchParams);
+  } = useClusterDataNodes(searchParams);
 
-  const columnDefinitions = useMemo<Array<Column>>(
-    () => [
-      { id: 'node', title: 'Node' },
-      { id: 'state', title: 'State' },
-      { id: 'version', title: 'Version' },
-      { id: 'role', title: 'Role' },
-    ],
-    [],
-  );
-
-  const columnRenderers = useMemo<ColumnRenderers<DataNode>>(
-    () => ({
-      attributes: {
-        node: {
-          renderCell: (_value, entity) => {
-            const datanodeRouteId = entity.node_id ?? entity.id;
-            const nodeName = entity.hostname ?? datanodeRouteId;
-
-            if (!datanodeRouteId) {
-              return nodeName;
-            }
-
-            return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
-          },
-        },
-        version: {
-          renderCell: (_value, entity) => entity.datanode_version ?? 'N/A',
-        },
-        role: {
-          renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
-        },
-        state: {
-          renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
-        },
-      },
-    }),
-    [],
-  );
+  const columnDefinitions = useMemo(() => createColumnDefinitions(), []);
+  const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
   const dataNodes = dataNodesResponse?.list ?? [];
   const totalDataNodes = dataNodesResponse?.pagination?.total ?? dataNodes.length;
@@ -123,7 +67,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
 
   const handleSortChange = useCallback(() => {}, []);
   const renderActions = useCallback(
-    (entity: DataNode) => <DataNodeActions dataNode={entity} refetch={refetch} />,
+    (entity: ClusterDataNode) => <DataNodeActions dataNode={entity} refetch={refetch} />,
     [refetch],
   );
 
@@ -135,7 +79,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
       titleCountAriaLabel="Show Data Nodes segment"
       headerLeftSection={isInitialLoading && <Spinner />}
       collapsible={collapsible}>
-      <EntityDataTable<DataNode>
+      <EntityDataTable<ClusterDataNode>
         entities={[...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes]} // Duplicate entries to simulate more data
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}

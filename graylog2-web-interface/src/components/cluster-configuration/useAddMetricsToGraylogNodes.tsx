@@ -30,7 +30,7 @@ const METRIC_NAMES = {
   journalSizeRatio: 'org.graylog2.journal.utilization-ratio',
   jvmMemoryHeapUsed: 'jvm.memory.heap.used',
   jvmMemoryHeapCommitted: 'jvm.memory.heap.committed',
-  jvmMemoryHeapMaxMemory: 'jvm.memory.heap.max',
+  jvmMemoryHeapMax: 'jvm.memory.heap.max',
   dataLakeJournalSize: 'org.graylog.plugins.datalake.output.journal.size',
   dataLakeJournalMaxSize: 'org.graylog.plugins.datalake.output.journal.size-limit',
   bufferInputUsage: 'org.graylog2.buffers.input.usage',

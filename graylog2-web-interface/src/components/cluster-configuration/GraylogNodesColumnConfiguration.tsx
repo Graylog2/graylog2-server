@@ -24,7 +24,8 @@ import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 
 import RatioIndicator from './RatioIndicator';
-import type { GraylogNode } from './useGraylogNodes';
+import { MetricsColumn, MetricsRow, SecondaryText } from './NodeMetricsLayout';
+import type { GraylogNode } from './useClusterGraylogNodes';
 
 type HealthRow = {
   key: string;
@@ -41,31 +42,6 @@ const NodePrimary = styled.div`
 
 const StyledLabel = styled(Label)`
   display: inline-flex;
-`;
-
-const SecondaryText = styled.div`
-  font-size: small;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-
-  span {
-    font-size: inherit;
-  }
-`;
-
-const MetricsColumn = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-`;
-
-const MetricsRow = styled(SecondaryText)`
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
 `;
 
 const JOURNAL_WARNING_THRESHOLD = 0.25;
@@ -277,7 +253,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     jvm: {
       renderCell: (_value, entity) => {
         const heapUsed = entity.metrics?.jvmMemoryHeapUsed;
-        const heapMax = entity.metrics?.jvmMemoryHeapMaxMemory;
+        const heapMax = entity.metrics?.jvmMemoryHeapMax;
         const ratio = computeRatio(heapUsed, heapMax);
         const usedLabel = heapUsed === undefined || heapUsed === null ? '' : NumberUtils.formatBytes(heapUsed);
         const maxLabel = heapMax === undefined || heapMax === null ? '' : NumberUtils.formatBytes(heapMax);

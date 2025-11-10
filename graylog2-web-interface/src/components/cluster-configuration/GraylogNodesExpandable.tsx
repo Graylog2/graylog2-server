@@ -19,8 +19,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { EntityDataTable, Spinner } from 'components/common';
 import type { Column } from 'components/common/EntityDataTable';
 
-import useGraylogNodes from './useGraylogNodes';
-import type { GraylogNode } from './useGraylogNodes';
+import useClusterGraylogNodes from './useClusterGraylogNodes';
+import type { GraylogNode } from './useClusterGraylogNodes';
 import GraylogNodeActions from './GraylogNodeActions';
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
 import {
@@ -40,7 +40,7 @@ const GraylogNodesExpandable = ({
   searchQuery: _searchQuery = '',
   onSelectSegment = undefined,
 }: Props) => {
-  const { nodes: graylogNodes, isLoading } = useGraylogNodes();
+  const { nodes: graylogNodes, isLoading } = useClusterGraylogNodes();
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
 

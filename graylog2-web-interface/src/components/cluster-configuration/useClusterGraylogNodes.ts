@@ -30,12 +30,12 @@ export type GraylogNode = NodeInfo &
     metrics: GraylogNodeMetrics;
   };
 
-export type UseGraylogNodesResult = {
+export type UseClusterGraylogNodesResult = {
   nodes: Array<GraylogNode>;
   isLoading: boolean;
 };
 
-const useGraylogNodes = (): UseGraylogNodesResult => {
+const useClusterGraylogNodes = (): UseClusterGraylogNodesResult => {
   const { nodes: graylogNodesStore } = useStore(NodesStore);
   const { clusterOverview: systemInfo } = useStore(ClusterOverviewStore);
 
@@ -64,4 +64,4 @@ const useGraylogNodes = (): UseGraylogNodesResult => {
   };
 };
 
-export default useGraylogNodes;
+export default useClusterGraylogNodes;
