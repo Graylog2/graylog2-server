@@ -154,8 +154,9 @@ public class StreamServiceImplTest {
     public void testCountBySource() {
         Map<String, Long> count = streamService.countBySource();
 
-        assertThat(count)
-                .containsEntry("illuminate_streams", 2L)
-                .containsEntry("user_streams", 1L);
+        assertThat(count).isEqualTo(Map.of(
+                "illuminate_streams", 2L,
+                "user_streams", 1L
+        ));
     }
 }
