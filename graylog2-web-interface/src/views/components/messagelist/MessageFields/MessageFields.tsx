@@ -52,15 +52,27 @@ type Props = {
 const IconSeparator = ({ expanded }: { expanded: boolean }) => (
   <Icon size="xs" name={expanded ? 'collapse_all' : 'expand_all'} type="regular" />
 );
-const Separator = ({ onClick, expanded, restLength }: Props) => (
-  <SeparatorContainer onClick={onClick}>
-    <Line />
-    <IconSeparator expanded={expanded} />
-    <span>{`${expanded ? 'Hide' : 'Show'} rest ${restLength || ''} fields`}</span>
-    <IconSeparator expanded={expanded} />
-    <Line />
-  </SeparatorContainer>
-);
+const Separator = ({ onClick, expanded, restLength }: Props) => {
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        onClick();
+      }
+    },
+    [onClick],
+  );
+
+  return (
+    <SeparatorContainer onClick={onClick} role="button" tabIndex={0} onKeyDown={onKeyDown}>
+      <Line />
+      <IconSeparator expanded={expanded} />
+      <span>{`${expanded ? 'Hide' : 'Show'} rest ${restLength || ''} fields`}</span>
+      <IconSeparator expanded={expanded} />
+      <Line />
+    </SeparatorContainer>
+  );
+};
 
 const SESSION_STORAGE_KEY = 'message_table_show_rest-fields';
 
