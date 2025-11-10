@@ -61,8 +61,7 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         Pass the timerange as a parameter, never put it into the query itself.
                         List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves.
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
-                        """.formatted(toolContext.customizationConfig().productName()),
-                true);
+                        """.formatted(toolContext.customizationConfig().productName()));
         this.scriptingApiService = scriptingApiService;
     }
 

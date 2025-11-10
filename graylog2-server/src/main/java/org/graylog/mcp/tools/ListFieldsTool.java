@@ -51,8 +51,7 @@ public class ListFieldsTool extends Tool<ListFieldsTool.Parameters, ListFieldsTo
                       Fields can have different meanings in different streams (and also per source), so that needs to be taken into account.
                       This tool can be scoped to streams to cut down on the noise.
                       Fields can have various properties, such as "enumerable" which means you can aggregate on them, they can be "numeric",
-                      making them suitable to use in aggregation metrics, or "full-text-search", which means their content is tokenized""",
-                true);
+                      making them suitable to use in aggregation metrics, or "full-text-search", which means their content is tokenized""");
         this.mappedFieldTypesService = mappedFieldTypesService;
     }
 

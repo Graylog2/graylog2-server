@@ -51,8 +51,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
                         retention settings (how long data is kept), index prefix patterns, and current state. Use this to understand data lifecycle management,
                         troubleshoot retention issues, or plan storage capacity. Essential for understanding how your log data is organized and managed over time.
                         No parameters required. Returns index set details.
-                        """.formatted(toolContext.customizationConfig().productName()),
-                true);
+                        """.formatted(toolContext.customizationConfig().productName()));
         this.indexSetService = indexSetService;
     }
 

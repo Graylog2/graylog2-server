@@ -50,8 +50,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
                 """
                         Returns system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """.formatted(toolContext.customizationConfig().productName()),
-                true);
+                        """.formatted(toolContext.customizationConfig().productName()));
         this.serverStatus = serverStatus;
         this.leaderElectionService = leaderElectionService;
     }

@@ -55,7 +55,7 @@ type McpTools = Record<string, McpToolState>;
 type McpToolEntity = EntityBase & {
   name: string;
   package: string;
-  access: string;
+  behavior: string;
   format: string;
   status: string;
   description: string;
@@ -67,7 +67,7 @@ type toolTableView = {
   sort: Sort;
 }
 
-const TABLE_COLUMNS: (keyof McpToolEntity)[] = ['name', 'package', 'access', 'format', 'status'];
+const TABLE_COLUMNS: (keyof McpToolEntity)[] = ['name', 'package', 'behavior', 'format', 'status'];
 
 const fetchTools = async () => {
   const url = '/mcp/api/tools';
@@ -106,7 +106,7 @@ const McpConfig = () => {
       id: tool.name,
       name: tool.name,
       package: tool.category,
-      access: tool.read_only ? 'Read Only' : 'Read/Write',
+      behavior: tool.read_only ? 'Read Only' : 'Read/Write',
       format: tool.output_format + (tool.format_overridden ? '*' : ''),
       status: tool.enabled && '🟢 enabled' || '🔴 disabled',
       description: "nothing yet"

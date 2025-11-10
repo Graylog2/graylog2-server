@@ -45,8 +45,7 @@ public class ReadResourceTool extends Tool<ReadResourceTool.Parameters, String> 
                 new TypeReference<>() {},
                 NAME,
                 f("Describe a specific %s resource with a given GRN", toolContext.customizationConfig().productName()),
-                f("A brief description of the %s resource.", toolContext.customizationConfig().productName()),
-                true);
+                f("A brief description of the %s resource.", toolContext.customizationConfig().productName()));
         this.grnRegistry = grnRegistry;
         this.resourceProviders = resourceProviders;
     }

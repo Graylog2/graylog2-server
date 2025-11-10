@@ -56,8 +56,7 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
                         List all configured %s inputs. Returns detailed information about each input including type (syslog, GELF, etc.), current state (running/stopped),
                         configuration parameters, and throughput statistics. Use this to monitor input health, troubleshoot data ingestion issues, or understand what types of
                         logs are being collected. No parameters required.
-                        """, toolContext.customizationConfig().productName()),
-                true);
+                        """, toolContext.customizationConfig().productName()));
         this.inputService = inputService;
         this.availableInputs = messageInputFactory.getAvailableInputs();
     }

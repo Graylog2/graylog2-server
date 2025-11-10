@@ -61,6 +61,9 @@ public abstract class Tool<P, O> {
     private final McpSchema.JsonSchema inputSchema;
     private final Map<String, Object> outputSchema;
     private final boolean readOnly;
+    private final boolean destructive;
+    private final boolean idempotent;
+    private final boolean openWorld;
     private boolean enabled;
     private OutputFormat outputFormatOverride;
 
@@ -71,7 +74,7 @@ public abstract class Tool<P, O> {
             String name,
             String title,
             String description) {
-        this(context, parameterType, outputType, name, title, description, true);
+        this(context, parameterType, outputType, name, title, description, false, false, false, false);
     }
 
     protected Tool(
@@ -81,12 +84,19 @@ public abstract class Tool<P, O> {
             String name,
             String title,
             String description,
-            boolean readOnly) {
+            boolean readOnly,
+            boolean destructive,
+            boolean idempotent,
+            boolean openWorld
+    ) {
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
         this.readOnly = readOnly;
+        this.destructive = destructive;
+        this.idempotent = idempotent;
+        this.openWorld = openWorld;
 
         this.objectMapper = context.objectMapper();
         this.clusterConfigService = context.clusterConfigService();
@@ -166,8 +176,34 @@ public abstract class Tool<P, O> {
         return "external";
     }
 
-    public boolean isReadOnly() {
+    public boolean hasReadOnlyBehavior() {
         return readOnly;
+    }
+
+    public boolean mayPerformDestructiveActions() {
+        return destructive;
+    }
+
+    public boolean hasIdempotentBehavior() {
+        return idempotent;
+    }
+
+    public boolean interactsWithOpenWorld() {
+        return openWorld;
+    }
+
+    public String behaviorHints() {
+        return """
+                This tool:
+                - %s modify its environment.
+                - %s perform destructive updates.
+                - %s idempotent (repeated calls with same args %s additional effect).
+                - %s with external entities.
+                """.formatted(
+                        readOnly ? "does not" : "may",
+                        destructive ? "may" : "does not",
+                        idempotent ? "is" : "is not", idempotent ? "have no" : "may have",
+                        openWorld ? "interacts" : "does not interact");
     }
 
     @JsonProperty
