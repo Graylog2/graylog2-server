@@ -25,6 +25,9 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableList;
+import jakarta.annotation.Nullable;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
+import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
 import org.graylog.shaded.opensearch2.org.apache.http.impl.client.BasicCredentialsProvider;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
@@ -39,32 +42,40 @@ import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.RestClientProvider;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
+import org.graylog.testing.elasticsearch.ContainerCacheKey;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
+import org.graylog2.security.TrustAllX509TrustManager;
+import org.graylog2.security.TrustManagerAndSocketFactoryProvider;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.opensearch.testcontainers.OpenSearchContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
 
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class OpenSearchInstance extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
+
+    private static final String DEFAULT_INITIAL_PASSWORD = "_ad0m#Ns_";
+
+    private final OpensearchSecurity security;
 
     @Deprecated
     private OpenSearchClient openSearchClient;
@@ -73,26 +84,39 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
     private List<String> featureFlags;
+    private static Map<ContainerCacheKey, OpenSearchClient> openSearchClients = new HashMap<>();
+    private static Map<ContainerCacheKey, OfficialOpensearchClient> officialOpensearchClients = new HashMap<>();
 
     public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
-        this(cachedInstance, version, hostname, network, heapSize, featureFlags, Map.of());
+        this(cachedInstance, version, hostname, network, heapSize, featureFlags, Map.of(), OpensearchSecurity.DISABLED);
     }
 
-    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env) {
+    public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags, Map<String, String> env, OpensearchSecurity security) {
         super(cachedInstance, version, hostname, network, heapSize, env);
         this.featureFlags = featureFlags;
+        this.security = security;
     }
 
     @Override
     public OpenSearchInstance init() {
         super.init();
-        // TODO: Check if client creation can be aware of cache to avoid recreating the client for every test method
-        RestHighLevelClient restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
-        this.officialOpensearchClient = buildOfficialClient();
+        if (Objects.nonNull(cacheKey)) {
+            if (openSearchClients.containsKey(cacheKey)) {
+                this.openSearchClient = openSearchClients.get(cacheKey);
+                this.officialOpensearchClient = officialOpensearchClients.get(cacheKey);
+            } else {
+                this.openSearchClient = buildClient();
+                this.officialOpensearchClient = buildOfficialClient();
+                openSearchClients.put(cacheKey, openSearchClient);
+                officialOpensearchClients.put(cacheKey, officialOpensearchClient);
+            }
+        } else {
+            this.openSearchClient = buildClient();
+            this.officialOpensearchClient = buildOfficialClient();
+        }
         this.client = new ClientOS(this.openSearchClient, officialOpensearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
-        adapters = new AdaptersOS2(openSearchClient, officialOpensearchClient, featureFlags);
+        adapters = new AdaptersOS(openSearchClient, officialOpensearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
         if (isFirstContainerStart) {
             afterContainerCreated();
@@ -100,40 +124,91 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
         return this;
     }
 
+    @Override
+    public void close() {
+        super.close();
+        if (officialOpensearchClient != null) {
+            officialOpensearchClient.close();
+        }
+        openSearchClients.remove(cacheKey);
+        officialOpensearchClients.remove(cacheKey);
+    }
+
+    private OpenSearchClient buildClient() {
+        RestHighLevelClient restHighLevelClient = buildRestClient();
+        return new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
+    }
+
     private OfficialOpensearchClient buildOfficialClient() {
+        final String protocol = isSecuredInstance() ? "https://" : "http://";
         return new OfficialOpensearchClientProvider(
-                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                ImmutableList.of(URI.create(protocol + this.getHttpHostAddress())),
                 IndexerJwtAuthToken.disabled(),
-                createCredentialsProvider() // no credentials!
+                createCredentialsProvider(),
+                getElasticsearchClientConfiguration()
         ).get();
     }
 
-    private static org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider createCredentialsProvider() {
-        return new org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider();
+    private org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider createCredentialsProvider() {
+        final org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider credentialsProvider = new org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider();
+        if(isSecuredInstance()) {
+            final org.apache.hc.client5.http.auth.AuthScope anyScope = new org.apache.hc.client5.http.auth.AuthScope(null, -1);
+            credentialsProvider.setCredentials(anyScope, new org.apache.hc.client5.http.auth.UsernamePasswordCredentials("admin", DEFAULT_INITIAL_PASSWORD.toCharArray()));
+        }
+        return credentialsProvider;
     }
 
+    @Deprecated
     private RestHighLevelClient buildRestClient() {
 
-        final ElasticsearchClientConfiguration config = buildconfig(Map.of(
-                "elasticsearch_connect_timeout", "60s",
-                "elasticsearch_socket_timeout", "60s",
-                "elasticsearch_idle_timeout", "60s",
-                "elasticsearch_max_total_connections", "1",
-                "elasticsearch_max_total_connections_per_route", "1",
-                "elasticsearch_max_retries", "1",
-                "elasticsearch_use_expect_continue", "false"
-        ));
+        final ElasticsearchClientConfiguration config = getElasticsearchClientConfiguration();
 
+        final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+
+        if (isSecuredInstance()) {
+            credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials("admin", DEFAULT_INITIAL_PASSWORD));
+        }
+
+        final String protocol = isSecuredInstance() ? "https://" : "http://";
+
+        final TrustManagerAndSocketFactoryProvider trustFactory = getTrustManagerAndSocketFactoryProvider();
         return new RestClientProvider(
                 new GracefulShutdownService(),
-                ImmutableList.of(URI.create("http://" + this.getHttpHostAddress())),
+                ImmutableList.of(URI.create(protocol + this.getHttpHostAddress())),
                 config,
-                new BasicCredentialsProvider(),
-                null,
+                credentialsProvider,
+                trustFactory,
                 IndexerJwtAuthToken.disabled(),
                 Collections.emptySet(),
                 Collections.emptySet())
                 .get();
+    }
+
+    private boolean isSecuredInstance() {
+        return security == OpensearchSecurity.ENABLED;
+    }
+
+    @Nullable
+    private TrustManagerAndSocketFactoryProvider getTrustManagerAndSocketFactoryProvider() {
+        if (isSecuredInstance()) {
+            try {
+                return new TrustManagerAndSocketFactoryProvider(new TrustAllX509TrustManager());
+            } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return null;
+        }
+    }
+
+    private ElasticsearchClientConfiguration getElasticsearchClientConfiguration() {
+        return buildconfig(Map.of(
+                "elasticsearch_connect_timeout", "60s",
+                "elasticsearch_socket_timeout", "60s",
+                "elasticsearch_max_total_connections", "1",
+                "elasticsearch_max_total_connections_per_route", "1",
+                "elasticsearch_use_expect_continue", "false"
+        ));
     }
 
     private ElasticsearchClientConfiguration buildconfig(Map<String, String> properties) {
@@ -149,6 +224,13 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     public static OpenSearchInstance create() {
         return OpenSearchInstanceBuilder.builder().instantiate();
+    }
+
+    public static OpenSearchInstance createSecured() {
+        final OpenSearchInstanceBuilder builder = OpenSearchInstanceBuilder.builder().withEnabledSecurity();
+        // TODO: without disabling caching, we get an unsecured instance. The cache is not differentiating based on configuration of the container
+        builder.cachedInstance(false);
+        return builder.instantiate();
     }
 
     protected void afterContainerCreated() {
@@ -232,15 +314,22 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
 
     @Override
     public GenericContainer<?> buildContainer(String image, Network network) {
-        var container = new OpenSearchContainer(DockerImageName.parse(image))
-                .withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
+        OpenSearchContainer container = new OpenSearchContainer(DockerImageName.parse(image));
+
+        container.withEnv("OPENSEARCH_JAVA_OPTS", getEsJavaOpts())
                 .withEnv("cluster.info.update.interval", "10s")
                 .withEnv("cluster.routing.allocation.disk.reroute_interval", "5s")
                 .withEnv("action.auto_create_index", "false")
-                .withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true")
                 .withEnv("START_PERF_ANALYZER", "false")
                 .withNetwork(network)
                 .withNetworkAliases(hostname);
+
+        if (isSecuredInstance()) {
+            container.withSecurityEnabled();
+            container.withEnv("OPENSEARCH_INITIAL_ADMIN_PASSWORD", DEFAULT_INITIAL_PASSWORD);
+        } else {
+            container.withEnv("DISABLE_INSTALL_DEMO_CONFIG", "true");
+        }
 
         getContainerEnv().forEach(container::withEnv);
 

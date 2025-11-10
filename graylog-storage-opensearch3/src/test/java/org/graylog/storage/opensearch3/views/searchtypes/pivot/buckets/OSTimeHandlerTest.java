@@ -31,6 +31,7 @@ import org.graylog.storage.opensearch3.views.searchtypes.pivot.AggTypes;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -68,6 +69,7 @@ class OSTimeHandlerTest {
         when(time.fields()).thenReturn(Collections.singletonList("foobar"));
         final AggTypes aggTypes = mock(AggTypes.class);
         when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
+        when(queryContext.timezone()).thenReturn(DateTimeZone.UTC);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }
 
