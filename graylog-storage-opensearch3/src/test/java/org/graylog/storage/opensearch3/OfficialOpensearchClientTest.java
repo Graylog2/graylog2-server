@@ -27,26 +27,26 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class OfficialOpensearchClientTest {
 
-  @Test
-  void testWithTimeout() {
-    OfficialOpensearchClient client = new OfficialOpensearchClient(null, null);
-    assertThat(client.executeWithTimeout(() -> asyncCall(0), "Error getting data", Duration.milliseconds(50)))
-        .isEqualTo("complete");
-    assertThatThrownBy(() ->
-        client.executeWithTimeout(() -> asyncCall(100), "Error getting data", Duration.milliseconds(50)))
-        .isInstanceOf(RuntimeException.class)
-        .hasMessage("Error getting data");
-  }
+    @Test
+    void testWithTimeout() {
+        OfficialOpensearchClient client = new OfficialOpensearchClient(null, null);
+        assertThat(client.executeWithTimeout(() -> asyncCall(0), "Error getting data", Duration.milliseconds(50)))
+                .isEqualTo("complete");
+        assertThatThrownBy(() ->
+                client.executeWithTimeout(() -> asyncCall(100), "Error getting data", Duration.milliseconds(50)))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessage("Error getting data");
+    }
 
-  private CompletableFuture<String> asyncCall(long timeout) {
-    return CompletableFuture.supplyAsync(() -> {
-      try {
-        Thread.sleep(timeout);
-      } catch (InterruptedException e) {
-        Thread.currentThread().interrupt();
-      }
-      return "complete";
-    });
-  }
+    private CompletableFuture<String> asyncCall(long timeout) {
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(timeout);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            return "complete";
+        });
+    }
 
 }
