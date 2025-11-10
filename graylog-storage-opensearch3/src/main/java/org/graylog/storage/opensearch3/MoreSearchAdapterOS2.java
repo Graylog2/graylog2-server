@@ -85,19 +85,16 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
-    private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
     private final OS2ResultMessageFactory resultMessageFactory;
 
     @Inject
     public MoreSearchAdapterOS2(OpenSearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
-                                SortOrderMapper sortOrderMapper,
                                 MultiChunkResultRetriever multiChunkResultRetriever,
                                 OS2ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.sortOrderMapper = sortOrderMapper;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
         this.resultMessageFactory = resultMessageFactory;
     }
@@ -251,7 +248,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     }
 
     private List<FieldSortBuilder> createSorting(Sorting sorting) {
-        final SortOrder order = sortOrderMapper.fromSorting(sorting);
+        final SortOrder order = SortOrder.valueOf(sorting.getUppercasedDirection());
         final List<FieldSortBuilder> sortBuilders;
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
             sortBuilders = List.of(
