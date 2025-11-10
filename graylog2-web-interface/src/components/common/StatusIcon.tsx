@@ -23,7 +23,7 @@ type Props = {
   className?: string;
 };
 
-const StatusIcon = ({ active, className = undefined }: Props, ref: React.RefObject<typeof Icon>) => (
+const StatusIcon = ({ active, className = undefined }: Props, ref: React.ForwardedRef<HTMLSpanElement>) => (
   <Icon
     ref={ref}
     name={active ? 'check_circle' : 'cancel'}
