@@ -32,6 +32,7 @@ const SUT = () => (
       isScratchpadVisible: true,
       localStorageItem: 'gl-scratchpad-jest',
       setScratchpadVisibility,
+      toggleScratchpadVisibility: jest.fn(),
     }}>
     <Scratchpad />
   </ScratchpadContext.Provider>

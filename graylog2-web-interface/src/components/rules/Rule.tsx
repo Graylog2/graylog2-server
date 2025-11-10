@@ -19,9 +19,7 @@ import React, { useContext, useState } from 'react';
 import { PageHeader, Spinner } from 'components/common';
 import { Row, Col, Button, BootstrapModalConfirm, Alert } from 'components/bootstrap';
 import DocsHelper from 'util/DocsHelper';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import useHistory from 'routing/useHistory';
 import Routes from 'routing/Routes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -46,7 +44,6 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
   const isManaged = scopePermissions && !scopePermissions?.is_mutable;
   const history = useHistory();
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   if (loadingScopePermissions) {
@@ -73,11 +70,10 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
         actions={
           isRuleBuilder && create ? (
             <Button
-              bsStyle="success"
+              bsStyle="primary"
               bsSize="small"
               onClick={() => {
                 sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.USE_SOURCE_CODE_EDITOR_CLICKED, {
-                  app_pathname: getPathnameWithoutId(pathname),
                   app_section: 'pipeline-rules',
                   app_action_value: 'source-code-editor-button',
                 });
@@ -117,7 +113,6 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           title="Switch to Source Code Editor"
           onConfirm={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CONFIRM_CLICKED, {
-              app_pathname: getPathnameWithoutId(pathname),
               app_section: 'pipeline-rules',
               app_action_value: 'confirm-button',
             });
@@ -127,7 +122,6 @@ const Rule = ({ create = false, title = '', isRuleBuilder = false }: Props) => {
           }}
           onCancel={() => {
             sendTelemetry(TELEMETRY_EVENT_TYPE.PIPELINE_RULE_BUILDER.SWITCH_TO_SOURCE_CODE_EDITOR_CANCEL_CLICKED, {
-              app_pathname: getPathnameWithoutId(pathname),
               app_section: 'pipeline-rules',
               app_action_value: 'cancel-button',
             });

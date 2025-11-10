@@ -30,6 +30,7 @@ import org.graylog.integrations.pagerduty.dto.PagerDutyMessage;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -55,11 +56,14 @@ public class MessageFactory {
 
     private final StreamService streamService;
     private final EventNotificationService eventNotificationService;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
-    MessageFactory(StreamService streamService, EventNotificationService eventNotificationService) {
+    MessageFactory(StreamService streamService, EventNotificationService eventNotificationService,
+                   CustomizationConfig customizationConfig) {
         this.streamService = streamService;
         this.eventNotificationService = eventNotificationService;
+        this.customizationConfig = customizationConfig;
     }
 
     public PagerDutyMessage createTriggerMessage(EventNotificationContext ctx) {
@@ -90,7 +94,7 @@ public class MessageFactory {
 
         Map<String, String> payload = new HashMap<String, String>();
         payload.put("summary", modelData.event().message());
-        payload.put("source", "Graylog:" + modelData.event().sourceStreams());
+        payload.put("source", customizationConfig.productName() + ":" + modelData.event().sourceStreams());
         payload.put("severity", eventPriority);
         payload.put("timestamp", modelData.event().eventTimestamp().toString());
         payload.put("component", "GraylogAlerts");

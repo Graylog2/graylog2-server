@@ -64,6 +64,7 @@ const HeatmapOnClickPopover = ({ clickPoint, config, setFieldData }: OnClickPopo
           metricValue={metricValue}
           rowPivotValues={rowPivotValues}
           setFieldData={setFieldData}
+          config={config}
         />
       </Popover.Dropdown>
     )

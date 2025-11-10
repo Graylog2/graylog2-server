@@ -30,9 +30,7 @@ import { Alert, Col, Row, Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import { FormSubmit, IfPermitted, NoSearchResult, ReadOnlyFormGroup } from 'components/common';
 import useHistory from 'routing/useHistory';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useIsGlobalTimeoutEnabled from 'hooks/useIsGlobalTimeoutEnabled';
 import { Link } from 'components/common/router';
@@ -115,7 +113,6 @@ const UserCreate = () => {
   const [submitError, setSubmitError] = useState<RequestError | undefined>();
   const [selectedRoles, setSelectedRoles] = useState<Immutable.Set<DescriptiveItem>>(Immutable.Set([initialRole]));
   const history = useHistory();
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
   const isGlobalTimeoutEnabled = useIsGlobalTimeoutEnabled();
 
@@ -185,12 +182,11 @@ const UserCreate = () => {
   };
 
   const onSubmit = (data) => {
-    handleFormSubmit(data, user.roles);
-
     sendTelemetry(TELEMETRY_EVENT_TYPE.USERS.USER_CREATED, {
-      app_pathname: getPathnameWithoutId(pathname),
       app_action_value: 'user-create-form',
     });
+
+    return handleFormSubmit(data, user.roles);
   };
 
   return (

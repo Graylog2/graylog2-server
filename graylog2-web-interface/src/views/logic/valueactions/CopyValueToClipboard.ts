@@ -14,9 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
+import type { ActionHandlerArguments, ActionHandlerCondition } from 'views/components/actions/ActionHandler';
 import copyToClipboard from 'util/copyToClipboard';
+import type { ActionContexts } from 'views/types';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
 
 const CopyValueToClipboard = ({ value }: ActionHandlerArguments) => copyToClipboard(value);
+
+const isEnabled: ActionHandlerCondition<Partial<ActionContexts>> = ({ contexts }) =>
+  !hasMultipleValueForActions(contexts);
+
+CopyValueToClipboard.isEnabled = isEnabled;
 
 export default CopyValueToClipboard;
