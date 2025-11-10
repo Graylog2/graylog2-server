@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
+
+import java.util.Map;
 
 @AutoValue
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -29,11 +32,36 @@ import com.google.auto.value.AutoValue;
 @JsonDeserialize(builder = ServerNodeDto.Builder.class)
 public abstract class ServerNodeDto extends NodeDto {
 
+    public static final String IS_PROCESSING_FIELD = "is_processing";
+    public static final String LOAD_BALANCER_STATUS_FIELD = "lb_status";
+
+    @JsonProperty("is_processing")
+    public abstract boolean isProcessing();
+
+    @JsonProperty("lb_status")
+    public abstract LoadBalancerStatus getLoadBalancerStatus();
+
     public abstract Builder toBuilder();
+
+    @Override
+    public Map<String, Object> toEntityParameters() {
+        final Map<String, Object> entityParameters = super.toEntityParameters();
+        entityParameters.put("is_processing", isProcessing());
+        if(getLoadBalancerStatus() != null) {
+            entityParameters.put("lb_status", getLoadBalancerStatus());
+        }
+        return entityParameters;
+    }
 
     @AutoValue.Builder
     @JsonIgnoreProperties(ignoreUnknown = true)
     public abstract static class Builder extends NodeDto.Builder<Builder> {
+
+        @JsonProperty(IS_PROCESSING_FIELD)
+        public abstract ServerNodeDto.Builder setProcessing(boolean isProcessing);
+
+        @JsonProperty(LOAD_BALANCER_STATUS_FIELD)
+        public abstract Builder setLoadBalancerStatus(LoadBalancerStatus loadBalancerStatus);
 
         @JsonCreator
         public static Builder builder() {
@@ -41,6 +69,5 @@ public abstract class ServerNodeDto extends NodeDto {
         }
 
         public abstract ServerNodeDto build();
-
     }
 }

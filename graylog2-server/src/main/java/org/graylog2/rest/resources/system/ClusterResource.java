@@ -43,6 +43,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
@@ -50,6 +51,7 @@ import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
 import org.graylog2.rest.resources.entities.EntityDefaults;
+import org.graylog2.rest.resources.entities.FilterOption;
 import org.graylog2.rest.resources.entities.Sorting;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
@@ -57,9 +59,13 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Api(value = "System/Cluster", description = "Node discovery")
 @RequiresAuthentication
@@ -82,12 +88,21 @@ public class ClusterResource extends RestResource {
     private static final String DEFAULT_SORT_FIELD = "hostname";
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id("is_leader").title("Leader").build(),
-            EntityAttribute.builder().id("transport_address").title("Transport address").build(),
-            EntityAttribute.builder().id("last_seen").title("Last seen").build(),
-            EntityAttribute.builder().id("hostname").title("Hostname").build(),
-            EntityAttribute.builder().id("short_node_id").title("Short node ID").build()
+            EntityAttribute.builder().id("is_leader").title("Leader").filterable(true).sortable(true).build(),
+            EntityAttribute.builder().id("transport_address").title("Transport address").searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id("last_seen").title("Last seen").sortable(true).build(),
+            EntityAttribute.builder().id("hostname").title("Hostname").searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id("short_node_id").title("Short node ID").sortable(true).build(),
+            EntityAttribute.builder().id("lb_status").title("Load balancer status").sortable(true).filterable(true).filterOptions(loadBalancerOptions()).build(),
+            EntityAttribute.builder().id("is_processing").title("Processing").sortable(true).filterable(true).build()
     );
+
+    private static Set<FilterOption> loadBalancerOptions() {
+        return Arrays.stream(LoadBalancerStatus.values())
+                .map(status -> new FilterOption(status.name(), status.name()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT))))
             .build();
