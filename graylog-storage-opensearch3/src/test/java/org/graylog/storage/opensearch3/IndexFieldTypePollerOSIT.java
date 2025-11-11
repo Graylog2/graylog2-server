@@ -21,7 +21,7 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
 import org.junit.Rule;
 
-public class IndexFieldTypePollerOS2IT extends IndexFieldTypePollerIT {
+public class IndexFieldTypePollerOSIT extends IndexFieldTypePollerIT {
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
