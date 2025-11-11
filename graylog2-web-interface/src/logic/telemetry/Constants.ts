@@ -46,6 +46,12 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_EDIT_CANCEL_CLICKED: 'Search Widget Edit Cancel Clicked',
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
+    CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_OPEN: 'Search Widget Message Favorite Fields Edit Open',
+    CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_CANCELED: 'Search Widget Message Favorite Fields Edit Canceled',
+    CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_SAVED: 'Search Widget Message Favorite Fields Edit Saved',
+    CHANGE_MESSAGE_FAVORITE_FIELD_TOGGLED: 'Search Widget Message Favorite Field Toggled',
+    CHANGE_MESSAGE_FAVORITE_FIELD_REORDERED: 'Search Widget Message Favorite Field Reordered',
+    CHANGE_MESSAGE_REST_FIELD_SHOW_TOGGLED: 'Search Widget Message Rest Field Show Toggled',
   },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',

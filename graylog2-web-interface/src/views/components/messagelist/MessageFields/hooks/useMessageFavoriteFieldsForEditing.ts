@@ -19,10 +19,13 @@ import uniq from 'lodash/uniq';
 
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FormattedField } from 'views/components/messagelist/MessageFields/types';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
 
 const useMessageFavoriteFieldsForEditing = () => {
+  const sendTelemetry = useSendTelemetry();
   const { saveFavoriteField, favoriteFields: initialFavoriteFields } = useContext(MessageFavoriteFieldsContext);
   const [favorites, setFavorites] = useState<Array<string>>(initialFavoriteFields ?? []);
   const resetFavoriteFields = useCallback(() => {
@@ -32,9 +35,15 @@ const useMessageFavoriteFieldsForEditing = () => {
   const saveEditedFavoriteFields = useCallback(() => {
     saveFavoriteField(favorites);
   }, [favorites, saveFavoriteField]);
-  const reorderFavoriteFields = useCallback((items: Array<FormattedField>) => {
-    setFavorites(items.map((item: FormattedField) => item.field));
-  }, []);
+  const reorderFavoriteFields = useCallback(
+    (items: Array<FormattedField>) => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELD_REORDERED, {
+        app_action_value: 'reordered',
+      });
+      setFavorites(items.map((item: FormattedField) => item.field));
+    },
+    [sendTelemetry],
+  );
   const onFavoriteToggle = useCallback(
     (fieldName: string) =>
       setFavorites((favs) => {

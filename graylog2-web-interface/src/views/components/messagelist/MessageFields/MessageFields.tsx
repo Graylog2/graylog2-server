@@ -23,6 +23,8 @@ import useFormattedFields from 'views/components/messagelist/MessageFields/hooks
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import { Icon } from 'components/common';
 import Store from 'logic/local-storage/Store';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const Line = styled.div(
   ({ theme }) => css`
@@ -77,18 +79,23 @@ const Separator = ({ onClick, expanded, restLength }: Props) => {
 const SESSION_STORAGE_KEY = 'message_table_show_rest-fields';
 
 const MessageFields = () => {
+  const sendTelemetry = useSendTelemetry();
   const [expanded, setExpanded] = useState(Store.sessionGet(SESSION_STORAGE_KEY) !== 'false');
   const { favoriteFields } = useContext(MessageFavoriteFieldsContext);
   const { formattedFavorites, formattedRest } = useFormattedFields(favoriteFields);
   const toggleExpand = useCallback(() => {
-    if (expanded) {
-      Store.sessionSet(SESSION_STORAGE_KEY, 'false');
-      setExpanded(false);
-    } else {
+    const isNowExpanded = !expanded;
+    if (isNowExpanded) {
       Store.sessionDelete(SESSION_STORAGE_KEY);
       setExpanded(true);
+    } else {
+      Store.sessionSet(SESSION_STORAGE_KEY, 'false');
+      setExpanded(false);
     }
-  }, [expanded]);
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_REST_FIELD_SHOW_TOGGLED, {
+      app_action_value: isNowExpanded,
+    });
+  }, [expanded, sendTelemetry]);
 
   return (
     <>

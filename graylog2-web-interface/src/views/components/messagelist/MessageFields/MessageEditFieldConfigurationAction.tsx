@@ -20,15 +20,26 @@ import React, { useState, useCallback } from 'react';
 import { Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import MessageFieldsEditModal from 'views/components/messagelist/MessageFields/MessageFieldsEditModal';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const MessageEditFieldConfigurationAction = () => {
   const [showModal, setShowModal] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   const toggleEditMode = useCallback(() => setShowModal((prev) => !prev), []);
 
+  const onClick = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_OPEN, {
+      app_action_value: 'open',
+    });
+
+    return toggleEditMode();
+  }, [sendTelemetry, toggleEditMode]);
+
   return (
     <>
-      <Button bsSize="small" onClick={toggleEditMode} title="Edit favorite fields">
+      <Button bsSize="small" onClick={onClick} title="Edit favorite fields">
         <Icon name="edit_square" /> Edit
       </Button>
       {showModal && <MessageFieldsEditModal toggleEditMode={toggleEditMode} />}

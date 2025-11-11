@@ -21,9 +21,12 @@ import { FavoriteFields } from '@graylog/server-api';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'logic/streams/types';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavoriteFields: Array<string>) => {
   const [isLoading, setIsLoading] = useState(false);
+  const sendTelemetry = useSendTelemetry();
 
   const saveFavoriteField = useCallback(
     (favoritesToSave: Array<string>) => {
@@ -38,7 +41,15 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
 
       setIsLoading(true);
       FavoriteFields.set({ fields: newFavoriteFieldsByStream })
-        .then(() => StreamsActions.refresh())
+        .then(() => {
+          sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_SAVED, {
+            app_action_value: {
+              fields_quantities: Object.values(newFavoriteFieldsByStream).map((fields) => fields.length),
+            },
+          });
+
+          return StreamsActions.refresh();
+        })
         .catch((errorThrown) =>
           UserNotification.error(
             `Setting fields to favorites failed with error: ${errorThrown}`,
@@ -47,7 +58,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         )
         .finally(() => setIsLoading(false));
     },
-    [initialFavoriteFields, streams],
+    [initialFavoriteFields, sendTelemetry, streams],
   );
 
   const toggleField = useCallback(
@@ -58,7 +69,13 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
 
       if (isFavorite) {
         FavoriteFields.remove({ field, stream_ids: streamIds })
-          .then(() => StreamsActions.refresh())
+          .then(() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELD_TOGGLED, {
+              app_action_value: 'remove',
+            });
+
+            return StreamsActions.refresh();
+          })
           .catch((errorThrown) =>
             UserNotification.error(
               `Removing field from favorites failed with error: ${errorThrown}`,
@@ -68,7 +85,13 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
           .finally(() => setIsLoading(false));
       } else {
         FavoriteFields.add({ field, stream_ids: streamIds })
-          .then(() => StreamsActions.refresh())
+          .then(() => {
+            sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELD_TOGGLED, {
+              app_action_value: 'add',
+            });
+
+            return StreamsActions.refresh();
+          })
           .catch((errorThrown) =>
             UserNotification.error(
               `Adding field to favorites failed with error: ${errorThrown}`,
@@ -78,7 +101,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
           .finally(() => setIsLoading(false));
       }
     },
-    [initialFavoriteFields, streams],
+    [initialFavoriteFields, sendTelemetry, streams],
   );
 
   return {
