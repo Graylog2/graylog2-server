@@ -329,10 +329,6 @@ public class ClientOS implements Client {
         deleteIndices(existingIndices());
         deleteTemplates(existingTemplates());
         refreshNode();
-        // currently the client is recreated on every init of the OS instance, so transport needs to be closed here
-        if (opensearchClient != null) {
-            opensearchClient.close();
-        }
     }
 
     private String[] existingComposableTemplates() {
