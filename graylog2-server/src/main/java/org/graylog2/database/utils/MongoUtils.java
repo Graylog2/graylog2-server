@@ -257,9 +257,9 @@ public class MongoUtils<T extends MongoEntity> {
                 List.of(Aggregates.group("$" + field, Accumulators.sum("count", 1))),
                 Document.class
         ).forEach(doc -> {
-            Object id = doc.get("_id");
+            String id = doc.getString("_id");
             if (id != null) {
-                counts.put(id.toString(), ((Number) doc.get("count")).longValue());
+                counts.put(id, doc.getInteger("count").longValue());
             }
         });
         return counts;
