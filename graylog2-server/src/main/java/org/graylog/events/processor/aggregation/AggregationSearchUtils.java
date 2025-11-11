@@ -25,6 +25,8 @@ import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
 import org.graylog.events.event.EventReplayInfo;
 import org.graylog.events.event.EventWithContext;
+import org.graylog.events.fields.FieldValue;
+import org.graylog.events.fields.FieldValueType;
 import org.graylog.events.processor.EventConsumer;
 import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventProcessorException;
@@ -186,6 +188,11 @@ public class AggregationSearchUtils {
             // TODO: Can we find a useful source value?
             final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
+
+            // add aggregation key/value fields to events so they can be used in notifications etc.
+            fields.forEach((k, v) -> {
+                if(event.getField(k) == null) event.setField(k, FieldValue.string(String.valueOf(v)));
+            });
 
             // Ask any event query modifier for its state and collect it into the event modifier state
             final Map<String, Object> eventModifierState = eventQueryModifiers.stream()
