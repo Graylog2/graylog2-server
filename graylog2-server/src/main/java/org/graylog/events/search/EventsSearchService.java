@@ -104,7 +104,7 @@ public class EventsSearchService {
         // filter replay infos from events where the event definition is no longer in existence
         final var filteredEvents = events.stream().map(e ->
             context.eventDefinitions().containsKey(e.event().eventDefinitionId()) ? e :
-                EventsSearchResult.Event.create(e.event().toBuilder().replayInfo(null).build(), e.indexName(), e.indexType())
+                EventsSearchResult.Event.create(e.event().toBuilder().replayInfo(null).eventDefinitionId(null).build(), e.indexName(), e.indexType())
         ).toList();
 
         return EventsSearchResult.builder()
