@@ -27,13 +27,6 @@ import RatioIndicator from './RatioIndicator';
 import { MetricsColumn, MetricsRow, SecondaryText } from './NodeMetricsLayout';
 import type { GraylogNode } from './useClusterGraylogNodes';
 
-type HealthRow = {
-  key: string;
-  label: string;
-  status: string;
-  bsStyle: string;
-};
-
 const NodePrimary = styled.div`
   display: flex;
   flex-direction: column;
@@ -107,45 +100,19 @@ const getNodeDisplayName = (node: GraylogNode) => {
   return node.node_id ?? node.hostname ?? node.id;
 };
 
-export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput'] as const;
+export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'messageProcessing', 'loadBalancer', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput'] as const;
 
 export const createColumnDefinitions = (): Array<Column> => [
   { id: 'node', title: 'Node' },
   { id: 'state', title: 'State' },
+  { id: 'messageProcessing', title: 'Message Processing' },
+  { id: 'loadBalancer', title: 'Load Balancer' },
   { id: 'journal', title: 'Journal' },
   { id: 'dataLakeJournal', title: 'Data Lake Journal' },
   { id: 'jvm', title: 'JVM' },
   { id: 'buffers', title: 'Buffers' },
   { id: 'throughput', title: 'Throughput' },
 ];
-
-const getHealthRows = (entity: GraylogNode): Array<HealthRow> => {
-  const rows: Array<HealthRow> = [];
-
-  if (entity.is_processing !== undefined && entity.is_processing !== null) {
-    const messageProcessingStatus = entity.is_processing ? 'ENABLED' : 'DISABLED';
-
-    rows.push({
-      key: 'message-processing',
-      label: 'Message Processing',
-      status: messageProcessingStatus,
-      bsStyle: entity.is_processing ? 'success' : 'warning',
-    });
-  }
-
-  const loadBalancersStatus = entity.lb_status?.toUpperCase();
-
-  if (loadBalancersStatus) {
-    rows.push({
-      key: 'load-balancer',
-      label: 'Load Balancer',
-      status: loadBalancersStatus,
-      bsStyle: loadBalancersStatus === 'ALIVE' ? 'success' : 'warning',
-    });
-  }
-
-  return rows;
-};
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
@@ -167,43 +134,65 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
       },
     },
     state: {
-      minWidth: 200,
       renderCell: (_value, entity) => {
         const lifecycleStatus = entity.lifecycle?.toUpperCase();
-        const healthRows = getHealthRows(entity);
 
-        if (!lifecycleStatus && !healthRows.length) {
+        if (!lifecycleStatus) {
           return null;
         }
 
         return (
           <MetricsColumn>
-            {lifecycleStatus && (
-              <MetricsRow>
-                <StyledLabel
-                  bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
-                  bsSize="xs"
-                  title={lifecycleStatus}
-                  aria-label={lifecycleStatus}>
-                  {lifecycleStatus}
-                </StyledLabel>
-              </MetricsRow>
-            )}
-            {healthRows.map(({ key, label, status, bsStyle }) => (
-              <MetricsRow key={key}>
-                <span>{label}</span>
-                <StyledLabel
-                  bsStyle={bsStyle}
-                  bsSize="xs"
-                  aria-label={`${label} ${status}`}>
-                  {status}
-                </StyledLabel>
-              </MetricsRow>
-            ))}
+            <MetricsRow>
+              <StyledLabel
+                bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
+                bsSize="xs"
+                title={lifecycleStatus}
+                aria-label={lifecycleStatus}>
+                {lifecycleStatus}
+              </StyledLabel>
+            </MetricsRow>
           </MetricsColumn>
         );
       },
-      
+    },
+    messageProcessing: {
+      renderCell: (_value, entity) => {
+        if (entity.is_processing === undefined || entity.is_processing === null) {
+          return null;
+        }
+
+        const status = entity.is_processing ? 'ENABLED' : 'DISABLED';
+
+        return (
+          <MetricsColumn>
+            <MetricsRow>
+              <StyledLabel bsStyle={entity.is_processing ? 'success' : 'warning'} bsSize="xs" aria-label={`Message processing ${status}`}>
+                {status}
+              </StyledLabel>
+            </MetricsRow>
+          </MetricsColumn>
+        );
+      },
+    },
+    loadBalancer: {
+      renderCell: (_value, entity) => {
+        const status = entity.lb_status?.toUpperCase();
+
+        if (!status) {
+          return null;
+        }
+
+        return (
+          <MetricsColumn>
+            <MetricsRow>
+              <StyledLabel bsStyle={status === 'ALIVE' ? 'success' : 'warning'} bsSize="xs" aria-label={`Load balancer ${status}`}>
+                {status}
+              </StyledLabel>
+            </MetricsRow>
+          </MetricsColumn>
+        );
+      },
     },
     journal: {
       renderCell: (_value, entity) => {
