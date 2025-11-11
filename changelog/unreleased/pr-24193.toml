@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Removes replay info from events for the FE where the eventdefinition no longer exists. No replay is possible in that case so the replay button is not showing any more."
+
+issues = ["18931"]
+pulls = ["24193"]
