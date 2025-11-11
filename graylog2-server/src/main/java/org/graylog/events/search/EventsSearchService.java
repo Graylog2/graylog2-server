@@ -101,11 +101,17 @@ public class EventsSearchService {
                 lookupStreams(streamIdsBuilder.build(), subject)
         );
 
+        // filter replay infos from events where the event definition is no longer in existence
+        final var filteredEvents = events.stream().map(e ->
+            context.eventDefinitions().containsKey(e.event().eventDefinitionId()) ? e :
+                EventsSearchResult.Event.create(e.event().toBuilder().eventDefinitionId(null).build(), e.indexName(), e.indexType())
+        ).toList();
+
         return EventsSearchResult.builder()
                 .parameters(parameters)
                 .totalEvents(result.resultsCount())
                 .duration(result.duration())
-                .events(events)
+                .events(filteredEvents)
                 .usedIndices(result.usedIndexNames())
                 .context(context)
                 .build();
