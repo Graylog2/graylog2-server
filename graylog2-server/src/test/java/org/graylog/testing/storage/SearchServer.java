@@ -20,7 +20,7 @@ import com.github.zafarkhaja.semver.Version;
 import org.graylog2.storage.SearchVersion;
 
 public class SearchServer {
-    private static final String DEFAULT_VERSION_STRING = "2.19.3";
+    private static final String DEFAULT_VERSION_STRING = "2.15.0";
 
     public static final SearchVersion DEFAULT_VERSION = SearchVersion.create(SearchVersion.Distribution.OPENSEARCH, Version.parse(DEFAULT_VERSION_STRING));
 
