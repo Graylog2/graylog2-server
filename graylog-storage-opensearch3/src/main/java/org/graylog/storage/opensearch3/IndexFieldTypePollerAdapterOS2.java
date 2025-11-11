@@ -100,7 +100,7 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
     }
 
     private FieldTypeDTO.Builder fromFieldNameAndMapping(final String fieldName, final FieldMappingApi.FieldMapping mapping) {
-        final Boolean fieldData = mapping.fielddata().orElse(false);
+        final boolean fieldData = mapping.fieldData();
         return FieldTypeDTO.builder()
                 .fieldName(fieldName)
                 .physicalType(mapping.type())
