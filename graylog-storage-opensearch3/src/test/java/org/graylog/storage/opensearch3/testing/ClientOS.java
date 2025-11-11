@@ -309,8 +309,7 @@ public class ClientOS implements Client {
 
     @Override
     public void refreshNode() {
-        final RefreshRequest refreshRequest = new RefreshRequest();
-        client.execute((c, requestOptions) -> c.indices().refresh(refreshRequest, requestOptions));
+        opensearchClient.sync(c -> c.indices().refresh(), "Failed to refresh indices");
     }
 
     @Override

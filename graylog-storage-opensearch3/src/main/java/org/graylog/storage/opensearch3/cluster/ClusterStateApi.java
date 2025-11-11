@@ -16,71 +16,57 @@
  */
 package org.graylog.storage.opensearch3.cluster;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Streams;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Request;
-import org.graylog.shaded.opensearch2.org.opensearch.client.Response;
-import org.graylog.storage.opensearch3.OpenSearchClient;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.inject.Inject;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.opensearch.client.opensearch.cluster.StateResponse;
+import org.opensearch.client.opensearch.cluster.state.ClusterStateMetric;
 
-import java.util.AbstractMap;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.mapping;
 
 public class ClusterStateApi {
-    private final ObjectMapper objectMapper;
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient officialClient;
 
     @Inject
-    public ClusterStateApi(ObjectMapper objectMapper,
-                           OpenSearchClient client) {
-        this.objectMapper = objectMapper;
-        this.client = client;
+    public ClusterStateApi(OfficialOpensearchClient officialClient) {
+        this.officialClient = officialClient;
     }
 
+    /**
+     * @return Map Index_name -> Set of field names
+     */
     public Map<String, Set<String>> fields(Collection<String> indices) {
-        final Request request = request(indices);
-
-        final JsonNode jsonResponse = client.execute((c, requestOptions) -> {
-            request.setOptions(requestOptions);
-            final Response response = c.getLowLevelClient().performRequest(request);
-            return objectMapper.readTree(response.getEntity().getContent());
-        }, "Unable to retrieve fields from indices: " + String.join(",", indices));
-
-        //noinspection UnstableApiUsage
-        return Streams.stream(jsonResponse.path("metadata").path("indices").fields())
-                .flatMap(index -> allFieldsFromIndex(index.getKey(), index.getValue()))
-                .collect(groupingBy(Map.Entry::getKey, mapping(Map.Entry::getValue, Collectors.toSet())));
+        final StateResponse state = officialClient.sync(c -> c.cluster().state(r -> r.metric(List.of(ClusterStateMetric.Metadata)).index(new LinkedList<>(indices))), "Failed to obtain cluster state metadata");
+        final MyResponse response = state.valueBody().to(MyResponse.class);
+        return response.metadata().indices().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> collectFields(e.getValue())));
     }
 
-    private Stream<Map.Entry<String, String>> allFieldsFromIndex(String indexName, JsonNode indexMapping) {
-        //noinspection UnstableApiUsage
-        return Streams.stream(indexMapping.path("mappings").fields())
-                .flatMap(documentType -> allFieldsFromDocumentType(indexName, documentType.getValue()));
+    private Set<String> collectFields(Index index) {
+        return index.mappings().values().stream().flatMap(e -> e.properties().keySet().stream()).collect(Collectors.toSet());
     }
 
-    private Stream<? extends Map.Entry<String, String>> allFieldsFromDocumentType(String indexName, JsonNode documentType) {
-        //noinspection UnstableApiUsage
-        return Streams.stream(documentType.path("properties").fields())
-                .map(field -> new AbstractMap.SimpleEntry<>(indexName, field.getKey()));
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private record MyResponse(Metadata metadata) {
+
     }
 
-    private Request request(Collection<String> indices) {
-        final StringBuilder apiEndpoint = new StringBuilder("/_cluster/state/metadata");
-        if (!indices.isEmpty()) {
-            final String joinedIndices = String.join(",", indices);
-            apiEndpoint.append("/");
-            apiEndpoint.append(joinedIndices);
-        }
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private record Metadata(Map<String, Index> indices) {
 
-        return new Request("GET", apiEndpoint.toString());
     }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    private record Index(Map<String, Mapping> mappings) {
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    /*
+      Field name -> field properties (ignored, we don't need them)
+     */
+    private record Mapping(Map<String, Object> properties) {}
 }

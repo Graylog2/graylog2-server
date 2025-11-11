@@ -82,7 +82,7 @@ public class AdaptersOS implements Adapters {
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch3.cat.CatApi(objectMapper, client),
-                new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),
+                new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
                 featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
                 new IndexStatisticsBuilder(),
                 objectMapper
