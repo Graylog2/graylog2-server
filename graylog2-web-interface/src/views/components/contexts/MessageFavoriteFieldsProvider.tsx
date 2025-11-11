@@ -37,11 +37,11 @@ type OriginalProps = React.PropsWithChildren<{
 const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const streams = useMemo<Array<Stream>>(() => {
-    const messageStreamIds: Array<string> = message.fields.streams;
+    const messageStreamIds: Array<string> = message?.fields?.streams ?? [];
     const streamsById = Object.fromEntries(streamsList.map((stream) => [stream.id, stream]));
 
     return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
-  }, [message.fields.streams, streamsList]);
+  }, [message, streamsList]);
 
   const initialFavoriteFields = useMemo(
     () =>
