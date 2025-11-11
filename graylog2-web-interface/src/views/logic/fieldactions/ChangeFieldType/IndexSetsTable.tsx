@@ -62,6 +62,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
     defaultSort: DEFAULT_LAYOUT.sort,
+    defaultColumnOrder: DEFAULT_LAYOUT.columnOrder,
   });
 
   const searchParams: SearchParams = useMemo(
@@ -162,7 +163,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
             }}
             columnSchemas={attributes}
             columnRenderers={columnRenderers}
-            columnsOrder={DEFAULT_LAYOUT.columnsOrder}
+            columnOrder={layoutConfig.columnOrder}
             entities={list}
             onColumnPreferencesChange={onColumnPreferencesChange}
             onPageSizeChange={onPageSizeChange}

@@ -43,6 +43,7 @@ describe('useTableLayout hook', () => {
     defaultSort: { attributeId: 'description', direction: 'asc' } as const,
     defaultPageSize: 20,
     defaultDisplayedAttributes: ['title'],
+    defaultColumnOrder: ['title'],
   };
 
   afterEach(() => {

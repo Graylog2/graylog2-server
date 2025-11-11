@@ -29,7 +29,6 @@ import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElemen
 import SearchActions from './SearchActions';
 
 import BulkActions from '../BulkActions';
-import { DEFAULT_LAYOUT } from '../Constants';
 
 type Props = {
   activeSavedSearchId: string;
@@ -79,7 +78,6 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
 
   const { list: savedSearches, pagination, attributes } = paginatedSavedSearches;
   const columnSchemas = [...attributes, ...pluggableAttributes.attributes];
-  const columnsOrder = [...DEFAULT_LAYOUT.columnsOrder, ...pluggableAttributes.attributeNames];
 
   return (
     <PaginatedList
@@ -108,7 +106,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
         <EntityDataTable<View>
           entities={savedSearches}
           columnPreferences={layoutConfig.columnPreferences}
-          columnsOrder={columnsOrder}
+          columnOrder={layoutConfig.columnOrder}
           onColumnPreferencesChange={onColumnPreferencesChange}
           bulkSelection={{ actions: <BulkActions /> }}
           onSortChange={onSortChange}

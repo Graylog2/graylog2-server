@@ -25,7 +25,7 @@ type DefaultLayout = {
   pageSize: number;
   sort: Sort;
   displayedColumns: Array<string>;
-  columnsOrder: Array<string>;
+  columnOrder: Array<string>;
 };
 
 const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: DefaultLayout) => {
@@ -36,6 +36,7 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     defaultPageSize: defaultLayout.pageSize,
     defaultDisplayedAttributes: defaultLayout.displayedColumns,
     defaultSort: defaultLayout.sort,
+    defaultColumnOrder: defaultLayout.columnOrder,
   });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(entityTableId);
   const searchParams = useMemo(
@@ -102,7 +103,7 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     onColumnPreferencesChange,
     onSortChange,
     onPageSizeChange,
-    columnsOrder: defaultLayout.columnsOrder,
+    columnOrder: defaultLayout.columnOrder,
   };
 };
 

@@ -82,6 +82,7 @@ export type DefaultLayout = {
   defaultSort: Sort;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
+  defaultColumnOrder: Array<string>;
 };
 
 export type ColumnMetaContext<Entity extends EntityBase> =

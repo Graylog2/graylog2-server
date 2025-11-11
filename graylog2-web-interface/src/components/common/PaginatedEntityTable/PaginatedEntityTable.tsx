@@ -51,7 +51,6 @@ type Props<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
-  columnsOrder: EntityDataTableProps['columnsOrder'];
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'];
@@ -83,7 +82,6 @@ const INITIAL_DATA = {
  */
 const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   actionsCellWidth = 160,
-  columnsOrder,
   entityActions,
   tableLayout,
   fetchEntities,
@@ -194,7 +192,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
             <EntityDataTable<T, M>
               entities={list}
               columnPreferences={layoutConfig.columnPreferences}
-              columnsOrder={columnsOrder}
+              columnOrder={layoutConfig.columnOrder}
               expandedSectionsRenderer={expandedSectionsRenderer}
               bulkSelection={bulkSelection}
               onColumnPreferencesChange={onColumnPreferencesChange}

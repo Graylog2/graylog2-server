@@ -206,7 +206,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Custom cell and header renderer for a column. Column ids need to be snake case. */
   columnRenderers?: ColumnRenderers<Entity, Meta>;
   /** Define default columns order. Column ids need to be snake case. */
-  columnsOrder?: Array<string>;
+  columnOrder?: Array<string>;
   /** The table data. */
   entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
@@ -239,7 +239,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
-  columnsOrder: attributeColumnsOder = [],
+  columnOrder: attributeColumnsOder = [],
   entities,
   expandedSectionsRenderer = undefined,
   onColumnPreferencesChange,
