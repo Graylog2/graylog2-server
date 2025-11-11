@@ -65,9 +65,9 @@ const useTableLayout = ({
       defaultPageSize,
       defaultSort,
       isInitialLoading,
+      userLayoutPreferences?.attributes,
       userLayoutPreferences.perPage,
       userLayoutPreferences.sort,
-      userLayoutPreferences?.attributes,
     ],
   );
 };

@@ -1,0 +1,5 @@
+type = "a"
+message = "Create metrics supplier for lookup tables."
+
+pulls = ["24038"]
+issues = ["Graylog2/graylog-plugin-enterprise#12226"]
