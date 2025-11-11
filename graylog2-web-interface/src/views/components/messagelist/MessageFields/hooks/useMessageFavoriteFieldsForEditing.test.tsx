@@ -25,6 +25,8 @@ import FieldType from 'views/logic/fieldtypes/FieldType';
 
 const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
 
+jest.mock('logic/telemetry/useSendTelemetry', () => jest.fn);
+
 type ProviderProps = {
   initialFavorites?: Array<string>;
   saveMock?: jest.Mock;

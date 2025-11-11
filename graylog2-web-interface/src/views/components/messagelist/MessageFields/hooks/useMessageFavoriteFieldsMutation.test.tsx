@@ -44,6 +44,8 @@ jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
 }));
 
+jest.mock('logic/telemetry/useSendTelemetry', () => jest.fn);
+
 describe('useMessageFavoriteFieldsMutation', () => {
   const streams: Array<Stream> = [
     {
