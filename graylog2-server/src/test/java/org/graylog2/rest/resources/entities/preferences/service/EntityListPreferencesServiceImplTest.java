@@ -19,7 +19,7 @@ package org.graylog2.rest.resources.entities.preferences.service;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences;
-import org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences;
+import org.graylog2.rest.resources.entities.preferences.model.SortPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferences;
 import org.graylog2.rest.resources.entities.preferences.model.StoredEntityListPreferencesId;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,7 +61,7 @@ public class EntityListPreferencesServiceImplTest {
     public void performsSaveAndGetOperationsCorrectly() {
         final StoredEntityListPreferences existingPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(EntityListPreferences.create(List.of("title", "description"), 42, new SingleFieldSortPreferences("title", ASC)))
+                .preferences(EntityListPreferences.create(List.of("title", "description"), 42, new SortPreferences("title", ASC)))
                 .build();
 
         //save
@@ -79,7 +79,7 @@ public class EntityListPreferencesServiceImplTest {
         //update with save
         StoredEntityListPreferences updatedPreference = StoredEntityListPreferences.builder()
                 .preferencesId(existingId)
-                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), 13, new SingleFieldSortPreferences("title", DESC)))
+                .preferences(EntityListPreferences.create(List.of("title", "description", "owner"), 13, new SortPreferences("title", DESC)))
                 .build();
         saved = toTest.save(updatedPreference);
         assertThat(saved).isTrue();
