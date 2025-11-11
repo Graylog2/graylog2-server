@@ -97,11 +97,13 @@ const MessageFields = () => {
     });
   }, [expanded, sendTelemetry]);
 
+  const hasFavorites = !!formattedFavorites?.length;
+
   return (
     <>
       <MessageFieldsViewModeList fields={formattedFavorites} />
-      <Separator onClick={toggleExpand} expanded={expanded} restLength={formattedRest?.length} />
-      {expanded && <MessageFieldsViewModeList fields={formattedRest} />}
+      {hasFavorites && <Separator onClick={toggleExpand} expanded={expanded} restLength={formattedRest?.length} />}
+      {(expanded || !hasFavorites) && <MessageFieldsViewModeList fields={formattedRest} />}
     </>
   );
 };

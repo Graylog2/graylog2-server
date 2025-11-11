@@ -24,7 +24,9 @@ import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import StringUtils from 'util/StringUtils';
-import useMessageFavoriteFieldsForEditing from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
+import useMessageFavoriteFieldsForEditing, {
+  DEFAULT_FIELDS,
+} from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
 import { ModalSubmit } from 'components/common';
 import MessageFieldsEditModeLists from 'views/components/messagelist/MessageFields/MessageFieldsEditModeLists';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -46,6 +48,8 @@ const ModalContentContainer = styled.div`
 const StyledAlert = styled(Alert)`
   margin-top: 0;
 `;
+
+const resetActionTitle = `Reset to default fields: ${DEFAULT_FIELDS.join(', ')}`;
 
 const MessageFieldsEditModal = ({ toggleEditMode }) => {
   const {
@@ -114,7 +118,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
         <ModalSubmit
           submitButtonText="Save Configuration"
           leftCol={
-            <Button bsStyle="link" onClick={_resetFavoriteFields}>
+            <Button bsStyle="link" onClick={_resetFavoriteFields} title={resetActionTitle}>
               Reset to default
             </Button>
           }

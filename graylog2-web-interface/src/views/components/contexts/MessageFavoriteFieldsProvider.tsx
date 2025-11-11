@@ -27,6 +27,7 @@ import useMessageFavoriteFieldsMutation from 'views/components/messagelist/Messa
 import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import type { Stream } from 'logic/streams/types';
+import { DEFAULT_FIELDS } from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;
@@ -43,7 +44,14 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
   }, [message.fields.streams, streamsList]);
 
   const initialFavoriteFields = useMemo(
-    () => uniq(flattenDeep(zip(streams.map((stream) => stream.favorite_fields)))),
+    () =>
+      uniq(
+        flattenDeep(
+          zip(
+            streams.map((stream) => (Array.isArray(stream.favorite_fields) ? stream.favorite_fields : DEFAULT_FIELDS)),
+          ),
+        ),
+      ),
     [streams],
   );
   const { saveFavoriteField, toggleField, isLoading } = useMessageFavoriteFieldsMutation(
