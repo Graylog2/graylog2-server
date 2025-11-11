@@ -117,12 +117,7 @@ public class ClientOS implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        for (String index : indices) {
-            if (indicesExists(index)) {
-                final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
-                client.execute((c, requestOptions) -> c.indices().delete(deleteIndexRequest, requestOptions));
-            }
-        }
+        opensearchClient.sync(c -> c.indices().delete(r -> r.index(List.of(indices))), "Failed to delete indices");
     }
 
     public void deleteDataStreams() {

@@ -43,7 +43,9 @@ public class ClusterStateApi {
     public Map<String, Set<String>> fields(Collection<String> indices) {
         final StateResponse state = officialClient.sync(c -> c.cluster().state(r -> r.metric(List.of(ClusterStateMetric.Metadata)).index(new LinkedList<>(indices))), "Failed to obtain cluster state metadata");
         final MyResponse response = state.valueBody().to(MyResponse.class);
-        return response.metadata().indices().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> collectFields(e.getValue())));
+        return response.metadata().indices().entrySet().stream()
+                .filter(entry -> entry.getValue().hasAnyProperties())
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> collectFields(e.getValue())));
     }
 
     private Set<String> collectFields(Index index) {
@@ -62,6 +64,9 @@ public class ClusterStateApi {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private record Index(Map<String, Mapping> mappings) {
+        public boolean hasAnyProperties() {
+            return mappings.values().stream().anyMatch(v -> !v.properties().isEmpty());
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)

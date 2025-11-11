@@ -34,6 +34,7 @@ class ClusterStateApiIT {
 
     private static final String MY_INDEX_NAME = "my_index_0";
     private static final String MY_OTHER_INDEX_NAME = "my_other_index_0";
+    private static final String MY_EMPTY_INDEX_NAME = "my_empty_index_0";
     @Rule
     public final OpenSearchInstance opensearch = OpenSearchInstance.create();
     private ClusterStateApi clusterStateApi;
@@ -43,13 +44,17 @@ class ClusterStateApiIT {
     setUp() {
         generateIndex(MY_INDEX_NAME, 10, i -> new MyDocument("doc" + i, i, new Date()));
         generateIndex(MY_OTHER_INDEX_NAME, 10, i -> new MyDatapoint(i, new Date()));
+
+        // this one is empty and has no document and no mappings
+        opensearch.getOfficialOpensearchClient().sync(c -> c.indices().create(r -> r.index(MY_EMPTY_INDEX_NAME)), "Failed to create index " + MY_EMPTY_INDEX_NAME);
+
         opensearch.client().refreshNode();
         clusterStateApi = new ClusterStateApi(opensearch.getOfficialOpensearchClient());
     }
 
     @AfterEach
     void tearDown() {
-        opensearch.client().deleteIndices(MY_INDEX_NAME, MY_OTHER_INDEX_NAME);
+        opensearch.client().deleteIndices(MY_INDEX_NAME, MY_OTHER_INDEX_NAME, MY_EMPTY_INDEX_NAME);
     }
 
     @Test
@@ -57,6 +62,12 @@ class ClusterStateApiIT {
         final Map<String, Set<String>> fields = clusterStateApi.fields(Set.of(MY_INDEX_NAME, MY_OTHER_INDEX_NAME));
         Assertions.assertThat(fields).containsEntry(MY_INDEX_NAME, Set.of("name", "count", "created"));
         Assertions.assertThat(fields).containsEntry(MY_OTHER_INDEX_NAME, Set.of("value", "created"));
+    }
+
+    @Test
+    void testEmptyIndex() {
+        Assertions.assertThat(clusterStateApi.fields(Set.of(MY_EMPTY_INDEX_NAME)))
+                .isEmpty();
     }
 
     private <T> void generateIndex(String indexName, int documentsCount, Function<Integer, T> documentCreator) {
