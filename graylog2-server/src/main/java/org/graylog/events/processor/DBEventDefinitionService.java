@@ -79,7 +79,9 @@ public class DBEventDefinitionService {
     @Inject
     public DBEventDefinitionService(MongoCollections mongoCollections,
                                     DBEventProcessorStateService stateService,
-                                    EntityRegistrar entityRegistrar, EntityScopeService entityScopeService, SearchFiltersReFetcher searchFiltersRefetcher) {
+                                    EntityRegistrar entityRegistrar,
+                                    EntityScopeService entityScopeService,
+                                    SearchFiltersReFetcher searchFiltersRefetcher) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, EventDefinitionDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
         this.scopedEntityMongoUtils = mongoCollections.scopedEntityUtils(collection, entityScopeService);
