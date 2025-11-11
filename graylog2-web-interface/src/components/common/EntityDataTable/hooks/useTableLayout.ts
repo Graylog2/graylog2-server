@@ -43,18 +43,24 @@ const columnPreferences = (userColumnPreferneces: ColumnPreferences, defaultAttr
 const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDisplayedAttributes }: DefaultLayout) => {
   const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId);
 
-  const test = columnPreferences(userLayoutPreferences?.attributes, defaultDisplayedAttributes);
-
   return useMemo(
     () => ({
       layoutConfig: {
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
         sort: userLayoutPreferences.sort ?? defaultSort,
-        columnPreferences: test,
+        columnPreferences: columnPreferences(userLayoutPreferences?.attributes, defaultDisplayedAttributes),
       },
       isInitialLoading,
     }),
-    [defaultPageSize, defaultSort, isInitialLoading, test, userLayoutPreferences.perPage, userLayoutPreferences.sort],
+    [
+      defaultDisplayedAttributes,
+      defaultPageSize,
+      defaultSort,
+      isInitialLoading,
+      userLayoutPreferences?.attributes,
+      userLayoutPreferences.perPage,
+      userLayoutPreferences.sort,
+    ],
   );
 };
 
