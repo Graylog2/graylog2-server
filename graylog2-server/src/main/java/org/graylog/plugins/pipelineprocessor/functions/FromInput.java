@@ -52,17 +52,24 @@ public class FromInput extends AbstractFunction<Boolean> {
         String id = idParam.optional(args, context).orElse("");
 
         MessageInput input = null;
-        if (id.isEmpty()) {
+        if ("".equals(id)) {
             final String name = nameParam.optional(args, context).orElse("");
-            if (name.isEmpty()) {
+            for (IOState<MessageInput> messageInputIOState : inputRegistry.getInputStates()) {
+                final MessageInput messageInput = messageInputIOState.getStoppable();
+                if (messageInput.getTitle().equalsIgnoreCase(name)) {
+                    input = messageInput;
+                    break;
+                }
+            }
+            if ("".equals(name)) {
                 return null;
             }
-            input = inputRegistry.getByTitle(name);
         } else {
             final IOState<MessageInput> inputState = inputRegistry.getInputState(id);
             if (inputState != null) {
                 input = inputState.getStoppable();
             }
+
         }
         return input != null
                 && input.getId().equals(context.currentMessage().getSourceInputId());

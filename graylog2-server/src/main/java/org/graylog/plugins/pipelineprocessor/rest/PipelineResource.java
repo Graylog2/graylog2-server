@@ -252,7 +252,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     }
 
     @ApiOperation(value = "Get rules metadata of a processing pipeline")
-    @Path("/meta/rules/{id}")
+    @Path("/{id}/meta/rules")
     @GET
     public PipelineRulesMetadataDao getRulesMetadata(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_READ, id);

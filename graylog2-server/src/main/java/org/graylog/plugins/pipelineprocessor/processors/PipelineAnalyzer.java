@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static org.graylog.plugins.pipelineprocessor.functions.FromInput.ID_ARG;
 import static org.graylog.plugins.pipelineprocessor.functions.FromInput.NAME_ARG;
+import static org.graylog2.plugin.Message.FIELD_GL2_FORWARDER_INPUT;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
 public class PipelineAnalyzer {
@@ -57,6 +58,10 @@ public class PipelineAnalyzer {
     public static final Set<String> REFERENCING_FUNCTIONS = Set.of(
             "from_forwarder_input",
             "from_input"
+    );
+    public static final Set<String> REFERENCING_VARIABLES = Set.of(
+            FIELD_GL2_SOURCE_INPUT,
+            FIELD_GL2_FORWARDER_INPUT
     );
 
     private final PipelineStreamConnectionsService connectionsService;
@@ -185,9 +190,9 @@ public class PipelineAnalyzer {
         @Override
         public void enterEquality(EqualityExpression expr) {
             Expression inputIdCandidate = null;
-            if (expr.left().toString().contains(FIELD_GL2_SOURCE_INPUT)) {
+            if (isReferenced(expr.left().toString())) {
                 inputIdCandidate = expr.right();
-            } else if (expr.right().toString().contains(FIELD_GL2_SOURCE_INPUT)) {
+            } else if (isReferenced(expr.right().toString())) {
                 inputIdCandidate = expr.left();
             }
             if (inputIdCandidate instanceof StringExpression stringExpression) {
@@ -196,6 +201,10 @@ public class PipelineAnalyzer {
                     createOrUpdateMention(inputId);
                 }
             }
+        }
+
+        private boolean isReferenced(String value) {
+            return REFERENCING_VARIABLES.stream().anyMatch(pattern -> pattern.contains(value));
         }
 
         @Override
