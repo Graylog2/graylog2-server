@@ -16,9 +16,12 @@
  */
 package org.graylog2.inputs;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
@@ -33,6 +36,7 @@ import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,7 +44,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,11 +52,6 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_CONFIGURATION;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATED_AT;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_CREATOR_USER_ID;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_TITLE;
-import static org.graylog2.plugin.inputs.MessageInput.FIELD_TYPE;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -64,6 +62,7 @@ public class InputServiceImplTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     @Mock
     private ExtractorFactory extractorFactory;
@@ -85,7 +84,7 @@ public class InputServiceImplTest {
         clusterEventBus = new ClusterEventBus("inputs-test", Executors.newSingleThreadExecutor());
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
         inputService = new InputServiceImpl(
-                mongodb.mongoConnection(),
+                new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()),
                 extractorFactory,
                 converterFactory,
                 messageInputFactory,
@@ -174,16 +173,17 @@ public class InputServiceImplTest {
 
         final EncryptedValue secret = encryptedValueService.encrypt("secret");
         final EncryptedValue secret2 = encryptedValueService.encrypt("secret2");
-        final String id = inputService.save(new InputImpl(Map.of(
-                FIELD_TYPE, "test type",
-                FIELD_TITLE, "test title",
-                FIELD_CREATED_AT, new Date(),
-                FIELD_CREATOR_USER_ID, "test creator",
-                FIELD_CONFIGURATION, Map.of(
+        final InputImpl newInput = InputImpl.builder()
+                .getTitle("test title")
+                .getType("test type")
+                .getCreatorUserId("test creator")
+                .getCreatedAt(new DateTime())
+                .getConfiguration(Map.of(
                         "encrypted", secret,
                         "encrypted2", secret2
-                )
-        )));
+                ))
+                .build();
+        final String id = inputService.save(newInput);
 
         assertThat(id).isNotBlank();
 

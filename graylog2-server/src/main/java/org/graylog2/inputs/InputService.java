@@ -18,8 +18,6 @@ package org.graylog2.inputs;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.IOState;
-import org.graylog2.plugin.database.Persisted;
-import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -31,7 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-public interface InputService extends PersistedService {
+public interface InputService {
     List<Input> all();
 
     List<Input> allOfThisNode(String nodeId);
@@ -40,9 +38,13 @@ public interface InputService extends PersistedService {
 
     Input create(Map<String, Object> fields);
 
-    <T extends Persisted> String saveWithoutEvents(T model) throws ValidationException;
+    String save(Input model) throws ValidationException;
 
-    String update(Input model) throws ValidationException;
+    String saveWithoutEvents(Input input) throws ValidationException;
+
+    String update(Input input) throws ValidationException;
+
+    int destroy(Input input);
 
     Input find(String id) throws NotFoundException;
 
@@ -102,7 +104,7 @@ public interface InputService extends PersistedService {
 
     void addStaticField(Input input, String key, String value) throws ValidationException;
 
-    List<Extractor> getExtractors(Input input);
+    List<Extractor> getExtractors(String inputId);
 
     Extractor getExtractor(Input input, String extractorId) throws NotFoundException;
 
@@ -114,7 +116,7 @@ public interface InputService extends PersistedService {
 
     MessageInput getMessageInput(Input io) throws NoSuchInputTypeException;
 
-    List<Map.Entry<String, String>> getStaticFields(Input input);
+    List<Map.Entry<String, String>> getStaticFields(String inputId);
 
     void persistDesiredState(Input input, IOState.Type desiredState);
 }
