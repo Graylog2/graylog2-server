@@ -26,7 +26,7 @@ const INITIAL_DATA = {};
 const attributesFromJSON = (attributes: TableLayoutPreferencesJSON['attributes']) => {
   const attributeIds = Object.keys(attributes ?? {});
 
-  if (attributeIds.length >= 0) {
+  if (attributeIds.length <= 0) {
     return undefined;
   }
 
