@@ -78,7 +78,7 @@ describe('NumberRefExpression', () => {
     );
 
     await screen.findByText(/avg\(\)/i);
-    await screen.findByText(/took_ms - long/i);
+    await screen.findByText(/took_ms/i);
   });
 
   it('should update ref and add series when function changes', async () => {

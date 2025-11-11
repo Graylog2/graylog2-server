@@ -68,6 +68,8 @@ type Props = {
 };
 
 const FieldTypeIcon = ({ type, monospace = true }: Props) => {
+  console.log(type.type);
+
   const icon = <Icon name={iconName(type.type)} className={styles.fieldTypeIcon} />;
 
   return monospace ? <IconWrapper>{icon}</IconWrapper> : icon;

@@ -63,7 +63,7 @@ type OptionRendererProps = {
   type?: FieldType;
 };
 
-const OptionRenderer = ({ label, qualified, type = undefined }: OptionRendererProps) => {
+const optionRenderer = ({ label, qualified, type = undefined }: OptionRendererProps) => {
   const children = (
     <FieldName>
       {type && (
@@ -187,9 +187,9 @@ const NumberRefExpression = ({
     () =>
       formattedFields
         .map((field) => ({
-          label: `${field.name} – ${field.value.type.type}`,
+          label: `${field.name}`,
           value: field.name,
-          type: field.value.type.type,
+          type: field.value.type,
           qualified: isFieldQualified(field),
         }))
         .sort(sortByLabel),
@@ -230,7 +230,7 @@ const NumberRefExpression = ({
               placeholder="Select Field (Optional)"
               onChange={handleAggregationFieldChange}
               options={fieldOptions}
-              optionRenderer={OptionRenderer}
+              optionRenderer={optionRenderer}
               value={series.field}
               allowCreate
             />
