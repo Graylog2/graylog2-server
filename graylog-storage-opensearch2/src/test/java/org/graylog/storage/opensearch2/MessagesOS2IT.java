@@ -22,6 +22,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesIT;
+import org.junit.After;
 import org.junit.Rule;
 
 import java.util.Map;
@@ -33,6 +34,13 @@ public class MessagesOS2IT extends MessagesIT {
     @Override
     protected SearchServerInstance searchServer() {
         return this.openSearchInstance;
+    }
+
+    @After
+    public void tearDownServer() {
+        // Forcing restart of OpenSearch, avoiding out of memory errors for subsequent tests
+        openSearchInstance.close();
+        openSearchInstance.init();
     }
 
     @Override

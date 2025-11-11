@@ -45,8 +45,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.opensearch.testcontainers.OpenSearchContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
@@ -62,13 +60,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class OpenSearchInstance extends TestableSearchServerInstance {
-    private static final Logger LOG = LoggerFactory.getLogger(OpenSearchInstance.class);
-
     private OpenSearchClient openSearchClient;
     private Client client;
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
-    private List<String> featureFlags;
+    private final List<String> featureFlags;
 
     public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
         this(cachedInstance, version, hostname, network, heapSize, featureFlags, Map.of());
