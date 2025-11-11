@@ -14,25 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.rest.resources.entities.preferences.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
+package org.graylog.storage.opensearch3;
 
-public record SortPreferences(@JsonProperty("field") String sortField,
-                              @JsonProperty("order") SortOrder sortOrder) {
-    public enum SortOrder {
-        ASC("asc"), DESC("desc");
+import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.indices.IndicesAdapterIT;
+import org.junit.Rule;
 
-        private final String title;
+public class IndicesAdapterOSIT extends IndicesAdapterIT {
 
-        SortOrder(String title) {
-            this.title = title;
-        }
+    @Rule
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
-        @JsonValue
-        public String getTitle() {
-            return title;
-        }
+    @Override
+    protected SearchServerInstance searchServer() {
+        return openSearchInstance;
     }
+
+
 }
