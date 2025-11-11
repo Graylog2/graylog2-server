@@ -23,27 +23,23 @@ import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavor
 import type { FormattedField } from 'views/components/messagelist/MessageFields/types';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
-const DEFAULT_FIELDS = ['default1', 'default2'];
-
-jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields', () => ({
-  __esModule: true,
-  default: jest.fn(),
-  DEFAULT_FIELDS,
-}));
+const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
 
 type ProviderProps = {
   initialFavorites?: Array<string>;
   saveMock?: jest.Mock;
+  toggleFieldMock?: jest.Mock;
 };
 
 const createWrapper =
-  ({ initialFavorites = ['one', 'two'], saveMock = jest.fn() }: ProviderProps = {}) =>
+  ({ initialFavorites = ['one', 'two'], toggleFieldMock = jest.fn(), saveMock = jest.fn() }: ProviderProps = {}) =>
   ({ children }: { children: React.ReactNode }) => (
     <MessageFavoriteFieldsContext.Provider
       value={{
+        isLoading: false,
         favoriteFields: initialFavorites,
         saveFavoriteField: saveMock,
-        isLoadingFavoriteFields: false,
+        toggleField: toggleFieldMock,
         messageFields: Immutable.List([]),
         message: undefined,
       }}>
