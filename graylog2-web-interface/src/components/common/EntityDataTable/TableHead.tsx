@@ -54,15 +54,18 @@ const DragIcon = styled(Icon)`
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
 
-  const { attributes, isDragging, listeners, setNodeRef, transform } = useSortable({
+  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
     id: header.column.id,
     disabled: !columnMeta?.enableColumnOrdering,
   });
+
+  console.log(transform);
 
   const style: CSSProperties = {
     opacity: isDragging ? 0.8 : 1,
     position: 'relative',
     transform: CSS.Translate.toString(transform), // translate instead of transform to avoid squishing
+    transformOrigin: 'left center',
     transition: 'width transform 0.2s ease-in-out',
     whiteSpace: 'nowrap',
     width: header.column.getSize(),
@@ -72,7 +75,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
   return (
     <Th $width={header.getSize()} colSpan={header.colSpan} key={header.id} ref={setNodeRef} style={style}>
       {columnMeta?.enableColumnOrdering && (
-        <DragHandle {...attributes} {...listeners} $isDragging={isDragging}>
+        <DragHandle ref={setActivatorNodeRef} {...attributes} {...listeners} $isDragging={isDragging}>
           <DragIcon name="drag_indicator" />
         </DragHandle>
       )}

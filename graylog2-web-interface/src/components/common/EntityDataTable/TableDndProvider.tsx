@@ -16,7 +16,9 @@
  */
 
 import * as React from 'react';
+import { useState, forwardRef, useCallback, useMemo } from 'react';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+import type { Modifier, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import {
   closestCenter,
   DndContext,
@@ -25,20 +27,15 @@ import {
   MouseSensor,
   TouchSensor,
   KeyboardSensor,
-  type DragStartEvent,
-  type DragEndEvent,
   DragOverlay,
-  pointerWithin,
 } from '@dnd-kit/core';
-import { snapCenterToCursor } from '@dnd-kit/modifiers';
-import { useState, forwardRef, useCallback, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import { getEventCoordinates } from '@dnd-kit/utilities';
 import styled, { css } from 'styled-components';
 import type { Table } from '@tanstack/react-table';
 
 import zIndices from 'theme/z-indices';
 import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
-import { Icon } from 'components/common';
+import Icon from 'components/common/Icon';
 import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 
 const CustomDragOverlay = styled.div(
@@ -49,16 +46,30 @@ const CustomDragOverlay = styled.div(
     width: min-content;
     font-weight: bold;
     white-space: nowrap;
-    box-shadow: ${theme.colors.input.boxShadow};
+    box-shadow:
+      rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+      rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+
+    border-radius: 5px;
+    border: 1px solid ${theme.colors.variant.lighter.default};
     display: flex;
     align-items: center;
-    gap: ${theme.spacings.sm};
+    line-height: 0;
+
+    gap: ${theme.spacings.xs};
+    cursor: grabbing;
+  `,
+);
+
+const DragOverlayIcon = styled(Icon)(
+  ({ theme }) => css`
+    color: ${theme.colors.text.secondary};
   `,
 );
 
 const Item = forwardRef(({ title }: { title: string }, ref: React.ForwardedRef<HTMLDivElement>) => (
   <CustomDragOverlay ref={ref}>
-    <Icon name="drag_pan" /> {title}
+    <DragOverlayIcon name="drag_pan" /> {title}
   </CustomDragOverlay>
 ));
 
@@ -67,6 +78,27 @@ const activeColumnTitle = <Entity extends EntityBase>(table: Table<Entity>, acti
     ?.meta as ColumnMetaContext<Entity>;
 
   return activeColumnMeta.label;
+};
+
+const snapOverlayToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
+  if (draggingNodeRect && activatorEvent) {
+    const activatorCoordinates = getEventCoordinates(activatorEvent);
+
+    if (!activatorCoordinates) {
+      return transform;
+    }
+
+    const offsetX = activatorCoordinates.x - draggingNodeRect.left;
+    const offsetY = activatorCoordinates.y - draggingNodeRect.top;
+
+    return {
+      ...transform,
+      x: transform.x + offsetX - 20,
+      y: transform.y + offsetY - 20,
+    };
+  }
+
+  return transform;
 };
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
@@ -113,7 +145,7 @@ const TableDndProvider = <Entity extends EntityBase>({
     <DndContext
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
-      modifiers={[snapCenterToCursor]}
+      modifiers={[snapOverlayToCursor]}
       onDragStart={handleDragStart}
       sensors={sensors}>
       <SortableContext items={draggableColumns} strategy={horizontalListSortingStrategy}>
