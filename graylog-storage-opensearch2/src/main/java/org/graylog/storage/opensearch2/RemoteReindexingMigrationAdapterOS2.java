@@ -261,7 +261,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         }
     }
 
-    private ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password, MigrationConfiguration migration) {
+    private ReindexRequest createReindexRequest(final String index, final BytesReference query, URI uri, String username, String password) {
         final ReindexRequest reindexRequest = new ReindexRequest();
         reindexRequest
                 .setRemoteInfo(new RemoteInfo(uri.getScheme(), uri.getHost(), uri.getPort(), uri.getPath(), query, username, password, Map.of(), RemoteInfo.DEFAULT_SOCKET_TIMEOUT, RemoteInfo.DEFAULT_CONNECT_TIMEOUT))
@@ -485,7 +485,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 final RequestOptions withHeader = requestOptions.toBuilder()
                         .addHeader(Task.X_OPAQUE_ID, migration.id())
                         .build();
-                return c.submitReindexTask(createReindexRequest(indexName, query, uri, username, password, migration), withHeader);
+                return c.submitReindexTask(createReindexRequest(indexName, query, uri, username, password), withHeader);
             });
             reindexMigrationService.assignTask(migration.id(), indexName, task.getTask());
             waitForTaskCompleted(migration, indexName, task.getTask(), locks);
@@ -656,7 +656,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private void recalculateIndexRanges(String index) {
         indices.refresh(index);
         try {
-            systemJobManager.submit(singleIndexRangeJobFactory.create(Set.of(), index));
+            systemJobManager.submit(singleIndexRangeJobFactory.create(index));
         } catch (SystemJobConcurrencyException e) {
             LOG.warn("Unable to trigger index range calculation for index: {}", index, e);
         }
