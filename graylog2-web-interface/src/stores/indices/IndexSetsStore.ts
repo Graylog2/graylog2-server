@@ -27,7 +27,7 @@ import type { DataTieringConfig, DataTieringFormValues, DataTieringStatus } from
 
 export type IndexSetFieldRestriction = {
   field_name: string;
-  type: 'immutable' | 'immutable_and_hidden';
+  type: 'immutable' | 'hidden';
 };
 
 export type IndexSetConfig = {

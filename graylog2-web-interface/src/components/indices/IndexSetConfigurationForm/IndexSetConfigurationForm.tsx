@@ -47,6 +47,7 @@ import IndexSetReadOnlyConfiguration from 'components/indices/IndexSetConfigurat
 import IndexSetRotationRetentionConfigurationSection from 'components/indices/IndexSetConfigurationForm/IndexSetRotationRetentionConfigurationSection';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
+import { parseFieldRestrictions } from 'components/indices/helpers/fieldRestrictions';
 
 type Props = {
   cancelLink: string;
@@ -113,22 +114,6 @@ const IndexSetConfigurationForm = ({
 
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
-  const parseFieldRestrictions = (field_restrictions: IndexSetFieldRestriction[]) => {
-    const getHidden = () =>
-      Object.keys(field_restrictions).filter(
-        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'hidden').length > 0,
-      );
-
-    const getImmutable = () =>
-      Object.keys(field_restrictions).filter(
-        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'immutable').length > 0,
-      );
-
-    if (field_restrictions) return [getImmutable(), getHidden()];
-
-    return [[], []];
-  };
-
   useEffect(() => {
     if (indexSet?.use_legacy_rotation) {
       setSelectedRetentionSegment('legacy');
@@ -138,9 +123,11 @@ const IndexSetConfigurationForm = ({
   }, [indexSet]);
 
   useEffect(() => {
-    const [tmpImmutable, tmpHidden] = parseFieldRestrictions(indexSet?.field_restrictions);
-    setImmutableFields(tmpImmutable);
-    setHiddenFields(tmpHidden);
+    const { immutableFields: parsedImmutableFields, hiddenFields: parsedHiddenFields } = parseFieldRestrictions(
+      indexSet?.field_restrictions,
+    );
+    setImmutableFields(parsedImmutableFields);
+    setHiddenFields(parsedHiddenFields);
   }, [indexSet]);
 
   const isDataTieringImmutable = useMemo(() => immutableFields.includes('data_tiering'), [immutableFields]);
