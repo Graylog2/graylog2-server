@@ -29,7 +29,6 @@ import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
-import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
@@ -80,7 +79,7 @@ public class AdaptersOS implements Adapters {
     public IndicesAdapter indicesAdapter() {
         return new IndicesAdapterOS(client,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
-                new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
+                new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),
                 featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
