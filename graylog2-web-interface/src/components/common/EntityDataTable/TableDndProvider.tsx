@@ -40,15 +40,15 @@ import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 
 const CustomDragOverlay = styled.div(
   ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
+    background-color: ${theme.colors.global.background};
     z-index: ${zIndices.dropdownMenu};
     padding: ${theme.spacings.sm};
     width: min-content;
     font-weight: bold;
     white-space: nowrap;
     box-shadow:
-      rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
-      rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+      rgba(60, 64, 67, 0.3) 0 1px 2px 0,
+      rgba(60, 64, 67, 0.15) 0 2px 6px 2px;
 
     border-radius: 5px;
     border: 1px solid ${theme.colors.variant.lighter.default};
