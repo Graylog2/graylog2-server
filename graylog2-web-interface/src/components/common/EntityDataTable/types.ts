@@ -59,7 +59,11 @@ export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
 };
 
 export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
-  displayed_attributes?: Array<string>;
+  attributes?: {
+    [attributeId: string]: {
+      status: 'show' | 'hide';
+    };
+  };
   sort?: {
     field: string;
     order: 'asc' | 'desc';
