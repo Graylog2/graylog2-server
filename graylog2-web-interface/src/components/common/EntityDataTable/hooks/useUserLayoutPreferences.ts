@@ -23,8 +23,15 @@ import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {};
 
-const attributesFromJSON = (attributes: TableLayoutPreferencesJSON['attributes']) =>
-  Object.keys(attributes).filter((key) => attributes[key].status === 'show');
+const attributesFromJSON = (attributes: TableLayoutPreferencesJSON['attributes']) => {
+  const attributeIds = Object.keys(attributes ?? {});
+
+  if (attributeIds.length >= 0) {
+    return undefined;
+  }
+
+  return attributeIds.filter((key) => attributes[key].status === 'show');
+};
 
 const preferencesFromJSON = ({
   attributes,
@@ -32,7 +39,7 @@ const preferencesFromJSON = ({
   per_page,
   custom_preferences,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
-  displayedAttributes: attributes ? attributesFromJSON(attributes) : undefined,
+  displayedAttributes: attributesFromJSON(attributes),
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
   customPreferences: custom_preferences,
