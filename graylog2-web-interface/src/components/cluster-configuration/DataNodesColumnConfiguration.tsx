@@ -35,17 +35,17 @@ const RoleLabel = styled(Label)`
   gap: 4px;
 `;
 
-export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'jvm', 'version', 'role'] as const;
+export const DEFAULT_VISIBLE_COLUMNS = ['hostname', 'data_node_status', 'jvm', 'datanode_version', 'opensearch_roles'] as const;
 
 const JVM_WARNING_THRESHOLD = 0.7;
 const JVM_DANGER_THRESHOLD = 0.9;
 
 export const createColumnDefinitions = (): Array<Column> => [
-  { id: 'node', title: 'Node' },
-  { id: 'state', title: 'State' },
-  { id: 'jvm', title: 'JVM' },
-  { id: 'version', title: 'Version' },
-  { id: 'role', title: 'Role' },
+  { id: 'hostname', title: 'Node', sortable: true },
+  { id: 'data_node_status', title: 'State', sortable: true },
+  { id: 'jvm', title: 'JVM', sortable: false },
+  { id: 'datanode_version', title: 'Version', sortable: true },
+  { id: 'opensearch_roles', title: 'Role', sortable: true },
 ];
 
 const getRoleLabels = (roles: Array<string>) =>
@@ -71,7 +71,7 @@ const renderRatioIndicator = (ratio: number | undefined, warning: number, danger
 
 export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
   attributes: {
-    node: {
+    hostname: {
       renderCell: (_value, entity) => {
         const datanodeRouteId = entity.node_id ?? entity.id;
         const nodeName = entity.hostname ?? datanodeRouteId;
@@ -83,7 +83,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
         return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
       },
     },
-    state: {
+    data_node_status: {
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
     },
     jvm: {
@@ -108,14 +108,14 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
         );
       },
     },
-    version: {
+    datanode_version: {
       renderCell: (_value, entity) => (
         <SecondaryText>
           <span>{entity.datanode_version ?? 'N/A'}</span>
         </SecondaryText>
       ),
     },
-    role: {
+    opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
     },
   },

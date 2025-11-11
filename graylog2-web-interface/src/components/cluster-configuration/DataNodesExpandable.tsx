@@ -18,7 +18,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { EntityDataTable, Spinner } from 'components/common';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
-import type { SearchParams } from 'stores/PaginationTypes';
+import type { SearchParams, Sort } from 'stores/PaginationTypes';
 
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
 import {
@@ -44,7 +44,7 @@ type Props = {
 const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '', onSelectSegment = undefined }: Props) => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
-  const searchParams = DEFAULT_SEARCH_PARAMS;
+  const [searchParams, setSearchParams] = useState<SearchParams>(DEFAULT_SEARCH_PARAMS);
   const {
     data: dataNodesResponse,
     refetch,
@@ -65,7 +65,12 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
     setVisibleColumns(newColumns);
   }, []);
 
-  const handleSortChange = useCallback(() => {}, []);
+  const handleSortChange = useCallback((newSort: Sort) => {
+    setSearchParams((prev) => ({
+      ...prev,
+      sort: newSort,
+    }));
+  }, []);
   const renderActions = useCallback(
     (entity: ClusterDataNode) => <DataNodeActions dataNode={entity} refetch={refetch} />,
     [refetch],
@@ -85,6 +90,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
         columnsOrder={columnsOrder}
         onColumnsChange={handleColumnsChange}
         onSortChange={handleSortChange}
+        activeSort={searchParams.sort}
         entityAttributesAreCamelCase
         entityActions={renderActions}
         columnDefinitions={columnDefinitions}
