@@ -14,23 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
 
-export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
+package org.graylog.storage.opensearch2;
 
-const useMessageFavoriteFields = (streams: Array<string>) => {
-  const [favorites, setFavorites] = React.useState<Array<string>>(DEFAULT_FIELDS);
-  const saveFields = (fields: Array<string>) => {
-    // eslint-disable-next-line no-console
-    console.log(streams, fields);
-    setFavorites(fields);
-  };
+import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.indices.IndicesAdapterIT;
+import org.junit.Rule;
 
-  return {
-    isLoading: false,
-    favoriteFields: favorites,
-    saveFields,
-  };
-};
+public class IndicesAdapterOS2IT extends IndicesAdapterIT {
 
-export default useMessageFavoriteFields;
+    @Rule
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+
+    @Override
+    protected SearchServerInstance searchServer() {
+        return openSearchInstance;
+    }
+}

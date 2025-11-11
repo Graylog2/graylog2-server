@@ -46,7 +46,7 @@ import java.util.Set;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Favorite Fields", description = "Retrieve/set favorite fields per stream", tags = {CLOUD_VISIBLE})
+@Api(value = "FavoriteFields", description = "Retrieve/set favorite fields per stream", tags = {CLOUD_VISIBLE})
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/favorite_fields")
 public class FavoriteFieldsResource extends RestResource {
