@@ -16,15 +16,18 @@
  */
 import React from 'react';
 import { screen, render, act } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { adminUser, bob } from 'fixtures/users';
 
 import UserEdit from './UserEdit';
 
 jest.mock('./ProfileSection', () => () => <div>ProfileSection</div>);
+jest.mock('./PreferencesSection', () => () => <div>PreferencesSection</div>);
 jest.mock('./SettingsSection', () => () => <div>SettingsSection</div>);
 jest.mock('./PasswordSection', () => () => <div>PasswordSection</div>);
 jest.mock('./RolesSection', () => () => <div>RolesSection</div>);
+jest.mock('./TeamsSection', () => () => <div>TeamsSection</div>);
 
 jest.useFakeTimers();
 
@@ -53,13 +56,31 @@ describe('<UserEdit />', () => {
     expect(screen.queryByText('Profile')).not.toBeInTheDocument();
   });
 
-  it('should display profile, settings and password section', () => {
+  it('should display profile and password section', () => {
     render(<UserEdit user={user} />);
 
     expect(screen.getByText('ProfileSection')).toBeInTheDocument();
-    expect(screen.getByText('SettingsSection')).toBeInTheDocument();
-    expect(screen.getByText('RolesSection')).toBeInTheDocument();
     expect(screen.getByText('PasswordSection')).toBeInTheDocument();
+  });
+
+  it('should display settings and preferences section', async () => {
+    render(<UserEdit user={user} />);
+
+    const tab = await screen.findByLabelText(/Preferences/i);
+    userEvent.click(tab);
+
+    expect(screen.getByText('PreferencesSection')).toBeInTheDocument();
+    expect(screen.getByText('SettingsSection')).toBeInTheDocument();
+  });
+
+  it('should display roles and teams section', async () => {
+    render(<UserEdit user={user} />);
+
+    const tab = await screen.findByLabelText(/Teams & Roles/i);
+    userEvent.click(tab);
+
+    expect(screen.getByText('RolesSection')).toBeInTheDocument();
+    expect(screen.getByText('TeamsSection')).toBeInTheDocument();
   });
 
   describe('external user', () => {
