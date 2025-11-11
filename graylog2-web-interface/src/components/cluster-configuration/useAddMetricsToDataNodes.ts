@@ -31,7 +31,6 @@ const METRIC_NAMES = {
   memHeapUsed: 'mem_heap_used',
   jvmMemoryHeapUsage: 'jvm.memory.heap.usage',
   jvmMemoryHeapUsed: 'jvm.memory.heap.used',
-  jvmMemoryHeapCommitted: 'jvm.memory.heap.committed',
   jvmMemoryHeapMax: 'jvm.memory.heap.max',
   diskFree: 'disk_free',
   dnHeapUsage: 'dn_heap_usage',

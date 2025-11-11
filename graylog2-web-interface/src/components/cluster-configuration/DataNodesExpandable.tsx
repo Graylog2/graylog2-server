@@ -80,7 +80,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
       headerLeftSection={isInitialLoading && <Spinner />}
       collapsible={collapsible}>
       <EntityDataTable<ClusterDataNode>
-        entities={[...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes, ...dataNodes]} // Duplicate entries to simulate more data
+        entities={dataNodes}
         visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
         onColumnsChange={handleColumnsChange}
