@@ -15,15 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type * as Immutable from 'immutable';
 
 import { MessageDetailsDefinitionList } from 'components/common';
+import type { Stream } from 'logic/streams/types';
+import StreamLink from 'components/streams/StreamLink';
 
 type Props = {
   timestamp: string;
   receivedBy: React.ReactElement;
   index: string;
-  streams: Immutable.Set<React.ReactElement>;
+  streams: Array<Stream>;
   assets: React.ReactElement;
 };
 
@@ -35,11 +36,17 @@ const MessageMetadata = ({ timestamp, receivedBy, index, streams, assets }: Prop
     <dt>Stored in index</dt>
     <dd>{index || 'Message is not stored'}</dd>
 
-    {streams.size > 0 && (
+    {!!streams.length && (
       <>
         <dt>Routed into streams</dt>
         <dd className="stream-list">
-          <ul>{streams.toArray()}</ul>
+          <ul>
+            {streams.map((stream) => (
+              <li key={stream.id}>
+                <StreamLink stream={stream} />
+              </li>
+            ))}
+          </ul>
         </dd>
       </>
     )}

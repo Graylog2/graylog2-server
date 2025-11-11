@@ -16,10 +16,12 @@
  */
 package org.graylog.storage.opensearch3.blocks;
 
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.get.GetSettingsResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.junit.Test;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch.indices.GetIndicesSettingsResponse;
+import org.opensearch.client.opensearch.indices.IndexSettings;
+import org.opensearch.client.opensearch.indices.IndexState;
 
 import java.util.Collection;
 import java.util.Map;
@@ -35,7 +37,7 @@ public class BlockSettingsParserTest {
 
     @Test
     public void noBlockedIndicesIdentifiedIfEmptyResponseParsed() {
-        GetSettingsResponse emptyResponse = new GetSettingsResponse(Map.of(), Map.of());
+        GetIndicesSettingsResponse emptyResponse = GetIndicesSettingsResponse.of(b -> b);
         final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptyResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
@@ -43,8 +45,9 @@ public class BlockSettingsParserTest {
 
     @Test
     public void noBlockedIndicesIdentifiedIfEmptySettingsPresent() {
-        var settingsBuilder = Map.of("index_0", Settings.builder().build());
-        GetSettingsResponse emptySettingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
+        GetIndicesSettingsResponse emptySettingsResponse = GetIndicesSettingsResponse.of(b -> b
+                .result(Map.of("index_0", IndexState.builder().settings(IndexSettings.of(s -> s)).build()))
+        );
         final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(emptySettingsResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(0, indicesBlockStatus.countBlockedIndices());
@@ -52,19 +55,20 @@ public class BlockSettingsParserTest {
 
     @Test
     public void parserProperlyResponseWithMultipleIndicesWithDifferentBlockSettings() {
-        var settingsBuilder =Map.of(
-                "index_with_no_block_settings", Settings.builder().put("lalala", 42).build(),
-                "index_with_false_block_setting", Settings.builder().put("index.blocks.read_only", false).build(),
-                "index_with_true_block_setting", Settings.builder().put("index.blocks.read_only", true).build(),
-                "index_with_multiple_true_block_settings", Settings.builder()
-                        .put("index.blocks.read_only", true)
-                        .put("index.blocks.read_only_allow_delete", true)
-                        .build(),
-                "index_with_mixed_block_settings", Settings.builder()
-                        .put("index.blocks.read_only", false)
-                        .put("index.blocks.read_only_allow_delete", true)
-                        .build());
-        GetSettingsResponse settingsResponse = new GetSettingsResponse(settingsBuilder, Map.of());
+        Map<String, IndexState> settingsBuilder = Map.of(
+                "index_with_no_block_settings", IndexState.of(b -> b.settings(IndexSettings.of(s -> s.customSettings(Map.of("lala", JsonData.of(42)))))),
+                "index_with_false_block_setting", IndexState.of(b -> b.settings(IndexSettings.of(s -> s.blocksReadOnly(false)))),
+                "index_with_true_block_setting", IndexState.of(b -> b.settings(IndexSettings.of(s -> s.blocksReadOnly(true)))),
+                "index_with_multiple_true_block_settings", IndexState.of(b -> b.settings(IndexSettings.of(s -> s
+                        .blocksReadOnly(true)
+                        .blocksReadOnlyAllowDelete(true)
+                ))),
+                "index_with_mixed_block_settings", IndexState.of(b -> b.settings(IndexSettings.of(s -> s
+                        .blocksReadOnly(false)
+                        .blocksReadOnlyAllowDelete(true)))));
+        GetIndicesSettingsResponse settingsResponse = GetIndicesSettingsResponse.of(b -> b
+                .result(settingsBuilder)
+        );
         final IndicesBlockStatus indicesBlockStatus = BlockSettingsParser.parseBlockSettings(settingsResponse, Optional.empty());
         assertNotNull(indicesBlockStatus);
         assertEquals(3, indicesBlockStatus.countBlockedIndices());
