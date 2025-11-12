@@ -38,7 +38,7 @@ const SeparatorContainer = styled.div(
   ({ theme }) => css`
     display: flex;
     align-items: center;
-    color: ${theme.colors.table.row.divider};
+    color: ${theme.colors.text.secondary};
     cursor: pointer;
     padding: ${theme.spacings.xxs} 0;
     font-size: ${theme.fonts.size.small};

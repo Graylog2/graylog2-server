@@ -48,7 +48,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         .then(() => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_SAVED, {
             app_action_value: {
-              fields_quantities: Object.values(newFavoriteFieldsByStream).map((fields) => fields.length),
+              fields_lengths: Object.values(newFavoriteFieldsByStream).map((fields) => fields.length),
             },
           });
 
