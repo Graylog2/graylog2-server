@@ -17,7 +17,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 
 import { EntityDataTable, Spinner } from 'components/common';
-import type { Column } from 'components/common/EntityDataTable';
+import type { ColumnSchema } from 'components/common/EntityDataTable';
 
 import useClusterGraylogNodes from './useClusterGraylogNodes';
 import type { GraylogNode } from './useClusterGraylogNodes';
@@ -44,7 +44,7 @@ const GraylogNodesExpandable = ({
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
 
-  const columnDefinitions = useMemo<Array<Column>>(() => createColumnDefinitions(), []);
+  const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
   const totalGraylogNodes = graylogNodes.length;
 
@@ -75,7 +75,7 @@ const GraylogNodesExpandable = ({
         onSortChange={handleSortChange}
         entityAttributesAreCamelCase
         entityActions={renderActions}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
         columnRenderers={columnRenderers}
         actionsCellWidth={160}
       />

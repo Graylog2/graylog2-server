@@ -19,7 +19,7 @@ import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
 import { Link } from 'components/common/router';
-import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
+import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 
@@ -102,7 +102,7 @@ const getNodeDisplayName = (node: GraylogNode) => {
 
 export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'messageProcessing', 'loadBalancer', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput'] as const;
 
-export const createColumnDefinitions = (): Array<Column> => [
+export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'node', title: 'Node' },
   { id: 'state', title: 'State' },
   { id: 'messageProcessing', title: 'Message Processing' },

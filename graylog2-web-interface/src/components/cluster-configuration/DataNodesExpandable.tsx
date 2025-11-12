@@ -17,6 +17,7 @@
 import React, { useMemo } from 'react';
 
 import { EntityDataTable, Spinner } from 'components/common';
+import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
 import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
@@ -48,7 +49,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
     isInitialLoading,
   } = useClusterDataNodes(searchParams);
 
-  const columnDefinitions = useMemo(() => createColumnDefinitions(), []);
+  const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
   const dataNodes = dataNodesResponse?.list ?? [];
@@ -73,7 +74,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
         activeSort={searchParams.sort}
         entityAttributesAreCamelCase
         entityActions={renderActions}
-        columnDefinitions={columnDefinitions}
+        columnSchemas={columnSchemas}
         columnRenderers={columnRenderers}
       />
     </ClusterNodesSectionWrapper>

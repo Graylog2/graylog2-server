@@ -18,7 +18,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
-import type { Column, ColumnRenderers } from 'components/common/EntityDataTable';
+import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import { Link } from 'components/common/router';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import type { DataNode } from 'components/datanode/Types';
@@ -40,7 +40,7 @@ export const DEFAULT_VISIBLE_COLUMNS = ['hostname', 'data_node_status', 'jvm', '
 const JVM_WARNING_THRESHOLD = 0.7;
 const JVM_DANGER_THRESHOLD = 0.9;
 
-export const createColumnDefinitions = (): Array<Column> => [
+export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'hostname', title: 'Node', sortable: true },
   { id: 'data_node_status', title: 'State', sortable: true },
   { id: 'jvm', title: 'JVM', sortable: false },
