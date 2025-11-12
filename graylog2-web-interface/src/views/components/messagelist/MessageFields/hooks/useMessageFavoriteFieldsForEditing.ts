@@ -17,9 +17,10 @@
 import { useState, useCallback, useContext } from 'react';
 import uniq from 'lodash/uniq';
 
-import { DEFAULT_FIELDS } from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FormattedField } from 'views/components/messagelist/MessageFields/types';
+
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
 
 const useMessageFavoriteFieldsForEditing = () => {
   const { saveFavoriteField, favoriteFields: initialFavoriteFields } = useContext(MessageFavoriteFieldsContext);

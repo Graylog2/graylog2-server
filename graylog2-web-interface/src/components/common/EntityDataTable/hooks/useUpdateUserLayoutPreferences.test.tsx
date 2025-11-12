@@ -62,8 +62,9 @@ describe('useUserSearchFilterQuery hook', () => {
 
     await waitFor(() =>
       expect(fetch).toHaveBeenCalledWith('POST', expect.stringContaining('/entitylists/preferences/streams'), {
-        displayed_attributes: layoutPreferencesJSON.displayed_attributes,
+        attributes: layoutPreferencesJSON.attributes,
         sort: layoutPreferencesJSON.sort,
+        custom_preferences: undefined,
         per_page: 100,
       }),
     );
