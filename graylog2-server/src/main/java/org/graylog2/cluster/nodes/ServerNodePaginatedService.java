@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.cluster.nodes;
 
-export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.database.MongoCollections;
 
-const useMessageFavoriteFields = (streams: Array<string>) => {
-  const [favorites, setFavorites] = React.useState<Array<string>>(DEFAULT_FIELDS);
-  const saveFields = (fields: Array<string>) => {
-    // eslint-disable-next-line no-console
-    console.log(streams, fields);
-    setFavorites(fields);
-  };
+@Singleton
+public class ServerNodePaginatedService extends AbstractPaginatedNodeService<ServerNodeDto> {
 
-  return {
-    isLoading: false,
-    favoriteFields: favorites,
-    saveFields,
-  };
-};
+    private static final String NODE_COLLECTION_NAME = "nodes";
 
-export default useMessageFavoriteFields;
+    @Inject
+    public ServerNodePaginatedService(MongoCollections mongoCollections) {
+        super(mongoCollections, NODE_COLLECTION_NAME, ServerNodeDto.class);
+    }
+}

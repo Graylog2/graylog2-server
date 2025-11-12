@@ -17,6 +17,7 @@
 package org.graylog2.cluster;
 
 import org.graylog2.cluster.nodes.ServerNodeDto;
+import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.plugin.system.NodeId;
 
 import jakarta.inject.Inject;
@@ -41,12 +42,14 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname, boolean isProcessing, LoadBalancerStatus lbStatus) {
         ServerNodeDto dto = ServerNodeDto.Builder.builder()
                 .setId(nodeId)
                 .setLeader(isLeader)
                 .setTransportAddress(httpPublishUri.toString())
                 .setHostname(hostname)
+                .setProcessing(isProcessing)
+                .setLoadBalancerStatus(lbStatus)
                 .build();
         return delegate.registerServer(dto);
     }

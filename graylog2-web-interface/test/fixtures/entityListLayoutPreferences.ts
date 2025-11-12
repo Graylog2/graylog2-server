@@ -24,7 +24,7 @@ export const layoutPreferences: TableLayoutPreferences = {
 };
 
 export const layoutPreferencesJSON: TableLayoutPreferencesJSON = {
-  displayed_attributes: ['title', 'description'],
+  attributes: { title: { status: 'show' }, description: { status: 'show' } },
   per_page: 50,
   sort: { field: 'title', order: 'asc' },
 };
