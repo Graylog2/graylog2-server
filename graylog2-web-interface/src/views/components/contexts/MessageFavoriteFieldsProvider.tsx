@@ -44,14 +44,7 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
   }, [message?.fields?.streams, streamsList]);
 
   const initialFavoriteFields = useMemo(
-    () =>
-      uniq(
-        flattenDeep(
-          zip(
-            streams.map((stream) => (Array.isArray(stream.favorite_fields) ? stream.favorite_fields : DEFAULT_FIELDS)),
-          ),
-        ),
-      ),
+    () => uniq(flattenDeep(zip(streams.map((stream) => stream?.favorite_fields ?? DEFAULT_FIELDS)))),
     [streams],
   );
   const { saveFavoriteField, toggleField, isLoading } = useMessageFavoriteFieldsMutation(

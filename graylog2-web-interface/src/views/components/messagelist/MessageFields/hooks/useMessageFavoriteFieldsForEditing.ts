@@ -22,7 +22,7 @@ import type { FormattedField } from 'views/components/messagelist/MessageFields/
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
-export const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
 
 const useMessageFavoriteFieldsForEditing = () => {
   const sendTelemetry = useSendTelemetry();
