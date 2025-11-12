@@ -30,13 +30,16 @@ import ConfigSummaryDefinitionListWrapper from './ConfigSummaryDefinitionListWra
 
 type Props = {
   dataAdapter: LookupTableAdapter;
+  noEdit?: boolean;
 };
 
-const DataAdapter = ({ dataAdapter }: Props) => {
+const DataAdapter = ({ dataAdapter, noEdit = false }: Props) => {
   const [lookupKey, setLookupKey] = React.useState('');
   const [lookupResult, setLookupResult] = React.useState(null);
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
   const navigate = useNavigate();
+
+  const canEdit = !noEdit && !loadingScopePermissions && scopePermissions?.is_mutable;
 
   const _onChange = (event: React.SyntheticEvent) => {
     setLookupKey(getValueFromInput(event.target));
@@ -70,7 +73,7 @@ const DataAdapter = ({ dataAdapter }: Props) => {
       <Col md={12}>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <Label>{plugin.displayName}</Label>
-          {!loadingScopePermissions && scopePermissions?.is_mutable && (
+          {canEdit && (
             <Button bsStyle="primary" onClick={handleEdit} role="button" name="edit_square">
               Edit
             </Button>

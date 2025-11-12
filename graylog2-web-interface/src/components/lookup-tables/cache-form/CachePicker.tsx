@@ -40,7 +40,7 @@ type Props = {
 };
 
 function CachePicker({ onCreateClick, caches = [] }: Props) {
-  const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
+  const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
   const sortedCaches = caches
     .map((inCache: LookupTableCache) => ({ value: inCache.id, label: `${inCache.title} (${inCache.name})` }))
     .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));

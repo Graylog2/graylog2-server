@@ -16,23 +16,42 @@
  */
 import * as React from 'react';
 import { useFormikContext } from 'formik';
+import type { FormikErrors } from 'formik';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
-const CacheConfigFormFields = React.forwardRef((_p, configRef: { current: any }) => {
+const validationMessageRenderer =
+  (validationErrors: FormikErrors<LookupTableCache>) => (fieldName: string, defaultText: string) =>
+    validationErrors[fieldName] ? (
+      <div>
+        <span>{defaultText}</span>
+        &nbsp;
+        <span>
+          <b>{validationErrors[fieldName]}</b>
+        </span>
+      </div>
+    ) : (
+      <span>{defaultText}</span>
+    );
+
+type Props = {
+  validationErrors: FormikErrors<LookupTableCache>;
+};
+
+const CacheConfigFormFields = React.forwardRef(({ validationErrors }: Props, configRef: { current: any }) => {
   const {
     values: { config },
   } = useFormikContext<LookupTableCache>();
 
-  const cachePlugins = usePluginEntities('lookupTableAdapters');
+  const cachePlugins = usePluginEntities('lookupTableCaches');
   const plugin = cachePlugins.find((p) => p.type === config?.type);
 
   const ConfigForm = React.useMemo(() => plugin?.formComponent, [plugin]);
 
   if (!plugin) return null;
 
-  return <ConfigForm config={config} ref={configRef} />;
+  return <ConfigForm config={config} ref={configRef} validationMessage={validationMessageRenderer(validationErrors)} />;
 });
 
 export default CacheConfigFormFields;

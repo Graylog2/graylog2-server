@@ -30,13 +30,31 @@ type Props = {
 
 function CacheTypeSelect({ cacheConfigType, onCacheChange }: Props) {
   const { types, fetchingCacheTypes } = useFetchCacheTypes();
-  const plugins = usePluginEntities('lookupTableAdapters');
+  const plugins = usePluginEntities('lookupTableCaches');
   const cachePlugins = Object.fromEntries(plugins.map((p) => [p.type, p]));
 
   const sortedCaches = React.useMemo(() => {
     if (!fetchingCacheTypes) {
-      return Object.values(types)
-        .map(({ type }) => ({ value: type, label: cachePlugins[type].displayName }))
+      return Object.keys(types)
+        .map((key) => {
+          const typeItem = types[key];
+
+          if (!cachePlugins[typeItem.type]) {
+            // eslint-disable-next-line no-console
+            console.error(`Plugin component for cache type ${typeItem.type} is missing - invalid or missing plugin?`);
+
+            return {
+              value: typeItem.type,
+              disabled: true,
+              label: `${typeItem.type} - missing or invalid plugin`,
+            };
+          }
+
+          return {
+            value: typeItem.type,
+            label: cachePlugins[typeItem.type].displayName,
+          };
+        })
         .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
     }
 

@@ -97,7 +97,7 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
   };
 
   const canModify = React.useMemo(
-    () => !create && !loadingScopePermissions && scopePermissions?.is_mutable,
+    () => create || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [create, loadingScopePermissions, scopePermissions?.is_mutable],
   );
 
@@ -117,7 +117,7 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
               {canModify && (
                 <Col md={3} mdOffset={9}>
                   <FormSubmit
-                    submitButtonText="Create cache"
+                    submitButtonText={create ? 'Create cache' : 'Update cache'}
                     submitLoadingText={create ? 'Creating cache...' : 'Updating cache...'}
                     isSubmitting={isSubmitting || creatingCache || updatingCache}
                     disabledSubmit={isSubmitting || creatingCache || updatingCache || !isValid}

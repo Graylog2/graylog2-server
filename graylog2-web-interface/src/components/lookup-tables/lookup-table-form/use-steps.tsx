@@ -16,16 +16,16 @@
  */
 import * as React from 'react';
 
-import { CacheCreate } from 'components/lookup-tables';
+import { CacheFormStep } from 'components/lookup-tables/cache-form';
 import { DataAdapterFormStep } from 'components/lookup-tables/adapter-form';
 import LookupTableFormFields from 'components/lookup-tables/LookupTableFormFields';
+
+import SummaryStep from './summary-step';
 
 function useSteps(
   activeStepKey: string = 'lookup-tables',
 ): [Array<any>, { activeStep: string; setActiveStep: (newStep: string) => void }] {
   const [activeStep, setActiveStep] = React.useState(activeStepKey);
-
-  const onClose = () => {};
 
   const steps = [
     {
@@ -40,12 +40,17 @@ function useSteps(
     {
       key: 'cache',
       title: 'Cache',
-      component: <CacheCreate saved={onClose} onCancel={onClose} validationErrors={{}} />,
+      component: <CacheFormStep />,
     },
     {
       key: 'data-adapter',
       title: 'Data Adapter',
       component: <DataAdapterFormStep />,
+    },
+    {
+      key: 'summary',
+      title: 'Summary',
+      component: <SummaryStep />,
     },
   ];
 

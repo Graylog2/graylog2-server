@@ -100,7 +100,7 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
   };
 
   const canModify = React.useMemo(
-    () => !create && !loadingScopePermissions && scopePermissions?.is_mutable,
+    () => create || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [create, loadingScopePermissions, scopePermissions?.is_mutable],
   );
 

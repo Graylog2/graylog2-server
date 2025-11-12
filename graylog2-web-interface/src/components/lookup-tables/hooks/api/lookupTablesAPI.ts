@@ -94,12 +94,7 @@ export const fetchCacheTypes = async () => {
   return state.types;
 };
 
-export const validateCache = async (cache: LookupTableCache) => {
-  await LookupTableCachesActions.validate(cache);
-  const state = LookupTableCachesStore.getInitialState();
-
-  return state.validationErrors;
-};
+export const validateCache = async (cache: LookupTableCache) => LookupTableCachesActions.validate(cache);
 
 export const createCache = async (payload: LookupTableCache) => LookupTableCachesActions.create(payload);
 

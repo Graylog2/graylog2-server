@@ -53,7 +53,7 @@ function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
     <StyledRow>
       <Col lg={9}>
         <Col lg={6}>
-          <DataAdapter dataAdapter={dataAdapter} />
+          <DataAdapter dataAdapter={dataAdapter} noEdit />
         </Col>
         <Col lg={6}>{DocComponent ? <DocComponent dataAdapterId={dataAdapter?.id} /> : null}</Col>
       </Col>

@@ -42,18 +42,19 @@ const StyledRow = styled(Row)`
 `;
 
 function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
-  const plugins = usePluginEntities('lookupTableAdapters');
+  const plugins = usePluginEntities('lookupTableCaches');
   const cachePlugin = React.useMemo(
     () => plugins.find((p: any) => p.type === cache?.config?.type),
     [cache?.config?.type, plugins],
   );
-  const DocComponent = React.useMemo(() => cachePlugin.documentationComponent, [cachePlugin]);
+
+  const DocComponent = React.useMemo(() => cachePlugin?.documentationComponent, [cachePlugin]);
 
   return (
     <StyledRow>
       <Col lg={9}>
         <Col lg={6}>
-          <Cache cache={cache} />
+          <Cache cache={cache} noEdit />
         </Col>
         <Col lg={6}>{DocComponent ? <DocComponent cacheId={cache?.id} /> : null}</Col>
       </Col>
@@ -61,7 +62,7 @@ function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
   );
 }
 
-function DataAdapterFormStep() {
+function CacheFormStep() {
   const { values, setFieldValue } = useFormikContext<LookupTable>();
   const { allCaches, loadingAllCaches } = useFetchAllCaches();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
@@ -104,4 +105,4 @@ function DataAdapterFormStep() {
   );
 }
 
-export default DataAdapterFormStep;
+export default CacheFormStep;

@@ -88,12 +88,12 @@ function CacheFormFields() {
         error={touched.name && errors.name ? errors.name : null}
         onChange={() => setGenerateName(!touched.name)}
         help={
-          touched.name || errors.name ? null : 'The name that is being used to refer to this cache. Must be unique.'
+          touched.name && errors.name ? null : 'The name that is being used to refer to this cache. Must be unique.'
         }
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
-      <CacheConfigFormFields ref={configRef} />
+      <CacheConfigFormFields ref={configRef} validationErrors={errors} />
     </fieldset>
   );
 }
