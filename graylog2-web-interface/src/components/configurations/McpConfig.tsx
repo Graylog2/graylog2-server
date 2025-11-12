@@ -22,7 +22,7 @@ import type { Store } from 'stores/StoreTypes';
 import { ConfigurationsActions, ConfigurationsStore } from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
-import { BootstrapModalForm, Button, Input, Table } from 'components/bootstrap';
+import { BootstrapModalForm, Button, Input, Table, Badge } from 'components/bootstrap';
 import { IfPermitted, Select, EntityDataTable} from 'components/common';
 import Spinner from 'components/common/Spinner';
 import 'moment-duration-format';
@@ -33,7 +33,7 @@ import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import type {EntityBase} from 'components/common/EntityDataTable/types';
 import type {Sort} from 'stores/PaginationTypes';
-// import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
+import useExpandedSections from 'components/common/EntityDataTable/hooks/useExpandedSections';
 
 type McpConfigState = {
   enable_remote_access: boolean;
@@ -41,13 +41,21 @@ type McpConfigState = {
   enable_output_schema: boolean;
 };
 
+enum McpToolBehavior {
+  ReadOnly    = 1 << 0,
+  Destructive = 1 << 1,
+  Idempotent  = 1 << 2,
+  OpenWorld   = 1 << 3
+}
+
 type McpToolState = {
   name: string;  // read-only
   category: string;  // read-only
-  read_only: boolean;  // read-only
+  behavior: McpToolBehavior;  // read-only
   format_overridden: boolean;  // read-only
   enabled: boolean;
   output_format: string;
+  description: string;
 }
 
 type McpTools = Record<string, McpToolState>;
@@ -55,7 +63,7 @@ type McpTools = Record<string, McpToolState>;
 type McpToolEntity = EntityBase & {
   name: string;
   package: string;
-  behavior: string;
+  behavior: McpToolBehavior;
   format: string;
   status: string;
   description: string;
@@ -85,6 +93,44 @@ const patchTools = async (states: McpTools) => {
   return fetch<{ errors?: string[] }>('POST', qualifyUrl(url), payload);
 };
 
+const expandedTool = (toolEntity: McpToolEntity) => (
+  <div>
+    <pre>{'> ' + toolEntity.name + "\n\n" + toolEntity.description}</pre>
+  </div>
+);
+
+const ToolNameCell = ({ entity }: { entity: McpToolEntity }) => {
+  const { toggleSection } = useExpandedSections();
+
+  return (
+    <Button
+      onClick={() => toggleSection(entity.id, 'tool')}
+      bsStyle='default'
+      bsSize='xs'
+    >
+      {entity.name}
+    </Button>
+  );
+};
+
+const renderBehaviorBadges = (behavior: McpToolBehavior) : React.ReactNode => {
+  const badges = Object.entries(McpToolBehavior)
+    .filter(([, b]) => typeof b === 'number')
+    .filter(([, b]) => (behavior & (b as number)) !== 0)
+    .map(([name, b]) => {
+      const val = b as McpToolBehavior;
+
+      return <Badge
+        key={val}
+        bsStyle={val & (McpToolBehavior.Destructive | McpToolBehavior.OpenWorld) ? 'warning' : 'info'}
+      >
+        {name}
+      </Badge>;
+    });
+
+  return <div>{badges.length != 0 ? badges : <i>Unknown</i>}</div>;
+}
+
 const McpConfig = () => {
   const [showConfigModal, setShowConfigModal] = useState<boolean>(false);
   const [modalConfig, setModalConfig] = useState<McpConfigState | undefined>(undefined);
@@ -92,7 +138,6 @@ const McpConfig = () => {
   const configuration = useStore(ConfigurationsStore as Store<Record<string, any>>, (state) => state?.configuration);
   const [toolsView, setToolsView] = useState<toolTableView>({entities: [], columns: TABLE_COLUMNS, sort: {attributeId: 'package', direction: 'asc'}});
   const [modalTools, setModalTools] = useState<McpTools>({});
-  // const { toggleSection } = useExpandedSections();
 
   const toRecordMap = (toolArray: McpToolState[]) => Object.fromEntries(
     toolArray.map(
@@ -106,10 +151,10 @@ const McpConfig = () => {
       id: tool.name,
       name: tool.name,
       package: tool.category,
-      behavior: tool.read_only ? 'Read Only' : 'Read/Write',
+      behavior: tool.behavior,
       format: tool.output_format + (tool.format_overridden ? '*' : ''),
       status: tool.enabled && '🟢 enabled' || '🔴 disabled',
-      description: "nothing yet"
+      description: tool.description
     })
   );
 
@@ -195,13 +240,6 @@ const McpConfig = () => {
     { value: "json", label: "(JSON) Structured Content" },
   ];
 
-  const expandedTool = (toolEntity: McpToolEntity) => (
-    <div>
-      <h3>{toolEntity.name}</h3>
-      <p>{toolEntity.description}</p>
-    </div>
-  );
-
   if (!viewConfig) {
     return <Spinner />;
   }
@@ -224,7 +262,7 @@ const McpConfig = () => {
         <dd>{viewConfig.enable_remote_access ? 'Enabled' : 'Disabled'}</dd>
         <br />
         <dt>Default output format</dt>
-        <dd>{viewConfig.use_simple_output ? 'Markdown' : 'JSON Structured Content' }</dd>
+        <dd>{viewConfig.use_simple_output ? 'Markdown' : 'JSON Structured Content'}</dd>
         <br />
         <dt>Output schema</dt>
         <dd>{viewConfig.enable_output_schema ? 'Enabled' : 'Disabled'}</dd>
@@ -254,32 +292,41 @@ const McpConfig = () => {
         columnDefinitions={[
           { id: 'name', title: 'Name', sortable: true },
           { id: 'package', title: 'Package', sortable: true },
-          { id: 'access', title: 'Access', sortable: true },
+          { id: 'behavior', title: 'Operational Behavior', sortable: true },
           { id: 'format', title: 'Output Format', sortable: true },
-          { id: 'status', title: 'Status', sortable: true }
+          { id: 'status', title: 'Status', sortable: true },
         ]}
         entityAttributesAreCamelCase={false}
-        onColumnsChange={(newCols: (keyof McpToolEntity)[]) => setToolsView((prev) => ({
-          ...prev,
-          columns: newCols
-        }))}
-        onSortChange={(newSort) => setToolsView((prev) => ({
-          ...prev,
-          entities: prev.entities.toSorted(getSorter(newSort)),
-          sort: newSort
-        }))}
+        onColumnsChange={(newCols: (keyof McpToolEntity)[]) =>
+          setToolsView((prev) => ({
+            ...prev,
+            columns: newCols,
+          }))
+        }
+        onSortChange={(newSort) =>
+          setToolsView((prev) => ({
+            ...prev,
+            entities: prev.entities.toSorted(getSorter(newSort)),
+            sort: newSort,
+          }))
+        }
         columnRenderers={{
           attributes: {
             name: {
-              renderCell: (value: string) => <i>{value}</i>,
-              staticWidth: 300
-            }
-          }
+              renderCell: (_value: string, entity: McpToolEntity) => <ToolNameCell entity={entity} />,
+              staticWidth: 300,
+            },
+            behavior: {
+              renderCell: renderBehaviorBadges,
+            },
+          },
         }}
+        // entityActions={renderToolEntityActions}
         expandedSectionsRenderer={{
-          name: {
-            title: 'Tool Name',
-            content: expandedTool
+          tool: {
+            title: 'Tool Details',
+            content: expandedTool,
+            disableHeader: true
           }
         }}
       />

@@ -96,7 +96,8 @@ public class McpApiRestResource extends RestResource {
                 "output_format", tool.getOutputFormat().toString(),
                 "format_overridden", tool.isOutputFormatOverridden(),
                 "category", tool.getCategory(),
-                "read_only", tool.hasReadOnlyBehavior()
+                "behavior", tool.bitwiseBehavior(),
+                "description", tool.description()
         )).toList();
 
         return Response.ok().entity(Map.of("tools", tools)).build();

@@ -30,8 +30,15 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.Optional;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.TYPE;
+
 
 /**
  * The base class for MCP tools.
@@ -50,6 +57,34 @@ public abstract class Tool<P, O> {
         public ToolContext {}
     }
 
+    /**
+     * Hints about tool behavior.
+     * <ul>
+     *     <li><code>readOnly</code>: the tool <b>does not modify</b> its environment.</li>
+     *     <li><code>destructive</code>: the tool may <b>perform destructive updates</b>.</li>
+     *     <li><code>idempotent</code>: repeated calls with same args have <b>no additional effect</b>.</li>
+     *     <li><code>openWorld</code>: the tool interacts with <b>external entities</b>.</li>
+     * </ul>
+     */
+    @Retention(RUNTIME) @Target(TYPE)
+    public @interface Behavior {
+        boolean readOnly() default false;
+        boolean destructive() default false;
+        boolean idempotent() default false;
+        boolean openWorld() default false;
+    }
+
+    public enum ToolBehavior {
+        READ_ONLY(1 << 0),
+        DESTRUCTIVE(1 << 1),
+        IDEMPOTENT(1 << 2),
+        OPEN_WORLD(1 << 3);
+
+        private final int mask;
+        ToolBehavior(int mask) { this.mask = mask; }
+        public int mask() { return mask; }
+    }
+
     private final ObjectMapper objectMapper;
     private final ClusterConfigService clusterConfigService;
     private final String productName;
@@ -60,10 +95,7 @@ public abstract class Tool<P, O> {
     private final String description;
     private final McpSchema.JsonSchema inputSchema;
     private final Map<String, Object> outputSchema;
-    private final boolean readOnly;
-    private final boolean destructive;
-    private final boolean idempotent;
-    private final boolean openWorld;
+    private final EnumSet<ToolBehavior> behaviors;
     private boolean enabled;
     private OutputFormat outputFormatOverride;
 
@@ -73,30 +105,29 @@ public abstract class Tool<P, O> {
             TypeReference<O> outputType,
             String name,
             String title,
-            String description) {
-        this(context, parameterType, outputType, name, title, description, false, false, false, false);
-    }
-
-    protected Tool(
-            ToolContext context,
-            TypeReference<P> parameterType,
-            TypeReference<O> outputType,
-            String name,
-            String title,
-            String description,
-            boolean readOnly,
-            boolean destructive,
-            boolean idempotent,
-            boolean openWorld
+            String description
     ) {
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
-        this.readOnly = readOnly;
-        this.destructive = destructive;
-        this.idempotent = idempotent;
-        this.openWorld = openWorld;
+
+        this.behaviors = EnumSet.noneOf(ToolBehavior.class);
+        Behavior behavior = this.getClass().getAnnotation(Behavior.class);
+        if (behavior != null) {
+            if (behavior.readOnly()) {
+                this.behaviors.add(ToolBehavior.READ_ONLY);
+            }
+            if (behavior.destructive()) {
+                this.behaviors.add(ToolBehavior.DESTRUCTIVE);
+            }
+            if (behavior.idempotent()) {
+                this.behaviors.add(ToolBehavior.IDEMPOTENT);
+            }
+            if (behavior.openWorld()) {
+                this.behaviors.add(ToolBehavior.OPEN_WORLD);
+            }
+        }
 
         this.objectMapper = context.objectMapper();
         this.clusterConfigService = context.clusterConfigService();
@@ -176,34 +207,12 @@ public abstract class Tool<P, O> {
         return "external";
     }
 
-    public boolean hasReadOnlyBehavior() {
-        return readOnly;
-    }
-
-    public boolean mayPerformDestructiveActions() {
-        return destructive;
-    }
-
-    public boolean hasIdempotentBehavior() {
-        return idempotent;
-    }
-
-    public boolean interactsWithOpenWorld() {
-        return openWorld;
-    }
-
-    public String behaviorHints() {
-        return """
-                This tool:
-                - %s modify its environment.
-                - %s perform destructive updates.
-                - %s idempotent (repeated calls with same args %s additional effect).
-                - %s with external entities.
-                """.formatted(
-                        readOnly ? "does not" : "may",
-                        destructive ? "may" : "does not",
-                        idempotent ? "is" : "is not", idempotent ? "have no" : "may have",
-                        openWorld ? "interacts" : "does not interact");
+    public byte bitwiseBehavior() {
+        int bits = 0;
+        for (ToolBehavior b : behaviors) {
+            bits |= b.mask();
+        }
+        return (byte) bits;
     }
 
     @JsonProperty

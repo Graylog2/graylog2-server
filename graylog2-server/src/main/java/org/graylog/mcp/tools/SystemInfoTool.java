@@ -32,6 +32,7 @@ import java.util.Locale;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+@Tool.Behavior(readOnly = true, idempotent = true)
 public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOverviewResponse> {
     public static String NAME = "get_system_status";
 
