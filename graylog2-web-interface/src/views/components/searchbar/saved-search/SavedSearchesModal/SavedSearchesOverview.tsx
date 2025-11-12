@@ -78,7 +78,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
   }
 
   const { list: savedSearches, pagination, attributes } = paginatedSavedSearches;
-  const columnDefinitions = [...attributes, ...pluggableAttributes.attributes];
+  const columnSchemas = [...attributes, ...pluggableAttributes.attributes];
   const visibleColumns = [...layoutConfig.displayedAttributes, ...pluggableAttributes.attributeNames];
   const columnsOrder = [...DEFAULT_LAYOUT.columnsOrder, ...pluggableAttributes.attributeNames];
 
@@ -121,7 +121,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
           expandedSectionsRenderer={pluggableExpandedSections}
           entityActions={renderSavedSearchActions}
           columnRenderers={customColumnRenderers}
-          columnDefinitions={columnDefinitions}
+          columnSchemas={columnSchemas}
         />
       )}
     </PaginatedList>
