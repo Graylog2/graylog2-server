@@ -19,7 +19,12 @@ package org.graylog.storage.opensearch3.stats;
 import jakarta.inject.Inject;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
+import org.opensearch.client.opensearch.cluster.ClusterStatsRequest;
 import org.opensearch.client.opensearch.cluster.ClusterStatsResponse;
+import org.opensearch.client.opensearch.cluster.stats.IndexMetric;
+import org.opensearch.client.opensearch.cluster.stats.Metric;
+
+import java.util.List;
 
 public class ClusterStatsApi {
     private final OfficialOpensearchClient officialOpensearchClient;
@@ -30,9 +35,13 @@ public class ClusterStatsApi {
     }
 
     public IndexSetStats clusterStats() {
-        // TODO: add metric filtering to optimize performance. But it currently fails with "Could not find a request path with this set of properties"
-        // final ClusterStatsResponse stats = officialOpensearchClient.sync(c -> c.cluster().stats(r -> r.metric(List.of(Metric.Indices)).indexMetric(List.of(IndexMetric.Store, IndexMetric.Docs))), "Couldn't read OpensSearch cluster stats");
-        final ClusterStatsResponse stats = officialOpensearchClient.sync(c -> c.cluster().stats(), "Couldn't read OpensSearch cluster stats");
+        final ClusterStatsRequest request = ClusterStatsRequest.builder()
+                .nodeId("_all")
+                .metric(List.of(Metric.Indices))
+                .indexMetric(List.of(IndexMetric.Store, IndexMetric.Docs))
+                .build();
+
+        final ClusterStatsResponse stats = officialOpensearchClient.sync(c -> c.cluster().stats(request), "Couldn't read OpensSearch cluster stats");
         return IndexSetStats.create(stats.indices().count(), stats.indices().docs().count(), stats.indices().store().sizeInBytes());
     }
 }
