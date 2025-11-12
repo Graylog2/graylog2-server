@@ -261,7 +261,7 @@ public class MongoUtils<T extends MongoEntity> {
         ).forEach(doc -> {
             Object id = doc.get("_id");
             if (id != null) {
-                counts.put(id.toString(), (doc.getInteger(countField)).longValue());
+                counts.put(id.toString(), doc.getInteger(countField).longValue());
             }
         });
         return counts;
