@@ -28,7 +28,7 @@ import { Alert, Col, Row } from 'components/bootstrap';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import { prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
-import type { IndexSet, IndexSetFormValues, IndexSetFieldRestriction } from 'stores/indices/IndexSetsStore';
+import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
