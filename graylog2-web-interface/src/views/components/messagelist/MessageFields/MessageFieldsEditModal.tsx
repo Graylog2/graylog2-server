@@ -79,7 +79,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
         <ModalContentContainer>
           <FieldsContainer>
             <StyledAlert bsStyle="info">
-              Favorite fields will be applied to the{' '}
+              Favorite fields will appear in all streams this message belongs to, including{' '}
               {StringUtils.pluralize(messageStreams.length, ' stream ', ' streams ')}
               {messageStreams.map((stream, index) => {
                 const isLast = index === messageStreams.length - 1;
