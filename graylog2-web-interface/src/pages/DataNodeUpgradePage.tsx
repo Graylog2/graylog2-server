@@ -200,7 +200,7 @@ const DataNodeUpgradePage = () => {
             {(data?.warnings?.length || 0) > 0 && (
               <Alert bsStyle="danger">
                 {data.warnings.map((warning) => (
-                  <p>{warning}</p>
+                  <p key={warning}>{warning}</p>
                 ))}
               </Alert>
             )}
@@ -402,7 +402,11 @@ const DataNodeUpgradePage = () => {
             </Col>
           )}
           {openUpgradeConfirmDialog && nodeInProgress && (
-            <Modal show backdrop={false} onHide={() => setOpenUpgradeConfirmDialog(false)}>
+            <Modal
+              show
+              backdrop={false}
+              onHide={() => setOpenUpgradeConfirmDialog(false)}
+              rootProps={{ lockScroll: false }}>
               <Modal.Header>
                 <Modal.Title>Data Node Manual Upgrade</Modal.Title>
               </Modal.Header>
