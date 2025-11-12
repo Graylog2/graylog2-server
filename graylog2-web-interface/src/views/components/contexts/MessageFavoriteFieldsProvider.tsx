@@ -28,6 +28,8 @@ import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
 import type { Stream } from 'logic/streams/types';
 import { DEFAULT_FIELDS } from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
+import { isPermitted } from 'util/PermissionsMixin';
+import useCurrentUser from 'hooks/useCurrentUser';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;
@@ -36,32 +38,40 @@ type OriginalProps = React.PropsWithChildren<{
 
 const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
   const { streams: streamsList = [] } = useStore(StreamsStore);
+  const { permissions } = useCurrentUser();
   const streams = useMemo<Array<Stream>>(() => {
     const messageStreamIds: Array<string> = message?.fields?.streams ?? [];
-    const streamsById = Object.fromEntries(streamsList.map((stream) => [stream.id, stream]));
+    const streamsById = Object.fromEntries(
+      streamsList
+        .filter((stream: Stream) => isPermitted(permissions, `streams:read:${stream.id}`))
+        .map((stream) => [stream.id, stream]),
+    );
 
     return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
-  }, [message?.fields?.streams, streamsList]);
+  }, [message?.fields?.streams, permissions, streamsList]);
 
   const initialFavoriteFields = useMemo(
     () => uniq(flattenDeep(zip(streams.map((stream) => stream?.favorite_fields ?? DEFAULT_FIELDS)))),
     [streams],
   );
-  const { saveFavoriteField, toggleField, isLoading } = useMessageFavoriteFieldsMutation(
-    streams,
-    initialFavoriteFields,
+
+  const editableStreams = useMemo(
+    () => streams.filter((stream: Stream) => isPermitted(permissions, `streams:edit:${stream.id}`)),
+    [permissions, streams],
   );
+
+  const { saveFavoriteField, toggleField } = useMessageFavoriteFieldsMutation(editableStreams, initialFavoriteFields);
 
   const contextValue = useMemo(
     () => ({
-      isLoading,
       favoriteFields: initialFavoriteFields,
       saveFavoriteField,
       messageFields,
       message,
       toggleField,
+      editableStreams,
     }),
-    [isLoading, initialFavoriteFields, saveFavoriteField, messageFields, message, toggleField],
+    [initialFavoriteFields, saveFavoriteField, messageFields, message, toggleField, editableStreams],
   );
 
   return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;

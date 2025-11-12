@@ -58,7 +58,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
     onFavoriteToggle,
   } = useMessageFavoriteFieldsForEditing();
   const sendTelemetry = useSendTelemetry();
-  const { message } = useContext(MessageFavoriteFieldsContext);
+  const { message, editableStreams } = useContext(MessageFavoriteFieldsContext);
   const messageStreams = useStore(StreamsStore, ({ streams }) =>
     streams.filter((stream) => message.fields.streams.includes(stream.id)),
   );
@@ -91,8 +91,8 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
           <FieldsContainer>
             <StyledAlert bsStyle="info">
               Favorite fields will appear in all streams this message belongs to, including{' '}
-              {StringUtils.pluralize(messageStreams.length, ' stream ', ' streams ')}
-              {messageStreams.map((stream, index) => {
+              {StringUtils.pluralize(editableStreams.length, ' stream ', ' streams ')}
+              {editableStreams.map((stream, index) => {
                 const isLast = index === messageStreams.length - 1;
 
                 return (

@@ -83,7 +83,6 @@ describe('MessageFavoriteFieldsProvider', () => {
   beforeEach(() => {
     StreamsActions.refresh = mockAction();
     asMock(useMessageFavoriteFieldsMutation).mockReturnValue({
-      isLoading: false,
       saveFavoriteField: mockSaveFields,
       toggleField: mockToggleField,
     });

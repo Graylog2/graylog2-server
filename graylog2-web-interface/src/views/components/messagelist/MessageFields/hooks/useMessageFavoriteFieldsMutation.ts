@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import { FavoriteFields } from '@graylog/server-api';
 
@@ -25,7 +25,6 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
 const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavoriteFields: Array<string>) => {
-  const [isLoading, setIsLoading] = useState(false);
   const sendTelemetry = useSendTelemetry();
 
   const saveFavoriteField = useCallback(
@@ -43,7 +42,6 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         ]),
       );
 
-      setIsLoading(true);
       FavoriteFields.set({ fields: newFavoriteFieldsByStream })
         .then(() => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_SAVED, {
@@ -59,8 +57,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
             `Setting fields to favorites failed with error: ${errorThrown}`,
             'Could not set fields to favorites',
           ),
-        )
-        .finally(() => setIsLoading(false));
+        );
     },
     [initialFavoriteFields, sendTelemetry, streams],
   );
@@ -69,7 +66,6 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
     (field: string) => {
       const isFavorite = initialFavoriteFields?.includes(field);
       const streamIds = streams.map((stream) => stream.id);
-      setIsLoading(true);
 
       if (isFavorite) {
         FavoriteFields.remove({ field, stream_ids: streamIds })
@@ -85,8 +81,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
               `Removing field from favorites failed with error: ${errorThrown}`,
               'Could not remove field from favorites',
             ),
-          )
-          .finally(() => setIsLoading(false));
+          );
       } else {
         FavoriteFields.add({ field, stream_ids: streamIds })
           .then(() => {
@@ -101,15 +96,13 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
               `Adding field to favorites failed with error: ${errorThrown}`,
               'Could not add field to favorites',
             ),
-          )
-          .finally(() => setIsLoading(false));
+          );
       }
     },
     [initialFavoriteFields, sendTelemetry, streams],
   );
 
   return {
-    isLoading,
     saveFavoriteField,
     toggleField,
   };

@@ -82,6 +82,7 @@ const renderComponent = () =>
             value={
               {
                 saveFavoriteField: saveFavoriteFields,
+                editableStreams: [],
                 message,
               } as any
             }>
