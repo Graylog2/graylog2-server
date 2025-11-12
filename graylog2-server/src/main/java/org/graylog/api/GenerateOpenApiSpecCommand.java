@@ -18,9 +18,14 @@ package org.graylog.api;
 
 import com.github.joschi.jadconfig.Repository;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.restrictions.Pattern;
+import com.github.rvesse.airline.annotations.restrictions.Required;
+import com.google.common.base.Stopwatch;
 import com.google.inject.Binding;
 import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.Stage;
 import com.google.inject.TypeLiteral;
@@ -34,6 +39,7 @@ import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
 import io.swagger.v3.core.util.Json;
+import io.swagger.v3.core.util.Yaml;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.commands.Server;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
@@ -46,20 +52,31 @@ import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIBindings;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIGenerator;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import static org.graylog2.plugin.inject.Graylog2Module.SYSTEM_REST_RESOURCES;
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Command(name = "openapi-spec", description = "Generates an OpenAPI specification for the Graylog REST API.")
 public class GenerateOpenApiSpecCommand extends Server {
 
     private static final TypeLiteral<Class<? extends PluginRestResource>> PLUGIN_REST_RESOURCE_TYPE =
             new TypeLiteral<>() {};
+
+    @Arguments(title = "Output file path", description = "File to write the OpenAPI specification to. " +
+            "If the file already exists, it will be silently overwritten. " +
+            "The format of the generated spec will be determined by the file extension (json or yaml).")
+    @Pattern(pattern = "^.+\\.(json|yaml|yml)$", description = "Output file must have a .json, .yaml or .yml extension.")
+    @Required
+    private String outputFile;
 
     @Override
     protected Collection<Repository> getConfigRepositories(String configFile) {
@@ -79,7 +96,7 @@ public class GenerateOpenApiSpecCommand extends Server {
     }
 
     @Override
-    protected com.google.inject.Injector doCreateInjector(List<Module> modules) {
+    protected Injector doCreateInjector(List<Module> modules) {
 
         // We don't want to actually create the injector, because that would execute a lot of code that we have
         // in the constructors of our components. We only want to inspect the guice bindings
@@ -105,9 +122,32 @@ public class GenerateOpenApiSpecCommand extends Server {
     @Override
     protected void startCommand() {
         final var generator = injector.getInstance(OpenAPIGenerator.class);
-        final var spec = generator.generateOpenApiSpec();
 
-        System.out.println(Json.pretty(spec));
+        final var stopwatch = Stopwatch.createStarted();
+
+        System.out.println("Generating OpenAPI specification.");
+
+        final var spec = generator.generateOpenApiSpec();
+        final var serialized = outputFile.endsWith(".json") ? Json.pretty(spec) : Yaml.pretty(spec);
+        final var targetPath = Path.of(outputFile);
+        final var parentPath = targetPath.getParent();
+
+        if ((Files.exists(targetPath) && !Files.isWritable(targetPath)) || !Files.isWritable(parentPath)) {
+            System.out.println("Cannot write to specified file: " + outputFile);
+            System.exit(1);
+        }
+        if (Files.exists(targetPath)) {
+            System.out.println("Overwriting existing file: " + outputFile);
+        }
+
+        try {
+            Files.writeString(targetPath, serialized);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to write OpenAPI spec to file " + outputFile, e);
+        }
+
+        System.out.println("OpenAPI specification written to " + outputFile);
+        System.out.println(f("[took %s ms]", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
     }
 
     private Module extractPluginRestResourcesModule(List<Element> elements) {
