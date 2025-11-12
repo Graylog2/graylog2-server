@@ -24,7 +24,7 @@ import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayo
 const useNonDisplayedAttributes = (defaultLayout) => {
   const { attributes } = useTableFetchContext();
   const {
-    layoutConfig: { columnPreferences },
+    layoutConfig: { attributes: columnPreferences },
     isInitialLoading,
   } = useTableLayout(defaultLayout);
 

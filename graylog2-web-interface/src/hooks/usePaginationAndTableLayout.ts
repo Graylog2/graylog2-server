@@ -36,7 +36,7 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     defaultPageSize: defaultLayout.pageSize,
     defaultDisplayedAttributes: defaultLayout.displayedColumns,
     defaultSort: defaultLayout.sort,
-    defaultColumnOrder: defaultLayout.columnOrder,
+    defaultColumnOrder: defaultLayout.order,
   });
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(entityTableId);
   const searchParams = useMemo(
@@ -103,7 +103,7 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     onColumnPreferencesChange,
     onSortChange,
     onPageSizeChange,
-    columnOrder: defaultLayout.columnOrder,
+    order: defaultLayout.order,
   };
 };
 

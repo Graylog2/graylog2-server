@@ -22,5 +22,5 @@ export const DEFAULT_LAYOUT = {
   pageSize: 20,
   sort: { attributeId: 'index_set_title', direction: 'asc' } as Sort,
   displayedColumns: ['index_set_title', 'stream_titles', 'types'],
-  columnOrder: ['index_set_title', 'stream_titles', 'types'],
+  order: ['index_set_title', 'stream_titles', 'types'],
 };

@@ -57,6 +57,7 @@ export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
   attributes?: ColumnPreferences;
   sort?: Sort;
   perPage?: number;
+  order?: Array<string>;
   customPreferences?: T;
 };
 
@@ -68,6 +69,7 @@ export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
   };
   per_page?: number;
   custom_preferences?: T;
+  order?: Array<string>;
 };
 
 export type ExpandedSectionRenderer<Entity> = {

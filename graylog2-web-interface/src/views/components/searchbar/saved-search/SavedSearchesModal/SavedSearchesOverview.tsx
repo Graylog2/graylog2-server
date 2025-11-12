@@ -107,7 +107,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
           actionsCellWidth={120}
           activeSort={layoutConfig.sort}
           bulkSelection={{ actions: <BulkActions /> }}
-          columnPreferences={layoutConfig.columnPreferences}
+          columnPreferences={layoutConfig.attributes}
           columnRenderers={customColumnRenderers}
           columnSchemas={columnSchemas}
           defaultDisplayedColumns={layoutConfig.defaultDisplayedColumns}
@@ -115,7 +115,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
           entityActions={renderSavedSearchActions}
           entityAttributesAreCamelCase
           expandedSectionsRenderer={pluggableExpandedSections}
-          columnOrder={layoutConfig.columnOrder}
+          columnOrder={layoutConfig.order}
           onColumnPreferencesChange={onColumnPreferencesChange}
           onPageSizeChange={onPageSizeChange}
           onSortChange={onSortChange}

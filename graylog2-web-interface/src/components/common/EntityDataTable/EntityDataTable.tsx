@@ -205,17 +205,20 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   columnSchemas: Array<ColumnSchema>;
   /** Custom cell and header renderer for a column. Column ids need to be snake case. */
   columnRenderers?: ColumnRenderers<Entity, Meta>;
-  /** Define default columns order. Column ids need to be snake case. */
-  columnOrder?: Array<string>;
   defaultDisplayedColumns: Array<string>;
+  defaultColumnOrder: Array<string>;
   /** The table data. */
   entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
   expandedSectionsRenderer?: {
     [sectionName: string]: ExpandedSectionRenderer<Entity>;
   };
-  /** Function to handle changes of columns visibility */
-  onColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
+  layoutPreferences: {
+    attributes?: ColumnPreferences;
+    order?: Array<string>;
+  };
+  /** Function to handle changes of column visibility, width and order */
+  onLayoutPreferencesChange: ({ attributes, order }: { attributes?: ColumnPreferences; order?: Array<string> }) => void;
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */
@@ -224,8 +227,6 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   pageSize?: number;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
-  /** Which columns should be displayed. */
-  columnPreferences?: ColumnPreferences;
   /** Meta data. */
   meta?: Meta;
 };
@@ -240,20 +241,20 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
-  columnOrder: attributeColumnsOder = [],
+  // columnOrder: attributeColumnsOrder = [],
   entities,
   expandedSectionsRenderer = undefined,
-  onColumnPreferencesChange,
+  onLayoutPreferencesChange,
+  defaultDisplayedColumns,
+  defaultColumnOrder,
+  entityActions = undefined,
+  layoutPreferences,
+  meta = undefined,
   onPageSizeChange = undefined,
   onSortChange,
   pageSize = undefined,
-  entityActions = undefined,
-  columnPreferences = undefined,
-  defaultDisplayedColumns,
-  meta = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
-
   const displayActionsCol = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
@@ -261,15 +262,26 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
 
-  const visibleColumnOrder = useVisibleColumnOrder(
-    columnPreferences,
-    attributeColumnsOder,
+  const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
+    layoutPreferences?.order ?? defaultColumnOrder,
+  );
+
+  const columnOrder = useVisibleColumnOrder(
+    layoutPreferences?.attributes,
+    internalAttributeColumnOrder,
     defaultDisplayedColumns,
     displayActionsCol,
     displayBulkSelectCol,
   );
 
-  const [columnOrder, setColumnOrder] = useState(visibleColumnOrder);
+  console.log({
+    order: columnOrder,
+    layoutPreferences,
+    attributeColumnsOrder: layoutPreferences.order,
+    defaultDisplayedColumns,
+    displayActionsCol,
+    displayBulkSelectCol,
+  });
 
   const { tableRef, actionsRef, actionsColWidth, columnWidths } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,
@@ -293,19 +305,20 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
-    columnPreferences,
     columnsDefinitions,
+    defaultColumnOrder,
     displayBulkSelectCol,
     entities,
+    columnOrder,
+    setInternalAttributeColumnOrder,
     isEntitySelectable,
+    layoutPreferences,
     onChangeSelection,
-    onColumnPreferencesChange,
+    onLayoutPreferencesChange,
     onSortChange,
     selectedEntities,
     setSelectedEntities,
     sort: activeSort,
-    visibleColumnOrder: columnOrder,
-    onColumnOrderChange: setColumnOrder,
   });
 
   return (
@@ -324,7 +337,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               </ButtonGroup>
             </LayoutConfigRow>
           </ActionsRow>
-          <TableDndProvider columnOrder={columnOrder} onColumnOrderChange={setColumnOrder} table={table}>
+          <TableDndProvider table={table}>
             <ScrollContainer id="scroll-container" ref={tableRef}>
               <StyledTable striped condensed hover>
                 <TableHead table={table} />

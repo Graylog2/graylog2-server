@@ -102,17 +102,10 @@ const snapOverlayToCursor: Modifier = ({ activatorEvent, draggingNodeRect, trans
 };
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
-  columnOrder: Array<string>;
-  onColumnOrderChange: any;
   table: Table<Entity>;
 }>;
 
-const TableDndProvider = <Entity extends EntityBase>({
-  columnOrder,
-  onColumnOrderChange,
-  children = undefined,
-  table,
-}: Props<Entity>) => {
+const TableDndProvider = <Entity extends EntityBase>({ children = undefined, table }: Props<Entity>) => {
   const [activeId, setActiveId] = useState<number | string | null>(null);
 
   const sensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
@@ -126,20 +119,19 @@ const TableDndProvider = <Entity extends EntityBase>({
     (event: DragEndEvent) => {
       const { active, over } = event;
       if (active && over && active.id !== over.id) {
-        onColumnOrderChange((curColumnOrder) => {
+        table.setColumnOrder((curColumnOrder) => {
           const oldIndex = curColumnOrder.indexOf(active.id as string);
           const newIndex = curColumnOrder.indexOf(over.id as string);
 
           return arrayMove(curColumnOrder, oldIndex, newIndex); //this is just a splice util
         });
       }
-
-      setActiveId(null);
     },
-    [onColumnOrderChange],
+    [table],
   );
 
-  const draggableColumns = useMemo(() => columnOrder.filter((id) => !UTILITY_COLUMNS.has(id)), [columnOrder]);
+  const test = table.getState().columnOrder;
+  const draggableColumns = useMemo(() => test.filter((id) => !UTILITY_COLUMNS.has(id)), [test]);
 
   return (
     <DndContext

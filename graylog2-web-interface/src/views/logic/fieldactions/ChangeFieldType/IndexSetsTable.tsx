@@ -62,7 +62,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     defaultPageSize: DEFAULT_LAYOUT.pageSize,
     defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
     defaultSort: DEFAULT_LAYOUT.sort,
-    defaultColumnOrder: DEFAULT_LAYOUT.columnOrder,
+    defaultColumnOrder: DEFAULT_LAYOUT.order,
   });
 
   const searchParams: SearchParams = useMemo(
@@ -163,7 +163,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
             }}
             columnSchemas={attributes}
             columnRenderers={columnRenderers}
-            columnOrder={layoutConfig.columnOrder}
+            columnOrder={layoutConfig.order}
             defaultDisplayedColumns={layoutConfig.defaultDisplayedColumns}
             entities={list}
             onColumnPreferencesChange={onColumnPreferencesChange}
@@ -171,7 +171,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
             entityAttributesAreCamelCase
             onSortChange={onSortChange}
             pageSize={layoutConfig.pageSize}
-            columnPreferences={layoutConfig.columnPreferences}
+            columnPreferences={layoutConfig.attributes}
           />
         )}
       </PaginatedList>
