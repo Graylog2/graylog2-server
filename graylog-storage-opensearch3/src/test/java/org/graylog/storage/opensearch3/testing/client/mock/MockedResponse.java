@@ -16,5 +16,5 @@
  */
 package org.graylog.storage.opensearch3.testing.client.mock;
 
-public record MockedResponse(String method, String url, String body) {
+record MockedResponse(String method, String url, String body) {
 }

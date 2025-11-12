@@ -31,13 +31,13 @@ import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-public class MockedTransport implements OpenSearchTransport {
+class MockedTransport implements OpenSearchTransport {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final JacksonJsonpMapper jacksonJsonpMapper;
     private final Set<MockedResponse> responses;
 
-    public MockedTransport(Set<MockedResponse> responses) {
+    MockedTransport(Set<MockedResponse> responses) {
         jacksonJsonpMapper = new JacksonJsonpMapper(OBJECT_MAPPER);
         this.responses = responses;
     }
@@ -46,7 +46,14 @@ public class MockedTransport implements OpenSearchTransport {
     public <RequestT, ResponseT, ErrorT> ResponseT performRequest(RequestT request, Endpoint<RequestT, ResponseT, ErrorT> endpoint, @Nullable TransportOptions options) throws IOException {
         final String url = endpoint.requestUrl(request);
         final String method = endpoint.method(request);
-        final String rawBody = responses.stream().filter(r -> r.method().equals(method) && r.url().equals(url)).map(MockedResponse::body).findFirst().orElseThrow(() -> new IllegalArgumentException("No response body provided for " + method + " and " + url));
+
+        final String rawBody = responses.stream()
+                .filter(r -> r.method().equals(method))
+                .filter(r -> r.url().equals(url))
+                .map(MockedResponse::body)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No response body provided for " + method + " and " + url));
+
         final JsonParser parser = OBJECT_MAPPER.createParser(rawBody);
         final JacksonJsonpParser jsonpParser = new JacksonJsonpParser(parser);
         final Object response = ((SimpleEndpoint) endpoint).responseDeserializer().deserialize(jsonpParser, jsonpMapper());
