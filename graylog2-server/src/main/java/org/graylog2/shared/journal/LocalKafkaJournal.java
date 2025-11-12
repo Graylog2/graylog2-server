@@ -656,8 +656,20 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * @param requestedMaximumCount Maximum number of entries to return.
      * @return A list of entries
      */
-    @Override
     public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
+        return read(readOffset, requestedMaximumCount, false);
+    }
+
+    /**
+     * Read from the journal, starting at the given offset. If the underlying journal implementation returns an empty
+     * list of entries, it will be returned even if we know there are more entries in the journal.
+     *
+     * @param readOffset            Offset to start reading at
+     * @param requestedMaximumCount Maximum number of entries to return.
+     * @param includeMessageId      if true JournalReadEntry contains messageId
+     * @return A list of entries
+     */
+    public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount, boolean includeMessageId) {
         // Always read at least one!
         final long maximumCount = Math.max(1, requestedMaximumCount);
         long maxOffset = readOffset + maximumCount;
@@ -699,12 +711,15 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 lastOffset = messageAndOffset.offset();
 
                 final byte[] payloadBytes = ByteBufferUtils.readBytes(messageAndOffset.message().payload());
-                if (LOG.isTraceEnabled()) {
+                if (LOG.isTraceEnabled() || includeMessageId) {
                     final byte[] keyBytes = ByteBufferUtils.readBytes(messageAndOffset.message().key());
+                    messages.add(new JournalReadEntry(keyBytes, payloadBytes, messageAndOffset.offset()));
                     LOG.trace("Read message {} contains {}", bytesToHex(keyBytes), bytesToHex(payloadBytes));
                 }
                 totalBytes += payloadBytes.length;
-                messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
+                if (!includeMessageId) {
+                    messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
+                }
                 // remember where to read from
                 nextReadOffset = messageAndOffset.nextOffset();
             }
