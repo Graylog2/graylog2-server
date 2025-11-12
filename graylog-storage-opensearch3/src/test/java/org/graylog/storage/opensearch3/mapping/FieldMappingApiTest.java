@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch3.mapping;
 
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.opensearch3.testing.client.mock.MockedOpensearchClient;
+import org.graylog.storage.opensearch3.testing.client.mock.ServerlessOpenSearchClient;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -39,8 +39,8 @@ class FieldMappingApiTest {
                 }
                 """;
 
-        final OfficialOpensearchClient opensearchClient = MockedOpensearchClient.builder()
-                .response("GET", "/graylog_13/_mapping", mappingResponse)
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_13/_mapping", mappingResponse)
                 .build();
 
         final FieldMappingApi api = new FieldMappingApi(opensearchClient);
@@ -77,8 +77,8 @@ class FieldMappingApiTest {
                 }
                 """;
 
-        final OfficialOpensearchClient opensearchClient = MockedOpensearchClient.builder()
-                .response("GET", "/graylog_42/_mapping", mappingResponse)
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_42/_mapping", mappingResponse)
                 .build();
 
         final FieldMappingApi api = new FieldMappingApi(opensearchClient);
@@ -107,8 +107,8 @@ class FieldMappingApiTest {
                   }
                 }
                 """;
-        final OfficialOpensearchClient opensearchClient = MockedOpensearchClient.builder()
-                .response("GET", "/graylog_42/_mapping", mappingResponse)
+        final OfficialOpensearchClient opensearchClient = ServerlessOpenSearchClient.builder()
+                .stubResponse("GET", "/graylog_42/_mapping", mappingResponse)
                 .build();
 
         final FieldMappingApi api = new FieldMappingApi(opensearchClient);

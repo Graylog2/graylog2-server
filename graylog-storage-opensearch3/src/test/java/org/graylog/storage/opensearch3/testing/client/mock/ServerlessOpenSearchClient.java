@@ -22,7 +22,15 @@ import org.opensearch.client.opensearch.OpenSearchClient;
 
 import java.util.LinkedHashSet;
 
-public class MockedOpensearchClient {
+/**
+ * This is a builder for stubbed/mocked opensearch client. The magic happens
+ * in {@link MockedResponse}, which will serve you your pre-registered json data, initially
+ * provided by {@link ServerlessOpenSearchClient.Builder#stubResponse(String, String, String)} calls.
+ *
+ * Main usage should be during conversion of existing heavily mocked tests where
+ * we have predefined json responses with expected data and structures.
+ */
+public class ServerlessOpenSearchClient {
 
     public static Builder builder() {
         return new Builder();
@@ -31,7 +39,7 @@ public class MockedOpensearchClient {
     public static class Builder {
         private final LinkedHashSet<MockedResponse> responses = new LinkedHashSet<>();
 
-        public Builder response(String method, String url, String body) {
+        public Builder stubResponse(String method, String url, String body) {
             responses.add(new MockedResponse(method, url, body));
             return this;
         }
