@@ -84,7 +84,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
   }, [sendTelemetry, toggleEditMode]);
 
   return (
-    <Modal onHide={_toggleEditMode} show rootProps={{ zIndex: 1030 }}>
+    <Modal onHide={_toggleEditMode} show>
       <Modal.Header>
         <Modal.Title>Favorite fields configuration</Modal.Title>
       </Modal.Header>

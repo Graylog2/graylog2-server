@@ -41,7 +41,7 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     const streamsById = Object.fromEntries(streamsList.map((stream) => [stream.id, stream]));
 
     return messageStreamIds.map((id) => streamsById?.[id]).filter((s) => !!s);
-  }, [message, streamsList]);
+  }, [message?.fields?.streams, streamsList]);
 
   const initialFavoriteFields = useMemo(
     () =>

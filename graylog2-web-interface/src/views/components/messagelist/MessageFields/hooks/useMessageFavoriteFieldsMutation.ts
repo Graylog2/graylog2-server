@@ -36,7 +36,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
         streams.map((stream) => [
           stream.id,
           favoritesToSave.filter((f) => {
-            const streamFavoriteFields = Array.isArray(stream.favorite_fields) ? stream.favorite_fields : [];
+            const streamFavoriteFields = stream?.favorite_fields ?? [];
 
             return streamFavoriteFields.includes(f) || newAddedFields.includes(f);
           }),
