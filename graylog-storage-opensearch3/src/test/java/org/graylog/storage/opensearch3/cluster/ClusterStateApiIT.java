@@ -23,8 +23,10 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch.core.BulkRequest;
+import org.opensearch.client.opensearch.core.bulk.BulkOperation;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -40,8 +42,7 @@ class ClusterStateApiIT {
     private ClusterStateApi clusterStateApi;
 
     @BeforeEach
-    void
-    setUp() {
+    void setUp() {
         generateIndex(MY_INDEX_NAME, 10, i -> new MyDocument("doc" + i, i, new Date()));
         generateIndex(MY_OTHER_INDEX_NAME, 10, i -> new MyDatapoint(i, new Date()));
 
@@ -62,19 +63,24 @@ class ClusterStateApiIT {
         final Map<String, Set<String>> fields = clusterStateApi.fields(Set.of(MY_INDEX_NAME, MY_OTHER_INDEX_NAME));
         Assertions.assertThat(fields).containsEntry(MY_INDEX_NAME, Set.of("name", "count", "created"));
         Assertions.assertThat(fields).containsEntry(MY_OTHER_INDEX_NAME, Set.of("value", "created"));
-    }
 
-    @Test
-    void testEmptyIndex() {
-        Assertions.assertThat(clusterStateApi.fields(Set.of(MY_EMPTY_INDEX_NAME)))
-                .isEmpty();
+        Assertions.assertThat(clusterStateApi.fields(Set.of(MY_EMPTY_INDEX_NAME))).isEmpty();
     }
 
     private <T> void generateIndex(String indexName, int documentsCount, Function<Integer, T> documentCreator) {
         opensearch.getOfficialOpensearchClient().sync(c -> c.indices().create(r -> r.index(indexName)), "Failed to create index");
         BulkRequest.Builder br = new BulkRequest.Builder();
-        IntStream.range(0, documentsCount).forEach(i -> br.operations(op -> op.index(idx -> idx.index(indexName).document(documentCreator.apply(i)))));
-        opensearch.getOfficialOpensearchClient().sync(c -> c.bulk(br.build()), "Failed to index documents");
+
+        final List<BulkOperation> bulkIndexRequests = IntStream.range(0, documentsCount)
+                .mapToObj(documentCreator::apply)
+                .map(doc -> indexObjectOperation(doc, indexName))
+                .toList();
+
+        opensearch.getOfficialOpensearchClient().sync(c -> c.bulk(br.operations(bulkIndexRequests).build()), "Failed to index documents");
+    }
+
+    private BulkOperation indexObjectOperation(Object doc, String indexName) {
+        return BulkOperation.of(bulk -> bulk.index(r -> r.index(indexName).document(doc)));
     }
 
 
