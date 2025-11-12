@@ -95,8 +95,8 @@ const EventConditionForm = ({
 
         if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
           const sort =
-            eventDefinitionType1Order ?? Number.MAX_SAFE_INTEGER -
-            eventDefinitionType2Order ?? Number.MAX_SAFE_INTEGER;
+            (eventDefinitionType1Order ?? Number.MAX_SAFE_INTEGER) -
+            (eventDefinitionType2Order ?? Number.MAX_SAFE_INTEGER);
 
           if (sort !== 0) {
             return sort;
