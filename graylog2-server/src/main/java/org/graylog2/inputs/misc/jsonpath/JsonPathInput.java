@@ -90,6 +90,11 @@ public class JsonPathInput extends MessageInput {
     }
 
     @Override
+    public boolean isForwarderCompatible() {
+        return false;
+    }
+
+    @Override
     public void checkConfiguration() throws ConfigurationException {
         super.checkConfiguration();
 
