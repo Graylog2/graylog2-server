@@ -18,7 +18,6 @@
 import React, { useState, useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
 import MessageFieldsEditModal from 'views/components/messagelist/MessageFields/MessageFieldsEditModal';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
@@ -40,7 +39,7 @@ const MessageEditFieldConfigurationAction = () => {
   return (
     <>
       <Button bsSize="small" onClick={onClick} title="Edit favorite fields">
-        <Icon name="edit_square" /> Edit
+        Edit favorite fields
       </Button>
       {showModal && <MessageFieldsEditModal toggleEditMode={toggleEditMode} />}
     </>

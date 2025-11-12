@@ -101,7 +101,7 @@ const MessageFields = () => {
 
   return (
     <>
-      <MessageFieldsViewModeList fields={formattedFavorites} />
+      <MessageFieldsViewModeList fields={formattedFavorites} isFavorite />
       {hasFavorites && <Separator onClick={toggleExpand} expanded={expanded} restLength={formattedRest?.length} />}
       {(expanded || !hasFavorites) && <MessageFieldsViewModeList fields={formattedRest} />}
     </>

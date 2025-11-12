@@ -35,12 +35,12 @@ const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   `,
 );
 
-const MessageFieldsViewModeList = ({ fields }: MessageFieldsListProps) => {
+const MessageFieldsViewModeList = ({ fields, isFavorite = false }: MessageFieldsListProps) => {
   const { message } = useContext(MessageFavoriteFieldsContext);
   if (!fields.length) return null;
 
   return (
-    <div>
+    <div data-testid={`${isFavorite ? 'favorite' : 'rest'}-fields-list`}>
       <MessageDetailsDL className="message-details-fields">
         {fields.map(({ field, value, type }) => (
           <MessageField key={field} fieldName={field} fieldType={type} value={value} message={message} />
