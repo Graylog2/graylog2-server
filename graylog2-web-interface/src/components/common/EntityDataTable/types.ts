@@ -22,20 +22,16 @@ export type EntityBase = {
   id: string;
 };
 
-export type Column = {
+export type ColumnSchema = {
   anyPermissions?: boolean;
+  // Indicates that a column does not exist as an attribute in table data
+  isDerived?: boolean;
 } & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
-  renderCell?: (
-    value: unknown,
-    entity: Entity,
-    column: Column,
-    meta: Meta,
-    additionalInfo?: unknown,
-  ) => React.ReactNode;
-  renderHeader?: (column: Column) => React.ReactNode;
+  renderCell?: (value: unknown, entity: Entity, meta: Meta, additionalInfo?: unknown) => React.ReactNode;
+  renderHeader?: (title: string) => React.ReactNode;
   textAlign?: string;
   minWidth?: number; // px
   width?: number; // fraction of unassigned table width, similar to CSS unit fr.
@@ -84,4 +80,9 @@ export type DefaultLayout = {
   defaultSort: Sort;
   defaultDisplayedAttributes: Array<string>;
   defaultPageSize: number;
+};
+
+export type ColumnMetaContext<Entity extends EntityBase> = {
+  label?: string;
+  columnRenderer?: ColumnRenderer<Entity>;
 };
