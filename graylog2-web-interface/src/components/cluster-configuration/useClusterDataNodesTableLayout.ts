@@ -47,30 +47,26 @@ type UseClusterDataNodesTableLayoutReturn = {
   handleSortChange: (newSort: Sort) => void;
 };
 
-const useClusterDataNodesTableLayout = (): UseClusterDataNodesTableLayoutReturn => {
+const useClusterDataNodesTableLayout = (searchQuery = ''): UseClusterDataNodesTableLayoutReturn => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const { layoutConfig, isInitialLoading: isLoadingLayout } = useTableLayout(TABLE_LAYOUT);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(TABLE_LAYOUT.entityTableId);
   const [visibleColumns, setVisibleColumns] = useState<Array<string>>(layoutConfig.displayedAttributes);
-  const [searchParams, setSearchParams] = useState<SearchParams>({
-    ...DEFAULT_SEARCH_PARAMS,
-    sort: layoutConfig.sort,
-  });
+  const [sort, setSort] = useState<Sort>(layoutConfig.sort);
 
   useEffect(() => {
     if (!isLoadingLayout && !isEqual(visibleColumns, layoutConfig.displayedAttributes)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setVisibleColumns(layoutConfig.displayedAttributes);
     }
   }, [isLoadingLayout, layoutConfig.displayedAttributes, visibleColumns]);
 
   useEffect(() => {
-    if (!isLoadingLayout && !isEqual(searchParams.sort, layoutConfig.sort)) {
-      setSearchParams((prev) => ({
-        ...prev,
-        sort: layoutConfig.sort,
-      }));
+    if (!isLoadingLayout && !isEqual(sort, layoutConfig.sort)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSort(layoutConfig.sort);
     }
-  }, [isLoadingLayout, layoutConfig.sort, searchParams.sort]);
+  }, [isLoadingLayout, layoutConfig.sort, sort]);
 
   const handleColumnsChange = useCallback(
     (newColumns: Array<string>) => {
@@ -86,13 +82,19 @@ const useClusterDataNodesTableLayout = (): UseClusterDataNodesTableLayoutReturn 
 
   const handleSortChange = useCallback(
     (newSort: Sort) => {
-      setSearchParams((prev) => ({
-        ...prev,
-        sort: newSort,
-      }));
+      setSort(newSort);
       updateTableLayout({ sort: newSort });
     },
     [updateTableLayout],
+  );
+
+  const searchParams = useMemo<SearchParams>(
+    () => ({
+      ...DEFAULT_SEARCH_PARAMS,
+      query: searchQuery,
+      sort,
+    }),
+    [searchQuery, sort],
   );
 
   return {

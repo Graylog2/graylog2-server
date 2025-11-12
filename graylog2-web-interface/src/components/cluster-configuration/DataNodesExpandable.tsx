@@ -34,7 +34,7 @@ type Props = {
   onSelectSegment?: () => void;
 };
 
-const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '', onSelectSegment = undefined }: Props) => {
+const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSegment = undefined }: Props) => {
   const {
     columnsOrder,
     visibleColumns,
@@ -42,18 +42,17 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery: _searchQuery = '
     isLoadingLayout,
     handleColumnsChange,
     handleSortChange,
-  } = useClusterDataNodesTableLayout();
+  } = useClusterDataNodesTableLayout(searchQuery);
+
   const {
-    data: dataNodesResponse,
+    nodes: dataNodes,
+    total: totalDataNodes,
     refetch,
     isInitialLoading,
   } = useClusterDataNodes(searchParams);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
-
-  const dataNodes = dataNodesResponse?.list ?? [];
-  const totalDataNodes = dataNodesResponse?.pagination?.total ?? dataNodes.length;
 
   const renderActions = (entity: ClusterDataNode) => <DataNodeActions dataNode={entity} refetch={refetch} />;
 

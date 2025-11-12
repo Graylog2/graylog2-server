@@ -33,6 +33,8 @@ export type ClusterDataNodeResponse = Omit<DataNodeResponse, 'list'> & {
 
 export type UseClusterDataNodesResult = {
   data: ClusterDataNodeResponse;
+  nodes: Array<ClusterDataNode>;
+  total: number;
   refetch: () => void;
   isInitialLoading: boolean;
   error: unknown;
@@ -60,8 +62,13 @@ const useClusterDataNodes = (
     [data, nodesWithMetrics],
   );
 
+  const nodes = dataWithMetrics.list;
+  const total = dataWithMetrics.pagination?.total ?? nodes.length;
+
   return {
     data: dataWithMetrics,
+    nodes,
+    total,
     refetch,
     isInitialLoading,
     error,
