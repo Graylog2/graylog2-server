@@ -32,10 +32,10 @@ const StyledIcon = styled(Icon)`
 `;
 
 const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
-  const { data: dataNodes, isInitialLoading } = useDataNodes();
+  const { data: dataNodes, isLoading } = useDataNodes();
   const productName = useProductName();
 
-  if (isInitialLoading) {
+  if (isLoading) {
     return <Spinner text="Loading Data Nodes" />;
   }
 

@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
+import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { DataNode } from 'components/datanode/Types';
@@ -36,23 +36,39 @@ export type UseClusterDataNodesResult = {
   nodes: Array<ClusterDataNode>;
   total: number;
   refetch: () => void;
-  isInitialLoading: boolean;
+  isLoading: boolean;
   error: unknown;
+  pollingEnabled: boolean;
+  setPollingEnabled: Dispatch<SetStateAction<boolean>>;
+};
+
+const DATANODES_REFETCH_INTERVAL = 5000;
+
+type UseClusterDataNodesOptions = UseDataNodesOptions & {
+  refetchInterval?: number | false;
+  initialPollingEnabled?: boolean;
 };
 
 const useClusterDataNodes = (
   searchParams?: SearchParams,
-  options?: UseDataNodesOptions,
-  refetchInterval?: number | false,
+  options?: UseClusterDataNodesOptions,
 ): UseClusterDataNodesResult => {
+  const {
+    enabled = true,
+    refetchInterval = DATANODES_REFETCH_INTERVAL,
+    initialPollingEnabled = true,
+  } = options ?? {};
+  const [pollingEnabled, setPollingEnabled] = useState(initialPollingEnabled);
+  const effectiveRefetchInterval = pollingEnabled ? refetchInterval : false;
+
   const {
     data,
     refetch,
-    isInitialLoading,
+    isLoading,
     error,
-  } = useDataNodes(searchParams, options, refetchInterval);
+  } = useDataNodes(searchParams, { enabled }, effectiveRefetchInterval);
 
-  const nodesWithMetrics = useAddMetricsToDataNodes(data.list);
+  const nodesWithMetrics = useAddMetricsToDataNodes(data.list, { refetchInterval: effectiveRefetchInterval, enabled });
 
   const dataWithMetrics = useMemo<ClusterDataNodeResponse>(
     () => ({
@@ -70,8 +86,10 @@ const useClusterDataNodes = (
     nodes,
     total,
     refetch,
-    isInitialLoading,
+    isLoading,
     error,
+    pollingEnabled,
+    setPollingEnabled,
   };
 };
 

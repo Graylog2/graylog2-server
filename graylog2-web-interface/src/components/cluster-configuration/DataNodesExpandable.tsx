@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { EntityDataTable, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
@@ -43,18 +43,30 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSeg
     handleColumnsChange,
     handleSortChange,
   } = useClusterDataNodesTableLayout(searchQuery);
-
   const {
     nodes: dataNodes,
     total: totalDataNodes,
     refetch,
-    isInitialLoading,
+    isLoading,
+    setPollingEnabled,
   } = useClusterDataNodes(searchParams);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
-  const renderActions = (entity: ClusterDataNode) => <DataNodeActions dataNode={entity} refetch={refetch} />;
+  const handleActionsInteractionChange = useCallback(
+    (isActive: boolean) => {
+      setPollingEnabled(!isActive);
+    },
+    [setPollingEnabled],
+  );
+
+  const renderActions = useCallback(
+    (entity: ClusterDataNode) => (
+      <DataNodeActions dataNode={entity} refetch={refetch} onInteractionChange={handleActionsInteractionChange} />
+    ),
+    [handleActionsInteractionChange, refetch],
+  );
 
   return (
     <ClusterNodesSectionWrapper
@@ -62,7 +74,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSeg
       titleCount={totalDataNodes}
       onTitleCountClick={onSelectSegment ?? null}
       titleCountAriaLabel="Show Data Nodes segment"
-      headerLeftSection={(isInitialLoading || isLoadingLayout) && <Spinner />}
+      headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
       <EntityDataTable<ClusterDataNode>
         entities={dataNodes}

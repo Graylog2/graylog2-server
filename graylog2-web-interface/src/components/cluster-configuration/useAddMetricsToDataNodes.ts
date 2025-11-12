@@ -97,8 +97,14 @@ const fetchMetricsForHostnames = async (hostnames: string[]) => {
   }), {});
 };
 
+type UseAddMetricsToDataNodesOptions = {
+  refetchInterval?: number | false;
+  enabled?: boolean;
+};
+
 const useAddMetricsToDataNodes = <Node extends Pick<DataNode, 'hostname'>>(
   nodes: ReadonlyArray<Node>,
+  { refetchInterval = false, enabled = true }: UseAddMetricsToDataNodesOptions = {},
 ): Array<Node & { metrics: DataNodeMetrics }> => {
   const hostnames = useMemo(
     () => Array.from(new Set(nodes.map(({ hostname }) => hostname))).sort(),
@@ -108,8 +114,8 @@ const useAddMetricsToDataNodes = <Node extends Pick<DataNode, 'hostname'>>(
   const { data: metricsByHostname = {} } = useQuery({
     queryKey: ['datanode-metrics', hostnames],
     queryFn: () => fetchMetricsForHostnames(hostnames),
-    enabled: hostnames.length > 0,
-    refetchInterval: 5000,
+    enabled: enabled && hostnames.length > 0,
+    refetchInterval,
   });
 
   return useMemo(

@@ -202,7 +202,7 @@ const useDataNodes = (
   { enabled }: UseDataNodesOptions = { enabled: true },
   refetchInterval: number | false = 5000,
 ) => {
-  const { data, refetch, isInitialLoading, error } = useQuery({
+  const { data, refetch, isLoading, error } = useQuery({
     queryKey: keyFn(searchParams),
 
     queryFn: () =>
@@ -229,7 +229,7 @@ const useDataNodes = (
       },
     },
     refetch,
-    isInitialLoading,
+    isLoading,
     error,
   };
 };
