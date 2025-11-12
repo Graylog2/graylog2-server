@@ -54,6 +54,8 @@ describe('<EntityDataTable />', () => {
     status: { status: 'show' },
   } as const;
 
+  const defaultDisplayedColumns = ['title', 'description', 'summary', 'status'];
+
   const data = [
     {
       id: 'row-id',
@@ -67,6 +69,7 @@ describe('<EntityDataTable />', () => {
   it('should render selected columns and table headers', async () => {
     render(
       <EntityDataTable
+        defaultDisplayedColumns={defaultDisplayedColumns}
         columnPreferences={columnPreferences}
         entities={data}
         onColumnPreferencesChange={() => {}}
@@ -89,6 +92,7 @@ describe('<EntityDataTable />', () => {
   it('should render default cell renderer', async () => {
     render(
       <EntityDataTable
+        defaultDisplayedColumns={defaultDisplayedColumns}
         columnPreferences={columnPreferences}
         entities={data}
         onSortChange={() => {}}
@@ -106,6 +110,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -130,6 +135,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -161,6 +167,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable<{ id: string; title: string }>
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -179,6 +186,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -195,6 +203,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -216,6 +225,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         entityAttributesAreCamelCase
         onSortChange={onSortChange}
@@ -249,6 +259,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -276,6 +287,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
@@ -301,8 +313,8 @@ describe('<EntityDataTable />', () => {
     expect(rowCheckboxes[0]).not.toBeChecked();
   });
 
-  it('should call onColumnsChange when changing column visibility', async () => {
-    const onColumnsChange = jest.fn();
+  it('should display default columns, which are not hidden via user column preferences and update visibility correctly', async () => {
+    const onColumnPreferencesChange = jest.fn();
 
     render(
       <EntityDataTable
@@ -310,23 +322,22 @@ describe('<EntityDataTable />', () => {
           description: { status: 'show' },
           status: { status: 'show' },
         }}
+        defaultDisplayedColumns={['description', 'status', 'title']}
         entities={data}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
-        onColumnPreferencesChange={onColumnsChange}
+        onColumnPreferencesChange={onColumnPreferencesChange}
         columnSchemas={columnSchemas}
       />,
     );
 
     userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /show title/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
 
-    expect(onColumnsChange).toHaveBeenCalledWith({
-      'created_at': { 'status': 'hide' },
+    expect(onColumnPreferencesChange).toHaveBeenCalledWith({
       'description': { 'status': 'show' },
       'status': { 'status': 'show' },
-      'stream': { 'status': 'hide' },
-      'title': { 'status': 'show' },
+      'title': { 'status': 'hide' },
     });
   });
 
@@ -345,6 +356,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         columnPreferences={{ ...columnPreferences, 'created_at': { status: 'show' } }}
+        defaultDisplayedColumns={defaultDisplayedColumns}
         entities={dataWithCamelCaseAttributes}
         onSortChange={() => {}}
         entityAttributesAreCamelCase
