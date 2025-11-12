@@ -159,7 +159,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
               actions: <BulkActionsDropdown />,
               isEntitySelectable,
             }}
-            columnDefinitions={attributes}
+            columnSchemas={attributes}
             columnRenderers={columnRenderers}
             columnsOrder={DEFAULT_LAYOUT.columnsOrder}
             entities={list}
