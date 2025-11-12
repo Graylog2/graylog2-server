@@ -1,8 +1,10 @@
 import type { IndexSetFieldRestriction } from 'stores/indices/IndexSetsStore';
 
 // eslint-disable-next-line import/prefer-default-export
-export const parseFieldRestrictions = (field_restrictions?: IndexSetFieldRestriction[]) => {
-  if (!field_restrictions || field_restrictions.length < 1) return {};
+export const parseFieldRestrictions = (
+  field_restrictions?: IndexSetFieldRestriction[],
+): { immutableFields: Array<string>; hiddenFields: Array<string> } => {
+  if (!field_restrictions || field_restrictions.length < 1) return { immutableFields: [], hiddenFields: [] };
 
   const getHidden = () =>
     Object.keys(field_restrictions).filter(
@@ -14,7 +16,5 @@ export const parseFieldRestrictions = (field_restrictions?: IndexSetFieldRestric
       (field) => field_restrictions[field].filter((restriction) => restriction.type === 'immutable').length > 0,
     );
 
-  if (field_restrictions) return { immutableFields: getImmutable(), hiddenFields: getHidden() };
-
-  return {};
+  return { immutableFields: getImmutable(), hiddenFields: getHidden() };
 };
