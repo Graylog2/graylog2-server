@@ -40,8 +40,6 @@ const FieldsContainer = styled.div(
 );
 
 const ModalContentContainer = styled.div`
-  max-height: 500px;
-  overflow-y: auto;
   font-size: ${({ theme }) => theme.fonts.size.small};
 `;
 
