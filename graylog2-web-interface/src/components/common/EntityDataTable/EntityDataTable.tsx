@@ -241,7 +241,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
-  // columnOrder: attributeColumnsOrder = [],
   entities,
   expandedSectionsRenderer = undefined,
   onLayoutPreferencesChange,
@@ -273,15 +272,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayActionsCol,
     displayBulkSelectCol,
   );
-
-  console.log({
-    order: columnOrder,
-    layoutPreferences,
-    attributeColumnsOrder: layoutPreferences.order,
-    defaultDisplayedColumns,
-    displayActionsCol,
-    displayBulkSelectCol,
-  });
 
   const { tableRef, actionsRef, actionsColWidth, columnWidths } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,

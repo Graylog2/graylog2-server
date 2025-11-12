@@ -39,7 +39,7 @@ const preferencesFromJSON = ({
 });
 
 const emptyPrefs = (): TableLayoutPreferences<any> => ({
-  attributes: [],
+  attributes: {},
   sort: undefined,
   perPage: undefined as any, // keep shape; adapt if your type requires a number
   customPreferences: undefined,
@@ -65,7 +65,7 @@ const useUserLayoutPreferences = <T>(
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
     // Keep last successful data on screen during background transitions
-    placeholderData: (prev) => prev ?? keepPreviousData,
+    placeholderData: () => keepPreviousData,
     // Reduce surprise background refetches that could snap the UI
     staleTime: 60 * 60 * 1000, // 1 hour
     refetchOnWindowFocus: false,
