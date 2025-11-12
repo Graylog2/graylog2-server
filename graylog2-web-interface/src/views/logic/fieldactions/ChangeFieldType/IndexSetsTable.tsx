@@ -164,6 +164,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
             columnSchemas={attributes}
             columnRenderers={columnRenderers}
             columnOrder={layoutConfig.columnOrder}
+            defaultDisplayedColumns={layoutConfig.defaultDisplayedColumns}
             entities={list}
             onColumnPreferencesChange={onColumnPreferencesChange}
             onPageSizeChange={onPageSizeChange}

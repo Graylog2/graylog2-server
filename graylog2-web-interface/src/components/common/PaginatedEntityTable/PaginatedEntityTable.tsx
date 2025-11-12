@@ -192,6 +192,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
             <EntityDataTable<T, M>
               entities={list}
               columnPreferences={layoutConfig.columnPreferences}
+              defaultDisplayedColumns={layoutConfig.defaultDisplayedColumns}
               columnOrder={layoutConfig.columnOrder}
               expandedSectionsRenderer={expandedSectionsRenderer}
               bulkSelection={bulkSelection}

@@ -207,6 +207,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   columnRenderers?: ColumnRenderers<Entity, Meta>;
   /** Define default columns order. Column ids need to be snake case. */
   columnOrder?: Array<string>;
+  defaultDisplayedColumns: Array<string>;
   /** The table data. */
   entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
@@ -247,7 +248,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
   entityActions = undefined,
-  columnPreferences = {},
+  columnPreferences = undefined,
+  defaultDisplayedColumns,
   meta = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
@@ -262,6 +264,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const visibleColumnOrder = useVisibleColumnOrder(
     columnPreferences,
     attributeColumnsOder,
+    defaultDisplayedColumns,
     displayActionsCol,
     displayBulkSelectCol,
   );
@@ -290,6 +293,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
+    columnPreferences,
     columnsDefinitions,
     displayBulkSelectCol,
     entities,

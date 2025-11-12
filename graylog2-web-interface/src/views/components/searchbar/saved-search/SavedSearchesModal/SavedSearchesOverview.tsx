@@ -104,21 +104,22 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       )}
       {!!savedSearches?.length && (
         <EntityDataTable<View>
-          entities={savedSearches}
-          columnPreferences={layoutConfig.columnPreferences}
-          columnOrder={layoutConfig.columnOrder}
-          onColumnPreferencesChange={onColumnPreferencesChange}
-          bulkSelection={{ actions: <BulkActions /> }}
-          onSortChange={onSortChange}
-          activeSort={layoutConfig.sort}
-          entityAttributesAreCamelCase
-          pageSize={searchParams.pageSize}
-          onPageSizeChange={onPageSizeChange}
           actionsCellWidth={120}
-          expandedSectionsRenderer={pluggableExpandedSections}
-          entityActions={renderSavedSearchActions}
+          activeSort={layoutConfig.sort}
+          bulkSelection={{ actions: <BulkActions /> }}
+          columnPreferences={layoutConfig.columnPreferences}
           columnRenderers={customColumnRenderers}
           columnSchemas={columnSchemas}
+          defaultDisplayedColumns={layoutConfig.defaultDisplayedColumns}
+          entities={savedSearches}
+          entityActions={renderSavedSearchActions}
+          entityAttributesAreCamelCase
+          expandedSectionsRenderer={pluggableExpandedSections}
+          columnOrder={layoutConfig.columnOrder}
+          onColumnPreferencesChange={onColumnPreferencesChange}
+          onPageSizeChange={onPageSizeChange}
+          onSortChange={onSortChange}
+          pageSize={searchParams.pageSize}
         />
       )}
     </PaginatedList>

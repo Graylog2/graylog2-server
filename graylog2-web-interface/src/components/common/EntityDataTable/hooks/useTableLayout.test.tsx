@@ -62,6 +62,7 @@ describe('useTableLayout hook', () => {
 
     expect(result.current.layoutConfig).toEqual({
       columnPreferences: layoutPreferences.attributes,
+      defaultDisplayedColumns: ['title'],
       sort: layoutPreferences.sort,
       pageSize: layoutPreferences.perPage,
     });
@@ -80,7 +81,8 @@ describe('useTableLayout hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      columnPreferences: { title: { status: 'show' } },
+      columnPreferences: undefined,
+      defaultDisplayedColumns: ['title'],
       sort: defaultLayout.defaultSort,
       pageSize: defaultLayout.defaultPageSize,
     });
@@ -102,7 +104,8 @@ describe('useTableLayout hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      columnPreferences: { title: { status: 'show' } },
+      columnPreferences: undefined,
+      defaultDisplayedColumns: ['title'],
       sort: defaultLayout.defaultSort,
       pageSize: layoutPreferences.perPage,
     });
