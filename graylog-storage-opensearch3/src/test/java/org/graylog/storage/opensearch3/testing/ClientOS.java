@@ -30,9 +30,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
@@ -117,7 +115,9 @@ public class ClientOS implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        opensearchClient.sync(c -> c.indices().delete(r -> r.index(List.of(indices)).ignoreUnavailable(true)), "Failed to delete indices");
+        if (indices.length > 0) {
+            opensearchClient.sync(c -> c.indices().delete(r -> r.index(List.of(indices)).ignoreUnavailable(true)), "Failed to delete indices");
+        }
     }
 
     public void deleteDataStreams() {
