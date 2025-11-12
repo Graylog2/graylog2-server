@@ -190,6 +190,28 @@ export function useFetchCaches() {
   return { fetchPaginatedCaches, cachesKeyFn };
 }
 
+export function useFetchAllCaches() {
+  const { data, isLoading } = useQuery({
+    queryKey: ['all-caches'],
+    queryFn: () =>
+      defaultOnError(
+        fetchPaginatedCaches({
+          page: 1,
+          pageSize: 10000,
+          query: null,
+          sort: { attributeId: 'name', direction: 'asc' },
+        }),
+        'Failed to fetch all caches',
+      ),
+    retry: false,
+  });
+
+  return {
+    allCaches: data?.list || [],
+    loadingAllCaches: isLoading,
+  };
+}
+
 export function useFetchCache(idOrName: string) {
   const { data, isLoading } = useQuery({
     queryKey: ['cache-details', idOrName],

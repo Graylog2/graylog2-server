@@ -23,6 +23,7 @@ import { Spinner } from 'components/common';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { CacheFormView } from 'components/lookup-tables';
 
 const FlexCol = styled(Col)`
   display: flex;
@@ -49,7 +50,11 @@ function LUTDataAdaptersFormPage() {
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
           <FlexCol md={12}>
-            {loadingCache ? <Spinner text="Loading Cache" /> : <div>Caches Form Placeholder</div>}
+            {loadingCache ? (
+              <Spinner text="Loading Cache" />
+            ) : (
+              <CacheFormView onCancel={navigateBack} saved={navigateBack} cache={cache} />
+            )}
           </FlexCol>
         </Row>
       </LUTPageLayout>

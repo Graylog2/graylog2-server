@@ -15,34 +15,24 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useFormikContext } from 'formik';
 
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
+import usePluginEntities from 'hooks/usePluginEntities';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 
-import LUTdrawer from './LUTDrawer';
+const CacheConfigFormFields = React.forwardRef((_p, configRef: { current: any }) => {
+  const {
+    values: { config },
+  } = useFormikContext<LookupTableCache>();
 
-export type ModalTypes = 'LUT' | 'CACHE' | 'DATA-ADAPTER';
+  const cachePlugins = usePluginEntities('lookupTableAdapters');
+  const plugin = cachePlugins.find((p) => p.type === config?.type);
 
-function LUTModals() {
-  const { modal, setModal, entity, setEntity, title, setTitle, double } = useModalContext();
+  const ConfigForm = React.useMemo(() => plugin?.formComponent, [plugin]);
 
-  const onClose = () => {
-    setModal(null);
-    setTitle(null);
-    setEntity(null);
-  };
+  if (!plugin) return null;
 
-  switch (modal) {
-    case 'LUT':
-    case 'CACHE':
-    case 'DATA-ADAPTER':
-      return (
-        <LUTdrawer title={title} onClose={onClose} double={double}>
-          {entity}
-        </LUTdrawer>
-      );
-    default:
-      return null;
-  }
-}
+  return <ConfigForm config={config} ref={configRef} />;
+});
 
-export default LUTModals;
+export default CacheConfigFormFields;

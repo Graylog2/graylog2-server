@@ -14,20 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { FormSubmit } from 'components/common';
 import { Col, Row } from 'components/bootstrap';
-import { useCreateAdapter, useUpdateAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { FormSubmit } from 'components/common';
+import { useCreateCache, useUpdateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useScopePermissions from 'hooks/useScopePermissions';
 import usePluginEntities from 'hooks/usePluginEntities';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import type { LookupTableAdapter } from 'logic/lookup-tables/types';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 
-import AdapterFormFields from './AdapterFormFields';
+import CacheFormFields from './CacheFormFields';
+
+const INIT_CACHE: LookupTableCache = {
+  id: undefined,
+  title: '',
+  description: '',
+  name: '',
+  config: {},
+};
 
 const FlexForm = styled(Form)`
   display: flex;
@@ -51,47 +59,36 @@ const Title = ({ title, typeName, create }: TitleProps) => {
   );
 };
 
-const INIT_ADAPTER = {
-  id: undefined,
-  title: '',
-  description: '',
-  name: '',
-  custom_error_ttl_enabled: false,
-  custom_error_ttl: null,
-  custom_error_ttl_unit: null,
-  config: {},
-};
-
 type Props = {
   type: string;
   title: string;
   saved: (response: any) => void;
   onCancel: () => void;
   create?: boolean;
-  dataAdapter?: LookupTableAdapter;
+  cache?: LookupTableCache;
 };
 
-const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAdapter = INIT_ADAPTER }: Props) => {
+function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_CACHE }: Props) {
   const sendTelemetry = useSendTelemetry();
-  const { loadingScopePermissions, scopePermissions } = useScopePermissions(dataAdapter);
-  const { createAdapter, creatingAdapter } = useCreateAdapter();
-  const { updateAdapter, updatingAdapter } = useUpdateAdapter();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
+  const { createCache, creatingCache } = useCreateCache();
+  const { updateCache, updatingCache } = useUpdateCache();
 
-  const adapterPlugins = usePluginEntities('lookupTableCaches');
-  const plugin = React.useMemo(() => adapterPlugins.find((p) => p.type === type), [adapterPlugins, type]);
+  const cachePlugins = usePluginEntities('lookupTableCaches');
+  const plugin = React.useMemo(() => cachePlugins.find((p) => p.type === type), [cachePlugins, type]);
 
   const DocComponent = React.useMemo(() => plugin?.documentationComponent, [plugin]);
   const pluginDisplayName = React.useMemo(() => plugin?.displayName || type, [plugin, type]);
 
-  const handleSubmit = async (values: LookupTableAdapter) => {
-    const promise = create ? createAdapter(values) : updateAdapter(values);
+  const handleSubmit = async (values: LookupTableCache) => {
+    const promise = create ? createCache(values) : updateCache(values);
 
     return promise.then((response) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'DATA_ADAPTER_CREATED' : 'DATA_ADAPTER_UPDATED'], {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[create ? 'CACHE_CREATED' : 'CACHE_UPDATED'], {
         app_pathname: 'lut',
-        app_section: 'lut_data_adapter',
+        app_section: 'lut_cache',
         event_details: {
-          type: dataAdapter?.config?.type,
+          type: values?.config?.type,
         },
       });
 
@@ -107,23 +104,23 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
   return (
     <>
       <Title title={title} typeName={pluginDisplayName} create={create} />
-      <Formik initialValues={dataAdapter} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
+      <Formik initialValues={cache} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
         {({ isSubmitting, isValid }) => (
           <FlexForm className="form form-horizontal">
             <Row style={{ flexGrow: 1 }}>
               <Col lg={6}>
-                <AdapterFormFields />
+                <CacheFormFields />
               </Col>
-              <Col lg={6}>{DocComponent ? <DocComponent dataAdapterId={dataAdapter?.id} /> : null}</Col>
+              <Col lg={6}>{DocComponent ? <DocComponent /> : null}</Col>
             </Row>
             <Row>
               {canModify && (
-                <Col mdOffset={9} md={3}>
+                <Col md={3} mdOffset={9}>
                   <FormSubmit
-                    submitButtonText={create ? 'Create adapter' : 'Update adapter'}
-                    submitLoadingText={create ? 'Creating adapter...' : 'Updating adapter...'}
-                    isSubmitting={isSubmitting || creatingAdapter || updatingAdapter}
-                    disabledSubmit={isSubmitting || creatingAdapter || updatingAdapter || !isValid}
+                    submitButtonText="Create cache"
+                    submitLoadingText={create ? 'Creating cache...' : 'Updating cache...'}
+                    isSubmitting={isSubmitting || creatingCache || updatingCache}
+                    disabledSubmit={isSubmitting || creatingCache || updatingCache || !isValid}
                     isAsyncSubmit
                     onCancel={onCancel}
                   />
@@ -135,6 +132,6 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
       </Formik>
     </>
   );
-};
+}
 
-export default DataAdapterForm;
+export default CacheForm;

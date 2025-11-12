@@ -17,22 +17,22 @@
 import * as React from 'react';
 import { useFormikContext } from 'formik';
 
-import { FormikFormGroup, TimeUnitInput } from 'components/common';
-import { useValidateDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import type { LookupTableAdapter, validationErrorsType } from 'logic/lookup-tables/types';
+import { useValidateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import { FormikFormGroup } from 'components/common';
+import type { LookupTableCache, validationErrorsType } from 'logic/lookup-tables/types';
 
-import AdapterConfigFormFields from './AdapterConfigFormFields';
+import CacheConfigFormFields from './CacheConfigFormFields';
 
-function AdapterFormFields() {
-  const { errors, values, touched, setFieldValue, setValues, setErrors } = useFormikContext<LookupTableAdapter>();
-  const { validateDataAdapter } = useValidateDataAdapter();
+function CacheFormFields() {
+  const { errors, values, touched, setValues, setErrors } = useFormikContext<LookupTableCache>();
+  const { validateCache } = useValidateCache();
   const configRef = React.useRef(null);
   const [generateName, setGenerateName] = React.useState<boolean>(!values.title);
 
   const _sanitizeName = (inName: string) => inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
 
   const _runValidations = React.useCallback(() => {
-    validateDataAdapter(values).then((resp: { errors: validationErrorsType }) => {
+    validateCache(values).then((resp: { errors: validationErrorsType }) => {
       const auxErrors = Object.keys(resp.errors).reduce((acc, key) => {
         // eslint-disable-next-line no-param-reassign
         if (errors[key]) acc[key] = errors[key];
@@ -45,7 +45,7 @@ function AdapterFormFields() {
       const configErrors = configRef?.current?.validate?.() || {};
       setErrors({ ...auxErrors, ...configErrors });
     });
-  }, [validateDataAdapter, values, setErrors, errors]);
+  }, [validateCache, values, setErrors, errors]);
 
   const handleTitleChange = (event: React.BaseSyntheticEvent) => {
     if (!generateName) return;
@@ -60,12 +60,6 @@ function AdapterFormFields() {
 
   React.useEffect(() => _runValidations(), [_runValidations, values]);
 
-  const updateCustomErrorTTL = (value: number, unit: string, enabled: boolean) => {
-    setFieldValue('custom_error_ttl', value);
-    setFieldValue('custom_error_ttl_unit', unit);
-    setFieldValue('custom_error_ttl_enabled', enabled);
-  };
-
   return (
     <fieldset>
       <FormikFormGroup
@@ -73,8 +67,8 @@ function AdapterFormFields() {
         name="title"
         label="* Title"
         required
+        help={touched.title && errors.title ? null : 'A short title for this cache.'}
         onChange={handleTitleChange}
-        help={touched.title && errors.title ? null : 'A short title for this data adapter.'}
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
@@ -82,7 +76,7 @@ function AdapterFormFields() {
         type="text"
         name="description"
         label="Description"
-        help="Data adapter description."
+        help="Cache description."
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
@@ -94,27 +88,14 @@ function AdapterFormFields() {
         error={touched.name && errors.name ? errors.name : null}
         onChange={() => setGenerateName(!touched.name)}
         help={
-          touched.name && errors.name
-            ? null
-            : 'The name that is being used to refer to this data adapter. Must be unique.'
+          touched.name || errors.name ? null : 'The name that is being used to refer to this cache. Must be unique.'
         }
         labelClassName="col-sm-3"
         wrapperClassName="col-sm-9"
       />
-      <TimeUnitInput
-        label="Custom Error TTL"
-        help="Define a custom TTL for caching erroneous results. Otherwise the default of 5 seconds is used"
-        update={updateCustomErrorTTL}
-        value={values.custom_error_ttl}
-        unit={values.custom_error_ttl_unit || 'MINUTES'}
-        units={['MILLISECONDS', 'SECONDS', 'MINUTES', 'HOURS', 'DAYS']}
-        enabled={values.custom_error_ttl_enabled}
-        labelClassName="col-sm-3"
-        wrapperClassName="col-sm-9"
-      />
-      <AdapterConfigFormFields ref={configRef} validationErrors={errors} />
+      <CacheConfigFormFields ref={configRef} />
     </fieldset>
   );
 }
 
-export default AdapterFormFields;
+export default CacheFormFields;

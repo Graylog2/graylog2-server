@@ -18,10 +18,10 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Row, Col } from 'components/bootstrap';
-import type { LookupTableAdapter } from 'logic/lookup-tables/types';
+import type { LookupTableCache } from 'logic/lookup-tables/types';
 
-import DataAdapterForm from './AdapterForm';
-import DataAdapterTypeSelect from './AdapterTypeSelect';
+import CacheForm from './CacheForm';
+import CacheTypeSelect from './CacheTypeSelect';
 
 const StyledRow = styled(Row)`
   display: flex;
@@ -35,35 +35,32 @@ const FlexCol = styled(Col)`
 `;
 
 type Props = {
-  saved?: (adapterObj: LookupTableAdapter) => void;
+  saved?: (adapterObj: LookupTableCache) => void;
   onCancel: () => void;
-  adapter?: LookupTableAdapter;
+  cache?: LookupTableCache;
 };
 
-const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined }: Props) => {
-  const [dataAdapter, setDataAdapter] = React.useState<LookupTableAdapter>(adapter);
-  const isCreate = React.useMemo(() => !dataAdapter?.id, [dataAdapter]);
+function CacheFormView({ saved = undefined, onCancel, cache = undefined }: Props) {
+  const [lutCache, setLutCache] = React.useState<LookupTableCache>(cache);
+  const isCreate = React.useMemo(() => !lutCache?.id, [lutCache]);
 
   return (
     <>
       {isCreate && (
         <StyledRow>
           <Col lg={6}>
-            <DataAdapterTypeSelect
-              adapterConfigType={dataAdapter ? dataAdapter.config.type : null}
-              onAdapterChange={setDataAdapter}
-            />
+            <CacheTypeSelect cacheConfigType={lutCache ? lutCache.config.type : null} onCacheChange={setLutCache} />
           </Col>
         </StyledRow>
       )}
-      {dataAdapter && (
+      {lutCache && (
         <StyledRow style={{ flexGrow: 1 }}>
           <FlexCol lg={9}>
-            <DataAdapterForm
-              dataAdapter={dataAdapter}
-              type={dataAdapter?.config?.type}
+            <CacheForm
+              cache={lutCache}
+              type={lutCache?.config?.type}
               create={isCreate}
-              title="Configure Adapter"
+              title="Configure Cache"
               saved={saved}
               onCancel={onCancel}
             />
@@ -72,6 +69,6 @@ const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined 
       )}
     </>
   );
-};
+}
 
-export default DataAdapterFormView;
+export default CacheFormView;

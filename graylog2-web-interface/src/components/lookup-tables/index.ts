@@ -32,12 +32,13 @@ export { default as CacheForm } from './CacheForm';
 export { default as CacheCreate } from './CacheCreate';
 export { default as CachePicker } from './CachePicker';
 export { default as CachesContainer } from './CachesContainer';
+export { CacheFormView } from './cache-form';
 
 export { default as DataAdaptersOverview } from './adapter-list';
 
 export { default as DataAdapterTableEntry } from './DataAdapterTableEntry';
 export { default as DataAdapter } from './DataAdapter';
-export { DataAdapterForm, DataAdapterTypeSelect, DataAdapterFormView } from './adapter-form';
+export { DataAdapterFormView } from './adapter-form';
 
 export { default as DataAdapterPicker } from './DataAdapterPicker';
 export { default as DataAdaptersContainer } from './DataAdaptersContainer';
