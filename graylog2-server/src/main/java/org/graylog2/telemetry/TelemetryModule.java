@@ -25,6 +25,8 @@ import org.graylog2.telemetry.suppliers.OutputsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.MongoDBMetricsSupplier;
 import org.graylog2.telemetry.suppliers.ShardsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.LookupTablesSupplier;
+import org.graylog2.telemetry.suppliers.EventDefinitionsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.EventNotificationsMetricsSupplier;
 
 public class TelemetryModule extends PluginModule {
     @Override
@@ -41,5 +43,7 @@ public class TelemetryModule extends PluginModule {
         addTelemetryMetricProvider("MongoDB Metrics", MongoDBMetricsSupplier.class);
         addTelemetryMetricProvider("Shards Metrics", ShardsMetricsSupplier.class);
         addTelemetryMetricProvider("Lookup Tables Metrics", LookupTablesSupplier.class);
+        addTelemetryMetricProvider("Event Definitions Metrics", EventDefinitionsMetricsSupplier.class);
+        addTelemetryMetricProvider("Event Notifications Metrics", EventNotificationsMetricsSupplier.class);
     }
 }
