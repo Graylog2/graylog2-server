@@ -16,20 +16,20 @@
  */
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
-import useColumnsWidths from './useColumnsWidths';
+import useColumnWidths from './useColumnWidths';
 
-describe('useColumnsWidths hook test', () => {
+describe('useColumnWidths hook test', () => {
   it('should calculate width for columns with flexible width', async () => {
     const columnRenderersByAttribute = {
       title: { width: 1 },
       description: { width: 2 },
     };
-    const columnsIds = ['title', 'description'];
+    const columnIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
-      useColumnsWidths({
+      useColumnWidths({
         columnRenderersByAttribute,
-        columnsIds,
+        columnIds,
         actionsColWidth: 0,
         bulkSelectColWidth: 0,
         tableWidth: 600,
@@ -48,12 +48,12 @@ describe('useColumnsWidths hook test', () => {
         width: 1,
       },
     };
-    const columnsIds = ['title', 'description'];
+    const columnIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
-      useColumnsWidths({
+      useColumnWidths({
         columnRenderersByAttribute,
-        columnsIds,
+        columnIds,
         actionsColWidth: 0,
         bulkSelectColWidth: 0,
         tableWidth: 600,
@@ -71,12 +71,12 @@ describe('useColumnsWidths hook test', () => {
       title: { width: 1 },
       description: { width: 2 },
     };
-    const columnsIds = ['title', 'description'];
+    const columnIds = ['title', 'description'];
 
     const { result } = renderHook(() =>
-      useColumnsWidths({
+      useColumnWidths({
         columnRenderersByAttribute,
-        columnsIds,
+        columnIds,
         actionsColWidth: 50,
         bulkSelectColWidth: 20,
         tableWidth: 600,

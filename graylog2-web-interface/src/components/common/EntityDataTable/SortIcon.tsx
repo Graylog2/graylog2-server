@@ -18,9 +18,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import type { Column } from 'components/common/EntityDataTable';
 import CommonSortIcon from 'components/common/SortIcon';
-import type { Sort } from 'stores/PaginationTypes';
+import type { ColumnMetaContext, EntityBase } from 'components/common/EntityDataTable/types';
 
 const StyledCommonSortIcon = styled(CommonSortIcon)`
   display: inline-block;
@@ -39,29 +38,15 @@ const SORT_ORDER_NAMES = {
   desc: 'descending',
 };
 
-const SortIcon = ({
-  onChange,
-  activeSort,
-  column,
-}: {
-  onChange: (newSort: Sort) => void;
-  column: Column;
-  activeSort: Sort | undefined;
-}) => {
-  const columnSortIsActive = activeSort?.attributeId === column.id;
-  const nextSortDirection =
-    !columnSortIsActive || activeSort.direction === SORT_DIRECTIONS.DESC ? SORT_DIRECTIONS.ASC : SORT_DIRECTIONS.DESC;
-  const title = `Sort ${column.title.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`;
-
-  const _onChange = () => {
-    onChange({ attributeId: column.id, direction: nextSortDirection });
-  };
+const SortIcon = <Entity extends EntityBase>({ header }: { header: any }) => {
+  const nextSortDirection = header.column.getNextSortingOrder();
+  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
 
   return (
     <StyledCommonSortIcon
-      activeDirection={columnSortIsActive ? activeSort.direction : undefined}
-      onChange={_onChange}
-      title={title}
+      activeDirection={header.column.getIsSorted()}
+      onChange={() => header.column.toggleSorting()}
+      title={`Sort ${columnMeta.label.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
       ascId={SORT_DIRECTIONS.ASC}
       descId={SORT_DIRECTIONS.DESC}
     />
