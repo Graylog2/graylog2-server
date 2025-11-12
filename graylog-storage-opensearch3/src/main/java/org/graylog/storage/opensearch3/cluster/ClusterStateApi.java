@@ -42,7 +42,7 @@ public class ClusterStateApi {
      */
     public Map<String, Set<String>> fields(Collection<String> indices) {
         final StateResponse state = officialClient.sync(c -> c.cluster().state(r -> r.metric(List.of(ClusterStateMetric.Metadata)).index(new LinkedList<>(indices))), "Failed to obtain cluster state metadata");
-        final MyResponse response = state.valueBody().to(MyResponse.class);
+        final TypedStateResponse response = state.valueBody().to(TypedStateResponse.class);
         return response.metadata().indices().entrySet().stream()
                 .filter(entry -> entry.getValue().hasAnyProperties())
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> collectFields(e.getValue())));
@@ -52,15 +52,16 @@ public class ClusterStateApi {
         return index.mappings().values().stream().flatMap(e -> e.properties().keySet().stream()).collect(Collectors.toSet());
     }
 
+    /**
+     * This class and its content exists only because opensearch client is not providing typed response to /cluster/state requests.
+     *
+     * @see <a href="https://github.com/opensearch-project/opensearch-java/issues/1791">opensearch-java#1791</a>
+     */
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record MyResponse(Metadata metadata) {
-
-    }
+    private record TypedStateResponse(Metadata metadata) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record Metadata(Map<String, Index> indices) {
-
-    }
+    private record Metadata(Map<String, Index> indices) {}
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private record Index(Map<String, Mapping> mappings) {
