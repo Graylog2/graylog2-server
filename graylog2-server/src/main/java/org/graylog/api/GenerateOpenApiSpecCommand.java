@@ -16,8 +16,6 @@
  */
 package org.graylog.api;
 
-import com.github.joschi.jadconfig.Repository;
-import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Pattern;
@@ -54,9 +52,7 @@ import org.graylog2.shared.rest.documentation.openapi.OpenAPIGenerator;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -77,18 +73,6 @@ public class GenerateOpenApiSpecCommand extends Server {
     @Pattern(pattern = "^.+\\.(json|yaml|yml)$", description = "Output file must have a .json, .yaml or .yml extension.")
     @Required
     private String outputFile;
-
-    @Override
-    protected Collection<Repository> getConfigRepositories(String configFile) {
-        return List.of(
-                // TODO: add a repo that reads from the shipped config file so that we don't have to provide so
-                // many default values.
-                new InMemoryRepository(Map.of(
-                        "password_secret", "not-required-for-this-command",
-                        "root_password_sha2", "not-required-for-this-command",
-                        "data_dir", "not-required-for-this-command"))
-        );
-    }
 
     @Override
     protected void beforeInjectorCreation(Set<Plugin> plugins) {
