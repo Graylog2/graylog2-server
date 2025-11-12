@@ -40,7 +40,7 @@ type Options = {
 };
 const savedSearchesUrl = qualifyUrl('/search/saved');
 
-const fetchSavedSearches = (searchParams: SearchParams) => {
+export const fetchSavedSearches = (searchParams: SearchParams) => {
   const url = PaginationURL(savedSearchesUrl, searchParams.page, searchParams.pageSize, searchParams.query, {
     sort: searchParams.sort.attributeId,
     order: searchParams.sort.direction,

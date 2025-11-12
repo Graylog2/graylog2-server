@@ -14,15 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { PaginatedList, Spinner, NoEntitiesExist, EntityDataTable } from 'components/common';
-import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/logic/fieldactions/ChangeFieldType/Constants';
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
-import type { SearchParams, Sort } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
-import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
-import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
+import { PaginatedEntityTable } from 'components/common';
+import { DEFAULT_LAYOUT } from 'views/logic/fieldactions/ChangeFieldType/Constants';
+import type { SearchParams } from 'stores/PaginationTypes';
+import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -30,13 +28,9 @@ import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/use
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const Container = styled.div`
   margin-top: 20px;
-`;
-const StyledNoEntitiesExist = styled(NoEntitiesExist)`
-  margin-bottom: 20px;
 `;
 
 type Props = {
@@ -53,72 +47,13 @@ const mapper = (indexSets: Array<IndexSet>): Record<string, IndexSet> => {
 };
 
 const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelection }: Props) => {
-  const [activePage, setActivePage] = useState(1);
-  const { data, isSuccess } = useIndexSetsList();
+  const { data } = useIndexSetsList();
+  const currentStreams = useCurrentStream();
+
   const mappedIndexSets = useMemo(() => mapper(data?.indexSets), [data?.indexSets]);
 
-  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout({
-    entityTableId: ENTITY_TABLE_ID,
-    defaultPageSize: DEFAULT_LAYOUT.pageSize,
-    defaultDisplayedAttributes: DEFAULT_LAYOUT.displayedColumns,
-    defaultSort: DEFAULT_LAYOUT.sort,
-    defaultColumnOrder: DEFAULT_LAYOUT.order,
-  });
-
-  const searchParams: SearchParams = useMemo(
-    () => ({
-      page: activePage,
-      pageSize: layoutConfig.pageSize,
-      sort: layoutConfig.sort as Sort,
-    }),
-    [activePage, layoutConfig.pageSize, layoutConfig.sort],
-  );
-  const currentStreams = useCurrentStream();
-  const {
-    data: { list, attributes, pagination },
-    isLoading,
-  } = useFieldTypeUsages({ field, streams: currentStreams }, searchParams, {
-    enabled: !isLoadingLayoutPreferences && !!currentStreams,
-  });
-
-  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(ENTITY_TABLE_ID);
-
-  const onPageChange = useCallback(
-    (newPage: number, newPageSize: number) => {
-      if (newPage) {
-        setActivePage(newPage);
-      }
-
-      if (newPageSize) {
-        updateTableLayout({ perPage: newPageSize });
-      }
-    },
-    [updateTableLayout],
-  );
-
-  const onPageSizeChange = useCallback(
-    (newPageSize: number) => {
-      setActivePage(1);
-      updateTableLayout({ perPage: newPageSize });
-    },
-    [updateTableLayout],
-  );
-
-  const onSortChange = useCallback(
-    (newSort: Sort) => {
-      setActivePage(1);
-      updateTableLayout({ sort: newSort });
-    },
-    [updateTableLayout],
-  );
-
-  const onColumnPreferencesChange = useCallback(
-    (newColumnPreferences: ColumnPreferences) => {
-      updateTableLayout({ attributes: newColumnPreferences });
-    },
-    [updateTableLayout],
-  );
-
+  const fetchEntities = (searchParams: SearchParams) =>
+    fetchFieldTypeUsages({ field, streams: currentStreams }, searchParams);
   const columnRenderers = useColumnRenderers(fieldTypes);
 
   const onChangeSelection = useCallback(
@@ -137,44 +72,26 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
     [mappedIndexSets],
   );
 
-  if (isLoadingLayoutPreferences || isLoading || !isSuccess) {
-    return <Spinner />;
-  }
-
   return (
     <Container>
-      <PaginatedList
-        onChange={onPageChange}
-        totalItems={pagination?.total}
-        pageSize={layoutConfig.pageSize}
-        activePage={activePage}
-        showPageSizeSelect={false}
-        useQueryParameter={false}>
-        {!list?.length ? (
-          <StyledNoEntitiesExist>No index sets have been found.</StyledNoEntitiesExist>
-        ) : (
-          <EntityDataTable<FieldTypeUsage>
-            activeSort={layoutConfig.sort}
-            bulkSelection={{
-              onChangeSelection,
-              initialSelection,
-              actions: <BulkActionsDropdown />,
-              isEntitySelectable,
-            }}
-            columnSchemas={attributes}
-            columnRenderers={columnRenderers}
-            columnOrder={layoutConfig.order}
-            defaultDisplayedColumns={layoutConfig.defaultDisplayedColumns}
-            entities={list}
-            onColumnPreferencesChange={onColumnPreferencesChange}
-            onPageSizeChange={onPageSizeChange}
-            entityAttributesAreCamelCase
-            onSortChange={onSortChange}
-            pageSize={layoutConfig.pageSize}
-            columnPreferences={layoutConfig.attributes}
-          />
-        )}
-      </PaginatedList>
+      <PaginatedEntityTable<FieldTypeUsage>
+        humanName="Index Sets"
+        tableLayout={DEFAULT_LAYOUT}
+        withoutURLParams
+        fetchEntities={fetchEntities}
+        keyFn={(searchParams) => ['fieldTypeUsages', field, searchParams]}
+        columnRenderers={columnRenderers}
+        entityActions={null}
+        entityAttributesAreCamelCase
+        bulkSelection={{
+          onChangeSelection,
+          initialSelection,
+          actions: <BulkActionsDropdown />,
+          isEntitySelectable,
+        }}
+        searchPlaceholder="Search for index sets"
+        fetchOptions={{ refetchInterval: 5000 }}
+      />
     </Container>
   );
 };

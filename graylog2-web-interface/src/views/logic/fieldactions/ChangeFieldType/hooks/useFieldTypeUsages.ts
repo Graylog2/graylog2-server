@@ -18,7 +18,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
-import type { Attribute } from 'stores/PaginationTypes';
+import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -36,13 +36,7 @@ export type Sort = {
   direction: 'asc' | 'desc';
 };
 
-export type SearchParams = {
-  page: number;
-  pageSize: number;
-  sort: Sort;
-};
-
-const fetchFieldTypeUsages = async (
+export const fetchFieldTypeUsages = async (
   { field, streams }: { field: string; streams: Array<string> },
   searchParams: SearchParams,
 ) => {
