@@ -29,9 +29,7 @@ const MessageEditFieldConfigurationAction = () => {
   const toggleEditMode = useCallback(() => setShowModal((prev) => !prev), []);
 
   const onClick = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_OPEN, {
-      app_action_value: 'open',
-    });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_OPEN, {});
 
     return toggleEditMode();
   }, [sendTelemetry, toggleEditMode]);

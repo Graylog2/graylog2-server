@@ -37,9 +37,7 @@ const useMessageFavoriteFieldsForEditing = () => {
   }, [favorites, saveFavoriteField]);
   const reorderFavoriteFields = useCallback(
     (items: Array<FormattedField>) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELD_REORDERED, {
-        app_action_value: 'reordered',
-      });
+      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELD_REORDERED, {});
       setFavorites(items.map((item: FormattedField) => item.field));
     },
     [sendTelemetry],

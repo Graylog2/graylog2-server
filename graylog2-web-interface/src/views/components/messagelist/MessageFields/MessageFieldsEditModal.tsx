@@ -74,9 +74,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
   }, [resetFavoriteFields, toggleEditMode]);
 
   const _toggleEditMode = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_CANCELED, {
-      app_action_value: 'canceled',
-    });
+    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_CANCELED, {});
 
     return toggleEditMode();
   }, [sendTelemetry, toggleEditMode]);
