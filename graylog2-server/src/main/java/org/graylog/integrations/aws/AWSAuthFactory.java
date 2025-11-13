@@ -69,7 +69,7 @@ public class AWSAuthFactory {
             awsCredentials = StaticCredentialsProvider.create(AwsBasicCredentials.create(accessKey, secretKey));
         } else {
             LOG.debug("Using default authorization provider chain.");
-            awsCredentials = DefaultCredentialsProvider.create();
+            awsCredentials = DefaultCredentialsProvider.builder().build();
         }
         return awsCredentials;
     }
