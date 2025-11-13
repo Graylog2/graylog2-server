@@ -23,7 +23,6 @@ import ViewLoaderContext from 'views/logic/ViewLoaderContext';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import FavoriteIcon from 'views/components/FavoriteIcon';
-import type { SearchParams } from 'stores/PaginationTypes';
 import { createGRN } from 'logic/permissions/GRN';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';

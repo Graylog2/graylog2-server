@@ -30,6 +30,7 @@ const onDelete = (
   savedSearch: View,
   deleteSavedSearch: (search: View) => Promise<void>,
   activeSavedSearchId: string,
+  refetch: () => void,
   deselectEntity: (searchId: string) => void,
 ) => {
   e.stopPropagation();

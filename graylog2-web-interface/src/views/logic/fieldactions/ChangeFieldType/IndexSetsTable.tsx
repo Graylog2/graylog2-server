@@ -20,6 +20,7 @@ import styled from 'styled-components';
 import { PaginatedEntityTable } from 'components/common';
 import { DEFAULT_LAYOUT } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import type { SearchParams } from 'stores/PaginationTypes';
+import type { SortableAttrbutes } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
@@ -52,7 +53,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
 
   const mappedIndexSets = useMemo(() => mapper(data?.indexSets), [data?.indexSets]);
 
-  const fetchEntities = (searchParams: SearchParams) =>
+  const fetchEntities = (searchParams: SearchParams<SortableAttrbutes>) =>
     fetchFieldTypeUsages({ field, streams: currentStreams }, searchParams);
   const columnRenderers = useColumnRenderers(fieldTypes);
 

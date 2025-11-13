@@ -31,14 +31,12 @@ const INITIAL_DATA = {
 type Options = {
   enabled: boolean;
 };
-export type Sort = {
-  attributeId: 'index_set_id' | 'index_set_title';
-  direction: 'asc' | 'desc';
-};
+
+export type SortableAttrbutes = 'index_set_id' | 'index_set_title';
 
 export const fetchFieldTypeUsages = async (
   { field, streams }: { field: string; streams: Array<string> },
-  searchParams: SearchParams,
+  searchParams: SearchParams<SortableAttrbutes>,
 ) => {
   const {
     sort: { attributeId, direction },
@@ -63,7 +61,7 @@ export const fetchFieldTypeUsages = async (
 
 const useFieldTypeUsages = (
   { streams, field }: { streams: Array<string>; field: string },
-  searchParams: SearchParams,
+  searchParams: SearchParams<SortableAttrbutes>,
   { enabled }: Options = { enabled: true },
 ): {
   data: {
