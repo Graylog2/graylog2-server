@@ -28,6 +28,7 @@ import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.inputs.InputService;
 import org.graylog2.shared.inputs.InputRegistry;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +44,6 @@ public class PipelineTestUtil {
             FromInput.NAME, new FromInput(mock(InputRegistry.class))));
     private final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
     private final PipelineStreamConnectionsService connectionsService;
-    private final InputService inputService;
 
     public static final String ALWAYS_TRUE_ID = "always_true_id";
     public static final String REMOVE_FIELD_ID = "remove_field_id";
@@ -59,7 +59,6 @@ public class PipelineTestUtil {
 
     public PipelineTestUtil(PipelineStreamConnectionsService connectionsService, InputService inputService) {
         this.connectionsService = connectionsService;
-        this.inputService = inputService;
         when(inputService.findIdsByTitle(INPUT_NAME)).thenReturn(List.of(INPUT_ID));
     }
 
@@ -85,7 +84,7 @@ public class PipelineTestUtil {
                 .build();
         stage.setRules(rules);
 
-        SortedSet<Stage> stages = new java.util.TreeSet<>((s1, s2) -> 0);
+        SortedSet<Stage> stages = new java.util.TreeSet<>(Comparator.comparingInt(Stage::stage));
         stages.add(stage);
         return stages;
     }

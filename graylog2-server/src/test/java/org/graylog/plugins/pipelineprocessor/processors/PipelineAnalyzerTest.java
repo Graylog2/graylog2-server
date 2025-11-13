@@ -75,7 +75,7 @@ class PipelineAnalyzerTest {
 
         assertTrue(result.isEmpty());
         assertTrue(ruleRecords.stream().anyMatch(dao ->
-                dao.pipelineId().equals("pipeline1_id")
+                dao.pipelineId().equals(pipeline1.id())
                         && dao.functions().isEmpty()
                         && dao.rules().contains(ALWAYS_TRUE_ID)));
     }
