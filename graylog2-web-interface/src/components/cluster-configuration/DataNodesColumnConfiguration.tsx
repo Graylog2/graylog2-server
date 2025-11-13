@@ -35,14 +35,14 @@ const RoleLabel = styled(Label)`
   gap: 4px;
 `;
 
-export const DEFAULT_VISIBLE_COLUMNS = ['hostname', 'data_node_status', 'jvm', 'datanode_version', 'opensearch_roles'] as const;
+export const DEFAULT_VISIBLE_COLUMNS = ['hostname', 'datanode_status', 'jvm', 'datanode_version', 'opensearch_roles'] as const;
 
 const JVM_WARNING_THRESHOLD = 0.7;
 const JVM_DANGER_THRESHOLD = 0.9;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'hostname', title: 'Node', sortable: true },
-  { id: 'data_node_status', title: 'State', sortable: true },
+  { id: 'datanode_status', title: 'State', sortable: true },
   { id: 'jvm', title: 'JVM', sortable: false },
   { id: 'datanode_version', title: 'Version', sortable: true },
   { id: 'opensearch_roles', title: 'Role', sortable: true },
@@ -83,7 +83,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
         return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
       },
     },
-    data_node_status: {
+    datanode_status: {
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
     },
     jvm: {

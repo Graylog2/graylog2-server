@@ -80,7 +80,7 @@ const MigrationDatanodeList = ({ showProvisioningState = true }: Props) => {
                 <tr key={datanode.id}>
                   <td>{datanode.hostname}</td>
                   <td>{datanode.transport_address}</td>
-                  <td>{showProvisioningState ? datanode.status : datanode.data_node_status}</td>
+                  <td>{showProvisioningState ? datanode.status : datanode.datanode_status}</td>
                   <td>
                     {datanode.cert_valid_until ? <Timestamp dateTime={datanode.cert_valid_until} /> : 'No certificate'}
                   </td>

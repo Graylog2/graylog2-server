@@ -155,9 +155,9 @@ const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown'
     }
   };
 
-  const isDatanodeRunning = dataNode.data_node_status === 'AVAILABLE';
-  const isDatanodeRemoved = dataNode.data_node_status === 'REMOVED';
-  const isRemovingDatanode = dataNode.data_node_status === 'REMOVING';
+  const isDatanodeRunning = dataNode.datanode_status === 'AVAILABLE';
+  const isDatanodeRemoved = dataNode.datanode_status === 'REMOVED';
+  const isRemovingDatanode = dataNode.datanode_status === 'REMOVING';
 
   return (
     <IfPermitted permissions="datanode:start">
