@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog2.inputs.InputService;
 import org.graylog2.shared.inputs.InputRegistry;
 
 import java.util.List;
@@ -42,13 +43,24 @@ public class PipelineTestUtil {
             FromInput.NAME, new FromInput(mock(InputRegistry.class))));
     private final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
     private final PipelineStreamConnectionsService connectionsService;
+    private final InputService inputService;
+
+    public static final String ALWAYS_TRUE_ID = "always_true_id";
+    public static final String REMOVE_FIELD_ID = "remove_field_id";
+    public static final String FROM_INPUT_ID = "from_input_id";
+    public static final String CONNECTION_ID = "connection1_id";
+    public static final String STREAM_ID = "stream1_id";
+    public static final String INPUT_NAME = "input1";
+    public static final String INPUT_ID = INPUT_NAME + "_id";
 
     public final Rule ALWAYS_TRUE = parser.parseRule("always_true_id", "rule \"alwaysTrue\" when true then end", true);
     public final Rule REMOVE_FIELD = parser.parseRule("remove_field_id", "rule \"removeField\" when true then remove_field(\"dummy\"); end", true);
     public final Rule FROM_INPUT = parser.parseRule("from_input_id", "rule \"fromInput\" when from_input(name: \"input1\") then end", true);
 
-    public PipelineTestUtil(PipelineStreamConnectionsService connectionsService) {
+    public PipelineTestUtil(PipelineStreamConnectionsService connectionsService, InputService inputService) {
         this.connectionsService = connectionsService;
+        this.inputService = inputService;
+        when(inputService.findIdsByTitle(INPUT_NAME)).thenReturn(List.of(INPUT_ID));
     }
 
     public Pipeline createPipelineWithRules(String pipelineName, List<Rule> rules) {
@@ -59,7 +71,7 @@ public class PipelineTestUtil {
                 .stages(createStagesWithRules(rules))
                 .build();
         PipelineConnections connections = PipelineConnections.create(
-                "connection1_id", "stream1_id", Set.of(pipelineId));
+                CONNECTION_ID, STREAM_ID, Set.of(pipelineId));
         when(connectionsService.loadByPipelineId(pipelineId)).thenReturn(Set.of(connections));
 
         return pipeline;

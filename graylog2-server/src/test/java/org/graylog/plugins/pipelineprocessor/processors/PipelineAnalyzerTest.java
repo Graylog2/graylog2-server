@@ -32,6 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.ALWAYS_TRUE_ID;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.FROM_INPUT_ID;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.INPUT_ID;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.REMOVE_FIELD_ID;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM_ID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PipelineAnalyzerTest {
@@ -50,11 +55,11 @@ class PipelineAnalyzerTest {
         org.mockito.MockitoAnnotations.openMocks(this).close();
         pipelineAnalyzer = new PipelineAnalyzer(connectionsService, inputService, new MetricRegistry());
         ruleRecords = new ArrayList<>();
-        testUtil = new PipelineTestUtil(connectionsService);
+        testUtil = new PipelineTestUtil(connectionsService, inputService);
     }
 
     @Test
-    void analyzeEmpty() {
+    void empty() {
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
                 ImmutableMap.of(), ImmutableMap.of(), List.of()
         );
@@ -62,7 +67,7 @@ class PipelineAnalyzerTest {
     }
 
     @Test
-    void analyzeSingleRule() {
+    void singleRule() {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.ALWAYS_TRUE));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
@@ -70,14 +75,45 @@ class PipelineAnalyzerTest {
 
         assertTrue(result.isEmpty());
         assertTrue(ruleRecords.stream().anyMatch(dao ->
-                dao.pipelineId().equals("pipeline1_id") && dao.rules().contains("always_true_id")));
+                dao.pipelineId().equals("pipeline1_id")
+                        && dao.functions().isEmpty()
+                        && dao.rules().contains(ALWAYS_TRUE_ID)));
     }
 
     @Test
-    void analyzeDeprecatedFunctions() {
+    void deprecatedFunction() {
+        Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.REMOVE_FIELD));
 
+        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+
+        assertTrue(result.isEmpty());
+        assertTrue(ruleRecords.stream().anyMatch(dao ->
+                dao.pipelineId().equals(pipeline1.id())
+                        && dao.rules().contains(REMOVE_FIELD_ID)
+                        && dao.functions().contains("remove_field")
+                        && dao.deprecatedFunctions().contains("remove_field")));
     }
 
+    @Test
+    void inputMention() {
+        Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.FROM_INPUT));
+
+        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+
+        assertTrue(result.containsKey(INPUT_ID));
+        Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
+        assertTrue(mentions.stream().anyMatch(entry ->
+                entry.pipelineId().equals(pipeline1.id())
+                        && entry.connectedStreams().contains(STREAM_ID)
+                        && entry.ruleId().equals(FROM_INPUT_ID)));
+
+        assertTrue(ruleRecords.stream().anyMatch(dao ->
+                dao.pipelineId().equals(pipeline1.id())
+                        && dao.rules().contains(FROM_INPUT_ID)
+                        && dao.functions().contains("from_input")));
+    }
 
 }
 
