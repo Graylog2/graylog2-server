@@ -40,7 +40,8 @@ const INIT_CACHE: LookupTableCache = {
 const FlexForm = styled(Form)`
   display: flex;
   flex-direction: column;
-  flex-grow: 1 !important;
+  flex-grow: 1;
+  width: 100%;
 `;
 
 type TitleProps = {
@@ -53,7 +54,7 @@ const Title = ({ title, typeName, create }: TitleProps) => {
   const TagName = create ? 'h3' : 'h2';
 
   return (
-    <TagName style={{ marginBottom: '12px' }}>
+    <TagName style={{ marginBottom: '12px', width: '100%' }}>
       {title} <small>({typeName})</small>
     </TagName>
   );
@@ -108,10 +109,14 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
         {({ isSubmitting, isValid }) => (
           <FlexForm className="form form-horizontal">
             <Row style={{ flexGrow: 1 }}>
-              <Col lg={6}>
+              <Col lg={DocComponent ? 6 : 8}>
                 <CacheFormFields />
               </Col>
-              <Col lg={6}>{DocComponent ? <DocComponent /> : null}</Col>
+              {DocComponent && (
+                <Col lg={6}>
+                  <DocComponent />
+                </Col>
+              )}
             </Row>
             <Row>
               {canModify && (

@@ -32,7 +32,8 @@ import AdapterFormFields from './AdapterFormFields';
 const FlexForm = styled(Form)`
   display: flex;
   flex-direction: column;
-  flex-grow: 1 !important;
+  flex-grow: 1;
+  width: 100%;
 `;
 
 type TitleProps = {
@@ -77,7 +78,7 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
   const { createAdapter, creatingAdapter } = useCreateAdapter();
   const { updateAdapter, updatingAdapter } = useUpdateAdapter();
 
-  const adapterPlugins = usePluginEntities('lookupTableCaches');
+  const adapterPlugins = usePluginEntities('lookupTableAdapters');
   const plugin = React.useMemo(() => adapterPlugins.find((p) => p.type === type), [adapterPlugins, type]);
 
   const DocComponent = React.useMemo(() => plugin?.documentationComponent, [plugin]);
@@ -111,10 +112,14 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
         {({ isSubmitting, isValid }) => (
           <FlexForm className="form form-horizontal">
             <Row style={{ flexGrow: 1 }}>
-              <Col lg={6}>
+              <Col lg={DocComponent ? 6 : 8}>
                 <AdapterFormFields />
               </Col>
-              <Col lg={6}>{DocComponent ? <DocComponent dataAdapterId={dataAdapter?.id} /> : null}</Col>
+              {DocComponent && (
+                <Col lg={6}>
+                  <DocComponent dataAdapterId={dataAdapter?.id} />
+                </Col>
+              )}
             </Row>
             <Row>
               {canModify && (

@@ -37,8 +37,8 @@ const FlexCol = styled(Col)`
 
 const StyledRow = styled(Row)`
   display: flex;
-  width: 100%;
   justify-content: center;
+  max-width: 1500px;
 `;
 
 function CacheReadOnly({ cache }: { cache: LookupTableCache }) {

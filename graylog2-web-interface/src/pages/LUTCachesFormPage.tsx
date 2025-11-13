@@ -25,6 +25,12 @@ import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { CacheFormView } from 'components/lookup-tables';
 
+const FlexContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
 const FlexCol = styled(Col)`
   display: flex;
   flex-direction: column;
@@ -38,7 +44,7 @@ function LUTDataAdaptersFormPage() {
   const navigateBack = () => navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <FlexContainer>
       <LUTPageLayout
         documentTitle="Lookup Tables - Caches Create"
         pageTitle="Create Caches for Lookup Tables"
@@ -58,7 +64,7 @@ function LUTDataAdaptersFormPage() {
           </FlexCol>
         </Row>
       </LUTPageLayout>
-    </div>
+    </FlexContainer>
   );
 }
 

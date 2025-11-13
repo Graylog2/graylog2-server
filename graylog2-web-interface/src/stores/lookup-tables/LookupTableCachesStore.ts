@@ -31,7 +31,7 @@ type Actions = {
   update: (cache: LookupTableCache) => Promise<void>;
   getTypes: () => Promise<unknown>;
   delete: (idOrName: string) => Promise<void>;
-  validate: (cache: LookupTableCache) => Promise<void>;
+  validate: (cache: LookupTableCache) => Promise<unknown>;
 };
 export const LookupTableCachesActions = singletonActions('core.LookupTableCaches', () =>
   Reflux.createActions<Actions>({

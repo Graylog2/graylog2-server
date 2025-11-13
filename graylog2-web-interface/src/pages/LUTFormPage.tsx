@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
@@ -22,11 +23,17 @@ import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
 import LookupTableWizard from 'components/lookup-tables/lookup-table-form';
 
+const FlexContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`;
+
 function LUTFormPage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <FlexContainer>
       <LUTPageLayout
         documentTitle="Lookup Tables Create"
         pageTitle="Lookup Tables Create"
@@ -42,7 +49,7 @@ function LUTFormPage() {
           </Col>
         </Row>
       </LUTPageLayout>
-    </div>
+    </FlexContainer>
   );
 }
 
