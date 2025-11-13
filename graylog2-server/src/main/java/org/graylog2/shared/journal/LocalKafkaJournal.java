@@ -656,6 +656,7 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
      * @param requestedMaximumCount Maximum number of entries to return.
      * @return A list of entries
      */
+    @Override
     public List<JournalReadEntry> read(long readOffset, long requestedMaximumCount) {
         return read(readOffset, requestedMaximumCount, false);
     }
@@ -711,15 +712,17 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 lastOffset = messageAndOffset.offset();
 
                 final byte[] payloadBytes = ByteBufferUtils.readBytes(messageAndOffset.message().payload());
-                if (LOG.isTraceEnabled() || includeMessageId) {
+                if (includeMessageId) {
                     final byte[] keyBytes = ByteBufferUtils.readBytes(messageAndOffset.message().key());
                     messages.add(new JournalReadEntry(keyBytes, payloadBytes, messageAndOffset.offset()));
-                    LOG.trace("Read message {} contains {}", bytesToHex(keyBytes), bytesToHex(payloadBytes));
-                }
-                totalBytes += payloadBytes.length;
-                if (!includeMessageId) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Read message {} contains {}", bytesToHex(keyBytes), bytesToHex(payloadBytes));
+                    }
+                } else {
                     messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
                 }
+
+                totalBytes += payloadBytes.length;
                 // remember where to read from
                 nextReadOffset = messageAndOffset.nextOffset();
             }
