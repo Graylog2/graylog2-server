@@ -15,10 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import Routes from 'integrations/aws/common/Routes';
+import AWSCloudTrailRoutes from 'integrations/aws/cloudtrail/common/Routes';
 
 import AWSInputConfiguration from './aws/AWSInputConfiguration';
 import AWSCloudWatchApp from './aws/cloudwatch/CloudWatchApp';
 import EmbeddedCloudWatchApp from './aws/cloudwatch/EmbeddedCloudWatchApp';
+import CloudTrailInputConfiguration from './aws/cloudtrail/CloudTrailInputConfiguration';
+import EmbeddedCloudTrailApp from './aws/cloudtrail/EmbeddedCloudTrailApp';
+import AWSCloudTrailApp from './aws/cloudtrail/CloudTrailApp';
 import PagerDutyNotificationDetails from './pager-duty/PagerDutyNotificationDetails';
 import PagerDutyNotificationForm from './pager-duty/PagerDutyNotificationForm';
 import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSummary';
@@ -36,12 +40,20 @@ import TeamsNotificationV2Summary from './event-notifications/event-notification
 import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
 
 const bindings = {
-  routes: [{ path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp }],
+  routes: [
+    { path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
+    { path: AWSCloudTrailRoutes.unqualified.INTEGRATIONS.AWSCloudTrail.ACTIVITYAPI.index, component: AWSCloudTrailApp },
+  ],
   inputConfiguration: [
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',
       component: AWSInputConfiguration,
       embeddedComponent: EmbeddedCloudWatchApp,
+    },
+    {
+      type: 'org.graylog.aws.inputs.cloudtrail.CloudTrailInput',
+      component: CloudTrailInputConfiguration,
+      embeddedComponent: EmbeddedCloudTrailApp,
     },
   ],
   eventNotificationTypes: [

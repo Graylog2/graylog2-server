@@ -14,29 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.aws.inputs.cloudtrail.notifications;
+package org.graylog.aws.sqs;
 
-public class CloudtrailSNSNotification {
-    private final String s3Bucket;
-    private final String s3ObjectKey;
+public class ObjectCreatedPutParseException extends RuntimeException {
     private final String receiptHandle;
 
-    protected CloudtrailSNSNotification(String receiptHandle, String s3Bucket, String s3ObjectKey) {
+    public ObjectCreatedPutParseException(String receiptHandle, String message) {
+        super(message);
         this.receiptHandle = receiptHandle;
-        this.s3Bucket = s3Bucket;
-        this.s3ObjectKey = s3ObjectKey;
     }
 
     public String getReceiptHandle() {
         return receiptHandle;
     }
-
-    public String getS3Bucket() {
-        return s3Bucket;
-    }
-
-    public String getS3ObjectKey() {
-        return s3ObjectKey;
-    }
-
 }
+
