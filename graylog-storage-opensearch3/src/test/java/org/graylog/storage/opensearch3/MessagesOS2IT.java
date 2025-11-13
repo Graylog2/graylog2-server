@@ -30,7 +30,7 @@ import java.util.Map;
 public class MessagesOS2IT extends MessagesIT {
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder()
-            .cachedInstance(false)
+            .heapSize("512m")
             .build();
 
     @Override
