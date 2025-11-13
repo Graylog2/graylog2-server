@@ -113,7 +113,7 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
 
     await screen.findByRole('heading', { name: /favorite fields configuration/i });
     await screen.findByRole('heading', { name: /^favorite fields$/i });
-    await screen.findByRole('heading', { name: /rest fields/i });
+    await screen.findByRole('heading', { name: /remaining fields/i });
   });
 
   it('cancel button runs mockedToggleEditMode', async () => {

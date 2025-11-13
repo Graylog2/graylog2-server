@@ -83,7 +83,7 @@ const MessageFieldsEditModeRestList = ({ fields, onFavoriteToggle }: MessageFiel
 
   return (
     <>
-      <h3>Rest fields</h3>
+      <h3>Remaining fields</h3>
       <Container>
         {fields.map(({ field, type, value }) => (
           <ItemContainer key={field}>

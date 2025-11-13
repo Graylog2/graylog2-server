@@ -69,7 +69,7 @@ const Separator = ({ onClick, expanded, restLength }: Props) => {
     <SeparatorContainer onClick={onClick} role="button" tabIndex={0} onKeyDown={onKeyDown}>
       <Line />
       <IconSeparator expanded={expanded} />
-      <span>{`${expanded ? 'Hide' : 'Show'} ${restLength || ''} non-favorite ${StringUtils.pluralize(restLength, 'field', 'fields')}`}</span>
+      <span>{`${expanded ? 'Hide' : 'Show'} ${restLength || ''} remaining ${StringUtils.pluralize(restLength, 'field', 'fields')}`}</span>
       <IconSeparator expanded={expanded} />
       <Line />
     </SeparatorContainer>
