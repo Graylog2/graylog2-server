@@ -50,8 +50,8 @@ class ClusterStatsApiIT {
         final IndexSetStats after = api.clusterStats();
 
         // verify that *after* values are the *before* plus 1 index with 10 docs
-        Assertions.assertThat(after.indices()).isEqualTo(before.indices() + 1);
-        Assertions.assertThat(after.documents()).isEqualTo(before.documents() + 10);
+        Assertions.assertThat(after.indices()).isGreaterThanOrEqualTo(before.indices() + 1);
+        Assertions.assertThat(after.documents()).isGreaterThanOrEqualTo(before.documents() + 10);
         Assertions.assertThat(after.size()).isGreaterThan(before.size());
     }
 

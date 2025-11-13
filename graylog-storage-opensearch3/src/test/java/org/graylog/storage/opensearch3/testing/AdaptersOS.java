@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
-import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS2;
+import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS;
 import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
 import org.graylog.storage.opensearch3.IndicesAdapterOS;
 import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
@@ -125,7 +125,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS2(client));
     }
 
 }

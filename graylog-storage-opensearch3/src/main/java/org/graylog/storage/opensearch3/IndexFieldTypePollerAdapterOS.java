@@ -25,6 +25,7 @@ import org.graylog2.indexer.fieldtypes.FieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.opensearch.client.opensearch._types.mapping.Property;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,16 +39,16 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapter {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterOS2.class);
+public class IndexFieldTypePollerAdapterOS implements IndexFieldTypePollerAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexFieldTypePollerAdapterOS.class);
     private final FieldMappingApi fieldMappingApi;
     private final boolean streamAwareFieldTypes;
     private final StreamsForFieldRetriever streamsForFieldRetriever;
 
     @Inject
-    public IndexFieldTypePollerAdapterOS2(final FieldMappingApi fieldMappingApi,
-                                          final Configuration configuration,
-                                          final StreamsForFieldRetriever streamsForFieldRetriever) {
+    public IndexFieldTypePollerAdapterOS(final FieldMappingApi fieldMappingApi,
+                                         final Configuration configuration,
+                                         final StreamsForFieldRetriever streamsForFieldRetriever) {
         this.fieldMappingApi = fieldMappingApi;
         this.streamAwareFieldTypes = configuration.maintainsStreamAwareFieldTypes();
         this.streamsForFieldRetriever = streamsForFieldRetriever;
@@ -69,9 +70,9 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
 
         final Map<String, FieldMappingApi.FieldMapping> filteredFieldTypes = fieldTypes.entrySet()
                 .stream()
-                // The "type" value is empty if we deal with a nested data type
+                // The "type" value is "object" if we deal with a nested data type
                 // TODO: Figure out how to handle nested fields, for now we only support the top-level fields
-                .filter(field -> !field.getValue().type().isEmpty())
+                .filter(field -> !field.getValue().type().equalsIgnoreCase(Property.Kind.Object.name()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
         if (!streamAwareFieldTypes) {
@@ -100,7 +101,7 @@ public class IndexFieldTypePollerAdapterOS2 implements IndexFieldTypePollerAdapt
     }
 
     private FieldTypeDTO.Builder fromFieldNameAndMapping(final String fieldName, final FieldMappingApi.FieldMapping mapping) {
-        final Boolean fieldData = mapping.fielddata().orElse(false);
+        final boolean fieldData = mapping.fieldData();
         return FieldTypeDTO.builder()
                 .fieldName(fieldName)
                 .physicalType(mapping.type())
