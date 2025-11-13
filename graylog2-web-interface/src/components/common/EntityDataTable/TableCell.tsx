@@ -11,7 +11,7 @@ import type { EntityBase, ColumnMetaContext } from 'components/common/EntityData
 const Td = styled.td<{ $isDragging: boolean; $transform: Transform; $width: number }>(
   ({ $isDragging, $width, $transform }) => css`
     word-break: break-word;
-    opacity: ${$isDragging ? 0.8 : 1};
+    opacity: ${$isDragging ? 0.4 : 1};
     transform: ${CSS.Translate.toString($transform)};
     transition: width transform 0.2s ease-in-out;
     width: ${$width}px;

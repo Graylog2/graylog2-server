@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import { useState, forwardRef, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
 import type { Modifier, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import {
@@ -30,55 +30,11 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import { getEventCoordinates } from '@dnd-kit/utilities';
-import styled, { css } from 'styled-components';
 import type { Table } from '@tanstack/react-table';
 
-import zIndices from 'theme/z-indices';
-import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
-import Icon from 'components/common/Icon';
+import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
-
-const CustomDragOverlay = styled.div(
-  ({ theme }) => css`
-    background-color: ${theme.colors.global.background};
-    z-index: ${zIndices.dropdownMenu};
-    padding: ${theme.spacings.sm};
-    width: min-content;
-    font-weight: bold;
-    white-space: nowrap;
-    box-shadow:
-      rgba(60, 64, 67, 0.3) 0 1px 2px 0,
-      rgba(60, 64, 67, 0.15) 0 2px 6px 2px;
-
-    border-radius: 5px;
-    border: 1px solid ${theme.colors.variant.lighter.default};
-    display: flex;
-    align-items: center;
-    line-height: 0;
-
-    gap: ${theme.spacings.xs};
-    cursor: grabbing;
-  `,
-);
-
-const DragOverlayIcon = styled(Icon)(
-  ({ theme }) => css`
-    color: ${theme.colors.text.secondary};
-  `,
-);
-
-const Item = forwardRef(({ title }: { title: string }, ref: React.ForwardedRef<HTMLDivElement>) => (
-  <CustomDragOverlay ref={ref}>
-    <DragOverlayIcon name="drag_pan" /> {title}
-  </CustomDragOverlay>
-));
-
-const activeColumnTitle = <Entity extends EntityBase>(table: Table<Entity>, activeId: string | number) => {
-  const activeColumnMeta = table.getAllColumns().find((col) => col.id === activeId)?.columnDef
-    ?.meta as ColumnMetaContext<Entity>;
-
-  return activeColumnMeta.label;
-};
+import ThDragOverlay from 'components/common/EntityDataTable/ThDragOverlay';
 
 const snapOverlayToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
   if (draggingNodeRect && activatorEvent) {
@@ -130,8 +86,8 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
     [table],
   );
 
-  const test = table.getState().columnOrder;
-  const draggableColumns = useMemo(() => test.filter((id) => !UTILITY_COLUMNS.has(id)), [test]);
+  const columnOrder = table.getState().columnOrder;
+  const draggableColumns = useMemo(() => columnOrder.filter((id) => !UTILITY_COLUMNS.has(id)), [columnOrder]);
 
   return (
     <DndContext
@@ -144,7 +100,7 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
         {children}
       </SortableContext>
       <DragOverlay dropAnimation={null}>
-        {activeId ? <Item title={activeColumnTitle(table, activeId)} /> : null}
+        {activeId ? <ThDragOverlay<Entity> column={table.getAllColumns().find((col) => col.id === activeId)} /> : null}
       </DragOverlay>
     </DndContext>
   );

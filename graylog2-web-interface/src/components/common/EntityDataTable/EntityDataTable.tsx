@@ -150,7 +150,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   actionsRef: React.MutableRefObject<HTMLDivElement>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
-  columnWidths: { [attributeId: string]: number };
+  columnWidths: { [_attributeId: string]: number };
   displayActionsCol: boolean;
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;

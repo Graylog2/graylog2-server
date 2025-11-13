@@ -17,6 +17,7 @@
 
 import * as React from 'react';
 import styled from 'styled-components';
+import type { Column } from '@tanstack/react-table';
 
 import CommonSortIcon from 'components/common/SortIcon';
 import type { ColumnMetaContext, EntityBase } from 'components/common/EntityDataTable/types';
@@ -38,14 +39,14 @@ const SORT_ORDER_NAMES = {
   desc: 'descending',
 };
 
-const SortIcon = <Entity extends EntityBase>({ header }: { header: any }) => {
-  const nextSortDirection = header.column.getNextSortingOrder();
-  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
+const SortIcon = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
+  const nextSortDirection = column.getNextSortingOrder();
+  const columnMeta = column.columnDef.meta as ColumnMetaContext<Entity>;
 
   return (
     <StyledCommonSortIcon
-      activeDirection={header.column.getIsSorted()}
-      onChange={() => header.column.toggleSorting()}
+      activeDirection={column.getIsSorted()}
+      onChange={() => column.toggleSorting()}
       title={`Sort ${columnMeta.label.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
       ascId={SORT_DIRECTIONS.ASC}
       descId={SORT_DIRECTIONS.DESC}

@@ -38,7 +38,7 @@ export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; 
     width: ${$width ? `${$width}px` : 'auto'};
     background-color: ${theme.colors.table.head.background};
     transition: width transform 0.2s ease-in-out;
-    opacity: ${$isDragging ? 0.8 : 1};
+    opacity: ${$isDragging ? 0.4 : 1};
     transform: ${CSS.Translate.toString($transform)};
   `,
 );
@@ -76,7 +76,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
         </DragHandle>
       )}
       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-      {header.column.getCanSort() && <SortIcon<Entity> header={header} />}
+      {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
     </Th>
   );
 };
