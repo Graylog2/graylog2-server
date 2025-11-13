@@ -24,17 +24,16 @@ import { Button } from 'components/bootstrap';
 import type { IconName } from 'components/common/Icon';
 import Icon from 'components/common/Icon';
 import Spinner from 'components/common/Spinner';
+import ModalButtonToolbar from 'components/common/ModalButtonToolbar';
 
-const InnerButtonWrapper = styled.div`
-  gap: ${({ theme }) => theme.spacings.xxs};
-  display: flex;
-  align-items: end;
-`;
-
-const OuterButtonWrapper = styled(InnerButtonWrapper)<{ $hasLeftCol: boolean }>(
-  ({ $hasLeftCol }) => css`
-    justify-content: ${$hasLeftCol ? 'space-between' : 'end'};
-  `,
+const Container = styled.div<{ $hasLeftCol: boolean }>(
+  ({ $hasLeftCol }) =>
+    $hasLeftCol &&
+    css`
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+    `,
 );
 
 const buttonTitle = (isSubmitting: boolean, submitText: React.ReactNode, submitLoadingText: string) => {
@@ -122,9 +121,9 @@ const ModalSubmit = ({ ...props }: Props) => {
   }, []);
 
   return (
-    <OuterButtonWrapper $hasLeftCol={!!leftCol} className={className}>
+    <Container $hasLeftCol={!!leftCol} className={className}>
       {leftCol}
-      <InnerButtonWrapper>
+      <ModalButtonToolbar>
         {isWithCancelProps(props) && (
           <Button
             type="button"
@@ -153,8 +152,8 @@ const ModalSubmit = ({ ...props }: Props) => {
           )}
           {submittingAsync ? <Spinner text={props.submitLoadingText} delay={0} /> : submitButtonText}
         </Button>
-      </InnerButtonWrapper>
-    </OuterButtonWrapper>
+      </ModalButtonToolbar>
+    </Container>
   );
 };
 
