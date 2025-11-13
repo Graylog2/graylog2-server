@@ -21,11 +21,12 @@ import jakarta.inject.Singleton;
 import org.graylog2.database.MongoCollections;
 
 @Singleton
-public class DataNodePaginatedService extends AbstractPaginatedNodeService<DataNodeDto> {
-    private static final String NODE_COLLECTION_NAME = "datanodes";
+public class ServerNodePaginatedService extends AbstractPaginatedNodeService<ServerNodeDto> {
+
+    private static final String NODE_COLLECTION_NAME = "nodes";
 
     @Inject
-    public DataNodePaginatedService(MongoCollections mongoCollections) {
-        super(mongoCollections, NODE_COLLECTION_NAME, DataNodeDto.class);
+    public ServerNodePaginatedService(MongoCollections mongoCollections) {
+        super(mongoCollections, NODE_COLLECTION_NAME, ServerNodeDto.class);
     }
 }
