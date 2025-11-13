@@ -146,16 +146,8 @@ public class WebInterfaceAssetsResource {
     }
 
     private String trimBasePath(String filename, HttpHeaders headers) {
-        final String baseUriPath = removeTrailingSlash(RestTools.buildRelativeExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).getPath());
+        final String baseUriPath = RestTools.buildRelativeExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).getPath();
         return filename.startsWith(baseUriPath) ? filename.substring(baseUriPath.length()) : filename;
-    }
-
-    private String removeTrailingSlash(String basePath) {
-        if (basePath == null || !basePath.endsWith("/")) {
-            return basePath;
-        }
-
-        return basePath.substring(0, basePath.length() - 1);
     }
 
     @GET
