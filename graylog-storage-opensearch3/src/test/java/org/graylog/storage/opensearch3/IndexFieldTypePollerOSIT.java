@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+package org.graylog.storage.opensearch3;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-import org.graylog2.database.MongoCollections;
+import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
+import org.junit.Rule;
 
-@Singleton
-public class DataNodePaginatedService extends AbstractPaginatedNodeService<DataNodeDto> {
-    private static final String NODE_COLLECTION_NAME = "datanodes";
+public class IndexFieldTypePollerOSIT extends IndexFieldTypePollerIT {
+    @Rule
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
-    @Inject
-    public DataNodePaginatedService(MongoCollections mongoCollections) {
-        super(mongoCollections, NODE_COLLECTION_NAME, DataNodeDto.class);
+    @Override
+    protected SearchServerInstance searchServer() {
+        return this.openSearchInstance;
     }
 }
