@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
-import AppConfig from 'util/AppConfig';
 
 export const isFieldFavorite = ({ contexts, field }: Partial<ActionHandlerArguments>) =>
   !!contexts.favoriteFields.find((f) => f === field);
@@ -23,8 +22,6 @@ export const isFieldFavorite = ({ contexts, field }: Partial<ActionHandlerArgume
 const ToggleFavoriteField = async ({ contexts, field }: ActionHandlerArguments) => contexts.toggleFavoriteField(field);
 
 ToggleFavoriteField.isHidden = (isAdding: boolean, props: Partial<ActionHandlerArguments>) =>
-  !AppConfig.isFeatureEnabled('message_table_favorite_fields') ||
-  (isAdding && isFieldFavorite(props)) ||
-  (!isAdding && !isFieldFavorite(props));
+  (isAdding && isFieldFavorite(props)) || (!isAdding && !isFieldFavorite(props));
 
 export default ToggleFavoriteField;
