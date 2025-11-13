@@ -19,20 +19,19 @@ import React, { useState, useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
 import MessageFieldsEditModal from 'views/components/messagelist/MessageFields/MessageFieldsEditModal';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
 
 const MessageEditFieldConfigurationAction = () => {
   const [showModal, setShowModal] = useState(false);
-  const sendTelemetry = useSendTelemetry();
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
 
   const toggleEditMode = useCallback(() => setShowModal((prev) => !prev), []);
 
   const onClick = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_OPEN, {});
+    sendFavoriteFieldTelemetry('EDIT_OPEN');
 
     return toggleEditMode();
-  }, [sendTelemetry, toggleEditMode]);
+  }, [sendFavoriteFieldTelemetry, toggleEditMode]);
 
   return (
     <>

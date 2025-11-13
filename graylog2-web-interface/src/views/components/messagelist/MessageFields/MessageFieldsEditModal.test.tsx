@@ -46,6 +46,7 @@ jest.mock('views/stores/StreamsStore', () => ({
 
 jest.mock('views/components/messagelist/MessageFields/hooks/useFormattedFields');
 jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing');
+jest.mock('views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
 
 const formattedFavorites = [
   {

@@ -23,9 +23,8 @@ import useFormattedFields from 'views/components/messagelist/MessageFields/hooks
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import { Icon } from 'components/common';
 import Store from 'logic/local-storage/Store';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import StringUtils from 'util/StringUtils';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
 
 const Line = styled.div(
   ({ theme }) => css`
@@ -78,19 +77,9 @@ const Separator = ({ onClick, expanded, restLength }: Props) => {
 };
 
 const SESSION_STORAGE_KEY = 'message_table_show_rest-fields';
-/*
-export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
-  const formattedFields = message.formatted_fields;
-  const renderedFields = Object.keys(formattedFields)
-    .sort()
-    .map((key) => {
-      const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
 
-      return <MessageField key={key} fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />;
-});
-*/
 const MessageFields = () => {
-  const sendTelemetry = useSendTelemetry();
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
   const [expanded, setExpanded] = useState(Store.sessionGet(SESSION_STORAGE_KEY) !== 'false');
   const { favoriteFields } = useContext(MessageFavoriteFieldsContext);
   const { formattedFavorites, formattedRest } = useFormattedFields(favoriteFields);
@@ -103,10 +92,10 @@ const MessageFields = () => {
       Store.sessionSet(SESSION_STORAGE_KEY, 'false');
       setExpanded(false);
     }
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_REST_FIELD_SHOW_TOGGLED, {
-      app_action_value: isNowExpanded,
+    sendFavoriteFieldTelemetry('NON_FAVORITE_SHOW_TOGGLED', {
+      is_expanded: isNowExpanded,
     });
-  }, [expanded, sendTelemetry]);
+  }, [expanded, sendFavoriteFieldTelemetry]);
 
   const hasFavorites = !!formattedFavorites?.length;
 

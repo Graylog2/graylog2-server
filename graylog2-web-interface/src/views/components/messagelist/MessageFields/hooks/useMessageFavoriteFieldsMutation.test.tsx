@@ -48,7 +48,7 @@ jest.mock('util/UserNotification', () => ({
   error: jest.fn(),
 }));
 
-jest.mock('logic/telemetry/useSendTelemetry', () => jest.fn);
+jest.mock('views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
 
 jest.mock('hooks/useCurrentUser');
 

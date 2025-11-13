@@ -22,8 +22,7 @@ import { FavoriteFields } from '@graylog/server-api';
 import { StreamsActions } from 'views/stores/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'logic/streams/types';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
 
 interface FavoriteFieldRequest {
   readonly field: string;
@@ -37,14 +36,12 @@ interface SetFavoriteFieldsRequest {
 }
 
 const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavoriteFields: Array<string>) => {
-  const sendTelemetry = useSendTelemetry();
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
   const { isPending: setFieldsIsPending, mutate: setFavoriteFields } = useMutation({
     mutationFn: (props: SetFavoriteFieldsRequest) => FavoriteFields.set(props),
     onSuccess: (_, newFavoriteFieldsByStream) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_SAVED, {
-        app_action_value: {
-          fields_lengths: Object.values(newFavoriteFieldsByStream.fields).map((fields) => fields.length),
-        },
+      sendFavoriteFieldTelemetry('EDIT_SAVED', {
+        fields_lengths: Object.values(newFavoriteFieldsByStream.fields).map((fields) => fields.length),
       });
 
       return StreamsActions.refresh();
@@ -59,7 +56,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
   const { mutate: addFavoriteField } = useMutation({
     mutationFn: (props: FavoriteFieldRequest) => FavoriteFields.add(props),
     onSuccess: () => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELD_TOGGLED, {
+      sendFavoriteFieldTelemetry('TOGGLED', {
         app_action_value: 'add',
       });
 
@@ -75,7 +72,7 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
   const { mutate: removeFavoriteField } = useMutation({
     mutationFn: (props: FavoriteFieldRequest) => FavoriteFields.remove(props),
     onSuccess: () => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELD_TOGGLED, {
+      sendFavoriteFieldTelemetry('TOGGLED', {
         app_action_value: 'remove',
       });
 

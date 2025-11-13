@@ -29,8 +29,7 @@ import useMessageFavoriteFieldsForEditing, {
 } from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
 import { ModalSubmit } from 'components/common';
 import MessageFieldsEditModeLists from 'views/components/messagelist/MessageFields/MessageFieldsEditModeLists';
-import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
 
 const FieldsContainer = styled.div(
   ({ theme }) => css`
@@ -57,7 +56,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
     reorderFavoriteFields,
     onFavoriteToggle,
   } = useMessageFavoriteFieldsForEditing();
-  const sendTelemetry = useSendTelemetry();
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
   const { message, editableStreams } = useContext(MessageFavoriteFieldsContext);
   const messageStreams = useStore(StreamsStore, ({ streams }) =>
     streams.filter((stream) => message.fields.streams.includes(stream.id)),
@@ -74,10 +73,10 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
   }, [resetFavoriteFields, toggleEditMode]);
 
   const _toggleEditMode = useCallback(() => {
-    sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_ACTION.CHANGE_MESSAGE_FAVORITE_FIELDS_EDIT_CANCELED, {});
+    sendFavoriteFieldTelemetry('EDIT_CANCELED');
 
     return toggleEditMode();
-  }, [sendTelemetry, toggleEditMode]);
+  }, [sendFavoriteFieldTelemetry, toggleEditMode]);
 
   return (
     <Modal onHide={_toggleEditMode} show>
