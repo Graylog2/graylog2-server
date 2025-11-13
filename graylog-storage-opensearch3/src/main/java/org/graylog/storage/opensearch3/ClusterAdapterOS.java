@@ -55,11 +55,6 @@ import org.opensearch.client.opensearch.cluster.PendingTasksResponse;
 import org.opensearch.client.opensearch.cluster.pending_tasks.PendingTask;
 import org.opensearch.client.opensearch.generic.Request;
 import org.opensearch.client.opensearch.generic.Requests;
-import org.opensearch.client.opensearch.nodes.NodesInfoRequest;
-import org.opensearch.client.opensearch.nodes.NodesInfoResponse;
-import org.opensearch.client.opensearch.nodes.OpenSearchNodesClient;
-import org.opensearch.client.opensearch.nodes.info.NodeInfo;
-import org.opensearch.client.opensearch.nodes.info.NodesInfoMetric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,7 +78,6 @@ public class ClusterAdapterOS implements ClusterAdapter {
     private final PlainJsonApi jsonApi;
     private final OpenSearchCatClient catClient;
     private final OpenSearchClusterClient clusterClient;
-    private final OpenSearchNodesClient nodesClient;
 
     @Inject
     public ClusterAdapterOS(OfficialOpensearchClient opensearchClient,
@@ -94,8 +88,6 @@ public class ClusterAdapterOS implements ClusterAdapter {
         this.opensearchClient = opensearchClient;
         this.catClient = opensearchClient.sync().cat();
         this.clusterClient = opensearchClient.sync().cluster();
-        this.nodesClient = opensearchClient.sync().nodes();
-
     }
 
     @Override
@@ -204,25 +196,28 @@ public class ClusterAdapterOS implements ClusterAdapter {
     @Override
     public Optional<String> nodeIdToName(String nodeId) {
         return nodeById(nodeId)
-                .map(NodeInfo::name);
+                .map(jsonNode -> jsonNode.get("name").asText());
     }
 
     @Override
     public Optional<String> nodeIdToHostName(String nodeId) {
         return nodeById(nodeId)
-                .map(NodeInfo::host);
+                .map(jsonNode -> jsonNode.path("host"))
+                .filter(host -> !host.isMissingNode())
+                .map(JsonNode::asText);
     }
 
-    private Optional<NodeInfo> nodeById(String nodeId) {
+    private Optional<JsonNode> nodeById(String nodeId) {
         if (Strings.isNullOrEmpty(nodeId)) {
             return Optional.empty();
         }
-        NodesInfoResponse info = opensearchClient.execute(() -> nodesClient.info(NodesInfoRequest.builder()
-                .nodeId(nodeId)
-                .metric(NodesInfoMetric.Os)
-                .build()
-        ), "Unable to retrieve node information for node id " + nodeId);
-        return Optional.ofNullable(info.nodes().get(nodeId));
+        Request request = Requests.builder()
+                .endpoint("/_nodes/" + nodeId)
+                .method("GET")
+                .build();
+        return Optional.of(jsonApi.performRequest(request, "Couldn't read Opensearch nodes data!"))
+                .map(jsonNode -> jsonNode.path("nodes").path(nodeId))
+                .filter(node -> !node.isMissingNode());
     }
 
     @Override
@@ -311,24 +306,24 @@ public class ClusterAdapterOS implements ClusterAdapter {
 
     @Override
     public Map<String, org.graylog2.system.stats.elasticsearch.NodeInfo> nodesInfo() {
-        NodesInfoResponse info = opensearchClient.execute(() -> nodesClient.info(NodesInfoRequest.builder()
-                .build()
-        ), "Couldn't read Opensearch nodes data!");
-
-        return info.nodes().entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> createNodeInfo(entry.getValue())
-                ));
+        Request request = Requests.builder()
+                .endpoint("/_nodes")
+                .method("GET")
+                .build();
+        JsonNode json = jsonApi.performRequest(request, "Couldn't read Opensearch nodes data!");
+        JsonNode nodes = json.at("/nodes");
+        return toStream(nodes.fieldNames()).collect(Collectors.toMap(
+                n -> n,
+                n -> createNodeInfo(nodes.get(n))
+        ));
     }
 
-    private org.graylog2.system.stats.elasticsearch.NodeInfo createNodeInfo(NodeInfo nodeInfo) {
-        assert nodeInfo.jvm() != null;
+    private org.graylog2.system.stats.elasticsearch.NodeInfo createNodeInfo(JsonNode nodesJson) {
         return org.graylog2.system.stats.elasticsearch.NodeInfo.builder()
-                .version(nodeInfo.version())
-                .os(nodeInfo.os())
-                .roles(nodeInfo.roles().stream().map(Enum::name).toList())
-                .jvmMemHeapMaxInBytes(nodeInfo.jvm().mem().heapMaxInBytes())
+                .version(nodesJson.at("/version").asText())
+                .os(nodesJson.at("/os"))
+                .roles(toStream(nodesJson.at("/roles").elements()).map(JsonNode::asText).toList())
+                .jvmMemHeapMaxInBytes(nodesJson.at("/jvm/mem/heap_max_in_bytes").asLong())
                 .build();
     }
 
