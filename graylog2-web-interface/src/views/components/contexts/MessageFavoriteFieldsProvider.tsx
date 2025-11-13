@@ -60,7 +60,10 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     [permissions, streams],
   );
 
-  const { saveFavoriteField, toggleField } = useMessageFavoriteFieldsMutation(editableStreams, initialFavoriteFields);
+  const { saveFavoriteField, toggleField, setFieldsIsPending } = useMessageFavoriteFieldsMutation(
+    editableStreams,
+    initialFavoriteFields,
+  );
 
   const contextValue = useMemo(
     () => ({
@@ -70,8 +73,17 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
       message,
       toggleField,
       editableStreams,
+      setFieldsIsPending,
     }),
-    [initialFavoriteFields, saveFavoriteField, messageFields, message, toggleField, editableStreams],
+    [
+      initialFavoriteFields,
+      saveFavoriteField,
+      messageFields,
+      message,
+      toggleField,
+      editableStreams,
+      setFieldsIsPending,
+    ],
   );
 
   return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;

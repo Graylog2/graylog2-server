@@ -85,6 +85,7 @@ describe('MessageFavoriteFieldsProvider', () => {
     asMock(useMessageFavoriteFieldsMutation).mockReturnValue({
       saveFavoriteField: mockSaveFields,
       toggleField: mockToggleField,
+      setFieldsIsPending: false,
     });
   });
   it('initializes favorites from streams and exposes them via context', () => {

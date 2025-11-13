@@ -44,6 +44,7 @@ const createWrapper =
         messageFields: Immutable.List([]),
         message: undefined,
         editableStreams: [],
+        setFieldsIsPending: false,
       }}>
       {children}
     </MessageFavoriteFieldsContext.Provider>

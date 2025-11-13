@@ -30,6 +30,7 @@ export type MessageFavoriteFieldsContextState = {
   toggleField: (field: string) => void;
   message: Message;
   editableStreams: Array<Stream>;
+  setFieldsIsPending: boolean;
 };
 
 const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsContextState>({
@@ -39,6 +40,7 @@ const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsCo
   toggleField: () => {},
   message: undefined,
   editableStreams: [],
+  setFieldsIsPending: false,
 });
 
 export default singleton('contexts.MessageFavoriteFieldsContext', () => MessageFavoriteFieldsContext);
