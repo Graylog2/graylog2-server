@@ -14,11 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.cat;
+package org.graylog.storage.opensearch3;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
+import org.junit.Rule;
 
-public record IndexSummaryResponse(@JsonProperty("index") String index,
-                                   @JsonProperty("status") String status,
-                                   @JsonProperty("health") String health) {
+public class IndexFieldTypePollerOSIT extends IndexFieldTypePollerIT {
+    @Rule
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+
+    @Override
+    protected SearchServerInstance searchServer() {
+        return this.openSearchInstance;
+    }
 }

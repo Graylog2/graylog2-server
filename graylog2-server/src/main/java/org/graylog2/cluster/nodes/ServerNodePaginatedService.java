@@ -14,10 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.cat;
+package org.graylog2.cluster.nodes;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.database.MongoCollections;
 
-public record AliasSummaryResponse(@JsonProperty("alias") String alias,
-                                   @JsonProperty("index") String index) {
+@Singleton
+public class ServerNodePaginatedService extends AbstractPaginatedNodeService<ServerNodeDto> {
+
+    private static final String NODE_COLLECTION_NAME = "nodes";
+
+    @Inject
+    public ServerNodePaginatedService(MongoCollections mongoCollections) {
+        super(mongoCollections, NODE_COLLECTION_NAME, ServerNodeDto.class);
+    }
 }
