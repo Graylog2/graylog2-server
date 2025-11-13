@@ -630,7 +630,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .flush(true)
         );
 
-        c.executeWithTimeout(() -> c.async().indices().forcemerge(request), "Unable to forcemerge index " + index, timeout);
+        c.executeWithTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), "Unable to forcemerge index " + index, timeout);
 
     }
 

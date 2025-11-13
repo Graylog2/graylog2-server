@@ -67,9 +67,9 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         }
     }
 
-    public <T> T executeWithTimeout(ThrowingSupplier<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
+    public <T> T executeWithTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
         try {
-            CompletableFuture<T> futureResponse = executeAsync(operation, errorMessage);
+            CompletableFuture<T> futureResponse = async(operation, errorMessage);
             return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
         } catch (Throwable t) {
             throw mapException(t, errorMessage);
