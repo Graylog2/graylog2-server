@@ -66,19 +66,19 @@ describe('<EntityDataTable />', () => {
     },
   ];
 
+  const defaultProps = {
+    defaultDisplayedColumns,
+    defaultColumnOrder: defaultDisplayedColumns,
+    layoutPreferences: { attributes: columnPreferences },
+    entities: data,
+    onLayoutPreferencesChange: () => {},
+    onSortChange: () => {},
+    entityAttributesAreCamelCase: true,
+    columnSchemas,
+  };
+
   it('should render selected columns and table headers', async () => {
-    render(
-      <EntityDataTable
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        layoutPreferences={{ attributes: columnPreferences }}
-        entities={data}
-        onLayoutPreferencesChange={() => {}}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        columnSchemas={columnSchemas}
-      />,
-    );
+    render(<EntityDataTable {...defaultProps} />);
 
     await screen.findByRole('columnheader', { name: /title/i });
     await screen.findByRole('columnheader', { name: /status/i });
@@ -91,18 +91,7 @@ describe('<EntityDataTable />', () => {
   });
 
   it('should render default cell renderer', async () => {
-    render(
-      <EntityDataTable
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        layoutPreferences={{ attributes: columnPreferences }}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
-        columnSchemas={columnSchemas}
-      />,
-    );
+    render(<EntityDataTable {...defaultProps} />);
 
     await screen.findByRole('columnheader', { name: /description/i });
     await screen.findByText('Entity description');
@@ -111,13 +100,7 @@ describe('<EntityDataTable />', () => {
   it('should render custom cell and header renderer', async () => {
     render(
       <EntityDataTable
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
+        {...defaultProps}
         columnRenderers={{
           attributes: {
             title: {
@@ -126,7 +109,6 @@ describe('<EntityDataTable />', () => {
             },
           },
         }}
-        columnSchemas={columnSchemas}
       />,
     );
 
@@ -137,13 +119,7 @@ describe('<EntityDataTable />', () => {
   it('should merge attribute and type column renderers renderer', async () => {
     render(
       <EntityDataTable
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
+        {...defaultProps}
         columnRenderers={{
           attributes: {
             title: {
@@ -157,7 +133,6 @@ describe('<EntityDataTable />', () => {
             },
           },
         }}
-        columnSchemas={columnSchemas}
       />,
     );
 
@@ -170,15 +145,8 @@ describe('<EntityDataTable />', () => {
   it('should render row actions', async () => {
     render(
       <EntityDataTable<{ id: string; title: string }>
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
+        {...defaultProps}
         entityActions={(entity) => `Custom actions for ${entity.title}`}
-        columnSchemas={columnSchemas}
       />,
     );
 
@@ -188,18 +156,7 @@ describe('<EntityDataTable />', () => {
   it('should not render column if user does not have required permissions', () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(
-      <EntityDataTable
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
-        columnSchemas={columnSchemas}
-      />,
-    );
+    render(<EntityDataTable {...defaultProps} />);
 
     expect(screen.queryByRole('columnheader', { name: /status/i })).not.toBeInTheDocument();
     expect(screen.queryByText('enabled')).not.toBeInTheDocument();
@@ -208,18 +165,11 @@ describe('<EntityDataTable />', () => {
   it('should display active sort', async () => {
     render(
       <EntityDataTable
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
+        {...defaultProps}
         activeSort={{
           attributeId: 'description',
           direction: 'asc',
         }}
-        columnSchemas={columnSchemas}
       />,
     );
 
@@ -229,18 +179,7 @@ describe('<EntityDataTable />', () => {
   it('should sort based on column', async () => {
     const onSortChange = jest.fn();
 
-    render(
-      <EntityDataTable
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        entityAttributesAreCamelCase
-        onSortChange={onSortChange}
-        onLayoutPreferencesChange={() => {}}
-        columnSchemas={columnSchemas}
-      />,
-    );
+    render(<EntityDataTable {...defaultProps} onSortChange={onSortChange} />);
 
     userEvent.click(await screen.findByTitle(/sort description ascending/i));
 
@@ -264,19 +203,7 @@ describe('<EntityDataTable />', () => {
 
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(
-      <EntityDataTable
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
-        bulkSelection={{ actions: <BulkActions /> }}
-        columnSchemas={columnSchemas}
-      />,
-    );
+    render(<EntityDataTable {...defaultProps} bulkSelection={{ actions: <BulkActions /> }} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
     userEvent.click(rowCheckboxes[0]);
@@ -293,19 +220,7 @@ describe('<EntityDataTable />', () => {
   it('should select all items', async () => {
     asMock(useCurrentUser).mockReturnValue(defaultUser.toBuilder().permissions(Immutable.List()).build());
 
-    render(
-      <EntityDataTable
-        layoutPreferences={{ attributes: columnPreferences }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
-        bulkSelection={{ actions: <div /> }}
-        columnSchemas={columnSchemas}
-      />,
-    );
+    render(<EntityDataTable {...defaultProps} bulkSelection={{ actions: <div /> }} />);
 
     const rowCheckboxes = await screen.findAllByRole('checkbox', { name: /select entity/i });
 
@@ -328,6 +243,7 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
+        {...defaultProps}
         layoutPreferences={{
           attributes: {
             description: { status: 'show' },
@@ -336,11 +252,7 @@ describe('<EntityDataTable />', () => {
         }}
         defaultDisplayedColumns={['description', 'status', 'title']}
         defaultColumnOrder={['description', 'status', 'title']}
-        entities={data}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
         onLayoutPreferencesChange={onLayoutPreferencesChange}
-        columnSchemas={columnSchemas}
       />,
     );
 
@@ -348,9 +260,11 @@ describe('<EntityDataTable />', () => {
     userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
 
     expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
-      'description': { 'status': 'show' },
-      'status': { 'status': 'show' },
-      'title': { 'status': 'hide' },
+      attributes: {
+        description: { status: 'show' },
+        status: { status: 'show' },
+        title: { status: 'hide' },
+      },
     });
   });
 
@@ -368,13 +282,9 @@ describe('<EntityDataTable />', () => {
 
     render(
       <EntityDataTable
+        {...defaultProps}
         layoutPreferences={{ attributes: { ...columnPreferences, 'created_at': { status: 'show' } } }}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        defaultColumnOrder={defaultDisplayedColumns}
         entities={dataWithCamelCaseAttributes}
-        onSortChange={() => {}}
-        entityAttributesAreCamelCase
-        onLayoutPreferencesChange={() => {}}
         columnRenderers={{
           attributes: {
             created_at: {
@@ -382,7 +292,6 @@ describe('<EntityDataTable />', () => {
             },
           },
         }}
-        columnSchemas={columnSchemas}
       />,
     );
 
