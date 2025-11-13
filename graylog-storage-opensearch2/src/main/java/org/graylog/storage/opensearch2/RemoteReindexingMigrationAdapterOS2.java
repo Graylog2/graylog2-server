@@ -211,6 +211,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     /**
      * Obtain and hold a lock for each index set that's going to be migrated. These locks will be automatically
      * extended as long as they are not explicitly released. If this node crashes, locks will expire automatically
+     *
      * @return locks that should be released after the migration.
      */
     private Set<Lock> lockIndexSets(MigrationConfiguration migration) {
@@ -233,7 +234,8 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private void createIndicesInNewCluster(MigrationConfiguration migration) {
         migration.indices().forEach(index -> {
             if (!this.indices.exists(index.indexName())) {
-                final boolean created = this.indices.create(index.indexName(), indexSetRegistry.getForIndex(index.indexName()).orElse(indexSetRegistry.getDefault()));
+                final boolean created = this.indices.create(index.indexName(), indexSetRegistry.getForIndex(
+                        index.indexName()).orElse(indexSetRegistry.getDefault()).basicIndexSetConfig());
                 if (created) {
                     logInfo(migration, "Created new target index " + index.indexName());
                 } else {
@@ -462,16 +464,16 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
             final boolean remoteClosed = getRemoteIndexState(uri, username, password, indexName) == IndexState.CLOSE;
             final boolean localClosed = getLocalIndexState(indexName) == IndexState.CLOSE;
 
-            if(remoteClosed) {
+            if (remoteClosed) {
                 openRemoteIndex(migration, uri, username, password, indexName);
                 postMigrationActions.add(() -> closeRemoteIndex(migration, uri, username, password, indexName));
             }
 
-            if(localClosed) {
+            if (localClosed) {
                 openLocalIndex(migration, indexName);
             }
 
-            if(remoteClosed || localClosed) {
+            if (remoteClosed || localClosed) {
                 postMigrationActions.add(() -> closeLocalIndex(migration, indexName));
             }
 

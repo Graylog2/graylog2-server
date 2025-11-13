@@ -23,8 +23,8 @@ import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.NodeInfoCache;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -154,7 +154,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
         final Map<String, Boolean> areReopened = this.indices.areReopened(indices);
 
         final List<IndexStatistics> sortedIndexStatistics = indicesStatistics.stream()
-                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)))
+                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(IndexPattern.SEPARATOR)))
                 .toList();
 
         for (IndexStatistics indexStatistics : sortedIndexStatistics) {

@@ -33,9 +33,15 @@ import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.indexer.IndexTemplateProvider;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
+import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
 import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
+import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
+import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
+import org.graylog2.indexer.indexset.fields.IndexPrefixField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
+import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
+import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
 import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -58,11 +64,16 @@ import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 @JsonAutoDetect
 @DbEntity(collection = MongoIndexSetService.COLLECTION_NAME, readPermission = INDEXSETS_READ)
 public abstract class IndexSetConfig implements
-        BasicIndexSetConfig,
         Comparable<IndexSetConfig>,
         ExtendedIndexSetFields,
         FieldRestrictionsField,
         IndexTemplateNameField,
+        ShardsAndReplicasField,
+        IndexAnalyzerField,
+        FieldTypeProfileField,
+        IndexTemplateTypeField,
+        IndexPrefixField,
+        CustomFieldMappingsField,
         ScopedEntity<IndexSetConfig.Builder> {
     public static final String DEFAULT_INDEX_TEMPLATE_TYPE = MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 
@@ -272,10 +283,15 @@ public abstract class IndexSetConfig implements
 
     @AutoValue.Builder
     public abstract static class Builder implements
-            BasicIndexSetConfigBuilder<Builder>,
             ExtendedIndexSetFieldsBuilder<Builder>,
             FieldRestrictionsFieldBuilder<Builder>,
             IndexTemplateNameFieldBuilder<Builder>,
+            ShardsAndReplicasFieldBuilder<Builder>,
+            IndexAnalyzerFieldBuilder<Builder>,
+            FieldTypeProfileFieldBuilder<Builder>,
+            IndexTemplateTypeFieldBuilder<Builder>,
+            IndexPrefixFieldBuilder<Builder>,
+            CustomFieldMappingsFieldBuilder<Builder>,
             ScopedEntity.Builder<Builder> {
 
         @JsonProperty(FIELD_REGULAR)

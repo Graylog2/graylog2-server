@@ -32,9 +32,9 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.counts.Counts;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.TooManyAliasesException;
@@ -152,7 +152,7 @@ public class IndexerOverviewResource extends RestResource {
         }
         indices.getClosedIndices(indexSet).forEach(indexName ->
                 indexSummaries.add(buildClosedIndexSummary(indexName, indexRanges, deflectorSummary)));
-        indexSummaries.sort(Comparator.comparing(IndexSummary::indexName, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)));
+        indexSummaries.sort(Comparator.comparing(IndexSummary::indexName, new NumberBasedIndexNameComparator(IndexPattern.SEPARATOR)));
         return indexSummaries;
     }
 

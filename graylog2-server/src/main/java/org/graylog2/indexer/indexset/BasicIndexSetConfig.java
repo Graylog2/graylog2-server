@@ -16,7 +16,8 @@
  */
 package org.graylog2.indexer.indexset;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
+import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
 import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
 import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
 import org.graylog2.indexer.indexset.fields.IndexPrefixField;
@@ -24,29 +25,36 @@ import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
 import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
 
-public interface BasicIndexSetConfig extends
-        ShardsAndReplicasField,
-        IndexAnalyzerField,
+@AutoValue
+public abstract class BasicIndexSetConfig implements
         FieldTypeProfileField,
         IndexTemplateTypeField,
         IndexTemplateNameField,
+        CustomFieldMappingsField,
+        IndexAnalyzerField,
+        ShardsAndReplicasField,
         IndexPrefixField {
-    String FIELD_CUSTOM_FIELD_MAPPINGS = "custom_field_mappings";
 
+    public abstract String indexWildcard();
 
-    @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS)
-    CustomFieldMappings customFieldMappings();
+    public static Builder builder() {
+        return new AutoValue_BasicIndexSetConfig.Builder();
+    }
 
-    interface BasicIndexSetConfigBuilder<T> extends
-            ShardsAndReplicasFieldBuilder<T>,
-            IndexAnalyzerFieldBuilder<T>,
-            FieldTypeProfileFieldBuilder<T>,
-            IndexTemplateTypeFieldBuilder<T>,
-            IndexTemplateNameFieldBuilder<T>,
-            IndexPrefixFieldBuilder<T> {
+    public abstract Builder toBuilder();
 
-        @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS)
-        T customFieldMappings(CustomFieldMappings customFieldMappings);
+    @AutoValue.Builder
+    public abstract static class Builder implements
+            FieldTypeProfileFieldBuilder<Builder>,
+            IndexTemplateTypeFieldBuilder<Builder>,
+            IndexTemplateNameFieldBuilder<Builder>,
+            CustomFieldMappingsFieldBuilder<Builder>,
+            IndexAnalyzerFieldBuilder<Builder>,
+            ShardsAndReplicasFieldBuilder<Builder>,
+            IndexPrefixFieldBuilder<Builder> {
 
+        public abstract Builder indexWildcard(String indexWildcard);
+
+        public abstract BasicIndexSetConfig build();
     }
 }

@@ -14,7 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.messages;
+package org.graylog2.indexer.indexset.fields;
 
-public record MessageWithIndex(ImmutableMessage message, String writeIndex) {
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.indexer.indexset.CustomFieldMappings;
+
+public interface CustomFieldMappingsField {
+
+    String FIELD_CUSTOM_FIELD_MAPPINGS = "custom_field_mappings";
+
+    @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS)
+    CustomFieldMappings customFieldMappings();
+
+    interface CustomFieldMappingsFieldBuilder<T> {
+
+        @JsonProperty(FIELD_CUSTOM_FIELD_MAPPINGS)
+        T customFieldMappings(CustomFieldMappings customFieldMappings);
+    }
 }

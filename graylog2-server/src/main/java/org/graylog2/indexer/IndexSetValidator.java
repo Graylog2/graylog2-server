@@ -25,6 +25,7 @@ import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.fields.RotationAndRetentionFields;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
@@ -40,12 +41,12 @@ import org.joda.time.Period;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static org.graylog2.indexer.MongoIndexSet.WARM_INDEX_INFIX;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_DATA_TIERING;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY_CLASS;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY;
 import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.index.IndexPattern.WARM_INDEX_INFIX;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -159,7 +160,7 @@ public class IndexSetValidator {
         }
 
         // Build an example index name with the new prefix and check if this would be managed by an existing index set
-        final String indexName = newConfig.indexPrefix() + MongoIndexSet.SEPARATOR + "0";
+        final String indexName = newConfig.indexPrefix() + IndexPattern.SEPARATOR + "0";
         if (indexSetRegistry.isManagedIndex(indexName)) {
             return Violation.create(f("Index prefix '%s' would conflict with an existing index set!", newConfig.indexPrefix()));
         }

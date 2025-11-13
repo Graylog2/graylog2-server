@@ -17,6 +17,7 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ComparisonChain;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
@@ -27,7 +28,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog2.indexer.MongoIndexSet.RESTORED_ARCHIVE_SUFFIX;
+import static org.graylog2.indexer.indexset.index.IndexPattern.RESTORED_ARCHIVE_SUFFIX;
 
 /**
  * This class is being used in plugins for testing, DO NOT move it to the test/ directory without changing the plugins.
@@ -128,6 +129,20 @@ public class TestIndexSet implements IndexSet {
     @Override
     public IndexSetConfig getConfig() {
         return config;
+    }
+
+    @Override
+    public BasicIndexSetConfig basicIndexSetConfig() {
+        return BasicIndexSetConfig.builder()
+                .fieldTypeProfile(config.fieldTypeProfile())
+                .indexTemplateType(config.indexTemplateType().orElse(null))
+                .indexTemplateName(config.indexTemplateName())
+                .customFieldMappings(config.customFieldMappings())
+                .indexAnalyzer(config.indexAnalyzer())
+                .shards(config.shards())
+                .replicas(config.replicas())
+                .indexWildcard(getIndexWildcard())
+                .build();
     }
 
     @Override

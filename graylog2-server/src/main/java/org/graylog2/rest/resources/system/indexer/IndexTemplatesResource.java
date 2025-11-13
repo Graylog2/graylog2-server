@@ -22,6 +22,15 @@ import com.google.auto.value.AutoValue;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -31,18 +40,6 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotBlank;
-
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -97,7 +94,7 @@ public class IndexTemplatesResource extends RestResource {
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
                 .orElseThrow(() -> new NotFoundException("Index set " + indexSetId + " not found"));
 
-        indices.ensureIndexTemplate(indexSet);
+        indices.ensureIndexTemplate(indexSet.basicIndexSetConfig());
 
         return createResponse(indexSet);
     }
@@ -111,14 +108,14 @@ public class IndexTemplatesResource extends RestResource {
         return indexSetRegistry.getAll().stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_EDIT, indexSet.getConfig().id()))
                 .map(indexSet -> {
-                    indices.ensureIndexTemplate(indexSet);
+                    indices.ensureIndexTemplate(indexSet.basicIndexSetConfig());
                     return createResponse(indexSet);
                 })
                 .collect(Collectors.toSet());
     }
 
     private IndexTemplateResponse createResponse(IndexSet indexSet) {
-        return IndexTemplateResponse.create(indexSet.getConfig().indexTemplateName(), indices.getIndexTemplate(indexSet));
+        return IndexTemplateResponse.create(indexSet.getConfig().indexTemplateName(), indices.getIndexTemplate(indexSet.basicIndexSetConfig()));
     }
 
     @AutoValue

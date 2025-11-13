@@ -17,7 +17,10 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ComparisonChain;
+import org.graylog2.indexer.indexset.BasicIndexSet;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import javax.annotation.Nullable;
@@ -28,15 +31,8 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet<IndexSetConfig> {
-    /**
-     * Returns an array with all managed indices in this index set.
-     * <p>
-     * Example: {@code ["graylog_0", "graylog_1", "graylog_2"]}
-     *
-     * @return array of index names
-     */
-    String[] getManagedIndices();
+public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
+
 
     /**
      * Returns the active write index.
@@ -50,6 +46,17 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet<IndexSetCo
      */
     @Nullable
     String getActiveWriteIndex() throws TooManyAliasesException;
+
+    /**
+     * Returns the write index alias name for this index set.
+     * <p>
+     * The write index alias always points to the newest index.
+     * <p>
+     * Example: {@code "graylog_deflector"}
+     *
+     * @return the write index alias name
+     */
+    String getWriteIndexAlias();
 
     /**
      * Returns a map where the key is an index name and the value a set of aliases for this index.
@@ -148,6 +155,8 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet<IndexSetCo
      */
     IndexSetConfig getConfig();
 
+    BasicIndexSetConfig basicIndexSetConfig();
+
     default String getNthIndexBeforeActiveIndexSet(final int n) {
         final String activeWriteIndex = getActiveWriteIndex();
         if (activeWriteIndex != null) {
@@ -157,7 +166,7 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet<IndexSetCo
                     .map(num -> {
                         final int indexNumber = num - n;
                         if (indexNumber >= 0) {
-                            return indexPrefix + MongoIndexSet.SEPARATOR + indexNumber;
+                            return indexPrefix + IndexPattern.SEPARATOR + indexNumber;
                         }
                         return null;
                     })

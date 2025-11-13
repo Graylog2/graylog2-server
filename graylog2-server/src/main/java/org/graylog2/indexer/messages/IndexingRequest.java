@@ -19,17 +19,16 @@ package org.graylog2.indexer.messages;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotNull;
-import org.graylog2.indexer.BasicIndexSet;
 
 @AutoValue
 @JsonAutoDetect
 public abstract class IndexingRequest {
-    public abstract BasicIndexSet indexSet();
+    public abstract String writeIndex();
 
     public abstract Indexable message();
 
-    public static IndexingRequest create(@NotNull BasicIndexSet indexSet, @NotNull Indexable message) {
-        return new AutoValue_IndexingRequest(indexSet, message);
+    public static IndexingRequest create(@NotNull String writeIndex, @NotNull Indexable message) {
+        return new AutoValue_IndexingRequest(writeIndex, message);
     }
 
 }

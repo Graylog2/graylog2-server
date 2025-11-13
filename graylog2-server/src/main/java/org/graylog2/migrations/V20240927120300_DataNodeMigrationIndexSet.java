@@ -67,7 +67,7 @@ public class V20240927120300_DataNodeMigrationIndexSet extends Migration {
                                 indexSet.getNewestIndex();
                             } catch (NoTargetIndexException e) {
                                 LOG.info("No existing index found for {}, creating last known index now", indexSetId);
-                                indices.create(currentWriteIndex, indexSet);
+                                indices.create(currentWriteIndex, indexSet.basicIndexSetConfig());
                                 indexSet.setUp();
                             }
                         });

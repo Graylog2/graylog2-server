@@ -18,7 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -58,7 +58,7 @@ public class IndexMappingFactoryTest {
     private void testForUnsupportedVersion(final String version) {
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(createNodeWithVersion(version), TEMPLATE_PROVIDERS);
 
-        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping(mock(IndexSetConfig.class)))
+        assertThatThrownBy(() -> indexMappingFactory.createIndexMapping(mock(BasicIndexSetConfig.class)))
                 .isInstanceOf(ElasticsearchException.class)
                 .hasMessageStartingWith("Unsupported Search version")
                 .hasMessageEndingWith(version)
@@ -86,7 +86,7 @@ public class IndexMappingFactoryTest {
     private void testForIndexMappingType(final String version, final String mappingClassName, final String templateType) throws ClassNotFoundException {
         final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(createNodeWithVersion(version), TEMPLATE_PROVIDERS);
 
-        final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+        final BasicIndexSetConfig indexSetConfig = mock(BasicIndexSetConfig.class);
         when(indexSetConfig.indexTemplateType()).thenReturn(Optional.of(templateType));
 
         final Class<?> expectedMappingClass = Class.forName("org.graylog2.indexer." + mappingClassName);

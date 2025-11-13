@@ -24,7 +24,9 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
@@ -45,7 +47,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -58,23 +59,18 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.audit.AuditEventTypes.ES_WRITE_INDEX_UPDATE;
+import static org.graylog2.indexer.indexset.index.IndexPattern.SEPARATOR;
+import static org.graylog2.indexer.indexset.index.IndexPattern.WARM_INDEX_INFIX;
 import static org.graylog2.indexer.indices.Indices.checkIfHealthy;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class MongoIndexSet implements IndexSet {
-    public static final String SEPARATOR = "_";
-    public static final String DEFLECTOR_SUFFIX = "deflector";
-    // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
-    // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
-    public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
-    public static final String WARM_INDEX_INFIX = "warm_";
+    private static final String DEFLECTOR_SUFFIX = "deflector";
     private static final String WARM_INDEX_INFIX_WITH_SEPARATOR = SEPARATOR + WARM_INDEX_INFIX;
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexSet.class);
     private final IndexSetConfig config;
     private final String writeIndexAlias;
     private final Indices indices;
-    private final Pattern indexPattern;
-    private final Pattern deflectorIndexPattern;
     private final String indexWildcard;
     private final IndexRangeService indexRangeService;
     private final AuditEventSender auditEventSender;
@@ -83,6 +79,7 @@ public class MongoIndexSet implements IndexSet {
     private final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     private final ActivityWriter activityWriter;
     private final NotificationService notificationService;
+    private final IndexPattern indexPattern;
 
     @Inject
     public MongoIndexSet(@Assisted final IndexSetConfig config,
@@ -106,12 +103,9 @@ public class MongoIndexSet implements IndexSet {
         this.notificationService = notificationService;
 
         // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
-        final String indexPattern = isNullOrEmpty(config.indexMatchPattern())
+        this.indexPattern = new IndexPattern(isNullOrEmpty(config.indexMatchPattern())
                 ? Pattern.quote(config.indexPrefix())
-                : config.indexMatchPattern();
-
-        this.indexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "(?:" + WARM_INDEX_INFIX + ")?" + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-        this.deflectorIndexPattern = Pattern.compile("^" + indexPattern + SEPARATOR + "(?:" + WARM_INDEX_INFIX + ")?" + "\\d+");
+                : config.indexMatchPattern());
 
         // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
         // prefix.
@@ -124,13 +118,9 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public String[] getManagedIndices() {
-        final Set<String> indexNames = indices.getIndexNamesAndAliases(getIndexWildcard()).keySet();
-        // also allow restore archives to be returned
-        final List<String> result = indexNames.stream()
+        return indices.getIndexNamesAndAliases(getIndexWildcard()).keySet().stream()
                 .filter(this::isManagedIndex)
-                .toList();
-
-        return result.toArray(new String[result.size()]);
+                .toArray(String[]::new);
     }
 
     @Override
@@ -205,7 +195,7 @@ public class MongoIndexSet implements IndexSet {
 
     @VisibleForTesting
     boolean isGraylogDeflectorIndex(final String indexName) {
-        return !isNullOrEmpty(indexName) && !isWriteIndexAlias(indexName) && deflectorIndexPattern.matcher(indexName).matches();
+        return !isNullOrEmpty(indexName) && !isWriteIndexAlias(indexName) && indexPattern.deflectorIndexMatches(indexName);
     }
 
     @Override
@@ -241,7 +231,7 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public boolean isManagedIndex(String index) {
-        return !isNullOrEmpty(index) && !isWriteIndexAlias(index) && indexPattern.matcher(index).matches();
+        return !isNullOrEmpty(index) && !isWriteIndexAlias(index) && indexPattern.indexMatches(index);
     }
 
     @Override
@@ -300,7 +290,7 @@ public class MongoIndexSet implements IndexSet {
 
         // Create new index.
         LOG.info("Creating target index <{}>.", newTarget);
-        if (!indices.create(newTarget, this)) {
+        if (!indices.create(newTarget, this.basicIndexSetConfig())) {
             String title = "Error rotating index set";
             String errorMsg = f("Could not create new target index <%s>.", newTarget);
             notificationService.publishIfFirst(
@@ -385,6 +375,21 @@ public class MongoIndexSet implements IndexSet {
     @Override
     public IndexSetConfig getConfig() {
         return config;
+    }
+
+    @Override
+    public BasicIndexSetConfig basicIndexSetConfig() {
+        return BasicIndexSetConfig.builder()
+                .fieldTypeProfile(config.fieldTypeProfile())
+                .indexTemplateType(config.indexTemplateType().orElse(null))
+                .indexTemplateName(config.indexTemplateName())
+                .customFieldMappings(config.customFieldMappings())
+                .indexAnalyzer(config.indexAnalyzer())
+                .shards(config.shards())
+                .replicas(config.replicas())
+                .indexWildcard(indexWildcard)
+                .indexPrefix(config.indexPrefix())
+                .build();
     }
 
     @Override

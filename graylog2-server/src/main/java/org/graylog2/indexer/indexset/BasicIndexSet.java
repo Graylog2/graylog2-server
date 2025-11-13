@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.indexset;
 
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
+import org.graylog2.indexer.NoTargetIndexException;
 
-public interface BasicIndexSet<T extends BasicIndexSetConfig> {
+public interface BasicIndexSet {
 
     /**
      * Returns the index wildcard for this index set.
@@ -32,17 +32,13 @@ public interface BasicIndexSet<T extends BasicIndexSetConfig> {
     String getIndexWildcard();
 
     /**
-     * Returns the write index alias name for this index set.
+     * Returns an array with all managed indices in this index set.
      * <p>
-     * The write index alias always points to the newest index.
-     * <p>
-     * Example: {@code "graylog_deflector"}
+     * Example: {@code ["graylog_0", "graylog_1", "graylog_2"]}
      *
-     * @return the write index alias name
+     * @return array of index names
      */
-    String getWriteIndexAlias();
-
-    T getConfig();
+    String[] getManagedIndices();
 
     /**
      * Returns the newest index.
