@@ -15,12 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
-import { CacheFormStep } from 'components/lookup-tables/cache-form';
-import { DataAdapterFormStep } from 'components/lookup-tables/adapter-form';
 import LookupTableFormFields from 'components/lookup-tables/LookupTableFormFields';
 
+import DataAdapterFormStep from './adapter-step';
+import CacheFormStep from './cache-step';
 import SummaryStep from './summary-step';
+
+const CenteredDiv = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+`;
 
 function useSteps(
   activeStepKey: string = 'lookup-tables',
@@ -32,9 +38,9 @@ function useSteps(
       key: 'lookup-table',
       title: 'Lookup Table',
       component: (
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+        <CenteredDiv>
           <LookupTableFormFields />
-        </div>
+        </CenteredDiv>
       ),
     },
     {

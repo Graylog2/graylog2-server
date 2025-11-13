@@ -46,7 +46,7 @@ const Title = ({ title, typeName, create }: TitleProps) => {
   const TagName = create ? 'h3' : 'h2';
 
   return (
-    <TagName style={{ marginBottom: '12px' }}>
+    <TagName style={{ marginBottom: '12px', width: '100%' }}>
       {title} <small>({typeName})</small>
     </TagName>
   );

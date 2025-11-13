@@ -23,22 +23,24 @@ import { Row, Col } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchDataAdapter, useFetchAllDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
+import DataAdapterPicker from 'components/lookup-tables/adapter-form/AdapterPicker';
+import DataAdapterFormView from 'components/lookup-tables/adapter-form/AdapterFormView';
 import type { LookupTable, LookupTableAdapter } from 'logic/lookup-tables/types';
-
-import DataAdapterPicker from './AdapterPicker';
-import DataAdapterFormView from './AdapterFormView';
 
 const FlexCol = styled(Col)`
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
   gap: 2rem;
 `;
 
 const StyledRow = styled(Row)`
   display: flex;
-  width: 100%;
   justify-content: center;
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
 `;
 
 function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
@@ -51,7 +53,7 @@ function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
 
   return (
     <StyledRow>
-      <Col lg={9}>
+      <Col lg={12}>
         <Col lg={6}>
           <DataAdapter dataAdapter={dataAdapter} noEdit />
         </Col>
@@ -91,7 +93,7 @@ function DataAdapterFormStep() {
         ) : (
           <>
             <StyledRow>
-              <Col lg={6}>
+              <Col lg={10} style={{ padding: '0 6px' }}>
                 <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
               </Col>
             </StyledRow>

@@ -60,7 +60,6 @@ function CachePicker({ onCreateClick, caches = [] }: Props) {
         <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
           {errorMessage || 'Select an existing cache'}
         </div>
-
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <StyledSelect
             placeholder="Select a cache"
@@ -70,7 +69,6 @@ function CachePicker({ onCreateClick, caches = [] }: Props) {
             onChange={(v) => setValue(v)}
             value={value}
           />
-
           <StyledButton type="button" aria-label="Create Cache" onClick={onCreateClick}>
             Create Cache
           </StyledButton>

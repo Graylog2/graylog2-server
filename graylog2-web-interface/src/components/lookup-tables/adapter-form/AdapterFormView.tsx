@@ -25,13 +25,13 @@ import DataAdapterTypeSelect from './AdapterTypeSelect';
 
 const StyledRow = styled(Row)`
   display: flex;
-  width: 100%;
   justify-content: center;
 `;
 
 const FlexCol = styled(Col)`
   display: flex;
   flex-direction: column;
+  align-items: center;
 `;
 
 type Props = {

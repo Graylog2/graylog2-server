@@ -23,14 +23,14 @@ import { Row, Col } from 'components/bootstrap';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchCache, useFetchAllCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import Cache from 'components/lookup-tables/Cache';
+import CachePicker from 'components/lookup-tables/cache-form/CachePicker';
+import CacheFormView from 'components/lookup-tables/cache-form/CacheFormView';
 import type { LookupTable, LookupTableCache } from 'logic/lookup-tables/types';
-
-import CachePicker from './CachePicker';
-import CacheFormView from './CacheFormView';
 
 const FlexCol = styled(Col)`
   display: flex;
   flex-direction: column;
+  width: 100%;
   height: 100%;
   gap: 2rem;
 `;
@@ -38,7 +38,9 @@ const FlexCol = styled(Col)`
 const StyledRow = styled(Row)`
   display: flex;
   justify-content: center;
+  width: 100%;
   max-width: 1500px;
+  margin: 0 auto;
 `;
 
 function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
@@ -52,7 +54,7 @@ function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
 
   return (
     <StyledRow>
-      <Col lg={9}>
+      <Col lg={12}>
         <Col lg={6}>
           <Cache cache={cache} noEdit />
         </Col>
@@ -92,7 +94,7 @@ function CacheFormStep() {
         ) : (
           <>
             <StyledRow>
-              <Col lg={6}>
+              <Col lg={10} style={{ padding: '0 6px' }}>
                 <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
               </Col>
             </StyledRow>
