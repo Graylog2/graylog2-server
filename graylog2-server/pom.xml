@@ -1141,20 +1141,52 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>generate-swagger-api-definition</id>
                         <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
+                        <configuration>
+                            <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/swagger</argument>
+                                <argument>org.graylog</argument>
+                                <argument>org.graylog2</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-openapi-spec</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>org.graylog2.bootstrap.Main</mainClass>
+                            <arguments>
+                                <argument>openapi-spec</argument>
+                                <argument>-np</argument>
+                                <argument>-f</argument>
+                                <argument>${project.basedir}/../misc/graylog.conf</argument>
+                                <argument>${project.build.directory}/swagger/openapi.yaml</argument>
+                            </arguments>
+                            <systemProperties>
+                                <systemProperty>
+                                    <key>graylog.password_secret</key>
+                                    <value>dummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummypasswordsecretforma</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>graylog.data_dir</key>
+                                    <value>${project.build.directory}/graylog-data</value>
+                                </systemProperty>
+                                <systemProperty>
+                                    <key>graylog.node_id_file</key>
+                                    <value>${project.build.directory}/node-id</value>
+                                </systemProperty>
+                            </systemProperties>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
-                    <arguments>
-                        <argument>${project.build.directory}/swagger</argument>
-                        <argument>org.graylog</argument>
-                        <argument>org.graylog2</argument>
-                    </arguments>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.cyclonedx</groupId>
