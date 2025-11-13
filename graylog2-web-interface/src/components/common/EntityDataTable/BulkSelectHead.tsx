@@ -15,14 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo } from 'react';
 import uniq from 'lodash/uniq';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
-import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { Th } from 'components/common/EntityDataTable/TableHead';
 
 export type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
@@ -30,7 +28,6 @@ const useCheckboxStatus = <Entity extends EntityBase>(
   data: Readonly<Array<Entity>>,
   selectedEntityIds: Array<string>,
 ) => {
-  const checkboxRef = useRef<HTMLInputElement>();
   const checkboxStatus: CheckboxStatus = useMemo(() => {
     const selectedEntities = data.filter(({ id }) => selectedEntityIds.includes(id));
 
@@ -45,20 +42,7 @@ const useCheckboxStatus = <Entity extends EntityBase>(
     return 'PARTIAL';
   }, [data, selectedEntityIds]);
 
-  useEffect(() => {
-    if (checkboxRef.current) {
-      if (checkboxStatus === 'PARTIAL') {
-        checkboxRef.current.indeterminate = true;
-
-        return;
-      }
-
-      checkboxRef.current.indeterminate = false;
-    }
-  }, [checkboxStatus]);
-
   return {
-    checkboxRef,
     checkboxStatus,
   };
 };
@@ -71,12 +55,9 @@ type Props<Entity extends EntityBase> = {
   getTitle?: (checkboxStatus: CheckboxStatus) => string;
 };
 
-export const BulkSelectHeadContent = <Entity extends EntityBase>({
-  data,
-  getTitle = getDefaultTitle,
-}: Props<Entity>) => {
+export const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
-  const { checkboxRef, checkboxStatus } = useCheckboxStatus(data, selectedEntities);
+  const { checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = getTitle(checkboxStatus);
 
   const onBulkSelect = () => {
@@ -93,9 +74,7 @@ export const BulkSelectHeadContent = <Entity extends EntityBase>({
 
   return (
     <RowCheckbox
-      inputRef={(ref) => {
-        checkboxRef.current = ref;
-      }}
+      indeterminate={checkboxStatus === 'PARTIAL'}
       onChange={onBulkSelect}
       checked={checkboxStatus === 'CHECKED'}
       title={title}
@@ -105,9 +84,4 @@ export const BulkSelectHeadContent = <Entity extends EntityBase>({
   );
 };
 
-const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => (
-  <Th $width={BULK_SELECT_COLUMN_WIDTH}>
-    <BulkSelectHeadContent<Entity> data={data} getTitle={getTitle} />
-  </Th>
-);
 export default BulkSelectHead;

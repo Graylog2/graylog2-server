@@ -167,7 +167,7 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
     event_definition_id: {
       minWidth: 300,
       width: 0.3,
-      renderCell: (eventDefinitionId: string, _, __, meta: EventsAdditionalData) => (
+      renderCell: (eventDefinitionId: string, _, meta: EventsAdditionalData) => (
         <EventDefinitionRenderer meta={meta} eventDefinitionId={eventDefinitionId} />
       ),
     },
@@ -176,7 +176,7 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 400,
     },
     remediation_steps: {
-      renderCell: (_, event: Event, __, meta: EventsAdditionalData, eventProcedureId: string) => (
+      renderCell: (_, event: Event, meta: EventsAdditionalData, eventProcedureId: string) => (
         <>
           {ValidSecurityLicense() ? (
             <EventProcedureRenderer eventProcedureId={eventProcedureId} eventId={event?.id} />
