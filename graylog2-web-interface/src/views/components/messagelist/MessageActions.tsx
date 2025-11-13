@@ -28,6 +28,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import MessagePermalinkButton from 'views/components/common/MessagePermalinkButton';
 import MessageEditFieldConfigurationAction from 'views/components/messagelist/MessageFields/MessageEditFieldConfigurationAction';
+import useFeature from 'hooks/useFeature';
 
 const TestAgainstStreamButton = ({
   streams,
@@ -108,6 +109,7 @@ const MessageActions = ({
   searchConfig,
 }: Props) => {
   const pluggableActions = usePluggableMessageActions(id, index);
+  const isFavoriteFieldsEnabled = useFeature('message_table_favorite_fields');
 
   if (disabled) {
     return <ButtonGroup />;
@@ -140,7 +142,7 @@ const MessageActions = ({
       <ClipboardButton title="Copy message" bsSize="small" text={JSON.stringify(fields, null, 2)} />
       {surroundingSearchButton}
       {disableTestAgainstStream ? null : <TestAgainstStreamButton streams={streams} id={id} index={index} />}
-      <MessageEditFieldConfigurationAction />
+      {isFavoriteFieldsEnabled && <MessageEditFieldConfigurationAction />}
     </ButtonGroup>
   );
 };

@@ -25,6 +25,7 @@ import { Icon } from 'components/common';
 import Store from 'logic/local-storage/Store';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import StringUtils from 'util/StringUtils';
 
 const Line = styled.div(
   ({ theme }) => css`
@@ -69,7 +70,7 @@ const Separator = ({ onClick, expanded, restLength }: Props) => {
     <SeparatorContainer onClick={onClick} role="button" tabIndex={0} onKeyDown={onKeyDown}>
       <Line />
       <IconSeparator expanded={expanded} />
-      <span>{`${expanded ? 'Hide' : 'Show'} rest ${restLength || ''} fields`}</span>
+      <span>{`${expanded ? 'Hide' : 'Show'} ${restLength || ''} non-favorite ${StringUtils.pluralize(restLength, 'field', 'fields')}`}</span>
       <IconSeparator expanded={expanded} />
       <Line />
     </SeparatorContainer>
@@ -77,7 +78,17 @@ const Separator = ({ onClick, expanded, restLength }: Props) => {
 };
 
 const SESSION_STORAGE_KEY = 'message_table_show_rest-fields';
+/*
+export const DefaultMessageFields = ({ message, fields }: MessageFieldsComponentProps) => {
+  const formattedFields = message.formatted_fields;
+  const renderedFields = Object.keys(formattedFields)
+    .sort()
+    .map((key) => {
+      const { type } = fields.find((t) => t.name === key, undefined, FieldTypeMapping.create(key, FieldType.Unknown));
 
+      return <MessageField key={key} fieldName={key} fieldType={type} message={message} value={formattedFields[key]} />;
+});
+*/
 const MessageFields = () => {
   const sendTelemetry = useSendTelemetry();
   const [expanded, setExpanded] = useState(Store.sessionGet(SESSION_STORAGE_KEY) !== 'false');

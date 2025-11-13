@@ -23,7 +23,7 @@ import MessageField from 'views/components/messagelist/MessageField';
 import { MessageDetailsDefinitionList } from 'components/common';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 
-const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
+export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
     color: ${theme.colors.text.primary};
 
