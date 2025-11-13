@@ -28,6 +28,7 @@ public enum NodeStatMetrics {
     MEM_TOTAL_USED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.os.mem.used_percent"),
     MEM_HEAP_USED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.jvm.mem.heap_used_percent"),
     DISK_FREE("float", new RollupAction.IsmRollup.AvgMetric(), "$.fs.total.available_in_bytes", NodeStatMetrics::bytesToGb),
+    DISK_USED("float", new RollupAction.IsmRollup.AvgMetric(), "$.fs.total.total_in_bytes", NodeStatMetrics::bytesToGb),
     THREAD_POOL_WRITE_THREADS("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.threads"),
     THREAD_POOL_WRITE_QUEUE("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.queue"),
     THREAD_POOL_WRITE_REJECTED("integer", new RollupAction.IsmRollup.AvgMetric(), "$.thread_pool.write.rejected"),
@@ -86,6 +87,15 @@ public enum NodeStatMetrics {
             return value;
         }
         return mappingFunction.apply(value);
+    }
+
+    public static String getMetricRegistryName(String fieldName) {
+        NodeStatMetrics metric = valueOf(fieldName.toUpperCase(Locale.ROOT));
+        return metric.getMetricRegistryName();
+    }
+
+    public String getMetricRegistryName() {
+        return "opensearch" + nodeStat.substring(1);
     }
 
 }
