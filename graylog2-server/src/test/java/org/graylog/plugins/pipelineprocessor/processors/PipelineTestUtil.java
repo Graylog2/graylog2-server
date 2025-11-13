@@ -21,6 +21,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
@@ -40,6 +42,8 @@ import static org.mockito.Mockito.when;
 public class PipelineTestUtil {
 
     private final FunctionRegistry functionRegistry = new FunctionRegistry(Map.of(
+            StringConversion.NAME, new StringConversion(),
+            HasField.NAME, new HasField(),
             RemoveField.NAME, new RemoveField(),
             FromInput.NAME, new FromInput(mock(InputRegistry.class))));
     private final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
@@ -48,14 +52,16 @@ public class PipelineTestUtil {
     public static final String ALWAYS_TRUE_ID = "always_true_id";
     public static final String REMOVE_FIELD_ID = "remove_field_id";
     public static final String FROM_INPUT_ID = "from_input_id";
+    public static final String GL2_SOURCE_INPUT_ID = "source_input_id";
     public static final String CONNECTION_ID = "connection1_id";
     public static final String STREAM_ID = "stream1_id";
     public static final String INPUT_NAME = "input1";
     public static final String INPUT_ID = INPUT_NAME + "_id";
 
-    public final Rule ALWAYS_TRUE = parser.parseRule("always_true_id", "rule \"alwaysTrue\" when true then end", true);
-    public final Rule REMOVE_FIELD = parser.parseRule("remove_field_id", "rule \"removeField\" when true then remove_field(\"dummy\"); end", true);
-    public final Rule FROM_INPUT = parser.parseRule("from_input_id", "rule \"fromInput\" when from_input(name: \"input1\") then end", true);
+    public final Rule ALWAYS_TRUE = parser.parseRule(ALWAYS_TRUE_ID, "rule \"alwaysTrue\" when true then end", true);
+    public final Rule REMOVE_FIELD = parser.parseRule(REMOVE_FIELD_ID, "rule \"removeField\" when true then remove_field(\"dummy\"); end", true);
+    public final Rule FROM_INPUT = parser.parseRule(FROM_INPUT_ID, "rule \"fromInput\" when from_input(name: \"input1\") then end", true);
+    public final Rule GL2_SOURCE_INPUT = parser.parseRule(GL2_SOURCE_INPUT_ID, "rule \"sourceInput\" when has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"input1_id\" then end", true);
 
     public PipelineTestUtil(PipelineStreamConnectionsService connectionsService, InputService inputService) {
         this.connectionsService = connectionsService;

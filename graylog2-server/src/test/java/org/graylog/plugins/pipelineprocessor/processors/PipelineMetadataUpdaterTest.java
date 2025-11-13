@@ -80,9 +80,7 @@ class PipelineMetadataUpdaterTest {
 
     @Test
     void testHandlePipelineChanges() {
-        PipelinesChangedEvent event = mock(PipelinesChangedEvent.class);
-        when(event.deletedPipelineIds()).thenReturn(Set.of("id1"));
-        when(event.updatedPipelineIds()).thenReturn(Set.of("id2"));
+        PipelinesChangedEvent event = PipelinesChangedEvent.create(Set.of("id1"), Set.of("id2"));
 
         updater.handlePipelineChanges(event, state, resolver, metricRegistry);
 
@@ -96,9 +94,7 @@ class PipelineMetadataUpdaterTest {
 
     @Test
     void testHandleConnectionChanges() {
-        PipelineConnectionsChangedEvent event = mock(PipelineConnectionsChangedEvent.class);
-        when(event.pipelineIds()).thenReturn(Set.of("id1"));
-
+        PipelineConnectionsChangedEvent event = PipelineConnectionsChangedEvent.create("stream_id", Set.of("id1"));
 
         updater.handleConnectionChanges(event, state, resolver, metricRegistry);
 
@@ -109,9 +105,9 @@ class PipelineMetadataUpdaterTest {
 
     @Test
     void testHandleRuleChanges() {
-        RulesChangedEvent event = mock(RulesChangedEvent.class);
-        when(event.deletedRules()).thenReturn(Set.of(new RulesChangedEvent.Reference("rule1", "Rule 1")));
-        when(event.updatedRules()).thenReturn(Set.of(new RulesChangedEvent.Reference("rule2", "Rule 2")));
+        RulesChangedEvent event = new RulesChangedEvent(
+                Set.of(new RulesChangedEvent.Reference("rule1", "Rule 1")),
+                Set.of(new RulesChangedEvent.Reference("rule2", "Rule 2")));
         when(pipelineMetadataService.getPipelinesByRules(Set.of("rule2"))).thenReturn(Set.of("pipeline1"));
         doReturn(Set.of(PipelineDao.create("pipeline1", DefaultEntityScope.NAME,
                 "title1", "description1", "source1", null, null)))
@@ -128,8 +124,7 @@ class PipelineMetadataUpdaterTest {
 
     @Test
     void testHandleInputDeletedDeletesInput() throws NotFoundException {
-        InputDeletedEvent event = mock(InputDeletedEvent.class);
-        when(event.inputId()).thenReturn("input1");
+        InputDeletedEvent event = new InputDeletedEvent("input1", "input1_title");
 
         when(inputsMetadataService.getByInputId("input1")).thenReturn(
                 PipelineInputsMetadataDao.builder()
