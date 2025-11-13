@@ -153,7 +153,7 @@ public class WebInterfaceAssetsResource {
     private String trimBasePath(String filename, HttpHeaders headers) {
         final String baseUriPath = RestTools.buildRelativeExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).getPath();
         final var result = filename.startsWith(baseUriPath) ? filename.substring(baseUriPath.length()) : filename;
-        LOG.info("Getting asset from {} - {} - {}", baseUriPath, filename, result);
+        LOG.warn("Getting asset from {} - {} - {}", baseUriPath, filename, result);
         return result;
     }
 
