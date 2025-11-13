@@ -37,6 +37,8 @@ import org.graylog2.shared.rest.resources.csp.CSP;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.customization.CustomizationConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.io.IOException;
@@ -130,12 +132,15 @@ public class WebInterfaceAssetsResource {
         return this.plugins.stream().filter(plugin -> plugin.metadata().getUniqueId().equals(pluginName)).findFirst();
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(WebInterfaceAssetsResource.class);
+
     @Path(ASSETS_PREFIX + "/{filename: .*}")
     @GET
     public Response get(@Context ContainerRequest request,
                         @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
         final var filenameWithoutSuffix = trimBasePath(filename, headers);
+
         try {
             final var resource = resourceFileReader.readFile(filenameWithoutSuffix, this.getClass());
             return getResponse(request, filenameWithoutSuffix, resource);
@@ -147,7 +152,9 @@ public class WebInterfaceAssetsResource {
 
     private String trimBasePath(String filename, HttpHeaders headers) {
         final String baseUriPath = RestTools.buildRelativeExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).getPath();
-        return filename.startsWith(baseUriPath) ? filename.substring(baseUriPath.length()) : filename;
+        final var result = filename.startsWith(baseUriPath) ? filename.substring(baseUriPath.length()) : filename;
+        LOG.info("Getting asset from {} - {} - {}", baseUriPath, filename, result);
+        return result;
     }
 
     @GET
