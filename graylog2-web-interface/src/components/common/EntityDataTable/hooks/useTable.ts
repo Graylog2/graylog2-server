@@ -173,14 +173,11 @@ const useTable = <Entity extends EntityBase>({
       const newColumnOrder = (updater instanceof Function ? updater(columnOrder) : updater).filter(
         (colId) => !UTILITY_COLUMNS.has(colId),
       );
-      console.log({ newColumnOrder });
       setInternalAttributeColumnOrder(newColumnOrder);
       onLayoutPreferencesChange({ order: newColumnOrder });
     },
     [columnOrder, onLayoutPreferencesChange, setInternalAttributeColumnOrder],
   );
-
-  console.log('here', columnOrder);
 
   // eslint-disable-next-line react-hooks/incompatible-library
   return useReactTable({

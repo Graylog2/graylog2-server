@@ -63,7 +63,6 @@ const useTableEventHandlers = ({
 
   const onLayoutPreferencesChange = useCallback(
     (layoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> }) => {
-      console.log('update', layoutPreferences);
       if (layoutPreferences.order) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMN_ORDER_CHANGED, {
           app_pathname: getPathnameWithoutId(pathname),

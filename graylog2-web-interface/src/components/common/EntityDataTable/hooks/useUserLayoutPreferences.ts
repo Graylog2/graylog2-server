@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import type { TableLayoutPreferences, TableLayoutPreferencesJSON } from 'components/common/EntityDataTable/types';
@@ -22,59 +21,39 @@ import fetch from 'logic/rest/FetchProvider';
 import { qualifyUrl } from 'util/URLUtils';
 import { defaultOnError } from 'util/conditional/onError';
 
-export const tableLayoutQK = (entityId: string) => ['table-layout', entityId] as const;
+const INITIAL_DATA = {};
 
 const preferencesFromJSON = ({
   attributes,
   sort,
   per_page,
   custom_preferences,
-  order,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
   attributes,
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
   customPreferences: custom_preferences,
-  order,
 });
-
-const emptyPrefs = (): TableLayoutPreferences<any> => ({
-  attributes: {},
-  sort: undefined,
-  perPage: undefined as any, // keep shape; adapt if your type requires a number
-  customPreferences: undefined,
-  order: [],
-});
-
 const fetchUserLayoutPreferences = (entityId: string) =>
-  fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`))
-    .then((res) => preferencesFromJSON(res ?? ({} as TableLayoutPreferencesJSON)))
-    .catch((e) => {
-      // Surface via defaultOnError to keep existing behavior
-      throw e;
-    });
+  fetch('GET', qualifyUrl(`/entitylists/preferences/${entityId}`)).then((res) => preferencesFromJSON(res ?? {}));
 
 const useUserLayoutPreferences = <T>(
   entityId: string,
 ): { data: TableLayoutPreferences<T>; isInitialLoading: boolean; refetch: () => void } => {
   const { data, isInitialLoading, refetch } = useQuery({
-    queryKey: tableLayoutQK(entityId),
+    queryKey: ['table-layout', entityId],
     queryFn: () =>
       defaultOnError(
         fetchUserLayoutPreferences(entityId),
         `Loading layout preferences for "${entityId}" overview failed with`,
       ),
-    // Keep last successful data on screen during background transitions
-    placeholderData: () => keepPreviousData,
-    // Reduce surprise background refetches that could snap the UI
-    staleTime: 60 * 60 * 1000, // 1 hour
-    refetchOnWindowFocus: false,
-    refetchOnMount: false,
-    select: (prefs) => (prefs ?? emptyPrefs()) as TableLayoutPreferences<T>,
+    placeholderData: keepPreviousData,
+    // 1 hour
+    staleTime: 60 * (60 * 1000),
   });
 
   return {
-    data: (data ?? emptyPrefs()) as TableLayoutPreferences<T>,
+    data: data ?? INITIAL_DATA,
     isInitialLoading,
     refetch,
   };
