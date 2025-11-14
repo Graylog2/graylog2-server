@@ -107,7 +107,6 @@ function DataAdapterList() {
             <PaginatedEntityTable<DataAdapterEntity>
               humanName="data adapter"
               entityActions={renderActions}
-              columnsOrder={adapterListElements.columnOrder}
               queryHelpComponent={queryHelpComponent}
               tableLayout={adapterListElements.defaultLayout}
               fetchEntities={handleFetchAdapters}

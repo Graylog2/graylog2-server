@@ -23,6 +23,7 @@ import { IfPermitted, ShareButton } from 'components/common';
 import type View from 'views/logic/views/View';
 import EntityShareModal from 'components/permissions/EntityShareModal';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 
 const onDelete = (
   e: React.MouseEvent<HTMLButtonElement>,
@@ -50,11 +51,11 @@ type Props = {
   search: View;
   onDeleteSavedSearch: (search: View) => Promise<void>;
   activeSavedSearchId: string;
-  refetch: () => void;
 };
 
-const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId, refetch }: Props) => {
+const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Props) => {
   const { deselectEntity } = useSelectedEntities();
+  const { refetch } = useTableFetchContext();
   const [showShareModal, setShowShareModal] = useState(false);
   const toggleEntityShareModal = useCallback(() => {
     setShowShareModal((cur) => !cur);

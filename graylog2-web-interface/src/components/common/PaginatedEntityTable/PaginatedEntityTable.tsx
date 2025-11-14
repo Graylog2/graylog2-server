@@ -51,7 +51,6 @@ type Props<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
-  columnsOrder: EntityDataTableProps['columnsOrder'];
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'];
@@ -83,7 +82,6 @@ const INITIAL_DATA = {
  */
 const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   actionsCellWidth = 160,
-  columnsOrder,
   entityActions,
   tableLayout,
   fetchEntities,
@@ -127,7 +125,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
 
   const appSection = `${tableLayout.entityTableId}-list`;
 
-  const { onPageSizeChange, onSearch, onSearchReset, onColumnsChange, onSortChange } = useTableEventHandlers({
+  const { onPageSizeChange, onSearch, onSearchReset, onLayoutPreferencesChange, onSortChange } = useTableEventHandlers({
     appSection,
     paginationQueryParameter: paginationState,
     updateTableLayout,
@@ -193,11 +191,15 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
           ) : (
             <EntityDataTable<T, M>
               entities={list}
-              visibleColumns={layoutConfig.displayedAttributes}
-              columnsOrder={columnsOrder}
+              defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
+              layoutPreferences={{
+                attributes: layoutConfig.attributes,
+                order: layoutConfig.order,
+              }}
+              defaultColumnOrder={tableLayout.defaultColumnOrder}
+              onLayoutPreferencesChange={onLayoutPreferencesChange}
               expandedSectionsRenderer={expandedSectionsRenderer}
               bulkSelection={bulkSelection}
-              onColumnsChange={onColumnsChange}
               onSortChange={onSortChange}
               onPageSizeChange={onPageSizeChange}
               pageSize={layoutConfig.pageSize}

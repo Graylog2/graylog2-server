@@ -1,0 +1,109 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+
+import * as React from 'react';
+import { useState, useCallback, useMemo } from 'react';
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
+import type { Modifier, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import {
+  closestCenter,
+  DndContext,
+  useSensors,
+  useSensor,
+  MouseSensor,
+  TouchSensor,
+  KeyboardSensor,
+  DragOverlay,
+} from '@dnd-kit/core';
+import { getEventCoordinates } from '@dnd-kit/utilities';
+import type { Table } from '@tanstack/react-table';
+
+import type { EntityBase } from 'components/common/EntityDataTable/types';
+import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
+import ThDragOverlay from 'components/common/EntityDataTable/ThDragOverlay';
+
+const snapOverlayToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
+  if (draggingNodeRect && activatorEvent) {
+    const activatorCoordinates = getEventCoordinates(activatorEvent);
+
+    if (!activatorCoordinates) {
+      return transform;
+    }
+
+    const offsetX = activatorCoordinates.x - draggingNodeRect.left;
+    const offsetY = activatorCoordinates.y - draggingNodeRect.top;
+
+    return {
+      ...transform,
+      x: transform.x + offsetX - 20,
+      y: transform.y + offsetY - 20,
+    };
+  }
+
+  return transform;
+};
+
+type Props<Entity extends EntityBase> = React.PropsWithChildren<{
+  table: Table<Entity>;
+}>;
+
+const TableDndProvider = <Entity extends EntityBase>({ children = undefined, table }: Props<Entity>) => {
+  const [activeId, setActiveId] = useState<number | string | null>(null);
+
+  const sensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    const { active } = event;
+
+    setActiveId(active.id);
+  }, []);
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (active && over && active.id !== over.id) {
+        table.setColumnOrder((curColumnOrder) => {
+          const oldIndex = curColumnOrder.indexOf(active.id as string);
+          const newIndex = curColumnOrder.indexOf(over.id as string);
+
+          return arrayMove(curColumnOrder, oldIndex, newIndex); //this is just a splice util
+        });
+      }
+    },
+    [table],
+  );
+
+  const columnOrder = table.getState().columnOrder;
+  const draggableColumns = useMemo(() => columnOrder.filter((id) => !UTILITY_COLUMNS.has(id)), [columnOrder]);
+
+  return (
+    <DndContext
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      modifiers={[snapOverlayToCursor]}
+      onDragStart={handleDragStart}
+      sensors={sensors}>
+      <SortableContext items={draggableColumns} strategy={horizontalListSortingStrategy}>
+        {children}
+      </SortableContext>
+      <DragOverlay dropAnimation={null}>
+        {activeId ? <ThDragOverlay<Entity> column={table.getAllColumns().find((col) => col.id === activeId)} /> : null}
+      </DragOverlay>
+    </DndContext>
+  );
+};
+
+export default TableDndProvider;

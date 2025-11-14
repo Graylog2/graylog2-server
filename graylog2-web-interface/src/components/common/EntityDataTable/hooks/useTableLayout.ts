@@ -20,7 +20,7 @@ import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
-const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDisplayedAttributes }: DefaultLayout) => {
+const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize }: DefaultLayout) => {
   const { data: userLayoutPreferences = {}, isInitialLoading } = useUserLayoutPreferences(entityTableId);
 
   return useMemo(
@@ -28,16 +28,17 @@ const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDi
       layoutConfig: {
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
         sort: userLayoutPreferences.sort ?? defaultSort,
-        displayedAttributes: userLayoutPreferences?.displayedAttributes ?? defaultDisplayedAttributes,
+        attributes: userLayoutPreferences?.attributes,
+        order: userLayoutPreferences.order,
       },
       isInitialLoading,
     }),
     [
-      defaultDisplayedAttributes,
       defaultPageSize,
       defaultSort,
       isInitialLoading,
-      userLayoutPreferences?.displayedAttributes,
+      userLayoutPreferences?.attributes,
+      userLayoutPreferences.order,
       userLayoutPreferences.perPage,
       userLayoutPreferences.sort,
     ],

@@ -22,7 +22,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
-import type { TableLayoutPreferences } from 'components/common/EntityDataTable/types';
+import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const useTableEventHandlers = ({
   updateTableLayout,
@@ -61,23 +61,53 @@ const useTableEventHandlers = ({
     [paginationQueryParameter, setQuery],
   );
 
-  const onSearchReset = useCallback(() => {
-    onSearch('');
-  }, [onSearch]);
+  const onLayoutPreferencesChange = useCallback(
+    (layoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> }) => {
+      if (layoutPreferences.order) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMN_ORDER_CHANGED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: appSection,
+          app_action_value: 'column-order-change',
+          column_order: layoutPreferences.order,
+        });
+      }
 
-  const onColumnsChange = useCallback(
-    (displayedAttributes: Array<string>) => {
-      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
-        app_pathname: getPathnameWithoutId(pathname),
-        app_section: appSection,
-        app_action_value: 'columns-select',
-        columns: displayedAttributes,
-      });
+      if (layoutPreferences.attributes) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: appSection,
+          app_action_value: 'columns-select',
+          columns: Object.keys(layoutPreferences.attributes).filter(
+            (key) => layoutPreferences.attributes[key].status === 'show',
+          ),
+        });
+      }
 
-      updateTableLayout({ displayedAttributes });
+      const newLayoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> } = {};
+
+      if (layoutPreferences.order) {
+        newLayoutPreferences.order = layoutPreferences.order;
+      }
+
+      if (layoutPreferences.attributes) {
+        newLayoutPreferences.attributes = layoutPreferences.attributes;
+      }
+
+      updateTableLayout(newLayoutPreferences);
     },
     [appSection, pathname, sendTelemetry, updateTableLayout],
   );
+
+  const onSearchReset = useCallback(() => {
+    onSearch('');
+  }, [onSearch]);
+  //
+  // const onColumnPreferencesChange = useCallback(
+  //   (newColumnPreferences: ColumnPreferences) => {
+  //     updateTableLayout({ attributes: newColumnPreferences });
+  //   },
+  //   [appSection, pathname, sendTelemetry, updateTableLayout],
+  // );
 
   const onSortChange = useCallback(
     (newSort: Sort) => {
@@ -95,10 +125,10 @@ const useTableEventHandlers = ({
   );
 
   return {
+    onLayoutPreferencesChange,
     onPageSizeChange,
     onSearch,
     onSearchReset,
-    onColumnsChange,
     onSortChange,
   };
 };

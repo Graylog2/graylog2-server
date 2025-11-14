@@ -60,7 +60,12 @@ describe('IndexSetFieldTypesList', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['name', 'description', 'type', 'custom_field_mappings'],
+        attributes: {
+          name: { status: 'show' },
+          description: { status: 'show' },
+          type: { status: 'show' },
+          custom_field_mappings: { status: 'show' },
+        },
       },
       isInitialLoading: false,
       refetch: () => {},

@@ -174,7 +174,11 @@ describe('ChangeFieldTypeModal', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['index_set_title', 'stream_titles', 'types'],
+        attributes: {
+          index_set_title: { status: 'show' },
+          stream_titles: { status: 'show' },
+          types: { status: 'show' },
+        },
       },
       isInitialLoading: false,
       refetch: () => {},
