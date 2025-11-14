@@ -41,21 +41,6 @@ public abstract class StreamsForFieldRetrieverIT extends ElasticsearchBaseTest {
     }
 
     @Test
-    public void retrievesProperStreamsForSingleField() {
-        Set<String> streams = getRetriever().getStreams("stream1_only", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(1).contains(STREAM_1);
-
-        streams = getRetriever().getStreams("stream2_only", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(1).contains(STREAM_2);
-
-        streams = getRetriever().getStreams("message", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(2).contains(STREAM_1, STREAM_2);
-
-        streams = getRetriever().getStreams("additional_field", INDEX_NAME);
-        assertThat(streams).isNotNull().hasSize(2).contains(STREAM_1, STREAM_2);
-    }
-
-    @Test
     public void retrievesProperStreamsForMultipleField() {
         final Map<String, Set<String>> streams = getRetriever().getStreams(List.of("stream1_only", "stream2_only", "message", "additional_field"), INDEX_NAME);
         assertThat(streams)
@@ -65,7 +50,5 @@ public abstract class StreamsForFieldRetrieverIT extends ElasticsearchBaseTest {
                 .hasEntrySatisfying("stream2_only", set -> assertThat(set).containsOnly(STREAM_2))
                 .hasEntrySatisfying("message", set -> assertThat(set).containsOnly(STREAM_1, STREAM_2))
                 .hasEntrySatisfying("additional_field", set -> assertThat(set).containsOnly(STREAM_1, STREAM_2));
-
-
     }
 }

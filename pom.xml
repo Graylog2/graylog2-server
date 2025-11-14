@@ -98,7 +98,7 @@
 
         <!-- Dependencies -->
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
-        <opensearch.client.version>3.3.0</opensearch.client.version>
+        <opensearch.client.version>3.2.0</opensearch.client.version>
         <airline.version>3.2.0</airline.version>
         <amqp-client.version>5.27.1</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
