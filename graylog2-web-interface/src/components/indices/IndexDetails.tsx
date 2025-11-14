@@ -29,12 +29,12 @@ import { IndicesActions } from 'stores/indices/IndicesStore';
 type Props = {
   index: IndexInfo;
   indexName: string;
-  indexRange: IndexRange;
+  indexRange?: IndexRange;
   indexSetId: string;
   isDeflector: boolean;
 };
 
-const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }: Props) => {
+const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId, isDeflector }: Props) => {
   useEffect(() => {
     IndicesActions.subscribe(indexName);
 
