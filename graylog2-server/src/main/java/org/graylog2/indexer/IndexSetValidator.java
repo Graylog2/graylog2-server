@@ -170,7 +170,7 @@ public class IndexSetValidator {
         // Example: new=graylog_foo existing=graylog => graylog is more generic so this is an error
         // Example: new=gray        existing=graylog => gray    is more generic so this is an error
         // This avoids problems with wildcard matching like "graylog_*".
-        for (final IndexSet indexSet : indexSetRegistry) {
+        for (final IndexSet indexSet : indexSetRegistry.getAllIndexSets()) {
             if (newConfig.indexPrefix().startsWith(indexSet.getIndexPrefix()) || indexSet.getIndexPrefix().startsWith(newConfig.indexPrefix())) {
                 return Violation.create(f("Index prefix '%s' would conflict with existing index set prefix '%s'",
                         newConfig.indexPrefix(),

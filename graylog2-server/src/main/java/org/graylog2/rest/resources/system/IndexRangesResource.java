@@ -42,6 +42,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -154,7 +155,7 @@ public class IndexRangesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
         submitIndexRangesCleanupJob();
-        submitIndexRangesJob(indexSetRegistry.getAll());
+        submitIndexRangesJob(indexSetRegistry.getAllBasicIndexSets());
 
         return Response.accepted().build();
     }
@@ -213,13 +214,13 @@ public class IndexRangesResource extends RestResource {
         return Response.accepted().build();
     }
 
-    private void submitIndexRangesJob(final Set<IndexSet> indexSets) {
+    public void submitIndexRangesJob(final Set<BasicIndexSet> indexSets) {
         final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSets);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(errorMsg, e);
+            LOG.info(errorMsg, e);
             throw new ForbiddenException(errorMsg);
         }
     }

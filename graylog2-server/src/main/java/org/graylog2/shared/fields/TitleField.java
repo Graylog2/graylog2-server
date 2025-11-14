@@ -14,19 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog2.shared.fields;
 
-import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
-import org.graylog2.storage.SearchVersion;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 
-import javax.annotation.Nonnull;
+public interface TitleField {
+    String FIELD_TITLE = "title";
 
-public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
+    @JsonProperty(FIELD_TITLE)
+    @NotBlank
+    String title();
 
-    String FAILURE_TEMPLATE_TYPE = "failures";
-    String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
+    interface TitleFieldBuilder<T> {
 
-    @Nonnull
-    T create(@Nonnull SearchVersion searchVersion, @Nonnull BasicIndexSetConfig indexSetConfig)
-            throws IgnoreIndexTemplate;
+        @JsonProperty(FIELD_TITLE)
+        T title(@NotBlank String title);
+
+    }
 }

@@ -86,9 +86,9 @@ class ChunkedBulkIndexerTest {
 
     private ChunkedBulkIndexer.BulkIndexResult success(List<IndexingRequest> requests) {
         final var results = requests.stream()
-                .map(request -> IndexingSuccess.create(request.message(), request.indexSet().getNewestIndex()))
+                .map(request -> IndexingSuccess.create(request.message(), null))
                 .toList();
-        return new ChunkedBulkIndexer.BulkIndexResult(IndexingResults.create(results, List.of()), () -> "", requests.size());
+        return new ChunkedBulkIndexer.BulkIndexResult(IndexingResults.create(results, List.of()), indexSet::getWriteIndexAlias, requests.size());
     }
 
     private ChunkedBulkIndexer.CircuitBreakerException circuitBreakerException() {
@@ -104,7 +104,7 @@ class ChunkedBulkIndexerTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(IndexingRequest.create(indexSet, messageFactory.createMessage(i + message, "source", now())));
+            messageList.add(IndexingRequest.create(indexSet.getWriteIndexAlias(), messageFactory.createMessage(i + message, "source", now())));
         }
         return messageList;
     }

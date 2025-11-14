@@ -199,7 +199,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                 final Set<Lock> locks = lockIndexSets(migration);
                 createIndicesInNewCluster(migration);
                 startAsyncTasks(migration, request, locks);
-                recaluculateAllIndexRanges();
+                recalculateAllIndexRanges();
                 createSystemNotification(Status.RUNNING);
             }).start();
         } catch (Exception e) {
@@ -666,14 +666,14 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void onMigrationFinished(Status status, Set<Lock> locks) {
         LOG.info("Remote reindexing migration finished");
-        recaluculateAllIndexRanges();
+        recalculateAllIndexRanges();
         createSystemNotification(status);
         locks.forEach(migrationLockService::release);
     }
 
-    private void recaluculateAllIndexRanges() {
+    private void recalculateAllIndexRanges() {
         this.indexRangesCleanupPeriodical.doRun();
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSetRegistry.getAll());
+        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSetRegistry.getAllBasicIndexSets());
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {

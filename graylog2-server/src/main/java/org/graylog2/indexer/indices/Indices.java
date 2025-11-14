@@ -37,9 +37,10 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.counts.CountsAdapter;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -149,7 +150,7 @@ public class Indices {
         return indicesAdapter.getIndexSetStats();
     }
 
-    public JsonNode getIndexStats(final IndexSet indexSet) {
+    public JsonNode getIndexStats(final BasicIndexSet indexSet) {
         return indicesAdapter.getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
@@ -340,7 +341,7 @@ public class Indices {
         return indicesAdapter.closedIndices(indices);
     }
 
-    public Set<String> getClosedIndices(final IndexSet indexSet) {
+    public Set<String> getClosedIndices(final BasicIndexSet indexSet) {
         return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 

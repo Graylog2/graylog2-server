@@ -111,7 +111,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     // TODO: find a better way to do this. These are all verbatim from org.graylog2.rest.resources.system.indexer.IndicesResource
 
     public OpenIndicesInfo open(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -123,7 +123,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     public ClosedIndices closed(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -135,7 +135,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     public ClosedIndices reopened(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());

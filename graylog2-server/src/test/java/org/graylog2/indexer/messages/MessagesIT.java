@@ -173,8 +173,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         message2.addField(fieldName, "fourty-two");
 
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(wrap(message1), indexSet),
-                new MessageWithIndex(wrap(message2), indexSet)
+                new MessageWithIndex(wrap(message1), indexSet.getWriteIndexAlias()),
+                new MessageWithIndex(wrap(message2), indexSet.getWriteIndexAlias())
         );
 
         var results = this.messages.bulkIndex(messageBatch);
@@ -194,8 +194,8 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         client().waitForGreenStatus("message_it2_deflector");
 
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(wrap(message1), indexSet),
-                new MessageWithIndex(wrap(message2), indexSet2)
+                new MessageWithIndex(wrap(message1), indexSet.getWriteIndexAlias()),
+                new MessageWithIndex(wrap(message2), indexSet2.getWriteIndexAlias())
         );
         var results = this.messages.bulkIndex(messageBatch);
 
@@ -291,7 +291,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
         final Message message = messageFactory.createMessage("Some message", "somesource", now());
         message.addField("custom_object", new TextNode("foo"));
         final List<MessageWithIndex> messageBatch = List.of(
-                new MessageWithIndex(wrap(message), indexSet)
+                new MessageWithIndex(wrap(message), indexSet.getWriteIndexAlias())
         );
 
         var results = this.messages.bulkIndex(messageBatch);
@@ -337,7 +337,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
+            messageList.add(new MessageWithIndex(wrap(messageFactory.createMessage(i + message, "source", now())), indexSet.getWriteIndexAlias()));
         }
         return messageList;
     }

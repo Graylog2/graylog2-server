@@ -18,7 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;

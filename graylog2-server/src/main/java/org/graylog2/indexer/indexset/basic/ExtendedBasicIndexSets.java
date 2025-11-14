@@ -14,19 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.indexset.basic;
 
-import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
-import org.graylog2.storage.SearchVersion;
+import java.util.Set;
 
-import javax.annotation.Nonnull;
+public interface ExtendedBasicIndexSets {
 
-public interface IndexTemplateProvider<T extends IndexMappingTemplate> {
-
-    String FAILURE_TEMPLATE_TYPE = "failures";
-    String ILLUMINATE_INDEX_TEMPLATE_TYPE = "illuminate_content";
-
-    @Nonnull
-    T create(@Nonnull SearchVersion searchVersion, @Nonnull BasicIndexSetConfig indexSetConfig)
-            throws IgnoreIndexTemplate;
+    Set<BasicIndexSet> indexSets();
 }

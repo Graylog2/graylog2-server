@@ -77,7 +77,7 @@ public class IndexTemplatesResource extends RestResource {
     public Set<IndexTemplateResponse> getAll() {
         checkPermission(RestPermissions.INDEXSETS_READ);
 
-        return indexSetRegistry.getAll().stream()
+        return indexSetRegistry.getAllIndexSets().stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.getConfig().id()))
                 .map(this::createResponse)
                 .collect(Collectors.toSet());
@@ -105,7 +105,7 @@ public class IndexTemplatesResource extends RestResource {
     @ApiOperation("Updates the index templates for all index sets in Elasticsearch")
     @AuditEvent(type = AuditEventTypes.ES_INDEX_TEMPLATE_UPDATE)
     public Set<IndexTemplateResponse> syncAll() {
-        return indexSetRegistry.getAll().stream()
+        return indexSetRegistry.getAllIndexSets().stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_EDIT, indexSet.getConfig().id()))
                 .map(indexSet -> {
                     indices.ensureIndexTemplate(indexSet.basicIndexSetConfig());

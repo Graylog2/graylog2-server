@@ -17,7 +17,7 @@
 package org.graylog2.indexer;
 
 import jakarta.annotation.Nonnull;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.storage.SearchVersion;
 
 import static org.graylog2.storage.SearchVersion.Distribution.ELASTICSEARCH;

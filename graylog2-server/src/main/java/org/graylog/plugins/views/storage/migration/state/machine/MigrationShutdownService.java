@@ -71,7 +71,7 @@ public class MigrationShutdownService extends AbstractIdleService {
                 MigrationState.REMOTE_REINDEX_RUNNING).contains(migrationStateMachine.getState())) {
             log.info("Storing active write indices for data node migration");
             Map<String, String> indices =
-                    indexSetRegistry.getAll().stream()
+                    indexSetRegistry.getAllIndexSets().stream()
                             .filter(indexSet -> indexSet.isUp() && indexSet.getConfig().isWritable() && Objects.nonNull(indexSet.getActiveWriteIndex()))
                             .collect(Collectors.toMap(is -> is.getConfig().id(), IndexSet::getActiveWriteIndex));
             migrationStateMachine.getContext().addExtendedState(RemoteReindexingMigrationAdapter.EXISTING_INDEX_SET_WRITE_INDICES,

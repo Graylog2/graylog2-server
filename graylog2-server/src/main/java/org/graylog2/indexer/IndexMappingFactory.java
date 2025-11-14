@@ -19,8 +19,8 @@ package org.graylog2.indexer;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.indexer.cluster.Node;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.storage.SearchVersion;
 
 import javax.annotation.Nonnull;

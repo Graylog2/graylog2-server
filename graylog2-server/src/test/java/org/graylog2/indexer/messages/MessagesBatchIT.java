@@ -93,7 +93,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(ImmutableMessage.wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
+            messageList.add(new MessageWithIndex(ImmutableMessage.wrap(messageFactory.createMessage(i + message, "source", now())), indexSet.getWriteIndexAlias()));
         }
         return messageList;
     }

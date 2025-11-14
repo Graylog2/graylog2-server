@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.indexset;
+package org.graylog2.indexer.indexset.basic;
 
 import com.google.auto.value.AutoValue;
 import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
@@ -24,9 +24,11 @@ import org.graylog2.indexer.indexset.fields.IndexPrefixField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
 import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
+import org.graylog2.shared.fields.TitleField;
 
 @AutoValue
 public abstract class BasicIndexSetConfig implements
+        TitleField,
         FieldTypeProfileField,
         IndexTemplateTypeField,
         IndexTemplateNameField,
@@ -45,6 +47,7 @@ public abstract class BasicIndexSetConfig implements
 
     @AutoValue.Builder
     public abstract static class Builder implements
+            TitleFieldBuilder<Builder>,
             FieldTypeProfileFieldBuilder<Builder>,
             IndexTemplateTypeFieldBuilder<Builder>,
             IndexTemplateNameFieldBuilder<Builder>,

@@ -274,7 +274,7 @@ public class IndicesIT extends SearchServerBaseTest {
 
         assertThat(client().templateExists(templateName)).isFalse();
 
-        indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet.basicIndexSetConfig());
 
         assertThat(client().templateExists(templateName)).isTrue();
         assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
@@ -296,7 +296,7 @@ public class IndicesIT extends SearchServerBaseTest {
 
         client().putTemplate(templateName, templateSource);
 
-        indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet.basicIndexSetConfig());
 
         assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
     }
@@ -364,7 +364,7 @@ public class IndicesIT extends SearchServerBaseTest {
     public void ensureIndexTemplateDoesntThrowOnIgnoreIndexTemplateAndExistingTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
-        indices.ensureIndexTemplate(indexSet);
+        indices.ensureIndexTemplate(indexSet.basicIndexSetConfig());
 
         assertThat(client().templateExists(templateName)).isTrue();
 
@@ -377,7 +377,7 @@ public class IndicesIT extends SearchServerBaseTest {
                 mock(IndexFieldTypeProfileService.class),
                 mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.basicIndexSetConfig())).doesNotThrowAnyException();
 
         assertThat(client().templateExists(templateName)).isTrue();
     }
@@ -411,7 +411,7 @@ public class IndicesIT extends SearchServerBaseTest {
                 mock(IndexFieldTypeProfileService.class),
                 mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.basicIndexSetConfig()))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
     }

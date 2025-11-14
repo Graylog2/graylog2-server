@@ -17,8 +17,8 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ComparisonChain;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import java.util.Map;
@@ -134,6 +134,7 @@ public class TestIndexSet implements IndexSet {
     @Override
     public BasicIndexSetConfig basicIndexSetConfig() {
         return BasicIndexSetConfig.builder()
+                .title(config.title())
                 .fieldTypeProfile(config.fieldTypeProfile())
                 .indexTemplateType(config.indexTemplateType().orElse(null))
                 .indexTemplateName(config.indexTemplateName())
@@ -142,6 +143,7 @@ public class TestIndexSet implements IndexSet {
                 .shards(config.shards())
                 .replicas(config.replicas())
                 .indexWildcard(getIndexWildcard())
+                .indexPrefix(config.indexPrefix())
                 .build();
     }
 

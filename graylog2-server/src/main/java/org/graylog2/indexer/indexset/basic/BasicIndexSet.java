@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.indexset;
+package org.graylog2.indexer.indexset.basic;
 
 import org.graylog2.indexer.NoTargetIndexException;
 
@@ -39,6 +39,21 @@ public interface BasicIndexSet {
      * @return array of index names
      */
     String[] getManagedIndices();
+
+    /**
+     * Checks if the given index name is part of this index set.
+     *
+     * @param index index name to check
+     * @return true if part of index set, false if not
+     */
+    boolean isManagedIndex(String index);
+
+    /**
+     * The basic configuration for this index set.
+     *
+     * @return basic index set configuration
+     */
+    BasicIndexSetConfig basicIndexSetConfig();
 
     /**
      * Returns the newest index.

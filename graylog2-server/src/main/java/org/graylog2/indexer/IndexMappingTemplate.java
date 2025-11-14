@@ -17,8 +17,8 @@
 package org.graylog2.indexer;
 
 import jakarta.annotation.Nullable;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.indexer.indices.IndexSettings;
 import org.graylog2.indexer.indices.Template;
 

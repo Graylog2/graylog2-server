@@ -42,6 +42,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
@@ -50,7 +51,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class IndexSetValidatorTest {
+class IndexSetValidatorTest {
 
     @Mock
     private IndexSetRegistry indexSetRegistry;
@@ -67,14 +68,14 @@ public class IndexSetValidatorTest {
     private IndexSetValidator validator;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() {
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
     }
 
     @Test
-    public void validate() throws Exception {
+    void validate() {
         final IndexSet indexSet = mock(IndexSet.class);
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         IndexSetConfig validConfig = testIndexSetConfig();
 
@@ -84,7 +85,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWhenAlreadyManaged() {
+    void validateWhenAlreadyManaged() {
         final String prefix = "graylog_index";
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
 
@@ -97,11 +98,11 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithConflict() {
+    void validateWithConflict() {
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
 
         // New index prefix starts with existing index prefix
         when(indexSet.getIndexPrefix()).thenReturn("graylog");
@@ -113,11 +114,11 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithConflict2() {
+    void validateWithConflict2() {
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
 
         // Existing index prefix starts with new index prefix
         when(indexSet.getIndexPrefix()).thenReturn("graylog");
@@ -129,12 +130,12 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateWithInvalidFieldTypeRefreshInterval() {
+    void validateWithInvalidFieldTypeRefreshInterval() {
         final Duration fieldTypeRefreshInterval = Duration.millis(999);
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
         final IndexSet indexSet = mock(IndexSet.class);
 
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
         when(newConfig.indexPrefix()).thenReturn("graylog_index");
 
@@ -146,8 +147,8 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateMaxRetentionPeriod() {
-        when(indexSetRegistry.iterator()).thenReturn(Collections.emptyIterator());
+    void validateMaxRetentionPeriod() {
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Set.of());
 
         // no max retention period configured
         assertThat(validator.validate(testIndexSetConfig())).isNotPresent();
@@ -171,7 +172,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void validateIndexAction() {
+    void validateIndexAction() {
         final String prefix = "graylog_index";
         final Duration fieldTypeRefreshInterval = Duration.standardSeconds(1L);
         final IndexSetConfig newConfig = mock(IndexSetConfig.class);
@@ -179,7 +180,7 @@ public class IndexSetValidatorTest {
         final RetentionStrategyConfig retentionStrategyConfig = mock(RetentionStrategyConfig.class);
 
         when(indexSet.getIndexPrefix()).thenReturn("foo");
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(newConfig.indexPrefix()).thenReturn(prefix);
         when(newConfig.fieldTypeRefreshInterval()).thenReturn(fieldTypeRefreshInterval);
         when(newConfig.retentionStrategyConfig()).thenReturn(retentionStrategyConfig);
@@ -190,10 +191,10 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void testStrategiesPresentIfDataTiersIsNull() {
+    void testStrategiesPresentIfDataTiersIsNull() {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getIndexPrefix()).thenReturn("foo");
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
 
 
         assertThat(validator.validate(testIndexSetConfig().toBuilder().retentionStrategyConfig(null).build())).hasValueSatisfying(v ->
@@ -211,10 +212,10 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void testDataTieringByDefaultDisabledInCloud() {
+    void testDataTieringByDefaultDisabledInCloud() {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getIndexPrefix()).thenReturn("foo");
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
 
@@ -227,7 +228,7 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void testWarmTierKeywordReserved() {
+    void testWarmTierKeywordReserved() {
         IndexSetConfig config = testIndexSetConfig().toBuilder().indexPrefix("warm_").build();
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
@@ -237,9 +238,9 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void testValidationOfProfilesInIndexSetConfig() {
+    void testValidationOfProfilesInIndexSetConfig() {
         final IndexSet indexSet = mock(IndexSet.class);
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);
@@ -265,9 +266,9 @@ public class IndexSetValidatorTest {
     }
 
     @Test
-    public void testValidationOfCustomMappingsInIndexSetConfig() {
+    void testValidationOfCustomMappingsInIndexSetConfig() {
         final IndexSet indexSet = mock(IndexSet.class);
-        when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
+        when(indexSetRegistry.getAllIndexSets()).thenReturn(Collections.singleton(indexSet));
         when(indexSet.getIndexPrefix()).thenReturn("foo");
 
         this.validator = new IndexSetValidator(indexSetRegistry, elasticsearchConfiguration, dataTieringOrchestrator, dataTieringChecker);

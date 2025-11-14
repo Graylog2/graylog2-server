@@ -24,8 +24,8 @@ import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
@@ -80,6 +80,7 @@ public class MongoIndexSet implements IndexSet {
     private final ActivityWriter activityWriter;
     private final NotificationService notificationService;
     private final IndexPattern indexPattern;
+    private final BasicIndexSetConfig basicIndexSetConfig;
 
     @Inject
     public MongoIndexSet(@Assisted final IndexSetConfig config,
@@ -114,6 +115,19 @@ public class MongoIndexSet implements IndexSet {
         } else {
             this.indexWildcard = config.indexWildcard();
         }
+
+        basicIndexSetConfig = BasicIndexSetConfig.builder()
+                .title(config.title())
+                .fieldTypeProfile(config.fieldTypeProfile())
+                .indexTemplateType(config.indexTemplateType().orElse(null))
+                .indexTemplateName(config.indexTemplateName())
+                .customFieldMappings(config.customFieldMappings())
+                .indexAnalyzer(config.indexAnalyzer())
+                .shards(config.shards())
+                .replicas(config.replicas())
+                .indexWildcard(indexWildcard)
+                .indexPrefix(config.indexPrefix())
+                .build();
     }
 
     @Override
@@ -379,17 +393,7 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public BasicIndexSetConfig basicIndexSetConfig() {
-        return BasicIndexSetConfig.builder()
-                .fieldTypeProfile(config.fieldTypeProfile())
-                .indexTemplateType(config.indexTemplateType().orElse(null))
-                .indexTemplateName(config.indexTemplateName())
-                .customFieldMappings(config.customFieldMappings())
-                .indexAnalyzer(config.indexAnalyzer())
-                .shards(config.shards())
-                .replicas(config.replicas())
-                .indexWildcard(indexWildcard)
-                .indexPrefix(config.indexPrefix())
-                .build();
+        return basicIndexSetConfig;
     }
 
     @Override

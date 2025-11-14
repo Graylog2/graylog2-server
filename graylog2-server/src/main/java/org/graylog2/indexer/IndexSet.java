@@ -17,9 +17,8 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ComparisonChain;
-import org.graylog2.indexer.indexset.BasicIndexSet;
-import org.graylog2.indexer.indexset.BasicIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
@@ -94,14 +93,6 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
     boolean isWriteIndexAlias(String index);
 
     /**
-     * Checks if the given index name is part of this index set.
-     *
-     * @param index index name to check
-     * @return true if part of index set, false if not
-     */
-    boolean isManagedIndex(String index);
-
-    /**
      * Prepares this index set to receive new messages.
      */
     void setUp();
@@ -154,8 +145,6 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
      * @return index set configuration object
      */
     IndexSetConfig getConfig();
-
-    BasicIndexSetConfig basicIndexSetConfig();
 
     default String getNthIndexBeforeActiveIndexSet(final int n) {
         final String activeWriteIndex = getActiveWriteIndex();
