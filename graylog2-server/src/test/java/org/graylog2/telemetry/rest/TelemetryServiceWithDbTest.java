@@ -98,11 +98,18 @@ public class TelemetryServiceWithDbTest {
     @Before
     public void setUp() {
         MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
+
+        MongoCollections mongoCollections = new MongoCollections(
+                new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
+                mongodb.mongoConnection()
+        );
+
         TelemetryClusterService telemetryClusterService = new TelemetryClusterService(
                 serverStatus,
                 clusterConfigService,
                 leaderElectionService,
-                new DBTelemetryClusterInfo(Duration.ZERO, mongodb.mongoConnection()));
+                new DBTelemetryClusterInfo(Duration.ZERO, mongoCollections)
+        );
 
         telemetryService = new TelemetryService(
                 true,

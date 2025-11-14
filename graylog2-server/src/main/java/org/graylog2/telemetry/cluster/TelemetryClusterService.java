@@ -16,7 +16,6 @@
  */
 package org.graylog2.telemetry.cluster;
 
-import com.google.common.collect.ImmutableMap;
 import org.graylog2.cluster.ClusterConfig;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
@@ -25,21 +24,20 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
+import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
 import org.joda.time.DateTime;
 
 import jakarta.inject.Inject;
 
+import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
-
-import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_IS_LEADER;
-import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_NODE_ID;
-import static org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo.FIELD_VERSION;
 
 public class TelemetryClusterService {
 
     public static final String UNKNOWN = "unknown";
+    public static final String FACILITY = "graylog-server";
+
     private final ServerStatus serverStatus;
     private final String clusterId;
     private final ClusterConfigService clusterConfigService;
@@ -61,23 +59,23 @@ public class TelemetryClusterService {
     }
 
     public void updateTelemetryClusterData() {
-        Map<String, Object> nodeInfo = new ImmutableMap.Builder<String, Object>()
-                .put("facility", "graylog-server")
-                .put("codename", ServerVersion.CODENAME)
-                .put(FIELD_NODE_ID, serverStatus.getNodeId().toString())
-                .put("cluster_id", clusterId)
-                .put(FIELD_VERSION, ServerVersion.VERSION.toString())
-                .put("started_at", Tools.getISO8601String(serverStatus.getStartedAt()))
-                .put("hostname", Tools.getLocalCanonicalHostname())
-                .put("lifecycle", serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH))
-                .put("lb_status", serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH))
-                .put("timezone", serverStatus.getTimezone().getID())
-                .put("operating_system", System.getProperty("os.name", UNKNOWN) + " " + System.getProperty("os.version", UNKNOWN))
-                .put(FIELD_IS_LEADER, leaderElectionService.isLeader())
-                .put("is_processing", serverStatus.isProcessing())
+        TelemetryClusterInfoDto nodeInfo = TelemetryClusterInfoDto.Builder.create()
+                .facility(FACILITY)
+                .codename(ServerVersion.CODENAME)
+                .nodeId(serverStatus.getNodeId().toString())
+                .clusterId(clusterId)
+                .version(ServerVersion.VERSION.toString())
+                .startedAt(Optional.ofNullable(serverStatus.getStartedAt()).orElseGet(Tools::nowUTC))
+                .hostname(Tools.getLocalCanonicalHostname())
+                .lifecycle(serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH))
+                .lbStatus(serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH))
+                .timezone(serverStatus.getTimezone().getID())
+                .operatingSystem(System.getProperty("os.name", UNKNOWN) + " " + System.getProperty("os.version", UNKNOWN))
+                .isLeader(leaderElectionService.isLeader())
+                .isProcessing(serverStatus.isProcessing())
                 .build();
 
-        dbTelemetryClusterInfo.update(nodeInfo, serverStatus.getNodeId().toString());
+        dbTelemetryClusterInfo.update(nodeInfo);
     }
 
     public String getClusterId() {
@@ -88,7 +86,7 @@ public class TelemetryClusterService {
         return Optional.ofNullable(clusterConfigService.getRaw(ClusterId.class)).map(ClusterConfig::lastUpdated);
     }
 
-    public Map<String, Map<String, Object>> nodesTelemetryInfo() {
+    public List<TelemetryClusterInfoDto> nodesTelemetryInfo() {
         return dbTelemetryClusterInfo.findAll();
     }
 
