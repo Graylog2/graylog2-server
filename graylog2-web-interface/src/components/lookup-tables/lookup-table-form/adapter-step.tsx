@@ -15,33 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { Spinner } from 'components/common';
-import { Row, Col } from 'components/bootstrap';
+import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchDataAdapter, useFetchAllDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
 import DataAdapterPicker from 'components/lookup-tables/adapter-form/AdapterPicker';
 import DataAdapterFormView from 'components/lookup-tables/adapter-form/AdapterFormView';
 import type { LookupTable, LookupTableAdapter } from 'logic/lookup-tables/types';
-
-const FlexCol = styled(Col)`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  gap: 2rem;
-`;
-
-const StyledRow = styled(Row)`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  max-width: 1500px;
-  margin: 0 auto;
-`;
 
 function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
   const plugins = usePluginEntities('lookupTableAdapters');
@@ -52,14 +35,10 @@ function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
   const DocComponent = React.useMemo(() => adapterPlugin.documentationComponent, [adapterPlugin]);
 
   return (
-    <StyledRow>
-      <Col lg={12}>
-        <Col lg={6}>
-          <DataAdapter dataAdapter={dataAdapter} noEdit />
-        </Col>
-        <Col lg={6}>{DocComponent ? <DocComponent dataAdapterId={dataAdapter?.id} /> : null}</Col>
-      </Col>
-    </StyledRow>
+    <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">
+      <DataAdapter dataAdapter={dataAdapter} noEdit />
+      {DocComponent && <DocComponent dataAdapterId={dataAdapter?.id} />}
+    </RowContainer>
   );
 }
 
@@ -86,23 +65,21 @@ function DataAdapterFormStep() {
   };
 
   return (
-    <Row className="content" style={{ flexGrow: 1 }}>
-      <FlexCol md={12}>
-        {loadingAllDataAdapters ? (
+    <ColContainer $gap="lg" $align="center">
+      {loadingAllDataAdapters ? (
+        <RowContainer>
           <Spinner text="Loading data adapters..." />
-        ) : (
-          <>
-            <StyledRow>
-              <Col lg={10} style={{ padding: '0 6px' }}>
-                <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
-              </Col>
-            </StyledRow>
-            {showAdapter && !loadingDataAdapter && <AdapterReadOnly dataAdapter={dataAdapter} />}
-            {showForm && !showAdapter && <DataAdapterFormView onCancel={onCancel} saved={onSaved} />}
-          </>
-        )}
-      </FlexCol>
-    </Row>
+        </RowContainer>
+      ) : (
+        <>
+          <RowContainer>
+            <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
+          </RowContainer>
+          {showAdapter && !loadingDataAdapter && <AdapterReadOnly dataAdapter={dataAdapter} />}
+          {showForm && !showAdapter && <DataAdapterFormView onCancel={onCancel} saved={onSaved} />}
+        </>
+      )}
+    </ColContainer>
   );
 }
 

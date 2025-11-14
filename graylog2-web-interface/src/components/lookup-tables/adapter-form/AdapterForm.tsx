@@ -18,8 +18,8 @@ import React from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
+import { Col, Row, RowContainer } from 'components/lookup-tables/layout-componets';
 import { FormSubmit } from 'components/common';
-import { Col, Row } from 'components/bootstrap';
 import { useCreateAdapter, useUpdateAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useScopePermissions from 'hooks/useScopePermissions';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -106,24 +106,24 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
   );
 
   return (
-    <>
-      <Title title={title} typeName={pluginDisplayName} create={create} />
-      <Formik initialValues={dataAdapter} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
-        {({ isSubmitting, isValid }) => (
-          <FlexForm className="form form-horizontal">
-            <Row style={{ flexGrow: 1 }}>
-              <Col lg={DocComponent ? 6 : 8}>
-                <AdapterFormFields />
-              </Col>
-              {DocComponent && (
-                <Col lg={6}>
-                  <DocComponent dataAdapterId={dataAdapter?.id} />
-                </Col>
-              )}
-            </Row>
-            <Row>
+    <RowContainer style={{ flexGrow: 1 }} $withDocs={!!DocComponent}>
+      <Col style={{ flexGrow: 1, height: '100%' }}>
+        <Title title={title} typeName={pluginDisplayName} create={create} />
+        <Formik initialValues={dataAdapter} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
+          {({ isSubmitting, isValid }) => (
+            <FlexForm className="form form-horizontal">
+              <Row $gap="xl" style={{ flexGrow: 1 }}>
+                <div style={{ width: DocComponent ? '60%' : '100%' }}>
+                  <AdapterFormFields />
+                </div>
+                {DocComponent && (
+                  <div style={{ width: '40%', flexGrow: 0 }}>
+                    <DocComponent dataAdapterId={dataAdapter?.id} />
+                  </div>
+                )}
+              </Row>
               {canModify && (
-                <Col mdOffset={9} md={3}>
+                <Row $align="center" $justify="flex-end">
                   <FormSubmit
                     submitButtonText={create ? 'Create adapter' : 'Update adapter'}
                     submitLoadingText={create ? 'Creating adapter...' : 'Updating adapter...'}
@@ -132,13 +132,13 @@ const DataAdapterForm = ({ type, title, saved, onCancel, create = false, dataAda
                     isAsyncSubmit
                     onCancel={onCancel}
                   />
-                </Col>
+                </Row>
               )}
-            </Row>
-          </FlexForm>
-        )}
-      </Formik>
-    </>
+            </FlexForm>
+          )}
+        </Formik>
+      </Col>
+    </RowContainer>
   );
 };
 

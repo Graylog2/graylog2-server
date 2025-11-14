@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { Col, Row, RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
+import { Col, Row, RowContainer } from 'components/lookup-tables/layout-componets';
 import { FormSubmit } from 'components/common';
 import { useCreateCache, useUpdateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useScopePermissions from 'hooks/useScopePermissions';
@@ -40,8 +40,9 @@ const INIT_CACHE: LookupTableCache = {
 const FlexForm = styled(Form)`
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   width: 100%;
+  height: 100%;
+  padding-bottom: ${({ theme }) => theme.spacings.md};
 `;
 
 type TitleProps = {
@@ -103,15 +104,21 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
   );
 
   return (
-    <RowContainer>
-      <Col>
+    <RowContainer style={{ flexGrow: 1 }} $withDocs={!!DocComponent}>
+      <Col style={{ flexGrow: 1, height: '100%' }}>
         <Title title={title} typeName={pluginDisplayName} create={create} />
         <Formik initialValues={cache} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
           {({ isSubmitting, isValid }) => (
-            <Form className="form" style={{ width: '100%' }}>
+            <FlexForm className="form form-horizontal">
               <Row $gap="xl" style={{ flexGrow: 1 }}>
-                <CacheFormFields />
-                {DocComponent && <DocComponent />}
+                <div style={{ width: DocComponent ? '60%' : '100%' }}>
+                  <CacheFormFields />
+                </div>
+                {DocComponent && (
+                  <div style={{ width: '40%', flexGrow: 0 }}>
+                    <DocComponent cacheId={cache?.id} />
+                  </div>
+                )}
               </Row>
               {canModify && (
                 <Row $align="center" $justify="flex-end">
@@ -125,7 +132,7 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
                   />
                 </Row>
               )}
-            </Form>
+            </FlexForm>
           )}
         </Formik>
       </Col>

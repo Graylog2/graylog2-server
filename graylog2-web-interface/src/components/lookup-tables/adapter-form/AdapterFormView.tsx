@@ -15,24 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import { Row, Col } from 'components/bootstrap';
+import { RowContainer } from 'components/lookup-tables/layout-componets';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 import DataAdapterForm from './AdapterForm';
 import DataAdapterTypeSelect from './AdapterTypeSelect';
-
-const StyledRow = styled(Row)`
-  display: flex;
-  justify-content: center;
-`;
-
-const FlexCol = styled(Col)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 
 type Props = {
   saved?: (adapterObj: LookupTableAdapter) => void;
@@ -47,28 +35,22 @@ const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined 
   return (
     <>
       {isCreate && (
-        <StyledRow>
-          <Col lg={6}>
-            <DataAdapterTypeSelect
-              adapterConfigType={dataAdapter ? dataAdapter.config.type : null}
-              onAdapterChange={setDataAdapter}
-            />
-          </Col>
-        </StyledRow>
+        <RowContainer>
+          <DataAdapterTypeSelect
+            adapterConfigType={dataAdapter ? dataAdapter.config.type : null}
+            onAdapterChange={setDataAdapter}
+          />
+        </RowContainer>
       )}
       {dataAdapter && (
-        <StyledRow style={{ flexGrow: 1 }}>
-          <FlexCol lg={9}>
-            <DataAdapterForm
-              dataAdapter={dataAdapter}
-              type={dataAdapter?.config?.type}
-              create={isCreate}
-              title="Configure Adapter"
-              saved={saved}
-              onCancel={onCancel}
-            />
-          </FlexCol>
-        </StyledRow>
+        <DataAdapterForm
+          dataAdapter={dataAdapter}
+          type={dataAdapter?.config?.type}
+          create={isCreate}
+          title="Configure Adapter"
+          saved={saved}
+          onCancel={onCancel}
+        />
       )}
     </>
   );
