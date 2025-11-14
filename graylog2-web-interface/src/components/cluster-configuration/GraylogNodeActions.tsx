@@ -25,13 +25,13 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
-import type { GraylogNode } from './useClusterNodes';
+import type { GraylogNode } from './useClusterGraylogNodes';
 
 type Props = {
   node: GraylogNode;
 };
 
-const ClusterActions = ({ node }: Props) => {
+const GraylogNodeActions = ({ node }: Props) => {
   const [showMessageProcessingModal, setShowMessageProcessingModal] = useState<boolean>(false);
   const [loadBalancerStatusToConfirm, setLoadBalancerStatusToConfirm] = useState<'ALIVE' | 'DEAD' | undefined>(
     undefined,
@@ -137,4 +137,4 @@ const ClusterActions = ({ node }: Props) => {
   );
 };
 
-export default ClusterActions;
+export default GraylogNodeActions;

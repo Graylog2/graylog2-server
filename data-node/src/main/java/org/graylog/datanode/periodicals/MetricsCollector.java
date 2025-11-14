@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.periodicals;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import jakarta.annotation.Nonnull;
@@ -59,12 +60,14 @@ public class MetricsCollector extends Periodical {
     private NodeMetricsCollector nodeStatMetricsCollector;
     private ClusterStatMetricsCollector clusterStatMetricsCollector;
     private final ObjectMapper objectMapper;
+    private final MetricRegistry metricRegistry;
 
     @Inject
-    public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper) {
+    public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper, MetricRegistry metricRegistry) {
         this.process = process;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
+        this.metricRegistry = metricRegistry;
     }
 
     @Override
@@ -107,7 +110,7 @@ public class MetricsCollector extends Periodical {
     public void doRun() {
         if (process.isInState(OpensearchState.AVAILABLE)) {
             process.restClient().ifPresent(client -> {
-                this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
+                this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper, metricRegistry);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
                 final IndexRequest indexRequest = new IndexRequest(configuration.getMetricsStream());
                 Map<String, Object> metrics = new HashMap<String, Object>();

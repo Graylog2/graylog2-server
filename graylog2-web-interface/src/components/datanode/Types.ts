@@ -57,7 +57,7 @@ export type DataNode = {
   transport_address: string;
   type: string;
   status: DataNodeStatus;
-  data_node_status?: string;
+  datanode_status?: string;
   cert_valid_until: string | null;
   error_msg?: string;
   datanode_version: string;

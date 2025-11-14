@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.metrics;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Criteria;
@@ -40,10 +41,12 @@ public class NodeMetricsCollector {
 
     private final RestHighLevelClient client;
     private final ObjectMapper objectMapper;
+    private final MetricRegistry metricRegistry;
 
-    public NodeMetricsCollector(RestHighLevelClient client, ObjectMapper objectMapper) {
+    public NodeMetricsCollector(RestHighLevelClient client, ObjectMapper objectMapper, MetricRegistry metricRegistry) {
         this.client = client;
         this.objectMapper = objectMapper;
+        this.metricRegistry = metricRegistry;
     }
 
     public Map<String, Object> getNodeMetrics(String node) {
@@ -58,6 +61,7 @@ public class NodeMetricsCollector {
                     .forEach(metric -> {
                         try {
                             metrics.put(metric.getFieldName(), metric.mapValue(nodeContext.read(metric.getNodeStat())));
+                            metricRegistry.histogram(metric.getFieldName()).update(System.currentTimeMillis());
                         } catch (Exception e) {
                             log.error("Could not retrieve metric {} for node {}", metric.getFieldName(), node);
                         }
