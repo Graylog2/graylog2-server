@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { Formik, Form } from 'formik';
 
-import { Col, Row } from 'components/bootstrap';
+import { Col, Row, RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
 import { FormSubmit } from 'components/common';
 import { useCreateCache, useUpdateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useScopePermissions from 'hooks/useScopePermissions';
@@ -103,24 +103,18 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
   );
 
   return (
-    <>
-      <Title title={title} typeName={pluginDisplayName} create={create} />
-      <Formik initialValues={cache} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
-        {({ isSubmitting, isValid }) => (
-          <FlexForm className="form form-horizontal">
-            <Row style={{ flexGrow: 1 }}>
-              <Col lg={DocComponent ? 6 : 8}>
+    <RowContainer>
+      <Col>
+        <Title title={title} typeName={pluginDisplayName} create={create} />
+        <Formik initialValues={cache} onSubmit={handleSubmit} validateOnBlur={false} enableReinitialize>
+          {({ isSubmitting, isValid }) => (
+            <Form className="form" style={{ width: '100%' }}>
+              <Row $gap="xl" style={{ flexGrow: 1 }}>
                 <CacheFormFields />
-              </Col>
-              {DocComponent && (
-                <Col lg={6}>
-                  <DocComponent />
-                </Col>
-              )}
-            </Row>
-            <Row>
+                {DocComponent && <DocComponent />}
+              </Row>
               {canModify && (
-                <Col md={3} mdOffset={9}>
+                <Row $align="center" $justify="flex-end">
                   <FormSubmit
                     submitButtonText={create ? 'Create cache' : 'Update cache'}
                     submitLoadingText={create ? 'Creating cache...' : 'Updating cache...'}
@@ -129,13 +123,13 @@ function CacheForm({ type, saved, title, onCancel, create = false, cache = INIT_
                     isAsyncSubmit
                     onCancel={onCancel}
                   />
-                </Col>
+                </Row>
               )}
-            </Row>
-          </FlexForm>
-        )}
-      </Formik>
-    </>
+            </Form>
+          )}
+        </Formik>
+      </Col>
+    </RowContainer>
   );
 }
 

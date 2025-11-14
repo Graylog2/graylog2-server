@@ -29,6 +29,20 @@ const FlexContainer = styled.div`
   height: 100%;
 `;
 
+const FlexCol = styled(Col)`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  & .flex-row {
+    flex-grow: 1;
+  }
+
+  & .content.row {
+    box-shadow: none;
+  }
+`;
+
 function LUTFormPage() {
   const navigate = useNavigate();
 
@@ -44,9 +58,9 @@ function LUTFormPage() {
           </Button>
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
-          <Col md={12}>
+          <FlexCol md={12}>
             <LookupTableWizard />
-          </Col>
+          </FlexCol>
         </Row>
       </LUTPageLayout>
     </FlexContainer>

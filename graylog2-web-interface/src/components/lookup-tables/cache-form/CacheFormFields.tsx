@@ -61,7 +61,7 @@ function CacheFormFields() {
   React.useEffect(() => _runValidations(), [_runValidations, values]);
 
   return (
-    <fieldset style={{ width: '100%' }}>
+    <fieldset>
       <FormikFormGroup
         type="text"
         name="title"

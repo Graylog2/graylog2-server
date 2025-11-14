@@ -24,6 +24,8 @@ import { useFetchLookupTable } from 'components/lookup-tables/hooks/useLookupTab
 import useSteps from 'components/lookup-tables/lookup-table-form/use-steps';
 import type { LookupTableType } from 'components/lookup-tables/LookupTableForm';
 
+import WizardButtons from './wizard-buttons';
+
 function LookupTableWizard() {
   const { lutIdOrName } = useParams<{ lutIdOrName: string }>();
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
@@ -42,15 +44,23 @@ function LookupTableWizard() {
 
   return (
     <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-      <Wizard
-        steps={steps}
-        activeStep={activeStep}
-        onStepChange={handleStepChange}
-        horizontal
-        justified
-        containerClassName=""
-        hidePreviousNextButtons
-      />
+      <>
+        <Wizard
+          steps={steps}
+          activeStep={activeStep}
+          onStepChange={handleStepChange}
+          horizontal
+          justified
+          containerClassName="flex-row"
+          hidePreviousNextButtons
+        />
+        <WizardButtons
+          isCreate={!lookupTable}
+          stepIds={steps.map((step) => step.key)}
+          activeStepId={activeStep}
+          onStepChange={handleStepChange}
+        />
+      </>
     </Formik>
   );
 }

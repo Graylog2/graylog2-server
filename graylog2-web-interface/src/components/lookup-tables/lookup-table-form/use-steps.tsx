@@ -24,12 +24,13 @@ import CacheFormStep from './cache-step';
 import SummaryStep from './summary-step';
 
 const CenteredDiv = styled.div`
-  max-width: 1200px;
+  max-width: 1250px;
   margin: 0 auto;
+  margin-top: 16px;
 `;
 
 function useSteps(
-  activeStepKey: string = 'lookup-tables',
+  activeStepKey: string = 'lookup-table',
 ): [Array<any>, { activeStep: string; setActiveStep: (newStep: string) => void }] {
   const [activeStep, setActiveStep] = React.useState(activeStepKey);
 

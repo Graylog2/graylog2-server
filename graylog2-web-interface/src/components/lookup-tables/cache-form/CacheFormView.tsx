@@ -15,24 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 
-import { Row, Col } from 'components/bootstrap';
+import { RowContainer } from 'components/lookup-tables/layout-componets';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 import CacheForm from './CacheForm';
 import CacheTypeSelect from './CacheTypeSelect';
-
-const StyledRow = styled(Row)`
-  display: flex;
-  justify-content: center;
-`;
-
-const FlexCol = styled(Col)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 
 type Props = {
   saved?: (adapterObj: LookupTableCache) => void;
@@ -47,25 +35,19 @@ function CacheFormView({ saved = undefined, onCancel, cache = undefined }: Props
   return (
     <>
       {isCreate && (
-        <StyledRow>
-          <Col lg={6}>
-            <CacheTypeSelect cacheConfigType={lutCache ? lutCache.config.type : null} onCacheChange={setLutCache} />
-          </Col>
-        </StyledRow>
+        <RowContainer>
+          <CacheTypeSelect cacheConfigType={lutCache ? lutCache.config.type : null} onCacheChange={setLutCache} />
+        </RowContainer>
       )}
       {lutCache && (
-        <StyledRow style={{ flexGrow: 1 }}>
-          <FlexCol lg={9}>
-            <CacheForm
-              cache={lutCache}
-              type={lutCache?.config?.type}
-              create={isCreate}
-              title="Configure Cache"
-              saved={saved}
-              onCancel={onCancel}
-            />
-          </FlexCol>
-        </StyledRow>
+        <CacheForm
+          cache={lutCache}
+          type={lutCache?.config?.type}
+          create={isCreate}
+          title="Configure Cache"
+          saved={saved}
+          onCancel={onCancel}
+        />
       )}
     </>
   );

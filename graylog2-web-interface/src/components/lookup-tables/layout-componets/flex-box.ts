@@ -67,3 +67,19 @@ export const Col = styled(FlexBase)<FlexItemType>`
   flex-direction: column;
   align-items: ${({ $align }) => $align || 'flex-start'};
 `;
+
+export const RowContainer = styled(Row)<{ $withDocs?: boolean }>`
+  flex-grow: 1;
+  max-width: ${({ $withDocs }) => ($withDocs ? '1550px' : '1250px')};
+  margin: 0 auto;
+
+  & fieldset,
+  .form-group {
+    width: 100%;
+  }
+`;
+
+export const ColContainer = styled(Col)`
+  flex-grow: 1;
+  padding: ${({ theme }) => theme.spacings.lg};
+`;

@@ -15,33 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { useFormikContext } from 'formik';
 
 import { Spinner } from 'components/common';
-import { Row, Col } from 'components/bootstrap';
+import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchCache, useFetchAllCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import Cache from 'components/lookup-tables/Cache';
 import CachePicker from 'components/lookup-tables/cache-form/CachePicker';
 import CacheFormView from 'components/lookup-tables/cache-form/CacheFormView';
 import type { LookupTable, LookupTableCache } from 'logic/lookup-tables/types';
-
-const FlexCol = styled(Col)`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height: 100%;
-  gap: 2rem;
-`;
-
-const StyledRow = styled(Row)`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  max-width: 1500px;
-  margin: 0 auto;
-`;
 
 function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
   const plugins = usePluginEntities('lookupTableCaches');
@@ -53,14 +36,10 @@ function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
   const DocComponent = React.useMemo(() => cachePlugin?.documentationComponent, [cachePlugin]);
 
   return (
-    <StyledRow>
-      <Col lg={12}>
-        <Col lg={6}>
-          <Cache cache={cache} noEdit />
-        </Col>
-        <Col lg={6}>{DocComponent ? <DocComponent cacheId={cache?.id} /> : null}</Col>
-      </Col>
-    </StyledRow>
+    <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">
+      <Cache cache={cache} noEdit />
+      {DocComponent && <DocComponent cacheId={cache?.id} />}
+    </RowContainer>
   );
 }
 
@@ -87,23 +66,21 @@ function CacheFormStep() {
   };
 
   return (
-    <Row className="content" style={{ flexGrow: 1 }}>
-      <FlexCol md={12}>
-        {loadingAllCaches ? (
+    <ColContainer $gap="lg" $align="center">
+      {loadingAllCaches ? (
+        <RowContainer>
           <Spinner text="Loading caches..." />
-        ) : (
-          <>
-            <StyledRow>
-              <Col lg={10} style={{ padding: '0 6px' }}>
-                <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
-              </Col>
-            </StyledRow>
-            {showCache && !loadingCache && <CacheReadOnly cache={cache} />}
-            {showForm && !showCache && <CacheFormView onCancel={onCancel} saved={onSaved} />}
-          </>
-        )}
-      </FlexCol>
-    </Row>
+        </RowContainer>
+      ) : (
+        <>
+          <RowContainer>
+            <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
+          </RowContainer>
+          {showCache && !loadingCache && <CacheReadOnly cache={cache} />}
+          {showForm && !showCache && <CacheFormView onCancel={onCancel} saved={onSaved} />}
+        </>
+      )}
+    </ColContainer>
   );
 }
 
