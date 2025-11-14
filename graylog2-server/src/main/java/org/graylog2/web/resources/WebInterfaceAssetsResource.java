@@ -141,6 +141,10 @@ public class WebInterfaceAssetsResource {
                         @PathParam("filename") String filename) {
         final var filenameWithoutSuffix = trimBasePath(filename, headers);
 
+        if("/".equals(filenameWithoutSuffix)) {
+            return generateIndexHtml(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
+        }
+
         try {
             final var resource = resourceFileReader.readFile(filenameWithoutSuffix, this.getClass());
             return getResponse(request, filenameWithoutSuffix, resource);
