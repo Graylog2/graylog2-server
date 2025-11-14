@@ -35,6 +35,6 @@ public class StreamsForFieldRetrieverOSIT extends StreamsForFieldRetrieverIT {
 
     @Override
     protected StreamsForFieldRetriever getRetriever() {
-        return new StreamsForFieldRetrieverOS(openSearchInstance.openSearchClient(), openSearchInstance.getOfficialOpensearchClient());
+        return new StreamsForFieldRetrieverOS(openSearchInstance.getOfficialOpensearchClient());
     }
 }

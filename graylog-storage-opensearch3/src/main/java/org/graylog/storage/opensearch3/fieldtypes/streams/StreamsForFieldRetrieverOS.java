@@ -16,23 +16,19 @@
  */
 package org.graylog.storage.opensearch3.fieldtypes.streams;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.FiltersAggregator;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.filter.ParsedFilters;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
 import org.graylog2.plugin.Message;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.FiltersAggregation;
+import org.opensearch.client.opensearch._types.aggregations.FiltersBucket;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.TrackHits;
 
 import java.util.List;
@@ -41,107 +37,89 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class StreamsForFieldRetrieverOS implements StreamsForFieldRetriever {
-    private static final String AGG_NAME = "fields";
+    private static final String AGG_NAME_FIELDS = "fields";
+    private static final String AGG_NAME_STREAMS = "streams";
     private static final int SEARCH_MAX_BUCKETS_OS = 65_535;
 
-    private final OpenSearchClient client;
     private final OfficialOpensearchClient officialOpensearchClient;
 
     @Inject
-    public StreamsForFieldRetrieverOS(final OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient) {
-        this.client = client;
+    public StreamsForFieldRetrieverOS(OfficialOpensearchClient officialOpensearchClient) {
         this.officialOpensearchClient = officialOpensearchClient;
     }
 
-    private record FieldBucket(String fieldName, Set<String> value) {}
-
     @Override
     public Map<String, Set<String>> getStreams(final List<String> fieldNames, final String indexName) {
-        final SearchResponse response = client.search(createSearchRequest(fieldNames, indexName),
-                "Unable to retrieve fields types aggregations");
 
-        final org.opensearch.client.opensearch.core.SearchResponse<Map> newResponse = officialOpensearchClient.sync(c -> c.search(searchBuilder -> creaxSearchSourceBuilder(fieldNames, indexName), Map.class), "Unable to retrieve fields types aggregations");
+        final SearchResponse<Object> response = officialOpensearchClient.sync(c -> c.search(searchBuilder -> createSearchRequest(fieldNames, indexName), Object.class), "Unable to retrieve fields types aggregations");
 
-
-        final ParsedFilters aggregation = response.getAggregations().get(AGG_NAME);
+        final Map<String, FiltersBucket> fieldBuckets = response.aggregations()
+                .get(AGG_NAME_FIELDS)
+                .filters()
+                .buckets()
+                .keyed();
 
         return fieldNames.stream()
-                .map(fieldName -> new FieldBucket(fieldName, retrieveStreamsFromAggregationInResponse(aggregation.getBucketByKey(fieldName))))
-                .collect(Collectors.toMap(FieldBucket::fieldName, FieldBucket::value));
+                .collect(Collectors.toMap(
+                        fieldName -> fieldName,
+                        fieldName -> collectStreamIDs(fieldBuckets.get(fieldName))));
     }
 
-    private org.opensearch.client.opensearch.core.SearchRequest.Builder creaxSearchSourceBuilder(List<String> fieldNames, String indexName) {
-        final org.opensearch.client.opensearch.core.SearchRequest.Builder builder = new org.opensearch.client.opensearch.core.SearchRequest.Builder()
-            .trackTotalHits(TrackHits.builder().count(0).build())
+    private static SearchRequest.Builder createSearchRequest(List<String> fieldNames, String indexName) {
+        // we are interested only in aggregations, let's disable all search results
+        final SearchRequest.Builder builder = new SearchRequest.Builder()
+                .index(indexName)
+                .trackTotalHits(TrackHits.builder().count(0).build())
                 .size(0);
 
-        final org.opensearch.client.opensearch._types.aggregations.Aggregation subagg = org.opensearch.client.opensearch._types.aggregations.Aggregation.builder().terms(terms -> terms.field(Message.FIELD_STREAMS).size(SEARCH_MAX_BUCKETS_OS)).build();
-
-        final FiltersAggregation filtersAgg = FiltersAggregation.builder()
-                .filters(fi -> fi.keyed(fieldsToExistQuery(fieldNames)))
+        // This is the main aggregation, collecting field names. Their streams are in a subagg below
+        final FiltersAggregation fieldsAggregation = FiltersAggregation.builder()
+                .filters(filters -> filters.keyed(fieldsToExistQuery(fieldNames)))
                 .otherBucket(false)
                 .build();
 
-        builder.aggregations(AGG_NAME, agg -> agg.filters(filtersAgg)); // <-- here I'd like to add a subagg named Message.FIELD_STREAMS, should be subaggregation of the filters aggregation
+        // this is a sub-aggregation, for each field name it collects all related stream IDs
+        final Aggregation streamsSubaggregation = Aggregation.builder()
+                .terms(terms -> terms.field(Message.FIELD_STREAMS).size(SEARCH_MAX_BUCKETS_OS))
+                .build();
+
+        builder.aggregations(AGG_NAME_FIELDS, aggregations -> aggregations.filters(fieldsAggregation).aggregations(AGG_NAME_STREAMS, streamsSubaggregation));
+
         return builder;
     }
 
-    private Map<String, Query> fieldsToExistQuery(List<String> fieldNames) {
-        return fieldNames.stream().collect(Collectors.toMap(fieldName -> fieldName, fieldName -> Query.builder().exists(e -> e.field(fieldName)).build()));
+    /**
+     * Extracts stream IDs from the bucket sub-aggregation
+     *
+     * @param filtersBucket bucket related to one field name
+     * @return stream IDs
+     */
+    private Set<String> collectStreamIDs(FiltersBucket filtersBucket) {
+        final StringTermsAggregate aggregation = filtersBucket.aggregations()
+                .get(AGG_NAME_STREAMS)
+                .sterms();
+
+        return aggregation.buckets()
+                .array()
+                .stream()
+                .map(StringTermsBucket::key)
+                .collect(Collectors.toSet());
     }
 
-    private SearchSourceBuilder createSearchSourceBuilder(final List<String> fieldNames) {
-        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-                .trackTotalHits(false)
-                .size(0);
-
-        final List<FiltersAggregator.KeyedFilter> filters = fieldNames.stream()
-                .map(fieldName -> new FiltersAggregator.KeyedFilter(fieldName, QueryBuilders.existsQuery(fieldName)))
-                .toList();
-
-        final var filtersAggregation = AggregationBuilders.filters(AGG_NAME, filters.toArray(FiltersAggregator.KeyedFilter[]::new)).otherBucket(false)
-                .subAggregation(AggregationBuilders
-                        .terms(Message.FIELD_STREAMS)
-                        .field(Message.FIELD_STREAMS)
-                        .size(SEARCH_MAX_BUCKETS_OS));
-
-        searchSourceBuilder.aggregation(filtersAggregation);
-        return searchSourceBuilder;
+    /**
+     * Converts field names into a map fieldName -> fieldExistQuery(fieldName)
+     */
+    @Nonnull
+    private static Map<String, Query> fieldsToExistQuery(List<String> fieldNames) {
+        return fieldNames.stream()
+                .collect(Collectors.toMap(fieldName -> fieldName, StreamsForFieldRetrieverOS::fieldExistQuery));
     }
 
-    @Override
-    public Set<String> getStreams(final String fieldName, final String indexName) {
-        final SearchRequest searchRequest = createSearchRequest(List.of(fieldName), indexName);
-
-        final SearchResponse searchResult = client.search(searchRequest, "Unable to retrieve fields types aggregations");
-
-        final ParsedFilters aggregation = searchResult.getAggregations().get(AGG_NAME);
-        final var bucket = aggregation.getBucketByKey(fieldName);
-
-        return retrieveStreamsFromAggregationInResponse(bucket);
-    }
-
-    private Set<String> retrieveStreamsFromAggregationInResponse(ParsedFilters.ParsedBucket searchResult) {
-        final Aggregations aggregations = searchResult.getAggregations();
-        if (aggregations != null) {
-            final Aggregation streamsAggregation = aggregations.get(Message.FIELD_STREAMS);
-
-            if (streamsAggregation instanceof MultiBucketsAggregation) {
-                final List<? extends MultiBucketsAggregation.Bucket> buckets = ((MultiBucketsAggregation) streamsAggregation).getBuckets();
-                if (buckets != null) {
-                    return buckets.stream()
-                            .map(MultiBucketsAggregation.Bucket::getKeyAsString)
-                            .collect(Collectors.toSet());
-                }
-            }
-        }
-        return Set.of();
-    }
-
-    private SearchRequest createSearchRequest(List<String> fieldNames, final String indexName) {
-        final SearchSourceBuilder searchSourceBuilder = createSearchSourceBuilder(fieldNames);
-        return new SearchRequest(indexName)
-                .source(searchSourceBuilder);
+    @Nonnull
+    private static Query fieldExistQuery(String fieldName) {
+        return Query.builder().
+                exists(existsQuery -> existsQuery.field(fieldName))
+                .build();
     }
 }
 
