@@ -265,7 +265,7 @@ type Props<T, M> = {
 
 /*
  * This component is a wrapper for the EntityDataTable.
- It contains all the required logic to either sync the URL query params or, alternatively, use local state for filters and pagination.
+ * It contains all the required logic to either sync the URL query params or, alternatively, use local state for filters and pagination.
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
 
