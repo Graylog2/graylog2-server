@@ -14,16 +14,76 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
+import { useMutation } from '@tanstack/react-query';
 
 import { FavoriteFields } from '@graylog/server-api';
 
 import { StreamsActions } from 'views/stores/StreamsStore';
 import UserNotification from 'util/UserNotification';
 import type { Stream } from 'logic/streams/types';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
+
+interface FavoriteFieldRequest {
+  readonly field: string;
+  readonly stream_ids: string[];
+}
+
+interface SetFavoriteFieldsRequest {
+  readonly fields: {
+    readonly [_key: string]: string[];
+  };
+}
 
 const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavoriteFields: Array<string>) => {
-  const [isLoading, setIsLoading] = useState(false);
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
+  const { isPending: setFieldsIsPending, mutate: setFavoriteFields } = useMutation({
+    mutationFn: (props: SetFavoriteFieldsRequest) => FavoriteFields.set(props),
+    onSuccess: (_, newFavoriteFieldsByStream) => {
+      sendFavoriteFieldTelemetry('EDIT_SAVED', {
+        fields_lengths: Object.values(newFavoriteFieldsByStream.fields).map((fields) => fields.length),
+      });
+
+      return StreamsActions.refresh();
+    },
+    onError: (errorThrown) =>
+      UserNotification.error(
+        `Setting fields to favorites failed with error: ${errorThrown}`,
+        'Could not set fields to favorites',
+      ),
+  });
+
+  const { mutate: addFavoriteField } = useMutation({
+    mutationFn: (props: FavoriteFieldRequest) => FavoriteFields.add(props),
+    onSuccess: () => {
+      sendFavoriteFieldTelemetry('TOGGLED', {
+        app_action_value: 'add',
+      });
+
+      return StreamsActions.refresh();
+    },
+    onError: (errorThrown) =>
+      UserNotification.error(
+        `Adding field to favorites failed with error: ${errorThrown}`,
+        'Could not add field to favorites',
+      ),
+  });
+
+  const { mutate: removeFavoriteField } = useMutation({
+    mutationFn: (props: FavoriteFieldRequest) => FavoriteFields.remove(props),
+    onSuccess: () => {
+      sendFavoriteFieldTelemetry('TOGGLED', {
+        app_action_value: 'remove',
+      });
+
+      return StreamsActions.refresh();
+    },
+    onError: (errorThrown) =>
+      UserNotification.error(
+        `Removing field from favorites failed with error: ${errorThrown}`,
+        'Could not remove field from favorites',
+      ),
+  });
 
   const saveFavoriteField = useCallback(
     (favoritesToSave: Array<string>) => {
@@ -32,57 +92,35 @@ const useMessageFavoriteFieldsMutation = (streams: Array<Stream>, initialFavorit
       const newFavoriteFieldsByStream = Object.fromEntries(
         streams.map((stream) => [
           stream.id,
-          favoritesToSave.filter((f) => stream.favorite_fields.includes(f) || newAddedFields.includes(f)),
+          favoritesToSave.filter((f) => {
+            const streamFavoriteFields = stream?.favorite_fields ?? [];
+
+            return streamFavoriteFields.includes(f) || newAddedFields.includes(f);
+          }),
         ]),
       );
 
-      setIsLoading(true);
-      FavoriteFields.set({ fields: newFavoriteFieldsByStream })
-        .then(() => StreamsActions.refresh())
-        .catch((errorThrown) =>
-          UserNotification.error(
-            `Setting fields to favorites failed with error: ${errorThrown}`,
-            'Could not set fields to favorites',
-          ),
-        )
-        .finally(() => setIsLoading(false));
+      setFavoriteFields({ fields: newFavoriteFieldsByStream });
     },
-    [initialFavoriteFields, streams],
+    [initialFavoriteFields, setFavoriteFields, streams],
   );
 
   const toggleField = useCallback(
     (field: string) => {
-      const isFavorite = initialFavoriteFields.includes(field);
+      const isFavorite = initialFavoriteFields?.includes(field);
       const streamIds = streams.map((stream) => stream.id);
-      setIsLoading(true);
 
       if (isFavorite) {
-        FavoriteFields.remove({ field, stream_ids: streamIds })
-          .then(() => StreamsActions.refresh())
-          .catch((errorThrown) =>
-            UserNotification.error(
-              `Removing field from favorites failed with error: ${errorThrown}`,
-              'Could not remove field from favorites',
-            ),
-          )
-          .finally(() => setIsLoading(false));
+        removeFavoriteField({ field, stream_ids: streamIds });
       } else {
-        FavoriteFields.add({ field, stream_ids: streamIds })
-          .then(() => StreamsActions.refresh())
-          .catch((errorThrown) =>
-            UserNotification.error(
-              `Adding field to favorites failed with error: ${errorThrown}`,
-              'Could not add field to favorites',
-            ),
-          )
-          .finally(() => setIsLoading(false));
+        addFavoriteField({ field, stream_ids: streamIds });
       }
     },
-    [initialFavoriteFields, streams],
+    [addFavoriteField, initialFavoriteFields, removeFavoriteField, streams],
   );
 
   return {
-    isLoading,
+    setFieldsIsPending,
     saveFavoriteField,
     toggleField,
   };

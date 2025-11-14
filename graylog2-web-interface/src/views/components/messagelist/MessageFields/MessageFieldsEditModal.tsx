@@ -18,16 +18,18 @@
 import React, { useContext, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import MessageFieldsEditModeList from 'views/components/messagelist/MessageFields/MessageFieldsEditModeList';
 import { Alert, Modal, Button } from 'components/bootstrap';
 import StreamLink from 'components/streams/StreamLink';
 import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
-import useFormattedFields from 'views/components/messagelist/MessageFields/hooks/useFormattedFields';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import StringUtils from 'util/StringUtils';
-import useMessageFavoriteFieldsForEditing from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
+import useMessageFavoriteFieldsForEditing, {
+  DEFAULT_FIELDS,
+} from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing';
 import { ModalSubmit } from 'components/common';
+import MessageFieldsEditModeLists from 'views/components/messagelist/MessageFields/MessageFieldsEditModeLists';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
 
 const FieldsContainer = styled.div(
   ({ theme }) => css`
@@ -37,14 +39,14 @@ const FieldsContainer = styled.div(
 );
 
 const ModalContentContainer = styled.div`
-  max-height: 500px;
-  overflow-y: auto;
   font-size: ${({ theme }) => theme.fonts.size.small};
 `;
 
 const StyledAlert = styled(Alert)`
   margin-top: 0;
 `;
+
+const resetActionTitle = `Reset to default fields: ${DEFAULT_FIELDS.join(', ')}`;
 
 const MessageFieldsEditModal = ({ toggleEditMode }) => {
   const {
@@ -54,8 +56,8 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
     reorderFavoriteFields,
     onFavoriteToggle,
   } = useMessageFavoriteFieldsForEditing();
-  const { formattedFavorites, formattedRest } = useFormattedFields(editingFavoriteFields);
-  const { message } = useContext(MessageFavoriteFieldsContext);
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
+  const { message, editableStreams } = useContext(MessageFavoriteFieldsContext);
   const messageStreams = useStore(StreamsStore, ({ streams }) =>
     streams.filter((stream) => message.fields.streams.includes(stream.id)),
   );
@@ -70,8 +72,14 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
     toggleEditMode();
   }, [resetFavoriteFields, toggleEditMode]);
 
+  const _toggleEditMode = useCallback(() => {
+    sendFavoriteFieldTelemetry('EDIT_CANCELED');
+
+    return toggleEditMode();
+  }, [sendFavoriteFieldTelemetry, toggleEditMode]);
+
   return (
-    <Modal onHide={toggleEditMode} show rootProps={{ zIndex: 1030 }}>
+    <Modal onHide={_toggleEditMode} show>
       <Modal.Header>
         <Modal.Title>Favorite fields configuration</Modal.Title>
       </Modal.Header>
@@ -79,9 +87,9 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
         <ModalContentContainer>
           <FieldsContainer>
             <StyledAlert bsStyle="info">
-              Favorite fields will be applied to the{' '}
-              {StringUtils.pluralize(messageStreams.length, ' stream ', ' streams ')}
-              {messageStreams.map((stream, index) => {
+              Favorite fields will appear in all streams this message belongs to, including{' '}
+              {StringUtils.pluralize(editableStreams.length, ' stream ', ' streams ')}
+              {editableStreams.map((stream, index) => {
                 const isLast = index === messageStreams.length - 1;
 
                 return (
@@ -93,19 +101,10 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
               })}{' '}
               in which this message is routed.
             </StyledAlert>
-            <MessageFieldsEditModeList
+            <MessageFieldsEditModeLists
               reorderFavoriteFields={reorderFavoriteFields}
               onFavoriteToggle={onFavoriteToggle}
-              fields={formattedFavorites}
-              message={message}
-              isFavorite
-            />
-            <MessageFieldsEditModeList
-              reorderFavoriteFields={reorderFavoriteFields}
-              onFavoriteToggle={onFavoriteToggle}
-              fields={formattedRest}
-              message={message}
-              isFavorite={false}
+              editingFavoriteFields={editingFavoriteFields}
             />
           </FieldsContainer>
         </ModalContentContainer>
@@ -114,7 +113,7 @@ const MessageFieldsEditModal = ({ toggleEditMode }) => {
         <ModalSubmit
           submitButtonText="Save Configuration"
           leftCol={
-            <Button bsStyle="link" onClick={_resetFavoriteFields}>
+            <Button bsStyle="link" onClick={_resetFavoriteFields} title={resetActionTitle}>
               Reset to default
             </Button>
           }
