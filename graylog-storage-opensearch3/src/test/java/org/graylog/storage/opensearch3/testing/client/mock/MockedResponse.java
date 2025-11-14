@@ -14,19 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
-import org.junit.Rule;
-
-public class IndexFieldTypePollerOS2IT extends IndexFieldTypePollerIT {
-    @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
-
-    @Override
-    protected SearchServerInstance searchServer() {
-        return this.openSearchInstance;
-    }
+record MockedResponse(String method, String url, String body) {
 }

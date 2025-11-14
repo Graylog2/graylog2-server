@@ -23,7 +23,9 @@ import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavor
 import type { FormattedField } from 'views/components/messagelist/MessageFields/types';
 import FieldType from 'views/logic/fieldtypes/FieldType';
 
-const DEFAULT_FIELDS = ['source', 'destination_ip', 'username'];
+const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
+
+jest.mock('views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
 
 type ProviderProps = {
   initialFavorites?: Array<string>;
@@ -36,12 +38,13 @@ const createWrapper =
   ({ children }: { children: React.ReactNode }) => (
     <MessageFavoriteFieldsContext.Provider
       value={{
-        isLoading: false,
         favoriteFields: initialFavorites,
         saveFavoriteField: saveMock,
         toggleField: toggleFieldMock,
         messageFields: Immutable.List([]),
         message: undefined,
+        editableStreams: [],
+        setFieldsIsPending: false,
       }}>
       {children}
     </MessageFavoriteFieldsContext.Provider>

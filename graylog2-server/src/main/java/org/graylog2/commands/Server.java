@@ -262,6 +262,8 @@ public class Server extends ServerBootstrap {
                         .setLeader(leaderElectionService.isLeader())
                         .setTransportAddress(httpConfiguration.getHttpPublishUri().toString())
                         .setHostname(Tools.getLocalCanonicalHostname())
+                        .setProcessing(serverStatus.isProcessing())
+                        .setLoadBalancerStatus(serverStatus.getLifecycle().getLoadbalancerStatus())
                         .build());
         serverStatus.setLocalMode(isLocal());
         if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {
