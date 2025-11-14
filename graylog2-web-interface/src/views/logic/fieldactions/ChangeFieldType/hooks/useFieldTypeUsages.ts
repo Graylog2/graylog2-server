@@ -18,7 +18,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemIndexSetsTypes } from '@graylog/server-api';
 
-import type { Attribute } from 'stores/PaginationTypes';
+import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { FieldTypeUsage } from 'views/logic/fieldactions/ChangeFieldType/types';
 import { defaultOnError } from 'util/conditional/onError';
 
@@ -31,20 +31,19 @@ const INITIAL_DATA = {
 type Options = {
   enabled: boolean;
 };
-export type Sort = {
-  attributeId: 'index_set_id' | 'index_set_title';
-  direction: 'asc' | 'desc';
-};
 
-export type SearchParams = {
-  page: number;
-  pageSize: number;
-  sort: Sort;
-};
+export type SortableAttributes = 'index_set_id' | 'index_set_title';
 
-const fetchFieldTypeUsages = async (
+export const queryKey = (searchParams: SearchParams, field: string, streams: Array<string>) => [
+  'fieldTypeUsages',
+  searchParams,
+  field,
+  streams,
+];
+
+export const fetchFieldTypeUsages = async (
   { field, streams }: { field: string; streams: Array<string> },
-  searchParams: SearchParams,
+  searchParams: SearchParams<SortableAttributes>,
 ) => {
   const {
     sort: { attributeId, direction },
@@ -69,7 +68,7 @@ const fetchFieldTypeUsages = async (
 
 const useFieldTypeUsages = (
   { streams, field }: { streams: Array<string>; field: string },
-  searchParams: SearchParams,
+  searchParams: SearchParams<SortableAttributes>,
   { enabled }: Options = { enabled: true },
 ): {
   data: {
@@ -82,7 +81,7 @@ const useFieldTypeUsages = (
   isLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading, isLoading } = useQuery({
-    queryKey: ['fieldTypeUsages', field, searchParams],
+    queryKey: queryKey(searchParams, field, streams),
 
     queryFn: () =>
       defaultOnError(
