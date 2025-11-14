@@ -75,7 +75,7 @@ public class MappedFieldTypesServiceImplTest {
     public void setUp() throws Exception {
         final Configuration withStreamAwarenessOff = spy(new Configuration());
         doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();
-        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOff, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOff, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
         when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
         when(streamService.indexSetIdsByIds(Collections.singleton("stream2"))).thenReturn(Collections.singleton("indexSetId"));
     }
@@ -84,7 +84,7 @@ public class MappedFieldTypesServiceImplTest {
     public void testDifferenceBetweenStreamAwareAndUnawareFieldTypeRetrieval() {
         final Configuration withStreamAwarenessOn = spy(new Configuration());
         doReturn(true).when(withStreamAwarenessOn).maintainsStreamAwareFieldTypes();
-        MappedFieldTypesServiceImpl streamAwareMappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOn, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
+        MappedFieldTypesServiceImpl streamAwareMappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOn, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
 
         final List<IndexFieldTypesDTO> fieldTypes = ImmutableList.of(
                 createIndexTypes(

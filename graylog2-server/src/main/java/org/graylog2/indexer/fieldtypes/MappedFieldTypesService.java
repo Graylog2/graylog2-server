@@ -24,4 +24,6 @@ import java.util.Set;
 
 public interface MappedFieldTypesService {
     Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange);
+
+    Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field);
 }
