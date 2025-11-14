@@ -142,6 +142,7 @@ public class WebInterfaceAssetsResource {
         final var filenameWithoutSuffix = trimBasePath(filename, headers);
 
         if("/".equals(filenameWithoutSuffix)) {
+            LOG.warn("delivering index.html because / was requested");
             return generateIndexHtml(headers, (String) request.getProperty(CSPDynamicFeature.CSP_NONCE_PROPERTY));
         }
 
