@@ -33,6 +33,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
@@ -49,6 +50,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
@@ -70,6 +72,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 import static com.mongodb.client.model.Filters.and;
@@ -116,6 +119,21 @@ public class InputServiceImpl implements InputService {
         collection.find().forEach(result::add);
 
         return result;
+    }
+
+    @Override
+    public PaginatedList<Input> paginated(Bson searchQuery,
+                                          Predicate<InputImpl> filter,
+                                          SortOrder order,
+                                          String sortField,
+                                          int page,
+                                          int perPage) {
+        final PaginatedList<InputImpl> pagedListResponse = paginationHelper.perPage(perPage)
+                .sort(order.toBsonSort(sortField))
+                .filter(searchQuery)
+                .page(page, filter);
+        final List<Input> inputs = new ArrayList<>(pagedListResponse.stream().toList());
+        return new PaginatedList<>(inputs, pagedListResponse.pagination().total(), pagedListResponse.pagination().page(), pagedListResponse.pagination().perPage());
     }
 
     @Override

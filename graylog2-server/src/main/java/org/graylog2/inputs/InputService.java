@@ -16,11 +16,14 @@
  */
 package org.graylog2.inputs;
 
+import org.bson.conversions.Bson;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.rest.models.SortOrder;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
 
 import java.util.Collection;
@@ -28,9 +31,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 
 public interface InputService {
     List<Input> all();
+
+    PaginatedList<Input> paginated(Bson searchQuery,
+                                   Predicate<InputImpl> filter,
+                                   SortOrder order,
+                                   String sortField,
+                                   int page,
+                                   int perPage);
 
     List<Input> allOfThisNode(String nodeId);
 

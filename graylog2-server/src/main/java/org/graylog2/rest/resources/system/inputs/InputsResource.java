@@ -53,9 +53,8 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
+import org.graylog2.inputs.InputImpl;
 import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.PaginatedInputService;
-import org.graylog2.inputs.ShinyInputImpl;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.inputs.encryption.EncryptedInputConfigs;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -109,14 +108,13 @@ public class InputsResource extends AbstractInputsResource {
             EntityAttribute.builder().id(MessageInput.FIELD_NODE_ID).title("Node").type(SearchQueryField.Type.STRING).filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_GLOBAL).title("Global").type(SearchQueryField.Type.BOOLEAN).filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
-            EntityAttribute.builder().id(MessageInput.FIELD_DESIRED_STATE).title("State").type(SearchQueryField.Type.DATE).filterable(true).build()
+            EntityAttribute.builder().id(MessageInput.FIELD_DESIRED_STATE).title("State").type(SearchQueryField.Type.STRING).filterable(true).build()
     );
     private static final EntityDefaults DEFAULTS = EntityDefaults.builder()
             .sort(Sorting.create(MessageInput.FIELD_TITLE, Sorting.Direction.ASC))
             .build();
 
     private final InputService inputService;
-    private final PaginatedInputService paginatedInputService;
     private final InputDiagnosticService inputDiagnosticService;
     private final DbQueryCreator dbQueryCreator;
     private final StreamService streamService;
@@ -128,7 +126,6 @@ public class InputsResource extends AbstractInputsResource {
 
     @Inject
     public InputsResource(InputService inputService,
-                          PaginatedInputService paginatedInputService,
                           InputDiagnosticService inputDiagnosticService,
                           StreamService streamService,
                           StreamRuleService streamRuleService,
@@ -138,7 +135,6 @@ public class InputsResource extends AbstractInputsResource {
                           ClusterEventBus clusterEventBus) {
         super(messageInputFactory.getAvailableInputs());
         this.inputService = inputService;
-        this.paginatedInputService = paginatedInputService;
         this.inputDiagnosticService = inputDiagnosticService;
         this.dbQueryCreator = new DbQueryCreator(MessageInput.FIELD_TITLE, ATTRIBUTES);
         this.streamService = streamService;
@@ -243,9 +239,9 @@ public class InputsResource extends AbstractInputsResource {
                                                   @DefaultValue(MessageInput.FIELD_TITLE) @QueryParam("sort") String sortField,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                                   @DefaultValue("asc") @QueryParam("order") SortOrder order) {
-        final Predicate<ShinyInputImpl> permissionFilter = input -> isPermitted(RestPermissions.INPUTS_READ, input.id());
+        final Predicate<InputImpl> permissionFilter = input -> isPermitted(RestPermissions.INPUTS_READ, input.getId());
 
-        final PaginatedList<ShinyInputImpl> result = paginatedInputService.findPaginated(
+        final PaginatedList<Input> result = inputService.paginated(
                 dbQueryCreator.createDbQuery(filters, query),
                 permissionFilter,
                 order,
