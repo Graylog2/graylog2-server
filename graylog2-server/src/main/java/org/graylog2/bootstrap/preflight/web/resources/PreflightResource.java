@@ -16,6 +16,7 @@
  */
 package org.graylog2.bootstrap.preflight.web.resources;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -84,7 +85,7 @@ public class PreflightResource {
 
     public record DataNode(String nodeId, String transportAddress, DataNodeProvisioningConfig.State status,
                            String errorMsg,
-                           String hostname, String shortNodeId, DataNodeStatus dataNodeStatus) {}
+                           String hostname, String shortNodeId, @JsonProperty(DataNodeDto.FIELD_DATANODE_STATUS) DataNodeStatus dataNodeStatus) {}
 
     @GET
     @Path("/data_nodes")
