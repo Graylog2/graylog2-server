@@ -68,20 +68,21 @@ public class TelemetryResponseFactoryTest {
         final String installationSource = "test-src";
         final TelemetryClusterInfoDto leader = nodeInfo("node-1", true);
         final TelemetryClusterInfoDto nonLeader = nodeInfo("node-2", false);
+        final DateTime date = DateTime.now(DateTimeZone.UTC);
         final TrafficCounterService.TrafficHistogram histogram = traffic(
                 Map.of(
-                        DateTime.now().minusDays(1), 10L,
-                        DateTime.now().minusDays(2), 5L
+                        date.minusDays(1), 10L,
+                        date.minusDays(2), 5L
                 ),
                 Map.of(
-                        DateTime.now().minusDays(1), 3L,
-                        DateTime.now().minusDays(2), 7L
+                        date.minusDays(1), 3L,
+                        date.minusDays(2), 7L
                 )
         );
 
         final ObjectNode clusterInfo = factory.createClusterInfo(
                 leader.clusterId(),
-                DateTime.now().minusDays(10),
+                date.minusDays(10),
                 List.of(leader, nonLeader),
                 histogram,
                 userCount,
@@ -124,7 +125,7 @@ public class TelemetryResponseFactoryTest {
 
         final ObjectNode clusterInfo = factory.createClusterInfo(
                 nonLeader1.clusterId(),
-                DateTime.now(),
+                DateTime.now(DateTimeZone.UTC),
                 List.of(nonLeader1, nonLeader2),
                 histogram,
                 0L,
