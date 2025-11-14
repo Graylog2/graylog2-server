@@ -225,6 +225,7 @@ class Input extends React.Component<
     } = this.props;
 
     const commonProps = {
+      id,
       type,
       label,
       name: name ?? id,
