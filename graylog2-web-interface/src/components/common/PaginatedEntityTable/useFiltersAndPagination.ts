@@ -57,53 +57,60 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
 };
 
 export const useWithLocalState = (layoutConfig: LayoutConfig) => {
-  const [fetchOptions, setFetchOptions] = useState<SearchParams>({
+  const [transientFetchOptions, setTransientFetchOptions] = useState<any>({
     query: '',
     page: DEFAULT_PAGE,
-    pageSize: layoutConfig.pageSize,
-    sort: layoutConfig.sort,
     filters: OrderedMap<string, Array<string>>(),
   });
 
   const setPagination = useCallback(
     ({ page, pageSize }: { page?: number; pageSize?: number }) => {
-      setFetchOptions({
-        ...fetchOptions,
+      setTransientFetchOptions({
+        ...transientFetchOptions,
         page,
         pageSize,
       });
     },
-    [fetchOptions],
+    [transientFetchOptions],
   );
 
   const resetPage = useCallback(() => {
-    setFetchOptions({
-      ...fetchOptions,
+    setTransientFetchOptions({
+      ...transientFetchOptions,
       page: DEFAULT_PAGE,
       sort: layoutConfig.sort,
     });
-  }, [fetchOptions, layoutConfig.sort]);
+  }, [transientFetchOptions, layoutConfig.sort]);
 
   const onChangeFilters = useCallback(
     (newFilters: UrlQueryFilters) => {
-      setFetchOptions({
-        ...fetchOptions,
+      setTransientFetchOptions({
+        ...transientFetchOptions,
         page: DEFAULT_PAGE,
         filters: newFilters,
       });
     },
-    [fetchOptions],
+    [transientFetchOptions],
   );
 
   const setQuery = useCallback(
     (newQuery: string) => {
-      setFetchOptions({
-        ...fetchOptions,
+      setTransientFetchOptions({
+        ...transientFetchOptions,
         query: newQuery,
         page: DEFAULT_PAGE,
       });
     },
-    [fetchOptions],
+    [transientFetchOptions],
+  );
+
+  const fetchOptions: SearchParams = useMemo(
+    () => ({
+      ...transientFetchOptions,
+      pageSize: layoutConfig.pageSize,
+      sort: layoutConfig.sort,
+    }),
+    [transientFetchOptions, layoutConfig.pageSize, layoutConfig.sort],
   );
 
   return useMemo(

@@ -268,7 +268,6 @@ type Props<T, M> = {
  * It contains all the required logic to either sync the URL query params or, alternatively, use local state for filters and pagination.
  * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
  */
-
 const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   fetchOptions: reactQueryOptions = undefined,
   ...props
