@@ -18,8 +18,9 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
 import { asMock } from 'helpers/mocking';
-import type { InputStateSummary } from 'hooks/useInputsStates';
+import type { InputState } from 'hooks/useInputsStates';
 import useInputsStates from 'hooks/useInputsStates';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
 
 import InputsDotBadge from './InputsDotBadge';
 
@@ -49,10 +50,13 @@ describe('<InputsDotBadge />', () => {
       refetch: jest.fn(),
       isLoading: false,
       data: {
-        states: [
-          { id: '1', state: 'RUNNING' } as InputStateSummary,
-          { id: '2', state: 'STARTING' } as InputStateSummary,
-        ],
+        input1: {
+          nodeA: { state: 'RUNNING', id: '1', detailed_message: null, message_input: {} as InputSummary },
+          nodeB: { state: 'STARTING', id: '2', detailed_message: 'Error', message_input: {} as InputSummary },
+        },
+        input2: {
+          nodeC: { state: 'RUNNING', id: '3', detailed_message: null, message_input: {} as InputSummary },
+        },
       },
     });
 
@@ -63,24 +67,27 @@ describe('<InputsDotBadge />', () => {
     expect(textEl).not.toHaveAttribute('title', 'Some inputs are in failed state or in setup mode.');
   });
 
-  describe.each(['FAILED', 'FAILING', 'SETUP'])('renders badge when an input state is %s', (problemState) => {
-    it(`shows badge (dot) with tooltip for state ${problemState}`, () => {
-      asMock(useInputsStates).mockReturnValue({
-        refetch: jest.fn(),
-        isLoading: false,
-        data: {
-          states: [
-            { id: '1', state: 'RUNNING' } as InputStateSummary,
-            { id: '2', state: problemState } as InputStateSummary,
-          ],
-        },
+  describe.each(['FAILED', 'FAILING', 'SETUP'])(
+    'renders badge when an input state is %s',
+    (problemState: InputState) => {
+      it(`shows badge (dot) with tooltip for state ${problemState}`, () => {
+        asMock(useInputsStates).mockReturnValue({
+          refetch: jest.fn(),
+          isLoading: false,
+          data: {
+            input1: {
+              nodeA: { state: 'RUNNING', id: '1', detailed_message: null, message_input: {} as InputSummary },
+              nodeB: { state: problemState, id: '2', detailed_message: 'Error', message_input: {} as InputSummary },
+            },
+          },
+        });
+
+        render(<InputsDotBadge text={TEXT} />);
+
+        const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
+        expect(badge).toBeInTheDocument();
+        expect(badge).toHaveTextContent(TEXT);
       });
-
-      render(<InputsDotBadge text={TEXT} />);
-
-      const badge = screen.getByTitle(/Some inputs are in failed state or in setup mode\./i);
-      expect(badge).toBeInTheDocument();
-      expect(badge).toHaveTextContent(TEXT);
-    });
-  });
+    },
+  );
 });

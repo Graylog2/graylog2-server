@@ -16,27 +16,21 @@
  */
 import * as React from 'react';
 
-import useInputsStates from 'hooks/useInputsStates';
-import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
+import { LinkContainer } from 'components/common/router';
+import { Button } from 'components/bootstrap';
+import Routes from 'routing/Routes';
 
-const InputsDotBadge = ({ text }: { text: string }) => {
-  const { data, isLoading } = useInputsStates();
-
-  if (isLoading) {
-    return null;
-  }
-
-  const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
-    Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
-  );
-
-  return (
-    <MenuItemDotBadge
-      text={text}
-      title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs}
-    />
-  );
+type Props = {
+  input: InputSummary;
 };
 
-export default InputsDotBadge;
+const TitleCell = ({ input }: Props) => (
+  <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
+    <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
+      {input.title}
+    </Button>
+  </LinkContainer>
+);
+
+export default TitleCell;

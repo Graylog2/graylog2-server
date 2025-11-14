@@ -19,6 +19,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import styled from 'styled-components';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import { useQueryClient } from '@tanstack/react-query';
 
 import { InputsActions } from 'stores/inputs/InputsStore';
 import type { InputDescription } from 'stores/inputs/InputTypesStore';
@@ -32,6 +33,7 @@ import { Select } from 'components/common';
 import { InputForm } from 'components/inputs';
 import type { ConfiguredInput } from 'components/messageloaders/Types';
 import useInputTypes from 'components/inputs/useInputTypes';
+import { KEY_PREFIX } from 'hooks/usePaginatedInputs';
 
 const StyledForm = styled.form`
   display: flex;
@@ -53,7 +55,7 @@ const CreateInputControl = () => {
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
   const inputTypes = useInputTypes();
-
+  const queryClient = useQueryClient();
   const resetFields = () => {
     setSelectedInput(undefined);
     setSelectedInputDefinition(undefined);
@@ -119,6 +121,7 @@ const CreateInputControl = () => {
 
     InputsActions.create(data).then(() => {
       resetFields();
+      queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
     });
   };
 

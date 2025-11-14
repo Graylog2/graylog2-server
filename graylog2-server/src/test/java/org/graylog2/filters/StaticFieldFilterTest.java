@@ -58,7 +58,7 @@ public class StaticFieldFilterTest {
         when(input.getId()).thenReturn("someid");
         when(inputService.all()).thenReturn(Collections.singletonList(input));
         when(inputService.find(eq("someid"))).thenReturn(input);
-        when(inputService.getStaticFields(eq(input)))
+        when(inputService.getStaticFields(eq(input.getId())))
                 .thenReturn(Collections.singletonList(Maps.immutableEntry("foo", "bar")));
 
         final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());

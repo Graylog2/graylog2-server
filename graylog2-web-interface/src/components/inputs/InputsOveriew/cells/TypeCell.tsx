@@ -16,27 +16,16 @@
  */
 import * as React from 'react';
 
-import useInputsStates from 'hooks/useInputsStates';
-import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
+import type { InputTypesSummary } from 'hooks/useInputTypes';
 
-const InputsDotBadge = ({ text }: { text: string }) => {
-  const { data, isLoading } = useInputsStates();
-
-  if (isLoading) {
-    return null;
-  }
-
-  const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
-    Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
-  );
-
-  return (
-    <MenuItemDotBadge
-      text={text}
-      title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs}
-    />
-  );
+type Props = {
+  type: string;
+  inputTypes?: InputTypesSummary;
 };
 
-export default InputsDotBadge;
+const TypeCell = ({ type, inputTypes = undefined }: Props) => {
+  const typeName = inputTypes && inputTypes?.types[type];
+
+  return <>{typeName || type}</>;
+};
+export default TypeCell;

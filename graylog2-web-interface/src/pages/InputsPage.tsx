@@ -14,28 +14,28 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import { DocumentTitle, PageHeader } from 'components/common';
-import { InputsList } from 'components/inputs';
+import { Row, Col } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import useProductName from 'brand-customization/useProductName';
+import { InputsOverview } from 'components/inputs/InputsOveriew';
+import useInputTypes from 'hooks/useInputTypes';
+import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
 
 const isCloud = AppConfig.isCloud();
 
 const InputsPage = () => {
   const productName = useProductName();
+  const { data: inputTypes, isLoading: isLoadingInputTypes } = useInputTypes();
+  const { data: inputTypeDescriptions, isLoading: isLoadingInputTypesDescriptions } = useInputTypesDescriptions();
 
-  useEffect(() => {
-    const listInputsInterval = setInterval(InputStatesStore.list, 2000);
-
-    return () => {
-      clearInterval(listInputsInterval);
-    };
-  }, []);
+  if (isLoadingInputTypes || isLoadingInputTypesDescriptions) {
+    return <Spinner />;
+  }
 
   return (
     <DocumentTitle title="Inputs">
@@ -59,7 +59,11 @@ const InputsPage = () => {
             </span>
           )}
         </PageHeader>
-        <InputsList />
+        <Row className="content">
+          <Col md={12}>
+            <InputsOverview inputTypeDescriptions={inputTypeDescriptions} inputTypes={inputTypes} />
+          </Col>
+        </Row>
       </div>
     </DocumentTitle>
   );

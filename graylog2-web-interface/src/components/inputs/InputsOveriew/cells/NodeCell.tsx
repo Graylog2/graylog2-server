@@ -16,27 +16,21 @@
  */
 import * as React from 'react';
 
-import useInputsStates from 'hooks/useInputsStates';
-import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
+import { LinkToNode } from 'components/common';
 
-const InputsDotBadge = ({ text }: { text: string }) => {
-  const { data, isLoading } = useInputsStates();
+type Props = {
+  input: InputSummary;
+};
 
-  if (isLoading) {
-    return null;
-  }
-
-  const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
-    Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
-  );
+const NodeCell = ({ input }: Props) => {
+  if (input.global && !input.node) return 'All Graylog Nodes';
 
   return (
-    <MenuItemDotBadge
-      text={text}
-      title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs}
-    />
+    <span>
+      <LinkToNode nodeId={input.node} />
+    </span>
   );
 };
 
-export default InputsDotBadge;
+export default NodeCell;
