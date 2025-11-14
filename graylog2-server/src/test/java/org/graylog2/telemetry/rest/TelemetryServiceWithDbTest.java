@@ -16,6 +16,7 @@
  */
 package org.graylog2.telemetry.rest;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.eventbus.EventBus;
@@ -89,7 +90,8 @@ public class TelemetryServiceWithDbTest {
     ServerStatus serverStatus;
     @Mock
     LeaderElectionService leaderElectionService;
-
+    @Mock
+    MetricRegistry metricRegistry;
     @Mock
     NodeService nodeService;
 
@@ -98,11 +100,19 @@ public class TelemetryServiceWithDbTest {
     @Before
     public void setUp() {
         MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
+
+        MongoCollections mongoCollections = new MongoCollections(
+                new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
+                mongodb.mongoConnection()
+        );
+
         TelemetryClusterService telemetryClusterService = new TelemetryClusterService(
                 serverStatus,
                 clusterConfigService,
                 leaderElectionService,
-                new DBTelemetryClusterInfo(Duration.ZERO, mongodb.mongoConnection()));
+                new DBTelemetryClusterInfo(Duration.ZERO, mongoCollections),
+                metricRegistry
+        );
 
         telemetryService = new TelemetryService(
                 true,
