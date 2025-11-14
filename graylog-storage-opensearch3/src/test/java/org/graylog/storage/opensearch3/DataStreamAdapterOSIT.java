@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DataStream;
 import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
@@ -26,21 +25,22 @@ import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Rule;
 import org.junit.Test;
+import org.opensearch.client.opensearch.indices.DataStream;
 
 import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class DataStreamAdapterOS2IT {
+public class DataStreamAdapterOSIT {
 
     @Rule
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    DataStreamAdapterOS2 dataStreamAdapter = new DataStreamAdapterOS2(openSearchInstance.openSearchClient(),
-            objectMapper, new IsmApi(openSearchInstance.openSearchClient(), objectMapper));
+    DataStreamAdapterOS dataStreamAdapter = new DataStreamAdapterOS(openSearchInstance.getOfficialOpensearchClient(), openSearchInstance.openSearchClient(),
+            objectMapper, new IsmApi(openSearchInstance.getOfficialOpensearchClient(), objectMapper));
 
 
     @Test
