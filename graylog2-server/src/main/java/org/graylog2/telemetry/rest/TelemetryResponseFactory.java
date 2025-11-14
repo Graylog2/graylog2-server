@@ -123,7 +123,7 @@ public class TelemetryResponseFactory {
 
     private Object leaderNodeVersion(List<TelemetryClusterInfoDto> nodes) {
         return nodes.stream()
-                .filter(n -> n.isLeader() != null && n.isLeader())
+                .filter(TelemetryClusterInfoDto::isLeader)
                 .map(TelemetryClusterInfoDto::version)
                 .findFirst()
                 .orElse(UNKNOWN_VERSION);
