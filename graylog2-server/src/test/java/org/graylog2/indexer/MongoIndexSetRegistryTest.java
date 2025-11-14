@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -63,7 +64,7 @@ public class MongoIndexSetRegistryTest {
     @Before
     public void setUp() throws Exception {
         this.indexSetsCache = new MongoIndexSetRegistry.IndexSetsCache(indexSetService, serverEventBus);
-        this.indexSetRegistry = new MongoIndexSetRegistry(indexSetService, mongoIndexSetFactory, indexSetsCache);
+        this.indexSetRegistry = new MongoIndexSetRegistry(indexSetService, mongoIndexSetFactory, indexSetsCache, Set.of());
     }
 
     @Test
@@ -172,15 +173,15 @@ public class MongoIndexSetRegistryTest {
     }
 
     @Test
-    public void getAllShouldBeCachedForEmptyList() {
+    public void getAllIndexSetsShouldBeCachedForEmptyList() {
         final List<IndexSetConfig> indexSetConfigs = Collections.emptyList();
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
-        assertThat(this.indexSetRegistry.getAll())
+        assertThat(this.indexSetRegistry.getAllIndexSets())
             .isNotNull()
             .isEmpty();
 
-        assertThat(this.indexSetRegistry.getAll())
+        assertThat(this.indexSetRegistry.getAllIndexSets())
             .isNotNull()
             .isEmpty();
 
@@ -188,20 +189,20 @@ public class MongoIndexSetRegistryTest {
     }
 
     @Test
-    public void getAllShouldBeCachedForNonEmptyList() {
+    public void getAllIndexSetsShouldBeCachedForNonEmptyList() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         final MongoIndexSet indexSet = mock(MongoIndexSet.class);
         when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(indexSet);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
-        assertThat(this.indexSetRegistry.getAll())
+        assertThat(this.indexSetRegistry.getAllIndexSets())
             .isNotNull()
             .isNotEmpty()
             .hasSize(1)
             .containsExactly(indexSet);
 
-        assertThat(this.indexSetRegistry.getAll())
+        assertThat(this.indexSetRegistry.getAllIndexSets())
             .isNotNull()
             .isNotEmpty()
             .hasSize(1)
@@ -211,14 +212,14 @@ public class MongoIndexSetRegistryTest {
     }
 
     @Test
-    public void getAllShouldNotBeCachedForCallAfterInvalidate() {
+    public void getAllIndexSetsShouldNotBeCachedForCallAfterInvalidate() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
         final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         final MongoIndexSet indexSet = mock(MongoIndexSet.class);
         when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(indexSet);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
-        assertThat(this.indexSetRegistry.getAll())
+        assertThat(this.indexSetRegistry.getAllIndexSets())
             .isNotNull()
             .isNotEmpty()
             .hasSize(1)
@@ -226,7 +227,7 @@ public class MongoIndexSetRegistryTest {
 
         this.indexSetsCache.invalidate();
 
-        assertThat(this.indexSetRegistry.getAll())
+        assertThat(this.indexSetRegistry.getAllIndexSets())
             .isNotNull()
             .isNotEmpty()
             .hasSize(1)

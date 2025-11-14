@@ -17,6 +17,7 @@
 package org.graylog2.indexer;
 
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import java.util.Collection;
@@ -30,7 +31,14 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
      *
      * @return list of index sets
      */
-    Set<IndexSet> getAll();
+    Set<IndexSet> getAllIndexSets();
+
+    /**
+     * Returns a list of all {@link BasicIndexSet} instances.
+     *
+     * @return list of basic index sets
+     */
+    Set<BasicIndexSet> getAllBasicIndexSets();
 
     /**
      * Returns the {@link IndexSet} for the given ID.
@@ -116,14 +124,6 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
      * @return if all aliases exist
      */
     boolean isUp();
-
-    /**
-     * Checks if the given index name is a current write index alias in any {@link IndexSet}.
-     *
-     * @param indexName the name of the index to check
-     * @return true when given index name is a current write index, false otherwise
-     */
-    boolean isCurrentWriteIndexAlias(String indexName);
 
     /**
      * Checks if the given index is a current write index in any {@link IndexSet}.

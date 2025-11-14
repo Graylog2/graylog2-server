@@ -25,10 +25,8 @@ import org.joda.time.Duration;
 
 import javax.annotation.Nullable;
 
-public interface BaseIndexSetFields {
+public interface RotationAndRetentionFields {
 
-    String FIELD_SHARDS = "shards";
-    String FIELD_REPLICAS = "replicas";
     String FIELD_ROTATION_STRATEGY_CLASS = "rotation_strategy_class";
     String FIELD_ROTATION_STRATEGY = "rotation_strategy";
     String FIELD_RETENTION_STRATEGY_CLASS = "retention_strategy_class";
@@ -37,14 +35,6 @@ public interface BaseIndexSetFields {
     String FIELD_INDEX_OPTIMIZATION_DISABLED = "index_optimization_disabled";
     String FIELD_DATA_TIERING = "data_tiering";
     String FIELD_TYPE_REFRESH_INTERVAL = "field_type_refresh_interval";
-
-    @Min(1)
-    @JsonProperty(FIELD_SHARDS)
-    int shards();
-
-    @Min(0)
-    @JsonProperty(FIELD_REPLICAS)
-    int replicas();
 
     @Min(1)
     @JsonProperty(FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS)
@@ -76,13 +66,7 @@ public interface BaseIndexSetFields {
     @JsonProperty(FIELD_DATA_TIERING)
     DataTieringConfig dataTieringConfig();
 
-    interface BaseIndexSetFieldsBuilder<T> {
-
-        @JsonProperty(FIELD_SHARDS)
-        T shards(@Min(1) int shards);
-
-        @JsonProperty(FIELD_REPLICAS)
-        T replicas(@Min(0) int replicas);
+    interface RotationAndRetentionFieldsBuilder<T> {
 
         @JsonProperty(FIELD_INDEX_OPTIMIZATION_MAX_NUM_SEGMENTS)
         T indexOptimizationMaxNumSegments(@Min(1) int indexOptimizationMaxNumSegments);

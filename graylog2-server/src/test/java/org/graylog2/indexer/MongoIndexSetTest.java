@@ -250,7 +250,7 @@ public class MongoIndexSetTest {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create("graylog_0", mongoIndexSet)).thenReturn(false);
+        when(indices.create("graylog_0", mongoIndexSet.basicIndexSetConfig())).thenReturn(false);
 
         Notification notification = new NotificationImpl();
         when(notificationService.build()).thenReturn(notification);
@@ -276,7 +276,7 @@ public class MongoIndexSetTest {
                 "graylog_0", Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
+        when(indices.create(newIndexName, mongoIndexSet.basicIndexSetConfig())).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
@@ -293,7 +293,7 @@ public class MongoIndexSetTest {
                 oldIndexName, Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
+        when(indices.create(newIndexName, mongoIndexSet.basicIndexSetConfig())).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
@@ -315,7 +315,7 @@ public class MongoIndexSetTest {
                 oldIndexName, Collections.singleton(deflector));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
+        when(indices.create(newIndexName, mongoIndexSet.basicIndexSetConfig())).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
@@ -330,7 +330,7 @@ public class MongoIndexSetTest {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(indexName, mongoIndexSet)).thenReturn(true);
+        when(indices.create(indexName, mongoIndexSet.basicIndexSetConfig())).thenReturn(true);
         when(indices.waitForRecovery(indexName)).thenReturn(HealthStatus.Green);
 
         final MongoIndexSet mongoIndexSet = createIndexSet(config);

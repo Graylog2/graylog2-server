@@ -18,8 +18,8 @@ package org.graylog2.indexer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.testing.jsonpath.JsonPathAssert;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.utilities.AssertJsonPath;
@@ -38,7 +38,7 @@ public class EventsIndexMappingTest {
 
     private static final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    private static final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+    private static final BasicIndexSetConfig indexSetConfig = mock(BasicIndexSetConfig.class);
     private static final IndexSetMappingTemplate INDEX_SET_MAPPING_TEMPLATE = mock(IndexSetMappingTemplate.class);
     public static final String DATE_FORMAT = "uuuu-MM-dd HH:mm:ss.SSS";
 

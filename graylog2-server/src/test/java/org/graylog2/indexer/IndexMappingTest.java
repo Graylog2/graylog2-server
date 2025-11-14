@@ -20,8 +20,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
+import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.junit.Assert;
@@ -87,7 +87,7 @@ class IndexMappingTest {
     })
     void createsValidMappingTemplates(final String versionString, final String expectedTemplateFileName) throws Exception {
         final SearchVersion version = SearchVersion.decode(versionString);
-        final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, Mockito.mock(IndexSetConfig.class));
+        final IndexMappingTemplate mapping = new MessageIndexTemplateProvider().create(version, Mockito.mock(BasicIndexSetConfig.class));
 
         var template = mapping.toTemplate(indexSetMappingTemplate);
         final String fixture = resourceFile(expectedTemplateFileName);

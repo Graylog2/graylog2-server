@@ -18,6 +18,8 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ComparisonChain;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import javax.annotation.Nullable;
@@ -28,47 +30,8 @@ import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
-public interface IndexSet extends Comparable<IndexSet> {
-    /**
-     * Returns an array with all managed indices in this index set.
-     * <p>
-     * Example: {@code ["graylog_0", "graylog_1", "graylog_2"]}
-     *
-     * @return array of index names
-     */
-    String[] getManagedIndices();
+public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
 
-    /**
-     * Returns the write index alias name for this index set.
-     * <p>
-     * The write index alias always points to the newest index.
-     * <p>
-     * Example: {@code "graylog_deflector"}
-     *
-     * @return the write index alias name
-     */
-    String getWriteIndexAlias();
-
-    /**
-     * Returns the index wildcard for this index set.
-     * <p>
-     * This can be used in Elasticsearch queries to match all managed indices in this index set.
-     * <p>
-     * Example: {@code "graylog_*"}
-     *
-     * @return the index wildcard
-     */
-    String getIndexWildcard();
-
-    /**
-     * Returns the newest index.
-     * <p>
-     * Example: {@code "graylog_42"}
-     *
-     * @return the newest index
-     * @throws NoTargetIndexException if there are no indices in this index set yet
-     */
-    String getNewestIndex() throws NoTargetIndexException;
 
     /**
      * Returns the active write index.
@@ -82,6 +45,17 @@ public interface IndexSet extends Comparable<IndexSet> {
      */
     @Nullable
     String getActiveWriteIndex() throws TooManyAliasesException;
+
+    /**
+     * Returns the write index alias name for this index set.
+     * <p>
+     * The write index alias always points to the newest index.
+     * <p>
+     * Example: {@code "graylog_deflector"}
+     *
+     * @return the write index alias name
+     */
+    String getWriteIndexAlias();
 
     /**
      * Returns a map where the key is an index name and the value a set of aliases for this index.
@@ -117,14 +91,6 @@ public interface IndexSet extends Comparable<IndexSet> {
      * @return true if given index name is the write index alias, false if not
      */
     boolean isWriteIndexAlias(String index);
-
-    /**
-     * Checks if the given index name is part of this index set.
-     *
-     * @param index index name to check
-     * @return true if part of index set, false if not
-     */
-    boolean isManagedIndex(String index);
 
     /**
      * Prepares this index set to receive new messages.
@@ -189,7 +155,7 @@ public interface IndexSet extends Comparable<IndexSet> {
                     .map(num -> {
                         final int indexNumber = num - n;
                         if (indexNumber >= 0) {
-                            return indexPrefix + MongoIndexSet.SEPARATOR + indexNumber;
+                            return indexPrefix + IndexPattern.SEPARATOR + indexNumber;
                         }
                         return null;
                     })

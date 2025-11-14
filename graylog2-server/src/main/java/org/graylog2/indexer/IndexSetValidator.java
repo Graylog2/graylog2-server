@@ -23,8 +23,9 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringChecker;
 import org.graylog2.datatiering.DataTieringConfig;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.indexset.fields.BaseIndexSetFields;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.fields.RotationAndRetentionFields;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyConfig;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
@@ -40,11 +41,12 @@ import org.joda.time.Period;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-import static org.graylog2.indexer.MongoIndexSet.WARM_INDEX_INFIX;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_RETENTION_STRATEGY;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_RETENTION_STRATEGY_CLASS;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_ROTATION_STRATEGY;
-import static org.graylog2.indexer.indexset.fields.BaseIndexSetFields.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_DATA_TIERING;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_RETENTION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY;
+import static org.graylog2.indexer.indexset.fields.RotationAndRetentionFields.FIELD_ROTATION_STRATEGY_CLASS;
+import static org.graylog2.indexer.indexset.index.IndexPattern.WARM_INDEX_INFIX;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 public class IndexSetValidator {
@@ -80,13 +82,13 @@ public class IndexSetValidator {
         }
 
         Violation refreshIntervalViolation = validateSimpleIndexSetConfig(newConfig);
-        if (refreshIntervalViolation != null){
+        if (refreshIntervalViolation != null) {
             return Optional.of(refreshIntervalViolation);
         }
         return Optional.empty();
     }
 
-    private Violation validateSimpleIndexSetConfig(BaseIndexSetFields newConfig) {
+    private Violation validateSimpleIndexSetConfig(RotationAndRetentionFields newConfig) {
         final Violation refreshIntervalViolation = validateRefreshInterval(newConfig.fieldTypeRefreshInterval());
         if (refreshIntervalViolation != null) {
             return refreshIntervalViolation;
@@ -99,7 +101,7 @@ public class IndexSetValidator {
     }
 
 
-    public Violation validateStrategyFields(BaseIndexSetFields newConfig) {
+    public Violation validateStrategyFields(RotationAndRetentionFields newConfig) {
         if (newConfig.retentionStrategyConfig() == null) {
             return Violation.create(FIELD_RETENTION_STRATEGY + " cannot be null!");
         }
@@ -158,7 +160,7 @@ public class IndexSetValidator {
         }
 
         // Build an example index name with the new prefix and check if this would be managed by an existing index set
-        final String indexName = newConfig.indexPrefix() + MongoIndexSet.SEPARATOR + "0";
+        final String indexName = newConfig.indexPrefix() + IndexPattern.SEPARATOR + "0";
         if (indexSetRegistry.isManagedIndex(indexName)) {
             return Violation.create(f("Index prefix '%s' would conflict with an existing index set!", newConfig.indexPrefix()));
         }
@@ -168,7 +170,7 @@ public class IndexSetValidator {
         // Example: new=graylog_foo existing=graylog => graylog is more generic so this is an error
         // Example: new=gray        existing=graylog => gray    is more generic so this is an error
         // This avoids problems with wildcard matching like "graylog_*".
-        for (final IndexSet indexSet : indexSetRegistry) {
+        for (final IndexSet indexSet : indexSetRegistry.getAllIndexSets()) {
             if (newConfig.indexPrefix().startsWith(indexSet.getIndexPrefix()) || indexSet.getIndexPrefix().startsWith(newConfig.indexPrefix())) {
                 return Violation.create(f("Index prefix '%s' would conflict with existing index set prefix '%s'",
                         newConfig.indexPrefix(),
@@ -194,7 +196,7 @@ public class IndexSetValidator {
     @Nullable
     public Violation checkDataTieringNotNull(Boolean useLegacyRotation, DataTieringConfig dataTieringConfig) {
         if (!useLegacyRotation && dataTieringConfig == null) {
-            return Violation.create(BaseIndexSetFields.FIELD_DATA_TIERING + " cannot be null!");
+            return Violation.create(FIELD_DATA_TIERING + " cannot be null!");
         }
         return null;
     }

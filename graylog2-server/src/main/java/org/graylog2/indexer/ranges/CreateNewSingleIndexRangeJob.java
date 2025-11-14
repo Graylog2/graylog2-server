@@ -18,34 +18,31 @@ package org.graylog2.indexer.ranges;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Set;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
+public class CreateNewSingleIndexRangeJob extends SystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(CreateNewSingleIndexRangeJob.class);
     private final String indexName;
     private final Indices indices;
+    private final IndexRangeService indexRangeService;
+
 
     public interface Factory {
-        CreateNewSingleIndexRangeJob create(Set<IndexSet> indexSets, String indexName);
+        CreateNewSingleIndexRangeJob create(String indexName);
     }
 
     @AssistedInject
-    public CreateNewSingleIndexRangeJob(@Assisted Set<IndexSet> indexSets,
-                                        @Assisted String indexName,
-                                        ActivityWriter activityWriter,
+    public CreateNewSingleIndexRangeJob(@Assisted String indexName,
                                         Indices indices,
                                         IndexRangeService indexRangeService) {
-        super(indexSets, activityWriter, indexRangeService);
         this.indexName = checkNotNull(indexName);
         this.indices = indices;
+        this.indexRangeService = indexRangeService;
     }
 
     @Override
@@ -56,6 +53,11 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     @Override
     public String getInfo() {
         return "Calculating ranges for index " + indexName + ".";
+    }
+
+    @Override
+    public void requestCancel() {
+        // Not cancelable
     }
 
     @Override
@@ -92,5 +94,15 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     public int maxConcurrency() {
         // Actually we need some sort of queuing for SystemJobs.
         return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int getProgress() {
+        return 0;
+    }
+
+    @Override
+    public String getClassName() {
+        return this.getClass().getCanonicalName();
     }
 }

@@ -28,7 +28,7 @@ import { Alert, Col, Row } from 'components/bootstrap';
 import 'components/indices/rotation';
 import 'components/indices/retention';
 import { prepareDataTieringConfig, prepareDataTieringInitialValues } from 'components/indices/data-tiering';
-import type { IndexSet, IndexSetFormValues, IndexSetFieldRestriction } from 'stores/indices/IndexSetsStore';
+import type { IndexSet, IndexSetFormValues } from 'stores/indices/IndexSetsStore';
 import type {
   RotationStrategyConfig,
   RetentionStrategyConfig,
@@ -47,6 +47,7 @@ import IndexSetReadOnlyConfiguration from 'components/indices/IndexSetConfigurat
 import IndexSetRotationRetentionConfigurationSection from 'components/indices/IndexSetConfigurationForm/IndexSetRotationRetentionConfigurationSection';
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
+import { parseFieldRestrictions } from 'components/indices/helpers/fieldRestrictions';
 
 type Props = {
   cancelLink: string;
@@ -102,6 +103,8 @@ const IndexSetConfigurationForm = ({
   const isCloud = AppConfig.isCloud();
   const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
+  console.log('===hiddenFields', hiddenFields);
+
   const initialSegment = (): RetentionConfigSegment => {
     if (hiddenFields.includes('data_tiering')) return 'legacy';
     if (hiddenFields.includes('legacy')) return 'data_tiering';
@@ -113,22 +116,6 @@ const IndexSetConfigurationForm = ({
 
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
 
-  const parseFieldRestrictions = (field_restrictions: IndexSetFieldRestriction[]) => {
-    const getHidden = () =>
-      Object.keys(field_restrictions).filter(
-        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'hidden').length > 0,
-      );
-
-    const getImmutable = () =>
-      Object.keys(field_restrictions).filter(
-        (field) => field_restrictions[field].filter((restriction) => restriction.type === 'immutable').length > 0,
-      );
-
-    if (field_restrictions) return [getImmutable(), getHidden()];
-
-    return [[], []];
-  };
-
   useEffect(() => {
     if (indexSet?.use_legacy_rotation) {
       setSelectedRetentionSegment('legacy');
@@ -138,9 +125,11 @@ const IndexSetConfigurationForm = ({
   }, [indexSet]);
 
   useEffect(() => {
-    const [tmpImmutable, tmpHidden] = parseFieldRestrictions(indexSet?.field_restrictions);
-    setImmutableFields(tmpImmutable);
-    setHiddenFields(tmpHidden);
+    const { immutableFields: parsedImmutableFields, hiddenFields: parsedHiddenFields } = parseFieldRestrictions(
+      indexSet?.field_restrictions,
+    );
+    setImmutableFields(parsedImmutableFields);
+    setHiddenFields(parsedHiddenFields);
   }, [indexSet]);
 
   const isDataTieringImmutable = useMemo(() => immutableFields.includes('data_tiering'), [immutableFields]);
