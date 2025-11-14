@@ -188,11 +188,13 @@ public class InputServiceImplTest {
         assertThat(id).isNotBlank();
 
         assertThat(inputService.find(id)).satisfies(input -> {
-            assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted", value -> {
+            Map<String, Object> configuration = input.getConfiguration();
+            Object encrypted = configuration.get("encrypted");
+            assertThat(configuration).hasEntrySatisfying("encrypted", value -> {
                 assertThat(value).isInstanceOf(EncryptedValue.class);
                 assertThat(value).isEqualTo(secret);
             });
-            assertThat(input.getConfiguration()).hasEntrySatisfying("encrypted2", value -> {
+            assertThat(configuration).hasEntrySatisfying("encrypted2", value -> {
                 assertThat(value).isInstanceOf(EncryptedValue.class);
                 assertThat(value).isEqualTo(secret2);
             });

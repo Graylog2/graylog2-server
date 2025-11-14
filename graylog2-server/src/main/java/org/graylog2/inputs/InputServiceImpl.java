@@ -18,7 +18,6 @@ package org.graylog2.inputs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
@@ -60,9 +59,11 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -78,7 +79,7 @@ import static org.graylog2.inputs.InputImpl.FIELD_CREATED_AT;
 
 public class InputServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
-    private static final String COLLECTION_NAME = "inputs";
+    public static final String COLLECTION_NAME = "inputs";
 
     private final ExtractorFactory extractorFactory;
     private final ConverterFactory converterFactory;
@@ -111,29 +112,37 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public List<Input> all() {
-        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
-        return collection.find().into(inputs.build());
+        final List<Input> result = new ArrayList<>();
+        collection.find().forEach(result::add);
+
+        return result;
     }
 
     @Override
     public List<Input> allOfThisNode(final String nodeId) {
-        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
-        return collection.find(or(
+        final List<Input> result = new ArrayList<>();
+        collection.find(or(
                 eq(MessageInput.FIELD_NODE_ID, nodeId),
                 eq(MessageInput.FIELD_GLOBAL, true)
-        )).into(inputs.build());
+        )).forEach(result::add);
+
+        return result;
     }
 
     @Override
     public List<Input> allByType(final String type) {
-        final ImmutableList.Builder<Input> inputs = ImmutableList.builder();
-        return collection.find(eq(MessageInput.FIELD_TYPE, type)).into(inputs.build());
+        final List<Input> result = new ArrayList<>();
+        collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(result::add);
+
+        return result;
     }
 
     @Override
     public Set<Input> findByIds(Collection<String> ids) {
-        final ImmutableSet.Builder<Input> inputs = ImmutableSet.builder();
-        return mongoUtils.getByIds(ids).into(inputs.build());
+        final Set<Input> result = new HashSet<>();
+        mongoUtils.getByIds(ids).forEach(result::add);
+
+        return result;
     }
 
     public String save(Input model) throws ValidationException {
@@ -209,9 +218,9 @@ public class InputServiceImpl implements InputService {
                 .getConfiguration((Map<String, Object>) fields.get(MessageInput.FIELD_CONFIGURATION))
                 .getCreatedAt(createdAt);
 
-        final Map<String, String> staticFields = (Map<String, String>) fields.get(MessageInput.FIELD_STATIC_FIELDS);
+        final List<Map<String, String>> staticFields = (List<Map<String, String>>) fields.get(MessageInput.FIELD_STATIC_FIELDS);
         if (staticFields != null && !staticFields.isEmpty()) {
-            builder.getStaticFields(staticFields);
+            builder.staticFields(staticFields);
         }
 
         if (!isGlobal) {
@@ -327,8 +336,15 @@ public class InputServiceImpl implements InputService {
         }
 
         final ImmutableList.Builder<Extractor> listBuilder = ImmutableList.builder();
-        resultDoc.getList(InputImpl.EMBEDDED_EXTRACTORS, Document.class).forEach(ex -> listBuilder.add(getExtractorFromDoc(ex)));
-
+        final List<Object> list = resultDoc.getList(InputImpl.EMBEDDED_EXTRACTORS, Object.class);
+        if (list != null) {
+            list.stream()
+                    .map(raw -> (raw instanceof Document)
+                            ? (Document) raw
+                            : new Document((Map<String, Object>) raw))
+                    .map(this::getExtractorFromDoc)
+                    .forEach(listBuilder::add);
+        }
         return listBuilder.build();
     }
 

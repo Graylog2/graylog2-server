@@ -16,10 +16,16 @@
  */
 package org.graylog2.inputs;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
+import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.IOState;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -27,13 +33,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Map;
 
 @AutoValue
+@JsonDeserialize(builder = InputImpl.Builder.class)
+@DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ)
 public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl, InputImpl.Builder> {
     private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
-    public static final String FIELD_ID = "id";
+    public static final String FIELD_ID = "_id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_NODE_ID = "node_id";
     public static final String FIELD_NAME = "name";
@@ -53,6 +62,7 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
     @Id
     @ObjectId
     @JsonProperty(FIELD_ID)
+    @Nullable
     public abstract String getId();
 
     @JsonProperty(FIELD_TITLE)
@@ -65,7 +75,21 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
     public abstract Map<String, Object> getConfiguration();
 
     @JsonProperty(EMBEDDED_STATIC_FIELDS)
-    public abstract Map<String, String> getStaticFields();
+    public abstract List<Map<String, String>> staticFields();
+
+    public Map<String, String> getStaticFields() {
+        if (staticFields() == null) {
+            return Map.of();
+        }
+        return staticFields().stream()
+                .filter(map -> map.containsKey(FIELD_STATIC_FIELD_KEY) && map.containsKey(FIELD_STATIC_FIELD_VALUE))
+                .collect(java.util.stream.Collectors.toMap(
+                        map -> map.get(FIELD_STATIC_FIELD_KEY),
+                        map -> map.get(FIELD_STATIC_FIELD_VALUE)
+                ));
+    }
+
+    ;
 
     @JsonProperty(FIELD_TYPE)
     public abstract String getType();
@@ -85,6 +109,7 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
     public abstract String getNodeId();
 
     @JsonProperty(FIELD_DESIRED_STATE)
+    @Nullable
     public abstract IOState.Type getDesiredState();
 
     public static Builder builder() {
@@ -92,33 +117,52 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
     }
 
     @AutoValue.Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    @JsonPOJOBuilder(withPrefix = "get")
     public abstract static class Builder implements BuildableMongoEntity.Builder<InputImpl, Builder> {
+        @JsonCreator
         public static Builder create() {
-            return new AutoValue_InputImpl.Builder();
+            return new AutoValue_InputImpl.Builder().staticFields(List.of())
+                    .isGlobal(false);
         }
 
+        @JsonProperty(FIELD_ID)
+        @Nullable
         public abstract Builder getId(String id);
 
+        @JsonProperty(FIELD_TITLE)
         public abstract Builder getTitle(String title);
 
+        @JsonProperty(FIELD_CREATED_AT)
         public abstract Builder getCreatedAt(DateTime createdAt);
 
+        @JsonProperty(FIELD_CONFIGURATION)
         public abstract Builder getConfiguration(Map<String, Object> configuration);
 
-        public abstract Builder getStaticFields(Map<String, String> staticFields);
+        @JsonProperty(EMBEDDED_STATIC_FIELDS)
+        @Nullable
+        public abstract Builder staticFields(List<Map<String, String>> staticFields);
 
+        @JsonProperty(FIELD_TYPE)
         public abstract Builder getType(String type);
 
+        @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder getCreatorUserId(String creatorUserId);
 
+        @JsonProperty(FIELD_GLOBAL)
         public abstract Builder isGlobal(Boolean isGlobal);
 
+        @JsonProperty(FIELD_CONTENT_PACK)
+        @Nullable
         public abstract Builder getContentPack(String contentPack);
 
+        @JsonProperty(FIELD_NODE_ID)
+        @Nullable
         public abstract Builder getNodeId(String nodeId);
 
+        @JsonProperty(FIELD_DESIRED_STATE)
+        @Nullable
         public abstract Builder getDesiredState(IOState.Type desiredState);
-
     }
 
     @Override
@@ -141,17 +185,9 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
 
         doc.put(FIELD_CONFIGURATION, getConfiguration());
 
-        if (getStaticFields() != null && !getStaticFields().isEmpty()) {
-            final java.util.List<Map<String, String>> staticList = new java.util.ArrayList<>(getStaticFields().size());
-            getStaticFields().forEach((k, v) -> {
-                if (k != null && v != null) {
-                    staticList.add(java.util.Map.of(
-                            FIELD_STATIC_FIELD_KEY, k,
-                            FIELD_STATIC_FIELD_VALUE, v
-                    ));
-                }
-            });
-            doc.put(EMBEDDED_STATIC_FIELDS, staticList);
+        final List<Map<String, String>> staticFields = staticFields();
+        if (staticFields != null && !getStaticFields().isEmpty()) {
+            doc.put(EMBEDDED_STATIC_FIELDS, staticFields());
         }
 
         if (getContentPack() != null) {
