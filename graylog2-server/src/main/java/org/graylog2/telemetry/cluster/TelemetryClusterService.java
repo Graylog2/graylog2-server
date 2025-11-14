@@ -16,6 +16,7 @@
  */
 package org.graylog2.telemetry.cluster;
 
+import com.codahale.metrics.MetricRegistry;
 import org.graylog2.cluster.ClusterConfig;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
@@ -23,6 +24,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.shared.ServerVersion;
+import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
 import org.joda.time.DateTime;
@@ -37,18 +39,23 @@ public class TelemetryClusterService {
 
     public static final String UNKNOWN = "unknown";
     public static final String FACILITY = "graylog-server";
+    public static final String METRIC_JVM_MEMORY_HEAP_USED = "jvm.memory.heap.used";
+    public static final String METRIC_JVM_MEMORY_HEAP_COMMITTED = "jvm.memory.heap.committed";
+    public static final String METRIC_JVM_MEMORY_HEAP_MAX = "jvm.memory.heap.max";
 
     private final ServerStatus serverStatus;
     private final String clusterId;
     private final ClusterConfigService clusterConfigService;
     private final LeaderElectionService leaderElectionService;
     private final DBTelemetryClusterInfo dbTelemetryClusterInfo;
+    private final MetricRegistry metricRegistry;
 
     @Inject
     public TelemetryClusterService(ServerStatus serverStatus,
                                    ClusterConfigService clusterConfigService,
                                    LeaderElectionService leaderElectionService,
-                                   DBTelemetryClusterInfo dbTelemetryClusterInfo) {
+                                   DBTelemetryClusterInfo dbTelemetryClusterInfo,
+                                   MetricRegistry metricRegistry) {
         this.serverStatus = serverStatus;
         this.clusterId = Optional.ofNullable(clusterConfigService.get(ClusterId.class))
                 .map(ClusterId::clusterId)
@@ -56,6 +63,7 @@ public class TelemetryClusterService {
         this.clusterConfigService = clusterConfigService;
         this.leaderElectionService = leaderElectionService;
         this.dbTelemetryClusterInfo = dbTelemetryClusterInfo;
+        this.metricRegistry = metricRegistry;
     }
 
     public void updateTelemetryClusterData() {
@@ -73,6 +81,9 @@ public class TelemetryClusterService {
                 .operatingSystem(System.getProperty("os.name", UNKNOWN) + " " + System.getProperty("os.version", UNKNOWN))
                 .isLeader(leaderElectionService.isLeader())
                 .isProcessing(serverStatus.isProcessing())
+                .memoryHeapUsed(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_USED).orElse(-1L))
+                .memoryHeapCommitted(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_COMMITTED).orElse(-1L))
+                .memoryHeapMax(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_MAX).orElse(-1L))
                 .build();
 
         dbTelemetryClusterInfo.update(nodeInfo);

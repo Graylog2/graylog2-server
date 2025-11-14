@@ -44,6 +44,9 @@ import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_IS
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_IS_PROCESSING;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LB_STATUS;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LIFECYCLE;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_HEAP_COMMITTED;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_HEAP_MAX;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_HEAP_USED;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_NODE_ID;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_OPERATING_SYSTEM;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_STARTED_AT;
@@ -83,6 +86,10 @@ public class DBTelemetryClusterInfo {
         updates.add(Updates.set(FIELD_TIMEZONE, nodeInfo.timezone()));
         updates.add(Updates.set(FIELD_IS_LEADER, nodeInfo.isLeader()));
         updates.add(Updates.set(FIELD_IS_PROCESSING, nodeInfo.isProcessing()));
+        updates.add(Updates.set(FIELD_VERSION, nodeInfo.version()));
+        updates.add(Updates.set(FIELD_MEMORY_HEAP_USED, nodeInfo.memoryHeapUsed()));
+        updates.add(Updates.set(FIELD_MEMORY_HEAP_COMMITTED, nodeInfo.memoryHeapCommitted()));
+        updates.add(Updates.set(FIELD_MEMORY_HEAP_MAX, nodeInfo.memoryHeapMax()));
         updates.add(Updates.set(FIELD_VERSION, nodeInfo.version()));
         updates.add(currentDate(FIELD_UPDATED_AT));
 

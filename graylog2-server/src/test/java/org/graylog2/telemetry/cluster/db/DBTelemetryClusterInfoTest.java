@@ -67,7 +67,7 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfoList).hasSize(2);
         assertThat(nodeInfoList)
                 .extracting(TelemetryClusterInfoDto::nodeId)
-                .containsExactlyInAnyOrder("node-1", "node-2");
+                .containsExactlyInAnyOrder(dto1.nodeId(), dto2.nodeId());
     }
 
     @Test
@@ -95,6 +95,9 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.timezone()).isEqualTo(dto.timezone());
         assertThat(nodeInfo.updatedAt()).isNotNull();
         assertThat(nodeInfo.version()).isEqualTo(dto.version());
+        assertThat(nodeInfo.memoryHeapUsed()).isEqualTo(dto.memoryHeapUsed());
+        assertThat(nodeInfo.memoryHeapCommitted()).isEqualTo(dto.memoryHeapCommitted());
+        assertThat(nodeInfo.memoryHeapMax()).isEqualTo(dto.memoryHeapMax());
     }
 
     @Test
@@ -123,6 +126,9 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.timezone()).isEqualTo(dto2.timezone());
         assertThat(nodeInfo.updatedAt()).isNotNull();
         assertThat(nodeInfo.version()).isEqualTo(dto2.version());
+        assertThat(nodeInfo.memoryHeapUsed()).isEqualTo(dto2.memoryHeapUsed());
+        assertThat(nodeInfo.memoryHeapCommitted()).isEqualTo(dto2.memoryHeapCommitted());
+        assertThat(nodeInfo.memoryHeapMax()).isEqualTo(dto2.memoryHeapMax());
     }
 
     private TelemetryClusterInfoDto nodeInfo(String nodeId, boolean isLeader) {
@@ -142,6 +148,9 @@ public class DBTelemetryClusterInfoTest {
                 .startedAt(DateTime.now(DateTimeZone.UTC).minusDays(5))
                 .timezone("UTC-" + randStr)
                 .version("5.2.0-" + randStr)
+                .memoryHeapUsed((long) (Math.random() * 1_000_000))
+                .memoryHeapCommitted((long) (Math.random() * 1_000_000))
+                .memoryHeapMax((long) (Math.random() * 1_000_000))
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
     }

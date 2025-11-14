@@ -48,6 +48,9 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
     public static final String FIELD_TIMEZONE = "timezone";
     public static final String FIELD_UPDATED_AT = "updated_at";
     public static final String FIELD_VERSION = "version";
+    public static final String FIELD_MEMORY_HEAP_USED = "memory_heap_used";
+    public static final String FIELD_MEMORY_HEAP_COMMITTED = "memory_heap_committed";
+    public static final String FIELD_MEMORY_HEAP_MAX = "memory_heap_max";
 
     @Id
     @ObjectId
@@ -90,6 +93,18 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
 
     @JsonProperty(FIELD_TIMEZONE)
     public abstract String timezone();
+
+    @JsonProperty(FIELD_MEMORY_HEAP_USED)
+    @Nullable
+    public abstract Long memoryHeapUsed();
+
+    @JsonProperty(FIELD_MEMORY_HEAP_COMMITTED)
+    @Nullable
+    public abstract Long memoryHeapCommitted();
+
+    @JsonProperty(FIELD_MEMORY_HEAP_MAX)
+    @Nullable
+    public abstract Long memoryHeapMax();
 
     @JsonIgnore
     @Nullable
@@ -157,6 +172,15 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
 
         @JsonProperty(FIELD_VERSION)
         public abstract Builder version(String version);
+
+        @JsonProperty(FIELD_MEMORY_HEAP_USED)
+        public abstract Builder memoryHeapUsed(Long memoryHeapUsed);
+
+        @JsonProperty(FIELD_MEMORY_HEAP_COMMITTED)
+        public abstract Builder memoryHeapCommitted(Long memoryHeapCommitted);
+
+        @JsonProperty(FIELD_MEMORY_HEAP_MAX)
+        public abstract Builder memoryHeapMax(Long memoryHeapMax);
 
         public abstract TelemetryClusterInfoDto build();
     }
