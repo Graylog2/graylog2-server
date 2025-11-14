@@ -25,7 +25,6 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
-import org.graylog2.inputs.PaginatedInputService;
 import org.graylog2.inputs.diagnosis.InputDiagnosticService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
@@ -73,7 +72,7 @@ public class InputsResourceMaskingPasswordsTest {
 
     class InputsTestResource extends InputsResource {
         public InputsTestResource(InputService inputService, MessageInputFactory messageInputFactory) {
-            super(inputService, mock(PaginatedInputService.class), mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
+            super(inputService, mock(InputDiagnosticService.class), mock(StreamService.class), mock(StreamRuleService.class),
                     mock(PipelineService.class), messageInputFactory, new Configuration(), mock(ClusterEventBus.class));
         }
 
