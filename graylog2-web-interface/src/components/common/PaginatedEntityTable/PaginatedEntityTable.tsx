@@ -30,8 +30,10 @@ import TableFetchContextProvider from 'components/common/PaginatedEntityTable/Ta
 import type { PaginatedResponse, FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
+import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
+import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 
-import useFiltersAndPagination from './useFiltersAndPagination';
+import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
 
 const SearchRow = styled.div`
   margin-bottom: 5px;
@@ -46,27 +48,6 @@ export type MiddleSectionProps = {
   searchParams: SearchParams;
   setFilters: (newFilters: UrlQueryFilters) => void;
 };
-type Props<T, M> = {
-  actionsCellWidth?: EntityDataTableProps['actionsCellWidth'];
-  additionalAttributes?: Array<Attribute>;
-  bulkSelection?: EntityDataTableProps['bulkSelection'];
-  columnRenderers: EntityDataTableProps['columnRenderers'];
-  columnsOrder: EntityDataTableProps['columnsOrder'];
-  entityActions: EntityDataTableProps['entityActions'];
-  entityAttributesAreCamelCase: boolean;
-  expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'];
-  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
-  fetchOptions?: FetchOptions;
-  filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
-  humanName: string;
-  keyFn: (options: SearchParams) => Array<unknown>;
-  queryHelpComponent?: React.ReactNode;
-  searchPlaceholder?: string;
-  tableLayout: DefaultLayout;
-  topRightCol?: React.ReactNode;
-  middleSection?: React.ComponentType<MiddleSectionProps>;
-  withoutURLParams?: boolean;
-};
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -75,39 +56,44 @@ const INITIAL_DATA = {
   meta: null,
 };
 
-/*
- * This component is a wrapper for the EntityDataTable.
- * It should be used whenever you want to render the table on a page.
- * It contains all the required logic to e.g. sync the URL query params.
- * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
- */
-const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
+type InnerProps = {
+  fetchOptions: SearchParams;
+  isLoadingLayoutPreferences: boolean;
+  layoutConfig: LayoutConfig;
+  onChangeFilters: (newFilters: UrlQueryFilters) => void;
+  paginationState: PaginationQueryParameterResult;
+  reactQueryOptions: FetchOptions;
+  setQuery: (newQuery: string) => void;
+};
+
+const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   actionsCellWidth = 160,
+  additionalAttributes = [],
+  bulkSelection = undefined,
+  columnRenderers,
   columnsOrder,
   entityActions,
-  tableLayout,
-  fetchEntities,
-  keyFn,
-  humanName,
-  columnRenderers,
-  queryHelpComponent = undefined,
-  filterValueRenderers = undefined,
-  expandedSectionsRenderer = undefined,
-  bulkSelection = undefined,
-  additionalAttributes = [],
   entityAttributesAreCamelCase,
-  topRightCol = undefined,
-  searchPlaceholder = undefined,
-  fetchOptions: reactQueryOptions = undefined,
+  expandedSectionsRenderer = undefined,
+  fetchEntities,
+  fetchOptions,
+  filterValueRenderers = undefined,
+  humanName,
+  isLoadingLayoutPreferences,
+  keyFn,
+  layoutConfig,
   middleSection: MiddleSection = undefined,
+  onChangeFilters,
+  paginationState,
+  queryHelpComponent = undefined,
+  reactQueryOptions,
+  searchPlaceholder = undefined,
+  setQuery,
+  tableLayout,
+  topRightCol = undefined,
   withoutURLParams = false,
-}: Props<T, M>) => {
-  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(tableLayout);
+}: Props<T, M> & InnerProps) => {
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
-  const { fetchOptions, setQuery, onChangeFilters, paginationState } = useFiltersAndPagination({
-    layoutConfig,
-    withoutURLParams,
-  });
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
 
   const {
@@ -142,7 +128,9 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
     [additionalAttributes, paginatedEntities?.attributes],
   );
 
-  if (isLoadingLayoutPreferences || isLoadingEntities) return <Spinner />;
+  if (isLoadingLayoutPreferences || isLoadingEntities) {
+    return <Spinner />;
+  }
 
   const {
     list,
@@ -213,6 +201,86 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
         </div>
       </PaginatedList>
     </TableFetchContextProvider>
+  );
+};
+
+type WrapperProps<T, M> = Props<T, M> & {
+  isLoadingLayoutPreferences: boolean;
+  layoutConfig: LayoutConfig;
+  reactQueryOptions: FetchOptions;
+};
+
+const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
+  const { fetchOptions, setQuery, onChangeFilters, paginationState } = useWithLocalState(props.layoutConfig);
+
+  return (
+    <PaginatedEntityTableInner<T, M>
+      {...props}
+      fetchOptions={fetchOptions}
+      setQuery={setQuery}
+      onChangeFilters={onChangeFilters}
+      paginationState={paginationState}
+    />
+  );
+};
+
+const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
+  const { fetchOptions, setQuery, onChangeFilters, paginationState } = useWithURLParams(props.layoutConfig);
+
+  return (
+    <PaginatedEntityTableInner<T, M>
+      {...props}
+      fetchOptions={fetchOptions}
+      setQuery={setQuery}
+      onChangeFilters={onChangeFilters}
+      paginationState={paginationState}
+    />
+  );
+};
+
+type Props<T, M> = {
+  actionsCellWidth?: EntityDataTableProps['actionsCellWidth'];
+  additionalAttributes?: Array<Attribute>;
+  bulkSelection?: EntityDataTableProps['bulkSelection'];
+  columnRenderers: EntityDataTableProps['columnRenderers'];
+  columnsOrder: EntityDataTableProps['columnsOrder'];
+  entityActions: EntityDataTableProps['entityActions'];
+  entityAttributesAreCamelCase: boolean;
+  expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'];
+  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
+  fetchOptions?: FetchOptions;
+  filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
+  humanName: string;
+  keyFn: (options: SearchParams) => Array<unknown>;
+  queryHelpComponent?: React.ReactNode;
+  searchPlaceholder?: string;
+  tableLayout: DefaultLayout;
+  topRightCol?: React.ReactNode;
+  middleSection?: React.ComponentType<MiddleSectionProps>;
+  withoutURLParams?: boolean;
+};
+
+/*
+ * This component is a wrapper for the EntityDataTable.
+ It contains all the required logic to either sync the URL query params or, alternatively, use local state for filters and pagination.
+ * It should not be used when there are multiple entity tables on the page or when the table is rendered in a modal.
+ */
+
+const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
+  fetchOptions: reactQueryOptions = undefined,
+  ...props
+}: Props<T, M>) => {
+  const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(props.tableLayout);
+
+  const Wrapper = props.withoutURLParams ? TableWithLocalState : TableWithURLParams;
+
+  return (
+    <Wrapper<T, M>
+      {...props}
+      layoutConfig={layoutConfig}
+      isLoadingLayoutPreferences={isLoadingLayoutPreferences}
+      reactQueryOptions={reactQueryOptions}
+    />
   );
 };
 

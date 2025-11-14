@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { OrderedMap } from 'immutable';
 
 import { useQueryParam, StringParam } from 'routing/QueryParams';
@@ -22,16 +22,14 @@ import usePaginationQueryParameter, { DEFAULT_PAGE } from 'hooks/usePaginationQu
 import useUrlQueryFilters from 'components/common/EntityFilters/hooks/useUrlQueryFilters';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 
-type LayoutConfig = { pageSize: number; sort: DefaultLayout['defaultSort'] };
-
-function useWithURLParams(layoutConfig: LayoutConfig) {
+export const useWithURLParams = (layoutConfig: LayoutConfig) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
 
-  const fetchOptions: SearchParams = React.useMemo(
+  const fetchOptions: SearchParams = useMemo(
     () => ({
       query,
       page: urlPagination.page,
@@ -42,7 +40,7 @@ function useWithURLParams(layoutConfig: LayoutConfig) {
     [layoutConfig.pageSize, layoutConfig.sort, urlPagination.page, query, urlQueryFilters],
   );
 
-  const onChangeFilters = React.useCallback(
+  const onChangeFilters = useCallback(
     (newUrlQueryFilters: UrlQueryFilters) => {
       urlPagination.resetPage();
       setUrlQueryFilters(newUrlQueryFilters);
@@ -56,10 +54,10 @@ function useWithURLParams(layoutConfig: LayoutConfig) {
     onChangeFilters,
     paginationState: urlPagination,
   };
-}
+};
 
-function useWithLocalState(layoutConfig: LayoutConfig) {
-  const [fetchOptions, setFetchOptions] = React.useState<SearchParams>({
+export const useWithLocalState = (layoutConfig: LayoutConfig) => {
+  const [fetchOptions, setFetchOptions] = useState<SearchParams>({
     query: '',
     page: DEFAULT_PAGE,
     pageSize: layoutConfig.pageSize,
@@ -67,7 +65,7 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
     filters: OrderedMap<string, Array<string>>(),
   });
 
-  const setPagination = React.useCallback(
+  const setPagination = useCallback(
     ({ page, pageSize }: { page?: number; pageSize?: number }) => {
       setFetchOptions({
         ...fetchOptions,
@@ -78,7 +76,7 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
     [fetchOptions],
   );
 
-  const resetPage = React.useCallback(() => {
+  const resetPage = useCallback(() => {
     setFetchOptions({
       ...fetchOptions,
       page: DEFAULT_PAGE,
@@ -86,7 +84,7 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
     });
   }, [fetchOptions, layoutConfig.sort]);
 
-  const onChangeFilters = React.useCallback(
+  const onChangeFilters = useCallback(
     (newFilters: UrlQueryFilters) => {
       setFetchOptions({
         ...fetchOptions,
@@ -97,7 +95,7 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
     [fetchOptions],
   );
 
-  const setQuery = React.useCallback(
+  const setQuery = useCallback(
     (newQuery: string) => {
       setFetchOptions({
         ...fetchOptions,
@@ -108,7 +106,7 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
     [fetchOptions],
   );
 
-  const localPagination = React.useMemo(
+  return useMemo(
     () => ({
       fetchOptions,
       setQuery,
@@ -122,21 +120,4 @@ function useWithLocalState(layoutConfig: LayoutConfig) {
     }),
     [fetchOptions, onChangeFilters, resetPage, setPagination, setQuery],
   );
-
-  return localPagination;
-}
-
-function useFiltersAndPagination({
-  layoutConfig,
-  withoutURLParams = false,
-}: {
-  layoutConfig: LayoutConfig;
-  withoutURLParams?: boolean;
-}) {
-  const urlPaginationState = useWithURLParams(layoutConfig);
-  const localPaginationState = useWithLocalState(layoutConfig);
-
-  return withoutURLParams ? localPaginationState : urlPaginationState;
-}
-
-export default useFiltersAndPagination;
+};
