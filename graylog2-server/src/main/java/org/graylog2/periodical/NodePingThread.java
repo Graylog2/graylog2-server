@@ -22,6 +22,7 @@ import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,8 @@ import javax.annotation.Nonnull;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+
+import java.util.Locale;
 
 @Singleton
 public class NodePingThread extends Periodical {
@@ -54,11 +57,17 @@ public class NodePingThread extends Periodical {
     // This method is "synchronized" because we are also calling it directly in AutomaticLeaderElectionService
     public synchronized void doRun() {
         final boolean isLeader = leaderElectionService.isLeader();
+
+        final boolean isProcessing = serverStatus.isProcessing();
+        final LoadBalancerStatus loadBalancerStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
+
         ServerNodeDto dto = ServerNodeDto.Builder.builder()
                 .setId(serverStatus.getNodeId().getNodeId())
                 .setLeader(isLeader)
                 .setTransportAddress(httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API).toString())
                 .setHostname(Tools.getLocalCanonicalHostname())
+                .setProcessing(isProcessing)
+                .setLoadBalancerStatus(loadBalancerStatus)
                 .build();
         nodeService.ping(dto);
     }

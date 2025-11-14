@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.graylog.storage.opensearch3.cat.CatApi;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -29,7 +28,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FlushStats;
+import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
+import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
+import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 
@@ -43,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class IndicesAdapterOSTest {
@@ -50,13 +54,11 @@ class IndicesAdapterOSTest {
     private IndicesAdapterOS toTest;
 
     @Mock
-    private OpenSearchClient client;
+    private OfficialOpensearchClient opensearchClient;
     @Mock
     private StatsApi statsApi;
     @Mock
     private ClusterStatsApi clusterStatsApi;
-    @Mock
-    private CatApi catApi;
     @Mock
     private ClusterStateApi clusterStateApi;
     @Mock
@@ -66,11 +68,15 @@ class IndicesAdapterOSTest {
 
     @BeforeEach
     void setUp() {
+        OpenSearchClient client = mock(OpenSearchClient.class);
+        when(opensearchClient.sync()).thenReturn(client);
+        when(client.indices()).thenReturn(mock(OpenSearchIndicesClient.class));
+        when(client.cat()).thenReturn(mock(OpenSearchCatClient.class));
+        when(client.generic()).thenReturn(mock(OpenSearchGenericClient.class));
         toTest = new IndicesAdapterOS(
-                client,
+                opensearchClient,
                 statsApi,
                 clusterStatsApi,
-                catApi,
                 clusterStateApi,
                 indexTemplateAdapter,
                 indexStatisticsBuilder,

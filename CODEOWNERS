@@ -1,0 +1,5 @@
+# Changes to index set mappings have to be carefully reviewed to ensure backwards compatibility.
+graylog2-server/src/main/java/org/graylog2/indexer/*Mapping*.java @Graylog2/architecture @dennisoelkers
+
+# Changes to our core Message object also deserve scrutiny.
+graylog2-server/src/main/java/org/graylog2/plugin/Message.java @Graylog2/architecture @dennisoelkers
