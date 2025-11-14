@@ -14,23 +14,27 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React, { useContext, useMemo } from 'react';
 
-import React, { useContext } from 'react';
-
-import MessageFieldsViewModeList from 'views/components/messagelist/MessageFields/MessageFieldsViewModeList';
-import useFormattedFields from 'views/components/messagelist/MessageFields/hooks/useFormattedFields';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
+import { AdditionalContext } from 'views/logic/ActionContext';
 
-const MessageFieldsViewMode = () => {
-  const { message, favoriteFields } = useContext(MessageFavoriteFieldsContext);
-  const { formattedFavorites, formattedRest } = useFormattedFields(favoriteFields);
+const MessageDetailAdditionalContextProvider = ({
+  isLocalNode,
+  children = null,
+}: React.PropsWithChildren<{ isLocalNode: boolean }>) => {
+  const { toggleField, favoriteFields } = useContext(MessageFavoriteFieldsContext);
 
-  return (
-    <>
-      <MessageFieldsViewModeList fields={formattedFavorites} message={message} isFavorite />
-      <MessageFieldsViewModeList fields={formattedRest} message={message} isFavorite={false} />
-    </>
+  const additionalContext = useMemo(
+    () => ({
+      isLocalNode,
+      toggleFavoriteField: toggleField,
+      favoriteFields,
+    }),
+    [favoriteFields, isLocalNode, toggleField],
   );
+
+  return <AdditionalContext.Provider value={additionalContext}>{children}</AdditionalContext.Provider>;
 };
 
-export default MessageFieldsViewMode;
+export default MessageDetailAdditionalContextProvider;

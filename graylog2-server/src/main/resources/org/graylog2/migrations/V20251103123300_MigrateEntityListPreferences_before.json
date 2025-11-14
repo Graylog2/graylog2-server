@@ -1,0 +1,20 @@
+{
+  "entity_list_preferences": [
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "streams" } },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "dashboards" }, "displayed_attributes" : [ "description", "favorite", "last_updated_at", "owner", "_entity_source.source", "summary", "title" ], "sort" : { "field" : "last_updated_at", "order" : "asc" } },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "saved-searches" }, "displayed_attributes" : [ "created_at", "favorite", "last_updated_at", "title" ], "sort" : { "field" : "last_updated_at", "order" : "desc" } },
+    { "_id" : { "user_id" : "5ffdbca8eeae7f4edf068822", "entity_list_id" : "dashboards" }, "displayed_attributes" : [ "description", "favorite", "owner", "summary", "title" ], "per_page" : 20 },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "index-set-field-types" }, "per_page" : 20, "sort" : { "field" : "field_name", "order" : "asc" } },
+    { "_id" : { "user_id" : "646f403132107352a00146c1", "entity_list_id" : "streams" } },
+    { "_id" : { "user_id" : "646f403132107352a00146c1", "entity_list_id" : "dashboards" } },
+    { "_id" : { "user_id" : "5ffdbca8eeae7f4edf068822", "entity_list_id" : "streams" }, "per_page" : 50, "sort" : { "field" : "title", "order" : "asc" } },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "reports_history" }, "displayed_attributes" : [ "generated_at", "has_asset", "status", "message" ], "per_page" : 10, "sort" : { "field" : "generated_at", "order" : "desc" } },
+    { "_id" : { "user_id" : "5ffdbca8eeae7f4edf068822", "entity_list_id" : "saved-searches" }, "displayed_attributes" : [ "created_at", "description", "favorite", "owner", "summary", "title" ] },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "reports" }, "sort" : { "field" : "title", "order" : "asc" } },
+    { "_id" : { "user_id" : "5ffdbca8eeae7f4edf068822", "entity_list_id" : "saved-searches-for-investigations" }, "per_page" : 20 },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "events" }, "displayed_attributes" : [ "message", "event_definition_id", "priority", "timestamp", "alert" ], "per_page" : 100, "sort" : { "field" : "timestamp", "order" : "desc" }, "custom_preferences" : { "showMetrics" : true } },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "security_events" }, "displayed_attributes" : [ "message", "event_definition_id", "owner", "priority", "scores", "status", "timestamp", "alert" ], "per_page" : 100, "sort" : { "field" : "timestamp", "order" : "desc" }, "custom_preferences" : { "showMetrics" : true } },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "event_definitions" }, "displayed_attributes" : [ "description", "matched_at", "priority", "scheduling", "_entity_source.source", "status", "title" ], "per_page" : 100 },
+    { "_id" : { "user_id" : "local:admin", "entity_list_id" : "token_usage" }, "sort" : { "field" : "last_access", "order" : "desc" } }
+  ]
+}
