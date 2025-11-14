@@ -14,22 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import type { IndexSetFieldRestriction } from 'stores/indices/IndexSetsStore';
+import type { IndexSetFieldRestrictions } from 'stores/indices/IndexSetsStore';
 
 // eslint-disable-next-line import/prefer-default-export
 export const parseFieldRestrictions = (
-  field_restrictions?: IndexSetFieldRestriction[],
+  fieldRestrictions?: IndexSetFieldRestrictions,
 ): { immutableFields: Array<string>; hiddenFields: Array<string> } => {
-  if (!field_restrictions || field_restrictions.length < 1) return { immutableFields: [], hiddenFields: [] };
+  const fieldsWithRestrictions = Object.keys(fieldRestrictions);
+  if (!fieldRestrictions || fieldsWithRestrictions.length < 1) return { immutableFields: [], hiddenFields: [] };
 
   const getHidden = () =>
-    Object.keys(field_restrictions).filter(
-      (field) => field_restrictions[field].filter((restriction) => restriction.type === 'hidden').length > 0,
+    fieldsWithRestrictions.filter(
+      (field) => fieldRestrictions[field].filter((restriction) => restriction.type === 'hidden').length > 0,
     );
 
   const getImmutable = () =>
-    Object.keys(field_restrictions).filter(
-      (field) => field_restrictions[field].filter((restriction) => restriction.type === 'immutable').length > 0,
+    fieldsWithRestrictions.filter(
+      (field) => fieldRestrictions[field].filter((restriction) => restriction.type === 'immutable').length > 0,
     );
 
   return { immutableFields: getImmutable(), hiddenFields: getHidden() };
