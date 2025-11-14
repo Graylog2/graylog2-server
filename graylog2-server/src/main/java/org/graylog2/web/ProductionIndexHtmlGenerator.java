@@ -24,6 +24,8 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.RestTools;
 import org.graylog2.web.customization.CustomizationConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
@@ -75,9 +77,13 @@ public class ProductionIndexHtmlGenerator implements IndexHtmlGenerator {
         this.customizationConfig = customizationConfig;
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(ProductionIndexHtmlGenerator.class);
+
     @Override
     public String get(MultivaluedMap<String, String> headers, String nonce) {
         final URI relativePath = RestTools.buildRelativeExternalUri(headers, httpConfiguration.getHttpExternalUri());
+        LOG.warn("Getting index.html from {}", relativePath);
+
         final Map<String, Object> model = ImmutableMap.<String, Object>builder()
                 .put("title", customizationConfig.productName() + " Web Interface")
                 .put("cssFiles", cssFiles)
