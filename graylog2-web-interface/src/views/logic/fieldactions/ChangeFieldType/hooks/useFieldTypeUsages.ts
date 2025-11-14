@@ -44,7 +44,11 @@ export const queryKey = (searchParams: SearchParams, field: string, streams: Arr
 export const fetchFieldTypeUsages = async (
   { field, streams }: { field: string; streams: Array<string> },
   searchParams: SearchParams<SortableAttributes>,
-) => {
+): Promise<{
+  list: Array<FieldTypeUsage>;
+  pagination: { total: number };
+  attributes: Array<Attribute>;
+}> => {
   const {
     sort: { attributeId, direction },
     page,
