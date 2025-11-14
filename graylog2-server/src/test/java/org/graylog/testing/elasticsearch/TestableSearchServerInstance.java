@@ -17,6 +17,7 @@
 package org.graylog.testing.elasticsearch;
 
 import com.google.common.io.Resources;
+import org.graylog.testing.elasticsearch.testenv.IntegrationTestEnvironment;
 import org.graylog2.shared.utilities.StringUtils;
 import org.graylog2.storage.SearchVersion;
 import org.junit.rules.ExternalResource;
@@ -26,11 +27,13 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -182,5 +185,17 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
     public TestableSearchServerInstance init() {
         createContainer();
         return this;
+    }
+
+    /**
+     * Create new integration test environment. Resources created inside this environment
+     * will be automatically deleted when the {@code action} finishes.
+     */
+    public void withTestableEnvironment(Consumer<IntegrationTestEnvironment> action)  {
+        try(final IntegrationTestEnvironment environment = new IntegrationTestEnvironment(this)) {
+            action.accept(environment);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
