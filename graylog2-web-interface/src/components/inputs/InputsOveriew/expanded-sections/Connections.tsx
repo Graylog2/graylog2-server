@@ -16,27 +16,14 @@
  */
 import * as React from 'react';
 
-import useInputsStates from 'hooks/useInputsStates';
-import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
+import { formatCount } from 'components/inputs/helpers/InputThroughputUtils';
 
-const InputsDotBadge = ({ text }: { text: string }) => {
-  const { data, isLoading } = useInputsStates();
+const Connections = ({ openConnections, totalConnections }: { openConnections: number; totalConnections: number }) => (
+  <span>
+    Active connections: <span className="active">{formatCount(openConnections)} </span>(
+    <span className="total">{formatCount(totalConnections)}</span> total)
+    <br />
+  </span>
+);
 
-  if (isLoading) {
-    return null;
-  }
-
-  const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
-    Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
-  );
-
-  return (
-    <MenuItemDotBadge
-      text={text}
-      title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs}
-    />
-  );
-};
-
-export default InputsDotBadge;
+export default Connections;
