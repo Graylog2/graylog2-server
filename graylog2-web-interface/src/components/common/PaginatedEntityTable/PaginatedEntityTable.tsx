@@ -78,6 +78,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   fetchEntities,
   fetchOptions,
   filterValueRenderers = undefined,
+  focusSearchAfterMount = false,
   humanName,
   isLoadingLayoutPreferences,
   keyFn,
@@ -157,6 +158,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
         }>
         <SearchRow>
           <SearchForm
+            focusAfterMount={focusSearchAfterMount}
             onSearch={onSearch}
             onReset={onSearchReset}
             query={fetchOptions.query}
@@ -250,13 +252,14 @@ type Props<T, M> = {
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
+  focusSearchAfterMount?: boolean;
   humanName: string;
   keyFn: (options: SearchParams) => Array<unknown>;
+  middleSection?: React.ComponentType<MiddleSectionProps>;
   queryHelpComponent?: React.ReactNode;
   searchPlaceholder?: string;
   tableLayout: DefaultLayout;
   topRightCol?: React.ReactNode;
-  middleSection?: React.ComponentType<MiddleSectionProps>;
   withoutURLParams?: boolean;
 };
 

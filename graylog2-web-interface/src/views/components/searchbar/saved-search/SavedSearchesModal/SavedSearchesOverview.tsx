@@ -53,19 +53,20 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
 
   return (
     <PaginatedEntityTable<View>
-      humanName="saved searches"
-      entityActions={renderSavedSearchActions}
-      bulkSelection={{ actions: <BulkActions /> }}
-      additionalAttributes={pluggableAttributes.attributes}
-      tableLayout={DEFAULT_LAYOUT}
-      columnsOrder={COLUMN_ORDER}
-      queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
-      fetchEntities={fetchSavedSearches}
-      keyFn={(searchParams) => ['saved-searches', 'overview', searchParams]}
       actionsCellWidth={120}
-      entityAttributesAreCamelCase
+      additionalAttributes={pluggableAttributes.attributes}
+      bulkSelection={{ actions: <BulkActions /> }}
       columnRenderers={customColumnRenderers}
+      columnsOrder={COLUMN_ORDER}
+      entityActions={renderSavedSearchActions}
+      entityAttributesAreCamelCase
       expandedSectionsRenderer={pluggableExpandedSections}
+      fetchEntities={fetchSavedSearches}
+      focusSearchAfterMount
+      humanName="saved searches"
+      keyFn={(searchParams) => ['saved-searches', 'overview', searchParams]}
+      queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
+      tableLayout={DEFAULT_LAYOUT}
       withoutURLParams
     />
   );

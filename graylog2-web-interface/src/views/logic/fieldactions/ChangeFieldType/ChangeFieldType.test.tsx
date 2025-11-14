@@ -23,9 +23,7 @@ import TestStoreProvider from 'views/test/TestStoreProvider';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import useInitialSelection from 'views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection';
 import asMock from 'helpers/mocking/AsMock';
-import useFieldTypeUsages, {
-  fetchFieldTypeUsages,
-} from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useInitialSelection', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
