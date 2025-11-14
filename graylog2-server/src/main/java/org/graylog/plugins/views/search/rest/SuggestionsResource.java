@@ -59,7 +59,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -128,8 +127,8 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
             return getNoSuggestionResponse(suggestionsRequest.field(), suggestionsRequest.input());
         }
 
-        final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
-        var fieldType = fieldTypes.stream().filter(f -> f.name().equals(fieldName))
+        var fieldType = mappedFieldTypesService.fieldTypeByStreamIds(streams, timerange, suggestionsRequest.field())
+                .stream()
                 .findFirst()
                 .map(MappedFieldTypeDTO::type)
                 .orElse(FieldTypes.Type.createType("unknown", Collections.emptySet()));
