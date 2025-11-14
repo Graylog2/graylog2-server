@@ -53,7 +53,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
 
   return (
     <PaginatedEntityTable<View>
-      humanName="Saved Searches"
+      humanName="saved searches"
       entityActions={renderSavedSearchActions}
       bulkSelection={{ actions: <BulkActions /> }}
       additionalAttributes={pluggableAttributes.attributes}
