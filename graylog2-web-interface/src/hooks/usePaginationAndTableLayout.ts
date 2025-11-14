@@ -19,6 +19,7 @@ import { useCallback, useMemo, useState } from 'react';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import type { Sort } from 'stores/PaginationTypes';
+import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 type DefaultLayout = {
   pageSize: number;
@@ -83,9 +84,9 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
 
   const onResetSearch = useCallback(() => onSearch(''), [onSearch]);
 
-  const onColumnsChange = useCallback(
-    (displayedAttributes: Array<string>) => {
-      updateTableLayout({ displayedAttributes });
+  const onColumnPreferencesChange = useCallback(
+    (newColumnPreferences: ColumnPreferences) => {
+      updateTableLayout({ attributes: newColumnPreferences });
     },
     [updateTableLayout],
   );
@@ -98,7 +99,7 @@ const usePaginationAndTableLayout = (entityTableId: string, defaultLayout: Defau
     onSearch,
     onResetSearch,
     searchParams,
-    onColumnsChange,
+    onColumnPreferencesChange,
     onSortChange,
     onPageSizeChange,
     columnsOrder: defaultLayout.columnsOrder,

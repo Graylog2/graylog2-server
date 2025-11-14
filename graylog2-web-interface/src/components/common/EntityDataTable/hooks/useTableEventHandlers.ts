@@ -22,7 +22,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
-import type { TableLayoutPreferences } from 'components/common/EntityDataTable/types';
+import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const useTableEventHandlers = ({
   updateTableLayout,
@@ -65,16 +65,16 @@ const useTableEventHandlers = ({
     onSearch('');
   }, [onSearch]);
 
-  const onColumnsChange = useCallback(
-    (displayedAttributes: Array<string>) => {
+  const onColumnPreferencesChange = useCallback(
+    (newColumnPreferences: ColumnPreferences) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
         app_pathname: getPathnameWithoutId(pathname),
         app_section: appSection,
         app_action_value: 'columns-select',
-        columns: displayedAttributes,
+        columns: Object.keys(newColumnPreferences).filter((key) => newColumnPreferences[key].status === 'show'),
       });
 
-      updateTableLayout({ displayedAttributes });
+      updateTableLayout({ attributes: newColumnPreferences });
     },
     [appSection, pathname, sendTelemetry, updateTableLayout],
   );
@@ -98,7 +98,7 @@ const useTableEventHandlers = ({
     onPageSizeChange,
     onSearch,
     onSearchReset,
-    onColumnsChange,
+    onColumnPreferencesChange,
     onSortChange,
   };
 };

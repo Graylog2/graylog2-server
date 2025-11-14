@@ -46,7 +46,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
     onSearch,
     onResetSearch,
     searchParams,
-    onColumnsChange,
+    onColumnPreferencesChange,
     onSortChange,
     onPageSizeChange,
   } = useSavedSearchPaginationAndTableLayout();
@@ -79,7 +79,6 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
 
   const { list: savedSearches, pagination, attributes } = paginatedSavedSearches;
   const columnSchemas = [...attributes, ...pluggableAttributes.attributes];
-  const visibleColumns = [...layoutConfig.displayedAttributes, ...pluggableAttributes.attributeNames];
   const columnsOrder = [...DEFAULT_LAYOUT.columnsOrder, ...pluggableAttributes.attributeNames];
 
   return (
@@ -107,21 +106,22 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       )}
       {!!savedSearches?.length && (
         <EntityDataTable<View>
-          entities={savedSearches}
-          visibleColumns={visibleColumns}
-          columnsOrder={columnsOrder}
-          onColumnsChange={onColumnsChange}
-          bulkSelection={{ actions: <BulkActions /> }}
-          onSortChange={onSortChange}
-          activeSort={layoutConfig.sort}
-          entityAttributesAreCamelCase
-          pageSize={searchParams.pageSize}
-          onPageSizeChange={onPageSizeChange}
           actionsCellWidth={120}
-          expandedSectionsRenderer={pluggableExpandedSections}
-          entityActions={renderSavedSearchActions}
+          activeSort={layoutConfig.sort}
+          bulkSelection={{ actions: <BulkActions /> }}
+          columnPreferences={layoutConfig.columnPreferences}
           columnRenderers={customColumnRenderers}
           columnSchemas={columnSchemas}
+          columnsOrder={columnsOrder}
+          defaultDisplayedColumns={layoutConfig.defaultDisplayedColumns}
+          entities={savedSearches}
+          entityActions={renderSavedSearchActions}
+          entityAttributesAreCamelCase
+          expandedSectionsRenderer={pluggableExpandedSections}
+          onColumnPreferencesChange={onColumnPreferencesChange}
+          onPageSizeChange={onPageSizeChange}
+          onSortChange={onSortChange}
+          pageSize={searchParams.pageSize}
         />
       )}
     </PaginatedList>

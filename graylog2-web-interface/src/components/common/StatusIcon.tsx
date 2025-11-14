@@ -23,8 +23,9 @@ type Props = {
   className?: string;
 };
 
-const StatusIcon = ({ active, className = undefined }: Props) => (
+const StatusIcon = ({ active, className = undefined }: Props, ref: React.ForwardedRef<HTMLSpanElement>) => (
   <Icon
+    ref={ref}
     name={active ? 'check_circle' : 'cancel'}
     bsStyle={active ? 'success' : undefined}
     className={className}
@@ -32,4 +33,4 @@ const StatusIcon = ({ active, className = undefined }: Props) => (
   />
 );
 
-export default StatusIcon;
+export default React.forwardRef(StatusIcon);

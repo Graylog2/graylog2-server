@@ -28,7 +28,8 @@ const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDi
       layoutConfig: {
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
         sort: userLayoutPreferences.sort ?? defaultSort,
-        displayedAttributes: userLayoutPreferences?.displayedAttributes ?? defaultDisplayedAttributes,
+        columnPreferences: userLayoutPreferences?.attributes,
+        defaultDisplayedColumns: defaultDisplayedAttributes,
       },
       isInitialLoading,
     }),
@@ -37,7 +38,7 @@ const useTableLayout = ({ entityTableId, defaultSort, defaultPageSize, defaultDi
       defaultPageSize,
       defaultSort,
       isInitialLoading,
-      userLayoutPreferences?.displayedAttributes,
+      userLayoutPreferences?.attributes,
       userLayoutPreferences.perPage,
       userLayoutPreferences.sort,
     ],
