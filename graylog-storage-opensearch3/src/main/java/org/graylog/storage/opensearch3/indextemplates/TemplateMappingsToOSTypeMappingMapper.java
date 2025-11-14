@@ -14,14 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.storage.opensearch3.indextemplates;
 
 import org.graylog2.indexer.indices.Template;
+import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 
-interface IndexTemplateAdapter {
-    boolean ensureIndexTemplate(String templateName, Template template);
+import java.util.function.Function;
 
-    boolean indexTemplateExists(String templateName);
+public class TemplateMappingsToOSTypeMappingMapper implements Function<Template.Mappings, TypeMapping> {
 
-    boolean deleteIndexTemplate(String templateName);
+    @Override
+    public TypeMapping apply(final Template.Mappings mappings) {
+        return TypeMapping.builder().build();
+    }
 }
