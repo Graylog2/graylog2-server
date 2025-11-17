@@ -27,23 +27,14 @@ import java.util.stream.Collectors;
  */
 public class SchedulerCapabilitiesService {
     private final Set<SchedulerCapabilities> schedulerCapabilities;
-    private final Set<JobDefinitionTypeCapability> jobDefinitionTypeCapabilities;
 
     @Inject
-    public SchedulerCapabilitiesService(Set<SchedulerCapabilities> schedulerCapabilities,
-                                        Set<JobDefinitionTypeCapability> jobDefinitionTypeCapabilities) {
+    public SchedulerCapabilitiesService(Set<SchedulerCapabilities> schedulerCapabilities) {
         this.schedulerCapabilities = schedulerCapabilities;
-        this.jobDefinitionTypeCapabilities = jobDefinitionTypeCapabilities;
     }
 
     public Set<String> getNodeCapabilities() {
         // TODO cache results? Currently the operations are rather cheap
         return schedulerCapabilities.stream().flatMap(s -> s.getNodeCapabilities().stream()).collect(Collectors.toSet());
-    }
-
-    public Set<String> notCapableToRunJobDefinitionTypes() {
-        return jobDefinitionTypeCapabilities.stream()
-                .flatMap(c -> c.notCapableToRunJobDefinitionTypes().stream())
-                .collect(Collectors.toSet());
     }
 }
