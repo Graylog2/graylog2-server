@@ -96,7 +96,12 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       $transform={transform}
       $isDragging={isDragging}>
       {columnMeta?.enableColumnOrdering && (
-        <DragHandle ref={setActivatorNodeRef} {...attributes} {...listeners} $isDragging={isDragging}>
+        <DragHandle
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          $isDragging={isDragging}
+          aria-label={`Reorder ${columnMeta.label.toLowerCase()} column`}>
           <DragIcon name="drag_indicator" />
         </DragHandle>
       )}

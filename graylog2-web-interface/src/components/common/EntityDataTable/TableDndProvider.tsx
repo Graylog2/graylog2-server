@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import { DragStartEvent, DragEndEvent, PointerSensor } from '@dnd-kit/core';
 import {
   closestCenter,
   DndContext,
@@ -45,7 +45,12 @@ type Props<Entity extends EntityBase> = React.PropsWithChildren<{
 const TableDndProvider = <Entity extends EntityBase>({ children = undefined, table }: Props<Entity>) => {
   const [activeId, setActiveId] = useState<number | string | null>(null);
 
-  const sensors = useSensors(useSensor(MouseSensor, {}), useSensor(TouchSensor, {}), useSensor(KeyboardSensor, {}));
+  const sensors = useSensors(
+    useSensor(MouseSensor, {}),
+    useSensor(TouchSensor, {}),
+    useSensor(PointerSensor, {}),
+    useSensor(KeyboardSensor, {}),
+  );
   const handleDragStart = useCallback((event: DragStartEvent) => {
     const { active } = event;
 
