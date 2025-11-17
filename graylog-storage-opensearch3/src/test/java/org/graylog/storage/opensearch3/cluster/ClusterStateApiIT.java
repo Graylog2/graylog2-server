@@ -55,7 +55,8 @@ class ClusterStateApiIT {
 
     @AfterEach
     void tearDown() {
-        opensearch.client().deleteIndices(MY_INDEX_NAME, MY_OTHER_INDEX_NAME, MY_EMPTY_INDEX_NAME);
+        // TODO: the @Rule annotation is not working for junit5, we have to trigger the cleanup manually here
+        opensearch.cleanUp();
     }
 
     @Test
