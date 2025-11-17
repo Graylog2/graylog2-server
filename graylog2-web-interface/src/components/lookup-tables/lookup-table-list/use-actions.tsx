@@ -84,9 +84,11 @@ function Actions({ lut }: ActionsProps) {
   );
 }
 
+const renderActions = (lut: LookupTableEntity) => <Actions lut={lut} />;
+
 function useActions() {
   return {
-    renderActions: (lut: LookupTableEntity) => <Actions lut={lut} />,
+    renderActions,
   };
 }
 

@@ -45,10 +45,12 @@ import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PaginatedPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -104,6 +106,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     private final PipelineStreamConnectionsService connectionsService;
     private final InputRoutingService inputRoutingService;
     private final RuleService ruleService;
+    private final MongoDbPipelineMetadataService metadataService;
 
     @Inject
     public PipelineResource(PipelineService pipelineService,
@@ -111,7 +114,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
                             PipelineRuleParser pipelineRuleParser,
                             PipelineStreamConnectionsService connectionsService,
                             InputRoutingService inputRoutingService,
-                            RuleService ruleService) {
+                            RuleService ruleService,
+                            MongoDbPipelineMetadataService metadataService) {
         this.pipelineService = pipelineService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.paginatedPipelineService = paginatedPipelineService;
@@ -119,6 +123,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
         this.connectionsService = connectionsService;
         this.inputRoutingService = inputRoutingService;
         this.ruleService = ruleService;
+        this.metadataService = metadataService;
     }
 
     @ApiOperation(value = "Create a processing pipeline from source")
@@ -237,13 +242,21 @@ public class PipelineResource extends RestResource implements PluginRestResource
         return PaginatedResponse.create("pipelines", pipelines);
     }
 
-    @ApiOperation(value = "Get a processing pipeline", notes = "It can take up to a second until the change is applied")
+    @ApiOperation(value = "Get a processing pipeline")
     @Path("/{id}")
     @GET
     public PipelineSource get(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_READ, id);
         final PipelineDao dao = pipelineService.load(id);
         return PipelineSource.fromDao(pipelineRuleParser, dao);
+    }
+
+    @ApiOperation(value = "Get rules metadata of a processing pipeline")
+    @Path("/{id}/meta/rules")
+    @GET
+    public PipelineRulesMetadataDao getRulesMetadata(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
+        checkPermission(PipelineRestPermissions.PIPELINE_READ, id);
+        return metadataService.get(id);
     }
 
     @ApiOperation(value = "Modify a processing pipeline", notes = "It can take up to a second until the change is applied")

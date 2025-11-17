@@ -17,11 +17,14 @@
 import { useState, useCallback, useContext } from 'react';
 import uniq from 'lodash/uniq';
 
-import { DEFAULT_FIELDS } from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFields';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 import type { FormattedField } from 'views/components/messagelist/MessageFields/types';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
+
+export const DEFAULT_FIELDS = ['source', 'destination_ip', 'usernames'];
 
 const useMessageFavoriteFieldsForEditing = () => {
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
   const { saveFavoriteField, favoriteFields: initialFavoriteFields } = useContext(MessageFavoriteFieldsContext);
   const [favorites, setFavorites] = useState<Array<string>>(initialFavoriteFields ?? []);
   const resetFavoriteFields = useCallback(() => {
@@ -31,9 +34,13 @@ const useMessageFavoriteFieldsForEditing = () => {
   const saveEditedFavoriteFields = useCallback(() => {
     saveFavoriteField(favorites);
   }, [favorites, saveFavoriteField]);
-  const reorderFavoriteFields = useCallback((items: Array<FormattedField>) => {
-    setFavorites(items.map((item: FormattedField) => item.field));
-  }, []);
+  const reorderFavoriteFields = useCallback(
+    (items: Array<FormattedField>) => {
+      sendFavoriteFieldTelemetry('REORDERED');
+      setFavorites(items.map((item: FormattedField) => item.field));
+    },
+    [sendFavoriteFieldTelemetry],
+  );
   const onFavoriteToggle = useCallback(
     (fieldName: string) =>
       setFavorites((favs) => {
