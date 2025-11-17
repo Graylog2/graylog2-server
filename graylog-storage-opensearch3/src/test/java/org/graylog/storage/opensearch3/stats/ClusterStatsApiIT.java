@@ -20,6 +20,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.junit.Rule;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch.core.BulkRequest;
@@ -36,6 +37,12 @@ class ClusterStatsApiIT {
     @BeforeEach
     void setUp() {
         api = new ClusterStatsApi(opensearch.getOfficialOpensearchClient());
+    }
+
+    @AfterEach
+    void tearDown() {
+        // TODO: the @Rule annotation is not working for junit5, we have to trigger the cleanup manually here
+        opensearch.cleanUp();
     }
 
     @Test
