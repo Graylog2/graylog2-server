@@ -87,8 +87,9 @@ public class SystemFieldsResource extends RestResource {
                 if (!unlimited && count >= limit) {
                     break outer;
                 }
-                fields.add(field);
-                count++;
+                if (fields.add(field)) {
+                    count++;
+                }
             }
         }
         if (!unlimited) {
