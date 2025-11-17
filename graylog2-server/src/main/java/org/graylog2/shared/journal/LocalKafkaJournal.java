@@ -712,15 +712,22 @@ public class LocalKafkaJournal extends AbstractIdleService implements Journal {
                 lastOffset = messageAndOffset.offset();
 
                 final byte[] payloadBytes = ByteBufferUtils.readBytes(messageAndOffset.message().payload());
-                if (includeMessageId) {
-                    final byte[] keyBytes = ByteBufferUtils.readBytes(messageAndOffset.message().key());
-                    messages.add(new JournalReadEntry(keyBytes, payloadBytes, messageAndOffset.offset()));
-                    if (LOG.isTraceEnabled()) {
-                        LOG.trace("Read message {} contains {}", bytesToHex(keyBytes), bytesToHex(payloadBytes));
-                    }
-                } else {
-                    messages.add(new JournalReadEntry(payloadBytes, messageAndOffset.offset()));
+                final boolean traceEnabled = LOG.isTraceEnabled();
+                final boolean readKey = includeMessageId || traceEnabled;
+
+                final byte[] keyBytes = readKey
+                        ? ByteBufferUtils.readBytes(messageAndOffset.message().key())
+                        : null;
+                final JournalReadEntry entry = includeMessageId
+                        ? new JournalReadEntry(keyBytes, payloadBytes, messageAndOffset.offset())
+                        : new JournalReadEntry(payloadBytes, messageAndOffset.offset());
+
+                if (traceEnabled) {
+                    LOG.trace("Read message {} contains {}",
+                            bytesToHex(keyBytes), bytesToHex(payloadBytes));
                 }
+
+                messages.add(entry);
 
                 totalBytes += payloadBytes.length;
                 // remember where to read from
