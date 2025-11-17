@@ -37,6 +37,7 @@ import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -177,7 +178,7 @@ public class InputServiceImplTest {
                 .getTitle("test title")
                 .getType("test type")
                 .getCreatorUserId("test creator")
-                .getCreatedAt(new DateTime())
+                .getCreatedAt(new DateTime(DateTimeZone.UTC))
                 .getConfiguration(Map.of(
                         "encrypted", secret,
                         "encrypted2", secret2
@@ -189,7 +190,6 @@ public class InputServiceImplTest {
 
         assertThat(inputService.find(id)).satisfies(input -> {
             Map<String, Object> configuration = input.getConfiguration();
-            Object encrypted = configuration.get("encrypted");
             assertThat(configuration).hasEntrySatisfying("encrypted", value -> {
                 assertThat(value).isInstanceOf(EncryptedValue.class);
                 assertThat(value).isEqualTo(secret);
