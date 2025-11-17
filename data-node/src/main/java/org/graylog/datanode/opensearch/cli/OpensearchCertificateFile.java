@@ -14,16 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine;
+package org.graylog.datanode.opensearch.cli;
 
-public enum OpensearchEvent {
-    PROCESS_PREPARED,
-    PROCESS_STARTED,
-    HEALTH_CHECK_OK,
-    HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED,
-    PROCESS_REMOVE,
-    RESET, // user-triggered action
-    CERTIFICATES_RELOAD,  // reload existing http and transport certificates
-    PROCESS_TERMINATED // failure from outside, not requested
+import org.graylog.datanode.process.configuration.files.KeystoreConfigFile;
+import org.graylog.security.certutil.csr.InMemoryKeystoreInformation;
+
+import java.nio.file.Path;
+import java.security.KeyStore;
+import java.util.function.Supplier;
+
+public class OpensearchCertificateFile  {
+
+    public static KeystoreConfigFile create(String filename, Supplier<KeyStore> supplier, char[] password) {
+        return new KeystoreConfigFile(Path.of(filename), new InMemoryKeystoreInformation(supplier.get(), password));
+    }
 }
