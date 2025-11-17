@@ -30,9 +30,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settin
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.alias.IndicesAliasesRequest.AliasActions;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.open.OpenIndexRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.refresh.RefreshRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.settings.put.UpdateSettingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.bulk.BulkRequest;
@@ -117,11 +115,8 @@ public class ClientOS implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        for (String index : indices) {
-            if (indicesExists(index)) {
-                final DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(index);
-                client.execute((c, requestOptions) -> c.indices().delete(deleteIndexRequest, requestOptions));
-            }
+        if (indices.length > 0) {
+            opensearchClient.sync(c -> c.indices().delete(r -> r.index(List.of(indices)).ignoreUnavailable(true)), "Failed to delete indices");
         }
     }
 
@@ -309,8 +304,7 @@ public class ClientOS implements Client {
 
     @Override
     public void refreshNode() {
-        final RefreshRequest refreshRequest = new RefreshRequest();
-        client.execute((c, requestOptions) -> c.indices().refresh(refreshRequest, requestOptions));
+        opensearchClient.sync(c -> c.indices().refresh(), "Failed to refresh indices");
     }
 
     @Override
