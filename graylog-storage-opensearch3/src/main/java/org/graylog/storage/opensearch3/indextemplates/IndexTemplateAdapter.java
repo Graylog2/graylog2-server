@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.storage.opensearch3.indextemplates;
 
 import org.graylog2.indexer.indices.Template;
 
-interface IndexTemplateAdapter {
+public interface IndexTemplateAdapter {
     boolean ensureIndexTemplate(String templateName, Template template);
 
     boolean indexTemplateExists(String templateName);
