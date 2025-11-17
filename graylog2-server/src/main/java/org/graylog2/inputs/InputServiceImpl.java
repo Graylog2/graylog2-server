@@ -359,9 +359,7 @@ public class InputServiceImpl implements InputService {
         final List<Object> list = resultDoc.getList(InputImpl.EMBEDDED_EXTRACTORS, Object.class);
         if (list != null) {
             list.stream()
-                    .map(raw -> (raw instanceof Document)
-                            ? (Document) raw
-                            : new Document((Map<String, Object>) raw))
+                    .map(this::toDocument)
                     .map(this::getExtractorFromDoc)
                     .forEach(listBuilder::add);
         }
@@ -387,18 +385,29 @@ public class InputServiceImpl implements InputService {
             throw new NotFoundException("Extractor " + extractorId + " not found for input " + input.getId());
         }
 
-        final List<Document> extractors = doc.getList(InputImpl.EMBEDDED_EXTRACTORS, Document.class);
+        final List<Object> extractors = doc.getList(InputImpl.EMBEDDED_EXTRACTORS, Object.class);
         if (extractors == null || extractors.isEmpty()) {
             throw new NotFoundException("Extractor " + extractorId + " not found for input " + input.getId());
         }
 
-        final Document extractorDoc = extractors.getFirst();
+        final Document extractorDoc = toDocument(extractors.getFirst());
         final Extractor extractor = getExtractorFromDoc(extractorDoc);
         if (extractor == null) {
             throw new NotFoundException("Extractor " + extractorId + " not found for input " + input.getId());
         }
 
         return extractor;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Document toDocument(Object raw) {
+        if (raw instanceof Document doc) {
+            return doc;
+        }
+        if (raw instanceof Map<?, ?> map) {
+            return new Document((Map<String, Object>) map);
+        }
+        throw new IllegalArgumentException("Unsupported value type: " + raw.getClass());
     }
 
     @SuppressWarnings("unchecked")
