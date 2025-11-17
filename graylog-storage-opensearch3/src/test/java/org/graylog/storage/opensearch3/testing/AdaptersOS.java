@@ -34,6 +34,7 @@ import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
@@ -83,7 +84,8 @@ public class AdaptersOS implements Adapters {
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
                 featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
                 new IndexStatisticsBuilder(),
-                objectMapper
+                objectMapper,
+                new OSSerializationUtils(objectMapper, officialOpensearchClient)
         );
     }
 
