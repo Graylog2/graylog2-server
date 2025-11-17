@@ -75,7 +75,7 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => 
       <Col sm={11}>
         <FormikInput
           key={`metrics-${metricIndex}-thresholds-${thresholdIndex}-name`}
-          id="thresholdName"
+          id={`metric-${metricIndex}-threshold-${thresholdIndex}-name`}
           label="Title"
           bsSize="small"
           placeholder="Specify threshold name"
@@ -90,7 +90,7 @@ const ThresholdFormItem = ({ metricIndex, thresholdIndex, onRemove }: Props) => 
       <Col sm={11}>
         <FormikInput
           key={`metrics-${metricIndex}-thresholds-${thresholdIndex}-value`}
-          id="thresholdValue"
+          id={`metric-${metricIndex}-threshold-${thresholdIndex}-value`}
           label="Value"
           bsSize="small"
           type="number"
