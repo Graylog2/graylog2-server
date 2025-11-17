@@ -24,6 +24,7 @@ const ToggleFavoriteField = async ({ contexts, field }: ActionHandlerArguments) 
 
 ToggleFavoriteField.isHidden = (isAdding: boolean, props: Partial<ActionHandlerArguments>) =>
   !AppConfig.isFeatureEnabled('message_table_favorite_fields') ||
+  props.contexts.favoriteFields == undefined ||
   (isAdding && isFieldFavorite(props)) ||
   (!isAdding && !isFieldFavorite(props));
 
