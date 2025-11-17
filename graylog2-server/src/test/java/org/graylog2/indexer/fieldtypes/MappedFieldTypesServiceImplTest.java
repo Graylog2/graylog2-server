@@ -25,7 +25,6 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,12 +46,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+// TODO: This should use a MongoDB instance and DB fixtures instead of mocks.
 public class MappedFieldTypesServiceImplTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private StreamService streamService;
 
     @Mock
     private IndexFieldTypesService indexFieldTypesService;
@@ -187,7 +184,7 @@ public class MappedFieldTypesServiceImplTest {
     }
 
     @Test
-    public void requestsFieldTypesForRequestedTimeRange() throws Exception {
+    public void requestsFieldTypesForRequestedTimeRange() {
         this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), AbsoluteRange.create("2010-05-17T23:28:14.000+02:00", "2021-05-05T12:09:23.213+02:00"));
 
         verify(this.indexLookup, times(1)).indexNamesForStreamsInTimeRange(streamIdCaptor.capture(), timeRangeCaptor.capture());
