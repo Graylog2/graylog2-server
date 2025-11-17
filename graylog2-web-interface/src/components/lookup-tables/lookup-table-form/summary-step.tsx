@@ -63,8 +63,12 @@ function TableSummary({ table }: { table: LookupTable }) {
         </Row>
       </Col>
       <LookupTableDetails table={table} />
-      <PurgeCache table={table} />
-      <TestLookup table={table} />
+      {table.id && (
+        <>
+          <PurgeCache table={table} />
+          <TestLookup table={table} />
+        </>
+      )}
     </Col>
   );
 }
@@ -98,7 +102,11 @@ function SummaryStep() {
 
   return (
     <ErrorsProvider>
-      <ErrorsConsumer lutNames={[values.name]} cacheNames={[cache?.name]} adapterNames={[dataAdapter?.name]} />
+      <ErrorsConsumer
+        lutNames={values.name ? [values.name] : undefined}
+        cacheNames={cache?.name ? [cache.name] : undefined}
+        adapterNames={dataAdapter?.name ? [dataAdapter.name] : undefined}
+      />
       <StyledContainer $gap="xl">
         <TableSummary table={values} />
         <Col $gap="lg">

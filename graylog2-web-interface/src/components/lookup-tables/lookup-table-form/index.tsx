@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { Formik } from 'formik';
+import type { FormikErrors } from 'formik';
 import { useParams } from 'react-router-dom';
 
 import { Wizard, Spinner } from 'components/common';
@@ -25,6 +26,17 @@ import useSteps from 'components/lookup-tables/lookup-table-form/use-steps';
 import type { LookupTableType } from 'components/lookup-tables/LookupTableForm';
 
 import WizardButtons from './wizard-buttons';
+
+const validations = (values: LookupTableType) => {
+  const errors: FormikErrors<LookupTableType> = {};
+
+  if (!values.title) errors.title = 'Title is required';
+  if (!values.name) errors.name = 'Name is required';
+  if (!values.cache_id) errors.cache_id = 'Cache is required';
+  if (!values.data_adapter_id) errors.data_adapter_id = 'Data Adapter is required';
+
+  return errors;
+};
 
 function LookupTableWizard() {
   const { lutIdOrName } = useParams<{ lutIdOrName: string }>();
@@ -43,7 +55,7 @@ function LookupTableWizard() {
   if (loadingLookupTable) return <Spinner text="Loading Lookup Table ..." />;
 
   return (
-    <Formik initialValues={initialValues} onSubmit={handleSubmit}>
+    <Formik initialValues={initialValues} onSubmit={handleSubmit} validate={validations} validateOnMount>
       <>
         <Wizard
           steps={steps}
