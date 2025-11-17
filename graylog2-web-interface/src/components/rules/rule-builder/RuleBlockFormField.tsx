@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useField } from 'formik';
 
 import { FormikFormGroup, InputOptionalInfo } from 'components/common';
@@ -55,6 +55,12 @@ const RuleBlockFormField = ({
   useEffect(() => {
     setPrimaryInputToggle(undefined);
   }, [functionName]);
+
+  const uniqueFieldId = useMemo(() => {
+    const blockIdentifier = blockId ?? 'new';
+
+    return `${blockIdentifier}_${order}_${param.name}`;
+  }, [blockId, order, param.name]);
 
   const paramValueExists = (paramValue: string | number | boolean | undefined): boolean =>
     typeof paramValue !== 'undefined' && paramValue !== null;
@@ -135,6 +141,7 @@ const RuleBlockFormField = ({
         required={!param.optional}
         buttonAfter={<Button onClick={() => onPrimaryInputToggle('custom')}>{`Set custom ${param.name}`}</Button>}
         help={param.description}
+        id={uniqueFieldId}
         {...field}>
         <>
           <option key="placeholder" value="">
@@ -165,6 +172,7 @@ const RuleBlockFormField = ({
           validate={validateTextField}
           buttonAfter={primaryInputButtonAfter()}
           help={param.description}
+          id={uniqueFieldId}
           {...field}
         />
       );
@@ -178,6 +186,7 @@ const RuleBlockFormField = ({
           required={!param.optional}
           buttonAfter={primaryInputButtonAfter()}
           help={param.description}
+          id={uniqueFieldId}
           {...field}
         />
       );
@@ -191,6 +200,7 @@ const RuleBlockFormField = ({
             name={param.name}
             label={field.value ? 'true' : 'false'}
             help={param.description}
+            id={uniqueFieldId}
             checked={field.value}
             buttonAfter={primaryInputButtonAfter()}
             {...field}
@@ -208,6 +218,7 @@ const RuleBlockFormField = ({
             required={!param.optional}
             help={!filteredOutputVariableList().length && param.optional ? typeNotFoundErrorMessage : param.description}
             error={!filteredOutputVariableList().length && !param.optional ? typeNotFoundErrorMessage : undefined}
+            id={uniqueFieldId}
             {...field}>
             <>
               <option key="placeholder" value="">

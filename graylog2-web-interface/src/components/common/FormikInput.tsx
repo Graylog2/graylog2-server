@@ -29,7 +29,7 @@ type BaseProps = {
   error?: React.ReactElement | string;
   formGroupClassName?: string;
   help?: React.ReactElement | string;
-  id: string;
+  id?: string;
   label?: React.ReactElement | string;
   labelClassName?: string;
   maxLength?: number;
@@ -63,6 +63,7 @@ const FormikInput = ({
   required = false,
   autoFocus = false,
   name,
+  id,
   type = 'text',
   help,
   validate = () => undefined,
@@ -93,10 +94,11 @@ const FormikInput = ({
             disabled={disabled}
             required={required}
             autoFocus={autoFocus}
+            name={name}
             {...typeSpecificProps}
             onBlur={onBlur}
             help={help}
-            id={name}
+            id={id ?? name}
             error={error}
             onChange={_handleChange}
             type={type}>

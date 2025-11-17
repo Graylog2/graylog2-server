@@ -20,6 +20,7 @@ import FormikInput from './FormikInput';
 
 type Props = React.PropsWithChildren<{
   autoComplete?: string;
+  id?: string;
   buttonAfter?: React.ReactElement | string;
   children?: React.ReactElement;
   disabled?: boolean;
@@ -56,6 +57,7 @@ const FormikFormGroup = ({
   label,
   name,
   onChange = undefined,
+  id = undefined,
   ...rest
 }: Props) => (
   <FormikInput
@@ -65,7 +67,7 @@ const FormikFormGroup = ({
     validate={validate}
     autoFocus={autoFocus}
     label={label}
-    id={name}
+    id={id ?? name}
     onChange={onChange}
     name={name}
     labelClassName={labelClassName}
