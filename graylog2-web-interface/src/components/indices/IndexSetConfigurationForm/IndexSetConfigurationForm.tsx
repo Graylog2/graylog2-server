@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
@@ -97,8 +97,10 @@ const IndexSetConfigurationForm = ({
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet] = useIndexSet(initialIndexSet);
 
-  const [immutableFields, setImmutableFields] = useState<string[]>([]);
-  const [hiddenFields, setHiddenFields] = useState<string[]>([]);
+  const getFieldRestrictions = useCallback(() => parseFieldRestrictions(indexSet?.field_restrictions), [indexSet]);
+
+  const immutableFields = getFieldRestrictions().immutableFields;
+  const hiddenFields = getFieldRestrictions().hiddenFields;
 
   const isCloud = AppConfig.isCloud();
   const enableDataTieringCloud = useFeature('data_tiering_cloud');
@@ -113,22 +115,6 @@ const IndexSetConfigurationForm = ({
   };
 
   const [selectedRetentionSegment, setSelectedRetentionSegment] = useState<RetentionConfigSegment>(initialSegment());
-
-  useEffect(() => {
-    if (indexSet?.use_legacy_rotation) {
-      setSelectedRetentionSegment('legacy');
-    } else {
-      setSelectedRetentionSegment('data_tiering');
-    }
-  }, [indexSet]);
-
-  useEffect(() => {
-    const { immutableFields: parsedImmutableFields, hiddenFields: parsedHiddenFields } = parseFieldRestrictions(
-      indexSet?.field_restrictions,
-    );
-    setImmutableFields(parsedImmutableFields);
-    setHiddenFields(parsedHiddenFields);
-  }, [indexSet]);
 
   const isDataTieringImmutable = useMemo(() => immutableFields.includes('data_tiering'), [immutableFields]);
   const isDataTieringLocked = isDataTieringImmutable && !ignoreFieldRestrictions;
