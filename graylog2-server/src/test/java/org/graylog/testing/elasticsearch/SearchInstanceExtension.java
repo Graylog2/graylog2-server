@@ -17,6 +17,7 @@
 package org.graylog.testing.elasticsearch;
 
 import org.assertj.core.util.Sets;
+import org.graylog2.shared.SuppressForbidden;
 import org.junit.jupiter.api.extension.AfterTestExecutionCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
@@ -49,6 +50,7 @@ public class SearchInstanceExtension implements TestInstancePostProcessor, After
         testInstances.forEach(TestableSearchServerInstance::cleanUp);
     }
 
+    @SuppressForbidden("request ensuring reflection field access call")
     @Override
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
         final ExtensionContext.Store store = context.getStore(ExtensionContext.Namespace.create(SearchInstanceExtension.class));
