@@ -40,7 +40,7 @@ import java.util.List;
 class DatanodeKeystoreTest {
 
     private EventBus eventBus;
-    private final List<DatanodeKeystoreChangedEvent> receivedEvents = new LinkedList<>();
+    private final List<Object> receivedEvents = new LinkedList<>();
 
     @BeforeEach
     void setUp() {
@@ -54,7 +54,13 @@ class DatanodeKeystoreTest {
     }
 
     @Subscribe
-    public void subscribe(DatanodeKeystoreChangedEvent event) {
+    public void subscribe(DatanodeCertificateChangedEvent event) {
+        // remember received events so we can verify them later
+        receivedEvents.add(event);
+    }
+
+    @Subscribe
+    public void subscribe(DatanodeCertificateRenewedEvent event) {
         // remember received events so we can verify them later
         receivedEvents.add(event);
     }
