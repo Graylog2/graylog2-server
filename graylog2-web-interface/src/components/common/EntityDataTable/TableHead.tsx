@@ -15,15 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
 import type { Table, Header } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
-import type { Transform } from '@dnd-kit/utilities';
 import { CSS } from '@dnd-kit/utilities';
 
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import Icon from 'components/common/Icon';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 
 import type { EntityBase, ColumnMetaContext } from './types';
 
@@ -33,13 +34,13 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; $transform: Transform }>(
+export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; $transform: string }>(
   ({ $transform, $width, $isDragging, theme }) => css`
     width: ${$width ? `${$width}px` : 'auto'};
     background-color: ${theme.colors.table.head.background};
     transition: width transform 0.2s ease-in-out;
     opacity: ${$isDragging ? 0.4 : 1};
-    transform: ${CSS.Translate.toString($transform)};
+    transform: ${$transform};
   `,
 );
 
@@ -54,13 +55,37 @@ const DragIcon = styled(Icon)`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
+const useSortableCol = (colId: string, disabled: boolean) => {
+  const { setColumnTransform } = useContext(DndStylesContext);
+  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
+    id: colId,
+    disabled,
+  });
+  const cssTransform = CSS.Translate.toString(transform);
+
+  useLayoutEffect(() => {
+    setColumnTransform((cur) => ({
+      ...cur,
+      [colId]: cssTransform,
+    }));
+  }, [colId, setColumnTransform, cssTransform]);
+
+  return {
+    attributes,
+    isDragging,
+    listeners,
+    setNodeRef,
+    transform: cssTransform,
+    setActivatorNodeRef,
+  };
+};
+
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
-
-  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
-    id: header.column.id,
-    disabled: !columnMeta?.enableColumnOrdering,
-  });
+  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortableCol(
+    header.column.id,
+    !columnMeta?.enableColumnOrdering,
+  );
 
   return (
     <Th

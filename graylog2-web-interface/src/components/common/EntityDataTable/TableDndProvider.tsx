@@ -18,7 +18,7 @@
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import type { Modifier, DragStartEvent, DragEndEvent } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import {
   closestCenter,
   DndContext,
@@ -29,33 +29,12 @@ import {
   KeyboardSensor,
   DragOverlay,
 } from '@dnd-kit/core';
-import { getEventCoordinates } from '@dnd-kit/utilities';
 import type { Table } from '@tanstack/react-table';
 
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 import ThDragOverlay from 'components/common/EntityDataTable/ThDragOverlay';
-
-const snapOverlayToCursor: Modifier = ({ activatorEvent, draggingNodeRect, transform }) => {
-  if (draggingNodeRect && activatorEvent) {
-    const activatorCoordinates = getEventCoordinates(activatorEvent);
-
-    if (!activatorCoordinates) {
-      return transform;
-    }
-
-    const offsetX = activatorCoordinates.x - draggingNodeRect.left;
-    const offsetY = activatorCoordinates.y - draggingNodeRect.top;
-
-    return {
-      ...transform,
-      x: transform.x + offsetX - 20,
-      y: transform.y + offsetY - 20,
-    };
-  }
-
-  return transform;
-};
+import DndStylesProvider from 'components/common/EntityDataTable/contexts/DndStylesProvider';
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
   table: Table<Entity>;
@@ -93,11 +72,10 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
     <DndContext
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
-      modifiers={[snapOverlayToCursor]}
       onDragStart={handleDragStart}
       sensors={sensors}>
       <SortableContext items={draggableColumns} strategy={horizontalListSortingStrategy}>
-        {children}
+        <DndStylesProvider>{children}</DndStylesProvider>
       </SortableContext>
       <DragOverlay dropAnimation={null}>
         {activeId ? <ThDragOverlay<Entity> column={table.getAllColumns().find((col) => col.id === activeId)} /> : null}

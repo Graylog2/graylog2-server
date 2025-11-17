@@ -1,18 +1,17 @@
 import type { Cell } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import * as React from 'react';
-import type { Transform } from '@dnd-kit/utilities';
-import { useSortable } from '@dnd-kit/sortable';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
-import { CSS } from '@dnd-kit/utilities';
 
-import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
+import type { EntityBase } from 'components/common/EntityDataTable/types';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 
-const Td = styled.td<{ $isDragging: boolean; $transform: Transform; $width: number }>(
+const Td = styled.td<{ $isDragging: boolean; $transform: string; $width: number }>(
   ({ $isDragging, $width, $transform }) => css`
     word-break: break-word;
     opacity: ${$isDragging ? 0.4 : 1};
-    transform: ${CSS.Translate.toString($transform)};
+    transform: ${$transform ?? 'none'};
     transition: width transform 0.2s ease-in-out;
     width: ${$width}px;
     z-index: ${$isDragging ? 1 : 0};
@@ -20,18 +19,14 @@ const Td = styled.td<{ $isDragging: boolean; $transform: Transform; $width: numb
 );
 
 const TableCell = <Entity extends EntityBase>({ cell }: { cell: Cell<Entity, unknown> }) => {
-  const columnMeta = cell.column.columnDef.meta as ColumnMetaContext<Entity>;
-
-  const { isDragging, setNodeRef, transform } = useSortable({
-    id: cell.column.id,
-    disabled: !columnMeta?.enableColumnOrdering,
-  });
+  const { columnTransform, activeColId } = useContext(DndStylesContext);
+  const isDragging = activeColId === cell.column.id;
+  const transform = columnTransform[cell.column.id];
 
   return (
-    <Td ref={setNodeRef} $isDragging={isDragging} $transform={transform} $width={cell.column.getSize()}>
+    <Td $isDragging={isDragging} $width={cell.column.getSize()} $transform={transform}>
       {flexRender(cell.column.columnDef.cell, cell.getContext())}
     </Td>
   );
 };
-
 export default TableCell;
