@@ -40,12 +40,12 @@ const SORT_ORDER_NAMES = {
 };
 
 const SortIcon = <Entity extends EntityBase>({ column }: { column: Column<Entity> }) => {
-  const nextSortDirection = column.getNextSortingOrder();
+  const nextSortDirection = column.getNextSortingOrder() || SORT_DIRECTIONS.ASC;
   const columnMeta = column.columnDef.meta as ColumnMetaContext<Entity>;
 
   return (
     <StyledCommonSortIcon
-      activeDirection={column.getIsSorted()}
+      activeDirection={column.getIsSorted() || null}
       onChange={() => column.toggleSorting()}
       title={`Sort ${columnMeta.label.toLowerCase()} ${SORT_ORDER_NAMES[nextSortDirection]}`}
       ascId={SORT_DIRECTIONS.ASC}
