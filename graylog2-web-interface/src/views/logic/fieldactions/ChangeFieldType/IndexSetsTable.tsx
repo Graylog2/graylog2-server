@@ -29,7 +29,6 @@ import useCurrentStream from 'views/logic/fieldactions/ChangeFieldType/hooks/use
 import isIndexFieldTypeChangeAllowed from 'components/indices/helpers/isIndexFieldTypeChangeAllowed';
 import useIndexSetsList from 'components/indices/hooks/useIndexSetsList';
 import type { IndexSet } from 'stores/indices/IndexSetsStore';
-import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const Container = styled.div`
   margin-top: 20px;
