@@ -54,6 +54,7 @@ import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
 import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
+import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -132,7 +133,7 @@ public class InputServiceImpl implements InputService {
                 .sort(order.toBsonSort(sortField))
                 .filter(searchQuery)
                 .page(page, filter);
-        final List<Input> inputs = new ArrayList<>(pagedListResponse.stream().toList());
+        final List<Input> inputs = new ArrayList<>(pagedListResponse.stream().map(this::withEncryptedFields).toList());
         return new PaginatedList<>(inputs, pagedListResponse.pagination().total(), pagedListResponse.pagination().page(), pagedListResponse.pagination().perPage());
     }
 
@@ -142,7 +143,7 @@ public class InputServiceImpl implements InputService {
         collection.find(or(
                 eq(MessageInput.FIELD_NODE_ID, nodeId),
                 eq(MessageInput.FIELD_GLOBAL, true)
-        )).forEach(result::add);
+        )).forEach(e -> result.add(withEncryptedFields(e)));
 
         return result;
     }
@@ -150,7 +151,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public List<Input> allByType(final String type) {
         final List<Input> result = new ArrayList<>();
-        collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(result::add);
+        collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(e -> result.add(withEncryptedFields(e)));
 
         return result;
     }
@@ -158,7 +159,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public Set<Input> findByIds(Collection<String> ids) {
         final Set<Input> result = new HashSet<>();
-        mongoUtils.getByIds(ids).forEach(result::add);
+        mongoUtils.getByIds(ids).forEach(e -> result.add(withEncryptedFields(e)));
 
         return result;
     }
@@ -254,8 +255,9 @@ public class InputServiceImpl implements InputService {
             throw new NotFoundException("Input id <" + id + "> is invalid!");
         }
 
-        return mongoUtils.getById(id)
+        final InputImpl input = mongoUtils.getById(id)
                 .orElseThrow(() -> new NotFoundException("Couldn't find input " + id));
+        return withEncryptedFields(input);
     }
 
     @Override
@@ -594,32 +596,40 @@ public class InputServiceImpl implements InputService {
         this.clusterEventBus.post(event);
     }
 
-/*    @SuppressWarnings({"unchecked", "rawtypes"})
-    private InputImpl createFromDbObject(DBObject o) {
-        final Map<String, Object> inputMap = new HashMap<>(o.toMap());
-
-        final String type = (String) inputMap.get(MessageInput.FIELD_TYPE);
-        final var encryptedFields = getEncryptedFields(type);
-
-        if (encryptedFields.isEmpty()) {
-            return new InputImpl((ObjectId) inputMap.get(InputImpl.FIELD_ID), inputMap);
-        }
-
-        final Map<String, Object> config = new HashMap<>((Map) inputMap.get(MessageInput.FIELD_CONFIGURATION));
-        encryptedFields.forEach(field -> {
-            final var encryptedValue = objectMapper.convertValue(config.get(field), EncryptedValue.class);
-            config.put(field, encryptedValue);
-        });
-
-        inputMap.put(MessageInput.FIELD_CONFIGURATION, config);
-
-        return new InputImpl((ObjectId) inputMap.get(InputImpl.FIELD_ID), inputMap);
-    }*/
-
     private Set<String> getEncryptedFields(String type) {
         return messageInputFactory.getConfig(type)
                 .map(EncryptedInputConfigs::getEncryptedFields)
                 .orElse(Set.of());
+    }
+
+    private InputImpl withEncryptedFields(InputImpl input) {
+        if (input == null) {
+            return null;
+        }
+        final Set<String> encryptedFields = getEncryptedFields(input.getType());
+        if (encryptedFields.isEmpty()) {
+            return input;
+        }
+        final Map<String, Object> originalConfig = input.getConfiguration();
+        if (originalConfig == null || originalConfig.isEmpty()) {
+            return input;
+        }
+
+        boolean modified = false;
+        final Map<String, Object> newConfig = new HashMap<>(originalConfig);
+        for (String field : encryptedFields) {
+            final Object raw = newConfig.get(field);
+            if (raw != null && !(raw instanceof EncryptedValue)) {
+                try {
+                    final EncryptedValue ev = objectMapper.convertValue(raw, EncryptedValue.class);
+                    newConfig.put(field, ev);
+                    modified = true;
+                } catch (IllegalArgumentException e) {
+                    LOG.warn("Failed to convert field '{}' to EncryptedValue for input '{}': {}", field, input.getId(), e.getMessage());
+                }
+            }
+        }
+        return modified ? input.toBuilder().getConfiguration(newConfig).build() : input;
     }
 
     @Override
