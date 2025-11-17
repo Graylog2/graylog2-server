@@ -78,7 +78,9 @@ import java.util.function.UnaryOperator;
 
 import static com.mongodb.client.model.Filters.and;
 import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Filters.or;
+import static com.mongodb.client.model.Filters.regex;
 import static org.graylog2.inputs.InputImpl.FIELD_CREATED_AT;
 
 public class InputServiceImpl implements InputService {
@@ -153,6 +155,18 @@ public class InputServiceImpl implements InputService {
         final List<Input> result = new ArrayList<>();
         collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(e -> result.add(withEncryptedFields(e)));
 
+        return result;
+    }
+
+    /**
+     * Finds input IDs by title using a case-insensitive regex search. This is designed to mimic
+     * InputRegistry::findByTitle behavior.
+     * Regex takes advantage of MongoDB indexes, making this method efficient for large datasets.
+     */
+    @Override
+    public List<String> findIdsByTitle(String title) {
+        final List<String> result = new ArrayList<>();
+        collection.find(regex(InputImpl.FIELD_TITLE, title, "i")).forEach(input -> result.add(input.getId()));
         return result;
     }
 
