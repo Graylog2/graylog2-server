@@ -19,24 +19,43 @@ package org.graylog.storage.opensearch3.testing;
 
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 
-public class OpenSearchTestServerExtension implements ParameterResolver {
+public class OpenSearchTestServerExtension implements ParameterResolver, AfterAllCallback {
+
+    public static final String OPENSEARCH_INSTANCE_KEY = "OPENSEARCH_INSTANCE";
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(SearchServerInstance.class);
+        return parameterContext.getParameter().getType().equals(SearchServerInstance.class) || parameterContext.getParameter().getType().equals(OpenSearchInstance.class);
     }
 
     @Override
     public @Nullable Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         final var paramType = parameterContext.getParameter().getType();
-        if (paramType.equals(SearchServerInstance.class)) {
-            return OpenSearchInstance.create();
+        if (paramType.equals(SearchServerInstance.class) || paramType.equals(OpenSearchInstance.class)) {
+
+            final OpenSearchInstance instance = OpenSearchInstance.create();
+            // Store it so AfterAll can retrieve it later and run cleanup
+            extensionContext.getStore(ExtensionContext.Namespace.GLOBAL)
+                    .put(OPENSEARCH_INSTANCE_KEY, instance);
+
+            return instance;
         }
         throw new RuntimeException("Unsupported parameter type: " + paramType);
+    }
+
+
+    @Override
+    public void afterAll(ExtensionContext context) {
+        OpenSearchInstance value = context.getStore(ExtensionContext.Namespace.GLOBAL)
+                .get(OPENSEARCH_INSTANCE_KEY, OpenSearchInstance.class);
+        if (value != null) {
+            value.cleanUp();
+        }
     }
 }
