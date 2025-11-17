@@ -19,7 +19,7 @@ import EntityDataTable from './EntityDataTable';
   columnRenderers={{
     title: {
       renderCell: (listItem) => `The title: ${listItem.title}`,
-      renderHeader: (attribute) => `Custom ${attribute.title}`,
+      renderHeader: (title) => `Custom ${title}`,
     },
   }}
 />;
