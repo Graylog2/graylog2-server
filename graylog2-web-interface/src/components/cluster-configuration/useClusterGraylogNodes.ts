@@ -14,53 +14,82 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
+import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 
-import { useStore } from 'stores/connect';
-import { ClusterOverviewStore } from 'stores/cluster/ClusterOverviewStore';
-import { NodesStore } from 'stores/nodes/NodesStore';
-import type { NodeInfo } from 'stores/nodes/NodesStore';
-import type { SystemOverview } from 'stores/cluster/types';
+import type { SearchParams } from 'stores/PaginationTypes';
 
 import useAddMetricsToGraylogNodes, { type GraylogNodeMetrics } from './useAddMetricsToGraylogNodes';
+import useGraylogNodes, {
+  type GraylogNode as BaseGraylogNode,
+  type GraylogNodesResponse,
+} from './useGraylogNodes';
 
-export type GraylogNode = NodeInfo &
-  Partial<SystemOverview> & {
-    id: string;
-    metrics: GraylogNodeMetrics;
-  };
+export type GraylogNode = BaseGraylogNode & { metrics: GraylogNodeMetrics };
 
-export type UseClusterGraylogNodesResult = {
-  nodes: Array<GraylogNode>;
-  isLoading: boolean;
+export type ClusterGraylogNodeResponse = Omit<GraylogNodesResponse, 'list'> & {
+  list: Array<GraylogNode>;
 };
 
-const useClusterGraylogNodes = (): UseClusterGraylogNodesResult => {
-  const { nodes: graylogNodesStore } = useStore(NodesStore);
-  const { clusterOverview: systemInfo } = useStore(ClusterOverviewStore);
+export type UseClusterGraylogNodesResult = {
+  data: ClusterGraylogNodeResponse;
+  nodes: Array<GraylogNode>;
+  total: number;
+  refetch: () => void;
+  isLoading: boolean;
+  error: unknown;
+  pollingEnabled: boolean;
+  setPollingEnabled: Dispatch<SetStateAction<boolean>>;
+};
 
-  const baseGraylogNodes = useMemo<Array<NodeInfo & Partial<SystemOverview> & { id: string }>>(() => {
-    const nodesFromStore = Object.values(graylogNodesStore || {});
+const GRAYLOG_NODES_REFETCH_INTERVAL = 5000;
 
-    return nodesFromStore.map((graylogNode) => {
-      const nodeOverview = systemInfo?.[graylogNode.node_id];
-      const combinedNode = {
-        ...graylogNode,
-        ...nodeOverview,
-      };
+type UseClusterGraylogNodesOptions = {
+  refetchInterval?: number | false;
+  initialPollingEnabled?: boolean;
+  enabled?: boolean;
+};
 
-      return {
-        ...combinedNode,
-        id: combinedNode.node_id,
-      };
-    });
-  }, [graylogNodesStore, systemInfo]);
+const useClusterGraylogNodes = (
+  searchParams?: SearchParams,
+  options?: UseClusterGraylogNodesOptions,
+): UseClusterGraylogNodesResult => {
+  const {
+    enabled = true,
+    refetchInterval = GRAYLOG_NODES_REFETCH_INTERVAL,
+    initialPollingEnabled = true,
+  } = options ?? {};
+  const [pollingEnabled, setPollingEnabled] = useState(initialPollingEnabled);
+  const effectiveRefetchInterval = pollingEnabled ? refetchInterval : false;
 
-  const graylogNodes = useAddMetricsToGraylogNodes(baseGraylogNodes);
+  const {
+    data,
+    refetch,
+    isLoading,
+    error,
+  } = useGraylogNodes(searchParams, { enabled }, effectiveRefetchInterval);
+
+  const nodesWithMetrics = useAddMetricsToGraylogNodes(data.list);
+
+  const dataWithMetrics = useMemo<ClusterGraylogNodeResponse>(
+    () => ({
+      ...data,
+      list: nodesWithMetrics,
+    }),
+    [data, nodesWithMetrics],
+  );
+
+  const nodes = dataWithMetrics.list;
+  const total = dataWithMetrics.pagination?.total ?? nodes.length;
 
   return {
-    nodes: graylogNodes,
-    isLoading: !graylogNodesStore || !systemInfo,
+    data: dataWithMetrics,
+    nodes,
+    total,
+    refetch,
+    isLoading,
+    error,
+    pollingEnabled,
+    setPollingEnabled,
   };
 };
 

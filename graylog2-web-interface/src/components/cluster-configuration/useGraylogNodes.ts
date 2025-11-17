@@ -33,6 +33,15 @@ export type GraylogNode = {
   is_leader: boolean;
   is_processing: boolean;
   lb_status?: string;
+  lifecycle?: string;
+  cluster_id?: string;
+  codename?: string;
+  facility?: string;
+  started_at?: string;
+  timezone?: string;
+  version?: string;
+  operating_system?: string;
+  type?: string;
 };
 
 export type GraylogNodes = Array<GraylogNode>;
