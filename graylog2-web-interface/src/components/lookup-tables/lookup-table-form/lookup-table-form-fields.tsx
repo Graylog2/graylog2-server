@@ -18,9 +18,10 @@ import * as React from 'react';
 import { useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
+import useScopePermissions from 'hooks/useScopePermissions';
 import { Input } from 'components/bootstrap';
 import { FormikFormGroup, JSONValueInput } from 'components/common';
-import type { LookupTableType } from 'components/lookup-tables/LookupTableForm';
+import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
 
 const StyledJSONValueInput = styled(JSONValueInput)`
   margin: 0;
@@ -39,6 +40,12 @@ const StyledDefaultValueSection = styled.div(
 
 function LookupTableFormFields() {
   const { setFieldValue, setFieldTouched, touched, values, errors } = useFormikContext<LookupTableType>();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
+
+  const canModify = React.useMemo(
+    () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
+    [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
+  );
 
   React.useEffect(() => {
     setFieldValue('enable_single_value', !!values.default_single_value);
@@ -55,6 +62,7 @@ function LookupTableFormFields() {
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3"
+        disabled={!canModify}
       />
 
       <FormikFormGroup
@@ -65,6 +73,7 @@ function LookupTableFormFields() {
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3"
+        disabled={!canModify}
       />
 
       <FormikFormGroup
@@ -79,6 +88,7 @@ function LookupTableFormFields() {
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3"
+        disabled={!canModify}
       />
 
       <StyledDefaultValueSection>
@@ -91,6 +101,7 @@ function LookupTableFormFields() {
           labelClassName="d-block mb-1"
           wrapperClassName="d-block"
           formGroupClassName="mb-3"
+          disabled={!canModify}
           checked={values.enable_single_value}
           onChange={() => {
             setFieldValue('enable_single_value', !values.enable_single_value);
@@ -117,6 +128,7 @@ function LookupTableFormFields() {
             value={values.default_single_value}
             valueType={values.default_single_value_type || 'NULL'}
             allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
+            disabled={!canModify}
           />
         )}
       </StyledDefaultValueSection>
@@ -131,6 +143,7 @@ function LookupTableFormFields() {
           labelClassName="d-block mb-1"
           wrapperClassName="d-block"
           formGroupClassName="mb-3"
+          disabled={!canModify}
           checked={values.enable_multi_value}
           onChange={() => {
             setFieldValue('enable_multi_value', !values.enable_multi_value);
@@ -157,6 +170,7 @@ function LookupTableFormFields() {
             value={values.default_multi_value}
             valueType={values.default_multi_value_type || 'NULL'}
             allowedTypes={['OBJECT', 'NULL']}
+            disabled={!canModify}
           />
         )}
       </StyledDefaultValueSection>

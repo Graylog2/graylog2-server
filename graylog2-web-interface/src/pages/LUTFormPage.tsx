@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import Routes from 'routing/Routes';
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import LookupTableWizard from 'components/lookup-tables/lookup-table-form';
+import { LookupTableWizard } from 'components/lookup-tables';
 
 const FlexContainer = styled.div`
   display: flex;

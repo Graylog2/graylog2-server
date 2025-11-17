@@ -17,8 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import LookupTableFormFields from 'components/lookup-tables/LookupTableFormFields';
-
+import LookupTableFormFields from './lookup-table-form-fields';
 import DataAdapterFormStep from './adapter-step';
 import CacheFormStep from './cache-step';
 import SummaryStep from './summary-step';

@@ -19,6 +19,7 @@ import { useFormikContext } from 'formik';
 
 import { Spinner } from 'components/common';
 import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
+import useScopePermissions from 'hooks/useScopePermissions';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchDataAdapter, useFetchAllDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
@@ -44,10 +45,16 @@ function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
 
 function DataAdapterFormStep() {
   const { values, setFieldValue } = useFormikContext<LookupTable>();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { allDataAdapters, loadingAllDataAdapters } = useFetchAllDataAdapters();
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(values.data_adapter_id);
   const [showForm, setShowForm] = React.useState<boolean>(false);
   const showAdapter = React.useMemo(() => values.data_adapter_id, [values.data_adapter_id]);
+
+  const canModify = React.useMemo(
+    () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
+    [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
+  );
 
   const onSaved = (newDataAdapter: LookupTableAdapter) => {
     setFieldValue('data_adapter_id', newDataAdapter.id);
@@ -72,9 +79,11 @@ function DataAdapterFormStep() {
         </RowContainer>
       ) : (
         <>
-          <RowContainer>
-            <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
-          </RowContainer>
+          {canModify && (
+            <RowContainer>
+              <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
+            </RowContainer>
+          )}
           {showAdapter && !loadingDataAdapter && <AdapterReadOnly dataAdapter={dataAdapter} />}
           {showForm && !showAdapter && <DataAdapterFormView onCancel={onCancel} saved={onSaved} />}
         </>

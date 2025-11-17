@@ -19,9 +19,11 @@ import { useNavigate } from 'react-router-dom';
 import { useFormikContext } from 'formik';
 
 import Routes from 'routing/Routes';
+import useScopePermissions from 'hooks/useScopePermissions';
 import { Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { Row } from 'components/lookup-tables/layout-componets';
+import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
 
 type Props = {
   isCreate: boolean;
@@ -32,7 +34,8 @@ type Props = {
 };
 
 function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoading }: Props) {
-  const { submitForm, resetForm, isValid } = useFormikContext();
+  const { values, submitForm, resetForm, isValid } = useFormikContext<LookupTableType>();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const navigate = useNavigate();
   const onFirstStep = React.useMemo(() => stepIds.indexOf(activeStepId) === 0, [stepIds, activeStepId]);
   const onLastStep = React.useMemo(() => stepIds.indexOf(activeStepId) === stepIds.length - 1, [stepIds, activeStepId]);
@@ -58,13 +61,20 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
     navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   };
 
+  const canModify = React.useMemo(
+    () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
+    [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
+  );
+
   if (activeStepId === 'summary') {
     return (
       <Row $align="center" $justify="flex-end" $width="100%">
         <Button onClick={onCancel}>Cancel</Button>
-        <Button bsStyle="primary" onClick={onSubmit} disabled={!isValid || isLoading}>
+        <Button bsStyle="primary" onClick={onSubmit} disabled={!isValid || isLoading || !canModify}>
           {isLoading ? (
-            <Spinner text={`${isCreate ? 'Creating' : 'Updating'} Lookup Table...`} />
+            <>
+              <Spinner text="" /> `${isCreate ? 'Creating' : 'Updating'} Lookup Table...`
+            </>
           ) : (
             `${isCreate ? 'Create' : 'Update'} Lookup Table`
           )}

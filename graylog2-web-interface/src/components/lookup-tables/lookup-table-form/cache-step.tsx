@@ -19,6 +19,7 @@ import { useFormikContext } from 'formik';
 
 import { Spinner } from 'components/common';
 import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
+import useScopePermissions from 'hooks/useScopePermissions';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchCache, useFetchAllCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import Cache from 'components/lookup-tables/Cache';
@@ -45,10 +46,16 @@ function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
 
 function CacheFormStep() {
   const { values, setFieldValue } = useFormikContext<LookupTable>();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { allCaches, loadingAllCaches } = useFetchAllCaches();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
   const [showForm, setShowForm] = React.useState<boolean>(false);
   const showCache = React.useMemo(() => values.cache_id, [values.cache_id]);
+
+  const canModify = React.useMemo(
+    () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
+    [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
+  );
 
   const onSaved = (newCache: LookupTableCache) => {
     setFieldValue('cache_id', newCache.id);
@@ -73,9 +80,11 @@ function CacheFormStep() {
         </RowContainer>
       ) : (
         <>
-          <RowContainer>
-            <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
-          </RowContainer>
+          {canModify && (
+            <RowContainer>
+              <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
+            </RowContainer>
+          )}
           {showCache && !loadingCache && <CacheReadOnly cache={cache} />}
           {showForm && !showCache && <CacheFormView onCancel={onCancel} saved={onSaved} />}
         </>

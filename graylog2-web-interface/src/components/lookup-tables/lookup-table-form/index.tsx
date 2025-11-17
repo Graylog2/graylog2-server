@@ -21,7 +21,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
 import { Wizard, Spinner } from 'components/common';
-import { INIT_TABLE_VALUES } from 'components/lookup-tables/LookupTableForm';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import {
@@ -30,9 +29,30 @@ import {
   useUpdateLookupTable,
 } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useSteps from 'components/lookup-tables/lookup-table-form/use-steps';
-import type { LookupTableType } from 'components/lookup-tables/LookupTableForm';
+import type { LookupTable } from 'logic/lookup-tables/types';
 
 import WizardButtons from './wizard-buttons';
+
+export type LookupTableType = LookupTable & {
+  enable_single_value: boolean;
+  enable_multi_value: boolean;
+};
+
+export const INIT_TABLE_VALUES: LookupTableType = {
+  id: undefined,
+  title: '',
+  description: '',
+  name: '',
+  cache_id: undefined,
+  data_adapter_id: undefined,
+  enable_single_value: false,
+  default_single_value: '',
+  default_single_value_type: 'NULL',
+  enable_multi_value: false,
+  default_multi_value: '',
+  default_multi_value_type: 'NULL',
+  content_pack: null,
+};
 
 const validations = (values: LookupTableType) => {
   const errors: FormikErrors<LookupTableType> = {};
