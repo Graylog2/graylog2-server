@@ -20,6 +20,8 @@ import type { IndexSetFieldRestrictions } from 'stores/indices/IndexSetsStore';
 export const parseFieldRestrictions = (
   fieldRestrictions?: IndexSetFieldRestrictions,
 ): { immutableFields: Array<string>; hiddenFields: Array<string> } => {
+  if (!fieldRestrictions || typeof fieldRestrictions !== 'object') return { immutableFields: [], hiddenFields: [] };
+
   const fieldsWithRestrictions = Object.keys(fieldRestrictions);
   if (!fieldRestrictions || fieldsWithRestrictions.length < 1) return { immutableFields: [], hiddenFields: [] };
 

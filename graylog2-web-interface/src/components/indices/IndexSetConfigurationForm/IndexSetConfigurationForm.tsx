@@ -103,8 +103,6 @@ const IndexSetConfigurationForm = ({
   const isCloud = AppConfig.isCloud();
   const enableDataTieringCloud = useFeature('data_tiering_cloud');
 
-  console.log('===hiddenFields', hiddenFields);
-
   const initialSegment = (): RetentionConfigSegment => {
     if (hiddenFields.includes('data_tiering')) return 'legacy';
     if (hiddenFields.includes('legacy')) return 'data_tiering';
