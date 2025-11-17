@@ -30,11 +30,13 @@ import {
   DragOverlay,
 } from '@dnd-kit/core';
 import type { Table } from '@tanstack/react-table';
+import { createPortal } from 'react-dom';
 
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 import ThDragOverlay from 'components/common/EntityDataTable/ThDragOverlay';
 import DndStylesProvider from 'components/common/EntityDataTable/contexts/DndStylesProvider';
+import zIndices from 'theme/z-indices';
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
   table: Table<Entity>;
@@ -77,9 +79,14 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
       <SortableContext items={draggableColumns} strategy={horizontalListSortingStrategy}>
         <DndStylesProvider>{children}</DndStylesProvider>
       </SortableContext>
-      <DragOverlay dropAnimation={null}>
-        {activeId ? <ThDragOverlay<Entity> column={table.getAllColumns().find((col) => col.id === activeId)} /> : null}
-      </DragOverlay>
+      {createPortal(
+        <DragOverlay dropAnimation={null} zIndex={zIndices.modalBody}>
+          {activeId ? (
+            <ThDragOverlay<Entity> column={table.getAllColumns().find((col) => col.id === activeId)} />
+          ) : null}
+        </DragOverlay>,
+        document.body,
+      )}
     </DndContext>
   );
 };
