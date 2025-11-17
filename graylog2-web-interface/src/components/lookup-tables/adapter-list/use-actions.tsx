@@ -84,9 +84,11 @@ function Actions({ adapter }: ActionsProps) {
   );
 }
 
+const renderActions = (adapter: DataAdapterEntity) => <Actions adapter={adapter} />;
+
 function useActions() {
   return {
-    renderActions: (adapter: DataAdapterEntity) => <Actions adapter={adapter} />,
+    renderActions,
   };
 }
 
