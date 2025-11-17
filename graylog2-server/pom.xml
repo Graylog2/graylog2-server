@@ -487,10 +487,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jukito</groupId>
-            <artifactId>jukito</artifactId>
-        </dependency>
-        <dependency>
             <groupId>name.falgout.jeffrey.testing.junit5</groupId>
             <artifactId>guice-extension</artifactId>
         </dependency>
@@ -827,11 +823,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
 

@@ -455,12 +455,6 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>org.jukito</groupId>
-                <artifactId>jukito</artifactId>
-                <version>${jukito.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>name.falgout.jeffrey.testing.junit5</groupId>
                 <artifactId>guice-extension</artifactId>
                 <version>${guice-extension.version}</version>
