@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch3.indextemplates.OS3SerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
@@ -80,7 +81,8 @@ class IndicesAdapterOSTest {
                 clusterStateApi,
                 indexTemplateAdapter,
                 indexStatisticsBuilder,
-                new ObjectMapperProvider().get()
+                new ObjectMapperProvider().get(),
+                new OS3SerializationUtils(new ObjectMapperProvider().get(), opensearchClient)
         );
     }
 
