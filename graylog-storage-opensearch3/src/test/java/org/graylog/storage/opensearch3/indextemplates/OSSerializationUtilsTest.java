@@ -83,7 +83,7 @@ class OSSerializationUtilsTest {
 
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-    OSSerializationUtils toTest;
+    private OSSerializationUtils toTest;
 
     @BeforeEach
     void setUp() {
