@@ -15,17 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
-import AppConfig from 'util/AppConfig';
 
-export const isFieldFavorite = ({ contexts, field }: Partial<ActionHandlerArguments>) =>
-  !!contexts.favoriteFields.find((f) => f === field);
+import ToggleFavoriteField from './ToggleFavoriteField';
 
-const ToggleFavoriteField = async ({ contexts, field }: ActionHandlerArguments) => contexts.toggleFavoriteField(field);
+jest.mock('util/AppConfig', () => ({
+  isFeatureEnabled: () => true,
+}));
+type ActionContexts = Partial<ActionHandlerArguments>['contexts'];
 
-ToggleFavoriteField.isHidden = (isAdding: boolean, props: Partial<ActionHandlerArguments>) =>
-  !AppConfig.isFeatureEnabled('message_table_favorite_fields') ||
-  !props.contexts?.favoriteFields ||
-  (isAdding && isFieldFavorite(props)) ||
-  (!isAdding && !isFieldFavorite(props));
-
-export default ToggleFavoriteField;
+describe('ToggleFavoriteField', () => {
+  describe('isHidden', () => {
+    it('returns true when favorite fields context is missing', () => {
+      const contexts = {} as ActionContexts;
+      expect(ToggleFavoriteField.isHidden(true, { contexts })).toBeTruthy();
+    });
+    it('returns false when favorite fields context is preset', () => {
+      const contexts = { favoriteFields: [] } as ActionContexts;
+      expect(ToggleFavoriteField.isHidden(true, { contexts })).toBeFalsy();
+    });
+  });
+});

@@ -21,7 +21,7 @@ import selectEvent from 'helpers/selectEvent';
 import { MockStore } from 'helpers/mocking';
 import asMock from 'helpers/mocking/AsMock';
 import useFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
-import useFieldTypeUsages from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 import { layoutPreferences } from 'fixtures/entityListLayoutPreferences';
 import TestStoreProvider from 'views/test/TestStoreProvider';
@@ -98,23 +98,21 @@ const fieldTypeUsages = [
   },
 ];
 const paginatedFieldUsage = {
-  data: {
-    list: fieldTypeUsages,
-    pagination: {
-      total: 2,
-      page: 1,
-      perPage: 5,
-      count: 1,
-    },
-    attributes,
+  list: fieldTypeUsages,
+  pagination: {
+    total: 2,
+    page: 1,
+    perPage: 5,
+    count: 1,
   },
-  refetch: () => {},
-  isInitialLoading: false,
-  isLoading: false,
+  attributes,
 };
 
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
-jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => jest.fn());
+jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages', () => ({
+  ...jest.requireActual('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages'),
+  fetchFieldTypeUsages: jest.fn(() => async () => {}),
+}));
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation', () => jest.fn());
 
@@ -169,7 +167,7 @@ describe('ChangeFieldTypeModal', () => {
     });
 
     asMock(useFieldTypeMutation).mockReturnValue({ isLoading: false, putFieldTypeMutation: putFieldTypeMutationMock });
-    asMock(useFieldTypeUsages).mockReturnValue(paginatedFieldUsage);
+    asMock(fetchFieldTypeUsages).mockResolvedValue(paginatedFieldUsage);
 
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
