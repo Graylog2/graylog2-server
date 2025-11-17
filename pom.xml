@@ -1090,6 +1090,10 @@
                             @defaultMessage Use org.apache.lucene.
                             org.graylog.shaded.opensearch2.org.apache.lucene.index.**
                             org.graylog.shaded.opensearch2.org.apache.lucene.store.**
+
+                            @defaultMessage Use JUnit 6 APIs
+                            org.junit.Assert
+                            org.junit.Test
                         ]]>
 
                     </signatures>
