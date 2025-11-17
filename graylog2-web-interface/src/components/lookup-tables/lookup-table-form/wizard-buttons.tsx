@@ -72,9 +72,9 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
         <Button onClick={onCancel}>Cancel</Button>
         <Button bsStyle="primary" onClick={onSubmit} disabled={!isValid || isLoading || !canModify}>
           {isLoading ? (
-            <>
-              <Spinner text="" /> `${isCreate ? 'Creating' : 'Updating'} Lookup Table...`
-            </>
+            <Row $gap="xs" $align="center">
+              <Spinner text="" /> <span>{isCreate ? 'Creating' : 'Updating'} Lookup Table...</span>
+            </Row>
           ) : (
             `${isCreate ? 'Create' : 'Update'} Lookup Table`
           )}
