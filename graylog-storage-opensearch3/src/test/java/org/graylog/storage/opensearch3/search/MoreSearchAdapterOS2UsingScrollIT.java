@@ -46,7 +46,7 @@ public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
         final OpenSearchClient client = openSearchInstance.openSearchClient();
-        return new MoreSearchAdapterOS2(client, true,
+        return new MoreSearchAdapterOS2(client, openSearchInstance.getOfficialOpensearchClient(), true,
                 new Scroll(client,
                         (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
