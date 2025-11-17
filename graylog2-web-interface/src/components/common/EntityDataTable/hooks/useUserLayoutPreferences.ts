@@ -23,13 +23,23 @@ import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {};
 
+const attributesFromJSON = (attributes: TableLayoutPreferencesJSON['attributes']) => {
+  const attributeIds = Object.keys(attributes ?? {});
+
+  if (attributeIds.length <= 0) {
+    return undefined;
+  }
+
+  return attributeIds.filter((key) => attributes[key].status === 'show');
+};
+
 const preferencesFromJSON = ({
-  displayed_attributes,
+  attributes,
   sort,
   per_page,
   custom_preferences,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
-  displayedAttributes: displayed_attributes,
+  displayedAttributes: attributesFromJSON(attributes),
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
   customPreferences: custom_preferences,

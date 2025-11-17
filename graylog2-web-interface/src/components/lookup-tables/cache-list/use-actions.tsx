@@ -84,9 +84,11 @@ function Actions({ cache }: ActionsProps) {
   );
 }
 
+const renderActions = (cache: CacheEntity) => <Actions cache={cache} />;
+
 function useActions() {
   return {
-    renderActions: (cache: CacheEntity) => <Actions cache={cache} />,
+    renderActions,
   };
 }
 
