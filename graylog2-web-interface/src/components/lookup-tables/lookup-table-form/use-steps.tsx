@@ -45,12 +45,12 @@ function useSteps(
     },
     {
       key: 'cache',
-      title: 'Cache',
+      title: 'Cache (required)',
       component: <CacheFormStep />,
     },
     {
       key: 'data-adapter',
-      title: 'Data Adapter',
+      title: 'Data Adapter (required)',
       component: <DataAdapterFormStep />,
     },
     {

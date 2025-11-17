@@ -48,18 +48,30 @@ const StyledContainer = styled(Row)`
   }
 `;
 
+const DangerText = styled.i`
+  color: ${({ theme }) => theme.colors.variant.danger};
+`;
+
+const MuttedText = styled.span`
+  color: ${({ theme }) => theme.colors.text.secondary};
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  width: 50px;
+`;
+
 function TableSummary({ table }: { table: LookupTable }) {
   return (
     <Col $gap="lg">
-      <Col $gap="xs">
+      <Col $gap="sm">
         <h2>Lookup Table Details</h2>
         <Row>
-          <span>Title:</span>
-          <span>{table.title}</span>
+          <MuttedText>Title:</MuttedText>
+          <span>{table.title || <DangerText>No title set (required)</DangerText>}</span>
         </Row>
         <Row>
-          <span>Name:</span>
-          <span>{table.name}</span>
+          <MuttedText>Name:</MuttedText>
+          <span>{table.name || <DangerText>No name set (required)</DangerText>}</span>
         </Row>
       </Col>
       <LookupTableDetails table={table} />
@@ -110,8 +122,22 @@ function SummaryStep() {
       <StyledContainer $gap="xl">
         <TableSummary table={values} />
         <Col $gap="lg">
-          {loadingCache ? <Spinner text="Loading cache..." /> : <CacheSummary cache={cache} />}
-          {loadingDataAdapter ? <Spinner text="Loading data adapter..." /> : <AdapterSummary adapter={dataAdapter} />}
+          {loadingCache ? (
+            <Spinner text="Loading cache..." />
+          ) : (
+            <Col $gap="sm">
+              <h2>Cache Details</h2>
+              <CacheSummary cache={cache} />
+            </Col>
+          )}
+          {loadingDataAdapter ? (
+            <Spinner text="Loading data adapter..." />
+          ) : (
+            <Col $gap="sm">
+              <h2>Data Adapter Details</h2>
+              <AdapterSummary adapter={dataAdapter} />
+            </Col>
+          )}
         </Col>
       </StyledContainer>
     </ErrorsProvider>

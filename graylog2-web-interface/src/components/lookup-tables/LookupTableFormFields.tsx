@@ -40,6 +40,11 @@ const StyledDefaultValueSection = styled.div(
 function LookupTableFormFields() {
   const { setFieldValue, setFieldTouched, touched, values, errors } = useFormikContext<LookupTableType>();
 
+  React.useEffect(() => {
+    setFieldValue('enable_single_value', !!values.default_single_value);
+    setFieldValue('enable_multi_value', !!values.default_multi_value);
+  }, [values.default_single_value, values.default_multi_value, setFieldValue]);
+
   return (
     <fieldset>
       <FormikFormGroup

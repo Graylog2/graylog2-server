@@ -20,6 +20,7 @@ import { useFormikContext } from 'formik';
 
 import Routes from 'routing/Routes';
 import { Button } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import { Row } from 'components/lookup-tables/layout-componets';
 
 type Props = {
@@ -27,10 +28,11 @@ type Props = {
   stepIds: Array<string>;
   activeStepId: string;
   onStepChange: (newStepId: string) => void;
+  isLoading: boolean;
 };
 
-function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange }: Props) {
-  const { submitForm, resetForm } = useFormikContext();
+function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoading }: Props) {
+  const { submitForm, resetForm, isValid } = useFormikContext();
   const navigate = useNavigate();
   const onFirstStep = React.useMemo(() => stepIds.indexOf(activeStepId) === 0, [stepIds, activeStepId]);
   const onLastStep = React.useMemo(() => stepIds.indexOf(activeStepId) === stepIds.length - 1, [stepIds, activeStepId]);
@@ -60,8 +62,12 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange }: Props)
     return (
       <Row $align="center" $justify="flex-end" $width="100%">
         <Button onClick={onCancel}>Cancel</Button>
-        <Button bsStyle="primary" onClick={onSubmit}>
-          {isCreate ? 'Create' : 'Update'} Lookup Table
+        <Button bsStyle="primary" onClick={onSubmit} disabled={!isValid || isLoading}>
+          {isLoading ? (
+            <Spinner text={`${isCreate ? 'Creating' : 'Updating'} Lookup Table...`} />
+          ) : (
+            `${isCreate ? 'Create' : 'Update'} Lookup Table`
+          )}
         </Button>
       </Row>
     );

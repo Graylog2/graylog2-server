@@ -17,11 +17,18 @@
 import * as React from 'react';
 import { Formik } from 'formik';
 import type { FormikErrors } from 'formik';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { Wizard, Spinner } from 'components/common';
 import { INIT_TABLE_VALUES } from 'components/lookup-tables/LookupTableForm';
-import { useFetchLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import {
+  useFetchLookupTable,
+  useCreateLookupTable,
+  useUpdateLookupTable,
+} from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import useSteps from 'components/lookup-tables/lookup-table-form/use-steps';
 import type { LookupTableType } from 'components/lookup-tables/LookupTableForm';
 
@@ -43,13 +50,36 @@ function LookupTableWizard() {
   const { lookupTable, loadingLookupTable } = useFetchLookupTable(lutIdOrName);
   const initialValues = React.useMemo(() => lookupTable || INIT_TABLE_VALUES, [lookupTable]);
   const [steps, { activeStep, setActiveStep }] = useSteps();
+  const navigate = useNavigate();
+  const sendTelemetry = useSendTelemetry();
+  const { createLookupTable, creatingLookupTable } = useCreateLookupTable();
+  const { updateLookupTable, updatingLookupTable } = useUpdateLookupTable();
+
+  const isCreate = React.useMemo(() => !lookupTable, [lookupTable]);
 
   const handleStepChange = (newStepKey: string) => {
     setActiveStep(newStepKey);
   };
 
-  const handleSubmit = (values: LookupTableType) => {
-    console.log(values);
+  const handleSubmit = async (values: LookupTableType) => {
+    const payload = { ...values };
+
+    delete payload.enable_multi_value;
+    delete payload.enable_single_value;
+
+    const promise = isCreate ? createLookupTable(payload) : updateLookupTable(payload);
+
+    return promise.then(() => {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.LUT[isCreate ? 'CREATED' : 'UPDATED'], {
+        app_pathname: 'lut',
+        app_section: 'lookup_table',
+        event_details: {
+          lookup_table_name: values.name,
+        },
+      });
+
+      navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
+    });
   };
 
   if (loadingLookupTable) return <Spinner text="Loading Lookup Table ..." />;
@@ -71,6 +101,7 @@ function LookupTableWizard() {
           stepIds={steps.map((step) => step.key)}
           activeStepId={activeStep}
           onStepChange={handleStepChange}
+          isLoading={creatingLookupTable || updatingLookupTable}
         />
       </>
     </Formik>
