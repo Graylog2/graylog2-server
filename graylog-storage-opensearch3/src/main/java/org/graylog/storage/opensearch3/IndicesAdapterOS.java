@@ -26,7 +26,7 @@ import jakarta.inject.Inject;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
-import org.graylog.storage.opensearch3.indextemplates.OS3SerializationUtils;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
@@ -120,7 +120,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private final OpenSearchIndicesClient indicesClient;
     private final OpenSearchCatClient catClient;
     private final OpenSearchGenericClient genericClient;
-    private final OS3SerializationUtils os3SerializationUtils;
+    private final OSSerializationUtils osSerializationUtils;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
@@ -135,7 +135,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
                             ObjectMapper objectMapper,
-                            final OS3SerializationUtils os3SerializationUtils) {
+                            final OSSerializationUtils osSerializationUtils) {
         this.c = c;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;
@@ -147,7 +147,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
         this.indicesClient = openSearchClient.indices();
         this.catClient = openSearchClient.cat();
         this.genericClient = openSearchClient.generic();
-        this.os3SerializationUtils = os3SerializationUtils;
+        this.osSerializationUtils = osSerializationUtils;
     }
 
     @Override
@@ -206,7 +206,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .settings(createIndexSettings(indexSettings));
         if (mapping != null) {
             try {
-                builder.mappings(os3SerializationUtils.fromMap(mapping, TypeMapping._DESERIALIZER));
+                builder.mappings(osSerializationUtils.fromMap(mapping, TypeMapping._DESERIALIZER));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -257,7 +257,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .ignoreUnavailable(true)
                     .expandWildcards(ExpandWildcard.All));
             IndexMappingRecord indexMappingRecord = response.get(index);
-            return os3SerializationUtils.toMap(indexMappingRecord.mappings());
+            return osSerializationUtils.toMap(indexMappingRecord.mappings());
         }, "Couldn't read mapping of index " + index);
     }
 

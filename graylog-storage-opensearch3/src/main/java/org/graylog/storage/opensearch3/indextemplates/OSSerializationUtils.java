@@ -33,14 +33,14 @@ import java.util.Map;
  * Utility class that helps use our APIs based on maps with OS3, strongly typed, builder-based APIs.
  * It has its disadvantages, but simplifies significantly mapping between nested maps and complex `org.opensearch.client.opensearch._types.*` classes.
  */
-public class OS3SerializationUtils {
+public class OSSerializationUtils {
 
     private final ObjectMapper objectMapper;
     private final OfficialOpensearchClient client;
 
     @Inject
-    public OS3SerializationUtils(final ObjectMapper objectMapper,
-                                 final OfficialOpensearchClient client) {
+    public OSSerializationUtils(final ObjectMapper objectMapper,
+                                final OfficialOpensearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
     }
