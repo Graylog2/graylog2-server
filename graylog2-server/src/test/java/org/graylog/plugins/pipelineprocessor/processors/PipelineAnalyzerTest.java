@@ -34,10 +34,13 @@ import java.util.Set;
 
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.ALWAYS_TRUE_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.FROM_INPUT_ID;
+import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.GL2_SOURCE_INPUT_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.INPUT_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.REMOVE_FIELD_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM_ID;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PipelineAnalyzerTest {
     private PipelineAnalyzer pipelineAnalyzer;
@@ -56,6 +59,8 @@ class PipelineAnalyzerTest {
         pipelineAnalyzer = new PipelineAnalyzer(connectionsService, inputService, new MetricRegistry());
         ruleRecords = new ArrayList<>();
         testUtil = new PipelineTestUtil(connectionsService, inputService);
+
+        when(inputService.find(INPUT_ID)).thenReturn(mock(org.graylog2.inputs.Input.class));
     }
 
     @Test
@@ -96,7 +101,7 @@ class PipelineAnalyzerTest {
     }
 
     @Test
-    void inputMention() {
+    void inputMentionFromFunction() {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.FROM_INPUT));
 
         Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
@@ -115,5 +120,26 @@ class PipelineAnalyzerTest {
                         && dao.functions().contains("from_input")));
     }
 
+    @Test
+    void inputMentionFromVariable() {
+        Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.GL2_SOURCE_INPUT));
+
+        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
+                ImmutableMap.of(pipeline1.id(), pipeline1), ImmutableMap.of(pipeline1.id(), pipeline1), ruleRecords);
+
+        assertTrue(result.containsKey(INPUT_ID));
+        Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
+        assertTrue(mentions.stream().anyMatch(entry ->
+                entry.pipelineId().equals(pipeline1.id())
+                        && entry.connectedStreams().contains(STREAM_ID)
+                        && entry.ruleId().equals(GL2_SOURCE_INPUT_ID)));
+
+        assertTrue(ruleRecords.stream().anyMatch(dao ->
+                dao.pipelineId().equals(pipeline1.id())
+                        && dao.rules().contains(GL2_SOURCE_INPUT_ID)
+                        && dao.functions().contains("has_field")
+                        && dao.functions().contains("to_string")
+        ));
+    }
 }
 

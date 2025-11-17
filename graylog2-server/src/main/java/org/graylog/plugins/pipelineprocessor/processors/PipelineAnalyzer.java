@@ -204,7 +204,7 @@ public class PipelineAnalyzer {
         }
 
         private boolean isReferenced(String value) {
-            return REFERENCING_VARIABLES.stream().anyMatch(pattern -> pattern.contains(value));
+            return REFERENCING_VARIABLES.stream().anyMatch(value::contains);
         }
 
         @Override

@@ -14,9 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { DEFAULT_LAYOUT, ENTITY_TABLE_ID } from 'views/components/searchbar/saved-search/Constants';
-import usePaginationAndTableLayout from 'hooks/usePaginationAndTableLayout';
+package org.graylog.storage.opensearch3.testing.client.mock;
 
-const useSavedSearchPaginationAndTableLayout = () => usePaginationAndTableLayout(ENTITY_TABLE_ID, DEFAULT_LAYOUT);
-
-export default useSavedSearchPaginationAndTableLayout;
+record MockedResponse(String method, String url, String body) {
+}
