@@ -25,6 +25,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.metrics.MetricUtils;
+import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
 import org.joda.time.DateTime;
@@ -49,13 +50,15 @@ public class TelemetryClusterService {
     private final LeaderElectionService leaderElectionService;
     private final DBTelemetryClusterInfo dbTelemetryClusterInfo;
     private final MetricRegistry metricRegistry;
+    private final StatsService statsService;
 
     @Inject
     public TelemetryClusterService(ServerStatus serverStatus,
                                    ClusterConfigService clusterConfigService,
                                    LeaderElectionService leaderElectionService,
                                    DBTelemetryClusterInfo dbTelemetryClusterInfo,
-                                   MetricRegistry metricRegistry) {
+                                   MetricRegistry metricRegistry,
+                                   StatsService statsService) {
         this.serverStatus = serverStatus;
         this.clusterId = Optional.ofNullable(clusterConfigService.get(ClusterId.class))
                 .map(ClusterId::clusterId)
@@ -64,6 +67,7 @@ public class TelemetryClusterService {
         this.leaderElectionService = leaderElectionService;
         this.dbTelemetryClusterInfo = dbTelemetryClusterInfo;
         this.metricRegistry = metricRegistry;
+        this.statsService = statsService;
     }
 
     public void updateTelemetryClusterData() {
@@ -84,6 +88,7 @@ public class TelemetryClusterService {
                 .memoryHeapUsed(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_USED).orElse(-1L))
                 .memoryHeapCommitted(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_COMMITTED).orElse(-1L))
                 .memoryHeapMax(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_MAX).orElse(-1L))
+                .cpuCores(statsService.systemStats().osStats().processor().totalCores())
                 .build();
 
         dbTelemetryClusterInfo.update(nodeInfo);

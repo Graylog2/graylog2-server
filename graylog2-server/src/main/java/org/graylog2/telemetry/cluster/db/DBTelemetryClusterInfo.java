@@ -38,6 +38,7 @@ import static org.graylog2.configuration.TelemetryConfiguration.TELEMETRY_CLUSTE
 import static org.graylog2.database.indices.MongoDbIndexTools.ensureTTLIndex;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CLUSTER_ID;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CODENAME;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CPU_CORES;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_FACILITY;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_HOSTNAME;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_IS_LEADER;
@@ -90,6 +91,7 @@ public class DBTelemetryClusterInfo {
         updates.add(Updates.set(FIELD_MEMORY_HEAP_USED, nodeInfo.memoryHeapUsed()));
         updates.add(Updates.set(FIELD_MEMORY_HEAP_COMMITTED, nodeInfo.memoryHeapCommitted()));
         updates.add(Updates.set(FIELD_MEMORY_HEAP_MAX, nodeInfo.memoryHeapMax()));
+        updates.add(Updates.set(FIELD_CPU_CORES, nodeInfo.cpuCores()));
         updates.add(Updates.set(FIELD_VERSION, nodeInfo.version()));
         updates.add(currentDate(FIELD_UPDATED_AT));
 
