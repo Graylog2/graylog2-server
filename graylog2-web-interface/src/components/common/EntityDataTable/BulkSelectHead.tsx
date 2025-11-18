@@ -19,10 +19,8 @@ import { useMemo } from 'react';
 import uniq from 'lodash/uniq';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
-import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import { Th } from 'components/common/EntityDataTable/TableHead';
 
 export type CheckboxStatus = 'CHECKED' | 'UNCHECKED' | 'PARTIAL';
 
@@ -57,10 +55,7 @@ type Props<Entity extends EntityBase> = {
   getTitle?: (checkboxStatus: CheckboxStatus) => string;
 };
 
-export const BulkSelectHeadContent = <Entity extends EntityBase>({
-  data,
-  getTitle = getDefaultTitle,
-}: Props<Entity>) => {
+export const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => {
   const { selectedEntities, setSelectedEntities } = useSelectedEntities();
   const { checkboxStatus } = useCheckboxStatus(data, selectedEntities);
   const title = getTitle(checkboxStatus);
@@ -89,9 +84,4 @@ export const BulkSelectHeadContent = <Entity extends EntityBase>({
   );
 };
 
-const BulkSelectHead = <Entity extends EntityBase>({ data, getTitle = getDefaultTitle }: Props<Entity>) => (
-  <Th $width={BULK_SELECT_COLUMN_WIDTH}>
-    <BulkSelectHeadContent<Entity> data={data} getTitle={getTitle} />
-  </Th>
-);
 export default BulkSelectHead;

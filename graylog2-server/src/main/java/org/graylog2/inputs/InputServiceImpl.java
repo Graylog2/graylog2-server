@@ -72,6 +72,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.graylog2.plugin.inputs.MessageInput.FIELD_TITLE;
+
 public class InputServiceImpl extends PersistedServiceImpl implements InputService {
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
 
@@ -133,6 +135,24 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             inputs.add(createFromDbObject(o));
         }
         return inputs.build();
+    }
+
+    /**
+     * Finds input IDs by title using a case-insensitive regex search. This is designed to mimic
+     * InputRegistry::findByTitle behavior.
+     * Regex takes advantage of MongoDB indexes, making this method efficient for large datasets.
+     */
+    @Override
+    public List<String> findIdsByTitle(String title) {
+        DBObject regexQuery = new BasicDBObject();
+        regexQuery.put(FIELD_TITLE, new BasicDBObject("$regex", title).append("$options", "i"));
+
+        final ImmutableList.Builder<String> inputIds = ImmutableList.builder();
+        for (final DBObject o : query(InputImpl.class, regexQuery)) {
+            final InputImpl fromDbObject = createFromDbObject(o);
+            inputIds.add(fromDbObject.getId());
+        }
+        return inputIds.build();
     }
 
     @Override
