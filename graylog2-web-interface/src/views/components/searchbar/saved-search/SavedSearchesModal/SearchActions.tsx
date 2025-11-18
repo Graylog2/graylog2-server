@@ -57,6 +57,7 @@ const SearchActions = ({ search, onDeleteSavedSearch, activeSavedSearchId }: Pro
   const { deselectEntity } = useSelectedEntities();
   const { refetch } = useTableFetchContext();
   const [showShareModal, setShowShareModal] = useState(false);
+
   const toggleEntityShareModal = useCallback(() => {
     setShowShareModal((cur) => !cur);
   }, []);

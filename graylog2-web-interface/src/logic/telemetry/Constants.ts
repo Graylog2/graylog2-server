@@ -47,6 +47,14 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
   },
+  FAVORITE_FIELDS: {
+    EDIT_OPEN: 'Favorite Fields Edit Open',
+    EDIT_CANCELED: 'Favorite Fields Edit Canceled',
+    EDIT_SAVED: 'Favorite Fields Edit Saved',
+    TOGGLED: 'Favorite Field Toggled',
+    REORDERED: 'Favorite Field Reordered',
+    NON_FAVORITE_SHOW_TOGGLED: 'Non Favorite Field Show Toggled',
+  },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
     MESSAGE_COUNT: 'Search Widget Message Count Created',

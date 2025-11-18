@@ -16,7 +16,7 @@
  */
 import { useMemo } from 'react';
 
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { DefaultLayout, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 

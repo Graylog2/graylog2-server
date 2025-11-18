@@ -17,7 +17,8 @@
 
 import type { Sort } from 'stores/PaginationTypes';
 
-export const ENTITY_TABLE_ID = 'field-type';
+export const COLUMN_ORDER = ['index_set_title', 'stream_titles', 'types'];
+
 export const DEFAULT_LAYOUT = {
   entityTableId: 'field-type',
   defaultPageSize: 20,

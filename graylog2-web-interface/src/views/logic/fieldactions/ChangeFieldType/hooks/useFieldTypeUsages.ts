@@ -74,7 +74,7 @@ const useFieldTypeUsages = (
   isLoading: boolean;
 } => {
   const { data, refetch, isInitialLoading, isLoading } = useQuery({
-    queryKey: ['fieldTypeUsages', field, searchParams],
+    queryKey: queryKey(searchParams, field, streams),
 
     queryFn: () =>
       defaultOnError(
