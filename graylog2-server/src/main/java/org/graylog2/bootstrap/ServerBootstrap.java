@@ -324,6 +324,9 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         LOG.info("Node ID: {}", nodeId);
 
         try {
+            // Always run cluster-wide migrations
+            runMigrations(injector, MigrationType.CLUSTER_WIDE);
+
             if (configuration.isLeader() && configuration.runMigrations()) {
                 runMigrations(injector, MigrationType.STANDARD);
             }
@@ -397,7 +400,7 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
         Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
 
-        LOG.info("Running {} migrations...", migrations.size());
+        LOG.info("Running {} {} migrations...", migrations.size(), migrationType);
 
         ImmutableSortedSet.copyOf(migrations).stream().filter(m -> m.migrationType() == migrationType).forEach(m -> {
             LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());

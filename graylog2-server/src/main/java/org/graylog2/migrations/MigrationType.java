@@ -25,5 +25,9 @@ public enum MigrationType {
      * Will run during a regular startup, after the preflight is either skipped or finished. This is the default
      * behaviour for most of our migrations.
      */
-    STANDARD
+    STANDARD,
+    /**
+     * Will run on all nodes in the cluster, regardless of their role.
+     */
+    CLUSTER_WIDE
 }
