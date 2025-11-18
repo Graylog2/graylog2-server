@@ -29,5 +29,5 @@ public enum MigrationType {
     /**
      * Will run on all nodes in the cluster, regardless of their role.
      */
-    CLUSTER_WIDE
+    ENFORCED_ON_ALL_NODES
 }
