@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
 import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
-import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS2;
+import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS;
 import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
 import org.graylog.storage.opensearch3.IndicesAdapterOS;
 import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
@@ -29,12 +29,12 @@ import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
-import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.testing.elasticsearch.Adapters;
@@ -80,11 +80,12 @@ public class AdaptersOS implements Adapters {
     public IndicesAdapter indicesAdapter() {
         return new IndicesAdapterOS(officialOpensearchClient,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
-                new org.graylog.storage.opensearch3.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
-                new org.graylog.storage.opensearch3.cluster.ClusterStateApi(objectMapper, client),
+                new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
+                new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
                 featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
                 new IndexStatisticsBuilder(),
-                objectMapper
+                objectMapper,
+                new OSSerializationUtils(objectMapper, officialOpensearchClient)
         );
     }
 
@@ -126,7 +127,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS2(client));
     }
 
 }

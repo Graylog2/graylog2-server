@@ -16,9 +16,9 @@
  */
 import EntityDataTable from './EntityDataTable';
 import MoreActions from './MoreActions';
-import type { ColumnRenderers, Column } from './types';
+import type { ColumnRenderers, ColumnSchema } from './types';
 
 export { default as useTableEventHandlers } from './hooks/useTableEventHandlers';
 
-export { ColumnRenderers, Column, MoreActions };
+export { ColumnRenderers, ColumnSchema, MoreActions };
 export default EntityDataTable;
