@@ -109,9 +109,10 @@ const EventConditionForm = ({
   );
 
   const formattedEventDefinitionTypes = useMemo(
-    () => sortedEventDefinitionTypes
-      .filter((type) => type.useCondition())
-      .map((type) => ({ label: type.displayName, value: type.type })),
+    () =>
+      sortedEventDefinitionTypes
+        .filter((type) => type.useCondition())
+        .map((type) => ({ label: type.displayName, value: type.type })),
     [sortedEventDefinitionTypes],
   );
 
@@ -186,9 +187,7 @@ const EventConditionForm = ({
                 disabled={disabledSelect || onlyFilters || isSigma}
                 required
               />
-              <HelpBlock>
-                {validation?.errors?.config?.[0] ?? 'Choose the type of Condition for this Event.'}
-              </HelpBlock>
+              <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Condition for this Event.'}</HelpBlock>
             </FormGroup>
           </>
         )}
