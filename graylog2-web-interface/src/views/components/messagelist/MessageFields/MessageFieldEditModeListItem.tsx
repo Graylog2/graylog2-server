@@ -15,18 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import type FieldType from 'views/logic/fieldtypes/FieldType';
-import type { Message } from 'views/components/messagelist/Types';
 import { MessageFieldName, MessageFieldValue } from 'views/components/messagelist/MessageField';
 import CommonFavoriteIcon from 'views/components/common/CommonFavoriteIcon';
+import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 
 type Props = {
   fieldName: string;
   fieldType: FieldType;
-  message: Message;
   value: any;
   isFavorite: boolean;
   onFavoriteToggle: (field: string) => void;
@@ -53,8 +52,9 @@ const Container = styled.div(
   `,
 );
 
-const MessageFieldEditMode = ({ fieldName, fieldType, message, value, isFavorite, onFavoriteToggle }: Props) => {
+const MessageFieldEditModeListItem = ({ fieldName, fieldType, value, isFavorite, onFavoriteToggle }: Props) => {
   const favTitle = isFavorite ? `Remove ${fieldName} from favorites` : `Add ${fieldName} to favorites`;
+  const { message } = useContext(MessageFavoriteFieldsContext);
 
   const _onFavoriteToggle = useCallback(() => onFavoriteToggle(fieldName), [fieldName, onFavoriteToggle]);
 
@@ -75,4 +75,4 @@ const MessageFieldEditMode = ({ fieldName, fieldType, message, value, isFavorite
   );
 };
 
-export default MessageFieldEditMode;
+export default MessageFieldEditModeListItem;
