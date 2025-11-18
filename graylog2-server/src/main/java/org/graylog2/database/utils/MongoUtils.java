@@ -253,13 +253,15 @@ public class MongoUtils<T extends MongoEntity> {
      */
     public Map<String, Long> countByField(String field) {
         final Map<String, Long> counts = new HashMap<>();
+        final String countField = "count";
+
         collection.aggregate(
-                List.of(Aggregates.group("$" + field, Accumulators.sum("count", 1))),
+                List.of(Aggregates.group("$" + field, Accumulators.sum(countField, 1))),
                 Document.class
         ).forEach(doc -> {
             Object id = doc.get("_id");
             if (id != null) {
-                counts.put(id.toString(), ((Number) doc.get("count")).longValue());
+                counts.put(id.toString(), doc.getInteger(countField).longValue());
             }
         });
         return counts;

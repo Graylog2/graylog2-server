@@ -58,16 +58,16 @@ export type PaginatedList<ItemType> = {
   pagination: ListPagination;
 };
 
-export type Sort = {
-  attributeId: string;
+export type Sort<T = string> = {
+  attributeId: T;
   direction: 'asc' | 'desc';
 };
 
-export type SearchParams = {
+export type SearchParams<T = string> = {
   page: number;
   pageSize: number;
   query: string;
-  sort: Sort;
+  sort: Sort<T>;
   filters?: UrlQueryFilters;
 };
 

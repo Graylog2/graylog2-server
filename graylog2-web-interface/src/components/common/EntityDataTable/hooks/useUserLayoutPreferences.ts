@@ -24,12 +24,12 @@ import { defaultOnError } from 'util/conditional/onError';
 const INITIAL_DATA = {};
 
 const preferencesFromJSON = ({
-  displayed_attributes,
+  attributes,
   sort,
   per_page,
   custom_preferences,
 }: TableLayoutPreferencesJSON): TableLayoutPreferences => ({
-  displayedAttributes: displayed_attributes,
+  attributes,
   sort: sort ? { attributeId: sort.field, direction: sort.order } : undefined,
   perPage: per_page,
   customPreferences: custom_preferences,
