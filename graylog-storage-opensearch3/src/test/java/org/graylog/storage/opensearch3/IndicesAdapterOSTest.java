@@ -85,7 +85,7 @@ class IndicesAdapterOSTest {
                 indexStatisticsBuilder,
                 objectMapper,
                 jsonApi,
-                new OSSerializationUtils(objectMapper, opensearchClient)
+                new OSSerializationUtils()
         );
     }
 
