@@ -51,6 +51,7 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
     public static final String FIELD_JVM_HEAP_USED = "jvm_heap_used";
     public static final String FIELD_JVM_HEAP_COMMITTED = "jvm_heap_committed";
     public static final String FIELD_JVM_HEAP_MAX = "jvm_heap_max";
+    public static final String FIELD_MEMORY_TOTAL = "memory_total";
     public static final String FIELD_CPU_CORES = "cpu_cores";
 
     @Id
@@ -106,6 +107,10 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
     @JsonProperty(FIELD_JVM_HEAP_MAX)
     @Nullable
     public abstract Long jvmHeapMax();
+
+    @JsonProperty(FIELD_MEMORY_TOTAL)
+    @Nullable
+    public abstract Long memoryTotal();
 
     @JsonProperty(FIELD_CPU_CORES)
     @Nullable
@@ -186,6 +191,9 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
 
         @JsonProperty(FIELD_JVM_HEAP_MAX)
         public abstract Builder jvmHeapMax(Long jvmHeapMax);
+
+        @JsonProperty(FIELD_MEMORY_TOTAL)
+        public abstract Builder memoryTotal(Long memoryTotal);
 
         @JsonProperty(FIELD_CPU_CORES)
         public abstract Builder cpuCores(Integer cpuCores);

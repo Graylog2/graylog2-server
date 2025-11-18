@@ -26,6 +26,7 @@ import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.shared.system.stats.StatsService;
+import org.graylog2.shared.system.stats.os.OsStats;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
 import org.joda.time.DateTime;
@@ -71,6 +72,8 @@ public class TelemetryClusterService {
     }
 
     public void updateTelemetryClusterData() {
+        final OsStats osStats = statsService.systemStats().osStats();
+
         TelemetryClusterInfoDto nodeInfo = TelemetryClusterInfoDto.Builder.create()
                 .facility(FACILITY)
                 .codename(ServerVersion.CODENAME)
@@ -88,7 +91,8 @@ public class TelemetryClusterService {
                 .jvmHeapUsed(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_USED).orElse(-1L))
                 .jvmHeapCommitted(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_COMMITTED).orElse(-1L))
                 .jvmHeapMax(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_MAX).orElse(-1L))
-                .cpuCores(statsService.systemStats().osStats().processor().totalCores())
+                .memoryTotal(osStats.memory().total())
+                .cpuCores(osStats.processor().totalCores())
                 .build();
 
         dbTelemetryClusterInfo.update(nodeInfo);

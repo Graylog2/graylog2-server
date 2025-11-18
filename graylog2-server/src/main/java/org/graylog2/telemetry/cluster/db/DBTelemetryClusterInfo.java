@@ -48,6 +48,7 @@ import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LI
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_COMMITTED;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_MAX;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_USED;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_TOTAL;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_NODE_ID;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_OPERATING_SYSTEM;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_STARTED_AT;
@@ -91,6 +92,7 @@ public class DBTelemetryClusterInfo {
         updates.add(Updates.set(FIELD_JVM_HEAP_USED, nodeInfo.jvmHeapUsed()));
         updates.add(Updates.set(FIELD_JVM_HEAP_COMMITTED, nodeInfo.jvmHeapCommitted()));
         updates.add(Updates.set(FIELD_JVM_HEAP_MAX, nodeInfo.jvmHeapMax()));
+        updates.add(Updates.set(FIELD_MEMORY_TOTAL, nodeInfo.memoryTotal()));
         updates.add(Updates.set(FIELD_CPU_CORES, nodeInfo.cpuCores()));
         updates.add(Updates.set(FIELD_VERSION, nodeInfo.version()));
         updates.add(currentDate(FIELD_UPDATED_AT));

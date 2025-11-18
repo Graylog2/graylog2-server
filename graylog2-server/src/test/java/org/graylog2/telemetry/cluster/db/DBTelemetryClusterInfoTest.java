@@ -95,6 +95,7 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.jvmHeapUsed()).isEqualTo(dto.jvmHeapUsed());
         assertThat(nodeInfo.jvmHeapCommitted()).isEqualTo(dto.jvmHeapCommitted());
         assertThat(nodeInfo.jvmHeapMax()).isEqualTo(dto.jvmHeapMax());
+        assertThat(nodeInfo.memoryTotal()).isEqualTo(dto.memoryTotal());
         assertThat(nodeInfo.cpuCores()).isEqualTo(dto.cpuCores());
     }
 
@@ -127,6 +128,7 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.jvmHeapUsed()).isEqualTo(dto2.jvmHeapUsed());
         assertThat(nodeInfo.jvmHeapCommitted()).isEqualTo(dto2.jvmHeapCommitted());
         assertThat(nodeInfo.jvmHeapMax()).isEqualTo(dto2.jvmHeapMax());
+        assertThat(nodeInfo.memoryTotal()).isEqualTo(dto2.memoryTotal());
         assertThat(nodeInfo.cpuCores()).isEqualTo(dto2.cpuCores());
     }
 }

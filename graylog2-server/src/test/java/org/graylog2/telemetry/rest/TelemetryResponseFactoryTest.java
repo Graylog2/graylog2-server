@@ -44,6 +44,7 @@ import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LI
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_COMMITTED;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_MAX;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_JVM_HEAP_USED;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_TOTAL;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_NODE_ID;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_OPERATING_SYSTEM;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_TIMEZONE;
@@ -121,6 +122,7 @@ public class TelemetryResponseFactoryTest {
             assertThat(node.get(FIELD_JVM_HEAP_USED).asLong()).isEqualTo(dto.jvmHeapUsed());
             assertThat(node.get(FIELD_JVM_HEAP_COMMITTED).asLong()).isEqualTo(dto.jvmHeapCommitted());
             assertThat(node.get(FIELD_JVM_HEAP_MAX).asLong()).isEqualTo(dto.jvmHeapMax());
+            assertThat(node.get(FIELD_MEMORY_TOTAL).asLong()).isEqualTo(dto.memoryTotal());
             assertThat(node.get(FIELD_CPU_CORES).asInt()).isEqualTo(dto.cpuCores());
         }
     }

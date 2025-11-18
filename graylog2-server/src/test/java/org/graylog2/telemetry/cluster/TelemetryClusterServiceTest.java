@@ -60,6 +60,7 @@ class TelemetryClusterServiceTest {
     private static final long HEAP_USED = 145806336L;
     private static final long HEAP_COMMITTED = 204472320L;
     private static final long HEAP_MAX = 1073741824L;
+    private static final long MEMORY_TOTAL = 51539607552L;
     private static final int CPU_CORES = 15;
     private static final boolean IS_LEADER = true;
     private static final boolean IS_PROCESSING = false;
@@ -100,6 +101,7 @@ class TelemetryClusterServiceTest {
         when(serverStatus.getLifecycle()).thenReturn(LIFECYCLE);
         when(serverStatus.getStartedAt()).thenReturn(STARTED_AT);
         when(serverStatus.getTimezone()).thenReturn(TIMEZONE);
+        when(statsService.systemStats().osStats().memory().total()).thenReturn(MEMORY_TOTAL);
         when(statsService.systemStats().osStats().processor().totalCores()).thenReturn(CPU_CORES);
 
         metricRegistry = new MetricRegistry();
@@ -146,6 +148,7 @@ class TelemetryClusterServiceTest {
             assertEquals(HEAP_COMMITTED, dto.jvmHeapCommitted());
             assertEquals(HEAP_MAX, dto.jvmHeapMax());
             assertEquals(CPU_CORES, dto.cpuCores());
+            assertEquals(MEMORY_TOTAL, dto.memoryTotal());
             assertEquals(expectedTimezone, dto.timezone());
             assertEquals(expectedLbStatus, dto.lbStatus());
             assertEquals(expectedLifecycle, dto.lifecycle());

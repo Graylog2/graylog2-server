@@ -46,6 +46,7 @@ public class TelemetryFixtures {
                 .jvmHeapUsed(randLong)
                 .jvmHeapCommitted(randLong)
                 .jvmHeapMax(randLong)
+                .memoryTotal(randLong)
                 .cpuCores(randInt)
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
