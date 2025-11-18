@@ -121,7 +121,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         final Set<String> streams = adaptStreams(suggestionsRequest.streams(), searchUser);
         final TimeRange timerange = Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange());
         final String fieldName = suggestionsRequest.field();
-        final var fieldType = mappedFieldTypesService.fieldTypeByStreamIds(streams, timerange, suggestionsRequest.field())
+        final var fieldType = mappedFieldTypesService.singleFieldTypeByStreamIds(streams, timerange, suggestionsRequest.field())
                 .stream()
                 .findFirst()
                 .map(MappedFieldTypeDTO::type)

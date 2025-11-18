@@ -53,7 +53,7 @@ public class FieldTypesResourceTest {
             }
 
             @Override
-            public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field) {
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
                 return streams.stream().map(streamID -> MappedFieldTypeDTO.create(field, FieldTypes.Type.builder().type("text").build())).collect(Collectors.toSet());
             }
         };
@@ -87,7 +87,7 @@ public class FieldTypesResourceTest {
             }
 
             @Override
-            public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field) {
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
                 return Set.of();
             }
         };
@@ -128,7 +128,7 @@ public class FieldTypesResourceTest {
             }
 
             @Override
-            public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field) {
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
                 return Set.of();
             }
         };
@@ -162,7 +162,7 @@ public class FieldTypesResourceTest {
             }
 
             @Override
-            public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field) {
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
                 return Set.of();
             }
         };
@@ -197,7 +197,7 @@ public class FieldTypesResourceTest {
             }
 
             @Override
-            public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field) {
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
                 return Set.of();
             }
         };
@@ -236,7 +236,7 @@ public class FieldTypesResourceTest {
             }
 
             @Override
-            public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field) {
+            public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
                 return Set.of();
             }
         }, mock(IndexFieldTypePollerPeriodical.class));

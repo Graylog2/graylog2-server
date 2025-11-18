@@ -39,7 +39,7 @@ class QueryValidationServiceImplTest {
         }
 
         @Override
-        public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streams, TimeRange timerange, String field) {
+        public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field) {
             return Set.of();
         }
     };

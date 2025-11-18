@@ -61,7 +61,7 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
 
     @Override
     public Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange) {
-        final Set<String> indexNames = this.indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.copyOf(streamIds), timeRange);
+        final Set<String> indexNames = this.indexLookup.indexNamesForStreamsInTimeRange(streamIds, timeRange);
         final var fieldTypeDTOs = this.indexFieldTypesService.findByIndexNames(indexNames)
                 .stream()
                 .flatMap(fieldTypes -> fieldTypes.fields().stream())
@@ -71,8 +71,8 @@ public class MappedFieldTypesServiceImpl implements MappedFieldTypesService {
     }
 
     @Override
-    public Set<MappedFieldTypeDTO> fieldTypeByStreamIds(Set<String> streamIds, TimeRange timeRange, String field) {
-        final var indexNames = this.indexLookup.indexNamesForStreamsInTimeRange(ImmutableSet.copyOf(streamIds), timeRange);
+    public Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streamIds, TimeRange timeRange, String field) {
+        final var indexNames = this.indexLookup.indexNamesForStreamsInTimeRange(streamIds, timeRange);
         final var fieldTypeDTOs = this.indexFieldTypesService.findForSingleField(field, indexNames)
                 .stream()
                 .filter(fieldTypeDTO -> !streamAwareFieldTypes || !Collections.disjoint(fieldTypeDTO.streams(), streamIds));
