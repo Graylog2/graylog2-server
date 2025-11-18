@@ -19,6 +19,10 @@ import Routes from 'integrations/aws/common/Routes';
 import AWSInputConfiguration from './aws/AWSInputConfiguration';
 import AWSCloudWatchApp from './aws/cloudwatch/CloudWatchApp';
 import EmbeddedCloudWatchApp from './aws/cloudwatch/EmbeddedCloudWatchApp';
+import DBConnectorApp from './dbconnector/DBConnectorApp';
+import DBConnectorRoutes from './dbconnector/Routes';
+import DBConnectorInputConfiguration from './dbconnector/DBConnectorInputConfiguration';
+import EmbeddedDBConnectorApp from './dbconnector/EmbeddedDBConnectorApp';
 import PagerDutyNotificationDetails from './pager-duty/PagerDutyNotificationDetails';
 import PagerDutyNotificationForm from './pager-duty/PagerDutyNotificationForm';
 import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSummary';
@@ -36,13 +40,20 @@ import TeamsNotificationV2Summary from './event-notifications/event-notification
 import TeamsNotificationV2Details from './event-notifications/event-notification-details/TeamsNotificationV2Details';
 
 const bindings = {
-  routes: [{ path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp }],
+  routes: [{ path: Routes.unqualified.INTEGRATIONS.AWS.CLOUDWATCH.index, component: AWSCloudWatchApp },
+  { path: DBConnectorRoutes.unqualified.INTEGRATIONS.DBConnector.ACTIVITYAPI.index, component: DBConnectorApp },
+],
   inputConfiguration: [
     {
       type: 'org.graylog.integrations.aws.inputs.AWSInput',
       component: AWSInputConfiguration,
       embeddedComponent: EmbeddedCloudWatchApp,
     },
+    {
+          type: 'org.graylog.integrations.dbconnector.DBConnectorInput',
+          component: DBConnectorInputConfiguration,
+          embeddedComponent: EmbeddedDBConnectorApp,
+        },
   ],
   eventNotificationTypes: [
     {

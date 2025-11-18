@@ -27,6 +27,11 @@ import org.graylog.integrations.aws.resources.KinesisSetupResource;
 import org.graylog.integrations.aws.transports.AWSTransport;
 import org.graylog.integrations.aws.transports.KinesisTransport;
 import org.graylog.integrations.dataadapters.GreyNoiseQuickIPDataAdapter;
+import org.graylog.integrations.dbconnector.DBConnectorCheckpoint;
+import org.graylog.integrations.dbconnector.DBConnectorCodec;
+import org.graylog.integrations.dbconnector.DBConnectorInput;
+import org.graylog.integrations.dbconnector.DBConnectorTransport;
+import org.graylog.integrations.dbconnector.api.DBConnectorResource;
 import org.graylog.integrations.inputs.paloalto.PaloAltoCodec;
 import org.graylog.integrations.inputs.paloalto.PaloAltoTCPInput;
 import org.graylog.integrations.inputs.paloalto11.PaloAlto11xCodec;
@@ -191,6 +196,13 @@ public class IntegrationsModule extends PluginModule {
         bind(IamClientBuilder.class).toProvider(IamClient::builder);
         bind(CloudWatchLogsClientBuilder.class).toProvider(CloudWatchLogsClient::builder);
         bind(KinesisClientBuilder.class).toProvider(KinesisClient::builder);
+
+        //DBConnector
+        addMessageInput(DBConnectorInput.class);
+        addTransport(DBConnectorInput.NAME, DBConnectorTransport.class);
+        addCodec(DBConnectorCodec.NAME, DBConnectorCodec.class);
+        registerJacksonSubtype(DBConnectorCheckpoint.class, DBConnectorCheckpoint.NAME);
+        addRestResource(DBConnectorResource.class);
     }
 
     /**
