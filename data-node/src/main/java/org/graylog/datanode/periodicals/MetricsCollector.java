@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.periodicals;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
@@ -24,6 +25,7 @@ import jakarta.inject.Inject;
 import org.graylog.datanode.Configuration;
 import org.graylog.datanode.metrics.ClusterStatMetricsCollector;
 import org.graylog.datanode.metrics.NodeMetricsCollector;
+import org.graylog.datanode.metrics.NodeStatMetrics;
 import org.graylog.datanode.opensearch.OpensearchProcess;
 import org.graylog.datanode.opensearch.statemachine.OpensearchState;
 import org.graylog.shaded.opensearch2.org.joda.time.DateTime;
@@ -48,9 +50,11 @@ import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.MemoryUsage;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MetricsCollector extends Periodical {
 
@@ -62,12 +66,32 @@ public class MetricsCollector extends Periodical {
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
 
+    private final static Map<String, Object> opensearchMetrics = new ConcurrentHashMap<>();
+
     @Inject
     public MetricsCollector(OpensearchProcess process, Configuration configuration, ObjectMapper objectMapper, MetricRegistry metricRegistry) {
         this.process = process;
         this.configuration = configuration;
         this.objectMapper = objectMapper;
         this.metricRegistry = metricRegistry;
+        registerNodeStatMetrics();
+    }
+
+    private void registerNodeStatMetrics() {
+        Arrays.stream(NodeStatMetrics.values())
+                .map(NodeStatMetrics::getMetricRegistryName)
+                .forEach(metric -> {
+                    metricRegistry.registerGauge(metric, new Gauge<Object>() {
+                        @Override
+                        public Object getValue() {
+                            return getNodeMetric(metric);
+                        }
+                    });
+                });
+    }
+
+    private Object getNodeMetric(String metricName) {
+        return opensearchMetrics.getOrDefault(metricName, 0L);
     }
 
     @Override
@@ -110,7 +134,7 @@ public class MetricsCollector extends Periodical {
     public void doRun() {
         if (process.isInState(OpensearchState.AVAILABLE)) {
             process.restClient().ifPresent(client -> {
-                this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper, metricRegistry);
+                this.nodeStatMetricsCollector = new NodeMetricsCollector(client, objectMapper);
                 this.clusterStatMetricsCollector = new ClusterStatMetricsCollector(client, objectMapper);
                 final IndexRequest indexRequest = new IndexRequest(configuration.getMetricsStream());
                 Map<String, Object> metrics = new HashMap<String, Object>();
@@ -118,7 +142,8 @@ public class MetricsCollector extends Periodical {
                 String node = configuration.getDatanodeNodeName();
                 metrics.put("node", node);
                 addJvmMetrics(metrics);
-                metrics.putAll(nodeStatMetricsCollector.getNodeMetrics(node));
+                Map<String, Object> nodeMetrics = nodeStatMetricsCollector.getNodeMetrics(node);
+                metrics.putAll(nodeMetrics);
                 indexRequest.source(metrics);
                 indexDocument(client, indexRequest);
 
@@ -128,6 +153,10 @@ public class MetricsCollector extends Periodical {
                     indexRequest.source(metrics);
                     indexDocument(client, indexRequest);
                 }
+
+                nodeMetrics.forEach((key, value) -> {
+                    opensearchMetrics.put(NodeStatMetrics.getMetricRegistryName(key), value);
+                });
             });
         }
     }
