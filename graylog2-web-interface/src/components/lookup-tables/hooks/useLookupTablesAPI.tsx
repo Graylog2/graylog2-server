@@ -255,6 +255,10 @@ export function useCreateCache() {
         queryKey: ['caches'],
         refetchType: 'active',
       });
+      queryClient.invalidateQueries({
+        queryKey: ['all-caches'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -363,6 +367,10 @@ export function useCreateAdapter() {
       UserNotification.success('Data Adapter created successfully');
       queryClient.invalidateQueries({
         queryKey: ['adapters'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['all-data-adapters'],
         refetchType: 'active',
       });
     },
