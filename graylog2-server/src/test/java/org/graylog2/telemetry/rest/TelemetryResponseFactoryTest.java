@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.system.traffic.TrafficCounterService;
 import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
+import org.graylog2.telemetry.fixtures.TelemetryFixtures;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.Test;
@@ -29,17 +30,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CLUSTER_ID;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CODENAME;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_CPU_CORES;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_FACILITY;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_HOSTNAME;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_IS_LEADER;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_IS_PROCESSING;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LB_STATUS;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_LIFECYCLE;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_HEAP_COMMITTED;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_HEAP_MAX;
+import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_MEMORY_HEAP_USED;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_NODE_ID;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_OPERATING_SYSTEM;
 import static org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto.FIELD_TIMEZONE;
@@ -66,8 +70,8 @@ public class TelemetryResponseFactoryTest {
     void createClusterInfo() {
         final long userCount = 42L;
         final String installationSource = "test-src";
-        final TelemetryClusterInfoDto leader = nodeInfo("node-1", true);
-        final TelemetryClusterInfoDto nonLeader = nodeInfo("node-2", false);
+        final TelemetryClusterInfoDto leader = TelemetryFixtures.nodeInfo("node-1", true);
+        final TelemetryClusterInfoDto nonLeader = TelemetryFixtures.nodeInfo("node-2", false);
         final DateTime date = DateTime.now(DateTimeZone.UTC);
         final TrafficCounterService.TrafficHistogram histogram = traffic(
                 Map.of(
@@ -114,13 +118,17 @@ public class TelemetryResponseFactoryTest {
             assertThat(node.get(FIELD_OPERATING_SYSTEM).asText()).isEqualTo(dto.operatingSystem());
             assertThat(node.get(FIELD_TIMEZONE).asText()).isEqualTo(dto.timezone());
             assertThat(node.get(FIELD_VERSION).asText()).isEqualTo(dto.version());
+            assertThat(node.get(FIELD_MEMORY_HEAP_USED).asLong()).isEqualTo(dto.memoryHeapUsed());
+            assertThat(node.get(FIELD_MEMORY_HEAP_COMMITTED).asLong()).isEqualTo(dto.memoryHeapCommitted());
+            assertThat(node.get(FIELD_MEMORY_HEAP_MAX).asLong()).isEqualTo(dto.memoryHeapMax());
+            assertThat(node.get(FIELD_CPU_CORES).asInt()).isEqualTo(dto.cpuCores());
         }
     }
 
     @Test
     void createClusterInfoWithNoLeaderAndEmptyTraffic() {
-        final TelemetryClusterInfoDto nonLeader1 = nodeInfo("node-1", false);
-        final TelemetryClusterInfoDto nonLeader2 = nodeInfo("node-2", false);
+        final TelemetryClusterInfoDto nonLeader1 = TelemetryFixtures.nodeInfo("node-1", false);
+        final TelemetryClusterInfoDto nonLeader2 = TelemetryFixtures.nodeInfo("node-2", false);
         final TrafficCounterService.TrafficHistogram histogram = traffic(Map.of(), Map.of());
 
         final ObjectNode clusterInfo = factory.createClusterInfo(
@@ -142,26 +150,5 @@ public class TelemetryResponseFactoryTest {
         when(h.output()).thenReturn(output);
         when(h.input()).thenReturn(input);
         return h;
-    }
-
-    private TelemetryClusterInfoDto nodeInfo(String nodeId, boolean isLeader) {
-        final String randStr = UUID.randomUUID().toString();
-
-        return TelemetryClusterInfoDto.Builder.create()
-                .nodeId(nodeId)
-                .isLeader(isLeader)
-                .clusterId("cluster-1" + randStr)
-                .codename("Noir-" + randStr)
-                .facility("graylog-server-" + randStr)
-                .hostname("hostname-" + randStr)
-                .isProcessing(true)
-                .lbStatus("active")
-                .lifecycle("running")
-                .operatingSystem("Linux 5.4-" + randStr)
-                .startedAt(DateTime.now(DateTimeZone.UTC).minusDays(5))
-                .timezone("UTC-" + randStr)
-                .version("5.2.0-" + randStr)
-                .updatedAt(DateTime.now(DateTimeZone.UTC))
-                .build();
     }
 }

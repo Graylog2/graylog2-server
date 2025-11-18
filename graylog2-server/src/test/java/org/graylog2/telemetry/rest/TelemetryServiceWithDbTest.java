@@ -34,6 +34,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.traffic.TrafficCounterService;
@@ -94,6 +95,8 @@ public class TelemetryServiceWithDbTest {
     MetricRegistry metricRegistry;
     @Mock
     NodeService nodeService;
+    @Mock
+    StatsService statsService;
 
     TelemetryService telemetryService;
 
@@ -111,7 +114,8 @@ public class TelemetryServiceWithDbTest {
                 clusterConfigService,
                 leaderElectionService,
                 new DBTelemetryClusterInfo(Duration.ZERO, mongoCollections),
-                metricRegistry
+                metricRegistry,
+                statsService
         );
 
         telemetryService = new TelemetryService(

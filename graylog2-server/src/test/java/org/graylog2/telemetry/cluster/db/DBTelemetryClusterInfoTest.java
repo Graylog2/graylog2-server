@@ -17,30 +17,27 @@
 package org.graylog2.telemetry.cluster.db;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.graylog2.telemetry.fixtures.TelemetryFixtures;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MongoDBExtension.class)
 public class DBTelemetryClusterInfoTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
     private DBTelemetryClusterInfo dbTelemetryClusterInfo;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(MongoDBTestService mongodb) {
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         final MongoJackObjectMapperProvider mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final MongoCollections mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
@@ -56,8 +53,8 @@ public class DBTelemetryClusterInfoTest {
 
     @Test
     public void findAllReturnsAllDocuments() {
-        final TelemetryClusterInfoDto dto1 = nodeInfo("node-1", true);
-        final TelemetryClusterInfoDto dto2 = nodeInfo("node-2", false);
+        final TelemetryClusterInfoDto dto1 = TelemetryFixtures.nodeInfo("node-1", true);
+        final TelemetryClusterInfoDto dto2 = TelemetryFixtures.nodeInfo("node-2", false);
 
         dbTelemetryClusterInfo.update(dto1);
         dbTelemetryClusterInfo.update(dto2);
@@ -72,7 +69,7 @@ public class DBTelemetryClusterInfoTest {
 
     @Test
     public void updateInsertsNewDocument() {
-        final TelemetryClusterInfoDto dto = nodeInfo("node-1", true);
+        final TelemetryClusterInfoDto dto = TelemetryFixtures.nodeInfo("node-1", true);
 
         dbTelemetryClusterInfo.update(dto);
 
@@ -98,14 +95,15 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.memoryHeapUsed()).isEqualTo(dto.memoryHeapUsed());
         assertThat(nodeInfo.memoryHeapCommitted()).isEqualTo(dto.memoryHeapCommitted());
         assertThat(nodeInfo.memoryHeapMax()).isEqualTo(dto.memoryHeapMax());
+        assertThat(nodeInfo.cpuCores()).isEqualTo(dto.cpuCores());
     }
 
     @Test
     public void updateOverwritesExistingDocumentForSameNode() {
-        final TelemetryClusterInfoDto dto1 = nodeInfo("node-1", true);
+        final TelemetryClusterInfoDto dto1 = TelemetryFixtures.nodeInfo("node-1", true);
         dbTelemetryClusterInfo.update(dto1);
 
-        final TelemetryClusterInfoDto dto2 = nodeInfo("node-1", false);
+        final TelemetryClusterInfoDto dto2 = TelemetryFixtures.nodeInfo("node-1", false);
         dbTelemetryClusterInfo.update(dto2);
 
         final List<TelemetryClusterInfoDto> nodeInfoList = dbTelemetryClusterInfo.findAll();
@@ -129,29 +127,6 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.memoryHeapUsed()).isEqualTo(dto2.memoryHeapUsed());
         assertThat(nodeInfo.memoryHeapCommitted()).isEqualTo(dto2.memoryHeapCommitted());
         assertThat(nodeInfo.memoryHeapMax()).isEqualTo(dto2.memoryHeapMax());
-    }
-
-    private TelemetryClusterInfoDto nodeInfo(String nodeId, boolean isLeader) {
-        final String randStr = UUID.randomUUID().toString();
-
-        return TelemetryClusterInfoDto.Builder.create()
-                .nodeId(nodeId)
-                .isLeader(isLeader)
-                .clusterId("cluster-1" + randStr)
-                .codename("Noir-" + randStr)
-                .facility("graylog-server-" + randStr)
-                .hostname("hostname-" + randStr)
-                .isProcessing(true)
-                .lbStatus("active")
-                .lifecycle("running")
-                .operatingSystem("Linux 5.4-" + randStr)
-                .startedAt(DateTime.now(DateTimeZone.UTC).minusDays(5))
-                .timezone("UTC-" + randStr)
-                .version("5.2.0-" + randStr)
-                .memoryHeapUsed((long) (Math.random() * 1_000_000))
-                .memoryHeapCommitted((long) (Math.random() * 1_000_000))
-                .memoryHeapMax((long) (Math.random() * 1_000_000))
-                .updatedAt(DateTime.now(DateTimeZone.UTC))
-                .build();
+        assertThat(nodeInfo.cpuCores()).isEqualTo(dto2.cpuCores());
     }
 }

@@ -27,6 +27,7 @@ import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.ServerVersion;
+import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
 import org.joda.time.DateTime;
@@ -59,6 +60,7 @@ class TelemetryClusterServiceTest {
     private static final long HEAP_USED = 145806336L;
     private static final long HEAP_COMMITTED = 204472320L;
     private static final long HEAP_MAX = 1073741824L;
+    private static final int CPU_CORES = 15;
     private static final boolean IS_LEADER = true;
     private static final boolean IS_PROCESSING = false;
 
@@ -73,6 +75,9 @@ class TelemetryClusterServiceTest {
 
     @Mock
     DBTelemetryClusterInfo dbTelemetryClusterInfo;
+
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    StatsService statsService;
 
     @Mock
     ClusterId clusterId;
@@ -95,6 +100,7 @@ class TelemetryClusterServiceTest {
         when(serverStatus.getLifecycle()).thenReturn(LIFECYCLE);
         when(serverStatus.getStartedAt()).thenReturn(STARTED_AT);
         when(serverStatus.getTimezone()).thenReturn(TIMEZONE);
+        when(statsService.systemStats().osStats().processor().totalCores()).thenReturn(CPU_CORES);
 
         metricRegistry = new MetricRegistry();
         metricRegistry.register(TelemetryClusterService.METRIC_JVM_MEMORY_HEAP_USED, (Gauge<Long>) () -> HEAP_USED);
@@ -106,7 +112,8 @@ class TelemetryClusterServiceTest {
                 clusterConfigService,
                 leaderElectionService,
                 dbTelemetryClusterInfo,
-                metricRegistry
+                metricRegistry,
+                statsService
         );
     }
 
@@ -138,6 +145,7 @@ class TelemetryClusterServiceTest {
             assertEquals(HEAP_USED, dto.memoryHeapUsed());
             assertEquals(HEAP_COMMITTED, dto.memoryHeapCommitted());
             assertEquals(HEAP_MAX, dto.memoryHeapMax());
+            assertEquals(CPU_CORES, dto.cpuCores());
             assertEquals(expectedTimezone, dto.timezone());
             assertEquals(expectedLbStatus, dto.lbStatus());
             assertEquals(expectedLifecycle, dto.lifecycle());
