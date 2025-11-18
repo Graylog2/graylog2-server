@@ -45,6 +45,7 @@ import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -95,7 +96,7 @@ public class TelemetryServiceWithDbTest {
     MetricRegistry metricRegistry;
     @Mock
     NodeService nodeService;
-    @Mock
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
     StatsService statsService;
 
     TelemetryService telemetryService;
@@ -170,6 +171,8 @@ public class TelemetryServiceWithDbTest {
         when(serverStatus.getNodeId()).thenReturn(new SimpleNodeId("1"));
         when(serverStatus.getLifecycle()).thenReturn(Lifecycle.RUNNING);
         when(serverStatus.getTimezone()).thenReturn(DateTimeZone.UTC);
+        when(statsService.systemStats().osStats().memory().total()).thenReturn(-1L);
+        when(statsService.systemStats().osStats().processor().totalCores()).thenReturn(-1);
 
         telemetryService.updateTelemetryClusterData();
         ObjectNode telemetryResponse = telemetryService.getTelemetryResponse(saveUserSettings(true));
