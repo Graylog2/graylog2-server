@@ -122,8 +122,8 @@ class OSSerializationUtilsTest {
 
     @Test
     void testFromStringOnTypeMappingClass() {
-        String metaKey = "meta";
-        ErrorResponse expected = new ErrorResponse.Builder()
+        final String metaKey = "meta";
+        final ErrorResponse expected = new ErrorResponse.Builder()
                 .status(404)
                 .error(ErrorCause.builder()
                         .type("index_not_found")
@@ -132,7 +132,7 @@ class OSSerializationUtilsTest {
                         .build())
                 .build();
         final String json = expected.toJsonString();
-        ErrorResponse errorResponse = toTest.fromJson(json, ErrorResponse._DESERIALIZER);
+        final ErrorResponse errorResponse = toTest.fromJson(json, ErrorResponse._DESERIALIZER);
         assertEquals(expected.status(), errorResponse.status());
         assertEquals(expected.error().type(), errorResponse.error().type());
         assertEquals(expected.error().reason(), errorResponse.error().reason());
