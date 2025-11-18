@@ -16,14 +16,15 @@
  */
 package org.graylog.plugins.views.search.views;
 
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.util.Map;
 
@@ -32,13 +33,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class DashboardServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
+    @RegisterExtension
+    static MongoDBExtension mongodbExtension = MongoDBExtension.createWithDefaultVersion();
 
     private DashboardService dashboardService;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(MongoDBTestService mongodb) {
         final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(
                 new ObjectMapperProvider().get()
         );
