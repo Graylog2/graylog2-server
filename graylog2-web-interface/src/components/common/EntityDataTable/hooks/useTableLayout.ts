@@ -16,11 +16,16 @@
  */
 import { useMemo } from 'react';
 
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { DefaultLayout, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 import useUserLayoutPreferences from './useUserLayoutPreferences';
 
-export type LayoutConfig = { pageSize: number; sort: DefaultLayout['defaultSort']; displayedAttributes: Array<string> };
+export type LayoutConfig = {
+  pageSize: number;
+  sort: DefaultLayout['defaultSort'];
+  defaultDisplayedColumns: Array<string>;
+  columnPreferences: ColumnPreferences;
+};
 
 const useTableLayout = ({
   entityTableId,
@@ -38,7 +43,8 @@ const useTableLayout = ({
       layoutConfig: {
         pageSize: userLayoutPreferences.perPage ?? defaultPageSize,
         sort: userLayoutPreferences.sort ?? defaultSort,
-        displayedAttributes: userLayoutPreferences?.displayedAttributes ?? defaultDisplayedAttributes,
+        columnPreferences: userLayoutPreferences?.attributes,
+        defaultDisplayedColumns: defaultDisplayedAttributes,
       },
       isInitialLoading,
     }),
@@ -47,7 +53,7 @@ const useTableLayout = ({
       defaultPageSize,
       defaultSort,
       isInitialLoading,
-      userLayoutPreferences?.displayedAttributes,
+      userLayoutPreferences?.attributes,
       userLayoutPreferences.perPage,
       userLayoutPreferences.sort,
     ],
