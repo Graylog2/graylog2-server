@@ -142,9 +142,9 @@ class TelemetryClusterServiceTest {
             assertEquals(IS_LEADER, dto.isLeader());
             assertEquals(IS_PROCESSING, dto.isProcessing());
             assertEquals(STARTED_AT, dto.startedAt());
-            assertEquals(HEAP_USED, dto.memoryHeapUsed());
-            assertEquals(HEAP_COMMITTED, dto.memoryHeapCommitted());
-            assertEquals(HEAP_MAX, dto.memoryHeapMax());
+            assertEquals(HEAP_USED, dto.jvmHeapUsed());
+            assertEquals(HEAP_COMMITTED, dto.jvmHeapCommitted());
+            assertEquals(HEAP_MAX, dto.jvmHeapMax());
             assertEquals(CPU_CORES, dto.cpuCores());
             assertEquals(expectedTimezone, dto.timezone());
             assertEquals(expectedLbStatus, dto.lbStatus());

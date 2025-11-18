@@ -48,9 +48,9 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
     public static final String FIELD_TIMEZONE = "timezone";
     public static final String FIELD_UPDATED_AT = "updated_at";
     public static final String FIELD_VERSION = "version";
-    public static final String FIELD_MEMORY_HEAP_USED = "memory_heap_used";
-    public static final String FIELD_MEMORY_HEAP_COMMITTED = "memory_heap_committed";
-    public static final String FIELD_MEMORY_HEAP_MAX = "memory_heap_max";
+    public static final String FIELD_JVM_HEAP_USED = "jvm_heap_used";
+    public static final String FIELD_JVM_HEAP_COMMITTED = "jvm_heap_committed";
+    public static final String FIELD_JVM_HEAP_MAX = "jvm_heap_max";
     public static final String FIELD_CPU_CORES = "cpu_cores";
 
     @Id
@@ -95,17 +95,17 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
     @JsonProperty(FIELD_TIMEZONE)
     public abstract String timezone();
 
-    @JsonProperty(FIELD_MEMORY_HEAP_USED)
+    @JsonProperty(FIELD_JVM_HEAP_USED)
     @Nullable
-    public abstract Long memoryHeapUsed();
+    public abstract Long jvmHeapUsed();
 
-    @JsonProperty(FIELD_MEMORY_HEAP_COMMITTED)
+    @JsonProperty(FIELD_JVM_HEAP_COMMITTED)
     @Nullable
-    public abstract Long memoryHeapCommitted();
+    public abstract Long jvmHeapCommitted();
 
-    @JsonProperty(FIELD_MEMORY_HEAP_MAX)
+    @JsonProperty(FIELD_JVM_HEAP_MAX)
     @Nullable
-    public abstract Long memoryHeapMax();
+    public abstract Long jvmHeapMax();
 
     @JsonProperty(FIELD_CPU_CORES)
     @Nullable
@@ -178,14 +178,14 @@ public abstract class TelemetryClusterInfoDto implements MongoEntity {
         @JsonProperty(FIELD_VERSION)
         public abstract Builder version(String version);
 
-        @JsonProperty(FIELD_MEMORY_HEAP_USED)
-        public abstract Builder memoryHeapUsed(Long memoryHeapUsed);
+        @JsonProperty(FIELD_JVM_HEAP_USED)
+        public abstract Builder jvmHeapUsed(Long jvmHeapUsed);
 
-        @JsonProperty(FIELD_MEMORY_HEAP_COMMITTED)
-        public abstract Builder memoryHeapCommitted(Long memoryHeapCommitted);
+        @JsonProperty(FIELD_JVM_HEAP_COMMITTED)
+        public abstract Builder jvmHeapCommitted(Long jvmHeapCommitted);
 
-        @JsonProperty(FIELD_MEMORY_HEAP_MAX)
-        public abstract Builder memoryHeapMax(Long memoryHeapMax);
+        @JsonProperty(FIELD_JVM_HEAP_MAX)
+        public abstract Builder jvmHeapMax(Long jvmHeapMax);
 
         @JsonProperty(FIELD_CPU_CORES)
         public abstract Builder cpuCores(Integer cpuCores);

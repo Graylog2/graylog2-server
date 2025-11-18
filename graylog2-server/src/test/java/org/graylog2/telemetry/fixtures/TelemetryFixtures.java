@@ -27,9 +27,9 @@ public class TelemetryFixtures {
                 .startedAt(DateTime.now(DateTimeZone.UTC).minusDays(5))
                 .timezone("UTC-" + randLong)
                 .version("5.2.0-" + randLong)
-                .memoryHeapUsed(randLong)
-                .memoryHeapCommitted(randLong)
-                .memoryHeapMax(randLong)
+                .jvmHeapUsed(randLong)
+                .jvmHeapCommitted(randLong)
+                .jvmHeapMax(randLong)
                 .cpuCores(randInt)
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
                 .build();

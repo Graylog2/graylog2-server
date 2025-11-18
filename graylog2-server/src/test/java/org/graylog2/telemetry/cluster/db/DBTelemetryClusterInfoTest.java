@@ -92,9 +92,9 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.timezone()).isEqualTo(dto.timezone());
         assertThat(nodeInfo.updatedAt()).isNotNull();
         assertThat(nodeInfo.version()).isEqualTo(dto.version());
-        assertThat(nodeInfo.memoryHeapUsed()).isEqualTo(dto.memoryHeapUsed());
-        assertThat(nodeInfo.memoryHeapCommitted()).isEqualTo(dto.memoryHeapCommitted());
-        assertThat(nodeInfo.memoryHeapMax()).isEqualTo(dto.memoryHeapMax());
+        assertThat(nodeInfo.jvmHeapUsed()).isEqualTo(dto.jvmHeapUsed());
+        assertThat(nodeInfo.jvmHeapCommitted()).isEqualTo(dto.jvmHeapCommitted());
+        assertThat(nodeInfo.jvmHeapMax()).isEqualTo(dto.jvmHeapMax());
         assertThat(nodeInfo.cpuCores()).isEqualTo(dto.cpuCores());
     }
 
@@ -124,9 +124,9 @@ public class DBTelemetryClusterInfoTest {
         assertThat(nodeInfo.timezone()).isEqualTo(dto2.timezone());
         assertThat(nodeInfo.updatedAt()).isNotNull();
         assertThat(nodeInfo.version()).isEqualTo(dto2.version());
-        assertThat(nodeInfo.memoryHeapUsed()).isEqualTo(dto2.memoryHeapUsed());
-        assertThat(nodeInfo.memoryHeapCommitted()).isEqualTo(dto2.memoryHeapCommitted());
-        assertThat(nodeInfo.memoryHeapMax()).isEqualTo(dto2.memoryHeapMax());
+        assertThat(nodeInfo.jvmHeapUsed()).isEqualTo(dto2.jvmHeapUsed());
+        assertThat(nodeInfo.jvmHeapCommitted()).isEqualTo(dto2.jvmHeapCommitted());
+        assertThat(nodeInfo.jvmHeapMax()).isEqualTo(dto2.jvmHeapMax());
         assertThat(nodeInfo.cpuCores()).isEqualTo(dto2.cpuCores());
     }
 }

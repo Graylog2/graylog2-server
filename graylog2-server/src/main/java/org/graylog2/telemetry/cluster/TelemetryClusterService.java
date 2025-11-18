@@ -85,9 +85,9 @@ public class TelemetryClusterService {
                 .operatingSystem(System.getProperty("os.name", UNKNOWN) + " " + System.getProperty("os.version", UNKNOWN))
                 .isLeader(leaderElectionService.isLeader())
                 .isProcessing(serverStatus.isProcessing())
-                .memoryHeapUsed(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_USED).orElse(-1L))
-                .memoryHeapCommitted(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_COMMITTED).orElse(-1L))
-                .memoryHeapMax(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_MAX).orElse(-1L))
+                .jvmHeapUsed(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_USED).orElse(-1L))
+                .jvmHeapCommitted(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_COMMITTED).orElse(-1L))
+                .jvmHeapMax(MetricUtils.getGaugeValue(metricRegistry, METRIC_JVM_MEMORY_HEAP_MAX).orElse(-1L))
                 .cpuCores(statsService.systemStats().osStats().processor().totalCores())
                 .build();
 
