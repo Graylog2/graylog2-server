@@ -39,7 +39,7 @@ const RestartGraylog = ({ currentStep, onTriggerStep, hideActions }: MigrationSt
         </code>
       </p>
       <Space h="md" />
-      <MigrationDatanodeList />
+      <MigrationDatanodeList showProvisioningState={false} />
       <p>
         Please wait for all data nodes to become &apos;AVAILABLE&apos;. Please check the data node&apos;s log if they do
         not become available within 1-2 minutes.
