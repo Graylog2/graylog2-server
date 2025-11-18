@@ -75,6 +75,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
@@ -181,7 +182,7 @@ public class InputFacadeTest {
                 .getTitle("Input Title")
                 .getType("org.graylog2.inputs.raw.udp.RawUDPInput")
                 .getConfiguration(Collections.emptyMap())
-                .getCreatedAt(DateTime.now())
+                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
                 .getCreatorUserId(UUID.randomUUID().toString())
                 .build();
 
@@ -210,7 +211,7 @@ public class InputFacadeTest {
                 .getType("org.graylog2.inputs.misc.jsonpath.JsonPathInput")
                 .getConfiguration(Map.of("encrypted_value",
                         new EncryptedValueService(UUID.randomUUID().toString()).encrypt("secret")))
-                .getCreatedAt(DateTime.now())
+                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
                 .getCreatorUserId(UUID.randomUUID().toString())
                 .build();
         final ImmutableList<Extractor> extractors = ImmutableList.of();
@@ -297,7 +298,7 @@ public class InputFacadeTest {
                 .getTitle("Excerpt")
                 .getType("org.graylog2.inputs.raw.udp.RawUDPInput")
                 .getConfiguration(Collections.emptyMap())
-                .getCreatedAt(DateTime.now())
+                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
                 .getCreatorUserId(UUID.randomUUID().toString())
                 .build();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
