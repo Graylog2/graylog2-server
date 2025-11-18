@@ -18,6 +18,8 @@ import React, { useCallback, useMemo, useState } from 'react';
 
 import { EntityDataTable, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
+import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
+import type { Sort } from 'stores/PaginationTypes';
 
 import useClusterGraylogNodes from './useClusterGraylogNodes';
 import type { GraylogNode } from './useClusterGraylogNodes';
@@ -42,21 +44,17 @@ const GraylogNodesExpandable = ({
 }: Props) => {
   const { nodes: graylogNodes, isLoading } = useClusterGraylogNodes();
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
-  const [visibleColumns, setVisibleColumns] = useState<Array<string>>([...DEFAULT_VISIBLE_COLUMNS]);
+  const [columnPreferences, setColumnPreferences] = useState<ColumnPreferences>();
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
   const totalGraylogNodes = graylogNodes.length;
 
-  const handleColumnsChange = useCallback((newColumns: Array<string>) => {
-    if (!newColumns.length) {
-      return;
-    }
-
-    setVisibleColumns(newColumns);
+  const handleColumnPreferencesChange = useCallback((newColumnPreferences: ColumnPreferences) => {
+    setColumnPreferences(newColumnPreferences);
   }, []);
 
-  const handleSortChange = useCallback(() => {}, []);
+  const handleSortChange = useCallback((_newSort: Sort) => {}, []);
   const renderActions = useCallback((entity: GraylogNode) => <GraylogNodeActions node={entity} />, []);
 
   return (
@@ -69,9 +67,10 @@ const GraylogNodesExpandable = ({
       collapsible={collapsible}>
       <EntityDataTable<GraylogNode>
         entities={graylogNodes}
-        visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
-        onColumnsChange={handleColumnsChange}
+        columnPreferences={columnPreferences}
+        defaultDisplayedColumns={columnsOrder}
+        onColumnPreferencesChange={handleColumnPreferencesChange}
         onSortChange={handleSortChange}
         entityAttributesAreCamelCase
         entityActions={renderActions}

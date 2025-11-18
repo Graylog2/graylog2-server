@@ -14,12 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import isEqual from 'lodash/isEqual';
+import { useCallback, useMemo } from 'react';
 
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
-import type { DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { ColumnPreferences, DefaultLayout } from 'components/common/EntityDataTable/types';
 import type { SearchParams, Sort } from 'stores/PaginationTypes';
 
 import { DEFAULT_VISIBLE_COLUMNS } from './DataNodesColumnConfiguration';
@@ -40,10 +39,11 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
 
 type UseClusterDataNodesTableLayoutReturn = {
   columnsOrder: Array<string>;
-  visibleColumns: Array<string>;
+  columnPreferences?: ColumnPreferences;
+  defaultDisplayedColumns: Array<string>;
   searchParams: SearchParams;
   isLoadingLayout: boolean;
-  handleColumnsChange: (newColumns: Array<string>) => void;
+  handleColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
   handleSortChange: (newSort: Sort) => void;
 };
 
@@ -51,38 +51,16 @@ const useClusterDataNodesTableLayout = (searchQuery = ''): UseClusterDataNodesTa
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const { layoutConfig, isInitialLoading: isLoadingLayout } = useTableLayout(TABLE_LAYOUT);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(TABLE_LAYOUT.entityTableId);
-  const [visibleColumns, setVisibleColumns] = useState<Array<string>>(layoutConfig.displayedAttributes);
-  const [sort, setSort] = useState<Sort>(layoutConfig.sort);
 
-  useEffect(() => {
-    if (!isLoadingLayout && !isEqual(visibleColumns, layoutConfig.displayedAttributes)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setVisibleColumns(layoutConfig.displayedAttributes);
-    }
-  }, [isLoadingLayout, layoutConfig.displayedAttributes, visibleColumns]);
-
-  useEffect(() => {
-    if (!isLoadingLayout && !isEqual(sort, layoutConfig.sort)) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSort(layoutConfig.sort);
-    }
-  }, [isLoadingLayout, layoutConfig.sort, sort]);
-
-  const handleColumnsChange = useCallback(
-    (newColumns: Array<string>) => {
-      if (!newColumns.length) {
-        return;
-      }
-
-      setVisibleColumns(newColumns);
-      updateTableLayout({ displayedAttributes: newColumns });
+  const handleColumnPreferencesChange = useCallback(
+    (newColumnPreferences: ColumnPreferences) => {
+      updateTableLayout({ attributes: newColumnPreferences });
     },
     [updateTableLayout],
   );
 
   const handleSortChange = useCallback(
     (newSort: Sort) => {
-      setSort(newSort);
       updateTableLayout({ sort: newSort });
     },
     [updateTableLayout],
@@ -92,17 +70,18 @@ const useClusterDataNodesTableLayout = (searchQuery = ''): UseClusterDataNodesTa
     () => ({
       ...DEFAULT_SEARCH_PARAMS,
       query: searchQuery,
-      sort,
+      sort: layoutConfig.sort,
     }),
-    [searchQuery, sort],
+    [layoutConfig.sort, searchQuery],
   );
 
   return {
     columnsOrder,
-    visibleColumns,
+    columnPreferences: layoutConfig.columnPreferences,
+    defaultDisplayedColumns: layoutConfig.defaultDisplayedColumns,
     searchParams,
     isLoadingLayout,
-    handleColumnsChange,
+    handleColumnPreferencesChange,
     handleSortChange,
   };
 };

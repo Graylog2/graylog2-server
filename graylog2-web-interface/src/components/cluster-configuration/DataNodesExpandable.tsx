@@ -37,10 +37,11 @@ type Props = {
 const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSegment = undefined }: Props) => {
   const {
     columnsOrder,
-    visibleColumns,
+    columnPreferences,
+    defaultDisplayedColumns,
     searchParams,
     isLoadingLayout,
-    handleColumnsChange,
+    handleColumnPreferencesChange,
     handleSortChange,
   } = useClusterDataNodesTableLayout(searchQuery);
   const {
@@ -78,9 +79,10 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSeg
       collapsible={collapsible}>
       <EntityDataTable<ClusterDataNode>
         entities={dataNodes}
-        visibleColumns={visibleColumns}
         columnsOrder={columnsOrder}
-        onColumnsChange={handleColumnsChange}
+        columnPreferences={columnPreferences}
+        defaultDisplayedColumns={defaultDisplayedColumns}
+        onColumnPreferencesChange={handleColumnPreferencesChange}
         onSortChange={handleSortChange}
         activeSort={searchParams.sort}
         entityAttributesAreCamelCase
