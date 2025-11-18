@@ -16,8 +16,6 @@
  */
 package org.graylog.storage.opensearch3.indextemplates;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.opensearch._types.mapping.DynamicTemplate;
@@ -98,12 +96,11 @@ class OSSerializationUtilsTest {
             Map.of("enabled", true));
 
 
-    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private OSSerializationUtils toTest;
 
     @BeforeEach
     void setUp() {
-        toTest = new OSSerializationUtils(objectMapper);
+        toTest = new OSSerializationUtils();
     }
 
     @Test

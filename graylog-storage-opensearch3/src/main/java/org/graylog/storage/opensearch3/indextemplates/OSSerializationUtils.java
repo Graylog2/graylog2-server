@@ -18,12 +18,10 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.stream.JsonParser;
 import org.opensearch.client.json.JsonpDeserializer;
-import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.PlainJsonSerializable;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 
@@ -37,22 +35,20 @@ import java.util.Map;
 @Singleton
 public class OSSerializationUtils {
 
-    private final ObjectMapper objectMapper;
-    private final JsonpMapper jsonpMapper;
+    private final JacksonJsonpMapper jsonpMapper;
 
     @Inject
-    public OSSerializationUtils(final ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        this.jsonpMapper = new JacksonJsonpMapper(objectMapper);
+    public OSSerializationUtils() {
+        this.jsonpMapper = new JacksonJsonpMapper();
     }
 
     public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
-        return objectMapper.readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
+        return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
     }
 
     public <T> T fromMap(final Map<String, Object> mapRepresentation,
                          final JsonpDeserializer<T> deserializer) throws JsonProcessingException {
-        final String json = objectMapper.writeValueAsString(mapRepresentation);
+        final String json = this.jsonpMapper.objectMapper().writeValueAsString(mapRepresentation);
         final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader(json));
         return deserializer.deserialize(parser, jsonpMapper);
     }

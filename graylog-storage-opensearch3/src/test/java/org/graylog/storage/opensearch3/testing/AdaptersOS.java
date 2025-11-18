@@ -78,7 +78,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
-        final OSSerializationUtils osSerializationUtils = new OSSerializationUtils(objectMapper);
+        final OSSerializationUtils osSerializationUtils = new OSSerializationUtils();
         return new IndicesAdapterOS(officialOpensearchClient,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
