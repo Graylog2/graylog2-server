@@ -49,6 +49,10 @@ public class OSSerializationUtils {
     public <T> T fromMap(final Map<String, Object> mapRepresentation,
                          final JsonpDeserializer<T> deserializer) throws JsonProcessingException {
         final String json = this.jsonpMapper.objectMapper().writeValueAsString(mapRepresentation);
+        return fromJson(json, deserializer);
+    }
+
+    public <T> T fromJson(String json, JsonpDeserializer<T> deserializer) {
         final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader(json));
         return deserializer.deserialize(parser, jsonpMapper);
     }
