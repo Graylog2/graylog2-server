@@ -33,7 +33,7 @@ import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
-import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
+import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -127,7 +127,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS(officialOpensearchClient));
     }
 
 }
