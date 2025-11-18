@@ -45,7 +45,7 @@ public class MoreSearchAdapterOS2UsingPaginationIT extends MoreSearchAdapterIT {
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
         final OpenSearchClient client = openSearchInstance.openSearchClient();
-        return new MoreSearchAdapterOS2(client, true,
+        return new MoreSearchAdapterOS2(client, openSearchInstance.getOfficialOpensearchClient(), true,
                 new PaginationOS2(resultMessageFactory, client,
                         new SearchRequestFactory(false, true, new IgnoreSearchFilters())
                 ),

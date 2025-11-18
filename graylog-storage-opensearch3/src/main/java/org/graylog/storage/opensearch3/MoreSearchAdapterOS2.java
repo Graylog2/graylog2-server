@@ -84,16 +84,18 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     private static final String histogramAggregationName = "histogram";
 
     private final OpenSearchClient client;
+    private final OfficialOpensearchClient officialOpensearchClient;
     private final Boolean allowLeadingWildcard;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
     private final OS2ResultMessageFactory resultMessageFactory;
 
     @Inject
-    public MoreSearchAdapterOS2(OpenSearchClient client,
+    public MoreSearchAdapterOS2(OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
                                 MultiChunkResultRetriever multiChunkResultRetriever,
                                 OS2ResultMessageFactory resultMessageFactory) {
         this.client = client;
+        this.officialOpensearchClient = officialOpensearchClient;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
         this.resultMessageFactory = resultMessageFactory;
@@ -114,6 +116,8 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
         sortBuilders.forEach(searchSourceBuilder::sort);
 
         final Set<String> indices = affectedIndices.isEmpty() ? Collections.singleton("") : affectedIndices;
+
+
         final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
                 .source(searchSourceBuilder)
                 .indicesOptions(INDICES_OPTIONS);
