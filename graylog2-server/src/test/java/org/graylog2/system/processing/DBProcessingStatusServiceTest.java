@@ -21,7 +21,6 @@ import com.github.joschi.jadconfig.util.Duration;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.BaseConfiguration;

@@ -18,6 +18,7 @@ package org.graylog.testing.mongodb;
 
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
@@ -91,7 +92,7 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
         if (context.getStore(NAMESPACE).get(Lifecycle.class) == null) {
             context.getStore(NAMESPACE).put(Lifecycle.class, lifecycle);
         }
-        return (MongoDBTestService) context.getStore(NAMESPACE).getOrComputeIfAbsent(MongoDBTestService.class, c -> {
+        return (MongoDBTestService) context.getStore(NAMESPACE).computeIfAbsent(MongoDBTestService.class, c -> {
             LOG.debug("Starting a new MongoDB service instance with lifecycle {}", lifecycle);
             this.network = Network.newNetwork();
             return MongoDBTestService.create(version, this.network);
@@ -145,7 +146,8 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext context) throws ParameterResolutionException {
         return MongoDBTestService.class.equals(parameterContext.getParameter().getType()) ||
-                MongoCollections.class.equals(parameterContext.getParameter().getType());
+                MongoCollections.class.equals(parameterContext.getParameter().getType()) ||
+                MongoConnection.class.equals(parameterContext.getParameter().getType());
     }
 
     @Override
@@ -158,6 +160,9 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
                     new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()),
                     getInstance(context).mongoConnection()
             );
+        }
+        if (MongoConnection.class.equals(parameterContext.getParameter().getType())) {
+            return getInstance(context).mongoConnection();
         }
         throw new ParameterResolutionException("Unsupported parameter type: " + parameterContext.getParameter().getName());
     }

@@ -44,6 +44,7 @@ public class MongoDBTestService implements AutoCloseable {
     private static final String DEFAULT_DATABASE_NAME = "graylog";
 
     private final MongoDBContainer container;
+    private final MongoDBVersion version;
     private MongoConnectionImpl mongoConnection;
 
     /**
@@ -52,7 +53,7 @@ public class MongoDBTestService implements AutoCloseable {
      * @return the service instance
      */
     public static MongoDBTestService create(Network network) {
-        return new MongoDBTestService(MongoDBContainer.create(network));
+        return new MongoDBTestService(MongoDBContainer.create(network), MongoDBVersion.DEFAULT);
     }
 
     /**
@@ -61,11 +62,12 @@ public class MongoDBTestService implements AutoCloseable {
      * @return the service instance
      */
     public static MongoDBTestService create(MongoDBVersion version, Network network) {
-        return new MongoDBTestService(MongoDBContainer.create(version, network));
+        return new MongoDBTestService(MongoDBContainer.create(version, network), version);
     }
 
-    private MongoDBTestService(MongoDBContainer container) {
+    private MongoDBTestService(MongoDBContainer container, MongoDBVersion version) {
         this.container = requireNonNull(container, "container cannot be null");
+        this.version = version;
     }
 
     /**
@@ -162,7 +164,7 @@ public class MongoDBTestService implements AutoCloseable {
         return container.getContainerId();
     }
 
-    public static String internalUri() {
+    public String internalUri() {
         return uriWithHostAndPort(MongoDBContainer.NETWORK_ALIAS, MongoDBContainer.MONGODB_PORT);
     }
 
@@ -189,4 +191,7 @@ public class MongoDBTestService implements AutoCloseable {
         }
     }
 
+    public MongoDBVersion version() {
+        return version;
+    }
 }

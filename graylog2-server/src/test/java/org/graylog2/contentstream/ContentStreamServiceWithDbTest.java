@@ -16,12 +16,9 @@
  */
 package org.graylog2.contentstream;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import org.graylog.testing.mongodb.MongoDBExtension;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentstream.db.DBContentStreamUserSettingsService;
 import org.graylog2.contentstream.rest.ContentStreamService;
 import org.graylog2.contentstream.rest.ContentStreamSettings;

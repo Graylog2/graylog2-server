@@ -19,7 +19,7 @@ package org.graylog.testing.completebackend;
 import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoDBVersion;
 import org.graylog2.plugin.Tools;
 import org.graylog2.storage.SearchVersion;
@@ -99,7 +99,7 @@ public class ContainerizedGraylogBackendServicesProvider {
     public static class Services implements AutoCloseable {
         private final Network network;
         private final SearchServerInstance searchServerInstance;
-        private final MongoDBInstance mongoDBInstance;
+        private final MongoDBTestService mongoDBInstance;
         private final MailServerContainer mailServerContainer;
 
         private final WebhookServerContainer webhookServerInstance;
@@ -119,13 +119,13 @@ public class ContainerizedGraylogBackendServicesProvider {
                     .build())) {
                 final Network network = Network.newNetwork();
 
-                final Future<MongoDBInstance> mongodbFuture = executorService.submit(
-                        withStopwatch(() -> MongoDBInstance.createUncachedStarted(network, mongodbVersion), "MongoDB"));
+                final Future<MongoDBTestService> mongodbFuture = executorService.submit(
+                        withStopwatch(() -> MongoDBTestService.create(mongodbVersion, network), "MongoDB"));
                 final Future<MailServerContainer> mailServerContainerFuture = executorService.submit(
                         withStopwatch(() -> MailServerContainer.createStarted(network), "Mailserver"));
                 final Future<WebhookServerContainer> webhookServerContainerFuture = executorService.submit(
                         withStopwatch(() -> WebhookServerContainer.createStarted(network), "WebhookTester"));
-                final MongoDBInstance mongoDB = mongodbFuture.get();
+                final MongoDBTestService mongoDB = mongodbFuture.get();
                 final MailServerContainer emailServerInstance = mailServerContainerFuture.get();
                 final WebhookServerContainer webhookServerInstance = webhookServerContainerFuture.get();
 
@@ -139,7 +139,7 @@ public class ContainerizedGraylogBackendServicesProvider {
                 final SearchServerInstance searchServer = builder
                         .cachedInstance(false) // This service layer caches OpenSearch instances itself
                         .network(network)
-                        .mongoDbUri(MongoDBInstance.internalUri())
+                        .mongoDbUri(mongoDB.internalUri())
                         .passwordSecret(PASSWORD_SECRET)
                         .rootPasswordSha2(ROOT_PASSWORD_SHA_2)
                         .featureFlags(enabledFeatureFlags)
@@ -168,7 +168,7 @@ public class ContainerizedGraylogBackendServicesProvider {
 
         private Services(Network network,
                          SearchServerInstance searchServer,
-                         MongoDBInstance mongoDBInstance,
+                         MongoDBTestService mongoDBInstance,
                          @Nullable MailServerContainer mailServerContainer,
                          @Nullable WebhookServerContainer webhookServerInstance,
                          Runnable cacheRemovalCallback) {
@@ -196,7 +196,7 @@ public class ContainerizedGraylogBackendServicesProvider {
             return String.join("-", parts);
         }
 
-        public MongoDBInstance getMongoDBInstance() {
+        public MongoDBTestService getMongoDBInstance() {
             return this.mongoDBInstance;
         }
 
@@ -232,7 +232,7 @@ public class ContainerizedGraylogBackendServicesProvider {
             searchServerInstance.cleanUp();
         }
 
-        public WebhookServerInstance getWebhookServerContainer() {
+        public WebhookServerContainer getWebhookServerContainer() {
             return webhookServerInstance;
         }
     }
