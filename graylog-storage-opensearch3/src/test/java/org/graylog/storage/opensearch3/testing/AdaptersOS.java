@@ -78,6 +78,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
+        final OSSerializationUtils osSerializationUtils = new OSSerializationUtils();
         return new IndicesAdapterOS(officialOpensearchClient,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
@@ -85,7 +86,7 @@ public class AdaptersOS implements Adapters {
                 featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
                 new IndexStatisticsBuilder(),
                 objectMapper,
-                new OSSerializationUtils(objectMapper, officialOpensearchClient)
+                osSerializationUtils
         );
     }
 
