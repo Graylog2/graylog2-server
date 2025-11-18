@@ -18,6 +18,9 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.ErrorCause;
+import org.opensearch.client.opensearch._types.ErrorResponse;
 import org.opensearch.client.opensearch._types.mapping.DynamicTemplate;
 import org.opensearch.client.opensearch._types.mapping.KeywordProperty;
 import org.opensearch.client.opensearch._types.mapping.LongNumberProperty;
@@ -115,6 +118,25 @@ class OSSerializationUtilsTest {
     void testToMapOnTypeMappingClass() throws Exception {
         final Map<String, Object> result = toTest.toMap(TEST_TYPE_MAPPING);
         assertEquals(TEST_TYPE_MAPPING_IN_MAP_FORMAT, result);
+    }
+
+    @Test
+    void testFromStringOnTypeMappingClass() {
+        String metaKey = "meta";
+        ErrorResponse expected = new ErrorResponse.Builder()
+                .status(404)
+                .error(ErrorCause.builder()
+                        .type("index_not_found")
+                        .reason("Index not found")
+                        .metadata(Map.of(metaKey, JsonData.of(123)))
+                        .build())
+                .build();
+        final String json = expected.toJsonString();
+        ErrorResponse errorResponse = toTest.fromJson(json, ErrorResponse._DESERIALIZER);
+        assertEquals(expected.status(), errorResponse.status());
+        assertEquals(expected.error().type(), errorResponse.error().type());
+        assertEquals(expected.error().reason(), errorResponse.error().reason());
+        assertEquals(expected.error().metadata().get(metaKey).to(Integer.class), errorResponse.error().metadata().get(metaKey).to(Integer.class));
     }
 
 }
