@@ -64,6 +64,10 @@
         <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
+
+        <!-- OpenAPI generation parameters (for generate-openapi profile) - can be overridden via -D flags -->
+        <openapi.server.output.file>${project.basedir}/src/main/resources/openapi/openapi.yaml</openapi.server.output.file>
+        <openapi.server.config.file>${project.basedir}/../misc/graylog.conf</openapi.server.config.file>
     </properties>
 
     <dependencies>
@@ -1155,37 +1159,6 @@
                             </arguments>
                         </configuration>
                     </execution>
-                    <execution>
-                        <id>generate-openapi-spec</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                        <configuration>
-                            <mainClass>org.graylog2.bootstrap.Main</mainClass>
-                            <arguments>
-                                <argument>openapi-spec</argument>
-                                <argument>-np</argument>
-                                <argument>-f</argument>
-                                <argument>${project.basedir}/../misc/graylog.conf</argument>
-                                <argument>${project.build.directory}/swagger/openapi.yaml</argument>
-                            </arguments>
-                            <systemProperties>
-                                <systemProperty>
-                                    <key>graylog.password_secret</key>
-                                    <value>dummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummypasswordsecretforma</value>
-                                </systemProperty>
-                                <systemProperty>
-                                    <key>graylog.data_dir</key>
-                                    <value>${project.build.directory}/graylog-data</value>
-                                </systemProperty>
-                                <systemProperty>
-                                    <key>graylog.node_id_file</key>
-                                    <value>${project.build.directory}/node-id</value>
-                                </systemProperty>
-                            </systemProperties>
-                        </configuration>
-                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -1237,6 +1210,50 @@
         </plugins>
     </build>
     <profiles>
+        <profile>
+            <id>generate-openapi</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-openapi-spec</id>
+                                <phase>compile</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>org.graylog2.bootstrap.Main</mainClass>
+                                    <arguments>
+                                        <argument>openapi-spec</argument>
+                                        <argument>-np</argument>
+                                        <argument>-f</argument>
+                                        <argument>${openapi.server.config.file}</argument>
+                                        <argument>${openapi.server.output.file}</argument>
+                                    </arguments>
+                                    <systemProperties>
+                                        <systemProperty>
+                                            <key>graylog.password_secret</key>
+                                            <value>dummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummy</value>
+                                        </systemProperty>
+                                        <systemProperty>
+                                            <key>graylog.data_dir</key>
+                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-spec-generation-data-${maven.build.timestamp}</value>
+                                        </systemProperty>
+                                        <systemProperty>
+                                            <key>graylog.node_id_file</key>
+                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-spec-generation-node-id-${maven.build.timestamp}</value>
+                                        </systemProperty>
+                                    </systemProperties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
         <profile>
             <id>release</id>
             <build>
