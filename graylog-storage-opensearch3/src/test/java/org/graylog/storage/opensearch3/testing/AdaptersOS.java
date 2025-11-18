@@ -29,6 +29,7 @@ import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
+import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
@@ -85,6 +86,7 @@ public class AdaptersOS implements Adapters {
                 featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
                 new IndexStatisticsBuilder(),
                 objectMapper,
+                new PlainJsonApi(objectMapper, client, officialOpensearchClient),
                 new OSSerializationUtils(objectMapper, officialOpensearchClient)
         );
     }

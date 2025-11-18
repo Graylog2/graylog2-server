@@ -67,6 +67,8 @@ class IndicesAdapterOSTest {
     private IndexTemplateAdapter indexTemplateAdapter;
     @Mock
     private IndexStatisticsBuilder indexStatisticsBuilder;
+    @Mock
+    private PlainJsonApi jsonApi;
 
     @BeforeEach
     void setUp() {
@@ -84,6 +86,7 @@ class IndicesAdapterOSTest {
                 indexTemplateAdapter,
                 indexStatisticsBuilder,
                 objectMapper,
+                jsonApi,
                 new OSSerializationUtils(objectMapper, opensearchClient)
         );
     }
