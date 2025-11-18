@@ -23,10 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
-import jakarta.json.stream.JsonParser;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
@@ -48,7 +48,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
-import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.aggregations.FilterAggregate;
@@ -89,7 +88,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -122,6 +120,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private final OpenSearchIndicesClient indicesClient;
     private final OpenSearchCatClient catClient;
     private final OpenSearchGenericClient genericClient;
+    private final OSSerializationUtils osSerializationUtils;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
@@ -135,7 +134,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             ClusterStateApi clusterStateApi,
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
-                            ObjectMapper objectMapper) {
+                            ObjectMapper objectMapper,
+                            final OSSerializationUtils osSerializationUtils) {
         this.c = c;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;
@@ -147,6 +147,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
         this.indicesClient = openSearchClient.indices();
         this.catClient = openSearchClient.cat();
         this.genericClient = openSearchClient.generic();
+        this.osSerializationUtils = osSerializationUtils;
     }
 
     @Override
@@ -205,7 +206,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .settings(createIndexSettings(indexSettings));
         if (mapping != null) {
             try {
-                builder.mappings(typeMappingFromMap(mapping));
+                builder.mappings(osSerializationUtils.fromMap(mapping, TypeMapping._DESERIALIZER));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -256,19 +257,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .ignoreUnavailable(true)
                     .expandWildcards(ExpandWildcard.All));
             IndexMappingRecord indexMappingRecord = response.get(index);
-            return typeMappingToMap(indexMappingRecord.mappings());
+            return osSerializationUtils.toMap(indexMappingRecord.mappings());
         }, "Couldn't read mapping of index " + index);
-    }
-
-    private Map<String, Object> typeMappingToMap(TypeMapping mapping) throws JsonProcessingException {
-        return objectMapper.readValue(mapping.toJsonString(), new TypeReference<>() {});
-    }
-
-    private TypeMapping typeMappingFromMap(Map<String, Object> mapping) throws JsonProcessingException {
-        String json = objectMapper.writeValueAsString(mapping);
-        JsonpMapper mapper = c.sync()._transport().jsonpMapper();
-        JsonParser parser = mapper.jsonProvider().createParser(new StringReader(json));
-        return TypeMapping._DESERIALIZER.deserialize(parser, mapper);
     }
 
     @Override
