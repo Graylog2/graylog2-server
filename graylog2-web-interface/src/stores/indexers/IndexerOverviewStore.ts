@@ -31,6 +31,8 @@ export const IndexerOverviewActions = singletonActions('core.IndexerOverview', (
   }),
 );
 
+export type IndexTier = 'WARM' | 'HOT';
+
 export type IndexSummary = {
   index_name?: string;
   size: {
@@ -43,7 +45,7 @@ export type IndexSummary = {
   is_closed: boolean;
   is_reopened: boolean;
   shard_count: number;
-  tier: 'WARM' | 'HOT';
+  tier: IndexTier;
 };
 
 export type IndexerOverview = {
