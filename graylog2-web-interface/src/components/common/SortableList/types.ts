@@ -16,10 +16,9 @@
  */
 
 import type * as React from 'react';
-import type { DraggableProvidedDraggableProps, DraggableProvidedDragHandleProps } from 'react-beautiful-dnd';
 
-export type DraggableProps = DraggableProvidedDraggableProps;
-export type DragHandleProps = DraggableProvidedDragHandleProps;
+export type OverlayDragHandleProps = {};
+export type DragHandleProps = React.HTMLAttributes<HTMLElement> | OverlayDragHandleProps;
 
 export type ListItemType = {
   id: string;
@@ -28,15 +27,14 @@ export type ListItemType = {
 
 export type CustomListItemRender<ItemType extends ListItemType> = ({
   disableDragging,
-  draggableProps,
   dragHandleProps,
   index,
   item,
   ref,
+  className,
 }: {
   className?: string;
   disableDragging?: boolean;
-  draggableProps: DraggableProps;
   dragHandleProps: DragHandleProps;
   index: number;
   item: ItemType;

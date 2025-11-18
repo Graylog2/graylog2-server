@@ -40,13 +40,13 @@ const List = <ItemType extends ListItemType>({
     {items?.map((item, index) => (
       <SortableListItem
         alignItemContent={alignItemContent}
-        item={item}
-        index={index}
-        key={item.id}
         customContentRender={customContentRender}
         customListItemRender={customListItemRender}
         disableDragging={disableDragging}
         displayOverlayInPortal={displayOverlayInPortal}
+        index={index}
+        item={item}
+        key={item.id}
       />
     ))}
   </>

@@ -21,43 +21,47 @@ import styled, { css } from 'styled-components';
 import { ListGroupItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
-import type { DraggableProps, DragHandleProps, ListItemType, CustomListItemRender, CustomContentRender } from './types';
+import type { ListItemType, CustomListItemRender, CustomContentRender, DragHandleProps } from './types';
 
 type Props<ItemType extends ListItemType> = {
   alignItemContent?: 'flex-start' | 'center';
   className?: string;
-  customListItemRender?: CustomListItemRender<ItemType>;
   customContentRender?: CustomContentRender<ItemType>;
+  customListItemRender?: CustomListItemRender<ItemType>;
   disableDragging?: boolean;
-  displayOverlayInPortal: boolean;
-  draggableProps: DraggableProps;
   dragHandleProps: DragHandleProps;
   index: number;
+  isDragging: boolean;
   item: ItemType;
 };
 
-const StyledListGroupItem = styled(ListGroupItem)<{ $alignItemContent: 'flex-start' | 'center' }>(
+const StyledListGroupItem = styled(ListGroupItem)<{
+  $alignItemContent: 'flex-start' | 'center';
+}>(
   ({ $alignItemContent }) => css`
     display: flex;
     align-items: ${$alignItemContent};
   `,
 );
 
-const DragHandle = styled.div`
-  margin-right: 5px;
-`;
+const DragHandle = styled.div<{ $isDragging: boolean }>(
+  ({ $isDragging }) => css`
+    margin-right: 5px;
+    cursor: ${$isDragging ? 'grabbing' : 'grab'};
+  `,
+);
 
 const ListItem = <ItemType extends ListItemType>(
   {
     alignItemContent = 'flex-start',
-    item,
-    index,
     className = undefined,
-    customListItemRender = undefined,
     customContentRender = undefined,
+    customListItemRender = undefined,
     disableDragging = false,
-    draggableProps,
     dragHandleProps,
+    index,
+    isDragging,
+    item,
   }: Props<ItemType>,
   ref: React.ForwardedRef<HTMLLIElement>,
 ) => {
@@ -69,8 +73,7 @@ const ListItem = <ItemType extends ListItemType>(
         {customListItemRender({
           className,
           disableDragging,
-          draggableProps: draggableProps,
-          dragHandleProps: dragHandleProps,
+          dragHandleProps,
           index,
           item,
           ref,
@@ -80,13 +83,9 @@ const ListItem = <ItemType extends ListItemType>(
   }
 
   return (
-    <StyledListGroupItem
-      $alignItemContent={alignItemContent}
-      ref={ref}
-      className={className}
-      containerProps={{ ...draggableProps }}>
+    <StyledListGroupItem $alignItemContent={alignItemContent} ref={ref} className={className}>
       {!disableDragging && (
-        <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
+        <DragHandle {...dragHandleProps} $isDragging={isDragging} data-testid={`sortable-item-${item.id}`}>
           <Icon name="drag_indicator" />
         </DragHandle>
       )}
