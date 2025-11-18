@@ -19,7 +19,7 @@ import styled from 'styled-components';
 import { useCallback, forwardRef, useMemo } from 'react';
 
 import { IconButton, SortableList, Icon } from 'components/common';
-import type { DragHandleProps, DraggableProps } from 'components/common/SortableList';
+import type { DragHandleProps } from 'components/common/SortableList';
 import UnknownAttributeTitle from 'views/components/widgets/events/UnknownAttributeTitle';
 
 const ListItemContainer = styled.div`
@@ -43,7 +43,6 @@ const DragHandle = styled.div`
 
 type ListItemProps = {
   item: { id: string; title: string };
-  draggableProps: DraggableProps;
   dragHandleProps: DragHandleProps;
   className: string;
   onChange: (columnName: string) => void;
@@ -53,8 +52,8 @@ type ListItemProps = {
 };
 
 const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
-  ({ className, dragHandleProps, draggableProps, item, onRemove, testIdPrefix }: ListItemProps, ref) => (
-    <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
+  ({ className, dragHandleProps, item, onRemove, testIdPrefix }: ListItemProps, ref) => (
+    <ListItemContainer className={className} ref={ref}>
       <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
         <Icon name="drag_indicator" />
       </DragHandle>
@@ -105,7 +104,7 @@ const SelectedColumnsList = ({
   );
 
   const SortableListItem = useCallback(
-    ({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+    ({ item, index, dragHandleProps, className, ref }) => (
       <ListItem
         onChange={(newFieldName) => onChangeColumn(index, newFieldName)}
         onRemove={() => onRemoveColumn(item.id)}
@@ -113,7 +112,6 @@ const SelectedColumnsList = ({
         item={item}
         testIdPrefix={`${testPrefix}-column-${index}`}
         dragHandleProps={dragHandleProps}
-        draggableProps={draggableProps}
         className={className}
         ref={ref}
       />

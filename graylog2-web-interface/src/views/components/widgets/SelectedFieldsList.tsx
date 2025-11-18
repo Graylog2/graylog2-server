@@ -15,13 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import styled from 'styled-components';
 import { useState, useCallback, forwardRef, useMemo } from 'react';
+import styled from 'styled-components';
 
 import { IconButton, SortableList, Icon } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
+import type { DragHandleProps } from 'components/common/SortableList';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 
 const ListItemContainer = styled.div`
@@ -50,7 +50,6 @@ const DragHandle = styled.div`
 type ListItemProps = {
   className: string;
   dragHandleProps: DragHandleProps;
-  draggableProps: DraggableProps;
   fieldSelect: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
   item: { id: string; title: string };
   onChange: (fieldName: string) => void;
@@ -70,7 +69,6 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
     {
       className,
       dragHandleProps,
-      draggableProps,
       fieldSelect = FieldSelect,
       item,
       onChange,
@@ -90,7 +88,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
     };
 
     return (
-      <ListItemContainer className={className} ref={ref} {...(draggableProps ?? {})}>
+      <ListItemContainer className={className} ref={ref}>
         {isEditing && (
           <EditFieldSelect
             id="add-field-select"
@@ -167,7 +165,7 @@ const SelectedFieldsList = ({
   );
 
   const SortableListItem = useCallback(
-    ({ item, index, dragHandleProps, draggableProps, className, ref }) => (
+    ({ item, index, dragHandleProps, className, ref }) => (
       <ListItem
         onChange={(newFieldName) => onChangeField(index, newFieldName)}
         onRemove={() => onRemoveField(item.id)}
@@ -177,7 +175,6 @@ const SelectedFieldsList = ({
         fieldSelect={fieldSelect}
         testIdPrefix={`${testPrefix}-field-${index}`}
         dragHandleProps={dragHandleProps}
-        draggableProps={draggableProps}
         className={className}
         ref={ref}
         showUnit={showUnit}

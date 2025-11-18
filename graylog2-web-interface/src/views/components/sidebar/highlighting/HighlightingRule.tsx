@@ -30,7 +30,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useLocation from 'routing/useLocation';
-import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
+import type { DragHandleProps } from 'components/common/SortableList';
 
 import ColorPreview from './ColorPreview';
 
@@ -104,7 +104,6 @@ const RuleColorPreview = ({ color, onChange }: RuleColorPreviewProps) => {
 type Props = {
   rule: HighlightingRuleClass;
   className?: string;
-  draggableProps?: DraggableProps;
   dragHandleProps?: DragHandleProps;
   onUpdate: (
     existingRule: HighlightingRuleClass,
@@ -117,7 +116,7 @@ type Props = {
 };
 
 const HighlightingRule = (
-  { rule, className = undefined, draggableProps = undefined, dragHandleProps = undefined, onUpdate, onDelete }: Props,
+  { rule, className = undefined, dragHandleProps = undefined, onUpdate, onDelete }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const { field, value, color, condition } = rule;
@@ -152,7 +151,7 @@ const HighlightingRule = (
   }, [location.pathname, onDelete, rule, sendTelemetry]);
 
   return (
-    <Container className={className} ref={ref} {...(draggableProps ?? {})}>
+    <Container className={className} ref={ref}>
       <RuleColorPreview color={color} onChange={_onChange} />
       <RightCol>
         <RuleContainer data-testid="highlighting-rule">

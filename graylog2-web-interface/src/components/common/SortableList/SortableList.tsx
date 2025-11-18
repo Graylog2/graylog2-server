@@ -111,7 +111,6 @@ const SortableList = <ItemType extends ListItemType>({
             customContentRender={customContentRender}
             customListItemRender={customListItemRender}
             disableDragging={disableDragging}
-            displayOverlayInPortal={displayOverlayInPortal}
             items={items}
           />
         </div>

@@ -23,7 +23,7 @@ import IconButton from 'components/common/IconButton';
 import { SortableList } from 'components/common';
 import type { Value, Condition, Color } from 'views/logic/views/formatting/highlighting/HighlightingRule';
 import HighlightingRuleClass from 'views/logic/views/formatting/highlighting/HighlightingRule';
-import type { DraggableProps, DragHandleProps } from 'components/common/SortableList';
+import type { DragHandleProps } from 'components/common/SortableList';
 
 import HighlightingRule, { Container, RuleContainer } from './HighlightingRule';
 import ColorPreview from './ColorPreview';
@@ -34,7 +34,6 @@ import SectionSubheadline from '../SectionSubheadline';
 
 type SortableHighlightingRuleProps = {
   item: { id: string; rule: HighlightingRuleClass };
-  draggableProps: DraggableProps;
   dragHandleProps: DragHandleProps;
   className?: string;
   onUpdate: (
@@ -48,14 +47,7 @@ type SortableHighlightingRuleProps = {
 };
 
 const SortableHighlightingRule = (
-  {
-    item: { id, rule },
-    draggableProps,
-    dragHandleProps,
-    className = undefined,
-    onUpdate,
-    onDelete,
-  }: SortableHighlightingRuleProps,
+  { item: { id, rule }, dragHandleProps, className = undefined, onUpdate, onDelete }: SortableHighlightingRuleProps,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
   <HighlightingRule
@@ -64,7 +56,6 @@ const SortableHighlightingRule = (
     onUpdate={onUpdate}
     onDelete={onDelete}
     dragHandleProps={dragHandleProps}
-    draggableProps={draggableProps}
     className={className}
     ref={ref}
   />
@@ -120,7 +111,6 @@ const HighlightingRules = ({
   const listItemRender = useCallback(
     (props: {
       item: { id: string; rule: HighlightingRuleClass };
-      draggableProps: DraggableProps;
       dragHandleProps: DragHandleProps;
       className?: string;
     }) => <SortableHighlightingRuleWrapper {...props} onUpdate={onUpdateRule} onDelete={onDeleteRule} />,
