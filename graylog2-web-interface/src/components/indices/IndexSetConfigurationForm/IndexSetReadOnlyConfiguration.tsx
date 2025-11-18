@@ -45,8 +45,8 @@ const IndexSetReadOnlyConfiguration = ({
 }) => {
   const indexPrefixHelp = (
     <span>
-      A <strong>unique</strong> prefix used for indices belonging to this index set. The prefix must start
-      with a letter or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
+      A <strong>unique</strong> prefix used for indices belonging to this index set. The prefix must start with a letter
+      or number, and can only contain letters, numbers, &apos;_&apos;, &apos;-&apos; and &apos;+&apos;.
     </span>
   );
 
