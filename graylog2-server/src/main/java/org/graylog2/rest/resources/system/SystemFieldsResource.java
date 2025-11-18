@@ -35,8 +35,12 @@ import org.graylog2.plugin.Message;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -56,6 +60,12 @@ public class SystemFieldsResource extends RestResource {
 
     private static final String FIELD_FIELDS = "fields";
 
+    private static final Collection<String> STANDARD_FIELDS = List.of(
+            Message.FIELD_SOURCE,
+            Message.FIELD_MESSAGE,
+            Message.FIELD_TIMESTAMP
+    );
+
     public record MessageFieldsDTO(
             @JsonProperty(FIELD_FIELDS) Set<String> fields) {}
 
@@ -66,7 +76,7 @@ public class SystemFieldsResource extends RestResource {
     @RequiresPermissions(RestPermissions.FIELDNAMES_READ)
     @Produces(APPLICATION_JSON)
     public MessageFieldsDTO fields(@ApiParam(name = "limit", value = "Maximum number of fields to return. Set to 0 for all fields.")
-                                           @QueryParam("limit") int limit) {
+                                   @QueryParam("limit") int limit) {
         boolean unlimited = limit <= 0;
 
         final String[] writeIndexWildcards = indexSetRegistry.getIndexWildcards();
@@ -80,28 +90,16 @@ public class SystemFieldsResource extends RestResource {
         // Requesting all fields for all indices at once risks exceeding the allocated buffer, so we get fields
         // index by index instead. https://github.com/Graylog2/graylog2-server/issues/22743
         // Consider caching fields to improve performance. This would also allow for pagination.
-        int count = 0;
-        outer:
-        for (String wildcard : writeIndexWildcards) {
-            for (String field : indices.getAllMessageFields(new String[]{wildcard})) {
-                if (!unlimited && count >= limit) {
-                    break outer;
-                }
-                if (fields.add(field)) {
-                    count++;
-                }
-            }
-        }
+        Stream.of(writeIndexWildcards)
+                .flatMap(index -> indices.getAllMessageFields(new String[]{index}).stream())
+                .distinct()
+                .limit(unlimited ? Long.MAX_VALUE : limit)
+                .forEach(fields::add);
+
         if (!unlimited) {
-            addStandardFields(fields);
+            fields.addAll(STANDARD_FIELDS);
         }
 
         return new MessageFieldsDTO(fields);
-    }
-
-    private void addStandardFields(Set<String> fields) {
-        fields.add(Message.FIELD_SOURCE);
-        fields.add(Message.FIELD_MESSAGE);
-        fields.add(Message.FIELD_TIMESTAMP);
     }
 }
