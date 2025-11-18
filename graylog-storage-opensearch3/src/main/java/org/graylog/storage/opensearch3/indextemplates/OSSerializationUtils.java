@@ -52,7 +52,7 @@ public class OSSerializationUtils {
         return fromJson(json, deserializer);
     }
 
-    public <T> T fromJson(String json, JsonpDeserializer<T> deserializer) {
+    public <T> T fromJson(final String json, final JsonpDeserializer<T> deserializer) {
         final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader(json));
         return deserializer.deserialize(parser, jsonpMapper);
     }
