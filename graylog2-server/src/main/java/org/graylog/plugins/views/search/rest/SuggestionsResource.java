@@ -57,9 +57,9 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleR
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -143,7 +143,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .timerange(timerange)
                 .build();
 
-        SuggestionResponse res = querySuggestionsService.suggest(req);
+        SuggestionResponse res = querySuggestionsService.suggest(req, Duration.ofSeconds(10));
         final List<SuggestionEntryDTO> suggestions = augmentSuggestions(res.suggestions().stream()
                 .map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence()))
                 .toList(), fieldType, searchUser);
