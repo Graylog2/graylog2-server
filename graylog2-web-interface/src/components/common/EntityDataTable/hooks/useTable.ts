@@ -16,19 +16,39 @@
  */
 
 import { useMemo, useCallback } from 'react';
-import type { ColumnDef, SortingState, Updater, VisibilityState } from '@tanstack/react-table';
+import type { ColumnDef, SortingState, Updater, VisibilityState, RowSelectionState } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
-import type { EntityBase } from 'components/common/EntityDataTable/types';
 import type { Sort } from 'stores/PaginationTypes';
-import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
+
+import type { ColumnPreferences, EntityBase } from '../types';
+
+const updateColumnPreferences = (
+  prevVisibleColumns: VisibilityState,
+  currVisibleColumns: VisibilityState,
+  columnPreferences: ColumnPreferences | undefined = {},
+) => {
+  const updated = { ...columnPreferences };
+
+  // only update the preferences for columns which have been shown/hidden by the user
+  Object.keys(currVisibleColumns).forEach((key) => {
+    if (currVisibleColumns[key] && !prevVisibleColumns[key]) {
+      updated[key] = { status: 'show' };
+    } else if (!currVisibleColumns[key] && prevVisibleColumns[key]) {
+      updated[key] = { status: 'hide' };
+    }
+  });
+
+  return updated;
+};
 
 type Props<Entity extends EntityBase> = {
+  columnPreferences: ColumnPreferences | undefined;
   columnsDefinitions: Array<ColumnDef<Entity>>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
   isEntitySelectable: (entity: Entity) => boolean | undefined;
-  onColumnsChange: (visibleColumns: Array<string>) => void;
+  onColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
   onSortChange: (sort: Sort) => void;
   sort: Sort | undefined;
   visibleColumnOrder: Array<string>;
@@ -38,12 +58,13 @@ type Props<Entity extends EntityBase> = {
 };
 
 const useTable = <Entity extends EntityBase>({
+  columnPreferences,
   columnsDefinitions,
   displayBulkSelectCol,
   entities,
   isEntitySelectable = () => true,
   onChangeSelection,
-  onColumnsChange,
+  onColumnPreferencesChange,
   onSortChange,
   selectedEntities,
   setSelectedEntities,
@@ -70,20 +91,17 @@ const useTable = <Entity extends EntityBase>({
     (updater: Updater<VisibilityState>) => {
       const newColumnVisibility = updater instanceof Function ? updater(columnVisibility) : updater;
 
-      return onColumnsChange(
-        Object.entries(newColumnVisibility)
-          .filter(([_colId, isVisible]) => isVisible)
-          .map(([colId]) => colId)
-          .filter((colId) => !UTILITY_COLUMNS.has(colId)),
+      return onColumnPreferencesChange(
+        updateColumnPreferences(columnVisibility, newColumnVisibility, columnPreferences),
       );
     },
-    [columnVisibility, onColumnsChange],
+    [columnPreferences, columnVisibility, onColumnPreferencesChange],
   );
 
   const rowSelection = useMemo(() => Object.fromEntries(selectedEntities.map((id) => [id, true])), [selectedEntities]);
 
   const onRowSelectionChange = useCallback(
-    (updater: Updater<Record<string, boolean>>) => {
+    (updater: Updater<RowSelectionState>) => {
       const newRowSelection = updater instanceof Function ? updater(rowSelection) : updater;
 
       const newSelection = Object.entries(newRowSelection)
