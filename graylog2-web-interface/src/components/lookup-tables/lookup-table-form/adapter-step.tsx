@@ -79,7 +79,7 @@ function DataAdapterFormStep() {
         </RowContainer>
       ) : (
         <>
-          {canModify && (
+          {canModify && !showForm && (
             <RowContainer>
               <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
             </RowContainer>

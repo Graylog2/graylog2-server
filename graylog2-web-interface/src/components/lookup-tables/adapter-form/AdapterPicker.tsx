@@ -57,9 +57,6 @@ function DataAdapterPicker({ onCreateClick, dataAdapters = [] }: Props) {
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3">
-        <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
-          {errorMessage || 'Select an existing data adapter'}
-        </div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <StyledSelect
             placeholder="Select a data adapter"
@@ -72,6 +69,9 @@ function DataAdapterPicker({ onCreateClick, dataAdapters = [] }: Props) {
           <StyledButton type="button" aria-label="Create Data Adapter" onClick={onCreateClick}>
             Create Data Adapter
           </StyledButton>
+        </div>
+        <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
+          {errorMessage || 'Select an existing data adapter'}
         </div>
       </Input>
     </fieldset>

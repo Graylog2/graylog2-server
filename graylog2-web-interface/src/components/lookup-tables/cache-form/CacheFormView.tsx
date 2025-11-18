@@ -15,12 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
+import { Button } from 'components/bootstrap';
 import { RowContainer } from 'components/lookup-tables/layout-componets';
 import type { LookupTableCache } from 'logic/lookup-tables/types';
 
 import CacheForm from './CacheForm';
 import CacheTypeSelect from './CacheTypeSelect';
+
+const UseExistingButton = styled(Button)`
+  margin-top: 1.57rem;
+`;
 
 type Props = {
   saved?: (adapterObj: LookupTableCache) => void;
@@ -37,6 +43,7 @@ function CacheFormView({ saved = undefined, onCancel, cache = undefined }: Props
       {isCreate && (
         <RowContainer>
           <CacheTypeSelect cacheConfigType={lutCache ? lutCache.config.type : null} onCacheChange={setLutCache} />
+          <UseExistingButton onClick={onCancel}>Use Existing Cache</UseExistingButton>
         </RowContainer>
       )}
       {lutCache && (

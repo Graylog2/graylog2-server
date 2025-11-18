@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useFormikContext } from 'formik';
 
@@ -24,6 +25,10 @@ import { Button } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import { Row } from 'components/lookup-tables/layout-componets';
 import type { LookupTableType } from 'components/lookup-tables/lookup-table-form';
+
+const ButtonsRow = styled(Row)`
+  margin-top: ${({ theme }) => theme.spacings.lg};
+`;
 
 type Props = {
   isCreate: boolean;
@@ -68,7 +73,7 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
 
   if (activeStepId === 'summary') {
     return (
-      <Row $align="center" $justify="flex-end" $width="100%">
+      <ButtonsRow $align="center" $justify="flex-end" $width="100%">
         <Button onClick={onCancel}>Cancel</Button>
         <Button bsStyle="primary" onClick={onSubmit} disabled={!isValid || isLoading || !canModify}>
           {isLoading ? (
@@ -79,17 +84,17 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
             `${isCreate ? 'Create' : 'Update'} Lookup Table`
           )}
         </Button>
-      </Row>
+      </ButtonsRow>
     );
   }
 
   return (
-    <Row $align="center" $justify="space-between" $width="100%">
+    <ButtonsRow $align="center" $justify="space-between" $width="100%">
       <Button onClick={onPrev} disabled={onFirstStep}>
         Previous
       </Button>
       <Button onClick={onNext}>Next</Button>
-    </Row>
+    </ButtonsRow>
   );
 }
 

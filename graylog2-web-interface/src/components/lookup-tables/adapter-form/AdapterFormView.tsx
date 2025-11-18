@@ -15,12 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 
+import { Button } from 'components/bootstrap';
 import { RowContainer } from 'components/lookup-tables/layout-componets';
 import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 import DataAdapterForm from './AdapterForm';
 import DataAdapterTypeSelect from './AdapterTypeSelect';
+
+const UseExistingButton = styled(Button)`
+  margin-top: 1.57rem;
+`;
 
 type Props = {
   saved?: (adapterObj: LookupTableAdapter) => void;
@@ -40,6 +46,7 @@ const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined 
             adapterConfigType={dataAdapter ? dataAdapter.config.type : null}
             onAdapterChange={setDataAdapter}
           />
+          <UseExistingButton onClick={onCancel}>Use Existing Data Adapter</UseExistingButton>
         </RowContainer>
       )}
       {dataAdapter && (

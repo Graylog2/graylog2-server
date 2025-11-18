@@ -80,7 +80,7 @@ function CacheFormStep() {
         </RowContainer>
       ) : (
         <>
-          {canModify && (
+          {canModify && !showForm && (
             <RowContainer>
               <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
             </RowContainer>
