@@ -80,6 +80,10 @@ export function useCreateLookupTable() {
         queryKey: ['lookup-tables'],
         refetchType: 'active',
       });
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-table-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -99,6 +103,10 @@ export function useUpdateLookupTable() {
       UserNotification.success('Lookup Table updated successfully');
       queryClient.invalidateQueries({
         queryKey: ['lookup-tables'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['lookup-table-details'],
         refetchType: 'active',
       });
     },
@@ -259,6 +267,10 @@ export function useCreateCache() {
         queryKey: ['all-caches'],
         refetchType: 'active',
       });
+      queryClient.invalidateQueries({
+        queryKey: ['cache-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -278,6 +290,14 @@ export function useUpdateCache() {
       UserNotification.success('Cache updated successfully');
       queryClient.invalidateQueries({
         queryKey: ['caches'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['all-caches'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['cache-details'],
         refetchType: 'active',
       });
     },
@@ -373,6 +393,10 @@ export function useCreateAdapter() {
         queryKey: ['all-data-adapters'],
         refetchType: 'active',
       });
+      queryClient.invalidateQueries({
+        queryKey: ['data-adapter-details'],
+        refetchType: 'active',
+      });
     },
     onError: (error: Error) => UserNotification.error(error.message),
   });
@@ -392,6 +416,14 @@ export function useUpdateAdapter() {
       UserNotification.success('Data Adapter updated successfully');
       queryClient.invalidateQueries({
         queryKey: ['adapters'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['all-data-adapters'],
+        refetchType: 'active',
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['data-adapter-details'],
         refetchType: 'active',
       });
     },
