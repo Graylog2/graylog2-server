@@ -17,7 +17,7 @@
 import React from 'react';
 import * as Immutable from 'immutable';
 import type { Matcher } from 'wrappedTestingLibrary';
-import { render, within, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, within, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import { act } from 'wrappedTestingLibrary/hooks';
