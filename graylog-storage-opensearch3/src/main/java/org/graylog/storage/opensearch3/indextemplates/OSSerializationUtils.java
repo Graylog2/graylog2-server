@@ -48,7 +48,6 @@ public class OSSerializationUtils {
         return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
     }
 
-    //TODO: test
     public Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
         return map.entrySet()
                 .stream()
