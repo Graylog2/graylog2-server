@@ -83,7 +83,7 @@ const ListItem = <ItemType extends ListItemType>(
       title={dragHandleTitle}
       aria-label={dragHandleTitle}
       data-sortable-id={item.id}
-      data-testid={`item-drag-handle-${item.id}`}>
+      data-testid={`drag-handle-${item.id}`}>
       <Icon name="drag_indicator" />
     </DragHandle>
   );
