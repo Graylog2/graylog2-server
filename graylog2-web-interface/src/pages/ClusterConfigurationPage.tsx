@@ -17,7 +17,7 @@
 import React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
-import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/shared-components/ClusterConfigurationPageNavigation';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import IndexerClusterHealth from 'components/indexers/IndexerClusterHealth';
 import ClusterConfigurationNodes from 'components/cluster-configuration/ClusterConfigurationNodes';

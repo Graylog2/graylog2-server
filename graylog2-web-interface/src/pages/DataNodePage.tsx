@@ -25,7 +25,7 @@ import { DocumentTitle, NoSearchResult, PageHeader, RelativeTime, Spinner } from
 import { CertRenewalButton } from 'components/datanode/DataNodeConfiguration/CertificateRenewal';
 import useDataNode from 'components/datanode/hooks/useDataNode';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
-import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/shared-components/ClusterConfigurationPageNavigation';
 
 const StyledHorizontalDl = styled.dl(
   ({ theme }) => css`

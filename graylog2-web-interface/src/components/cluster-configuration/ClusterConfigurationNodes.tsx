@@ -20,8 +20,8 @@ import styled from 'styled-components';
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { SearchForm } from 'components/common';
 
-import GraylogNodesExpandable from './GraylogNodesExpandable';
-import DataNodesExpandable from './DataNodesExpandable';
+import GraylogNodesExpandable from './graylog-nodes/GraylogNodesExpandable';
+import DataNodesExpandable from './data-nodes/DataNodesExpandable';
 
 const SectionCol = styled(Col)`
   margin-bottom: 12px;

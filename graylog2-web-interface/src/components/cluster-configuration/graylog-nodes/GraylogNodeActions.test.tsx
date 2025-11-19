@@ -18,8 +18,8 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { GraylogNode } from './useClusterGraylogNodes';
-import GraylogNodeActions from './GraylogNodeActions';
+import type { GraylogNode } from '../graylog-nodes/useClusterGraylogNodes';
+import GraylogNodeActions from '../graylog-nodes/GraylogNodeActions';
 
 const nodeMock: GraylogNode = {
   cluster_id: '600120f7-a111-4ec3-88b0-aee4067fb21d',

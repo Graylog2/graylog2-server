@@ -25,19 +25,17 @@ import type { Metric, NodeMetric } from 'stores/metrics/MetricsStore';
 import type { DataNode } from 'components/datanode/Types';
 
 const METRIC_NAMES = {
-  cpuLoad: 'cpu_load',
-  memFree: 'mem_free',
-  memTotalUsed: 'mem_total_used',
-  memHeapUsed: 'mem_heap_used',
+  totalMemory: 'opensearch.os.mem.total_in_bytes',
+  usedMemory: 'opensearch.os.mem.used_in_bytes',
   jvmMemoryHeapUsage: 'jvm.memory.heap.usage',
   jvmMemoryHeapUsed: 'jvm.memory.heap.used',
   jvmMemoryHeapMax: 'jvm.memory.heap.max',
-  diskFree: 'disk_free',
-  dnHeapUsage: 'dn_heap_usage',
-  dnNonHeapUsage: 'dn_non_heap_usage',
-  dnProcessors: 'dn_processors',
-  dnThreadCount: 'dn_thread_count',
-  dnGcTime: 'dn_gc_time',
+  opensearchJvmMemoryHeapUsedPercent: 'opensearch.jvm.mem.heap_used_percent',
+  cpuLoadAverage1m: 'opensearch.os.cpu.load_average.1m',
+  indexTotal: 'opensearch.indices.indexing.index_total',
+  indexTimeInMillis: 'opensearch.indices.indexing.index_time_in_millis',
+  totalFsBytes: 'opensearch.fs.total.total_in_bytes',
+  availableFsBytes: 'opensearch.fs.total.available_in_bytes',
 } as const;
 
 type MetricNameKey = keyof typeof METRIC_NAMES;

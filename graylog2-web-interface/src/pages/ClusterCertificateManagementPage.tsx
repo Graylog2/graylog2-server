@@ -20,7 +20,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import DataNodeConfiguration from 'components/datanode/DataNodeConfiguration/DataNodeConfiguration';
-import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/shared-components/ClusterConfigurationPageNavigation';
 
 const ClusterCertificateManagementPage = () => (
   <DocumentTitle title="Certificate Management">

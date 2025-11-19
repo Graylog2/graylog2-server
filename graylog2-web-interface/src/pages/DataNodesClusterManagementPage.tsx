@@ -21,7 +21,7 @@ import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import ClusterManagementOverview from 'components/datanode/ClusterManagement/ClusterManagementOverview';
-import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/shared-components/ClusterConfigurationPageNavigation';
 import { widgetDragHandleClass, widgetActionsMenuClass } from 'views/components/widgets/Constants';
 
 const StyledCol = styled(Col)`

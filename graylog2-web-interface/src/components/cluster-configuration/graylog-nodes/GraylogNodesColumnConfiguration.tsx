@@ -23,9 +23,10 @@ import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityData
 import Routes from 'routing/Routes';
 import NumberUtils from 'util/NumberUtils';
 
-import RatioIndicator from './RatioIndicator';
-import { MetricsColumn, MetricsRow, SecondaryText } from './NodeMetricsLayout';
 import type { GraylogNode } from './useClusterGraylogNodes';
+
+import RatioIndicator from '../shared-components/RatioIndicator';
+import { MetricsColumn, MetricsRow, SecondaryText } from '../shared-components/NodeMetricsLayout';
 
 const NodePrimary = styled.div`
   display: flex;
@@ -100,23 +101,33 @@ const getNodeDisplayName = (node: GraylogNode) => {
   return node.node_id ?? node.hostname ?? node.id;
 };
 
-export const DEFAULT_VISIBLE_COLUMNS = ['node', 'state', 'messageProcessing', 'loadBalancer', 'journal', 'dataLakeJournal', 'jvm', 'buffers', 'throughput'] as const;
+export const DEFAULT_VISIBLE_COLUMNS = [
+  'hostname',
+  'lifecycle',
+  'is_processing',
+  'lb_status',
+  'journal',
+  'dataLakeJournal',
+  'jvm',
+  'buffers',
+  'throughput',
+] as const;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'node', title: 'Node' },
-  { id: 'state', title: 'State' },
-  { id: 'messageProcessing', title: 'Message Processing' },
-  { id: 'loadBalancer', title: 'Load Balancer' },
-  { id: 'journal', title: 'Journal' },
-  { id: 'dataLakeJournal', title: 'Data Lake Journal' },
-  { id: 'jvm', title: 'JVM' },
-  { id: 'buffers', title: 'Buffers' },
-  { id: 'throughput', title: 'Throughput' },
+  { id: 'hostname', title: 'Node', sortable: true },
+  { id: 'lifecycle', title: 'State', sortable: true },
+  { id: 'is_processing', title: 'Message Processing', sortable: true },
+  { id: 'lb_status', title: 'Load Balancer', sortable: true },
+  { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
+  { id: 'dataLakeJournal', title: 'Data Lake Journal', isDerived: true, sortable: false },
+  { id: 'jvm', title: 'JVM', isDerived: true, sortable: false },
+  { id: 'buffers', title: 'Buffers', isDerived: true, sortable: false },
+  { id: 'throughput', title: 'Throughput', isDerived: true, sortable: false },
 ];
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
-    node: {
+    hostname: {
       renderCell: (_value, entity) => {
         const nodeId = entity.node_id;
         const nodeName = getNodeDisplayName(entity);
@@ -133,7 +144,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         );
       },
     },
-    state: {
+    lifecycle: {
       renderCell: (_value, entity) => {
         const lifecycleStatus = entity.lifecycle?.toUpperCase();
 
@@ -156,7 +167,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         );
       },
     },
-    messageProcessing: {
+    is_processing: {
       renderCell: (_value, entity) => {
         if (entity.is_processing === undefined || entity.is_processing === null) {
           return null;
@@ -175,7 +186,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
         );
       },
     },
-    loadBalancer: {
+    lb_status: {
       renderCell: (_value, entity) => {
         const status = entity.lb_status?.toUpperCase();
 

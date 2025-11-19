@@ -18,15 +18,14 @@ import React, { useCallback, useMemo } from 'react';
 
 import { EntityDataTable, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
-import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
-import ClusterNodesSectionWrapper from './ClusterNodesSectionWrapper';
-import {
-  createColumnDefinitions,
-  createColumnRenderers,
-} from './DataNodesColumnConfiguration';
-import useClusterDataNodesTableLayout from './useClusterDataNodesTableLayout';
-import useClusterDataNodes, { type ClusterDataNode } from './useClusterDataNodes';
+import useClusterGraylogNodes from './useClusterGraylogNodes';
+import type { GraylogNode } from './useClusterGraylogNodes';
+import GraylogNodeActions from './GraylogNodeActions';
+import { createColumnDefinitions, createColumnRenderers } from './GraylogNodesColumnConfiguration';
+import useClusterGraylogNodesTableLayout from './useClusterGraylogNodesTableLayout';
+
+import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
 
 type Props = {
   collapsible?: boolean;
@@ -34,7 +33,7 @@ type Props = {
   onSelectSegment?: () => void;
 };
 
-const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSegment = undefined }: Props) => {
+const GraylogNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSegment = undefined }: Props) => {
   const {
     columnsOrder,
     columnPreferences,
@@ -43,55 +42,38 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSeg
     isLoadingLayout,
     handleColumnPreferencesChange,
     handleSortChange,
-  } = useClusterDataNodesTableLayout(searchQuery);
-  const {
-    nodes: dataNodes,
-    total: totalDataNodes,
-    refetch,
-    isLoading,
-    setPollingEnabled,
-  } = useClusterDataNodes(searchParams);
+  } = useClusterGraylogNodesTableLayout(searchQuery);
+  const { nodes: graylogNodes, total: totalGraylogNodes, isLoading } = useClusterGraylogNodes(searchParams);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
-  const handleActionsInteractionChange = useCallback(
-    (isActive: boolean) => {
-      setPollingEnabled(!isActive);
-    },
-    [setPollingEnabled],
-  );
-
-  const renderActions = useCallback(
-    (entity: ClusterDataNode) => (
-      <DataNodeActions dataNode={entity} refetch={refetch} onInteractionChange={handleActionsInteractionChange} />
-    ),
-    [handleActionsInteractionChange, refetch],
-  );
+  const renderActions = useCallback((entity: GraylogNode) => <GraylogNodeActions node={entity} />, []);
 
   return (
     <ClusterNodesSectionWrapper
-      title="Data Nodes"
-      titleCount={totalDataNodes}
+      title="Graylog Nodes"
+      titleCount={totalGraylogNodes}
       onTitleCountClick={onSelectSegment ?? null}
-      titleCountAriaLabel="Show Data Nodes segment"
+      titleCountAriaLabel="Show Graylog Nodes segment"
       headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
-      <EntityDataTable<ClusterDataNode>
-        entities={dataNodes}
+      <EntityDataTable<GraylogNode>
+        entities={graylogNodes}
         columnsOrder={columnsOrder}
         columnPreferences={columnPreferences}
         defaultDisplayedColumns={defaultDisplayedColumns}
         onColumnPreferencesChange={handleColumnPreferencesChange}
         onSortChange={handleSortChange}
         activeSort={searchParams.sort}
-        entityAttributesAreCamelCase
+        entityAttributesAreCamelCase={false}
         entityActions={renderActions}
         columnSchemas={columnSchemas}
         columnRenderers={columnRenderers}
+        actionsCellWidth={160}
       />
     </ClusterNodesSectionWrapper>
   );
 };
 
-export default DataNodesExpandable;
+export default GraylogNodesExpandable;

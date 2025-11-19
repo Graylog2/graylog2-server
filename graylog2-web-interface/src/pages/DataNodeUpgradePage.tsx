@@ -27,7 +27,7 @@ import useDataNodeUpgradeStatus, {
   stopShardReplication,
 } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
 import type { DataNodeInformation } from 'components/datanode/hooks/useDataNodeUpgradeStatus';
-import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/shared-components/ClusterConfigurationPageNavigation';
 import DocumentationLink from 'components/support/DocumentationLink';
 import HelpPopoverButton from 'components/common/HelpPopoverButton';
 

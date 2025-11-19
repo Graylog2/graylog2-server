@@ -25,7 +25,7 @@ import useMigrationWizardStep from 'components/datanode/hooks/useMigrationWizard
 import useTriggerMigrationState from 'components/datanode/hooks/useTriggerMigrationState';
 import { MIGRATION_STATE } from 'components/datanode/Constants';
 import ResetMigrationButton from 'components/datanode/migrations/common/ResetMigrationButton';
-import ClusterConfigurationPageNavigation from 'components/cluster-configuration/ClusterConfigurationPageNavigation';
+import ClusterConfigurationPageNavigation from 'components/cluster-configuration/shared-components/ClusterConfigurationPageNavigation';
 import useProductName from 'brand-customization/useProductName';
 
 const WizardContainer = styled(Col)`
