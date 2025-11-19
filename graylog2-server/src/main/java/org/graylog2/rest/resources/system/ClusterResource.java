@@ -43,6 +43,7 @@ import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.SortOrder;
@@ -93,13 +94,20 @@ public class ClusterResource extends RestResource {
             EntityAttribute.builder().id("last_seen").title("Last seen").sortable(true).build(),
             EntityAttribute.builder().id("hostname").title("Hostname").searchable(true).sortable(true).build(),
             EntityAttribute.builder().id("short_node_id").title("Short node ID").sortable(true).build(),
-            EntityAttribute.builder().id("lb_status").title("Load balancer status").sortable(true).filterable(true).filterOptions(loadBalancerOptions()).build(),
-            EntityAttribute.builder().id("is_processing").title("Processing").sortable(true).filterable(true).build()
+            EntityAttribute.builder().id(ServerNodeDto.FIELD_LOAD_BALANCER_STATUS).title("Load balancer status").sortable(true).filterable(true).filterOptions(loadBalancerOptions()).build(),
+            EntityAttribute.builder().id(ServerNodeDto.FIELD_LIFECYCLE).title("Lifecycle").sortable(true).filterable(true).filterOptions(lifecycleOptions()).build(),
+            EntityAttribute.builder().id(ServerNodeDto.FIELD_IS_PROCESSING).title("Processing").sortable(true).filterable(true).build()
     );
 
     private static Set<FilterOption> loadBalancerOptions() {
         return Arrays.stream(LoadBalancerStatus.values())
                 .map(status -> new FilterOption(status.name(), status.name()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    private static Set<FilterOption> lifecycleOptions() {
+        return Arrays.stream(Lifecycle.values())
+                .map(status -> new FilterOption(status.name(), status.getDescription()))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
