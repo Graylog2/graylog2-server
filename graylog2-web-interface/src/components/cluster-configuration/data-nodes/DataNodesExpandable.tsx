@@ -33,9 +33,15 @@ type Props = {
   collapsible?: boolean;
   searchQuery?: string;
   onSelectSegment?: () => void;
+  pageSizeLimit?: number;
 };
 
-const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSegment = undefined }: Props) => {
+const DataNodesExpandable = ({
+  collapsible = true,
+  searchQuery = '',
+  onSelectSegment = undefined,
+  pageSizeLimit = undefined,
+}: Props) => {
   const {
     columnsOrder,
     columnPreferences,
@@ -44,7 +50,7 @@ const DataNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSeg
     isLoadingLayout,
     handleColumnPreferencesChange,
     handleSortChange,
-  } = useClusterDataNodesTableLayout(searchQuery);
+  } = useClusterDataNodesTableLayout(searchQuery, pageSizeLimit);
   const {
     nodes: dataNodes,
     total: totalDataNodes,

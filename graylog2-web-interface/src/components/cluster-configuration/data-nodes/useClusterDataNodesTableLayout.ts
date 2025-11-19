@@ -47,7 +47,10 @@ type UseClusterDataNodesTableLayoutReturn = {
   handleSortChange: (newSort: Sort) => void;
 };
 
-const useClusterDataNodesTableLayout = (searchQuery = ''): UseClusterDataNodesTableLayoutReturn => {
+const useClusterDataNodesTableLayout = (
+  searchQuery = '',
+  pageSizeLimit?: number,
+): UseClusterDataNodesTableLayoutReturn => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const { layoutConfig, isInitialLoading: isLoadingLayout } = useTableLayout(TABLE_LAYOUT);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(TABLE_LAYOUT.entityTableId);
@@ -71,8 +74,9 @@ const useClusterDataNodesTableLayout = (searchQuery = ''): UseClusterDataNodesTa
       ...DEFAULT_SEARCH_PARAMS,
       query: searchQuery,
       sort: layoutConfig.sort,
+      pageSize: pageSizeLimit ?? layoutConfig.pageSize ?? DEFAULT_SEARCH_PARAMS.pageSize,
     }),
-    [layoutConfig.sort, searchQuery],
+    [layoutConfig.pageSize, layoutConfig.sort, pageSizeLimit, searchQuery],
   );
 
   return {

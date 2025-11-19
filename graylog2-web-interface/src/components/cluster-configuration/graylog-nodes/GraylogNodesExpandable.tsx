@@ -31,9 +31,15 @@ type Props = {
   collapsible?: boolean;
   searchQuery?: string;
   onSelectSegment?: () => void;
+  pageSizeLimit?: number;
 };
 
-const GraylogNodesExpandable = ({ collapsible = true, searchQuery = '', onSelectSegment = undefined }: Props) => {
+const GraylogNodesExpandable = ({
+  collapsible = true,
+  searchQuery = '',
+  onSelectSegment = undefined,
+  pageSizeLimit = undefined,
+}: Props) => {
   const {
     columnsOrder,
     columnPreferences,
@@ -42,7 +48,7 @@ const GraylogNodesExpandable = ({ collapsible = true, searchQuery = '', onSelect
     isLoadingLayout,
     handleColumnPreferencesChange,
     handleSortChange,
-  } = useClusterGraylogNodesTableLayout(searchQuery);
+  } = useClusterGraylogNodesTableLayout(searchQuery, pageSizeLimit);
   const { nodes: graylogNodes, total: totalGraylogNodes, isLoading } = useClusterGraylogNodes(searchParams);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);

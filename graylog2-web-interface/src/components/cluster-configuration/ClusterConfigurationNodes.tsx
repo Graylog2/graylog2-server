@@ -46,6 +46,8 @@ const SEGMENT_OPTIONS = [
   { label: 'Data Nodes', value: 'data' as NodeSegment },
 ];
 
+const ALL_SEGMENT_PAGE_SIZE = 10;
+
 const ClusterConfigurationNodes = () => {
   const [activeSegment, setActiveSegment] = useState<NodeSegment>('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -53,6 +55,7 @@ const ClusterConfigurationNodes = () => {
 
   const showGraylogNodes = activeSegment === 'all' || activeSegment === 'graylog';
   const showDataNodes = activeSegment === 'all' || activeSegment === 'data';
+  const segmentLimit = activeSegment === 'all' ? ALL_SEGMENT_PAGE_SIZE : undefined;
 
   return (
     <Row className="content">
@@ -79,6 +82,7 @@ const ClusterConfigurationNodes = () => {
           <GraylogNodesExpandable
             collapsible={activeSegment === 'all'}
             searchQuery={normalizedSearch}
+            pageSizeLimit={segmentLimit}
             onSelectSegment={activeSegment === 'all' ? () => setActiveSegment('graylog') : undefined}
           />
         </SectionCol>
@@ -88,6 +92,7 @@ const ClusterConfigurationNodes = () => {
           <DataNodesExpandable
             collapsible={activeSegment === 'all'}
             searchQuery={normalizedSearch}
+            pageSizeLimit={segmentLimit}
             onSelectSegment={activeSegment === 'all' ? () => setActiveSegment('data') : undefined}
           />
         </SectionCol>

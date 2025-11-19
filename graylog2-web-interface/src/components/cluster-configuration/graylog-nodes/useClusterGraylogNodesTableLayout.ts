@@ -47,7 +47,10 @@ type UseClusterGraylogNodesTableLayoutReturn = {
   handleSortChange: (newSort: Sort) => void;
 };
 
-const useClusterGraylogNodesTableLayout = (searchQuery = ''): UseClusterGraylogNodesTableLayoutReturn => {
+const useClusterGraylogNodesTableLayout = (
+  searchQuery = '',
+  pageSizeLimit?: number,
+): UseClusterGraylogNodesTableLayoutReturn => {
   const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const { layoutConfig, isInitialLoading: isLoadingLayout } = useTableLayout(TABLE_LAYOUT);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(TABLE_LAYOUT.entityTableId);
@@ -71,8 +74,9 @@ const useClusterGraylogNodesTableLayout = (searchQuery = ''): UseClusterGraylogN
       ...DEFAULT_SEARCH_PARAMS,
       query: searchQuery,
       sort: layoutConfig.sort,
+      pageSize: pageSizeLimit ?? layoutConfig.pageSize ?? DEFAULT_SEARCH_PARAMS.pageSize,
     }),
-    [layoutConfig.sort, searchQuery],
+    [layoutConfig.pageSize, layoutConfig.sort, pageSizeLimit, searchQuery],
   );
 
   return {
