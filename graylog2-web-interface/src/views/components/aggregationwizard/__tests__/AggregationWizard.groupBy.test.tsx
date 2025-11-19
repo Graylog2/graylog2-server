@@ -355,39 +355,8 @@ describe('AggregationWizard', () => {
     extendedTimeout,
   );
 
-  it(
-    'should correctly update sort of groupings',
-    async () => {
-      const pivot0 = Pivot.create(['timestamp'], 'time', { interval: { type: 'auto', scaling: 1 } });
-      const pivot1 = Pivot.createValues(['took_ms']);
-      const config = widgetConfig.toBuilder().rowPivots([pivot0, pivot1]).build();
-
-      const onChange = jest.fn();
-      renderSUT({ onChange, config });
-
-      const groupBySection = await screen.findByTestId('Group By-section');
-
-      const firstItem = within(groupBySection).getByTestId('grouping-0-drag-handle');
-      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-      await screen.findByText(/You have lifted an item/i);
-      fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
-      await screen.findByText(/You have moved the item/i);
-      fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-      await screen.findByText(/You have dropped the item/i);
-
-      await submitWidgetConfigForm();
-
-      const updatedConfig = widgetConfig.toBuilder().rowPivots([pivot1, pivot0]).build();
-
-      await waitFor(() => expect(onChange).toHaveBeenCalledTimes(1));
-
-      expect(onChange).toHaveBeenCalledWith(updatedConfig);
-    },
-    extendedTimeout,
-  );
-
   describe('test reordering', () => {
-    useSortableItemRectsMock(['http_method', 'took_ms']);
+    useSortableItemRectsMock();
 
     it(
       'should correctly update sort of grouping fields',

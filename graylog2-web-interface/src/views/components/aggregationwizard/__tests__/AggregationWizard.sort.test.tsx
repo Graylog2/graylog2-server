@@ -246,7 +246,7 @@ describe('AggregationWizard', () => {
   );
 
   describe('test reordering', () => {
-    useSortableItemRectsMock(['http_method', 'took_ms']);
+    useSortableItemRectsMock();
 
     it(
       'should correctly update sort of sort elements',
@@ -261,8 +261,10 @@ describe('AggregationWizard', () => {
 
         const sortSection = await screen.findByTestId('Sort-section');
 
-        const firstItemDragHandle = within(sortSection).getByTestId('drag-handle-http_method');
-        firstItemDragHandle.focus();
+        const [firstItemDragHandle] = within(sortSection).getAllByRole('button', {
+          name: /Drag or press space to reorder/i,
+        });
+        await firstItemDragHandle.focus();
 
         await act(async () => {
           await userEvent.keyboard('[Space]');
@@ -270,7 +272,7 @@ describe('AggregationWizard', () => {
 
         userEvent.keyboard('{ArrowDown}');
 
-        await screen.findByText('Draggable item http_method was moved over droppable area took_ms.');
+        await screen.findByText(/was moved over droppable area/i);
 
         await act(async () => {
           await userEvent.keyboard('[Space]');

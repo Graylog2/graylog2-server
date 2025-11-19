@@ -29,10 +29,7 @@ const list = [
 ];
 
 describe('SortableList', () => {
-  useSortableItemRectsMock(
-    list.map(({ id }) => id),
-    { height: 10, width: 100 },
-  );
+  useSortableItemRectsMock({ height: 10, width: 100 });
 
   it('should list items', async () => {
     render(<SortableList items={list} onMoveItem={() => {}} />);
