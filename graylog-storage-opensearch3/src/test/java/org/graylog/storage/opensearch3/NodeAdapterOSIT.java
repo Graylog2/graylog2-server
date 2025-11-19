@@ -17,23 +17,22 @@
 package org.graylog.storage.opensearch3;
 
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.storage.opensearch3.testing.OpenSearchTestServerExtension;
 import org.graylog.testing.storage.SearchServer;
 import org.graylog2.storage.SearchVersion;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(OpenSearchTestServerExtension.class)
 class NodeAdapterOSIT {
-
-    @Rule
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     private NodeAdapterOS adapter;
 
     @BeforeEach
-    void setUp() {
+    void setUp(OpenSearchInstance openSearchInstance) {
         adapter = new NodeAdapterOS(openSearchInstance.getOfficialOpensearchClient());
     }
 
