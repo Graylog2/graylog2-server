@@ -19,7 +19,6 @@ package org.graylog2.utilities;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -39,38 +38,13 @@ public class IpSubnetTest {
         });
     }
 
-    private IpSubnet ipSubnet;
-    private String ipAddress;
-    private String networkAddress;
-    private String broadcastAddress;
-    private boolean isInSubnet;
-
-    public void initIpSubnetTest(String cidr, String ipAddress, String networkAddress, String broadcastAddress, boolean isInSubnet) throws UnknownHostException {
-        this.ipSubnet = new IpSubnet(cidr);
-        this.ipAddress = ipAddress;
-        this.networkAddress = networkAddress;
-        this.broadcastAddress = broadcastAddress;
-        this.isInSubnet = isInSubnet;
-    }
-
     @MethodSource("data")
     @ParameterizedTest
     public void getNetworkAddress(String cidr, String ipAddress, String networkAddress, String broadcastAddress, boolean isInSubnet) throws Exception {
-        initIpSubnetTest(cidr, ipAddress, networkAddress, broadcastAddress, isInSubnet);
+        final IpSubnet ipSubnet = new IpSubnet(cidr);
         assertThat(ipSubnet.getNetworkAddress()).isEqualTo(networkAddress);
-    }
-
-    @MethodSource("data")
-    @ParameterizedTest
-    public void getBroadcastAddress(String cidr, String ipAddress, String networkAddress, String broadcastAddress, boolean isInSubnet) throws Exception {
-        initIpSubnetTest(cidr, ipAddress, networkAddress, broadcastAddress, isInSubnet);
         assertThat(ipSubnet.getBroadcastAddress()).isEqualTo(broadcastAddress);
-    }
-
-    @MethodSource("data")
-    @ParameterizedTest
-    public void contains(String cidr, String ipAddress, String networkAddress, String broadcastAddress, boolean isInSubnet) throws UnknownHostException {
-        initIpSubnetTest(cidr, ipAddress, networkAddress, broadcastAddress, isInSubnet);
         assertThat(ipSubnet.contains(ipAddress)).isEqualTo(isInSubnet);
     }
+
 }
