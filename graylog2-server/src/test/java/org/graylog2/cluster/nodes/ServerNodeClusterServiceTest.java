@@ -27,6 +27,7 @@ import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
@@ -52,6 +53,8 @@ public class ServerNodeClusterServiceTest {
     private static final URI TRANSPORT_URI = URI.create("http://10.0.0.1:12900");
     private static final String LOCAL_CANONICAL_HOSTNAME = Tools.getLocalCanonicalHostname();
     private static final String NODE_ID = "28164cbe-4ad9-4c9c-a76e-088655aa7889";
+    private static final boolean IS_PROCESSING = true;
+    private static final Lifecycle LIFECYCLE = Lifecycle.RUNNING;
 
     @Mock
     private Configuration configuration;
@@ -80,6 +83,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         final Node node = nodeService.byNodeId(nodeId);
@@ -104,6 +109,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         @SuppressWarnings("deprecation")
@@ -129,6 +136,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
@@ -141,6 +150,8 @@ public class ServerNodeClusterServiceTest {
                 .setLeader(true)
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
+                .setProcessing(IS_PROCESSING)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         final ServerNodeDto node = nodeService.byNodeId(nodeId);

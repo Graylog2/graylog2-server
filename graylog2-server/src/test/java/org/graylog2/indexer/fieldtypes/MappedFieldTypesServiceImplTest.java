@@ -25,7 +25,6 @@ import org.graylog2.Configuration;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,9 +52,6 @@ import static org.mockito.Mockito.when;
 public class MappedFieldTypesServiceImplTest {
 
     @Mock
-    private StreamService streamService;
-
-    @Mock
     private IndexFieldTypesService indexFieldTypesService;
 
     @Mock
@@ -76,16 +72,14 @@ public class MappedFieldTypesServiceImplTest {
     public void setUp() throws Exception {
         final Configuration withStreamAwarenessOff = spy(new Configuration());
         doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();
-        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOff, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
-        when(streamService.indexSetIdsByIds(Collections.singleton("stream1"))).thenReturn(Collections.singleton("indexSetId"));
-        when(streamService.indexSetIdsByIds(Collections.singleton("stream2"))).thenReturn(Collections.singleton("indexSetId"));
+        this.mappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOff, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
     }
 
     @Test
     public void testDifferenceBetweenStreamAwareAndUnawareFieldTypeRetrieval() {
         final Configuration withStreamAwarenessOn = spy(new Configuration());
         doReturn(true).when(withStreamAwarenessOn).maintainsStreamAwareFieldTypes();
-        MappedFieldTypesServiceImpl streamAwareMappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOn, streamService, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
+        MappedFieldTypesServiceImpl streamAwareMappedFieldTypesService = new MappedFieldTypesServiceImpl(withStreamAwarenessOn, indexFieldTypesService, new FieldTypeMapper(), indexLookup, fieldUnitObtainer);
 
         final List<IndexFieldTypesDTO> fieldTypes = ImmutableList.of(
                 createIndexTypes(
@@ -102,7 +96,8 @@ public class MappedFieldTypesServiceImplTest {
                         FieldTypeDTO.builder().fieldName("field4").physicalType("keyword").streams(Set.of("stream1")).build()
                 )
         );
-        when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
+        when(indexFieldTypesService.findByIndexNames(Set.of("testIndex", "testIndex2"))).thenReturn(fieldTypes);
+        when(indexFieldTypesService.findByIndexNames(Set.of("testIndex2"))).thenReturn(List.of(fieldTypes.get(1)));
         when(indexLookup.indexNamesForStreamsInTimeRange(Collections.singleton("stream1"), RelativeRange.allTime())).thenReturn(ImmutableSet.of("testIndex", "testIndex2"));
         when(indexLookup.indexNamesForStreamsInTimeRange(Collections.singleton("stream2"), RelativeRange.allTime())).thenReturn(ImmutableSet.of("testIndex2"));
 
@@ -153,7 +148,7 @@ public class MappedFieldTypesServiceImplTest {
                         FieldTypeDTO.builder().fieldName("field1").physicalType("text").streams(Set.of("stream1")).build()
                 )
         );
-        when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
+        when(indexFieldTypesService.findByIndexNames(Set.of("testIndex", "testIndex2"))).thenReturn(fieldTypes);
         when(indexLookup.indexNamesForStreamsInTimeRange(Collections.singleton("stream1"), RelativeRange.allTime())).thenReturn(ImmutableSet.of("testIndex", "testIndex2"));
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
@@ -178,7 +173,7 @@ public class MappedFieldTypesServiceImplTest {
                         FieldTypeDTO.builder().fieldName("field2").physicalType("long").streams(Set.of("stream1")).build()
                 )
         );
-        when(indexFieldTypesService.findForIndexSets(Collections.singleton("indexSetId"))).thenReturn(fieldTypes);
+        when(indexFieldTypesService.findByIndexNames(Set.of("testIndex", "testIndex2"))).thenReturn(fieldTypes);
         when(indexLookup.indexNamesForStreamsInTimeRange(Collections.singleton("stream1"), RelativeRange.allTime())).thenReturn(ImmutableSet.of("testIndex", "testIndex2"));
 
         final Set<MappedFieldTypeDTO> result = this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), RelativeRange.allTime());
@@ -189,7 +184,7 @@ public class MappedFieldTypesServiceImplTest {
     }
 
     @Test
-    public void requestsFieldTypesForRequestedTimeRange() throws Exception {
+    public void requestsFieldTypesForRequestedTimeRange() {
         this.mappedFieldTypesService.fieldTypesByStreamIds(Collections.singleton("stream1"), AbsoluteRange.create("2010-05-17T23:28:14.000+02:00", "2021-05-05T12:09:23.213+02:00"));
 
         verify(this.indexLookup, times(1)).indexNamesForStreamsInTimeRange(streamIdCaptor.capture(), timeRangeCaptor.capture());

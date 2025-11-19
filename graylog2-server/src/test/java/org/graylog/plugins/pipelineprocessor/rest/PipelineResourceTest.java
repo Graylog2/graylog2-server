@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.inputs.InputRoutingService;
@@ -72,12 +73,15 @@ public class PipelineResourceTest {
     @Mock
     private RuleService ruleService;
 
+    @Mock
+    private MongoDbPipelineMetadataService metadataService;
+
     private PipelineResource pipelineResource;
 
     @BeforeEach
     public void setup() {
         pipelineResource = new PipelineTestResource(
-                pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService, ruleService);
+                pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService, ruleService, metadataService);
     }
 
     @Test
@@ -204,8 +208,9 @@ public class PipelineResourceTest {
                              PipelineRuleParser pipelineRuleParser,
                              PipelineStreamConnectionsService connectionsService,
                              InputRoutingService inputRoutingService,
-                             RuleService ruleService) {
-            super(pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService, ruleService);
+                             RuleService ruleService,
+                             MongoDbPipelineMetadataService metadataService) {
+            super(pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService, ruleService, metadataService);
         }
 
         @Override

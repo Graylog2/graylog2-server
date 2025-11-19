@@ -21,6 +21,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.index.IndexResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchInstance;
+import org.graylog.storage.opensearch3.testing.OpenSearchInstanceBuilder;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.messages.MessagesIT;
 
@@ -28,7 +29,9 @@ import java.util.Map;
 
 public class MessagesOS2IT extends MessagesIT {
     @SearchInstance
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstanceBuilder.builder()
+            .heapSize("2g")
+            .build();
 
     @Override
     protected SearchServerInstance searchServer() {

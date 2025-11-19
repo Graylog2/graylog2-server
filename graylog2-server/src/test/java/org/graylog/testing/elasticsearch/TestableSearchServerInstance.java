@@ -52,6 +52,7 @@ public abstract class TestableSearchServerInstance implements SearchServerInstan
 
     protected static volatile boolean isFirstContainerStart = true;
     private boolean closed = false;
+    protected ContainerCacheKey cacheKey;
 
     @Override
     public abstract Client client();
@@ -84,7 +85,7 @@ public abstract class TestableSearchServerInstance implements SearchServerInstan
         if (!cachedInstance) {
             return doBuildContainer(image);
         }
-        final ContainerCacheKey cacheKey = new ContainerCacheKey(version, heapSize, env);
+        cacheKey = new ContainerCacheKey(version, heapSize, env);
         if (!containersByVersion.containsKey(cacheKey)) {
             containersByVersion.put(cacheKey, doBuildContainer(image));
         } else {
