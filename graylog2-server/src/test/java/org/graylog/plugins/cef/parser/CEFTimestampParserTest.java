@@ -48,22 +48,10 @@ public class CEFTimestampParserTest {
         });
     }
 
-    private String testString;
-    private DateTime expectedDateTime;
-    private DateTimeZone timeZone;
-    private Locale locale;
-
-    public void initCEFTimestampParserTest(String testString, DateTime expectedDateTime, DateTimeZone timeZone, Locale locale) {
-        this.testString = testString;
-        this.expectedDateTime = expectedDateTime;
-        this.timeZone = timeZone;
-        this.locale = locale;
-    }
 
     @MethodSource("data")
     @ParameterizedTest
     public void parseWithTimeZoneAndLocale(String testString, DateTime expectedDateTime, DateTimeZone timeZone, Locale locale) throws Exception {
-        initCEFTimestampParserTest(testString, expectedDateTime, timeZone, locale);
         assertEquals(expectedDateTime, CEFTimestampParser.parse(testString, timeZone, locale), testString);
     }
 }
