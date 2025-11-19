@@ -35,7 +35,6 @@ import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static java.util.Objects.requireNonNull;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -73,24 +72,6 @@ public class KeyUtilTest {
         });
     }
 
-    private String keyAlgorithm;
-    private String keyFileName;
-    private String keyPassword;
-    private Class<? extends Exception> exceptionClass;
-    private String exceptionMessage;
-
-    public void initKeyUtilTest(String keyAlgorithm,
-                       String keyFileName,
-                       String keyPassword,
-                       Class<? extends Exception> exceptionClass,
-                       String exceptionMessage) {
-        this.keyAlgorithm = requireNonNull(keyAlgorithm);
-        this.keyFileName = requireNonNull(keyFileName);
-        this.keyPassword = keyPassword;
-        this.exceptionClass = exceptionClass;
-        this.exceptionMessage = exceptionMessage;
-    }
-
     private File resourceToFile(String fileName) throws URISyntaxException {
         return new File(Resources.getResource("org/graylog2/plugin/inputs/transports/util/" + fileName).toURI());
     }
@@ -98,7 +79,6 @@ public class KeyUtilTest {
     @MethodSource("data")
     @ParameterizedTest(name = "{0} with file <{1}>, password <{2}>")
     public void testLoadCertificates(String keyAlgorithm, String keyFileName, String keyPassword, Class<? extends Exception> exceptionClass, String exceptionMessage) throws Exception {
-        initKeyUtilTest(keyAlgorithm, keyFileName, keyPassword, exceptionClass, exceptionMessage);
         final File certFile = resourceToFile(CERTIFICATES.get(keyAlgorithm));
         final Collection<? extends Certificate> certificates = KeyUtil.loadCertificates(certFile.toPath());
         assertThat(certificates)
@@ -109,7 +89,6 @@ public class KeyUtilTest {
     @MethodSource("data")
     @ParameterizedTest(name = "{0} with file <{1}>, password <{2}>")
     public void testLoadCertificatesDir(String keyAlgorithm, String keyFileName, String keyPassword, Class<? extends Exception> exceptionClass, String exceptionMessage) throws Exception {
-        initKeyUtilTest(keyAlgorithm, keyFileName, keyPassword, exceptionClass, exceptionMessage);
         final File certDir = resourceToFile("certs");
         final Collection<? extends Certificate> certificates = KeyUtil.loadCertificates(certDir.toPath());
         assertThat(certificates)
@@ -121,7 +100,6 @@ public class KeyUtilTest {
     @MethodSource("data")
     @ParameterizedTest(name = "{0} with file <{1}>, password <{2}>")
     public void testLoadPrivateKey(String keyAlgorithm, String keyFileName, String keyPassword, Class<? extends Exception> exceptionClass, String exceptionMessage) throws Exception {
-        initKeyUtilTest(keyAlgorithm, keyFileName, keyPassword, exceptionClass, exceptionMessage);
         if (exceptionClass != null) {
             Throwable exception = assertThrows(exceptionClass, () -> {
 
@@ -141,7 +119,6 @@ public class KeyUtilTest {
     @MethodSource("data")
     @ParameterizedTest(name = "{0} with file <{1}>, password <{2}>")
     public void testCreateNettySslHandler(String keyAlgorithm, String keyFileName, String keyPassword, Class<? extends Exception> exceptionClass, String exceptionMessage) throws Exception {
-        initKeyUtilTest(keyAlgorithm, keyFileName, keyPassword, exceptionClass, exceptionMessage);
         if (exceptionClass != null) {
             Throwable exception = assertThrows(exceptionClass, () -> {
 
