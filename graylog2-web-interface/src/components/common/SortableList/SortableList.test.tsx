@@ -16,8 +16,11 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { waitFor, act } from 'wrappedTestingLibrary/hooks';
+import userEvent from '@testing-library/user-event';
 
 import SortableList from './SortableList';
+import useSortableItemRectsMock from './tests/useSortableItemRectsMock';
 
 const list = [
   { id: 'item-1', title: 'Item 1' },
@@ -26,6 +29,8 @@ const list = [
 ];
 
 describe('SortableList', () => {
+  useSortableItemRectsMock(list, { height: 10, width: 100 });
+
   it('should list items', async () => {
     render(<SortableList items={list} onMoveItem={() => {}} />);
 
@@ -34,30 +39,38 @@ describe('SortableList', () => {
     await screen.findByText('Item 3');
   });
 
-  // it('should sort list', async () => {
-  //   const onMoveItemStub = jest.fn();
-  //   render(<SortableList items={list} onMoveItem={onMoveItemStub} />);
-  //
-  //   const firstItem = screen.getByTestId('sortable-item-item-1');
-  //   fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-  //   await screen.findByText(/You have lifted an item/i);
-  //   fireEvent.keyDown(firstItem, { key: 'ArrowDown', keyCode: 40 });
-  //   await screen.findByText(/You have moved the item/i);
-  //   fireEvent.keyDown(firstItem, { key: 'Space', keyCode: 32 });
-  //   await screen.findByText(/You have dropped the item/i);
-  //
-  //   await waitFor(() =>
-  //     expect(onMoveItemStub).toHaveBeenCalledWith(
-  //       [
-  //         { id: 'item-2', title: 'Item 2' },
-  //         { id: 'item-1', title: 'Item 1' },
-  //         { id: 'item-3', title: 'Item 3' },
-  //       ],
-  //       0,
-  //       1,
-  //     ),
-  //   );
-  // });
+  it('should sort list', async () => {
+    const onMoveItemStub = jest.fn();
+    render(<SortableList items={list} onMoveItem={onMoveItemStub} />);
+
+    const firstItemDragHandle = await screen.findByTestId('item-drag-handle-item-1');
+
+    firstItemDragHandle.focus();
+
+    await act(async () => {
+      await userEvent.keyboard('[Space]');
+    });
+
+    userEvent.keyboard('{ArrowDown}');
+
+    await screen.findByText('Draggable item item-1 was moved over droppable area item-2.');
+
+    await act(async () => {
+      await userEvent.keyboard('[Space]');
+    });
+
+    await waitFor(() =>
+      expect(onMoveItemStub).toHaveBeenCalledWith(
+        [
+          { id: 'item-2', title: 'Item 2' },
+          { id: 'item-1', title: 'Item 1' },
+          { id: 'item-3', title: 'Item 3' },
+        ],
+        0,
+        1,
+      ),
+    );
+  });
 
   it('should render list items with custom content', () => {
     render(<SortableList items={list} onMoveItem={() => {}} customContentRender={({ item: { id } }) => `Id: ${id}`} />);
