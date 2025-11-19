@@ -16,7 +16,7 @@
  */
 package org.graylog2.cluster;
 
-import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -31,14 +31,14 @@ import java.util.stream.Collectors;
 
 /**
  * This is a test double for the NodeService. It holds all the registered nodes in memory.
- * Use the {@link NodeService#registerServer(String, boolean, URI, String, boolean, org.graylog2.plugin.lifecycles.LoadBalancerStatus)} to initialize nodes in your tests.
+ * Use the {@link NodeService#registerServer(String, boolean, URI, String, boolean, org.graylog2.plugin.lifecycles.Lifecycle)} to initialize nodes in your tests.
  */
 public class TestNodeService implements NodeService {
 
     private final List<Node> nodes = new LinkedList<>();
 
     @Override
-    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname, boolean isProcessing, LoadBalancerStatus lbStatus) {
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname, boolean isProcessing, Lifecycle lifecycle) {
         return nodes.add(new NodeRecord(nodeId, isLeader, httpPublishUri.toString(), hostname, DateTime.now(DateTimeZone.UTC)));
     }
 

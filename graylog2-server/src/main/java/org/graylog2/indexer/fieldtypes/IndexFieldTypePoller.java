@@ -18,10 +18,9 @@ package org.graylog2.indexer.fieldtypes;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-
-import jakarta.inject.Inject;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -71,9 +70,7 @@ public class IndexFieldTypePoller {
                 // Other indices will only be polled if we don't have the mapping data already.
                 .filter(indexName -> indexName.equals(activeWriteIndex) || !existingIndexNames.contains(indexName)
                         || (maintainsStreamBasedFieldLists && missesStreamData(existingIndexTypes, indexName)))
-                .map(indexName -> pollIndex(indexName, indexSet.getConfig().id()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+                .flatMap(indexName -> pollIndex(indexName, indexSet.getConfig().id()).stream())
                 .collect(Collectors.toSet());
     }
 
