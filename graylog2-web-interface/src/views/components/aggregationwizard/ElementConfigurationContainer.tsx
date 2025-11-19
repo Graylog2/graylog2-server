@@ -60,18 +60,10 @@ type Props = {
   elementTitle: string;
   dragHandle?: React.ReactNode;
   className?: string;
-  // testIdPrefix?: string;
 };
 
 const ElementConfigurationContainer = (
-  {
-    children,
-    onRemove = undefined,
-    // testIdPrefix = 'configuration',
-    dragHandle = undefined,
-    className = undefined,
-    elementTitle,
-  }: Props,
+  { children, onRemove = undefined, dragHandle = undefined, className = undefined, elementTitle }: Props,
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
   <Container className={className} ref={ref}>
