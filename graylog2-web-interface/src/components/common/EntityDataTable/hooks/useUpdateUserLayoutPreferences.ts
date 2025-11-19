@@ -23,12 +23,12 @@ import UserNotification from 'util/UserNotification';
 import useUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUserLayoutPreferences';
 
 const preferencesToJSON = <T>({
-  displayedAttributes = [],
+  attributes,
   sort,
   perPage,
   customPreferences,
 }: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
-  attributes: Object.fromEntries(displayedAttributes.map((attributeId) => [attributeId, { status: 'show' }])),
+  attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
   custom_preferences: customPreferences,

@@ -44,6 +44,7 @@ import type {
   EntityBase,
   ExpandedSectionRenderer,
   ColumnRenderersByAttribute,
+  ColumnPreferences,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import TableHead from './TableHead';
@@ -207,6 +208,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   columnRenderers?: ColumnRenderers<Entity, Meta>;
   /** Define default columns order. Column ids need to be snake case. */
   columnsOrder?: Array<string>;
+  defaultDisplayedColumns: Array<string>;
   /** The table data. */
   entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
@@ -214,7 +216,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
     [sectionName: string]: ExpandedSectionRenderer<Entity>;
   };
   /** Function to handle changes of columns visibility */
-  onColumnsChange: (columnIds: Array<string>) => void;
+  onColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */
@@ -224,7 +226,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Which columns should be displayed. */
-  visibleColumns: Array<string>;
+  columnPreferences?: ColumnPreferences;
   /** Meta data. */
   meta?: Meta;
 };
@@ -242,12 +244,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   columnsOrder: attributeColumnsOder = [],
   entities,
   expandedSectionsRenderer = undefined,
-  onColumnsChange,
+  onColumnPreferencesChange,
   onPageSizeChange = undefined,
   onSortChange,
   pageSize = undefined,
   entityActions = undefined,
-  visibleColumns: visibleAttributeColumns,
+  columnPreferences = undefined,
+  defaultDisplayedColumns,
   meta = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
@@ -260,8 +263,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
 
   const visibleColumnOrder = useVisibleColumnOrder(
-    visibleAttributeColumns,
+    columnPreferences,
     attributeColumnsOder,
+    defaultDisplayedColumns,
     displayActionsCol,
     displayBulkSelectCol,
   );
@@ -288,12 +292,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
+    columnPreferences,
     columnsDefinitions,
     displayBulkSelectCol,
     entities,
     isEntitySelectable,
     onChangeSelection,
-    onColumnsChange,
+    onColumnPreferencesChange,
     onSortChange,
     selectedEntities,
     setSelectedEntities,

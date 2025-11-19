@@ -33,7 +33,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FlushStats;
 import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
-import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
@@ -67,6 +66,8 @@ class IndicesAdapterOSTest {
     private IndexTemplateAdapter indexTemplateAdapter;
     @Mock
     private IndexStatisticsBuilder indexStatisticsBuilder;
+    @Mock
+    private PlainJsonApi jsonApi;
 
     @BeforeEach
     void setUp() {
@@ -74,7 +75,6 @@ class IndicesAdapterOSTest {
         when(opensearchClient.sync()).thenReturn(client);
         when(client.indices()).thenReturn(mock(OpenSearchIndicesClient.class));
         when(client.cat()).thenReturn(mock(OpenSearchCatClient.class));
-        when(client.generic()).thenReturn(mock(OpenSearchGenericClient.class));
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         toTest = new IndicesAdapterOS(
                 opensearchClient,
@@ -84,7 +84,8 @@ class IndicesAdapterOSTest {
                 indexTemplateAdapter,
                 indexStatisticsBuilder,
                 objectMapper,
-                new OSSerializationUtils(objectMapper, opensearchClient)
+                jsonApi,
+                new OSSerializationUtils()
         );
     }
 

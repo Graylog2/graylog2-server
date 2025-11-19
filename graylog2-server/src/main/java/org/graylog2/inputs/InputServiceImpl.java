@@ -239,7 +239,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public Input create(Map<String, Object> fields) {
         final DateTime createdAt = (DateTime) fields.getOrDefault(FIELD_CREATED_AT, Tools.nowUTC());
-        final boolean isGlobal = (Boolean) fields.get(MessageInput.FIELD_GLOBAL);
+        final boolean isGlobal = (Boolean) fields.getOrDefault(MessageInput.FIELD_GLOBAL, false);
         final InputImpl.Builder builder = InputImpl.builder()
                 .getType((String) fields.get(MessageInput.FIELD_TYPE))
                 .getTitle((String) fields.get(MessageInput.FIELD_TITLE))
@@ -459,7 +459,7 @@ public class InputServiceImpl implements InputService {
     @SuppressWarnings("unchecked")
     private List<Converter> getConvertersOfExtractor(Document extractor) {
         final ImmutableList.Builder<Converter> listBuilder = ImmutableList.builder();
-        final List<Document> list = extractor.getList(Extractor.FIELD_CONVERTERS, Document.class);
+        final List<Document> list = extractor.getList(Extractor.FIELD_CONVERTERS, Object.class).stream().map(this::toDocument).toList();
 
         list.forEach(c -> {
             try {

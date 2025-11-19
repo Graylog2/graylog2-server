@@ -22,7 +22,7 @@ import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Before;
@@ -45,7 +45,7 @@ public class NodeServiceImplTest {
     private static final URI TRANSPORT_URI = URI.create("http://10.0.0.1:12900");
     private static final String LOCAL_CANONICAL_HOSTNAME = Tools.getLocalCanonicalHostname();
     private static final String NODE_ID = "28164cbe-4ad9-4c9c-a76e-088655aa7889";
-    private static final LoadBalancerStatus LB_STATUS = LoadBalancerStatus.ALIVE;
+    private static final Lifecycle LIFECYCLE = Lifecycle.RUNNING;
     private static final boolean IS_PROCESSING = true;
 
     @Rule
@@ -71,7 +71,7 @@ public class NodeServiceImplTest {
                 .describedAs("The collection should be empty")
                 .isEmpty();
 
-        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME, IS_PROCESSING, LB_STATUS);
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME, IS_PROCESSING, LIFECYCLE);
 
         final Node node = nodeService.byNodeId(nodeId);
 
@@ -90,7 +90,7 @@ public class NodeServiceImplTest {
                 .describedAs("There should be one existing node")
                 .isEqualTo(NODE_ID);
 
-        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME, IS_PROCESSING, LB_STATUS);
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME, IS_PROCESSING, LIFECYCLE);
 
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongodb.mongoConnection().getDatabase().getCollection("nodes");
@@ -110,7 +110,7 @@ public class NodeServiceImplTest {
     @Test
     public void testAllActive() throws NodeNotFoundException {
         assertThat(nodeService.allActive().keySet()).isEmpty();
-        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME, IS_PROCESSING, LB_STATUS);
+        nodeService.registerServer(nodeId.getNodeId(), true, TRANSPORT_URI, LOCAL_CANONICAL_HOSTNAME, IS_PROCESSING, LIFECYCLE);
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
     }
