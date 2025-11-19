@@ -233,11 +233,17 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public Input create(String id, Map<String, Object> fields) {
-        return null;
+        InputImpl.Builder builder = buildFromMap(fields);
+        builder.getId(id);
+        return builder.build();
     }
 
     @Override
     public Input create(Map<String, Object> fields) {
+        return buildFromMap(fields).build();
+    }
+
+    private InputImpl.Builder buildFromMap(Map<String, Object> fields) {
         final DateTime createdAt = (DateTime) fields.getOrDefault(FIELD_CREATED_AT, Tools.nowUTC());
         final boolean isGlobal = (Boolean) fields.getOrDefault(MessageInput.FIELD_GLOBAL, false);
         final InputImpl.Builder builder = InputImpl.builder()
@@ -259,7 +265,7 @@ public class InputServiceImpl implements InputService {
             builder.getNodeId((String) fields.get(MessageInput.FIELD_NODE_ID));
         }
 
-        return builder.build();
+        return builder;
     }
 
     @Override
