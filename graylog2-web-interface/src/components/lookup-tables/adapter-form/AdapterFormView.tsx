@@ -32,9 +32,10 @@ type Props = {
   saved?: (adapterObj: LookupTableAdapter) => void;
   onCancel: () => void;
   adapter?: LookupTableAdapter;
+  isStep?: boolean;
 };
 
-const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined }: Props) => {
+const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined, isStep = false }: Props) => {
   const [dataAdapter, setDataAdapter] = React.useState<LookupTableAdapter>(adapter);
   const isCreate = React.useMemo(() => !dataAdapter?.id, [dataAdapter]);
 
@@ -46,7 +47,7 @@ const DataAdapterFormView = ({ saved = undefined, onCancel, adapter = undefined 
             adapterConfigType={dataAdapter ? dataAdapter.config.type : null}
             onAdapterChange={setDataAdapter}
           />
-          <UseExistingButton onClick={onCancel}>Use Existing Data Adapter</UseExistingButton>
+          {isStep && <UseExistingButton onClick={onCancel}>Use Existing Data Adapter</UseExistingButton>}
         </RowContainer>
       )}
       {dataAdapter && (

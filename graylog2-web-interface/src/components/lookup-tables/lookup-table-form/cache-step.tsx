@@ -86,7 +86,7 @@ function CacheFormStep() {
             </RowContainer>
           )}
           {showCache && !loadingCache && <CacheReadOnly cache={cache} />}
-          {showForm && !showCache && <CacheFormView onCancel={onCancel} saved={onSaved} />}
+          {showForm && !showCache && <CacheFormView onCancel={onCancel} saved={onSaved} isStep />}
         </>
       )}
     </ColContainer>

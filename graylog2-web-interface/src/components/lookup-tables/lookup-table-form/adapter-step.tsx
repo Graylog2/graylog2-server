@@ -85,7 +85,7 @@ function DataAdapterFormStep() {
             </RowContainer>
           )}
           {showAdapter && !loadingDataAdapter && <AdapterReadOnly dataAdapter={dataAdapter} />}
-          {showForm && !showAdapter && <DataAdapterFormView onCancel={onCancel} saved={onSaved} />}
+          {showForm && !showAdapter && <DataAdapterFormView onCancel={onCancel} saved={onSaved} isStep />}
         </>
       )}
     </ColContainer>

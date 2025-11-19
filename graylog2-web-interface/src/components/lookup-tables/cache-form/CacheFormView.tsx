@@ -32,9 +32,10 @@ type Props = {
   saved?: (adapterObj: LookupTableCache) => void;
   onCancel: () => void;
   cache?: LookupTableCache;
+  isStep?: boolean;
 };
 
-function CacheFormView({ saved = undefined, onCancel, cache = undefined }: Props) {
+function CacheFormView({ saved = undefined, onCancel, cache = undefined, isStep = false }: Props) {
   const [lutCache, setLutCache] = React.useState<LookupTableCache>(cache);
   const isCreate = React.useMemo(() => !lutCache?.id, [lutCache]);
 
@@ -43,7 +44,7 @@ function CacheFormView({ saved = undefined, onCancel, cache = undefined }: Props
       {isCreate && (
         <RowContainer>
           <CacheTypeSelect cacheConfigType={lutCache ? lutCache.config.type : null} onCacheChange={setLutCache} />
-          <UseExistingButton onClick={onCancel}>Use Existing Cache</UseExistingButton>
+          {isStep && <UseExistingButton onClick={onCancel}>Use Existing Cache</UseExistingButton>}
         </RowContainer>
       )}
       {lutCache && (
