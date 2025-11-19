@@ -21,7 +21,6 @@ import type { NodeInfo } from 'stores/nodes/NodesStore';
 import { keyFn, fetchInputs } from 'hooks/usePaginatedInputs';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
-import type { SearchParams } from 'stores/PaginationTypes';
 import CreateInputControl from 'components/inputs/CreateInputControl';
 import customColumnRenderers from 'components/inputs/InputsOveriew/ColumnRenderers';
 import getInputsTableElements from 'components/inputs/InputsOveriew/Constants';
