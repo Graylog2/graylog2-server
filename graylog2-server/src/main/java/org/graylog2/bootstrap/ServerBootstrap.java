@@ -19,6 +19,7 @@ package org.graylog2.bootstrap;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
@@ -399,8 +400,8 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
         //noinspection unchecked
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
         final Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
-        final Set<Migration> migrationsToRun = ImmutableSortedSet.copyOf(migrations).stream().filter(m -> m.migrationType() == migrationType).collect(Collectors.toSet());
-        LOG.info("Running {} {} migrations...", migrationsToRun.size(), migrationType);
+        final Set<Migration> migrationsToRun = migrations.stream().filter(m -> m.migrationType() == migrationType).collect(ImmutableSortedSet.toImmutableSortedSet(Ordering.natural()));
+        LOG.info("Running {} migrations of type {}...", migrationsToRun.size(), migrationType);
 
         for (Migration migration : migrationsToRun) {
             LOG.debug("Running migration <{}>", migration.getClass().getCanonicalName());
