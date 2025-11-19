@@ -20,7 +20,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.IndexingRequest;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.streams.StreamService;

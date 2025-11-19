@@ -34,8 +34,8 @@ package org.graylog.plugins.views.storage.migration.state.machine;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 import jakarta.inject.Inject;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.datanode.CurrentWriteIndices;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.slf4j.Logger;

@@ -17,27 +17,14 @@
 package org.graylog2.indexer.indexset.basic;
 
 import com.google.auto.value.AutoValue;
-import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
-import org.graylog2.indexer.indexset.fields.FieldTypeProfileField;
-import org.graylog2.indexer.indexset.fields.IndexAnalyzerField;
-import org.graylog2.indexer.indexset.fields.IndexPrefixField;
-import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
-import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
 import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
-import org.graylog2.shared.fields.TitleField;
+import org.graylog2.indexer.template.IndexTemplateConfig;
 
 @AutoValue
 public abstract class BasicIndexSetConfig implements
-        TitleField,
-        FieldTypeProfileField,
-        IndexTemplateTypeField,
-        IndexTemplateNameField,
-        CustomFieldMappingsField,
-        IndexAnalyzerField,
-        ShardsAndReplicasField,
-        IndexPrefixField {
+        ShardsAndReplicasField {
 
-    public abstract String indexWildcard();
+    public abstract IndexTemplateConfig indexTemplateConfig();
 
     public static Builder builder() {
         return new AutoValue_BasicIndexSetConfig.Builder();
@@ -47,16 +34,9 @@ public abstract class BasicIndexSetConfig implements
 
     @AutoValue.Builder
     public abstract static class Builder implements
-            TitleFieldBuilder<Builder>,
-            FieldTypeProfileFieldBuilder<Builder>,
-            IndexTemplateTypeFieldBuilder<Builder>,
-            IndexTemplateNameFieldBuilder<Builder>,
-            CustomFieldMappingsFieldBuilder<Builder>,
-            IndexAnalyzerFieldBuilder<Builder>,
-            ShardsAndReplicasFieldBuilder<Builder>,
-            IndexPrefixFieldBuilder<Builder> {
+            ShardsAndReplicasFieldBuilder<Builder> {
 
-        public abstract Builder indexWildcard(String indexWildcard);
+        public abstract Builder indexTemplateConfig(IndexTemplateConfig indexTemplateConfig);
 
         public abstract BasicIndexSetConfig build();
     }

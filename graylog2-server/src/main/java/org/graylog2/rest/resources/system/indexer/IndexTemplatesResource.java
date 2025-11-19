@@ -34,8 +34,8 @@ import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -94,7 +94,7 @@ public class IndexTemplatesResource extends RestResource {
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
                 .orElseThrow(() -> new NotFoundException("Index set " + indexSetId + " not found"));
 
-        indices.ensureIndexTemplate(indexSet.basicIndexSetConfig());
+        indices.ensureIndexTemplate(indexSet.indexTemplateConfig());
 
         return createResponse(indexSet);
     }
@@ -108,14 +108,14 @@ public class IndexTemplatesResource extends RestResource {
         return indexSetRegistry.getAllIndexSets().stream()
                 .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_EDIT, indexSet.getConfig().id()))
                 .map(indexSet -> {
-                    indices.ensureIndexTemplate(indexSet.basicIndexSetConfig());
+                    indices.ensureIndexTemplate(indexSet.indexTemplateConfig());
                     return createResponse(indexSet);
                 })
                 .collect(Collectors.toSet());
     }
 
     private IndexTemplateResponse createResponse(IndexSet indexSet) {
-        return IndexTemplateResponse.create(indexSet.getConfig().indexTemplateName(), indices.getIndexTemplate(indexSet.basicIndexSetConfig()));
+        return IndexTemplateResponse.create(indexSet.getConfig().indexTemplateName(), indices.getIndexTemplate(indexSet.indexTemplateConfig()));
     }
 
     @AutoValue

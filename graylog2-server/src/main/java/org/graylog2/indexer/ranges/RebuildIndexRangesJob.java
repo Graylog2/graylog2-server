@@ -22,7 +22,7 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.shared.system.activities.Activity;
@@ -102,7 +102,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         Stopwatch sw = Stopwatch.createStarted();
         for (BasicIndexSet basicIndexSet : indexSets.keySet()) {
             LOG.info("Recalculating index ranges for index set {} ({}): {} indices affected.",
-                    basicIndexSet.basicIndexSetConfig().title(),
+                    basicIndexSet.title(),
                     basicIndexSet.getIndexWildcard(),
                     indexSets.get(basicIndexSet).size());
             for (String index : indexSets.get(basicIndexSet)) {

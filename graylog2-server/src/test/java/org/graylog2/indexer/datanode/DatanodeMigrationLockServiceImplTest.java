@@ -21,7 +21,7 @@ import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.MongoLockService;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.AfterEach;

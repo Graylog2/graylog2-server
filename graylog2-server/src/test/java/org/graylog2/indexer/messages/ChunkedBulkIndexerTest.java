@@ -18,7 +18,7 @@ package org.graylog2.indexer.messages;
 
 import com.google.common.base.Strings;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.joda.time.DateTime;

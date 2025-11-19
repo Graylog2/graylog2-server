@@ -31,8 +31,6 @@ import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.datatiering.DataTieringConfig;
-import org.graylog2.indexer.IndexTemplateProvider;
-import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.indexset.fields.CustomFieldMappingsField;
 import org.graylog2.indexer.indexset.fields.ExtendedIndexSetFields;
 import org.graylog2.indexer.indexset.fields.FieldRestrictionsField;
@@ -43,6 +41,8 @@ import org.graylog2.indexer.indexset.fields.IndexTemplateNameField;
 import org.graylog2.indexer.indexset.fields.IndexTemplateTypeField;
 import org.graylog2.indexer.indexset.fields.ShardsAndReplicasField;
 import org.graylog2.indexer.indexset.restrictions.IndexSetFieldRestriction;
+import org.graylog2.indexer.template.IndexTemplateProvider;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.validation.ValidObjectId;
@@ -57,7 +57,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.shared.security.RestPermissions.INDEXSETS_READ;
 
 @AutoValue

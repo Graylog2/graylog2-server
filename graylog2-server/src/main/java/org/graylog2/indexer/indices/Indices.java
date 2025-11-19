@@ -30,14 +30,10 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.datatiering.WarmIndexDeletedEvent;
 import org.graylog2.datatiering.WarmIndexInfo;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMappingFactory;
-import org.graylog2.indexer.IndexMappingTemplate;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indexset.basic.BasicIndexSetConfig;
@@ -49,6 +45,11 @@ import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.indexer.template.IgnoreIndexTemplate;
+import org.graylog2.indexer.template.IndexMappingFactory;
+import org.graylog2.indexer.template.IndexMappingTemplate;
+import org.graylog2.indexer.template.IndexTemplateConfig;
+import org.graylog2.indexer.template.IndexTemplateNotFoundException;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.joda.time.DateTime;
@@ -191,7 +192,7 @@ public class Indices {
         return indicesAdapter.resolveAlias(alias);
     }
 
-    public void ensureIndexTemplate(BasicIndexSetConfig config) {
+    public void ensureIndexTemplate(IndexTemplateConfig config) {
         final String templateName = config.indexTemplateName();
         try {
             var template = buildTemplate(config);
@@ -209,13 +210,13 @@ public class Indices {
         }
     }
 
-    public Template getIndexTemplate(BasicIndexSetConfig config) {
+    public Template getIndexTemplate(IndexTemplateConfig config) {
         final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(config, profileService);
         return indexMappingFactory.createIndexMapping(config)
                 .toTemplate(indexSetMappingTemplate);
     }
 
-    Template buildTemplate(BasicIndexSetConfig config) throws IgnoreIndexTemplate {
+    Template buildTemplate(IndexTemplateConfig config) throws IgnoreIndexTemplate {
         final IndexSetMappingTemplate indexSetMappingTemplate = getTemplateIndexSetConfig(config, profileService);
         return indexMappingFactory.createIndexMapping(config)
                 .toTemplate(indexSetMappingTemplate, 0L);
@@ -240,14 +241,14 @@ public class Indices {
                           @Nullable Map<String, Object> indexSettings) {
         try {
             // Make sure our index template exists before creating an index!
-            ensureIndexTemplate(config);
-            Optional<IndexMappingTemplate> indexMappingTemplate = indexMapping(config);
+            ensureIndexTemplate(config.indexTemplateConfig());
+            Optional<IndexMappingTemplate> indexMappingTemplate = indexMapping(config.indexTemplateConfig());
             IndexSettings settings = indexMappingTemplate
                     .map(t -> t.indexSettings(config, indexSettings))
                     .orElse(IndexMappingTemplate.createIndexSettings(config));
 
             Map<String, Object> mappings = indexMappingTemplate
-                    .map(t -> t.indexMappings(config, indexMapping))
+                    .map(t -> t.indexMappings(config.indexTemplateConfig(), indexMapping))
                     .orElse(null);
 
             indicesAdapter.create(indexName, settings, mappings);
@@ -264,7 +265,7 @@ public class Indices {
         return true;
     }
 
-    private Optional<IndexMappingTemplate> indexMapping(BasicIndexSetConfig config) {
+    private Optional<IndexMappingTemplate> indexMapping(IndexTemplateConfig config) {
         try {
             return Optional.of(indexMappingFactory.createIndexMapping(config));
         } catch (IgnoreIndexTemplate e) {
@@ -273,7 +274,7 @@ public class Indices {
     }
 
     public IndexSetMappingTemplate getTemplateIndexSetConfig(
-            final BasicIndexSetConfig config,
+            final IndexTemplateConfig config,
             final IndexFieldTypeProfileService profileService) {
         final String profileId = config.fieldTypeProfile();
         final CustomFieldMappings customFieldMappings = config.customFieldMappings();

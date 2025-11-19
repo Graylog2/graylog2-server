@@ -18,8 +18,8 @@ package org.graylog2.migrations;
 
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.datanode.CurrentWriteIndices;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;

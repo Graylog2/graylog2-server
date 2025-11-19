@@ -19,7 +19,7 @@ package org.graylog2.outputs;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import org.graylog.testing.messages.MessagesExtension;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.IndexingResults;
 import org.graylog2.indexer.messages.MessageWithIndex;
 import org.graylog2.indexer.messages.Messages;

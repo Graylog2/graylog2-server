@@ -16,9 +16,16 @@
  */
 package org.graylog2.indexer.indexset.basic;
 
-import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.template.IndexTemplateConfig;
 
 public interface BasicIndexSet {
+
+    /**
+     * The title for this index set.
+     *
+     * @return index set title
+     */
+    String title();
 
     /**
      * Returns the index wildcard for this index set.
@@ -49,19 +56,9 @@ public interface BasicIndexSet {
     boolean isManagedIndex(String index);
 
     /**
-     * The basic configuration for this index set.
+     * The index template configuration for this index set.
      *
-     * @return basic index set configuration
+     * @return index template configuration
      */
-    BasicIndexSetConfig basicIndexSetConfig();
-
-    /**
-     * Returns the newest index.
-     * <p>
-     * Example: {@code "graylog_42"}
-     *
-     * @return the newest index
-     * @throws NoTargetIndexException if there are no indices in this index set yet
-     */
-    String getNewestIndex() throws NoTargetIndexException;
+    IndexTemplateConfig indexTemplateConfig();
 }

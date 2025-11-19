@@ -18,8 +18,8 @@ package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indices.Indices;

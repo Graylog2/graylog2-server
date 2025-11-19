@@ -60,8 +60,8 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.IndexSetConfig.DEFAULT_FIELD_TYPE_REFRESH_INTERVAL;
+import static org.graylog2.indexer.template.EventIndexTemplateProvider.EVENT_TEMPLATE_TYPE;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {

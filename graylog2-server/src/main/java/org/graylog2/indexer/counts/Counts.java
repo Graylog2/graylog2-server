@@ -18,7 +18,7 @@ package org.graylog2.indexer.counts;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 
 import java.util.Arrays;
