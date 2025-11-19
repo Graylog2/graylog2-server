@@ -30,8 +30,6 @@ import java.util.Collection;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class AutoIntervalTest {
-    private String result;
-    private String expectedResult;
 
     public static Collection<Object[]> data() throws InvalidRangeParametersException {
         return Arrays.asList(new Object[][] {
@@ -77,16 +75,9 @@ public class AutoIntervalTest {
         });
     }
 
-    public void initAutoIntervalTest(TimeRange range, double scalingFactor, String expectedResult, String description) {
-        final AutoInterval autoInterval = AutoInterval.create(scalingFactor);
-        this.result = autoInterval.toDateInterval(range).toString();
-        this.expectedResult = expectedResult;
-    }
-
     @MethodSource("data")
     @ParameterizedTest(name = "{3}: Range of {0} should be {2} for scaling of {1}")
     public void test(TimeRange range, double scalingFactor, String expectedResult, String description) throws Exception {
-        initAutoIntervalTest(range, scalingFactor, expectedResult, description);
-        assertThat(result).isEqualTo(expectedResult);
+        assertThat(AutoInterval.create(scalingFactor).toDateInterval(range).toString()).describedAs(description).isEqualTo(expectedResult);
     }
 }
