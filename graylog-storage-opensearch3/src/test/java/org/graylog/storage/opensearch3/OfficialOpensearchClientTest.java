@@ -30,10 +30,10 @@ class OfficialOpensearchClientTest {
     @Test
     void testWithTimeout() {
         OfficialOpensearchClient client = new OfficialOpensearchClient(null, null);
-        assertThat((String)client.executeWithTimeout(c -> asyncCall(0), "Error getting data", Duration.milliseconds(50)))
+        assertThat((String) client.executeWithClientTimeout(c -> asyncCall(0), "Error getting data", Duration.milliseconds(50)))
                 .isEqualTo("complete");
         assertThatThrownBy(() ->
-                client.executeWithTimeout(c -> asyncCall(100), "Error getting data", Duration.milliseconds(50)))
+                client.executeWithClientTimeout(c -> asyncCall(100), "Error getting data", Duration.milliseconds(50)))
                 .isInstanceOf(RuntimeException.class)
                 .hasMessage("Error getting data");
     }
