@@ -69,6 +69,12 @@ public interface StreamService extends PersistedService {
      */
     long count();
 
+    /**
+     * @return a map with counts of streams grouped by source (Illuminate vs user-created).
+     * Only streams within the {@link org.graylog2.database.entities.DefaultEntityScope} are considered.
+     */
+    Map<String, Long> countBySource();
+
     void pause(Stream stream) throws ValidationException;
 
     void resume(Stream stream) throws ValidationException;
