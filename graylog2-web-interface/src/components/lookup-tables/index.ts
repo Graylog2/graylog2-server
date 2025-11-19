@@ -27,7 +27,6 @@ export { default as CachesOverview } from './cache-list';
 export { default as CacheTableEntry } from './CacheTableEntry';
 export { default as Cache } from './Cache';
 export { default as CacheForm } from './CacheForm';
-export { default as CacheCreate } from './CacheCreate';
 export { default as CachesContainer } from './CachesContainer';
 export { CacheFormView } from './cache-form';
 
