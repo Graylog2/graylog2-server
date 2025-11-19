@@ -23,6 +23,8 @@ import { Icon } from 'components/common';
 
 import type { ListItemType, CustomListItemRender, CustomContentRender, DragHandleProps } from './types';
 
+const DRAG_HANDLE_DEFAULT_TITLE = 'Drag or press space to reorder';
+
 type Props<ItemType extends ListItemType> = {
   alignItemContent?: 'flex-start' | 'center';
   className?: string;
@@ -69,6 +71,10 @@ const ListItem = <ItemType extends ListItemType>(
   ref: React.ForwardedRef<HTMLLIElement>,
 ) => {
   const itemContent = customContentRender ? customContentRender({ item, index }) : item.title;
+  const dragHandleTitle =
+    typeof item.title === 'string'
+      ? `${DRAG_HANDLE_DEFAULT_TITLE} ${item.title.toLocaleLowerCase()}`
+      : `${DRAG_HANDLE_DEFAULT_TITLE}`;
 
   if (customListItemRender) {
     return (
@@ -96,6 +102,8 @@ const ListItem = <ItemType extends ListItemType>(
         <DragHandle
           {...dragHandleProps}
           $isDragging={isDragging}
+          title={dragHandleTitle}
+          aria-label={dragHandleTitle}
           data-testid={`item-drag-handle-${item.id}`}>
           <Icon name="drag_indicator" />
         </DragHandle>

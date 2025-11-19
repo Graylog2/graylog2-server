@@ -43,8 +43,9 @@ describe('SortableList', () => {
     const onMoveItemStub = jest.fn();
     render(<SortableList items={list} onMoveItem={onMoveItemStub} />);
 
-    const firstItemDragHandle = await screen.findByTestId('item-drag-handle-item-1');
-
+    const firstItemDragHandle = await screen.findByRole('button', {
+      name: /Drag or press space to reorder Item 1/i,
+    });
     firstItemDragHandle.focus();
 
     await act(async () => {

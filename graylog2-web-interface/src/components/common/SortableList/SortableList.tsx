@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useCallback, useState } from 'react';
 import type { DragEndEvent } from '@dnd-kit/core';
 import {
+  PointerSensor,
   DndContext,
   closestCenter,
   useSensor,
@@ -70,6 +71,7 @@ const SortableList = <ItemType extends ListItemType>({
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
     useSensor(TouchSensor, {}),
+    useSensor(PointerSensor, {}),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
