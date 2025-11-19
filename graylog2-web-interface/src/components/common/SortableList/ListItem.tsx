@@ -76,13 +76,25 @@ const ListItem = <ItemType extends ListItemType>(
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${item.title.toLocaleLowerCase()}`
       : `${DRAG_HANDLE_DEFAULT_TITLE}`;
 
+  const dragHandle = disableDragging ? null : (
+    <DragHandle
+      {...dragHandleProps}
+      $isDragging={isDragging}
+      title={dragHandleTitle}
+      aria-label={dragHandleTitle}
+      data-sortable-id={item.id}
+      data-testid={`item-drag-handle-${item.id}`}>
+      <Icon name="drag_indicator" />
+    </DragHandle>
+  );
+
   if (customListItemRender) {
     return (
       <>
         {customListItemRender({
           className,
           disableDragging,
-          dragHandleProps,
+          dragHandle,
           index,
           item,
           ref,
@@ -92,22 +104,8 @@ const ListItem = <ItemType extends ListItemType>(
   }
 
   return (
-    <StyledListGroupItem
-      $alignItemContent={alignItemContent}
-      ref={ref}
-      className={className}
-      data-testid={`sortable-item-${item.id}`}
-      data-sortable-id={item.id}>
-      {!disableDragging && (
-        <DragHandle
-          {...dragHandleProps}
-          $isDragging={isDragging}
-          title={dragHandleTitle}
-          aria-label={dragHandleTitle}
-          data-testid={`item-drag-handle-${item.id}`}>
-          <Icon name="drag_indicator" />
-        </DragHandle>
-      )}
+    <StyledListGroupItem $alignItemContent={alignItemContent} ref={ref} className={className}>
+      {dragHandle}
       {itemContent}
     </StyledListGroupItem>
   );

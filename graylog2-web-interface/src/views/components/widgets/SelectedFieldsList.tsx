@@ -18,10 +18,9 @@ import * as React from 'react';
 import { useState, useCallback, forwardRef, useMemo } from 'react';
 import styled from 'styled-components';
 
-import { IconButton, SortableList, Icon } from 'components/common';
+import { IconButton, SortableList } from 'components/common';
 import FieldSelect from 'views/components/aggregationwizard/FieldSelect';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import type { DragHandleProps } from 'components/common/SortableList';
 import FieldUnit from 'views/components/aggregationwizard/units/FieldUnit';
 
 const ListItemContainer = styled.div`
@@ -39,17 +38,9 @@ const FieldTitle = styled(TextOverflowEllipsis)`
   flex: 1;
 `;
 
-const DragHandle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 25px;
-  margin-right: 5px;
-`;
-
 type ListItemProps = {
   className: string;
-  dragHandleProps: DragHandleProps;
+  dragHandle: React.ReactNode;
   fieldSelect: React.ComponentType<React.ComponentProps<typeof FieldSelect>>;
   item: { id: string; title: string };
   onChange: (fieldName: string) => void;
@@ -57,7 +48,6 @@ type ListItemProps = {
   selectSize: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit: boolean;
-  testIdPrefix: string;
 };
 
 const Actions = styled.div`
@@ -68,7 +58,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
   (
     {
       className,
-      dragHandleProps,
+      dragHandle,
       fieldSelect = FieldSelect,
       item,
       onChange,
@@ -76,7 +66,6 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
       selectSize,
       selectedFields,
       showUnit,
-      testIdPrefix,
     }: ListItemProps,
     ref,
   ) => {
@@ -109,9 +98,7 @@ const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
 
         {!isEditing && (
           <>
-            <DragHandle {...dragHandleProps} data-testid={`${testIdPrefix}-drag-handle`}>
-              <Icon name="drag_indicator" />
-            </DragHandle>
+            {dragHandle}
             <FieldTitle>{item.title}</FieldTitle>
             <Actions>
               {showUnit && <FieldUnit field={item.title} />}
@@ -132,11 +119,9 @@ type Props = {
   selectSize?: 'normal' | 'small';
   selectedFields: Array<string>;
   showUnit?: boolean;
-  testPrefix?: string;
 };
 
 const SelectedFieldsList = ({
-  testPrefix = undefined,
   selectedFields,
   onChange,
   selectSize = undefined,
@@ -165,7 +150,7 @@ const SelectedFieldsList = ({
   );
 
   const SortableListItem = useCallback(
-    ({ item, index, dragHandleProps, className, ref }) => (
+    ({ item, index, dragHandle, className, ref }) => (
       <ListItem
         onChange={(newFieldName) => onChangeField(index, newFieldName)}
         onRemove={() => onRemoveField(item.id)}
@@ -173,14 +158,13 @@ const SelectedFieldsList = ({
         selectedFields={selectedFields ?? []}
         item={item}
         fieldSelect={fieldSelect}
-        testIdPrefix={`${testPrefix}-field-${index}`}
-        dragHandleProps={dragHandleProps}
+        dragHandle={dragHandle}
         className={className}
         ref={ref}
         showUnit={showUnit}
       />
     ),
-    [selectSize, selectedFields, fieldSelect, testPrefix, showUnit, onChangeField, onRemoveField],
+    [selectSize, selectedFields, fieldSelect, showUnit, onChangeField, onRemoveField],
   );
 
   const onSortChange = useCallback(

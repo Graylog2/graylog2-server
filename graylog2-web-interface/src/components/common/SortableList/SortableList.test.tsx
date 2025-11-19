@@ -80,8 +80,9 @@ describe('SortableList', () => {
   });
 
   it('should render custom list items', () => {
-    const customListItemRender = (item, ref, className, dragHandleProps) => (
-      <div ref={ref} className={className} {...dragHandleProps}>
+    const customListItemRender = (item, ref, className, dragHandle) => (
+      <div ref={ref} className={className}>
+        {dragHandle}
         Id: {item.id}
       </div>
     );
@@ -90,8 +91,8 @@ describe('SortableList', () => {
       <SortableList
         items={list}
         onMoveItem={() => {}}
-        customListItemRender={({ item, ref, className, dragHandleProps }) =>
-          customListItemRender(item, ref, className, dragHandleProps)
+        customListItemRender={({ item, ref, className, dragHandle }) =>
+          customListItemRender(item, ref, className, dragHandle)
         }
       />,
     );

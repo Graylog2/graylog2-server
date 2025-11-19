@@ -27,7 +27,7 @@ export type ListItemType = {
 
 export type CustomListItemRender<ItemType extends ListItemType> = ({
   disableDragging,
-  dragHandleProps,
+  dragHandle,
   index,
   item,
   ref,
@@ -35,7 +35,7 @@ export type CustomListItemRender<ItemType extends ListItemType> = ({
 }: {
   className?: string;
   disableDragging?: boolean;
-  dragHandleProps: DragHandleProps;
+  dragHandle: React.ReactNode;
   index: number;
   item: ItemType;
   ref: React.Ref<any>;
