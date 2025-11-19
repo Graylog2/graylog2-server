@@ -273,6 +273,10 @@ const AppRouter = () => {
               path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterIdOrName'),
               element: <LUTDataAdaptersFormPage />,
             },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW,
+              element: withLUTModalProvider(LUTDataAdaptersPage),
+            },
 
             { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },
             { path: RoutePaths.SYSTEM.PIPELINES.RULES, element: <RulesPage /> },
