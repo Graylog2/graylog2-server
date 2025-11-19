@@ -49,6 +49,7 @@ import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -119,10 +120,9 @@ public class AbstractTcpTransportTest {
         final AbstractTcpTransport transport = new AbstractTcpTransport(
             configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration, tlsConfiguration) {};
 
-        Throwable exception = assertThrows(IllegalStateException.class, () ->
-
-            transport.getChildChannelHandlers(input));
-        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath()));
+        assertThatThrownBy(() -> transport.getChildChannelHandlers(input))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
     }
 
     @Test
