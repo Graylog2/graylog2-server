@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
