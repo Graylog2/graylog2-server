@@ -1,0 +1,96 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useFormikContext } from 'formik';
+
+import { Spinner } from 'components/common';
+import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
+import useScopePermissions from 'hooks/useScopePermissions';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { useFetchCache, useFetchAllCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import Cache from 'components/lookup-tables/Cache';
+import CachePicker from 'components/lookup-tables/cache-form/CachePicker';
+import CacheFormView from 'components/lookup-tables/cache-form/CacheFormView';
+import type { LookupTable, LookupTableCache } from 'logic/lookup-tables/types';
+
+function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
+  const plugins = usePluginEntities('lookupTableCaches');
+  const cachePlugin = React.useMemo(
+    () => plugins.find((p: any) => p.type === cache?.config?.type),
+    [cache?.config?.type, plugins],
+  );
+
+  const DocComponent = React.useMemo(() => cachePlugin?.documentationComponent, [cachePlugin]);
+
+  return (
+    <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">
+      <Cache cache={cache} noEdit />
+      {DocComponent && <DocComponent cacheId={cache?.id} />}
+    </RowContainer>
+  );
+}
+
+function CacheFormStep() {
+  const { values, setFieldValue } = useFormikContext<LookupTable>();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
+  const { allCaches, loadingAllCaches } = useFetchAllCaches();
+  const { cache, loadingCache } = useFetchCache(values.cache_id);
+  const [showForm, setShowForm] = React.useState<boolean>(false);
+  const showCache = React.useMemo(() => values.cache_id, [values.cache_id]);
+
+  const canModify = React.useMemo(
+    () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
+    [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
+  );
+
+  const onSaved = (newCache: LookupTableCache) => {
+    setFieldValue('cache_id', newCache.id);
+    setShowForm(false);
+  };
+
+  const onCancel = () => {
+    setFieldValue('cache_id', '');
+    setShowForm(false);
+  };
+
+  const onCreateClick = () => {
+    onCancel();
+    setTimeout(() => setShowForm(true), 100);
+  };
+
+  return (
+    <ColContainer $gap="lg" $align="center">
+      {loadingAllCaches ? (
+        <RowContainer>
+          <Spinner text="Loading caches..." />
+        </RowContainer>
+      ) : (
+        <>
+          {canModify && !showForm && (
+            <RowContainer>
+              <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
+            </RowContainer>
+          )}
+          {showCache && !loadingCache && <CacheReadOnly cache={cache} />}
+          {showForm && !showCache && <CacheFormView onCancel={onCancel} saved={onSaved} isStep />}
+        </>
+      )}
+    </ColContainer>
+  );
+}
+
+export default CacheFormStep;

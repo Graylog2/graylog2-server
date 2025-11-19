@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useNavigate } from 'react-routesr-dom';
 
+import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import { useDeleteDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { DataAdapterEntity } from 'components/lookup-tables/types';
 
@@ -34,13 +35,11 @@ function Actions({ adapter }: ActionsProps) {
   const sendTelemetry = useSendTelemetry();
   const { deleteDataAdapter, deletingDataAdapter } = useDeleteDataAdapter();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
   const handleEdit = React.useCallback(() => {
-    setModal('DATA-ADAPTER-EDIT');
-    setTitle(adapter.name);
-    setEntity(adapter);
-  }, [adapter, setModal, setTitle, setEntity]);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapter.id));
+  }, [adapter, navigate]);
 
   const handleDelete = React.useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DATA_ADAPTER_DELETED, {
