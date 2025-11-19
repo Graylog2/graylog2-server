@@ -90,18 +90,9 @@ public class TimeUnitIntervalTest {
             });
         }
 
-        private String timeunit;
-        private String expectedTimeunit;
-
-        public void initValidTimeUnitIntervalsTest(String timeunit, String expectedTimeunit) {
-            this.timeunit = timeunit;
-            this.expectedTimeunit = expectedTimeunit;
-        }
-
         @MethodSource("data")
         @ParameterizedTest
         public void allowsPositiveQuantityAndKnownUnit(String timeunit, String expectedTimeunit) throws InvalidRangeParametersException {
-            initValidTimeUnitIntervalsTest(timeunit, expectedTimeunit);
             final TimeUnitInterval interval = builder().timeunit(timeunit).build();
 
             assertThat(interval.toDateInterval(RelativeRange.create(300)).toString())
