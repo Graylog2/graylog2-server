@@ -26,6 +26,7 @@ import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.security.SessionDeletedEvent;
+import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -35,9 +36,13 @@ import java.util.stream.Stream;
 
 import static com.mongodb.client.model.Filters.eq;
 import static org.graylog2.security.sessions.SessionDTO.FIELD_SESSION_ID;
+import static org.graylog2.shared.utilities.StringUtils.f;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Singleton
 public class MongoDbSessionService implements SessionService {
+    private static final Logger LOG = getLogger(MongoDbSessionService.class);
+
     public static final String COLLECTION_NAME = "sessions";
     private final ClusterEventBus eventBus;
     private final MongoCollection<SessionDTO> collection;
@@ -50,11 +55,18 @@ public class MongoDbSessionService implements SessionService {
         // Legacy: we had a non-unique index on session_id before. Remove it so that we can create the index again as
         // unique.
         final var indexes = collection.listIndexes().into(new ArrayList<>());
-        indexes.stream()
-                .filter(index -> index.getString("name").equals("session_id_1"))
-                .filter(index -> !index.getBoolean("unique", false))
-                .findFirst()
-                .ifPresent(index -> collection.dropIndex("session_id_1"));
+        final var indexName = "session_id_1";
+        try {
+            indexes.stream()
+                    .filter(index -> index.getString("name").equals(indexName))
+                    .filter(index -> !index.getBoolean("unique", false))
+                    .findFirst()
+                    .ifPresent(index -> collection.dropIndex(indexName));
+        } catch (Exception e) {
+            LOG.warn(f("There was an error when trying to remove the \"%s\" index from the \"%s\" " +
+                            "collection. Treating this as a transient condition. The following error occurred: %s.",
+                    indexName, COLLECTION_NAME, e.getMessage()));
+        }
 
         collection.createIndex(Indexes.ascending(SessionDTO.FIELD_SESSION_ID), new IndexOptions().unique(true));
     }
