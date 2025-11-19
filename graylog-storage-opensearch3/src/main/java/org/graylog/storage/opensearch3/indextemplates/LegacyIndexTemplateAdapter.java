@@ -47,7 +47,7 @@ public class LegacyIndexTemplateAdapter implements IndexTemplateAdapter {
                     .name(templateName)
                     .indexPatterns(template.indexPatterns())
                     .mappings(templateMapper.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
-                    //.settings(template.settings()) //TODO: mapping from  Map<String,Object> to Map<String,JsonData>
+                    .settings(templateMapper.toJsonDataMap(template.settings()))
                     .order(template.order().intValue())
                     .build();
             final AcknowledgedResponseBase putTemplateResponse = indicesClient.putTemplate(putTemplateRequest);

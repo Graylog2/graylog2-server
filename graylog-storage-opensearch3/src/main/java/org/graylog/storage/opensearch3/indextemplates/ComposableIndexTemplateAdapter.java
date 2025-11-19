@@ -23,6 +23,7 @@ import org.opensearch.client.opensearch._types.AcknowledgedResponseBase;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.indices.DeleteIndexTemplateRequest;
 import org.opensearch.client.opensearch.indices.ExistsIndexTemplateRequest;
+import org.opensearch.client.opensearch.indices.IndexSettings;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutIndexTemplateRequest;
 import org.opensearch.client.opensearch.indices.put_index_template.IndexTemplateMapping;
@@ -49,7 +50,7 @@ public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {
                     .indexPatterns(template.indexPatterns())
                     .template(IndexTemplateMapping.builder()
                             .mappings(templateMapper.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
-                            //.settings(template.settings()) //TODO: mapper to index settings
+                            .settings(templateMapper.fromMap(template.settings(), IndexSettings._DESERIALIZER))
                             .build())
                     .priority(template.order().intValue())
                     .build();

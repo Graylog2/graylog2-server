@@ -24,6 +24,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.indices.DeleteTemplateRequest;
@@ -70,6 +71,7 @@ class LegacyIndexTemplateAdapterTest {
     @Test
     void testEnsureIndexTemplateOnSuccessfulTemplateCreation() throws Exception {
         TypeMapping typeMapping = TypeMapping.builder().build();
+        Map<String, JsonData> settings = Map.of();
         Template template = new Template(
                 List.of("graylog-*"),
                 new Template.Mappings(Map.of()),
@@ -77,6 +79,7 @@ class LegacyIndexTemplateAdapterTest {
                 new Template.Settings(Map.of())
         );
         doReturn(typeMapping).when(templateMapper).fromMap(template.mappings(), TypeMapping._DESERIALIZER);
+        doReturn(settings).when(templateMapper).toJsonDataMap(template.settings());
 
         doReturn(PutTemplateResponse.builder().acknowledged(true).build())
                 .when(indicesClient)
@@ -85,6 +88,7 @@ class LegacyIndexTemplateAdapterTest {
                                 .name("template")
                                 .indexPatterns(List.of("graylog-*"))
                                 .mappings(typeMapping)
+                                .settings(settings)
                                 .order(13)
                                 .build()
 

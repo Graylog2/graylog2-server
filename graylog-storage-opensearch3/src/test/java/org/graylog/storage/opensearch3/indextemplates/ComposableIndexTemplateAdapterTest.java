@@ -29,6 +29,7 @@ import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.indices.DeleteIndexTemplateRequest;
 import org.opensearch.client.opensearch.indices.DeleteIndexTemplateResponse;
 import org.opensearch.client.opensearch.indices.ExistsIndexTemplateRequest;
+import org.opensearch.client.opensearch.indices.IndexSettings;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.PutIndexTemplateRequest;
 import org.opensearch.client.opensearch.indices.PutIndexTemplateResponse;
@@ -71,6 +72,7 @@ class ComposableIndexTemplateAdapterTest {
     @Test
     void testEnsureIndexTemplateOnSuccessfulTemplateCreation() throws Exception {
         TypeMapping typeMapping = TypeMapping.builder().build();
+        IndexSettings indexSettings = IndexSettings.builder().build();
         Template template = new Template(
                 List.of("graylog-*"),
                 new Template.Mappings(Map.of()),
@@ -78,6 +80,7 @@ class ComposableIndexTemplateAdapterTest {
                 new Template.Settings(Map.of())
         );
         doReturn(typeMapping).when(templateMapper).fromMap(template.mappings(), TypeMapping._DESERIALIZER);
+        doReturn(indexSettings).when(templateMapper).fromMap(template.settings(), IndexSettings._DESERIALIZER);
 
         doReturn(PutIndexTemplateResponse.builder().acknowledged(true).build())
                 .when(indicesClient)
@@ -87,6 +90,7 @@ class ComposableIndexTemplateAdapterTest {
                                 .indexPatterns(List.of("graylog-*"))
                                 .template(IndexTemplateMapping.builder()
                                         .mappings(typeMapping)
+                                        .settings(indexSettings)
                                         .build())
                                 .priority(13)
                                 .build()

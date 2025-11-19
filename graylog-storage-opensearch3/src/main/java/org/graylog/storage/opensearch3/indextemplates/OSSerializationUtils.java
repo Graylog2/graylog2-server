@@ -21,12 +21,14 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.stream.JsonParser;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
 import org.opensearch.client.json.PlainJsonSerializable;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 
 import java.io.StringReader;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Utility class that helps use our APIs based on maps with OS3, strongly typed, builder-based APIs.
@@ -44,6 +46,17 @@ public class OSSerializationUtils {
 
     public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
         return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
+    }
+
+    //TODO: test
+    public Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
+        return map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> JsonData.of(entry.getValue())
+                        )
+                );
     }
 
     public <T> T fromMap(final Map<String, Object> mapRepresentation,
