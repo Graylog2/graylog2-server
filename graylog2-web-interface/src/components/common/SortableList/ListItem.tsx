@@ -44,10 +44,13 @@ const StyledListGroupItem = styled(ListGroupItem)<{
   `,
 );
 
-const DragHandle = styled.div<{ $isDragging: boolean }>(
+const DragHandle = styled.button<{ $isDragging: boolean }>(
   ({ $isDragging }) => css`
     margin-right: 5px;
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
+    background: transparent;
+    border: 0;
+    padding: 0;
   `,
 );
 
@@ -83,9 +86,17 @@ const ListItem = <ItemType extends ListItemType>(
   }
 
   return (
-    <StyledListGroupItem $alignItemContent={alignItemContent} ref={ref} className={className}>
+    <StyledListGroupItem
+      $alignItemContent={alignItemContent}
+      ref={ref}
+      className={className}
+      data-testid={`sortable-item-${item.id}`}
+      data-sortable-id={item.id}>
       {!disableDragging && (
-        <DragHandle {...dragHandleProps} $isDragging={isDragging} data-testid={`sortable-item-${item.id}`}>
+        <DragHandle
+          {...dragHandleProps}
+          $isDragging={isDragging}
+          data-testid={`item-drag-handle-${item.id}`}>
           <Icon name="drag_indicator" />
         </DragHandle>
       )}
