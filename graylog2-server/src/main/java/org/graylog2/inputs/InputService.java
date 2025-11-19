@@ -131,5 +131,5 @@ public interface InputService {
 
     List<Map.Entry<String, String>> getStaticFields(String inputId);
 
-    void persistDesiredState(Input input, IOState.Type desiredState);
+    void persistDesiredState(Input input, IOState.Type desiredState) throws ValidationException;
 }
