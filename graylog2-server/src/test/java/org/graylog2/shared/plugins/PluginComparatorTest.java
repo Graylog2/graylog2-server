@@ -29,10 +29,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PluginComparatorTest {
-    private PluginLoader.PluginComparator comparator = new PluginLoader.PluginComparator();
+    private final PluginLoader.PluginComparator comparator = new PluginLoader.PluginComparator();
 
     public static Object[][] provideData() {
         return new Object[][]{
@@ -50,21 +50,10 @@ public class PluginComparatorTest {
         };
     }
 
-    private Plugin first;
-    private Plugin second;
-    private int comparisonResult;
-
-    public void initPluginComparatorTest(Plugin first, Plugin second, int comparisonResult) {
-        this.first = first;
-        this.second = second;
-        this.comparisonResult = comparisonResult;
-    }
-
     @MethodSource("provideData")
     @ParameterizedTest
     public void testCompare(Plugin first, Plugin second, int comparisonResult) throws Exception {
-        initPluginComparatorTest(first, second, comparisonResult);
-        assertTrue(comparator.compare(first, second) == comparisonResult);
+        assertEquals(comparator.compare(first, second), comparisonResult);
     }
 
     public static class TestPlugin implements Plugin {
