@@ -73,7 +73,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.Tools.nowUTC;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -174,7 +174,7 @@ public class OpenSearchBackendTest {
 
     @Test
     public void testExplain() {
-        when(indexLookup.indexRangesForStreamsInTimeRange(anySet(), any())).thenAnswer(a -> {
+        when(indexLookup.indexRangesForStreamsInTimeRange(anyCollection(), any())).thenAnswer(a -> {
             if (a.getArgument(1, TimeRange.class).getFrom().getYear() < 2024) {
                 return Set.of(
                         MongoIndexRange.create("graylog_0", nowUTC(), nowUTC(), nowUTC(), 0),

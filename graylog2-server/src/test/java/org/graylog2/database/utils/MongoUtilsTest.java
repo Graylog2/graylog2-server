@@ -62,6 +62,7 @@ import static org.graylog2.database.utils.MongoUtils.stringIdsIn;
 @ExtendWith(MongoJackExtension.class)
 class MongoUtilsTest {
 
+
     private record DTO(@Id @org.mongojack.ObjectId String id, String name) implements MongoEntity {}
 
     private record DTORef(@Id @org.mongojack.ObjectId String id, ObjectId refId,
@@ -70,12 +71,14 @@ class MongoUtilsTest {
     private MongoCollections mongoCollections;
     private MongoCollection<DTO> collection;
     private MongoCollection<DTORef> collectionRef;
+    private MongoUtils<DTO> utils;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) {
         this.mongoCollections = mongoCollections;
         collection = mongoCollections.collection("test", DTO.class);
         collectionRef = mongoCollections.collection("test1", DTORef.class);
+        utils = mongoCollections.utils(collection);
     }
 
     @Test
