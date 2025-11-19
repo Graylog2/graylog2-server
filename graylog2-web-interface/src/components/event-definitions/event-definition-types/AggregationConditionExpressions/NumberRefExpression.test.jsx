@@ -208,7 +208,7 @@ describe('NumberRefExpression', () => {
     const definition = eventDefinition([initialSeries]);
     const handleChange = jest.fn();
 
-    render(
+    const wrapper = mount(
       <NumberRefExpression
         eventDefinition={definition}
         aggregationFunctions={aggregationFunctions}
