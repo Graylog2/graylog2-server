@@ -16,10 +16,10 @@
  */
 package org.graylog2.cluster;
 
-import org.graylog2.cluster.nodes.ServerNodeDto;
-import org.graylog2.plugin.system.NodeId;
-
 import jakarta.inject.Inject;
+import org.graylog2.cluster.nodes.ServerNodeDto;
+import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.system.NodeId;
 
 import java.net.URI;
 import java.util.Collection;
@@ -41,12 +41,14 @@ public class NodeServiceImpl implements NodeService {
     }
 
     @Override
-    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname) {
+    public boolean registerServer(String nodeId, boolean isLeader, URI httpPublishUri, String clusterUri, String hostname, boolean isProcessing, Lifecycle lifecycle) {
         ServerNodeDto dto = ServerNodeDto.Builder.builder()
                 .setId(nodeId)
                 .setLeader(isLeader)
                 .setTransportAddress(httpPublishUri.toString())
                 .setHostname(hostname)
+                .setProcessing(isProcessing)
+                .setLifecycle(lifecycle)
                 .build();
         return delegate.registerServer(dto);
     }
