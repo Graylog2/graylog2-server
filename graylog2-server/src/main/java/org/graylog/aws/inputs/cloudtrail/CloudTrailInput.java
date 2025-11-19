@@ -89,9 +89,7 @@ public class CloudTrailInput extends MessageInput {
             super(NAME, false, "");
         }
 
-        public boolean isForwarderCompatible() {
-            return false;
-        }
+        // isForwarderCompatible() is enabled by default.suc
 
         public boolean isCloudCompatible() {
             return true;
@@ -180,10 +178,5 @@ public class CloudTrailInput extends MessageInput {
                     "The source is set to aws-cloudtrail by default. If desired, you may override it with a custom value.",
                     ConfigurationField.Optional.OPTIONAL);
         }
-    }
-
-    @Override
-    public boolean onlyOnePerCluster() {
-        return true;
     }
 }
