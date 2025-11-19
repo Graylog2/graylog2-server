@@ -67,7 +67,11 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         }
     }
 
-    public <T> T executeWithClientTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
+    /**
+     * Uses a timeout to wait for results from an asynchronous request.
+     * Attention: This is a client timeout, not a server timeout. This doesn't mean the request is cancelled after the timeout.
+     */
+    <T> T executeWithClientTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
         try {
             CompletableFuture<T> futureResponse = async(operation, errorMessage);
             return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
