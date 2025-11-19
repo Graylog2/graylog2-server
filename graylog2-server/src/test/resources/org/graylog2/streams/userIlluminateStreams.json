@@ -1,0 +1,44 @@
+{
+  "streams": [
+    {
+      "_id" : { "$oid": "68e6707f9298e90ee1baf3da" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "68ef5a130f5ba3bef59ca629",
+      "matching_type" : "AND",
+      "description" : "nginx",
+      "created_at" : { "$date" : "2025-10-08T14:09:03.197+00:00" },
+      "disabled" : false,
+      "title" : "nginx"
+    },
+    {
+      "_id" : { "$oid": "68ef5a130f5ba3bef59ca631" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "68ef5a130f5ba3bef59ca629",
+      "matching_type" : "AND",
+      "description" : "nginx",
+      "created_at" : { "$date" : "2025-10-15T08:23:47.797+00:00" },
+      "disabled" : false,
+      "title" : "Illuminate:nginx"
+    },
+    {
+      "_id" : { "$oid": "68e66f669298e90ee1bae9d2" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "68ef5a130f5ba3bef59ca629",
+      "matching_type" : "AND",
+      "description" : "nginx",
+      "created_at" : { "$date" : "2025-10-15T08:23:47.797+00:00" },
+      "disabled" : false,
+      "title" : "Illuminate:nginx2"
+    },
+    {
+      "_id" : { "$oid": "000000000000000000000001" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "68ef5a130f5ba3bef59ca629",
+      "matching_type" : "AND",
+      "description" : "Default Stream",
+      "created_at" : { "$date" : "2025-10-15T08:23:47.797+00:00" },
+      "disabled" : false,
+      "title" : "Default Stream"
+    }
+  ]
+}
