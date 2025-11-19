@@ -68,6 +68,7 @@ public class MongoDBTestService implements AutoCloseable {
     private MongoDBTestService(MongoDBContainer container, MongoDBVersion version) {
         this.container = requireNonNull(container, "container cannot be null");
         this.version = version;
+        start();
     }
 
     /**
