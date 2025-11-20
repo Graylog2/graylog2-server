@@ -364,7 +364,7 @@ public class IndicesIT extends SearchServerBaseTest {
     public void ensureIndexTemplateDoesntThrowOnIgnoreIndexTemplateAndExistingTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
-        indices.ensureIndexTemplate(indexSet.basicIndexSetConfig());
+        indices.ensureIndexTemplate(indexSet.indexTemplateConfig());
 
         assertThat(client().templateExists(templateName)).isTrue();
 
@@ -377,7 +377,7 @@ public class IndicesIT extends SearchServerBaseTest {
                 mock(IndexFieldTypeProfileService.class),
                 mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.basicIndexSetConfig())).doesNotThrowAnyException();
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.indexTemplateConfig())).doesNotThrowAnyException();
 
         assertThat(client().templateExists(templateName)).isTrue();
     }
@@ -411,7 +411,7 @@ public class IndicesIT extends SearchServerBaseTest {
                 mock(IndexFieldTypeProfileService.class),
                 mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.basicIndexSetConfig()))
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.indexTemplateConfig()))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
     }
