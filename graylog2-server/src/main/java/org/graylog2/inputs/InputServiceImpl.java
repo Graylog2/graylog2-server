@@ -27,6 +27,7 @@ import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -182,7 +183,7 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
-    public String saveWithoutEvents(Input model) {
+    public String saveWithoutEvents(Input model) throws ValidationException {
         return save(model, false);
     }
 
@@ -193,7 +194,8 @@ public class InputServiceImpl implements InputService {
         throw new IllegalArgumentException("Expected InputImpl, got " + input.getClass().getName());
     }
 
-    private String save(Input model, boolean fireEvents) {
+    private String save(Input model, boolean fireEvents) throws ValidationException {
+        validateStaticFields(model);
         final InputImpl input = toInputImpl(model);
         String inputId = input.getId();
         boolean isNew = (inputId == null || inputId.isBlank());
@@ -213,6 +215,7 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public String update(Input model) throws ValidationException {
+        validateStaticFields(model);
         final InputImpl input = toInputImpl(model);
         final String inputId = input.getId();
 
@@ -220,6 +223,24 @@ public class InputServiceImpl implements InputService {
         publishChange(InputUpdated.create(inputId));
 
         return inputId;
+    }
+
+    private void validateStaticFields(Input input) throws ValidationException {
+        final Map<String, String> staticFields = input.getStaticFields();
+        if (staticFields == null || staticFields.isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, String> entry : staticFields.entrySet()) {
+            final String key = entry.getKey();
+            final String value = entry.getValue();
+            if (key == null || key.isBlank()) {
+                throw new ValidationException("Static field key must not be blank");
+            }
+            if (value == null || value.isBlank()) {
+                throw new ValidationException("Static field value for key '" + key + "' must not be blank");
+            }
+        }
+
     }
 
     @Override
@@ -300,7 +321,8 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
-    public void addExtractor(Input input, Extractor extractor) {
+    public void addExtractor(Input input, Extractor extractor) throws ValidationException  {
+        validateExtractor(extractor);
         final Document embeddedDoc = new Document(extractor.getPersistedFields());
         final UpdateResult result = collection.updateOne(
                 MongoUtils.idEq(input.getId()),
@@ -312,8 +334,35 @@ public class InputServiceImpl implements InputService {
         }
     }
 
+    public void validateExtractor(Extractor extractor) throws ValidationException {
+        if (StringUtils.isBlank(extractor.getTitle())) {
+            throw new ValidationException("Extractor title must not be blank");
+        }
+
+        if (extractor.getType() == null) {
+            throw new ValidationException("Extractor type must not be blank");
+        }
+
+        if (extractor.getCursorStrategy() == null) {
+            throw new ValidationException("Extractor cursor strategy must not be blank");
+        }
+
+        if (StringUtils.isBlank(extractor.getSourceField())) {
+            throw new ValidationException("Extractor source field must not be blank");
+        }
+
+        if (StringUtils.isBlank(extractor.getCreatorUserId())) {
+            throw new ValidationException("Extractor creator user id must not be blank");
+        }
+
+        if (extractor.getExtractorConfig() == null) {
+            throw new ValidationException("Extractor config must not be null");
+        }
+    }
+
     @Override
     public void updateExtractor(Input input, Extractor extractor) throws ValidationException {
+        validateExtractor(extractor);
         final Document embeddedDoc = new Document(extractor.getPersistedFields());
 
         //First remove the old extractor
@@ -661,7 +710,7 @@ public class InputServiceImpl implements InputService {
     }
 
     @Override
-    public void persistDesiredState(Input input, IOState.Type desiredState) {
+    public void persistDesiredState(Input input, IOState.Type desiredState) throws ValidationException {
         final Input updatedInput = input.withDesiredState(desiredState);
         saveWithoutEvents(updatedInput);
     }

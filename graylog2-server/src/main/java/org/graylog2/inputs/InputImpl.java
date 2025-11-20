@@ -22,6 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import com.google.auto.value.AutoValue;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
 import org.graylog2.plugin.IOState;
@@ -50,7 +52,6 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
     public static final String FIELD_CONFIGURATION = "configuration";
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     public static final String FIELD_CREATED_AT = "created_at";
-    public static final String FIELD_ATTRIBUTES = "attributes";
     public static final String FIELD_GLOBAL = "global";
     public static final String EMBEDDED_EXTRACTORS = "extractors";
     public static final String EMBEDDED_STATIC_FIELDS = "static_fields";
@@ -65,12 +66,15 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
     @Nullable
     public abstract String getId();
 
+    @NotBlank
     @JsonProperty(FIELD_TITLE)
     public abstract String getTitle();
 
+    @NotNull
     @JsonProperty(FIELD_CREATED_AT)
     public abstract DateTime getCreatedAt();
 
+    @NotNull
     @JsonProperty(FIELD_CONFIGURATION)
     public abstract Map<String, Object> getConfiguration();
 
@@ -89,27 +93,27 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
                 ));
     }
 
-    ;
-
+    @NotNull
     @JsonProperty(FIELD_TYPE)
     public abstract String getType();
 
+    @NotNull
     @JsonProperty(FIELD_CREATOR_USER_ID)
     public abstract String getCreatorUserId();
 
     @JsonProperty(FIELD_GLOBAL)
     public abstract Boolean isGlobal();
 
-    @JsonProperty(FIELD_CONTENT_PACK)
     @Nullable
+    @JsonProperty(FIELD_CONTENT_PACK)
     public abstract String getContentPack();
 
-    @JsonProperty(FIELD_NODE_ID)
     @Nullable
+    @JsonProperty(FIELD_NODE_ID)
     public abstract String getNodeId();
 
-    @JsonProperty(FIELD_DESIRED_STATE)
     @Nullable
+    @JsonProperty(FIELD_DESIRED_STATE)
     public abstract IOState.Type getDesiredState();
 
     public static Builder builder() {
@@ -127,7 +131,6 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
         }
 
         @JsonProperty(FIELD_ID)
-        @Nullable
         public abstract Builder getId(String id);
 
         @JsonProperty(FIELD_TITLE)
@@ -140,7 +143,6 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
         public abstract Builder getConfiguration(Map<String, Object> configuration);
 
         @JsonProperty(EMBEDDED_STATIC_FIELDS)
-        @Nullable
         public abstract Builder staticFields(List<Map<String, String>> staticFields);
 
         @JsonProperty(FIELD_TYPE)
@@ -153,15 +155,12 @@ public abstract class InputImpl implements Input, BuildableMongoEntity<InputImpl
         public abstract Builder isGlobal(Boolean isGlobal);
 
         @JsonProperty(FIELD_CONTENT_PACK)
-        @Nullable
         public abstract Builder getContentPack(String contentPack);
 
         @JsonProperty(FIELD_NODE_ID)
-        @Nullable
         public abstract Builder getNodeId(String nodeId);
 
         @JsonProperty(FIELD_DESIRED_STATE)
-        @Nullable
         public abstract Builder getDesiredState(IOState.Type desiredState);
     }
 

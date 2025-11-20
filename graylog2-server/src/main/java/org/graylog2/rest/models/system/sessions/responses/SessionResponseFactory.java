@@ -17,15 +17,24 @@
 package org.graylog2.rest.models.system.sessions.responses;
 
 import org.apache.shiro.session.Session;
+import org.apache.shiro.subject.Subject;
+import org.graylog2.rest.models.system.sessions.SessionUtils;
+import org.graylog2.security.sessions.SessionAuthContext;
 
-/**
- * Factory to create a JSON response for a given session. A plugin may provide a custom implementation, if additional
- * attributes are required in the response.
- */
-public interface SessionResponseFactory {
-    /**
-     * Create a JSON response for the given session.
-     * @return
-     */
-    SessionResponse forSession(Session session);
+public class SessionResponseFactory {
+    private SessionResponseFactory() {
+    }
+
+    public static SessionResponse forSession(Session session) {
+        final var response = DefaultSessionResponse.builder()
+                .validUntil(SessionUtils.getValidUntil(session))
+                .sessionId(session.getId().toString())
+                .userId(new Subject.Builder().sessionId(session.getId()).buildSubject().getPrincipal().toString())
+                .username(String.valueOf(session.getAttribute(SessionUtils.USERNAME_SESSION_KEY)))
+                .build();
+        if (session.getAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY) instanceof SessionAuthContext authContext) {
+            return authContext.enrichSessionResponse(response);
+        }
+        return response;
+    }
 }
