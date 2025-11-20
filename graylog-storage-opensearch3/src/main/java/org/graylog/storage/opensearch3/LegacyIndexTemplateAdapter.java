@@ -16,53 +16,88 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplatesExistRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Template;
 
 import jakarta.inject.Inject;
+import org.opensearch.client.opensearch.generic.Body;
+import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Response;
 
+import java.io.IOException;
 import java.util.Map;
 
 public class LegacyIndexTemplateAdapter implements IndexTemplateAdapter {
-    private final OpenSearchClient client;
+    private final OfficialOpensearchClient opensearchClient;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public LegacyIndexTemplateAdapter(OpenSearchClient client) {
-        this.client = client;
+    public LegacyIndexTemplateAdapter(OfficialOpensearchClient opensearchClient, ObjectMapper objectMapper) {
+        this.opensearchClient = opensearchClient;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public boolean ensureIndexTemplate(String templateName, Template template) {
-        final Map<String, Object> templateSource = Map.of(
+        var source = Map.of(
                 "index_patterns", template.indexPatterns(),
                 "mappings", template.mappings(),
                 "settings", template.settings(),
                 "order", template.order()
         );
-        final PutIndexTemplateRequest request = new PutIndexTemplateRequest(templateName)
-                .source(templateSource);
 
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
-                "Unable to create index template " + templateName);
+        try {
+            Request request = org.opensearch.client.opensearch.generic.Requests.builder()
+                    .endpoint("/_template/" + templateName)
+                    .method("PUT")
+                    .body(Body.from(objectMapper.writeValueAsBytes(source), "application/json"))
+                    .build();
+            final boolean created = opensearchClient.sync(c -> {
+                try (final Response res = c.generic().execute(request)) {
+                    return res.getStatus() == 200;
+                }
+            }, "Failed to put template");
 
-        return result.isAcknowledged();
+            if (!created) {
+                throw new RuntimeException("Failed to put template " + templateName);
+            }
+            return true;
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsTemplate(new IndexTemplatesExistRequest(templateName),
-                requestOptions), "Unable to verify index template existence " + templateName);
+
+        org.opensearch.client.opensearch.generic.Request newRequest = org.opensearch.client.opensearch.generic.Requests.builder()
+                .endpoint("/_template/" + templateName)
+                .method("HEAD")
+                .build();
+        return opensearchClient.sync(c -> {
+            try (final org.opensearch.client.opensearch.generic.Response response = c.generic().execute(newRequest)) {
+                return response.getStatus() == 200;
+            }
+        }, "Unable to verify index template existence " + templateName);
     }
 
     @Override
     public boolean deleteIndexTemplate(String templateName) {
-        final DeleteIndexTemplateRequest request = new DeleteIndexTemplateRequest(templateName);
+        org.opensearch.client.opensearch.generic.Request request = org.opensearch.client.opensearch.generic.Requests.builder()
+                .endpoint("/_template/" + templateName)
+                .method("DELETE")
+                .build();
 
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteTemplate(request, requestOptions),
-                "Unable to delete index template " + templateName);
-        return result.isAcknowledged();
+        return opensearchClient.sync(c -> {
+            try (final org.opensearch.client.opensearch.generic.Response response = c.generic().execute(request)) {
+                return response.getStatus() == 200;
+            }
+        }, "Unable to delete index template " + templateName);
     }
 }

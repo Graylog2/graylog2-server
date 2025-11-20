@@ -43,6 +43,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -82,7 +83,7 @@ public class AdaptersOS implements Adapters {
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
+                indexTemplateAdapter(),
                 new IndexStatisticsBuilder(),
                 objectMapper,
                 new OSSerializationUtils(objectMapper, officialOpensearchClient)
@@ -130,4 +131,12 @@ public class AdaptersOS implements Adapters {
         return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS2(client));
     }
 
+    @Override
+    public IndexTemplateAdapter indexTemplateAdapter() {
+        if(featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            return new ComposableIndexTemplateAdapter(officialOpensearchClient, objectMapper);
+        } else {
+            return new LegacyIndexTemplateAdapter(officialOpensearchClient, objectMapper);
+        }
+    }
 }

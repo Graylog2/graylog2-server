@@ -16,19 +16,16 @@
  */
 package org.graylog.storage.opensearch3.testing;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import jakarta.json.stream.JsonParser;
-import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.IndexState;
-import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpMapper;
@@ -39,9 +36,6 @@ import org.opensearch.client.opensearch.cat.IndicesResponse;
 import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
 import org.opensearch.client.opensearch.cluster.GetClusterSettingsResponse;
 import org.opensearch.client.opensearch.core.BulkRequest.Builder;
-import org.opensearch.client.opensearch.generic.Body;
-import org.opensearch.client.opensearch.generic.Request;
-import org.opensearch.client.opensearch.generic.Response;
 import org.opensearch.client.opensearch.indices.GetIndexResponse;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.IndexSettings;
@@ -133,95 +127,6 @@ public class ClientOS implements Client {
                 .entrySet()
                 .stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, p -> p.getValue()._kind().toString().toLowerCase(Locale.ROOT)));
-    }
-
-    private boolean composableTemplateExists(String templateName) {
-        return opensearchClient.sync(c -> c.indices().existsTemplate(r -> r.name(templateName)), "Failed to check if composable template " + templateName + " exists").value();
-    }
-
-    private boolean legacyTemplateExists(String templateName) {
-        org.opensearch.client.opensearch.generic.Request newRequest = org.opensearch.client.opensearch.generic.Requests.builder()
-                .endpoint("/_template/" + templateName)
-                .method("HEAD")
-                .build();
-        return opensearchClient.sync(c -> {
-            try (final org.opensearch.client.opensearch.generic.Response response = c.generic().execute(newRequest)) {
-                return response.getStatus() == 200;
-            }
-        }, "Failed to check if legacy template " + templateName + " exists");
-    }
-
-    @Override
-    public boolean templateExists(String templateName) {
-        return featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? composableTemplateExists(templateName) : legacyTemplateExists(templateName);
-    }
-
-    private void putComposableTemplate(String templateName, Template template) {
-        org.opensearch.client.opensearch.indices.PutIndexTemplateRequest request = new org.opensearch.client.opensearch.indices.PutIndexTemplateRequest.Builder()
-                .name(templateName)
-                .indexPatterns(template.indexPatterns())
-                .priority(Math.toIntExact(template.order()))
-                .template(t -> t
-                        .settings(s -> s.customSettings(toSettings(template.settings())))
-                        .mappings(m -> m.properties(toProperties(template.mappings())))
-                )
-                .build();
-        opensearchClient.sync(c -> c.indices().putIndexTemplate(request), "Failed to put index template");
-    }
-
-    private Map<String, Property> toProperties(Template.Mappings mappings) {
-        return mappings.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> dynamicallyCreateProperty(String.valueOf(entry.getValue()))));
-    }
-
-    private Map<String, JsonData> toSettings(Template.Settings settings) {
-        return settings.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> JsonData.of(entry.getValue())));
-    }
-
-    private void putLegacyTemplate(String templateName, Template template) {
-        var source = Map.of(
-                "index_patterns", template.indexPatterns(),
-                "mappings", template.mappings(),
-                "settings", template.settings(),
-                "order", template.order()
-        );
-
-        try {
-            Request request = org.opensearch.client.opensearch.generic.Requests.builder()
-                    .endpoint("/_template/" + templateName)
-                    .method("PUT")
-                    .body(Body.from(objectMapper.writeValueAsBytes(source), "application/json"))
-                    .build();
-            final Boolean created = opensearchClient.sync(c -> {
-                try (final Response res = c.generic().execute(request)) {
-                    return res.getStatus() == 200;
-                }
-            }, "Failed to put template");
-
-            if (!created) {
-                throw new RuntimeException("Failed to put template " + templateName);
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
-
-
-    }
-
-    @Override
-    public void putTemplate(String templateName, Template template) {
-        if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
-            putComposableTemplate(templateName, template);
-        } else {
-            putLegacyTemplate(templateName, template);
-        }
-    }
-
-    private CompressedXContent serialize(Object obj) {
-        try {
-            return new CompressedXContent(objectMapper.writeValueAsString(obj));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void deleteComposableTemplates() {

@@ -25,6 +25,8 @@ import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.opensearch.client.json.JsonpDeserializer;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.PlainJsonSerializable;
+import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch._types.mapping.Property;
 
 import java.io.StringReader;
 import java.util.Map;
@@ -36,6 +38,7 @@ import java.util.Map;
 public class OSSerializationUtils {
 
     private final ObjectMapper objectMapper;
+    private final JsonpMapper jsonpMapper;
     private final OfficialOpensearchClient client;
 
     @Inject
@@ -43,6 +46,7 @@ public class OSSerializationUtils {
                                 final OfficialOpensearchClient client) {
         this.objectMapper = objectMapper;
         this.client = client;
+        this.jsonpMapper = new JacksonJsonpMapper(objectMapper);
     }
 
     public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
@@ -55,5 +59,14 @@ public class OSSerializationUtils {
         final JsonpMapper mapper = client.sync()._transport().jsonpMapper();
         final JsonParser parser = mapper.jsonProvider().createParser(new StringReader(json));
         return deserializer.deserialize(parser, mapper);
+    }
+
+    /**
+     * This is an ugly hack because there is no way to dynamically resolve opensearch property type in os3 client
+     *
+     */
+    public Property propertyOfType(String type) {
+        final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader("{\"type\": \"" + type + "\"}"));
+        return Property._DESERIALIZER.deserialize(parser, jsonpMapper);
     }
 }

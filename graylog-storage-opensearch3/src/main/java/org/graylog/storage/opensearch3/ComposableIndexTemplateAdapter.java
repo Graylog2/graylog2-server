@@ -17,65 +17,62 @@
 package org.graylog.storage.opensearch3;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.ComposableIndexTemplateExistRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.DeleteComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
-import org.graylog2.indexer.indices.Template;
-
 import jakarta.inject.Inject;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
+import org.graylog2.indexer.indices.Template;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.indices.DeleteIndexTemplateResponse;
+import org.opensearch.client.opensearch.indices.PutIndexTemplateRequest;
+import org.opensearch.client.opensearch.indices.PutIndexTemplateResponse;
 
-import java.io.IOException;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {
-    private final OpenSearchClient client;
-
-    private final ObjectMapper objectMapper;
+    private final OfficialOpensearchClient opensearchClient;
+    private final OSSerializationUtils osSerializationUtils;
 
     @Inject
-    public ComposableIndexTemplateAdapter(OpenSearchClient client, ObjectMapper objectMapper) {
-        this.client = client;
-        this.objectMapper = objectMapper;
+    public ComposableIndexTemplateAdapter(OfficialOpensearchClient opensearchClient, ObjectMapper objectMapper) {
+        this.opensearchClient = opensearchClient;
+        this.osSerializationUtils = new OSSerializationUtils(objectMapper, opensearchClient);
+
     }
 
     @Override
     public boolean ensureIndexTemplate(String templateName, Template template) {
-        var serializedMapping = serialize(template.mappings());
-        var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
-        var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), osTemplate, null, template.order(), null, null);
-        var request = new PutComposableIndexTemplateRequest()
+
+
+        PutIndexTemplateRequest request = new PutIndexTemplateRequest.Builder()
                 .name(templateName)
-                .indexTemplate(indexTemplate);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
-                "Unable to create index template " + templateName);
-
-        return result.isAcknowledged();
+                .indexPatterns(template.indexPatterns())
+                .priority(Math.toIntExact(template.order()))
+                .template(t -> t
+                        .settings(s -> s.customSettings(toSettings(template.settings())))
+                        .mappings(m -> m.properties(toProperties(template.mappings())))
+                )
+                .build();
+        final PutIndexTemplateResponse result = opensearchClient.sync(c -> c.indices().putIndexTemplate(request), "Unable to create index template " + templateName);
+        return result.acknowledged();
     }
 
-    private CompressedXContent serialize(Object obj) {
-        try {
-            return new CompressedXContent(objectMapper.writeValueAsString(obj));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+
+    private Map<String, Property> toProperties(Template.Mappings mappings) {
+        return mappings.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> osSerializationUtils.propertyOfType(String.valueOf(entry.getValue()))));
     }
 
-    @Override
+    private Map<String, JsonData> toSettings(Template.Settings settings) {
+        return settings.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> JsonData.of(entry.getValue())));
+    }
+
     public boolean indexTemplateExists(String templateName) {
-        return client.execute((c, requestOptions) -> c.indices().existsIndexTemplate(new ComposableIndexTemplateExistRequest(templateName),
-                requestOptions), "Unable to verify index template existence " + templateName);
+        return opensearchClient.sync(c -> c.indices().existsTemplate(r -> r.name(templateName)), "Unable to verify index template existence " + templateName).value();
     }
 
-    @Override
     public boolean deleteIndexTemplate(String templateName) {
-        var request = new DeleteComposableIndexTemplateRequest(templateName);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().deleteIndexTemplate(request, requestOptions),
-                "Unable to delete index template " + templateName);
-        return result.isAcknowledged();
+        final DeleteIndexTemplateResponse result = opensearchClient.sync(c -> c.indices().deleteIndexTemplate(req -> req.name(templateName)), "Failed to delete compostable templates.");
+        return result.acknowledged();
     }
 }
