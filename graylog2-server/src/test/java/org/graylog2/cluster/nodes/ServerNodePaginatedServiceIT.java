@@ -20,22 +20,18 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
-import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.Configuration;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.system.ClusterResource;
 import org.graylog2.search.SearchQueryParser;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Rule;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,41 +39,21 @@ import java.util.Map;
 import java.util.UUID;
 
 
+@ExtendWith(MongoDBExtension.class)
 class ServerNodePaginatedServiceIT {
 
     public static final int STALE_LEADER_TIMEOUT_MS = 2000;
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private ServerNodePaginatedService serverNodePaginatedService;
     private SearchQueryParser queryParser;
 
     @BeforeEach
-    void setUp() throws ValidationException, RepositoryException {
-
-        mongodb.start();
-        final ServerNodeClusterService serverNodeService = createServerNodeService();
-        serverNodeService.registerServer(node());
-        serverNodePaginatedService = new ServerNodePaginatedService(getMongoCollections());
-        queryParser = new SearchQueryParser("hostname", ClusterResource.SERVER_NODE_ENTITY_SEARCH_MAPPINGS);
-    }
-
-    @Nonnull
-    private ServerNodeClusterService createServerNodeService() throws RepositoryException, ValidationException {
+    void setUp(MongoCollections mongoCollections) throws ValidationException, RepositoryException {
         final Configuration configuration = configuration(Collections.singletonMap("stale_leader_timeout", String.valueOf(STALE_LEADER_TIMEOUT_MS)));
-        return new ServerNodeClusterService(mongodb.mongoConnection(), configuration);
-    }
-
-    @Nonnull
-    private MongoCollections getMongoCollections() {
-        MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapperProvider().get());
-        return new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection());
-    }
-
-    @AfterEach
-    void tearDown() {
-        mongodb.close();
+        final ServerNodeClusterService serverNodeService = new ServerNodeClusterService(mongoCollections.mongoConnection(), configuration);
+        serverNodeService.registerServer(node());
+        serverNodePaginatedService = new ServerNodePaginatedService(mongoCollections);
+        queryParser = new SearchQueryParser("hostname", ClusterResource.SERVER_NODE_ENTITY_SEARCH_MAPPINGS);
     }
 
     private static NodeDto node() {

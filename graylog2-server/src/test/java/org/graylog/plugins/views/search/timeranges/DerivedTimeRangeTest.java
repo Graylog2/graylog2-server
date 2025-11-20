@@ -20,7 +20,7 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
