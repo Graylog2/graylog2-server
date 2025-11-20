@@ -24,8 +24,9 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.system.urlallowlist.RegexHelper;
 import org.graylog2.system.urlallowlist.UrlAllowlist;
 import org.graylog2.system.urlallowlist.UrlAllowlistService;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -40,6 +41,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class V20191129134600_CreateInitialUrlAllowlistTest {
+    private AutoCloseable mocks;
     @Mock
     private ClusterConfigService configService;
     @Mock
@@ -54,9 +56,9 @@ public class V20191129134600_CreateInitialUrlAllowlistTest {
     @InjectMocks
     private V20191129134600_CreateInitialUrlAllowlist migration;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        mocks = MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -78,15 +80,20 @@ public class V20191129134600_CreateInitialUrlAllowlistTest {
         final String notAllowlisted = "https://wwwXgraylogXcom/message/testXjson/messsage";
 
         assertThat(allowlist.isAllowlisted(allowlisted)).withFailMessage(
-                        "allowlist " + allowlist + " is expected to consider url <" + allowlisted + "> allowlisted.")
+                "allowlist " + allowlist + " is expected to consider url <" + allowlisted + "> allowlisted.")
                 .isTrue();
         assertThat(allowlist.isAllowlisted(notAllowlisted)).withFailMessage(
-                        "allowlist " + allowlist + " is expected to consider url <" + notAllowlisted + "> not allowlisted.")
+                "allowlist " + allowlist + " is expected to consider url <" + notAllowlisted + "> not allowlisted.")
                 .isFalse();
         assertThat(allowlist.entries()
                 .size()).isEqualTo(1);
         assertThat(allowlist.entries()
                 .get(0)
                 .value()).isEqualTo("^\\Qhttps://www.graylog.com/\\E.*?\\Q/test.json/\\E.*?$");
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        mocks.close();
     }
 }

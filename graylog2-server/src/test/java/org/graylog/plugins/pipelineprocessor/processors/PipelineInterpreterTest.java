@@ -60,7 +60,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.messageq.MessageQueueAcknowledger;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.Collections;
@@ -74,7 +74,7 @@ import java.util.stream.Collectors;
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -589,15 +589,14 @@ public class PipelineInterpreterTest {
         // then
         assertThat(processed)
                 .hasSize(1)
-                .hasOnlyOneElementSatisfying(m -> {
+                .hasOnlyOneElementSatisfying(m ->
                     assertThat(m.processingErrors())
                             .hasSize(1)
                             .hasOnlyOneElementSatisfying(pe -> {
                                 assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.RuleConditionEvaluationError);
                                 assertThat(pe.getMessage()).isEqualTo("Error evaluating condition for rule <broken_condition/broken_condition> (pipeline <pipeline/p1>)");
                                 assertThat(pe.getDetails()).isEqualTo("In call to function 'to_double' at 3:4 an exception was thrown: class java.lang.String cannot be cast to class java.lang.Double (java.lang.String and java.lang.Double are in module java.base of loader 'bootstrap')");
-                            });
-                });
+                            }));
     }
 
     @Test
@@ -637,15 +636,14 @@ public class PipelineInterpreterTest {
         // then
         assertThat(processed)
                 .hasSize(1)
-                .hasOnlyOneElementSatisfying(m -> {
+                .hasOnlyOneElementSatisfying(m ->
                     assertThat(m.processingErrors())
                             .hasSize(1)
                             .hasOnlyOneElementSatisfying(pe -> {
                                 assertThat(pe.getCause()).isEqualTo(ProcessingFailureCause.RuleStatementEvaluationError);
                                 assertThat(pe.getMessage()).isEqualTo("Error evaluating action for rule <broken_statement/broken_statement> (pipeline <pipeline/p1>)");
                                 assertThat(pe.getDetails()).isEqualTo("In call to function 'set_field' at 5:4 an exception was thrown: class java.lang.Long cannot be cast to class java.lang.Double (java.lang.Long and java.lang.Double are in module java.base of loader 'bootstrap')");
-                            });
-                });
+                            }));
     }
 
     @Test

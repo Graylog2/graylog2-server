@@ -17,7 +17,7 @@
 package org.graylog2.plugin;
 
 import org.graylog2.shared.SuppressForbidden;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
