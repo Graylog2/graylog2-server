@@ -43,6 +43,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.suggest.term.T
 import org.graylog.storage.errors.ResponseError;
 import org.graylog2.plugin.Message;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -60,7 +61,7 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
     }
 
     @Override
-    public SuggestionResponse suggest(SuggestionRequest req) {
+    public SuggestionResponse suggest(SuggestionRequest req, Duration timeout) {
         final Set<String> affectedIndices = indexLookup.indexNamesForStreamsInTimeRange(req.streams(), req.timerange());
         final TermSuggestionBuilder suggestionBuilder = SuggestBuilders.termSuggestion(req.field()).text(req.input()).size(req.size());
         final BoolQueryBuilder query = QueryBuilders.boolQuery()
@@ -75,9 +76,10 @@ public class QuerySuggestionsES7 implements QuerySuggestionsService {
                 .suggest(new SuggestBuilder().addSuggestion("corrections", suggestionBuilder));
 
         try {
-            final SearchResponse result = client.search(new SearchRequest(affectedIndices.toArray(new String[]{}))
+            final var request = new SearchRequest(affectedIndices.toArray(new String[]{}))
                     .source(search)
-                    .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN), "Failed to execute aggregation");
+                    .indicesOptions(IndicesOptions.LENIENT_EXPAND_OPEN);
+            final SearchResponse result = client.search(request, "Failed to execute aggregation");
             final ParsedTerms fieldValues = result.getAggregations().get("fieldvalues");
             final List<SuggestionEntry> entries = fieldValues.getBuckets().stream().map(b -> new SuggestionEntry(b.getKeyAsString(), b.getDocCount())).collect(Collectors.toList());
 

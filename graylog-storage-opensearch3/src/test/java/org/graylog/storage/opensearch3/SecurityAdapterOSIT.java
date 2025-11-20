@@ -18,15 +18,15 @@ package org.graylog.storage.opensearch3;
 
 import org.assertj.core.api.Assertions;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog2.indexer.security.SecurityAdapter;
-import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 
 class SecurityAdapterOSIT {
 
     public static final String TESTED_ROLE = "all_access";
     public static final String USERNAME = "max.mustermann";
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.createSecured();
 
     @Test
