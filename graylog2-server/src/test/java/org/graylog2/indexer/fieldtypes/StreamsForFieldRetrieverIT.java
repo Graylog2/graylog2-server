@@ -18,8 +18,8 @@ package org.graylog2.indexer.fieldtypes;
 
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
@@ -35,7 +35,7 @@ public abstract class StreamsForFieldRetrieverIT extends ElasticsearchBaseTest {
 
     protected abstract StreamsForFieldRetriever getRetriever();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         importFixture("org/graylog2/indexer/fieldtypes/streams/StreamsForFieldRetrieverIT.json");
     }

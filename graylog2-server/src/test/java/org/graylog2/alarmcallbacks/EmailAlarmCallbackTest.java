@@ -28,21 +28,19 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.web.customization.CustomizationConfig;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class EmailAlarmCallbackTest {
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private final AlertSender alertSender = mock(AlertSender.class);
     private final NotificationService notificationService = mock(NotificationService.class);
@@ -55,7 +53,7 @@ public class EmailAlarmCallbackTest {
 
     private EmailAlarmCallback alarmCallback;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         alarmCallback = new EmailAlarmCallback(alertSender, notificationService, nodeId, emailRecipientsFactory,
                 userService, emailConfiguration, graylogConfig, customizationConfig);
@@ -103,10 +101,10 @@ public class EmailAlarmCallbackTest {
 
         when(emailConfiguration.getFromEmail()).thenReturn("");
 
-        expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("Sender or subject are missing or invalid.");
+        Throwable exception = assertThrows(ConfigurationException.class, () ->
 
-        alarmCallback.checkConfiguration();
+            alarmCallback.checkConfiguration());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Sender or subject are missing or invalid."));
     }
 
     @Test
@@ -120,10 +118,10 @@ public class EmailAlarmCallbackTest {
         final Configuration configuration = new Configuration(configMap);
         alarmCallback.initialize(configuration);
 
-        expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("Sender or subject are missing or invalid.");
+        Throwable exception = assertThrows(ConfigurationException.class, () ->
 
-        alarmCallback.checkConfiguration();
+            alarmCallback.checkConfiguration());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Sender or subject are missing or invalid."));
     }
 
     @Test
