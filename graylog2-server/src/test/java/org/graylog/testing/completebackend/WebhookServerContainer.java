@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class WebhookServerContainer /* extends ExternalResource */ implements AutoCloseable {
+public class WebhookServerContainer implements AutoCloseable {
 
     private static final Logger LOG = LoggerFactory.getLogger(WebhookServerContainer.class);
     public static final int REQUEST_ACCEPT_PORT = 8000;
