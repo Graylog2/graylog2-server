@@ -25,20 +25,22 @@ import org.graylog2.indexer.indexset.V20161216123500_Succeeded;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -46,11 +48,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class V20161216123500_DefaultIndexSetMigrationTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private IndexSetService indexSetService;
@@ -61,7 +61,7 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
     private Migration migration;
 
 
-    @Before
+    @BeforeEach
     public void setUpService() {
         migration = new V20161216123500_DefaultIndexSetMigration(
                 elasticsearchConfiguration,
@@ -153,10 +153,10 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
     @Test
     public void upgradeFailsIfDefaultIndexSetHasNotBeenCreated() {
         when(clusterConfigService.get(DefaultIndexSetCreated.class)).thenReturn(null);
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("The default index set hasn't been created yet. This is a bug!");
+        Throwable exception = assertThrows(IllegalStateException.class, () ->
 
-        migration.upgrade();
+            migration.upgrade());
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("The default index set hasn't been created yet. This is a bug!"));
     }
 
     @Test

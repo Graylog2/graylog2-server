@@ -14,10 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog2.security.sessions;
 
-import java.net.URI;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-public interface MailServerInstance {
-    URI getEndpointURI();
+public interface SessionService {
+    Optional<SessionDTO> getBySessionId(String sessionId);
+
+    boolean deleteBySessionId(String sessionId);
+
+    String create(SessionDTO session);
+
+    void update(SessionDTO session);
+
+    Stream<SessionDTO> streamAll();
 }

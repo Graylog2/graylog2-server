@@ -14,18 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security;
+package org.graylog.testing.inject;
 
-import org.apache.shiro.session.mgt.SimpleSession;
-import org.graylog2.plugin.database.PersistedService;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
-
-public interface MongoDBSessionService extends PersistedService {
-    @Nullable
-    MongoDbSession load(String sessionId);
-
-    Collection<MongoDbSession> loadAll();
-    SimpleSession daoToSimpleSession(MongoDbSession mongoDbSession);
+public class InputConfigurationModule implements Module {
+    @Override
+    public void configure(Binder binder) {
+        binder.bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
+    }
 }
