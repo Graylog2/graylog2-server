@@ -68,7 +68,6 @@ import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
@@ -168,7 +167,6 @@ public class StreamResource extends RestResource {
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineService pipelineService;
     private final EntitySharesService entitySharesService;
-    private final ClusterEventBus clusterEventBus;
 
     private final DbQueryCreator dbQueryCreator;
 
@@ -183,8 +181,7 @@ public class StreamResource extends RestResource {
                           MessageFactory messageFactory,
                           PipelineStreamConnectionsService pipelineStreamConnectionsService,
                           PipelineService pipelineService,
-                          EntitySharesService entitySharesService,
-                          ClusterEventBus clusterEventBus) {
+                          EntitySharesService entitySharesService) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
@@ -196,7 +193,6 @@ public class StreamResource extends RestResource {
         this.entitySharesService = entitySharesService;
         this.dbQueryCreator = new DbQueryCreator(StreamImpl.FIELD_TITLE, attributes);
         this.recentActivityService = recentActivityService;
-        this.clusterEventBus = clusterEventBus;
         final SuccessContextCreator<Stream> successAuditLogContextCreator = (entity, entityClass) ->
                 Map.of("response_entity",
                         Map.of("stream_id", entity.getId(),
@@ -506,8 +502,7 @@ public class StreamResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.STREAM_START)
     public void resume(@ApiParam(name = "streamId", required = true)
-                       @PathParam("streamId") @NotEmpty String streamId,
-                       @Context UserContext userContext) throws NotFoundException, ValidationException {
+                           @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         resumeInner(streamId, null);
     }
 
@@ -732,7 +727,8 @@ public class StreamResource extends RestResource {
                 stream.getRemoveMatchesFromDefaultStream(),
                 stream.getIndexSetId(),
                 stream.getCategories(),
-                stream.isEditable()
+                stream.isEditable(),
+                stream.getFavoriteFields()
         );
     }
 

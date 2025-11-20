@@ -22,7 +22,6 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import Immutable from 'immutable';
 
 import { asMock } from 'helpers/mocking';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import OriginalDashboardActions from 'views/components/dashboard/DashboardsOverview/DashboardActions';
 import { simpleView } from 'views/test/ViewFixtures';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -31,14 +30,13 @@ import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSele
 import type { ContextValue } from 'components/common/PaginatedEntityTable/TableFetchContext';
 import TableFetchContext from 'components/common/PaginatedEntityTable/TableFetchContext';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import { deleteView } from 'views/api/views';
 
 jest.mock('hooks/useCurrentUser');
 jest.mock('components/common/EntityDataTable/hooks/useSelectedEntities');
 
-jest.mock('views/stores/ViewManagementStore', () => ({
-  ViewManagementActions: {
-    delete: jest.fn(() => Promise.resolve()),
-  },
+jest.mock('views/api/views', () => ({
+  deleteView: jest.fn(() => Promise.resolve()),
 }));
 
 const mockSearchParams = {
@@ -100,7 +98,7 @@ describe('DashboardActions', () => {
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
-    expect(ViewManagementActions.delete).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+    expect(deleteView).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
   });
 
   it('deletes dashboard when user confirms deletion', async () => {
@@ -112,7 +110,7 @@ describe('DashboardActions', () => {
 
     await waitFor(() => expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?'));
 
-    expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+    expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
   });
 
   it('does not display more actions dropdown when user has no permissions for deletion and there are no pluggable actions', async () => {
@@ -140,8 +138,8 @@ describe('DashboardActions', () => {
 
     beforeEach(() => {
       PluginStore.register(plugin);
-      asMock(ViewManagementActions.delete).mockClear();
-      asMock(ViewManagementActions.delete).mockImplementation((view) => Promise.resolve(view));
+      asMock(deleteView).mockClear();
+      asMock(deleteView).mockImplementation(() => Promise.resolve());
     });
 
     afterEach(() => {
@@ -153,9 +151,7 @@ describe('DashboardActions', () => {
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() =>
-        expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })),
-      );
+      await waitFor(() => expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
 
       expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard);
     });
@@ -169,9 +165,7 @@ describe('DashboardActions', () => {
 
       await clickDashboardAction('Delete');
 
-      await waitFor(() =>
-        expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })),
-      );
+      await waitFor(() => expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' })));
 
       expect(contextValue.refetch).toHaveBeenCalled();
     });
@@ -185,7 +179,7 @@ describe('DashboardActions', () => {
 
       await waitFor(() => expect(deletingDashboard).toHaveBeenCalledWith(simpleDashboard));
 
-      expect(ViewManagementActions.delete).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+      expect(deleteView).not.toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
     });
 
     it('resorts to default behavior when hook returns `null`', async () => {
@@ -200,7 +194,7 @@ describe('DashboardActions', () => {
 
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?');
 
-      expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+      expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
     });
 
     it('resorts to default behavior when hook throws error', async () => {
@@ -228,7 +222,7 @@ describe('DashboardActions', () => {
 
       expect(window.confirm).toHaveBeenCalledWith('Are you sure you want to delete "Foo"?');
 
-      expect(ViewManagementActions.delete).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
+      expect(deleteView).toHaveBeenCalledWith(expect.objectContaining({ id: 'foo' }));
     });
   });
 });

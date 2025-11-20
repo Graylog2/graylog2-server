@@ -42,6 +42,7 @@ import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.conditions.EnabledIfSearchServer;
 import org.graylog.testing.restoperations.DatanodeOpensearchWait;
 import org.graylog.testing.restoperations.RestOperationParameters;
+import org.graylog2.cluster.nodes.DataNodeDto;
 import org.graylog2.cluster.nodes.DataNodeStatus;
 import org.graylog2.cluster.preflight.DataNodeProvisioningConfig;
 import org.graylog2.security.JwtSecret;
@@ -311,9 +312,9 @@ public class DatanodeProvisioningIT {
             @JsonProperty("transport_address") String transportAddress,
             @JsonProperty("status") String status,
             @JsonProperty("error_msg") String errorMsg,
-            @JsonProperty("hostname") String hostname,
+            @JsonProperty(DataNodeDto.FIELD_HOSTNAME) String hostname,
             @JsonProperty("short_node_id") String shortNodeId,
-            @JsonProperty("data_node_status") String dataNodeStatus
+            @JsonProperty(DataNodeDto.FIELD_DATANODE_STATUS) String dataNodeStatus
     ) {
     }
 }

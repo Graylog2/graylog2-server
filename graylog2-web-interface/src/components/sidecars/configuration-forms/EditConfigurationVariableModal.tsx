@@ -99,7 +99,7 @@ class EditConfigurationVariableModal extends React.Component<
   };
 
   // Needs to be after _validateFormData is defined
-  // eslint-disable-next-line react/sort-comp
+
   _debouncedValidateFormData = debounce(this._validateFormData, 200);
 
   _formDataUpdate = (key) => {

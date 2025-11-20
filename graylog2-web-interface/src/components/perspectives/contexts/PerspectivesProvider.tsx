@@ -24,7 +24,7 @@ import usePersistedSetting from 'hooks/usePersistedSetting';
 
 import PerspectivesContext from './PerspectivesContext';
 
-const DEFAULT_PERSPECTIVE = 'default';
+export const DEFAULT_PERSPECTIVE = 'default';
 
 const findPerspective = (perspectives: Array<Perspective>, perspectiveId: string) =>
   perspectives.find(({ id }) => id === perspectiveId);
