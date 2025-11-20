@@ -20,14 +20,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.ws.rs.DefaultValue;
-import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
@@ -36,7 +34,6 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,12 +49,9 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public AggregateMessagesTool(ObjectMapper objectMapper,
-                                 CustomizationConfig customizationConfig,
-                                 SchemaGeneratorProvider schemaGeneratorProvider,
-                                 ScriptingApiService scriptingApiService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public AggregateMessagesTool(final ToolContext toolContext, ScriptingApiService scriptingApiService) {
+        super(
+                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -70,7 +64,7 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                         You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
                         For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(toolContext.customizationConfig().productName()));
         this.scriptingApiService = scriptingApiService;
     }
 
