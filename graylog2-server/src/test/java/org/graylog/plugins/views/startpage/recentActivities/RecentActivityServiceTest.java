@@ -23,6 +23,7 @@ import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.TestUser;
+import org.graylog.security.CapabilityRegistry;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.shares.GranteeService;
@@ -104,7 +105,8 @@ public class RecentActivityServiceTest {
                 MAXIMUM,
                 new DBGrantService(mongoCollections),
                 mock(GranteeService.class),
-                new PluggableEntityService(Set.of())
+                new PluggableEntityService(Set.of()),
+                mock(CapabilityRegistry.class)
         );
      }
 

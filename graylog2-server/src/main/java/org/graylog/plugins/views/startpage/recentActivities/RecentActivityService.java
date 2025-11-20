@@ -29,6 +29,7 @@ import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.security.Capability;
+import org.graylog.security.CapabilityRegistry;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.GrantDTO;
 import org.graylog.security.PermissionAndRoleResolver;
@@ -40,6 +41,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.pagination.MongoPaginationHelper;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.security.Permission;
 import org.graylog2.rest.models.SortOrder;
 
 import java.util.HashSet;
@@ -59,6 +61,7 @@ public class RecentActivityService {
     private final DBGrantService grantService;
     private final GranteeService granteeService;
     private final PluggableEntityService pluggableEntityService;
+    private CapabilityRegistry capabilityRegistry;
 
     @Inject
     public RecentActivityService(final MongoCollections mongoCollections,
@@ -68,10 +71,10 @@ public class RecentActivityService {
                                  final PermissionAndRoleResolver permissionAndRoleResolver,
                                  final DBGrantService grantService,
                                  final GranteeService granteeService,
-                                 final PluggableEntityService pluggableEntityService) {
-        this(mongoCollections, mongoConnection, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES, grantService,
-                granteeService,
-                pluggableEntityService);
+                                 final PluggableEntityService pluggableEntityService,
+                                 final CapabilityRegistry capabilityRegistry) {
+        this(mongoCollections, mongoConnection, eventBus, grnRegistry, permissionAndRoleResolver, MAXIMUM_RECENT_ACTIVITIES,
+                grantService, granteeService, pluggableEntityService, capabilityRegistry);
     }
 
     /*
@@ -85,10 +88,12 @@ public class RecentActivityService {
                                     final long maximum,
                                     final DBGrantService grantService,
                                     final GranteeService granteeService,
-                                    final PluggableEntityService pluggableEntityService) {
+                                    final PluggableEntityService pluggableEntityService,
+                                    final CapabilityRegistry capabilityRegistry) {
         this.grantService = grantService;
         this.granteeService = granteeService;
         this.pluggableEntityService = pluggableEntityService;
+        this.capabilityRegistry = capabilityRegistry;
         final var mongodb = mongoConnection.getMongoDatabase();
         if (!mongodb.listCollectionNames().into(new HashSet<>()).contains(COLLECTION_NAME)) {
             mongodb.createCollection(COLLECTION_NAME, new CreateCollectionOptions().capped(true).sizeInBytes(maximum * 1024).maxDocuments(maximum));
@@ -146,14 +151,18 @@ public class RecentActivityService {
         final var principal = grnRegistry.newGRN(GRNTypes.USER, user.getUser().getId());
         final var grantees = permissionAndRoleResolver.resolveGrantees(principal).stream().map(GRN::toString).toList();
         final var sharedEntities = getShareGRNsFor(principal);
-        var query = Filters.or(Filters.in(RecentActivityDTO.FIELD_GRANTEE, grantees), Filters.in(RecentActivityDTO.FIELD_ITEM_GRN, sharedEntities));
         return pagination
                 .perPage(perPage)
                 .sort(sort)
-                .filter(query)
                 .includeGrandTotal(true)
-                .grandTotalFilter(query)
-                .page(page);
+                .page(page, activity -> {
+                    final var itemGRN = activity.itemGrn();
+                    final var hasAnyPermission = capabilityRegistry.getPermissions(Capability.VIEW, itemGRN.grnType())
+                            .stream()
+                            .map(Permission::permission)
+                            .anyMatch(permission -> user.isPermitted(permission, itemGRN.entity()));
+                    return hasAnyPermission || grantees.contains(activity.grantee()) || sharedEntities.contains(itemGRN);
+                });
     }
 
     private Set<GRN> getShareGRNsFor(GRN grantee) {

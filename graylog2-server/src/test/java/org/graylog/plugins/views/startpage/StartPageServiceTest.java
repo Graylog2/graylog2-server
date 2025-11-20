@@ -31,6 +31,7 @@ import org.graylog.plugins.views.startpage.lastOpened.LastOpenedForUserDTO;
 import org.graylog.plugins.views.startpage.lastOpened.LastOpenedService;
 import org.graylog.plugins.views.startpage.recentActivities.RecentActivityService;
 import org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever;
+import org.graylog.security.CapabilityRegistry;
 import org.graylog.security.DBGrantService;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.shares.GranteeService;
@@ -105,7 +106,7 @@ public class StartPageServiceTest {
         final var collections = new MongoCollections(mongoJackObjectMapperProvider, connection);
         var lastOpenedService = new LastOpenedService(collections, eventbus);
         var recentActivityService = new RecentActivityService(collections, connection, eventbus, grnRegistry, permissionAndRoleResolver,
-                new DBGrantService(collections), mock(GranteeService.class), new PluggableEntityService(Set.of()));
+                new DBGrantService(collections), mock(GranteeService.class), new PluggableEntityService(Set.of()), mock(CapabilityRegistry.class));
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
         startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog, Map.of()));
