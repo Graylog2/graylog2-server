@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, forwardRef, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import { IconButton, SortableList } from 'components/common';
@@ -32,27 +32,6 @@ const ColumnTitle = styled.div`
   flex: 1;
 `;
 
-type ListItemProps = {
-  item: { id: string; title: string };
-  dragHandle: React.ReactNode;
-  className: string;
-  onChange: (columnName: string) => void;
-  onRemove: () => void;
-  selectedColumns: Array<string>;
-};
-
-const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
-  ({ className, dragHandle, item, onRemove }: ListItemProps, ref) => (
-    <ListItemContainer className={className} ref={ref}>
-      {dragHandle}
-      <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
-      <div>
-        <IconButton name="delete" title={`Remove ${item.title} column`} onClick={onRemove} />
-      </div>
-    </ListItemContainer>
-  ),
-);
-
 type Props = {
   onChange: (newSelectedColumns: Array<string>) => void;
   displayOverlayInPortal?: boolean;
@@ -66,16 +45,6 @@ const SelectedColumnsList = ({ selectedColumns, onChange, displayOverlayInPortal
     [columnTitle, selectedColumns],
   );
 
-  const onChangeColumn = useCallback(
-    (columnIndex: number, newFieldName: string) => {
-      const newColumns = [...selectedColumns];
-      newColumns[columnIndex] = newFieldName;
-
-      onChange(newColumns);
-    },
-    [onChange, selectedColumns],
-  );
-
   const onRemoveColumn = useCallback(
     (removedFieldName: string) => {
       const newColumns = selectedColumns.filter((columnName) => columnName !== removedFieldName);
@@ -85,18 +54,25 @@ const SelectedColumnsList = ({ selectedColumns, onChange, displayOverlayInPortal
   );
 
   const SortableListItem = useCallback(
-    ({ item, index, dragHandle, className, ref }) => (
-      <ListItem
-        onChange={(newFieldName) => onChangeColumn(index, newFieldName)}
-        onRemove={() => onRemoveColumn(item.id)}
-        selectedColumns={selectedColumns ?? []}
-        item={item}
-        dragHandle={dragHandle}
-        className={className}
-        ref={ref}
-      />
-    ),
-    [selectedColumns, onChangeColumn, onRemoveColumn],
+    (props: {
+      item: { id: string; title: string };
+      dragHandle: React.ReactNode;
+      className?: string;
+      ref: React.Ref<HTMLDivElement>;
+    }) => {
+      const { item, dragHandle, className, ref } = props;
+
+      return (
+        <ListItemContainer className={className} ref={ref}>
+          {dragHandle}
+          <ColumnTitle>{item.title === 'unknown' ? <UnknownAttributeTitle /> : item.title}</ColumnTitle>
+          <div>
+            <IconButton name="delete" title={`Remove ${item.title} column`} onClick={() => onRemoveColumn(item.id)} />
+          </div>
+        </ListItemContainer>
+      );
+    },
+    [onRemoveColumn],
   );
 
   const onSortChange = useCallback(
