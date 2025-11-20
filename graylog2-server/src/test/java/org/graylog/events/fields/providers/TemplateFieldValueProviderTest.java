@@ -23,8 +23,8 @@ import org.graylog.events.event.TestEvent;
 import org.graylog.events.fields.FieldValue;
 import org.graylog.events.fields.FieldValueType;
 import org.joda.time.DateTime;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -85,7 +85,7 @@ public class TemplateFieldValueProviderTest extends FieldValueProviderTest {
     }
 
     @Test
-    @Ignore("template engine doesn't support expressions")
+    @Disabled("template engine doesn't support expressions")
     public void templateCalculation() {
         final TestEvent event = new TestEvent();
         final EventWithContext eventWithContext = EventWithContext.create(event, newMessage(ImmutableMap.of("bytes", 1024)));

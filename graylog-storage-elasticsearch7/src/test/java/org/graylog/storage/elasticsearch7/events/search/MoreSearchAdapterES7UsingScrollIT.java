@@ -25,16 +25,15 @@ import org.graylog.storage.elasticsearch7.MoreSearchAdapterES7;
 import org.graylog.storage.elasticsearch7.Scroll;
 import org.graylog.storage.elasticsearch7.ScrollResultES7;
 import org.graylog.storage.elasticsearch7.SearchRequestFactory;
-import org.graylog.storage.elasticsearch7.SortOrderMapper;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.TestResultMessageFactory;
-import org.junit.Rule;
 
 public class MoreSearchAdapterES7UsingScrollIT extends MoreSearchAdapterIT {
 
-    @Rule
+    @SearchInstance
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
@@ -46,15 +45,14 @@ public class MoreSearchAdapterES7UsingScrollIT extends MoreSearchAdapterIT {
 
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
         final ElasticsearchClient client = elasticsearch.elasticsearchClient();
         return new MoreSearchAdapterES7(new ES7ResultMessageFactory(resultMessageFactory),
-                client, true, sortOrderMapper,
+                client, true,
                 new Scroll(client,
                         (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
                                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
                         ),
-                        new SearchRequestFactory(sortOrderMapper, false, true, new IgnoreSearchFilters())
+                        new SearchRequestFactory(false, true, new IgnoreSearchFilters())
                 )
 
         );

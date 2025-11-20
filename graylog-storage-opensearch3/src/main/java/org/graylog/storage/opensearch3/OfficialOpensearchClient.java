@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.apache.hc.core5.http.ContentTooLongException;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -30,7 +31,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -46,9 +49,40 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         }
     }
 
+    public <T> T sync(ThrowingFunction<T> operation, String errorMessage) {
+        try {
+            return operation.apply(sync);
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
     public <T> CompletableFuture<T> executeAsync(ThrowingSupplier<CompletableFuture<T>> operation, String errorMessage) {
         try {
             return operation.get().exceptionally(ex -> {
+                throw mapException(ex, errorMessage);
+            });
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    /**
+     * Uses a timeout to wait for results from an asynchronous request.
+     * Attention: This is a client timeout, not a server timeout. This doesn't mean the request is cancelled after the timeout.
+     */
+    <T> T executeWithClientTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
+        try {
+            CompletableFuture<T> futureResponse = async(operation, errorMessage);
+            return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    public <T> CompletableFuture<T> async(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage) {
+        try {
+            return operation.apply(async).exceptionally(ex -> {
                 throw mapException(ex, errorMessage);
             });
         } catch (Throwable t) {
@@ -74,10 +108,20 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
         T get() throws Exception;
     }
 
+    @FunctionalInterface
+    public interface ThrowingFunction<T> {
+        T apply(OpenSearchClient syncClient) throws Exception;
+    }
+
+    @FunctionalInterface
+    public interface ThrowingAsyncFunction<T> {
+        T apply(OpenSearchAsyncClient syncClient) throws Exception;
+    }
+
     public static RuntimeException mapException(Throwable t, String message) {
         if (t instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
-                return new IndexNotFoundException(t.getMessage());
+                return new IndexNotFoundException(message, List.of(t.getMessage(), "Try recalculating your index ranges"));
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
                 return new MasterNotDiscoveredException();

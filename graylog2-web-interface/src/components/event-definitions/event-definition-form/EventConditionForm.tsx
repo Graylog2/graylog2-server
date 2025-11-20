@@ -16,8 +16,6 @@
  */
 import * as React from 'react';
 import { useCallback, useMemo } from 'react';
-import defaultTo from 'lodash/defaultTo';
-import get from 'lodash/get';
 
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Select } from 'components/common';
@@ -97,8 +95,8 @@ const EventConditionForm = ({
 
         if (eventDefinitionType1Order !== undefined || eventDefinitionType2Order !== undefined) {
           const sort =
-            defaultTo(eventDefinitionType1Order, Number.MAX_SAFE_INTEGER) -
-            defaultTo(eventDefinitionType2Order, Number.MAX_SAFE_INTEGER);
+            (eventDefinitionType1Order ?? Number.MAX_SAFE_INTEGER) -
+            (eventDefinitionType2Order ?? Number.MAX_SAFE_INTEGER);
 
           if (sort !== 0) {
             return sort;
@@ -111,7 +109,10 @@ const EventConditionForm = ({
   );
 
   const formattedEventDefinitionTypes = useMemo(
-    () => sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type })),
+    () =>
+      sortedEventDefinitionTypes
+        .filter((type) => type.useCondition())
+        .map((type) => ({ label: type.displayName, value: type.type })),
     [sortedEventDefinitionTypes],
   );
 
@@ -186,9 +187,7 @@ const EventConditionForm = ({
                 disabled={disabledSelect || onlyFilters || isSigma}
                 required
               />
-              <HelpBlock>
-                {get(validation, 'errors.config[0]', 'Choose the type of Condition for this Event.')}
-              </HelpBlock>
+              <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Condition for this Event.'}</HelpBlock>
             </FormGroup>
           </>
         )}

@@ -74,7 +74,7 @@ const BufferUsage = ({ nodeId, bufferType, title }: Props) => {
   const usage = usageMetric ? usageMetric.metric.value : NaN;
   const sizeMetric = metrics[nodeId][`${prefix}.size`] as GaugeMetric;
   const size = sizeMetric ? sizeMetric.metric.value : NaN;
-  // eslint-disable-next-line no-restricted-globals
+
   const usagePercentage = !isNaN(usage) && !isNaN(size) ? usage / size : 0;
   const percentLabel = NumberUtils.formatPercentage(usagePercentage);
 

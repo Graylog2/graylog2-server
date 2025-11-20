@@ -39,6 +39,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.Response;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.ResponseException;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.RestHighLevelClient;
 import org.graylog.storage.errors.ResponseError;
+import org.graylog.storage.function.ThrowingBiFunction;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
@@ -93,10 +94,6 @@ public class ElasticsearchClient {
         final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
 
         return firstResponseFrom(result, errorMessage);
-    }
-
-    public SearchResponse singleSearch(SearchRequest searchRequest, String errorMessage) {
-        return execute((c, requestOptions) -> c.search(searchRequest, requestOptions), errorMessage);
     }
 
     public List<MultiSearchResponse.Item> msearch(List<SearchRequest> searchRequests, String errorMessage) {
