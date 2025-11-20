@@ -14,10 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.testing.inject;
 
-import java.net.URI;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 
-public interface MailServerInstance {
-    URI getEndpointURI();
+public class InputConfigurationModule implements Module {
+    @Override
+    public void configure(Binder binder) {
+        binder.bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
+    }
 }
