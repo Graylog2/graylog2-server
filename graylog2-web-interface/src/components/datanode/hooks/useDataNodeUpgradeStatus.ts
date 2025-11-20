@@ -22,7 +22,7 @@ import { defaultOnError } from 'util/conditional/onError';
 import UserNotification from 'util/UserNotification';
 
 export interface DataNodeInformation {
-  datanode_status: 'UNCONFIGURED' | 'PREPARED' | 'STARTING' | 'AVAILABLE' | 'UNAVAILABLE' | 'REMOVING' | 'REMOVED';
+  data_node_status: 'UNCONFIGURED' | 'PREPARED' | 'STARTING' | 'AVAILABLE' | 'UNAVAILABLE' | 'REMOVING' | 'REMOVED';
   hostname: string;
   opensearch_version: string;
   datanode_version: string;

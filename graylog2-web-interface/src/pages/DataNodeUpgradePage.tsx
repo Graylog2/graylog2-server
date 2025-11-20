@@ -317,9 +317,9 @@ const DataNodeUpgradePage = () => {
                             <div>
                               {outdated_node?.hostname}&nbsp;
                               <Label
-                                bsStyle={outdated_node?.datanode_status === 'AVAILABLE' ? 'success' : 'warning'}
+                                bsStyle={outdated_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'}
                                 bsSize="xs">
-                                {outdated_node?.datanode_status}
+                                {outdated_node?.data_node_status}
                               </Label>
                               &nbsp;
                               {outdated_node?.manager_node && (
@@ -365,9 +365,9 @@ const DataNodeUpgradePage = () => {
                             <div>
                               {upgraded_node?.hostname}&nbsp;
                               <Label
-                                bsStyle={upgraded_node?.datanode_status === 'AVAILABLE' ? 'success' : 'warning'}
+                                bsStyle={upgraded_node?.data_node_status === 'AVAILABLE' ? 'success' : 'warning'}
                                 bsSize="xs">
-                                {upgraded_node?.datanode_status}
+                                {upgraded_node?.data_node_status}
                               </Label>
                               &nbsp;
                               {upgraded_node?.manager_node && (
