@@ -27,7 +27,7 @@ import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
-import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.resources.system.ClusterResource;
 import org.graylog2.search.SearchQueryParser;
@@ -87,7 +87,7 @@ class ServerNodePaginatedServiceIT {
                 .setLeader(true)
                 .setTransportAddress("http://my-hostname:8999")
                 .setProcessing(true)
-                .setLoadBalancerStatus(LoadBalancerStatus.ALIVE)
+                .setLifecycle(Lifecycle.RUNNING)
                 .build();
     }
 
