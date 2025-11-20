@@ -41,6 +41,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.SuggestBuild
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestion;
 import org.graylog.shaded.opensearch2.org.opensearch.search.suggest.term.TermSuggestionBuilder;
 import org.graylog.storage.errors.ResponseError;
+import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.plugin.Message;
 
 import java.util.List;

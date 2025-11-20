@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3;
 
 import com.github.joschi.jadconfig.util.Duration;
 import org.apache.hc.core5.http.ContentTooLongException;
+import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
