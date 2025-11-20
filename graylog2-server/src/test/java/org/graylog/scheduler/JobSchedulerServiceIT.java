@@ -101,22 +101,18 @@ class JobSchedulerServiceIT {
         final Duration lockExpirationDuration = Duration.seconds(10);
 
         final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        jobDefinitionService = new DBJobDefinitionService(
-                new MongoCollections(mapperProvider,
-                        mongoDBTestService.mongoConnection()), mapperProvider);
+        final var mongoCollections = new MongoCollections(mapperProvider, mongoDBTestService.mongoConnection());
+        jobDefinitionService = new DBJobDefinitionService(mongoCollections, mapperProvider);
 
         jobTriggerService = new DBJobTriggerService(
-                new MongoCollections(mapperProvider, mongoDBTestService.mongoConnection()),
+                mongoCollections,
                 nodeId,
                 clock,
                 schedulerCapabilitiesService,
                 lockExpirationDuration
         );
 
-        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(
-                new MongoCollections(mapperProvider,
-                        mongoDBTestService.mongoConnection()),
-                mapperProvider);
+        final DBJobDefinitionService jobDefinitionService = new DBJobDefinitionService(mongoCollections, mapperProvider);
         final JobScheduleStrategies scheduleStrategies = new JobScheduleStrategies(clock);
 
         final JobTriggerUpdates.Factory jobTriggerUpdatesFactory = trigger -> new JobTriggerUpdates(

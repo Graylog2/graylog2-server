@@ -18,8 +18,8 @@ package org.graylog2.streams;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,7 +27,7 @@ public class StreamMetricsTest {
     private MetricRegistry metricRegistry;
     private StreamMetrics streamMetrics;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         metricRegistry = new MetricRegistry();
         streamMetrics = new StreamMetrics(metricRegistry);

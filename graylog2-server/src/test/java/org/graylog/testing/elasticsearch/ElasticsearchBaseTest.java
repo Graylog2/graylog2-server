@@ -19,8 +19,8 @@ package org.graylog.testing.elasticsearch;
 import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.storage.SearchVersion;
-import org.junit.Before;
-import org.junit.Rule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.Map;
@@ -36,13 +36,12 @@ import java.util.Map;
  * <p>
  * Check the {@link #importFixture(String)} method if you need to load fixture data from JSON files.
  */
+@ExtendWith(SkipDefaultIndexTemplateWatcher.class)
 public abstract class ElasticsearchBaseTest {
-    @Rule
-    public final SkipDefaultIndexTemplateWatcher skipTemplatesWatcher = new SkipDefaultIndexTemplateWatcher();
 
-    @Before
-    public void before() {
-        if (!skipTemplatesWatcher.shouldSkip()) {
+    @BeforeEach
+    public void before(@SkipDefaultIndexTemplate boolean skipDefaultIndexTemplates) {
+        if (!skipDefaultIndexTemplates) {
             addGraylogDefaultIndexTemplate();
         }
     }

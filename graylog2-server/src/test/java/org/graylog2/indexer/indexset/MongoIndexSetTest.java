@@ -36,14 +36,14 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -55,20 +55,20 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.indexer.template.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.MongoIndexSet.hotIndexName;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MongoIndexSetTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     private final IndexSetConfig config = IndexSetConfig.create(
             "Test",
@@ -104,7 +104,7 @@ public class MongoIndexSetTest {
     @Mock
     private NotificationService notificationService;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         mongoIndexSet = createIndexSet(config);
     }
@@ -256,17 +256,18 @@ public class MongoIndexSetTest {
         when(notificationService.build()).thenReturn(notification);
 
         String errorMessage = "Could not create new target index <graylog_0>.";
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage(errorMessage);
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
 
-        final MongoIndexSet mongoIndexSet = createIndexSet(config);
-        mongoIndexSet.cycle();
+            final MongoIndexSet mongoIndexSet = createIndexSet(config);
+            mongoIndexSet.cycle();
 
-        ArgumentCaptor<Notification> argument = ArgumentCaptor.forClass(Notification.class);
-        verify(notificationService, times(1)).publishIfFirst(argument.capture());
+            ArgumentCaptor<Notification> argument = ArgumentCaptor.forClass(Notification.class);
+            verify(notificationService, times(1)).publishIfFirst(argument.capture());
 
-        Notification publishedNotification = argument.getValue();
-        assertThat(publishedNotification.getDetail("description")).isEqualTo(errorMessage);
+            Notification publishedNotification = argument.getValue();
+            assertThat(publishedNotification.getDetail("description")).isEqualTo(errorMessage);
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString(errorMessage));
     }
 
     @Test

@@ -21,8 +21,8 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.fail;
 public class InMemoryRuleServiceTest {
     private InMemoryRuleService service;
 
-    @Before
+    @BeforeEach
     public void setup() {
         service = new InMemoryRuleService(new ClusterEventBus());
     }

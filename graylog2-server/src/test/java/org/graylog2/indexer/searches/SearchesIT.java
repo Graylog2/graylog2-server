@@ -50,12 +50,13 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -78,12 +79,11 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public abstract class SearchesIT extends ElasticsearchBaseTest {
     private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
     private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private static final String INDEX_NAME = "graylog_0";
     private static final String STREAM_ID = "000000000000000000000001";
@@ -154,7 +154,7 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
     protected MetricRegistry metricRegistry;
     protected Searches searches;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));

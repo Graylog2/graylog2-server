@@ -33,10 +33,9 @@ import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,10 +64,10 @@ public class IpfixAggregatorTest {
             Resources.getResource("ipfix-iana-elements.json")
     );
 
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
-    @Ignore("Not ready. Has InvalidIPFixMessageVersion.")
+    @Disabled("Not ready. Has InvalidIPFixMessageVersion.")
     @Test
     public void completePacket() throws IOException {
         final ByteBuf packetBytes = Utils.readPacket("templates-data.ipfix");
@@ -84,7 +83,7 @@ public class IpfixAggregatorTest {
         assertThat(ipfixMessage).isNotNull();
     }
 
-    @Ignore("Not ready. Has InvalidIPFixMessageVersion.")
+    @Disabled("Not ready. Has InvalidIPFixMessageVersion.")
     @Test
     public void multipleMessagesTemplateLater() throws IOException {
         final ByteBuf datasetOnlyBytes = Utils.readPacket("dataset-only.ipfix");
