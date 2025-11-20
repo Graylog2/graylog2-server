@@ -127,7 +127,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
         return this.indexSetsCache.get()
                 .stream()
                 .filter(indexSet -> Objects.equals(indexSet.id(), indexSetId))
-                .map(indexSetConfig -> (IndexSet) mongoIndexSetFactory.create(indexSetConfig))
+                .map(mongoIndexSetFactory::create)
                 .findFirst();
     }
 
@@ -136,7 +136,6 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
         return findAllIndexSets()
                 .stream()
                 .filter(indexSet -> indexSet.isManagedIndex(indexName))
-                .map(indexSet -> (IndexSet) indexSet)
                 .findFirst();
     }
 
