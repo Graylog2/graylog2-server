@@ -103,7 +103,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     private Set<IndexSet> findAllIndexSets() {
-        return getIndexSetsStream().collect(Collectors.toSet());
+        return getIndexSetsStream().collect(ImmutableSet.toImmutableSet());
     }
 
     private Stream<IndexSet> getIndexSetsStream() {
@@ -112,7 +112,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
 
     @Override
     public Set<IndexSet> getAllIndexSets() {
-        return ImmutableSet.copyOf(findAllIndexSets());
+        return findAllIndexSets();
     }
 
     @Override
