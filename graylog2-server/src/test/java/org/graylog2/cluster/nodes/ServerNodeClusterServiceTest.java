@@ -26,7 +26,7 @@ import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class ServerNodeClusterServiceTest {
     private static final String LOCAL_CANONICAL_HOSTNAME = Tools.getLocalCanonicalHostname();
     private static final String NODE_ID = "28164cbe-4ad9-4c9c-a76e-088655aa7889";
     private static final boolean IS_PROCESSING = true;
-    private static final LoadBalancerStatus LB_STATUS = LoadBalancerStatus.ALIVE;
+    private static final Lifecycle LIFECYCLE = Lifecycle.RUNNING;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -82,7 +82,7 @@ public class ServerNodeClusterServiceTest {
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
                 .setProcessing(IS_PROCESSING)
-                .setLoadBalancerStatus(LB_STATUS)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         final Node node = nodeService.byNodeId(nodeId);
@@ -108,7 +108,7 @@ public class ServerNodeClusterServiceTest {
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
                 .setProcessing(IS_PROCESSING)
-                .setLoadBalancerStatus(LB_STATUS)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         @SuppressWarnings("deprecation")
@@ -135,7 +135,7 @@ public class ServerNodeClusterServiceTest {
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
                 .setProcessing(IS_PROCESSING)
-                .setLoadBalancerStatus(LB_STATUS)
+                .setLifecycle(LIFECYCLE)
                 .build());
         assertThat(nodeService.allActive().keySet()).containsExactly(nodeId.getNodeId());
 
@@ -149,7 +149,7 @@ public class ServerNodeClusterServiceTest {
                 .setTransportAddress(TRANSPORT_URI.toString())
                 .setHostname(LOCAL_CANONICAL_HOSTNAME)
                 .setProcessing(IS_PROCESSING)
-                .setLoadBalancerStatus(LB_STATUS)
+                .setLifecycle(LIFECYCLE)
                 .build());
 
         final ServerNodeDto node = nodeService.byNodeId(nodeId);
