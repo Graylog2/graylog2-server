@@ -65,8 +65,8 @@ import org.opensearch.client.opensearch.core.ReindexResponse;
 import org.opensearch.client.opensearch.core.reindex.Destination;
 import org.opensearch.client.opensearch.core.reindex.Source;
 import org.opensearch.client.opensearch.generic.Body;
-import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.opensearch.indices.ForcemergeRequest;
 import org.opensearch.client.opensearch.indices.GetAliasRequest;
@@ -120,7 +120,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
     private final OpenSearchIndicesClient indicesClient;
     private final OpenSearchCatClient catClient;
-    private final OpenSearchGenericClient genericClient;
+    private final PlainJsonApi jsonApi;
     private final OSSerializationUtils osSerializationUtils;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
@@ -136,6 +136,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
                             ObjectMapper objectMapper,
+                            PlainJsonApi jsonApi,
                             final OSSerializationUtils osSerializationUtils) {
         this.c = c;
         this.statsApi = statsApi;
@@ -145,9 +146,9 @@ public class IndicesAdapterOS implements IndicesAdapter {
         this.indexStatisticsBuilder = indexStatisticsBuilder;
         this.objectMapper = objectMapper;
         this.openSearchClient = c.sync();
+        this.jsonApi = jsonApi;
         this.indicesClient = openSearchClient.indices();
         this.catClient = openSearchClient.cat();
-        this.genericClient = openSearchClient.generic();
         this.osSerializationUtils = osSerializationUtils;
     }
 
@@ -243,8 +244,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .method("PUT")
                     .body(Body.from(objectMapper.writeValueAsBytes(mapping), "application/json"))
                     .build();
-            c.execute(() -> genericClient.execute(request),
-                    "Unable to update index mapping " + indexName);
+            jsonApi.performRequest(request, "Unable to update index mapping " + indexName);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to update index mapping " + indexName, e);
         }
@@ -264,18 +264,15 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
-        return c.execute(() -> {
-            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b.index(index)
-                    .ignoreUnavailable(true)
-                    .allowNoIndices(true)
-                    .expandWildcards(ExpandWildcard.Open)
-            );
-            org.opensearch.client.opensearch.indices.IndexSettings settings = result.get(index).settings();
-            if (settings == null) {
-                return Map.of();
-            }
-            return objectMapper.readValue(settings.toJsonString(), new TypeReference<>() {});
-        }, "Couldn't read settings of index " + index);
+        Request request = Requests.builder()
+                .method("GET")
+                .endpoint("/" + index + "/_settings")
+                .build();
+        JsonNode jsonNode = jsonApi.performRequest(request, "Unable to retrieve index settings " + index);
+        return Optional.ofNullable(jsonNode.get(index))
+                .map(node -> node.get("settings"))
+                .map(node -> objectMapper.convertValue(node, new TypeReference<Map<String, Object>>() {}))
+                .orElse(Map.of());
     }
 
     /**
@@ -542,7 +539,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public boolean exists(String index) {
         try {
-            indicesClient.get(r -> r.index(index).ignoreUnavailable(false));
+            indicesClient.get(r -> r.index(index).flatSettings(true).ignoreUnavailable(false));
             return true;
         } catch (IOException | OpenSearchException e) {
             if (e instanceof OpenSearchException && e.getMessage().contains("no such index")) {
@@ -563,6 +560,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
         return c.execute(() -> {
             GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
                     .index(indexWildcard)
+                    .flatSettings(true)
                     .expandWildcards(status.stream().map(this::resolveWildcard).collect(Collectors.toList()))
                     .ignoreUnavailable(true)));
             return result.result().keySet();
@@ -621,7 +619,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .flush(true)
         );
 
-        c.execute(() -> OfficialOpensearchClient.withTimeout(indicesClient, timeout).forcemerge(request), "Unable to forcemerge index " + index);
+        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
 
     }
 

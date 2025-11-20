@@ -29,11 +29,12 @@ import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.OpenSearchClient;
+import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
-import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
+import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -79,6 +80,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
+        final OSSerializationUtils osSerializationUtils = new OSSerializationUtils();
         return new IndicesAdapterOS(officialOpensearchClient,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
@@ -86,7 +88,8 @@ public class AdaptersOS implements Adapters {
                 indexTemplateAdapter(),
                 new IndexStatisticsBuilder(),
                 objectMapper,
-                new OSSerializationUtils(objectMapper, officialOpensearchClient)
+                new PlainJsonApi(objectMapper, client, officialOpensearchClient),
+                osSerializationUtils
         );
     }
 
@@ -128,7 +131,7 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
-        return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS2(client));
+        return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS(officialOpensearchClient));
     }
 
     @Override
