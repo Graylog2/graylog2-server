@@ -98,6 +98,7 @@ public abstract class TestableSearchServerInstance extends ExternalResource impl
 
     private GenericContainer<?> doBuildContainer(String image) {
         LOG.debug("Creating instance {} (cached: {})", image, cachedInstance);
+        isFirstContainerStart = true;
         final GenericContainer<?> container = buildContainer(image, network);
         container.start();
         if (LOG.isDebugEnabled()) {
