@@ -16,15 +16,12 @@
  */
 package org.graylog2.audit;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AuditEventTypeTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void testStringType() throws Exception {
@@ -52,20 +49,20 @@ public class AuditEventTypeTest {
     }
 
     @Test
-    public void testInvalid1() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        AuditEventType.create("foo");
+    public void testInvalid1() {
+        assertThrows(IllegalArgumentException.class, () ->
+            AuditEventType.create("foo"));
     }
 
     @Test
-    public void testInvalid2() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        AuditEventType.create("");
+    public void testInvalid2() {
+        assertThrows(IllegalArgumentException.class, () ->
+            AuditEventType.create(""));
     }
 
     @Test
-    public void testInvalid3() throws Exception {
-        expectedException.expect(IllegalArgumentException.class);
-        AuditEventType.create(null);
+    public void testInvalid3() {
+        assertThrows(IllegalArgumentException.class, () ->
+            AuditEventType.create(null));
     }
 }

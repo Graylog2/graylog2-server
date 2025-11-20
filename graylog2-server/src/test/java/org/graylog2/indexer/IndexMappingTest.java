@@ -24,7 +24,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetMappingTemplate;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -103,7 +103,7 @@ class IndexMappingTest {
         try {
             final URL resource = this.getClass().getResource(filename);
             if (resource == null) {
-                Assert.fail("Unable to find resource file for test: " + filename);
+                Assertions.fail("Unable to find resource file for test: " + filename);
             }
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);
