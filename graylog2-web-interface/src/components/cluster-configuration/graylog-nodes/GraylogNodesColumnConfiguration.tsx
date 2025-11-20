@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
 import { Link } from 'components/common/router';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import Routes from 'routing/Routes';
@@ -25,18 +23,9 @@ import NumberUtils from 'util/NumberUtils';
 
 import type { GraylogNode } from './useClusterGraylogNodes';
 
-import RatioIndicator from '../shared-components/RatioIndicator';
-import { MetricsColumn, MetricsRow, SecondaryText } from '../shared-components/NodeMetricsLayout';
-
-const NodePrimary = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-`;
-
-const StyledLabel = styled(Label)`
-  display: inline-flex;
-`;
+import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
+import { buildRatioIndicator, computeRatio } from '../shared-components/RatioIndicator';
+import { MetricsColumn, MetricsRow, NodePrimary, SecondaryText, StyledLabel } from '../shared-components/NodeMetricsLayout';
 
 const JOURNAL_WARNING_THRESHOLD = 0.25;
 const JOURNAL_DANGER_THRESHOLD = 0.5;
@@ -45,26 +34,16 @@ const JVM_DANGER_THRESHOLD = 0.9;
 const BUFFER_WARNING_THRESHOLD = 0.6;
 const BUFFER_DANGER_THRESHOLD = 0.8;
 
-const computeRatio = (current: number | undefined | null, max: number | undefined | null) => {
-  if (current === undefined || current === null || max === undefined || max === null || max === 0) {
-    return undefined;
-  }
-
-  return current / max;
-};
-
-const renderRatioIndicator = (ratio: number | undefined | null, warning: number, danger: number) =>
-  ratio === undefined || ratio === null ? null : (
-    <RatioIndicator ratio={ratio} warningThreshold={warning} dangerThreshold={danger} />
-  );
-
-
 const renderBufferRow = (
   label: string,
   usage: number | undefined | null,
   size: number | undefined | null,
 ) => {
-  const ratioIndicator = renderRatioIndicator(computeRatio(usage, size), BUFFER_WARNING_THRESHOLD, BUFFER_DANGER_THRESHOLD);
+  const ratioIndicator = buildRatioIndicator(
+    computeRatio(usage, size),
+    BUFFER_WARNING_THRESHOLD,
+    BUFFER_DANGER_THRESHOLD,
+  );
 
   return (
     <MetricsRow key={label}>
@@ -75,7 +54,7 @@ const renderBufferRow = (
 };
 
 const formatThroughput = (value: number | undefined | null) => {
-  if (value === undefined || value === null) {
+  if (value == null) {
     return '';
   }
 
@@ -169,7 +148,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     is_processing: {
       renderCell: (_value, entity) => {
-        if (entity.is_processing === undefined || entity.is_processing === null) {
+        if (entity.is_processing == null) {
           return null;
         }
 
@@ -206,71 +185,35 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
       },
     },
     journal: {
-      renderCell: (_value, entity) => {
-        const journalCurrent = entity.metrics?.journalSize;
-        const journalMax = entity.metrics?.journalMaxSize;
-        const ratio = entity.metrics?.journalSizeRatio ?? computeRatio(journalCurrent, journalMax);
-        const currentLabel =
-          journalCurrent === undefined || journalCurrent === null ? '' : NumberUtils.formatBytes(journalCurrent);
-        const maxLabel = journalMax === undefined || journalMax === null ? '' : NumberUtils.formatBytes(journalMax);
-        const sizeLabel = [currentLabel, maxLabel].filter(Boolean).join(' / ');
-        const ratioIndicator = renderRatioIndicator(ratio, JOURNAL_WARNING_THRESHOLD, JOURNAL_DANGER_THRESHOLD);
-
-        return (
-          <MetricsColumn>
-            {sizeLabel && (
-              <MetricsRow>
-                <span>{sizeLabel}</span>
-              </MetricsRow>
-            )}
-            {ratioIndicator && <MetricsRow>{ratioIndicator}</MetricsRow>}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.journalSize}
+          max={entity.metrics?.journalMaxSize}
+          ratio={entity.metrics?.journalSizeRatio}
+          warningThreshold={JOURNAL_WARNING_THRESHOLD}
+          dangerThreshold={JOURNAL_DANGER_THRESHOLD}
+        />
+      ),
     },
     dataLakeJournal: {
-      renderCell: (_value, entity) => {
-        const current = entity.metrics?.dataLakeJournalSize;
-        const max = entity.metrics?.journalMaxSize;
-        const ratio = computeRatio(current, max);
-        const currentLabel = current === undefined || current === null ? '' : NumberUtils.formatBytes(current);
-        const maxLabel = max === undefined || max === null ? '' : NumberUtils.formatBytes(max);
-        const sizeLabel = [currentLabel, maxLabel].filter(Boolean).join(' / ');
-        const ratioIndicator = renderRatioIndicator(ratio, JOURNAL_WARNING_THRESHOLD, JOURNAL_DANGER_THRESHOLD);
-
-        return (
-          <MetricsColumn>
-            {sizeLabel && (
-              <MetricsRow>
-                <span>{sizeLabel}</span>
-              </MetricsRow>
-            )}
-            {ratioIndicator && <MetricsRow>{ratioIndicator}</MetricsRow>}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.dataLakeJournalSize}
+          max={entity.metrics?.journalMaxSize}
+          warningThreshold={JOURNAL_WARNING_THRESHOLD}
+          dangerThreshold={JOURNAL_DANGER_THRESHOLD}
+        />
+      ),
     },
     jvm: {
-      renderCell: (_value, entity) => {
-        const heapUsed = entity.metrics?.jvmMemoryHeapUsed;
-        const heapMax = entity.metrics?.jvmMemoryHeapMax;
-        const ratio = computeRatio(heapUsed, heapMax);
-        const usedLabel = heapUsed === undefined || heapUsed === null ? '' : NumberUtils.formatBytes(heapUsed);
-        const maxLabel = heapMax === undefined || heapMax === null ? '' : NumberUtils.formatBytes(heapMax);
-        const sizeLabel = [usedLabel, maxLabel].filter(Boolean).join(' / ');
-        const ratioIndicator = renderRatioIndicator(ratio, JVM_WARNING_THRESHOLD, JVM_DANGER_THRESHOLD);
-
-        return (
-          <MetricsColumn>
-            {sizeLabel && (
-              <MetricsRow>
-                <span>{sizeLabel}</span>
-              </MetricsRow>
-            )}
-            {ratioIndicator && <MetricsRow>{ratioIndicator}</MetricsRow>}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.jvmMemoryHeapUsed}
+          max={entity.metrics?.jvmMemoryHeapMax}
+          warningThreshold={JVM_WARNING_THRESHOLD}
+          dangerThreshold={JVM_DANGER_THRESHOLD}
+        />
+      ),
     },
     buffers: {
       renderCell: (_value, entity) => {

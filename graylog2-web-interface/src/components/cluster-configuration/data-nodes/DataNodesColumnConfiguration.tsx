@@ -15,9 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 import { Link } from 'components/common/router';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
@@ -27,14 +25,8 @@ import Routes from 'routing/Routes';
 
 import type { ClusterDataNode } from './useClusterDataNodes';
 
-import RatioIndicator from '../shared-components/RatioIndicator';
-import { MetricsColumn, MetricsRow, SecondaryText } from '../shared-components/NodeMetricsLayout';
-
-const RoleLabel = styled(Label)`
-  display: inline-flex;
-  justify-content: center;
-  gap: 4px;
-`;
+import { MetricsColumn, MetricsRow, RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
+import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 export const DEFAULT_VISIBLE_COLUMNS = ['hostname', 'datanode_status', 'memory', 'jvm', 'cpu', 'indexing', 'storage', 'datanode_version', 'opensearch_roles'] as const;
 
@@ -67,31 +59,14 @@ const getRoleLabels = (roles: Array<string>) =>
 const getDataNodeRoles = (dataNode: DataNode) =>
   dataNode.opensearch_roles?.map((currentRole) => currentRole.trim()).filter(Boolean) ?? [];
 
-const computeRatio = (current: number | undefined | null, max: number | undefined | null) => {
-  if (current === undefined || current === null || max === undefined || max === null || max === 0) {
-    return undefined;
-  }
-
-  return current / max;
-};
-
-const renderRatioIndicator = (ratio: number | undefined, warning: number, danger: number) =>
-  ratio === undefined ? null : <RatioIndicator ratio={ratio} warningThreshold={warning} dangerThreshold={danger} />;
-
-const formatBytes = (value: number | undefined | null) =>
-  value === undefined || value === null ? '' : NumberUtils.formatBytes(value);
-
 const formatNumberValue = (value: number | undefined | null, suffix = '') =>
-  value === undefined || value === null ? '' : `${NumberUtils.formatNumber(value)}${suffix}`;
+  value == null ? '' : `${NumberUtils.formatNumber(value)}${suffix}`;
+
+const calculateUsedFsBytes = (total: number | undefined | null, available: number | undefined | null) =>
+  total != null && available != null ? total - available : undefined;
 
 const formatIndexLatency = (total: number | undefined | null, timeInMillis: number | undefined | null) => {
-  if (
-    total === undefined ||
-    total === null ||
-    timeInMillis === undefined ||
-    timeInMillis === null ||
-    timeInMillis === 0
-  ) {
+  if (total == null || timeInMillis == null || timeInMillis === 0) {
     return '';
   }
 
@@ -118,46 +93,25 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
     },
     memory: {
-      renderCell: (_value, entity) => {
-        const used = entity.metrics?.usedMemory;
-        const total = entity.metrics?.totalMemory;
-        const ratio = computeRatio(used, total);
-        const sizeLabel = [formatBytes(used), formatBytes(total)].filter(Boolean).join(' / ');
-        const ratioIndicator = renderRatioIndicator(ratio, MEMORY_WARNING_THRESHOLD, MEMORY_DANGER_THRESHOLD);
-
-        return (
-          <MetricsColumn>
-            {sizeLabel && (
-              <MetricsRow>
-                <span>{sizeLabel}</span>
-              </MetricsRow>
-            )}
-            {ratioIndicator && <MetricsRow>{ratioIndicator}</MetricsRow>}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.usedMemory}
+          max={entity.metrics?.totalMemory}
+          warningThreshold={MEMORY_WARNING_THRESHOLD}
+          dangerThreshold={MEMORY_DANGER_THRESHOLD}
+        />
+      ),
     },
     jvm: {
-      renderCell: (_value, entity) => {
-        const heapUsed = entity.metrics?.jvmMemoryHeapUsed;
-        const heapMax = entity.metrics?.jvmMemoryHeapMax;
-        const ratio = computeRatio(heapUsed, heapMax);
-        const usedLabel = heapUsed === undefined || heapUsed === null ? '' : NumberUtils.formatBytes(heapUsed);
-        const maxLabel = heapMax === undefined || heapMax === null ? '' : NumberUtils.formatBytes(heapMax);
-        const sizeLabel = [usedLabel, maxLabel].filter(Boolean).join(' / ');
-        const ratioIndicator = renderRatioIndicator(ratio, JVM_WARNING_THRESHOLD, JVM_DANGER_THRESHOLD);
-
-        return (
-          <MetricsColumn>
-            {sizeLabel && (
-              <MetricsRow>
-                <span>{sizeLabel}</span>
-              </MetricsRow>
-            )}
-            {ratioIndicator && <MetricsRow>{ratioIndicator}</MetricsRow>}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.jvmMemoryHeapUsed}
+          max={entity.metrics?.jvmMemoryHeapMax}
+          ratioPercent={entity.metrics?.opensearchJvmMemoryHeapUsedPercent}
+          warningThreshold={JVM_WARNING_THRESHOLD}
+          dangerThreshold={JVM_DANGER_THRESHOLD}
+        />
+      ),
     },
     cpu: {
       renderCell: (_value, entity) => {
@@ -214,29 +168,14 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
       },
     },
     storage: {
-      renderCell: (_value, entity) => {
-        const total = entity.metrics?.totalFsBytes;
-        const available = entity.metrics?.availableFsBytes;
-        const used = total !== undefined && total !== null && available !== undefined && available !== null ? total - available : undefined;
-        const sizeLabel = [formatBytes(used), formatBytes(total)].filter(Boolean).join(' / ');
-        const ratio = computeRatio(used, total);
-        const ratioIndicator = renderRatioIndicator(ratio, STORAGE_WARNING_THRESHOLD, STORAGE_DANGER_THRESHOLD);
-
-        if (!sizeLabel && !ratioIndicator) {
-          return null;
-        }
-
-        return (
-          <MetricsColumn>
-            {sizeLabel && (
-              <MetricsRow>
-                <span>{sizeLabel}</span>
-              </MetricsRow>
-            )}
-            {ratioIndicator && <MetricsRow>{ratioIndicator}</MetricsRow>}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={calculateUsedFsBytes(entity.metrics?.totalFsBytes, entity.metrics?.availableFsBytes)}
+          max={entity.metrics?.totalFsBytes}
+          warningThreshold={STORAGE_WARNING_THRESHOLD}
+          dangerThreshold={STORAGE_DANGER_THRESHOLD}
+        />
+      ),
     },
     datanode_version: {
       renderCell: (_value, entity) => (

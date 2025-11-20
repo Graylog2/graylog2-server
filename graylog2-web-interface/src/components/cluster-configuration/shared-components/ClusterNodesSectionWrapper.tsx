@@ -19,16 +19,7 @@ import styled, { css } from 'styled-components';
 
 import { Section } from 'components/common';
 
-const Container = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'hideBorder',
-})<{ hideBorder?: boolean }>(({ hideBorder, theme }) => css`
-  ${hideBorder &&
-  css`
-    > div {
-      border: none;
-    }
-  `}
-
+const Container = styled.div(({ theme }) => css`
   table thead,
   table thead tr,
   table thead th {
@@ -84,9 +75,9 @@ const TitleCountButton = styled.button`
 `;
 
 const TableWrapper = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'maxHeight' && prop !== 'hideScrollbar',
-})<{ maxHeight?: string; hideScrollbar?: boolean }>(
-  ({ maxHeight, hideScrollbar, theme }) => css`
+  shouldForwardProp: (prop) => prop !== 'maxHeight',
+})<{ maxHeight?: string }>(
+  ({ maxHeight, theme }) => css`
     margin-top: calc(-1 * ${theme.spacings.lg});
 
     ${maxHeight &&
@@ -94,16 +85,6 @@ const TableWrapper = styled.div.withConfig({
       div#scroll-container {
         max-height: ${maxHeight};
         overflow-y: auto;
-
-        ${hideScrollbar &&
-        css`
-          scrollbar-width: none;
-          -ms-overflow-style: none;
-
-          &::-webkit-scrollbar {
-            display: none;
-          }
-        `}
       }
 
       div#scroll-container table thead {
@@ -131,26 +112,20 @@ const getMaxHeightValue = (maxContentHeight: number | string | null, collapsible
 type Props = React.PropsWithChildren<{
   title: string;
   titleCount?: number | null;
-  titleCountAriaLabel?: string;
   onTitleCountClick?: (() => void) | null;
   headerLeftSection?: React.ReactNode;
   collapsible?: boolean;
   maxContentHeight?: number | string | null;
-  hideBorder?: boolean;
-  hideScrollbar?: boolean;
 }>;
 
 const ClusterNodesSectionWrapper = ({
   children = null,
   title,
   titleCount = null,
-  titleCountAriaLabel = undefined,
   onTitleCountClick = null,
   headerLeftSection = undefined,
   collapsible = true,
   maxContentHeight = 400,
-  hideBorder = false,
-  hideScrollbar = false,
 }: Props) => {
   const renderHeader = () => {
     const hasCount = titleCount !== null && titleCount !== undefined;
@@ -176,7 +151,7 @@ const ClusterNodesSectionWrapper = ({
               : undefined
           }
           disabled={!isInteractive}
-          aria-label={titleCountAriaLabel ?? `${title} (${titleCount})`}>
+          aria-label={`Show ${title}`}>
           ({titleCount})
         </TitleCountButton>
       </TitleWrapper>
@@ -184,16 +159,14 @@ const ClusterNodesSectionWrapper = ({
   };
 
   return (
-    <Container hideBorder={hideBorder}>
+    <Container>
       <Section
         title={title}
         header={renderHeader()}
         collapsible={collapsible}
         headerLeftSection={headerLeftSection}
         collapseButtonPosition="left">
-        <TableWrapper
-          maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}
-          hideScrollbar={hideScrollbar}>
+        <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>
           {children}
         </TableWrapper>
       </Section>

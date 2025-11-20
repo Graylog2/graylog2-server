@@ -21,18 +21,12 @@ import { MetricsActions, MetricsStore } from 'stores/metrics/MetricsStore';
 import { useStore } from 'stores/connect';
 
 const METRIC_NAMES = {
-  journalAppend1SecRate: 'org.graylog2.journal.append.1-sec-rate',
-  journalRead1SecRate: 'org.graylog2.journal.read.1-sec-rate',
-  journalSegments: 'org.graylog2.journal.segments',
-  journalEntriesUncommitted: 'org.graylog2.journal.entries-uncommitted',
   journalSize: 'org.graylog2.journal.size',
   journalMaxSize: 'org.graylog2.journal.size-limit',
   journalSizeRatio: 'org.graylog2.journal.utilization-ratio',
   jvmMemoryHeapUsed: 'jvm.memory.heap.used',
-  jvmMemoryHeapCommitted: 'jvm.memory.heap.committed',
   jvmMemoryHeapMax: 'jvm.memory.heap.max',
   dataLakeJournalSize: 'org.graylog.plugins.datalake.output.journal.size',
-  dataLakeJournalMaxSize: 'org.graylog.plugins.datalake.output.journal.size-limit',
   bufferInputUsage: 'org.graylog2.buffers.input.usage',
   bufferOutputUsage: 'org.graylog2.buffers.output.usage',
   bufferProcessUsage: 'org.graylog2.buffers.process.usage',
@@ -47,22 +41,16 @@ export type GraylogNodeMetrics = { [key: string]: number | undefined | null };
 
 const METRIC_NAMES_LIST = Object.values(METRIC_NAMES);
 const METRIC_SHORT_NAMES = Object.keys(METRIC_NAMES);
+const EMPTY_METRICS: GraylogNodeMetrics = METRIC_SHORT_NAMES.reduce(
+  (acc, name) => ({ ...acc, [name]: undefined }),
+  {} as GraylogNodeMetrics,
+);
 
-const useAddMetricsToGraylogNodes = <Node extends { node_id?: string; id?: string }>(
+const useAddMetricsToGraylogNodes = <Node extends { node_id: string }>(
   nodes: ReadonlyArray<Node>,
 ): Array<Node & { metrics: GraylogNodeMetrics }> => {
   const { metrics } = useStore(MetricsStore);
-  const nodeIdentifiers = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          nodes
-            .map((node) => node.node_id ?? node.id)
-            .filter((identifier): identifier is string => Boolean(identifier)),
-        ),
-      ),
-    [nodes],
-  );
+  const nodeIdentifiers = useMemo(() => Array.from(new Set(nodes.map((node) => node.node_id))), [nodes]);
 
   useEffect(() => {
     if (!nodeIdentifiers.length) {
@@ -85,26 +73,21 @@ const useAddMetricsToGraylogNodes = <Node extends { node_id?: string; id?: strin
       const nodeMetrics = metrics?.[nodeId];
 
       const entry: GraylogNodeMetrics = !nodeMetrics
-        ? Object.fromEntries(METRIC_SHORT_NAMES.map((name) => [name, undefined])) as GraylogNodeMetrics
+        ? { ...EMPTY_METRICS }
         : MetricsExtractor.getValuesForNode(nodeMetrics, METRIC_NAMES);
 
       return { ...acc, [nodeId]: entry };
     }, {});
   }, [metrics, nodeIdentifiers]);
 
-  return useMemo(() => {
-    const nodesWithMetrics = nodes.map((node) => {
-      const identifier = node.node_id ?? node.id;
-      const nodeMetrics = identifier ? metricsByNodeId[identifier] : undefined;
-
-      return {
+  return useMemo(
+    () =>
+      nodes.map((node) => ({
         ...node,
-        metrics: nodeMetrics ?? {},
-      };
-    });
-
-    return nodesWithMetrics;
-  }, [metricsByNodeId, nodes]);
+        metrics: metricsByNodeId[node.node_id] ?? {},
+      })),
+    [metricsByNodeId, nodes],
+  );
 };
 
 export default useAddMetricsToGraylogNodes;

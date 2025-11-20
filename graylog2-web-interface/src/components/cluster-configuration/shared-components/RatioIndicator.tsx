@@ -32,8 +32,16 @@ const StyledLabel = styled(Label)`
   display: inline-flex;
 `;
 
+export const computeRatio = (used: number | undefined | null, max: number | undefined | null) => {
+  if (used == null || max == null || max === 0) {
+    return undefined;
+  }
+
+  return used / max;
+};
+
 type Props = {
-  ratio: number ;
+  ratio: number | undefined | null;
   warningThreshold: number;
   dangerThreshold: number;
 };
@@ -63,5 +71,11 @@ const RatioIndicator = ({ ratio, warningThreshold, dangerThreshold }: Props) => 
     </SecondaryText>
   );
 };
+
+export const buildRatioIndicator = (
+  ratio: number | undefined | null,
+  warningThreshold: number,
+  dangerThreshold: number,
+) => (ratio == null ? null : <RatioIndicator ratio={ratio} warningThreshold={warningThreshold} dangerThreshold={dangerThreshold} />);
 
 export default RatioIndicator;

@@ -81,7 +81,6 @@ const DataNodesExpandable = ({
       title="Data Nodes"
       titleCount={totalDataNodes}
       onTitleCountClick={onSelectSegment ?? null}
-      titleCountAriaLabel="Show Data Nodes segment"
       headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
       <EntityDataTable<ClusterDataNode>

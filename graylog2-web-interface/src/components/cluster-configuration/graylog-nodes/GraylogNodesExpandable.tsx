@@ -61,7 +61,6 @@ const GraylogNodesExpandable = ({
       title="Graylog Nodes"
       titleCount={totalGraylogNodes}
       onTitleCountClick={onSelectSegment ?? null}
-      titleCountAriaLabel="Show Graylog Nodes segment"
       headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
       <EntityDataTable<GraylogNode>
