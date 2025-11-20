@@ -131,7 +131,12 @@ public class MongoDBExtension implements BeforeAllCallback, AfterAllCallback, Be
 
     @Override
     public void afterAll(ExtensionContext context) {
-        closeInstance(context);
+        // Only run for root test class context. If this runs for @Nested tests, then we close the instance too early.
+        if (context.getParent()
+                .flatMap(ExtensionContext::getTestClass)
+                .isEmpty()) {
+            closeInstance(context);
+        }
     }
 
     @Override
