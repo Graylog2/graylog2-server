@@ -88,7 +88,7 @@ public class AdaptersOS implements Adapters {
                 new IndexStatisticsBuilder(),
                 objectMapper,
                 new PlainJsonApi(objectMapper, client, officialOpensearchClient),
-                new OSSerializationUtils(objectMapper)
+                new OSSerializationUtils()
         );
     }
 

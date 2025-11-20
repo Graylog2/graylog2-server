@@ -40,8 +40,8 @@ public class OSSerializationUtils {
     private final JacksonJsonpMapper jsonpMapper;
 
     @Inject
-    public OSSerializationUtils(final ObjectMapper objectMapper) {
-        this.jsonpMapper = new JacksonJsonpMapper(objectMapper);
+    public OSSerializationUtils() {
+        this.jsonpMapper = new JacksonJsonpMapper();
     }
 
 
