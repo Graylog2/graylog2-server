@@ -18,10 +18,7 @@ import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { DataNode } from 'components/datanode/Types';
-import useDataNodes, {
-  type DataNodeResponse,
-  type UseDataNodesOptions,
-} from 'components/datanode/hooks/useDataNodes';
+import useDataNodes, { type DataNodeResponse } from 'components/datanode/hooks/useDataNodes';
 
 import useAddMetricsToDataNodes, { type DataNodeMetrics } from './useAddMetricsToDataNodes';
 
@@ -44,9 +41,10 @@ export type UseClusterDataNodesResult = {
 
 const DATANODES_REFETCH_INTERVAL = 5000;
 
-type UseClusterDataNodesOptions = UseDataNodesOptions & {
+type UseClusterDataNodesOptions = {
   refetchInterval?: number | false;
   initialPollingEnabled?: boolean;
+  enabled?: boolean;
 };
 
 const useClusterDataNodes = (

@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
+import styled from 'styled-components';
 
-import { EntityDataTable, Spinner } from 'components/common';
+import { EntityDataTable, NoSearchResult, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
@@ -29,18 +30,24 @@ import useClusterDataNodes, { type ClusterDataNode } from './useClusterDataNodes
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
 
+const EmptyState = styled(NoSearchResult)`
+  margin-top: ${({ theme }) => theme.spacings.xl};
+`;
+
 type Props = {
   collapsible?: boolean;
   searchQuery?: string;
-  onSelectSegment?: () => void;
+  onSelectNodeType?: () => void;
   pageSizeLimit?: number;
+  refetchInterval?: number | false;
 };
 
 const DataNodesExpandable = ({
   collapsible = true,
   searchQuery = '',
-  onSelectSegment = undefined,
+  onSelectNodeType = undefined,
   pageSizeLimit = undefined,
+  refetchInterval = undefined,
 }: Props) => {
   const {
     columnsOrder,
@@ -57,7 +64,7 @@ const DataNodesExpandable = ({
     refetch,
     isLoading,
     setPollingEnabled,
-  } = useClusterDataNodes(searchParams);
+  } = useClusterDataNodes(searchParams, { refetchInterval });
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
@@ -80,22 +87,26 @@ const DataNodesExpandable = ({
     <ClusterNodesSectionWrapper
       title="Data Nodes"
       titleCount={totalDataNodes}
-      onTitleCountClick={onSelectSegment ?? null}
+      onTitleCountClick={onSelectNodeType ?? null}
       headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
-      <EntityDataTable<ClusterDataNode>
-        entities={dataNodes}
-        columnsOrder={columnsOrder}
-        columnPreferences={columnPreferences}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        onColumnPreferencesChange={handleColumnPreferencesChange}
-        onSortChange={handleSortChange}
-        activeSort={searchParams.sort}
-        entityAttributesAreCamelCase
-        entityActions={renderActions}
-        columnSchemas={columnSchemas}
-        columnRenderers={columnRenderers}
-      />
+      {!isLoading && !isLoadingLayout && dataNodes.length === 0 ? (
+        <EmptyState>No Data Nodes found.</EmptyState>
+      ) : (
+        <EntityDataTable<ClusterDataNode>
+          entities={dataNodes}
+          columnsOrder={columnsOrder}
+          columnPreferences={columnPreferences}
+          defaultDisplayedColumns={defaultDisplayedColumns}
+          onColumnPreferencesChange={handleColumnPreferencesChange}
+          onSortChange={handleSortChange}
+          activeSort={searchParams.sort}
+          entityAttributesAreCamelCase
+          entityActions={renderActions}
+          columnSchemas={columnSchemas}
+          columnRenderers={columnRenderers}
+        />
+      )}
     </ClusterNodesSectionWrapper>
   );
 };

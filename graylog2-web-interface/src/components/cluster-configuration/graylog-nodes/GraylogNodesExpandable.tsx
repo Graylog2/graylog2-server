@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
+import styled from 'styled-components';
 
-import { EntityDataTable, Spinner } from 'components/common';
+import { EntityDataTable, NoSearchResult, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 
 import useClusterGraylogNodes from './useClusterGraylogNodes';
@@ -27,18 +28,24 @@ import useClusterGraylogNodesTableLayout from './useClusterGraylogNodesTableLayo
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
 
+const EmptyState = styled(NoSearchResult)`
+  margin-top: ${({ theme }) => theme.spacings.xl};
+`;
+
 type Props = {
   collapsible?: boolean;
   searchQuery?: string;
-  onSelectSegment?: () => void;
+  onSelectNodeType?: () => void;
   pageSizeLimit?: number;
+  refetchInterval?: number | false;
 };
 
 const GraylogNodesExpandable = ({
   collapsible = true,
   searchQuery = '',
-  onSelectSegment = undefined,
+  onSelectNodeType = undefined,
   pageSizeLimit = undefined,
+  refetchInterval = undefined,
 }: Props) => {
   const {
     columnsOrder,
@@ -49,7 +56,7 @@ const GraylogNodesExpandable = ({
     handleColumnPreferencesChange,
     handleSortChange,
   } = useClusterGraylogNodesTableLayout(searchQuery, pageSizeLimit);
-  const { nodes: graylogNodes, total: totalGraylogNodes, isLoading } = useClusterGraylogNodes(searchParams);
+  const { nodes: graylogNodes, total: totalGraylogNodes, isLoading } = useClusterGraylogNodes(searchParams, { refetchInterval });
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
@@ -60,23 +67,27 @@ const GraylogNodesExpandable = ({
     <ClusterNodesSectionWrapper
       title="Graylog Nodes"
       titleCount={totalGraylogNodes}
-      onTitleCountClick={onSelectSegment ?? null}
+      onTitleCountClick={onSelectNodeType ?? null}
       headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
-      <EntityDataTable<GraylogNode>
-        entities={graylogNodes}
-        columnsOrder={columnsOrder}
-        columnPreferences={columnPreferences}
-        defaultDisplayedColumns={defaultDisplayedColumns}
-        onColumnPreferencesChange={handleColumnPreferencesChange}
-        onSortChange={handleSortChange}
-        activeSort={searchParams.sort}
-        entityAttributesAreCamelCase={false}
-        entityActions={renderActions}
-        columnSchemas={columnSchemas}
-        columnRenderers={columnRenderers}
-        actionsCellWidth={160}
-      />
+      {!isLoading && !isLoadingLayout && graylogNodes.length === 0 ? (
+        <EmptyState>No Graylog Nodes found.</EmptyState>
+      ) : (
+        <EntityDataTable<GraylogNode>
+          entities={graylogNodes}
+          columnsOrder={columnsOrder}
+          columnPreferences={columnPreferences}
+          defaultDisplayedColumns={defaultDisplayedColumns}
+          onColumnPreferencesChange={handleColumnPreferencesChange}
+          onSortChange={handleSortChange}
+          activeSort={searchParams.sort}
+          entityAttributesAreCamelCase={false}
+          entityActions={renderActions}
+          columnSchemas={columnSchemas}
+          columnRenderers={columnRenderers}
+          actionsCellWidth={160}
+        />
+      )}
     </ClusterNodesSectionWrapper>
   );
 };

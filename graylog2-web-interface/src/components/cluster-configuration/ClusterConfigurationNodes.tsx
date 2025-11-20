@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
@@ -38,24 +38,31 @@ const ControlsWrapper = styled.div`
   gap: 12px;
 `;
 
-type NodeSegment = 'all' | 'graylog' | 'data';
+type NodeType = 'all' | 'graylog' | 'data';
 
-const SEGMENT_OPTIONS = [
-  { label: 'All Nodes', value: 'all' as NodeSegment },
-  { label: 'Graylog Nodes', value: 'graylog' as NodeSegment },
-  { label: 'Data Nodes', value: 'data' as NodeSegment },
+const NODE_TYPE_OPTIONS = [
+  { label: 'All Nodes', value: 'all' as NodeType },
+  { label: 'Graylog Nodes', value: 'graylog' as NodeType },
+  { label: 'Data Nodes', value: 'data' as NodeType },
 ];
 
-const ALL_SEGMENT_PAGE_SIZE = 10;
+const ALL_NODES_PAGE_SIZE = 10;
+const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
+const ALL_NODES_REFETCH_INTERVAL = 5000;
+const SINGLE_NODE_TYPE_REFETCH_INTERVAL = 10000;
 
 const ClusterConfigurationNodes = () => {
-  const [activeSegment, setActiveSegment] = useState<NodeSegment>('all');
+  const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
+  const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
+  const handleResetSearch = useCallback(() => setSearchQuery(''), []);
 
-  const showGraylogNodes = activeSegment === 'all' || activeSegment === 'graylog';
-  const showDataNodes = activeSegment === 'all' || activeSegment === 'data';
-  const segmentLimit = activeSegment === 'all' ? ALL_SEGMENT_PAGE_SIZE : undefined;
+  const showGraylogNodes = activeNodeType === 'all' || activeNodeType === 'graylog';
+  const showDataNodes = activeNodeType === 'all' || activeNodeType === 'data';
+  const isAllNodesView = activeNodeType === 'all';
+  const pageSizeLimit = isAllNodesView ? ALL_NODES_PAGE_SIZE : SINGLE_NODE_TYPE_PAGE_SIZE;
+  const refetchInterval = isAllNodesView ? ALL_NODES_REFETCH_INTERVAL : SINGLE_NODE_TYPE_REFETCH_INTERVAL;
 
   return (
     <Row className="content">
@@ -67,33 +74,35 @@ const ClusterConfigurationNodes = () => {
             wrapperClass=""
             queryWidth={400}
             topMargin={0}
-            onQueryChange={setSearchQuery}
-            onReset={() => setSearchQuery('')}
+            onSearch={handleSearch}
+            onReset={handleResetSearch}
           />
-          <SegmentedControl<NodeSegment>
-            value={activeSegment}
-            data={SEGMENT_OPTIONS}
-            onChange={(value) => setActiveSegment(value)}
+          <SegmentedControl<NodeType>
+            value={activeNodeType}
+            data={NODE_TYPE_OPTIONS}
+            onChange={(value) => setActiveNodeType(value)}
           />
         </ControlsWrapper>
       </SectionCol>
       {showGraylogNodes && (
         <SectionCol md={12}>
           <GraylogNodesExpandable
-            collapsible={activeSegment === 'all'}
+            collapsible={activeNodeType === 'all'}
             searchQuery={normalizedSearch}
-            pageSizeLimit={segmentLimit}
-            onSelectSegment={activeSegment === 'all' ? () => setActiveSegment('graylog') : undefined}
+            pageSizeLimit={pageSizeLimit}
+            refetchInterval={refetchInterval}
+            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('graylog') : undefined}
           />
         </SectionCol>
       )}
       {showDataNodes && (
         <SectionCol md={12}>
           <DataNodesExpandable
-            collapsible={activeSegment === 'all'}
+            collapsible={activeNodeType === 'all'}
             searchQuery={normalizedSearch}
-            pageSizeLimit={segmentLimit}
-            onSelectSegment={activeSegment === 'all' ? () => setActiveSegment('data') : undefined}
+            pageSizeLimit={pageSizeLimit}
+            refetchInterval={refetchInterval}
+            onSelectNodeType={activeNodeType === 'all' ? () => setActiveNodeType('data') : undefined}
           />
         </SectionCol>
       )}
