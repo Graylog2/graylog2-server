@@ -48,33 +48,34 @@ public class MongoDBTestService implements AutoCloseable {
     private MongoConnectionImpl mongoConnection;
 
     /**
-     * Create service instance with the default version and network.
+     * Create service instance with the default version and network and start it immediately.
      *
      * @return the service instance
      */
-    public static MongoDBTestService create(Network network) {
-        return new MongoDBTestService(MongoDBContainer.create(network), MongoDBVersion.DEFAULT);
+    public static MongoDBTestService createStarted(Network network) {
+        return createStarted(MongoDBVersion.DEFAULT, network);
     }
 
     /**
-     * Create service instance with the given version and network.
+     * Create service instance with the given version and network and start it immediately.
      *
      * @return the service instance
      */
-    public static MongoDBTestService create(MongoDBVersion version, Network network) {
-        return new MongoDBTestService(MongoDBContainer.create(version, network), version);
+    public static MongoDBTestService createStarted(MongoDBVersion version, Network network) {
+        final var mongoDBTestService = new MongoDBTestService(MongoDBContainer.create(version, network), version);
+        mongoDBTestService.start();
+        return mongoDBTestService;
     }
 
     private MongoDBTestService(MongoDBContainer container, MongoDBVersion version) {
         this.container = requireNonNull(container, "container cannot be null");
         this.version = version;
-        start();
     }
 
     /**
      * Starts the service and establishes a client connection. Will do nothing if service is already running.
      */
-    public void start() {
+    private void start() {
         if (container.isRunning()) {
             return;
         }

@@ -120,7 +120,7 @@ public class ContainerizedGraylogBackendServicesProvider {
                 final Network network = Network.newNetwork();
 
                 final Future<MongoDBTestService> mongodbFuture = executorService.submit(
-                        withStopwatch(() -> MongoDBTestService.create(mongodbVersion, network), "MongoDB"));
+                        withStopwatch(() -> MongoDBTestService.createStarted(mongodbVersion, network), "MongoDB"));
                 final Future<MailServerContainer> mailServerContainerFuture = executorService.submit(
                         withStopwatch(() -> MailServerContainer.createStarted(network), "Mailserver"));
                 final Future<WebhookServerContainer> webhookServerContainerFuture = executorService.submit(
