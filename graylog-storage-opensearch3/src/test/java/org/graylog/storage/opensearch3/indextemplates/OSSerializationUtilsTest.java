@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch3.indextemplates;
 
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.opensearch.client.json.JsonData;
@@ -103,7 +104,7 @@ class OSSerializationUtilsTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new OSSerializationUtils();
+        toTest = new OSSerializationUtils(new ObjectMapperProvider().get());
     }
 
     @Test

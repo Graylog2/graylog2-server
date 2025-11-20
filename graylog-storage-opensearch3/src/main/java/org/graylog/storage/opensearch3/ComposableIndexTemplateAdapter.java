@@ -37,7 +37,7 @@ public class ComposableIndexTemplateAdapter implements IndexTemplateAdapter {
     @Inject
     public ComposableIndexTemplateAdapter(OfficialOpensearchClient opensearchClient, ObjectMapper objectMapper) {
         this.opensearchClient = opensearchClient;
-        this.osSerializationUtils = new OSSerializationUtils(objectMapper, opensearchClient);
+        this.osSerializationUtils = new OSSerializationUtils(objectMapper);
 
     }
 

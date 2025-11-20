@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.stream.JsonParser;
@@ -36,18 +37,13 @@ import java.util.Map;
 @Singleton
 public class OSSerializationUtils {
 
-    private final ObjectMapper objectMapper;
-    private final JsonpMapper jsonpMapper;
-    private final OfficialOpensearchClient client;
+    private final JacksonJsonpMapper jsonpMapper;
 
     @Inject
-    public OSSerializationUtils(final ObjectMapper objectMapper,
-                                final OfficialOpensearchClient client) {
-        this.objectMapper = objectMapper;
-        this.client = client;
+    public OSSerializationUtils(final ObjectMapper objectMapper) {
         this.jsonpMapper = new JacksonJsonpMapper(objectMapper);
+    }
 
-    private final JacksonJsonpMapper jsonpMapper;
 
     public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
         return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
