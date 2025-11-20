@@ -23,12 +23,10 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
-import Icon from 'components/common/Icon';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
+import DragHandle from 'components/common/SortableList/DragHandle';
 
 import type { EntityBase, ColumnMetaContext } from './types';
-
-const DRAG_HANDLE_DEFAULT_TITLE = 'Drag or press space to reorder';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -45,20 +43,6 @@ export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; 
     transform: ${$transform};
   `,
 );
-
-const DragHandle = styled.button<{ $isDragging: boolean }>(
-  ({ $isDragging }) => css`
-    margin-right: 5px;
-    cursor: ${$isDragging ? 'grabbing' : 'grab'};
-    background: transparent;
-    border: 0;
-    padding: 0;
-  `,
-);
-
-const DragIcon = styled(Icon)`
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
 
 const useSortableCol = (colId: string, disabled: boolean) => {
   const { setColumnTransform } = useContext(DndStylesContext);
@@ -87,15 +71,10 @@ const useSortableCol = (colId: string, disabled: boolean) => {
 
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
-  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortableCol(
+  const { attributes, isDragging, listeners, setNodeRef, transform } = useSortableCol(
     header.column.id,
     !columnMeta?.enableColumnOrdering,
   );
-
-  const dragHandleTitle =
-    typeof columnMeta?.label === 'string'
-      ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnMeta.label.toLocaleLowerCase()}`
-      : `${DRAG_HANDLE_DEFAULT_TITLE}`;
 
   return (
     <Th
@@ -107,15 +86,11 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       $isDragging={isDragging}>
       {columnMeta?.enableColumnOrdering && (
         <DragHandle
-          ref={setActivatorNodeRef}
-          {...attributes}
-          {...listeners}
-          $isDragging={isDragging}
-          data-sortable-index={header.index}
-          title={dragHandleTitle}
-          aria-label={dragHandleTitle}>
-          <DragIcon name="drag_indicator" />
-        </DragHandle>
+          index={header.index}
+          dragHandleProps={{ ...attributes, ...listeners }}
+          isDragging={isDragging}
+          itemTitle={columnMeta.label}
+        />
       )}
       {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
       {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
