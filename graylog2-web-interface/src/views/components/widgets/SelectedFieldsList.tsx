@@ -150,20 +150,30 @@ const SelectedFieldsList = ({
   );
 
   const SortableListItem = useCallback(
-    ({ item, index, dragHandle, className, ref }) => (
-      <ListItem
-        onChange={(newFieldName) => onChangeField(index, newFieldName)}
-        onRemove={() => onRemoveField(item.id)}
-        selectSize={selectSize}
-        selectedFields={selectedFields ?? []}
-        item={item}
-        fieldSelect={fieldSelect}
-        dragHandle={dragHandle}
-        className={className}
-        ref={ref}
-        showUnit={showUnit}
-      />
-    ),
+    (props: {
+      item: { id: string; title: string };
+      index: number;
+      dragHandle: React.ReactNode;
+      className: string;
+      ref: React.Ref<HTMLDivElement>;
+    }) => {
+      const { item, index, dragHandle, className, ref } = props;
+
+      return (
+        <ListItem
+          onChange={(newFieldName) => onChangeField(index, newFieldName)}
+          onRemove={() => onRemoveField(item.id)}
+          selectSize={selectSize}
+          selectedFields={selectedFields ?? []}
+          item={item}
+          fieldSelect={fieldSelect}
+          dragHandle={dragHandle}
+          className={className}
+          ref={ref}
+          showUnit={showUnit}
+        />
+      );
+    },
     [selectSize, selectedFields, fieldSelect, showUnit, onChangeField, onRemoveField],
   );
 
