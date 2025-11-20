@@ -60,14 +60,6 @@ public class ExportClient {
         return new ExportException("Unable to complete export: ", new ElasticsearchException(e));
     }
 
-    public SearchResponse singleSearch(SearchRequest request, String errorMessage) {
-        try {
-            return this.client.singleSearch(request, errorMessage);
-        } catch (Exception e) {
-            throw wrapException(e);
-        }
-    }
-
     public <R> R execute(ThrowingBiFunction<RestHighLevelClient, RequestOptions, R, IOException> fn, String errorMessage) {
         try {
             return this.client.execute(fn, errorMessage);
