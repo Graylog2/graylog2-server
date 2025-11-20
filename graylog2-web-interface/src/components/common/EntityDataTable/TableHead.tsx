@@ -28,6 +28,8 @@ import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStyl
 
 import type { EntityBase, ColumnMetaContext } from './types';
 
+const DRAG_HANDLE_DEFAULT_TITLE = 'Drag or press space to reorder';
+
 const Thead = styled.thead(
   ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
@@ -44,10 +46,13 @@ export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; 
   `,
 );
 
-const DragHandle = styled.div<{ $isDragging: boolean }>(
+const DragHandle = styled.button<{ $isDragging: boolean }>(
   ({ $isDragging }) => css`
-    display: inline-block;
+    margin-right: 5px;
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
+    background: transparent;
+    border: 0;
+    padding: 0;
   `,
 );
 
@@ -87,6 +92,11 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
     !columnMeta?.enableColumnOrdering,
   );
 
+  const dragHandleTitle =
+    typeof columnMeta?.label === 'string'
+      ? `${DRAG_HANDLE_DEFAULT_TITLE} ${columnMeta.label.toLocaleLowerCase()}`
+      : `${DRAG_HANDLE_DEFAULT_TITLE}`;
+
   return (
     <Th
       key={header.id}
@@ -101,7 +111,9 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
           {...attributes}
           {...listeners}
           $isDragging={isDragging}
-          aria-label={`Reorder ${columnMeta.label.toLowerCase()} column`}>
+          data-sortable-index={header.index}
+          title={dragHandleTitle}
+          aria-label={dragHandleTitle}>
           <DragIcon name="drag_indicator" />
         </DragHandle>
       )}
