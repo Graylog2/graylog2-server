@@ -26,18 +26,18 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public interface IndexSetRegistry extends Iterable<IndexSet> {
+public interface IndexSetRegistry {
     /**
-     * Returns a list of all {@link IndexSet} instances.
+     * Returns all {@link IndexSet} instances.
      *
-     * @return list of index sets
+     * @return set of index sets
      */
     Set<IndexSet> getAllIndexSets();
 
     /**
-     * Returns a list of all {@link BasicIndexSet} instances.
+     * Returns all {@link BasicIndexSet} instances.
      *
-     * @return list of basic index sets
+     * @return set of basic index sets
      */
     Set<BasicIndexSet> getAllBasicIndexSets();
 
@@ -75,7 +75,6 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
 
     /**
      * Returns the {@link IndexSet} that is marked as default.
-     *
      * Throws an {@link IllegalStateException} if the default index set does not exist.
      *
      * @return the default index set
@@ -83,9 +82,9 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
     IndexSet getDefault();
 
     /**
-     * Returns a list of all managed indices.
+     * Returns an array of all managed indices.
      *
-     * @return list of managed indices
+     * @return array of managed indices
      */
     String[] getManagedIndices();
 
@@ -106,16 +105,16 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
     Map<String, Boolean> isManagedIndex(Collection<String> indices);
 
     /**
-     * Returns the list of all index wildcards.
+     * Returns an array of all index wildcards.
      *
-     * @return list of wildcards
+     * @return array of wildcards
      */
     String[] getIndexWildcards();
 
     /**
-     * Returns the list of all write index aliases.
+     * Returns an array of all write index aliases.
      *
-     * @return list of names
+     * @return array of write index alias names
      */
     String[] getWriteIndexAliases();
 
@@ -131,7 +130,7 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
      *
      * @param index the index name to check
      * @return true when index is a current write index, false otherwise
-     * @throws TooManyAliasesException
+     * @throws TooManyAliasesException when more than one write alias resolves to the given index
      */
     boolean isCurrentWriteIndex(String index) throws TooManyAliasesException;
 }

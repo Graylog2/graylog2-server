@@ -17,8 +17,8 @@
 package org.graylog2.periodical;
 
 import jakarta.inject.Inject;
-import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.notifications.Notification;
@@ -69,7 +69,7 @@ public class IndexBlockCheck extends Periodical {
 
     private List<String> getAllActiveWriteIndices() {
         List<String> activeWriteIndices = new ArrayList<>();
-        indexSetRegistry.forEach((indexSet) -> {
+        indexSetRegistry.getAllIndexSets().forEach((indexSet) -> {
             try {
                 final String activeWriteIndex = indexSet.getActiveWriteIndex();
                 if (activeWriteIndex != null) {

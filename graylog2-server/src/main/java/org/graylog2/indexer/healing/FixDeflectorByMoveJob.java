@@ -69,7 +69,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public void execute() {
-        indexSetRegistry.forEach(this::doExecute);
+        indexSetRegistry.getAllIndexSets().forEach(this::doExecute);
     }
 
     public void doExecute(IndexSet indexSet) {

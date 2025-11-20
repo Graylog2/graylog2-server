@@ -23,7 +23,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Streams;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.indexer.indexset.IndexSet;
@@ -38,7 +37,6 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -219,11 +217,5 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
         return getForIndex(indexName)
                 .map(indexSet -> Objects.equals(indexSet.getActiveWriteIndex(), indexName))
                 .orElse(false);
-    }
-
-    @Nonnull
-    @Override
-    public Iterator<IndexSet> iterator() {
-        return getAllIndexSets().iterator();
     }
 }

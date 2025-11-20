@@ -33,6 +33,26 @@ import static java.util.Objects.requireNonNull;
 
 public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
 
+    /**
+     * Returns the write index alias name for this index set.
+     * <p>
+     * The write index alias always points to the newest index.
+     * <p>
+     * Example: {@code "graylog_deflector"}
+     *
+     * @return the write index alias name
+     */
+    String getWriteIndexAlias();
+
+    /**
+     * Returns the newest index.
+     * <p>
+     * Example: {@code "graylog_42"}
+     *
+     * @return the newest index
+     * @throws NoTargetIndexException if there are no indices in this index set yet
+     */
+    String getNewestIndex() throws NoTargetIndexException;
 
     /**
      * Returns the active write index.
@@ -46,17 +66,6 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
      */
     @Nullable
     String getActiveWriteIndex() throws TooManyAliasesException;
-
-    /**
-     * Returns the write index alias name for this index set.
-     * <p>
-     * The write index alias always points to the newest index.
-     * <p>
-     * Example: {@code "graylog_deflector"}
-     *
-     * @return the write index alias name
-     */
-    String getWriteIndexAlias();
 
     /**
      * Returns a map where the key is an index name and the value a set of aliases for this index.
@@ -154,15 +163,6 @@ public interface IndexSet extends Comparable<IndexSet>, BasicIndexSet {
      */
     BasicIndexSetConfig basicIndexSetConfig();
 
-    /**
-     * Returns the newest index.
-     * <p>
-     * Example: {@code "graylog_42"}
-     *
-     * @return the newest index
-     * @throws NoTargetIndexException if there are no indices in this index set yet
-     */
-    String getNewestIndex() throws NoTargetIndexException;
 
     default String getNthIndexBeforeActiveIndexSet(final int n) {
         final String activeWriteIndex = getActiveWriteIndex();
