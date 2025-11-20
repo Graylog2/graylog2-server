@@ -97,10 +97,6 @@ public class OpenSearchClient {
         return firstResponseFrom(result, errorMessage);
     }
 
-    public SearchResponse singleSearch(SearchRequest searchRequest, String errorMessage) {
-        return execute((c, requestOptions) -> c.search(searchRequest, requestOptions), errorMessage);
-    }
-
     public List<MultiSearchResponse.Item> msearch(List<SearchRequest> searchRequests, String errorMessage) {
         var multiSearchRequest = new MultiSearchRequest();
 
