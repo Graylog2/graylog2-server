@@ -19,7 +19,6 @@ package org.graylog.plugins.views.search.export;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,14 +29,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ExportJobServiceTest {
 
     @Test
-    void roundTrip(MongoDBTestService mongoDBTestService, MongoJackObjectMapperProvider mongoJackObjectMapperProvider) {
+    void roundTrip(MongoDBTestService mongoDBTestService, MongoCollections mongoCollections) {
         final SearchTypeExportJob job = SearchTypeExportJob.create(
                 "000000000000000000000001",
                 "000000000000000000000002",
                 "000000000000000000000003",
                 ResultFormat.empty());
 
-        final ExportJobService service = new ExportJobService(new MongoCollections(mongoJackObjectMapperProvider, mongoDBTestService.mongoConnection()));
+        final ExportJobService service = new ExportJobService(mongoCollections);
 
         assertThat(service.get(service.save(job))).isNotEmpty().containsInstanceOf(SearchTypeExportJob.class);
     }

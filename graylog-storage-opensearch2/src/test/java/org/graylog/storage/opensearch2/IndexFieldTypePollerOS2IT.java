@@ -17,12 +17,12 @@
 package org.graylog.storage.opensearch2;
 
 import org.graylog.storage.opensearch2.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerIT;
-import org.junit.Rule;
 
 public class IndexFieldTypePollerOS2IT extends IndexFieldTypePollerIT {
-    @Rule
+    @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
     @Override
