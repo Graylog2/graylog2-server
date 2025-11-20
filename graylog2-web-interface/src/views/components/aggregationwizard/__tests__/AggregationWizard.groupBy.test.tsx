@@ -370,7 +370,9 @@ describe('AggregationWizard', () => {
 
         const groupBySection = await screen.findByTestId('Group By-section');
 
-        const firstItemDragHandle = within(groupBySection).getByTestId('drag-handle-http_method');
+        const firstItemDragHandle = within(groupBySection).getByRole('button', {
+          name: /Drag or press space to reorder http_method/i,
+        });
         firstItemDragHandle.focus();
 
         await act(async () => {

@@ -82,8 +82,7 @@ const ListItem = <ItemType extends ListItemType>(
       $isDragging={isDragging}
       title={dragHandleTitle}
       aria-label={dragHandleTitle}
-      data-sortable-index={index}
-      data-testid={`drag-handle-${item.id}`}>
+      data-sortable-index={index}>
       <Icon name="drag_indicator" />
     </DragHandle>
   );
