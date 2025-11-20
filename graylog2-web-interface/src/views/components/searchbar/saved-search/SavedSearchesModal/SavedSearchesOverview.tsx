@@ -20,7 +20,7 @@ import { useCallback } from 'react';
 import { PaginatedEntityTable } from 'components/common';
 import type View from 'views/logic/views/View';
 import QueryHelper from 'components/common/QueryHelper';
-import { fetchSavedSearches } from 'views/hooks/useSavedSearches';
+import { fetchSavedSearches, queryKey } from 'views/hooks/useSavedSearches';
 import useColumnRenderers from 'views/components/searchbar/saved-search/useColumnRenderes';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
 import { DEFAULT_LAYOUT } from 'views/components/searchbar/saved-search/Constants';
@@ -60,7 +60,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       tableLayout={DEFAULT_LAYOUT}
       queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
       fetchEntities={fetchSavedSearches}
-      keyFn={(searchParams) => ['saved-searches', 'overview', searchParams]}
+      keyFn={queryKey}
       actionsCellWidth={120}
       entityAttributesAreCamelCase
       columnRenderers={customColumnRenderers}

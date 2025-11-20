@@ -295,7 +295,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
-    columnPreferences,
     columnsDefinitions,
     defaultColumnOrder,
     displayBulkSelectCol,

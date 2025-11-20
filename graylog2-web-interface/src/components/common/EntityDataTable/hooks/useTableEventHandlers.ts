@@ -101,13 +101,6 @@ const useTableEventHandlers = ({
   const onSearchReset = useCallback(() => {
     onSearch('');
   }, [onSearch]);
-  //
-  // const onColumnPreferencesChange = useCallback(
-  //   (newColumnPreferences: ColumnPreferences) => {
-  //     updateTableLayout({ attributes: newColumnPreferences });
-  //   },
-  //   [appSection, pathname, sendTelemetry, updateTableLayout],
-  // );
 
   const onSortChange = useCallback(
     (newSort: Sort) => {

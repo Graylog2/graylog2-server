@@ -48,26 +48,6 @@ export type MiddleSectionProps = {
   searchParams: SearchParams;
   setFilters: (newFilters: UrlQueryFilters) => void;
 };
-type Props<T, M> = {
-  actionsCellWidth?: EntityDataTableProps['actionsCellWidth'];
-  additionalAttributes?: Array<Attribute>;
-  bulkSelection?: EntityDataTableProps['bulkSelection'];
-  columnRenderers: EntityDataTableProps['columnRenderers'];
-  entityActions: EntityDataTableProps['entityActions'];
-  entityAttributesAreCamelCase: boolean;
-  expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'];
-  fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
-  fetchOptions?: FetchOptions;
-  filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
-  humanName: string;
-  keyFn: (options: SearchParams) => Array<unknown>;
-  queryHelpComponent?: React.ReactNode;
-  searchPlaceholder?: string;
-  tableLayout: DefaultLayout;
-  topRightCol?: React.ReactNode;
-  middleSection?: React.ComponentType<MiddleSectionProps>;
-  withoutURLParams?: boolean;
-};
 
 const INITIAL_DATA = {
   pagination: { total: 0 },
@@ -88,6 +68,9 @@ type InnerProps = {
 
 const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   actionsCellWidth = 160,
+  additionalAttributes = [],
+  bulkSelection = undefined,
+  columnRenderers,
   entityActions,
   entityAttributesAreCamelCase,
   expandedSectionsRenderer = undefined,
@@ -265,7 +248,6 @@ type Props<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
-  columnsOrder: EntityDataTableProps['columnsOrder'];
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'];

@@ -34,10 +34,21 @@ type Options = {
 
 export type SortableAttrbutes = 'index_set_id' | 'index_set_title';
 
+export const queryKey = (searchParams: SearchParams, field: string, streams: Array<string>) => [
+  'fieldTypeUsages',
+  searchParams,
+  field,
+  streams,
+];
+
 export const fetchFieldTypeUsages = async (
   { field, streams }: { field: string; streams: Array<string> },
   searchParams: SearchParams<SortableAttrbutes>,
-) => {
+): Promise<{
+  list: Array<FieldTypeUsage>;
+  pagination: { total: number };
+  attributes: Array<Attribute>;
+}> => {
   const {
     sort: { attributeId, direction },
     page,

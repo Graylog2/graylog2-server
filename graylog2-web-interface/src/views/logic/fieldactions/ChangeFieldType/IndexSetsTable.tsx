@@ -21,7 +21,7 @@ import { PaginatedEntityTable } from 'components/common';
 import { DEFAULT_LAYOUT } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { SortableAttrbutes } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
-import { fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { queryKey, fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -80,7 +80,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
         tableLayout={DEFAULT_LAYOUT}
         withoutURLParams
         fetchEntities={fetchEntities}
-        keyFn={(searchParams) => ['fieldTypeUsages', field, searchParams]}
+        keyFn={(searchParams) => queryKey(searchParams, field, currentStreams)}
         columnRenderers={columnRenderers}
         entityActions={null}
         entityAttributesAreCamelCase
