@@ -14,7 +14,6 @@ const Td = styled.td<{ $isDragging: boolean; $transform: string; $width: number 
     transform: ${$transform ?? 'none'};
     transition: width transform 0.2s ease-in-out;
     width: ${$width}px;
-    z-index: ${$isDragging ? 1 : 0};
   `,
 );
 

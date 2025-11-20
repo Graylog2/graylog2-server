@@ -44,8 +44,6 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
     display: flex;
     align-items: center;
     line-height: 0;
-
-    cursor: grabbing;
   `,
 );
 

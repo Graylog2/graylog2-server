@@ -18,8 +18,9 @@
 import * as React from 'react';
 import { useState, useCallback, useMemo } from 'react';
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-kit/sortable';
-import { DragStartEvent, DragEndEvent, PointerSensor } from '@dnd-kit/core';
+import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import {
+  PointerSensor,
   closestCenter,
   DndContext,
   useSensors,
@@ -65,7 +66,7 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
           const oldIndex = curColumnOrder.indexOf(active.id as string);
           const newIndex = curColumnOrder.indexOf(over.id as string);
 
-          return arrayMove(curColumnOrder, oldIndex, newIndex); //this is just a splice util
+          return arrayMove(curColumnOrder, oldIndex, newIndex);
         });
       }
     },
