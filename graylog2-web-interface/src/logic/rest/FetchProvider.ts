@@ -21,6 +21,7 @@ import ErrorsActions from 'actions/errors/ErrorsActions';
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import CancellablePromise from 'logic/rest/CancellablePromise';
 import { ServerAvailabilityActions } from 'stores/sessions/ServerAvailabilityStore';
+import type { Method } from 'routing/types';
 
 // eslint-disable-next-line global-require,@typescript-eslint/no-require-imports
 const importSessionStore = memoize(() => require('stores/sessions/SessionStore'));
@@ -266,8 +267,6 @@ function queuePromiseIfNotLoggedin<T>(promise: () => Promise<T>): () => Promise<
 
   return promise;
 }
-
-type Method = 'GET' | 'PUT' | 'POST' | 'DELETE';
 
 export default function fetch<T = any>(
   method: Method,

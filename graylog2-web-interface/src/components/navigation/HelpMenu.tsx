@@ -16,32 +16,48 @@
  */
 import * as React from 'react';
 
+import usePluginEntities from 'hooks/usePluginEntities';
 import { NavDropdown } from 'components/bootstrap';
-import { Icon, IfPermitted } from 'components/common';
-import DocsHelper from 'util/DocsHelper';
-import Routes from 'routing/Routes';
+import { Icon } from 'components/common';
 import useHotkeysContext from 'hooks/useHotkeysContext';
 import Menu from 'components/bootstrap/Menu';
 import NavIcon from 'components/navigation/NavIcon';
-
-const HelpMenuLinkItem = ({ href, children = undefined }: React.PropsWithChildren<{ href: string }>) => (
-  <Menu.Item component="a" href={href} target="_blank" leftSection={<Icon name="open_in_new" />}>
-    {children}
-  </Menu.Item>
-);
+import usePermissions from 'hooks/usePermissions';
 
 const HelpMenu = () => {
   const { setShowHotkeysModal } = useHotkeysContext();
+  const menuItems = usePluginEntities('helpMenu');
+  const { isPermitted } = usePermissions();
+  const availableMenuItems = menuItems.filter((item) => isPermitted(item.permissions));
 
   return (
     <NavDropdown title={<NavIcon type="help" />} hoverTitle="Help" noCaret>
-      <HelpMenuLinkItem href={DocsHelper.versionedDocsHomePage()}>Documentation</HelpMenuLinkItem>
+      {availableMenuItems.map((item) => {
+        if ('externalLink' in item) {
+          return (
+            <Menu.Item
+              key={item.description}
+              component="a"
+              href={item.externalLink}
+              target="_blank"
+              leftSection={<Icon name="open_in_new" />}>
+              {item.description}
+            </Menu.Item>
+          );
+        }
 
-      <Menu.Item onClick={() => setShowHotkeysModal(true)}>Keyboard Shortcuts</Menu.Item>
+        if ('action' in item) {
+          return (
+            <Menu.Item
+              key={item.description}
+              onClick={() => item.action({ showHotkeysModal: () => setShowHotkeysModal(true) })}>
+              {item.description}
+            </Menu.Item>
+          );
+        }
 
-      <IfPermitted permissions="api_browser:read">
-        <HelpMenuLinkItem href={Routes.global_api_browser()}>Cluster Global API browser</HelpMenuLinkItem>
-      </IfPermitted>
+        throw Error('Help menu item must have either external link or action defined');
+      })}
     </NavDropdown>
   );
 };

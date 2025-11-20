@@ -18,8 +18,11 @@ package org.graylog2.indexer;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.indexset.restrictions.DefaultIndexSetConfigTransformer;
+import org.graylog2.indexer.indexset.restrictions.IndexSetConfigTransformer;
 import org.graylog2.indexer.indexset.template.requirement.EnterprisePluginRequirement;
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirement;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -35,5 +38,7 @@ public class IndexerBindings extends Graylog2Module {
 
         Multibinder.newSetBinder(binder(), IndexSetTemplateRequirement.class).addBinding().to(EnterprisePluginRequirement.class);
         Multibinder.newSetBinder(binder(), OpenIndexSetFilterFactory.class);
+
+        OptionalBinder.newOptionalBinder(binder(), IndexSetConfigTransformer.class).setDefault().to(DefaultIndexSetConfigTransformer.class);
     }
 }

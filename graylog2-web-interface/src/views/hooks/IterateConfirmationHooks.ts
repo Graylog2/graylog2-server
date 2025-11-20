@@ -18,7 +18,6 @@ const iterateConfirmationHooks = async <Args extends Array<any>>(
   hooks: Array<(...args: Args) => Promise<boolean | null>>,
   ...args: Args
 ) => {
-  // eslint-disable-next-line no-restricted-syntax
   for (const hook of hooks) {
     try {
       // eslint-disable-next-line no-await-in-loop

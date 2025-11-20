@@ -18,10 +18,10 @@ import Qs from 'qs';
 
 import { Builder } from 'logic/rest/FetchProvider';
 import * as URLUtils from 'util/URLUtils';
+import type { Method } from 'routing/types';
 
 type Query = { [key: string]: string | number | boolean | string[] };
 type Headers = { [key: string]: string | number | boolean | string[] };
-type Methods = 'GET' | 'POST' | 'PUT' | 'DELETE';
 export type RequestOptions = {
   requestShouldExtendSession?: boolean;
 };
@@ -34,7 +34,7 @@ const headersFromOptions = (options: RequestOptions): Headers => {
   return {};
 };
 const request = (
-  method: Methods,
+  method: Method,
   path: string,
   body: any,
   query: Query,

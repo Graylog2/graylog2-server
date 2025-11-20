@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-/* eslint-disable no-restricted-globals */
+
 import React from 'react';
 import numeral from 'numeral';
 import styled, { css } from 'styled-components';

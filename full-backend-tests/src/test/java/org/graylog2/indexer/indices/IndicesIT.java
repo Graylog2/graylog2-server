@@ -22,9 +22,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
-import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IgnoreIndexTemplate;
@@ -36,6 +36,7 @@ import org.graylog2.indexer.IndexTemplateNotFoundException;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
@@ -71,9 +72,9 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -117,7 +118,8 @@ public class IndicesIT extends SearchServerBaseTest {
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter(),
-                mock(IndexFieldTypeProfileService.class)
+                mock(IndexFieldTypeProfileService.class),
+                searchServer().adapters().countsAdapter()
         );
     }
 
@@ -372,7 +374,8 @@ public class IndicesIT extends SearchServerBaseTest {
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter(),
-                mock(IndexFieldTypeProfileService.class));
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
 
@@ -405,7 +408,8 @@ public class IndicesIT extends SearchServerBaseTest {
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter(),
-                mock(IndexFieldTypeProfileService.class));
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class));
 
         assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)

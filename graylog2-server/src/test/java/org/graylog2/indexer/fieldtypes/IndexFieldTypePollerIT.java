@@ -27,6 +27,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.Indices;
@@ -37,8 +38,8 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -90,7 +91,7 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
         return searchServer().adapters().indexFieldTypePollerAdapter(configuration);
     }
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final Node node = mock(Node.class);
         final Indices indices = new Indices(
@@ -101,7 +102,8 @@ public abstract class IndexFieldTypePollerIT extends ElasticsearchBaseTest {
                 new NullAuditEventSender(),
                 mock(EventBus.class),
                 createIndicesAdapter(),
-                mock(IndexFieldTypeProfileService.class)
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class)
         );
         final Configuration withStreamAwarenessOff = spy(new Configuration());
         doReturn(false).when(withStreamAwarenessOff).maintainsStreamAwareFieldTypes();

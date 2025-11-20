@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
@@ -50,7 +49,6 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.apache.commons.lang.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.authz.permission.WildcardPermission;
@@ -88,14 +86,13 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.MongoDBSessionService;
-import org.graylog2.security.MongoDbSession;
 import org.graylog2.security.UserSessionTerminationService;
+import org.graylog2.security.sessions.SessionDTO;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
 import org.graylog2.shared.users.Role;
-import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserManagementService;
 import org.graylog2.users.PaginatedUserService;
 import org.graylog2.users.PasswordComplexityConfig;
@@ -110,7 +107,6 @@ import org.threeten.extra.PeriodDuration;
 
 import javax.annotation.Nullable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -154,7 +150,7 @@ public class UsersResource extends RestResource {
     private final PaginatedUserService paginatedUserService;
     private final AccessTokenService accessTokenService;
     private final RoleService roleService;
-    private final MongoDBSessionService sessionService;
+    private final SessionService sessionService;
     private final SearchQueryParser searchQueryParser;
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
@@ -173,7 +169,7 @@ public class UsersResource extends RestResource {
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
-                         MongoDBSessionService sessionService,
+                         SessionService sessionService,
                          UserSessionTerminationService sessionTerminationService,
                          DefaultSecurityManager securityManager,
                          GlobalAuthServiceConfig globalAuthServiceConfig,
@@ -469,26 +465,47 @@ public class UsersResource extends RestResource {
     }
 
     private void setUserRoles(@Nullable List<String> roles, User user) {
-        if (roles != null) {
-            try {
-                final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
-                List<String> unknownRoles = new ArrayList<>();
-                roles.forEach(roleName -> {
-                    checkPermission(RestPermissions.ROLES_EDIT, roleName);
-                    if (!nameMap.containsKey(roleName.toLowerCase(Locale.US))) {
-                        unknownRoles.add(roleName);
-                    }
-                });
-                if (!unknownRoles.isEmpty()) {
-                    throw new BadRequestException(
-                            String.format(Locale.ENGLISH, "Invalid role names: %s", StringUtils.join(unknownRoles, ", "))
-                    );
-                }
-                final Iterable<String> roleIds = Iterables.transform(roles, Roles.roleNameToIdFunction(nameMap));
-                user.setRoleIds(Sets.newHashSet(roleIds));
-            } catch (org.graylog2.database.NotFoundException e) {
-                throw new InternalServerErrorException(e);
+        if (roles == null) {
+            return;
+        }
+
+        try {
+            final Map<String, Role> nameMap = roleService.loadAllLowercaseNameMap();
+            final Map<String, String> idToNameMap = nameMap.values().stream()
+                    .collect(Collectors.toMap(Role::getId, r -> r.getName().toLowerCase(Locale.US)));
+
+            final Set<String> normalizedRoles = roles.stream()
+                    .map(r -> r.toLowerCase(Locale.US))
+                    .collect(Collectors.toSet());
+
+            final List<String> unknownRoles = normalizedRoles.stream()
+                    .filter(r -> !nameMap.containsKey(r)).toList();
+
+            if (!unknownRoles.isEmpty()) {
+                throw new BadRequestException(
+                        String.format(Locale.ENGLISH, "Invalid role names: %s", String.join(", ", unknownRoles))
+                );
             }
+
+            final Set<String> currentRoleNames = user.getRoleIds().stream()
+                    .map(idToNameMap::get)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
+            final Set<String> changedRoles = Sets.symmetricDifference(normalizedRoles, currentRoleNames);
+
+            for (String changedRole : changedRoles) {
+                checkPermission(RestPermissions.ROLES_ASSIGN, nameMap.get(changedRole).getName());
+            }
+
+            final Set<String> roleIds = normalizedRoles.stream()
+                    .map(nameMap::get)
+                    .map(Role::getId)
+                    .collect(Collectors.toSet());
+
+            user.setRoleIds(roleIds);
+
+        } catch (org.graylog2.database.NotFoundException e) {
+            throw new InternalServerErrorException(e);
         }
     }
 
@@ -872,12 +889,12 @@ public class UsersResource extends RestResource {
         String clientAddress = null;
         if (optSessions.isPresent()) {
             final AllUserSessions sessions = optSessions.get();
-            final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
+            final Optional<SessionDTO> mongoDbSession = sessions.forUser(user);
             if (mongoDbSession.isPresent()) {
-                final MongoDbSession session = mongoDbSession.get();
+                final SessionDTO session = mongoDbSession.get();
                 sessionActive = true;
-                lastActivity = session.getLastAccessTime();
-                clientAddress = session.getHost();
+                lastActivity = Date.from(session.lastAccessTime());
+                clientAddress = session.host().orElse(null);
             }
         }
         List<WildcardPermission> wildcardPermissions;
@@ -941,7 +958,7 @@ public class UsersResource extends RestResource {
                 .filter(rootUser -> isPermitted(USERS_READ, rootUser.getName()))
                 .map(rootUser -> {
                     final Set<String> adminRoles = userManagementService.getRoleNames(rootUser);
-                    final Optional<MongoDbSession> lastSession = sessions.forUser(rootUser);
+                    final Optional<SessionDTO> lastSession = sessions.forUser(rootUser);
                     return UserOverviewDTO.builder()
                             .username(rootUser.getName())
                             .fullName(rootUser.getFullName())
@@ -993,31 +1010,32 @@ public class UsersResource extends RestResource {
     }
 
     private static class AllUserSessions {
-        private final Map<String, Optional<MongoDbSession>> sessions;
+        private final Map<String, Optional<SessionDTO>> sessions;
 
-        private AllUserSessions(Collection<MongoDbSession> sessions) {
+        public static AllUserSessions create(SessionService sessionService) {
+            try (var sessionDTOStream = sessionService.streamAll()) {
+                return new AllUserSessions(sessionDTOStream.toList());
+            }
+        }
+
+        private AllUserSessions(Collection<SessionDTO> sessions) {
             this.sessions = getLastSessionForUser(sessions);
         }
 
-        public static AllUserSessions create(MongoDBSessionService sessionService) {
-            return new AllUserSessions(sessionService.loadAll());
-        }
-
-        public Optional<MongoDbSession> forUser(User user) {
+        public Optional<SessionDTO> forUser(User user) {
             return sessions.getOrDefault(user.getId(), Optional.empty());
         }
 
-        public Optional<MongoDbSession> forUser(UserOverviewDTO user) {
+        public Optional<SessionDTO> forUser(UserOverviewDTO user) {
             return sessions.getOrDefault(user.id(), Optional.empty());
         }
 
         // Among all active sessions, find the last recently used for each user
-        private Map<String, Optional<MongoDbSession>> getLastSessionForUser(Collection<MongoDbSession> sessions) {
-            //noinspection OptionalGetWithoutIsPresent
+        private Map<String, Optional<SessionDTO>> getLastSessionForUser(Collection<SessionDTO> sessions) {
             return sessions.stream()
-                    .filter(s -> s.getUserIdAttribute().isPresent())
-                    .collect(groupingBy(s -> s.getUserIdAttribute().get(),
-                            maxBy(Comparator.comparing(MongoDbSession::getLastAccessTime))));
+                    .filter(s -> s.userId().isPresent())
+                    .collect(groupingBy(s -> s.userId().get(),
+                            maxBy(Comparator.comparing(SessionDTO::lastAccessTime))));
         }
     }
 }
