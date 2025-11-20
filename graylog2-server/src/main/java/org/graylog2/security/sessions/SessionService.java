@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.security;
+package org.graylog2.security.sessions;
 
-import org.apache.shiro.session.mgt.SimpleSession;
-import org.graylog2.plugin.database.PersistedService;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-import javax.annotation.Nullable;
-import java.util.Collection;
+public interface SessionService {
+    Optional<SessionDTO> getBySessionId(String sessionId);
 
-public interface MongoDBSessionService extends PersistedService {
-    @Nullable
-    MongoDbSession load(String sessionId);
+    boolean deleteBySessionId(String sessionId);
 
-    Collection<MongoDbSession> loadAll();
-    SimpleSession daoToSimpleSession(MongoDbSession mongoDbSession);
+    String create(SessionDTO session);
+
+    void update(SessionDTO session);
+
+    Stream<SessionDTO> streamAll();
 }
