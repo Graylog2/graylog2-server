@@ -28,11 +28,13 @@ import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.resources.system.RemoteLookupTableResource;
 import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import retrofit2.Call;
 import retrofit2.Response;
 
@@ -53,7 +55,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class ClusterLookupTableResourceTest {
 
     @Mock
@@ -79,7 +82,7 @@ public class ClusterLookupTableResourceTest {
 
     private ClusterLookupTableResource underTest;
 
-    @Before
+    @BeforeEach
     public void setup() throws Exception {
 
         when(httpHeaders.getRequestHeader("Authorization"))
@@ -214,7 +217,7 @@ public class ClusterLookupTableResourceTest {
     }
 
     private void mock204Response(String tableName, String key,
-                                 RemoteLookupTableResource remoteLookupTableResource) throws IOException {
+            RemoteLookupTableResource remoteLookupTableResource) throws IOException {
         final Call<Void> call = callMock();
 
         when(remoteLookupTableResource.performPurge(tableName, key))
@@ -230,21 +233,21 @@ public class ClusterLookupTableResourceTest {
     }
 
     private void mock404Response(String tableName, String key,
-                                 RemoteLookupTableResource remoteLookupTableResource) throws IOException {
+            RemoteLookupTableResource remoteLookupTableResource) throws IOException {
         final Call<Void> call = callMock();
 
         when(remoteLookupTableResource.performPurge(tableName, key))
                 .thenReturn(call);
 
         when(call.execute()).thenReturn(Response.error(
-                        ResponseBody.create(null, "Resource Not Found"),
-                        new okhttp3.Response.Builder() //
-                                .code(404)
-                                .message("Not Found")
-                                .protocol(Protocol.HTTP_1_1)
-                                .request(new Request.Builder().url("http://localhost/").build())
-                                .build()
-                )
+                ResponseBody.create(null, "Resource Not Found"),
+                new okhttp3.Response.Builder() //
+                        .code(404)
+                        .message("Not Found")
+                        .protocol(Protocol.HTTP_1_1)
+                        .request(new Request.Builder().url("http://localhost/").build())
+                        .build()
+        )
         );
     }
 

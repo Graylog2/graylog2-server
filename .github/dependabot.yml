@@ -57,6 +57,9 @@ updates:
           - "< 5"
     rebase-strategy: "disabled"
     groups:
+      dnd-kit:
+        patterns:
+          - "@dnd-kit/*"
       mantine:
         patterns:
           - "@mantine/*"

@@ -22,8 +22,8 @@ import org.graylog2.grok.InMemoryGrokPatternService;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.concurrent.Executors;
@@ -37,7 +37,7 @@ public class GrokTesterResourceTest {
 
     private GrokTesterResource resource;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
     public void setUp() throws Exception {
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
