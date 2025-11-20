@@ -34,6 +34,7 @@ import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch._types.HealthStatus;
+import org.opensearch.client.opensearch._types.Refresh;
 import org.opensearch.client.opensearch._types.mapping.Property;
 import org.opensearch.client.opensearch.cat.IndicesResponse;
 import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
@@ -265,7 +266,7 @@ public class ClientOS implements Client {
     @Override
     public void bulkIndex(BulkIndexRequest bulkIndexRequest) {
         Builder bulk = new Builder();
-        bulkIndexRequest.requests().forEach((index, docs) -> docs.forEach(doc -> bulk.operations(op -> op.index(idx -> idx.index(index).document(doc)))));
+        bulkIndexRequest.requests().forEach((index, docs) -> docs.forEach(doc -> bulk.refresh(Refresh.True).operations(op -> op.index(idx -> idx.index(index).document(doc)))));
         opensearchClient.sync(c -> c.bulk(bulk.build()), "Failed to bulk index documents");
     }
 
