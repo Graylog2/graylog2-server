@@ -17,8 +17,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
-import { Label } from 'components/bootstrap';
 import NumberUtils from 'util/NumberUtils';
+
+import { StyledLabel } from './NodeMetricsLayout';
 
 const SecondaryText = styled.div`
   font-size: small;
@@ -26,10 +27,6 @@ const SecondaryText = styled.div`
   span {
     font-size: inherit;
   }
-`;
-
-const StyledLabel = styled(Label)`
-  display: inline-flex;
 `;
 
 export const computeRatio = (used: number | undefined | null, max: number | undefined | null) => {
