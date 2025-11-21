@@ -18,26 +18,20 @@ package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.victools.jsonschema.generator.CustomDefinition;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
-import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
-import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.web.customization.CustomizationConfig;
-import org.joda.time.DateTime;
 
 import java.util.Map;
 import java.util.Optional;
-
-import static com.github.victools.jsonschema.generator.OptionPreset.PLAIN_JSON;
-import static com.github.victools.jsonschema.generator.SchemaVersion.DRAFT_2020_12;
-import static com.github.victools.jsonschema.module.jackson.JacksonOption.RESPECT_JSONPROPERTY_REQUIRED;
 
 /**
  * The base class for MCP tools.
@@ -114,30 +108,28 @@ public abstract class Tool<P, O> {
         } else {
             this.inputSchema = objectMapper.convertValue(inputSchemaNode, McpSchema.JsonSchema.class);
         }
+//        this.inputSchema = generateInputSchema(parameterType);
         // if our tool produces anything other than a String, we want to create a JSON schema for it
-        if (String.class.equals(outputType.getType())) {
-            this.outputSchema = null;
-        } else {
-            SchemaGeneratorConfigBuilder configBuilder = new SchemaGeneratorConfigBuilder(DRAFT_2020_12, PLAIN_JSON);
+        this.outputSchema = String.class.equals(outputType.getType()) ? null : generateOutputSchema(outputType);
+    }
 
-            // Add Jackson module to respect @JsonProperty annotations
-            configBuilder.with(new JacksonModule(RESPECT_JSONPROPERTY_REQUIRED));
-
-            // Configure DateTime to be treated as a string
-            configBuilder.forTypesInGeneral()
-                    .withCustomDefinitionProvider((javaType, ctx) -> {
-                        if (javaType.getErasedType() == DateTime.class) {
-                            ObjectNode customNode = ctx.getGeneratorConfig().createObjectNode();
-                            customNode.put("type", "string");
-                            customNode.put("format", "date-time");
-                            return new CustomDefinition(customNode);
-                        }
-                        return null;
-                    });
-
-            generator = new SchemaGenerator(configBuilder.build());
-            this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
+    private JsonSchema generateSchema(TypeReference<?> type) {
+        try {
+            return new JsonSchemaGenerator(objectMapper)
+                    .generateSchema(objectMapper.getTypeFactory().constructType(type));
+        } catch (JsonMappingException e) {
+            return null;
         }
+    }
+
+    private McpSchema.JsonSchema generateInputSchema(TypeReference<P> type) {
+        JsonSchema schema = generateSchema(type);
+        return schema == null ? null : objectMapper.convertValue(schema, McpSchema.JsonSchema.class);
+    }
+
+    private Map<String, Object> generateOutputSchema(TypeReference<O> type) {
+        JsonSchema schema = generateSchema(type);
+        return schema == null ? null : objectMapper.convertValue(schema, new TypeReference<>() {});
     }
 
     protected boolean isOutputSchemaEnabled() {
