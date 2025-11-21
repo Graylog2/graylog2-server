@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
+import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -479,16 +480,13 @@ public class IndicesIT extends SearchServerBaseTest {
     @FullBackendTest
     public void setClosingDateMergesExistingMetaDataEntries() {
         final String index = createRandomIndex("foo");
-        client().updateMapping(index, Map.of("_meta", Map.of("existing", "should be kept")));
+        client().updateMappingMeta(index, "existing", "should be kept");
 
         indices.setClosingDate(index, Tools.nowUTC());
 
-        final Map<String, Object> mapping = client().getMapping(index);
-        assertThat(mapping.get("_meta")).satisfies(v -> {
-            assertThat(v).isNotNull();
-            //noinspection unchecked
-            assertThat(((Map<String, Object>) v).get("existing")).isEqualTo("should be kept");
-        });
+        final String existingValue = client().getMappingMetaValue(index, "existing", String.class);
+        Assertions.assertThat(existingValue).isEqualTo("should be kept");
+
         final Optional<DateTime> closingDate = indices.indexClosingDate(index);
         assertThat(closingDate).isNotEmpty();
     }

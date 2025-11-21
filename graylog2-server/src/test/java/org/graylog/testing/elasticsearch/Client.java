@@ -23,6 +23,7 @@ import java.util.Optional;
 
 public interface Client {
 
+    @Deprecated
     Optional<Map<String, Object>> findMessage(String index, String query);
 
     default void createIndex(String index) {
@@ -54,8 +55,6 @@ public interface Client {
 
     void putTemplate(String templateName, Template source);
 
-    void deleteTemplates(String... templates);
-
     void waitForGreenStatus(String... indices);
 
     void refreshNode();
@@ -74,8 +73,8 @@ public interface Client {
 
     void setIndexBlock(String index);
 
-    void updateMapping(String index, Map<String, Object> mapping);
-    Map<String, Object> getMapping(String index);
+    void updateMappingMeta(String index, String key, Object value);
+    <T> T getMappingMetaValue(String index, String key, Class<T> type);
 
     String getClusterSetting(String setting);
 
@@ -84,8 +83,4 @@ public interface Client {
     IndexState getStatus(String indexName);
 
     void openIndex(String indexName);
-
-    default void setRequestCircuitBreakerLimit(String limit) {
-        putSetting("indices.breaker.total.limit", limit);
-    }
 }
