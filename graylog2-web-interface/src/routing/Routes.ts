@@ -48,6 +48,7 @@ const Routes = {
   STARTPAGE: '/',
   NOTFOUND: '/notfound',
   SEARCH: '/search',
+  SEARCH_SHOW: (id: string) => `/search/${id}`,
   STREAMS: '/streams',
   STREAM_NEW: '/streams/new',
   ALERTS: {
