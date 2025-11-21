@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
@@ -303,8 +302,6 @@ const Routes = {
     Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution),
   stream_alerts: (streamId: string) => `/alerts/?stream_id=${streamId}`,
 
-  legacy_stream_search: (streamId: string) => `/streams/${streamId}/messages`,
-
   dashboard_show: (dashboardId: string) => `/dashboards/${dashboardId}`,
 
   show_saved_search: (searchId: string) => `/search/${searchId}`,
@@ -415,62 +412,9 @@ const qualifiedRoutes = qualifyUrls(Routes);
 
 const unqualified = Routes;
 
-/*
- * Global registry of plugin routes. Route names are generated automatically from the route path, by removing
- * any colons, replacing slashes with underscores, and making the string uppercase. Below there is an example of how
- * to access the routes.
- *
- * Plugin register example:
- * routes: [
- *           { path: '/system/pipelines', component: Foo },
- *           { path: '/system/pipelines/:pipelineId', component: Bar },
- * ]
- *
- * Using routes on plugin components:
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES')}>...</LinkContainer>
- * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
- *
- */
-const pluginRoute = (routeKey: string, throwError: boolean = true) => {
-  const pluginRoutes = {};
-
-  PluginStore.exports('routes').forEach((route) => {
-    const uri = new URI(route.path);
-    const segments = uri.segment();
-    const key = segments
-      .map((segment) => segment.replace(':', ''))
-      .join('_')
-      .toUpperCase();
-    const paramNames = segments.filter((segment) => segment.startsWith(':'));
-
-    if (paramNames.length > 0) {
-      pluginRoutes[key] = (...paramValues) => {
-        paramNames.forEach((param, idx) => {
-          const value = String(paramValues[idx]);
-
-          uri.segment(segments.indexOf(param), value);
-        });
-
-        return uri.pathname();
-      };
-
-      return;
-    }
-
-    pluginRoutes[key] = route.path;
-  });
-
-  const route = qualifyUrls(pluginRoutes)[routeKey];
-
-  if (!route && throwError) {
-    throw new Error(`Could not find plugin route '${routeKey}'.`);
-  }
-
-  return route;
+const defaultExport = {
+  ...qualifiedRoutes,
+  unqualified,
 };
-
-const getPluginRoute = (routeKey: string) => pluginRoute(routeKey, false);
-
-const defaultExport = Object.assign(qualifiedRoutes, { pluginRoute, getPluginRoute, unqualified });
 
 export default defaultExport;
