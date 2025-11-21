@@ -104,7 +104,7 @@ public class StartPageServiceTest {
         final var connection = mongodb.mongoConnection();
         var lastOpenedService = new LastOpenedService(mongoCollections, eventbus);
         var recentActivityService = new RecentActivityService(mongoCollections, connection, eventbus, grnRegistry, permissionAndRoleResolver,
-                new DBGrantService(collections), mock(GranteeService.class), new PluggableEntityService(Set.of()), mock(CapabilityRegistry.class));
+                new DBGrantService(mongoCollections), mock(GranteeService.class), new PluggableEntityService(Set.of()), mock(CapabilityRegistry.class));
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
         startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog, Map.of()));
