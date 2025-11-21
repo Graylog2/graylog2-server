@@ -32,7 +32,7 @@ import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 import java.util.List;

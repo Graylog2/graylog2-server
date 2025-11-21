@@ -19,8 +19,8 @@ package org.graylog2.indexer.ranges;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import org.assertj.jodatime.api.Assertions;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
@@ -37,12 +37,13 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Set;
@@ -50,14 +51,13 @@ import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class MongoIndexRangeServiceTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
@@ -69,11 +69,11 @@ public class MongoIndexRangeServiceTest {
     private EventBus localEventBus;
     private MongoIndexRangeService indexRangeService;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         localEventBus = new EventBus("local-event-bus");
         indexRangeService = new MongoIndexRangeService(
-                new MongoCollections(objectMapperProvider, mongodb.mongoConnection()), indices, indexSetRegistry,
+                mongoCollections, indices, indexSetRegistry,
                 new NullAuditEventSender(), new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"), localEventBus);
     }
 
@@ -89,15 +89,17 @@ public class MongoIndexRangeServiceTest {
         assertThat(indexRange.calculationDuration()).isEqualTo(23);
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     @MongoDBFixtures("MongoIndexRangeServiceTest-LegacyIndexRanges.json")
     public void getIgnoresLegacyIndexRange() throws Exception {
-        indexRangeService.get("graylog_0");
+        assertThrows(NotFoundException.class, () ->
+            indexRangeService.get("graylog_0"));
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void getThrowsNotFoundException() throws Exception {
-        indexRangeService.get("does-not-exist");
+        assertThrows(NotFoundException.class, () ->
+            indexRangeService.get("does-not-exist"));
     }
 
     /**
@@ -189,12 +191,14 @@ public class MongoIndexRangeServiceTest {
         Assertions.assertThat(indexRange.calculatedAt()).isEqualToIgnoringHours(DateTime.now(DateTimeZone.UTC));
     }
 
-    @Test(expected = ElasticsearchException.class)
+    @Test
     public void calculateRangeFailsIfIndexIsNotHealthy() throws Exception {
-        final String index = "graylog";
-        when(indices.waitForRecovery(index)).thenThrow(new ElasticsearchException("TEST"));
+        assertThrows(ElasticsearchException.class, () -> {
+            final String index = "graylog";
+            when(indices.waitForRecovery(index)).thenThrow(new ElasticsearchException("TEST"));
 
-        indexRangeService.calculateRange(index);
+            indexRangeService.calculateRange(index);
+        });
     }
 
     @Test
