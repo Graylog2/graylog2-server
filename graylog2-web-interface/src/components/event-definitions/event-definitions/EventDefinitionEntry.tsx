@@ -59,7 +59,7 @@ const EventDefinitionEntry = ({ context, eventDefinition, onDisable, onEnable, o
 
   const isSystemEventDefinition = (): boolean => eventDefinition.config.type === 'system-notifications-v1';
 
-  const titleSuffix = (): JSX.Element | undefined => {
+  const titleSuffix = (): React.JSX.Element | undefined => {
     if (isSystemEventDefinition()) {
       return undefined;
     }

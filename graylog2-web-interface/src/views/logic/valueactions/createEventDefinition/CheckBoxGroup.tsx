@@ -30,7 +30,7 @@ const CHECKBOX_STATES = {
 type Props = {
   groupLabel: string;
   checked: Checked;
-  labels: { [name: string]: JSX.Element };
+  labels: { [name: string]: React.JSX.Element };
   onChange: (newChecked: Checked) => void;
 };
 
