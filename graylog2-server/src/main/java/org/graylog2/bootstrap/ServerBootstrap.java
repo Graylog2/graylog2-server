@@ -19,6 +19,7 @@ package org.graylog2.bootstrap;
 import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Ordering;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.ServiceManager;
@@ -327,6 +328,9 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
             if (configuration.isLeader() && configuration.runMigrations()) {
                 runMigrations(injector, MigrationType.STANDARD);
             }
+
+            // Migrations that must be executed on all nodes, regardless of their leader status
+            runMigrations(injector, MigrationType.ENFORCED_ON_ALL_NODES);
         } catch (Exception e) {
             LOG.error("Exception while running migrations", e);
             System.exit(1);
@@ -395,22 +399,22 @@ public abstract class ServerBootstrap extends AbstractNodeCommand {
     public void runMigrations(Injector injector, MigrationType migrationType) {
         //noinspection unchecked
         final TypeLiteral<Set<Migration>> typeLiteral = (TypeLiteral<Set<Migration>>) TypeLiteral.get(Types.setOf(Migration.class));
-        Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
+        final Set<Migration> migrations = injector.getInstance(Key.get(typeLiteral));
+        final Set<Migration> migrationsToRun = migrations.stream().filter(m -> m.migrationType() == migrationType).collect(ImmutableSortedSet.toImmutableSortedSet(Ordering.natural()));
+        LOG.info("Running {} migrations of type {}...", migrationsToRun.size(), migrationType);
 
-        LOG.info("Running {} migrations...", migrations.size());
-
-        ImmutableSortedSet.copyOf(migrations).stream().filter(m -> m.migrationType() == migrationType).forEach(m -> {
-            LOG.debug("Running migration <{}>", m.getClass().getCanonicalName());
+        for (Migration migration : migrationsToRun) {
+            LOG.debug("Running migration <{}>", migration.getClass().getCanonicalName());
             try {
-                m.upgrade();
+                migration.upgrade();
             } catch (Exception e) {
                 if (configuration.ignoreMigrationFailures()) {
-                    LOG.warn("Ignoring failure of migration <{}>: {}", m.getClass().getCanonicalName(), e.getMessage());
+                    LOG.warn("Ignoring failure of migration <{}>: {}", migration.getClass().getCanonicalName(), e.getMessage());
                 } else {
                     throw e;
                 }
             }
-        });
+        }
     }
 
     protected void savePidFile(final String pidFile) {
