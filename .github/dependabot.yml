@@ -19,6 +19,12 @@ updates:
           - ">= 10"
       # we want to manually update the opensearch-java client as long as it requires intensive testing
       - dependency-name: "org.opensearch.client:opensearch-java"
+    groups:
+      openrewrite:
+        patterns:
+          - "org.openrewrite:*"
+          - "org.openrewrite.maven:*"
+          - "org.openrewrite.recipe:*"
     open-pull-requests-limit: 25
     labels:
       - dependencies
