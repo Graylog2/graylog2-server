@@ -20,11 +20,12 @@ import { useMemo } from 'react';
 import { useTableFetchContext } from 'components/common/PaginatedEntityTable';
 import type { Attribute } from 'stores/PaginationTypes';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 
-const useNonDisplayedAttributes = (defaultLayout) => {
+const useNonDisplayedAttributes = (defaultLayout: DefaultLayout) => {
   const { attributes } = useTableFetchContext();
   const {
-    layoutConfig: { columnPreferences },
+    layoutConfig: { columnPreferences = {} },
     isInitialLoading,
   } = useTableLayout(defaultLayout);
 
