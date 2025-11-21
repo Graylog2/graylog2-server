@@ -57,7 +57,7 @@ const TitleCell = ({ dashboard: { id, requires, title }, requirementsProvided }:
     );
   }
 
-  return <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>;
+  return <Link to={Routes.DASHBOARD.SHOW(id)}>{title}</Link>;
 };
 
 export default TitleCell;

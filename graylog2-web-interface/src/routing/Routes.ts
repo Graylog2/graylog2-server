@@ -79,7 +79,10 @@ const Routes = {
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
-  DASHBOARD_NEW: '/dashboards/new',
+  DASHBOARD: {
+    NEW: '/dashboards/new',
+    SHOW: (id: string) => `/dashboards/${id}`,
+  },
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
   SYSTEM: {
