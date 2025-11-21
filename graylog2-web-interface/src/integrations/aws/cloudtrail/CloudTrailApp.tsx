@@ -14,15 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.aws.json;
+import React from 'react';
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import PageHeader from 'components/common/PageHeader';
+import { ExternalLink } from 'components/common';
 
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class SQSMessage {
-    @JsonProperty("Message")
-    public String message;
-    @JsonProperty("MessageId")
-    public String messageId;
-}
+import EmbeddedCloudTrailApp from './EmbeddedCloudTrailApp';
+
+const CloudTrailApp = () => (
+  <>
+    <PageHeader title="AWS CloudTrail Integrations">
+      <span>This feature retrieves log records from AWS CloudTrail Platform.</span>
+      <p>
+        You need to have <ExternalLink href="https://aws.amazon.com/console/">AWS CloudTrail</ExternalLink>.{' '}
+      </p>
+    </PageHeader>
+    <EmbeddedCloudTrailApp />
+  </>
+);
+
+export default CloudTrailApp;
+
