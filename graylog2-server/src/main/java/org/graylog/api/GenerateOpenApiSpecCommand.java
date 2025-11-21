@@ -16,6 +16,8 @@
  */
 package org.graylog.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Pattern;
@@ -36,8 +38,8 @@ import com.google.inject.spi.DefaultBindingTargetVisitor;
 import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
-import io.swagger.v3.core.util.Json;
-import io.swagger.v3.core.util.Yaml;
+import io.swagger.v3.core.util.ObjectMapperFactory;
+import io.swagger.v3.oas.models.OpenAPI;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.commands.Server;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
@@ -46,6 +48,7 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.security.encryption.EncryptedValueService;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIBindings;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIGenerator;
@@ -95,7 +98,7 @@ public class GenerateOpenApiSpecCommand extends Server {
                 systemRestResourcesModule, pluginRestResourcesModule, jacksonSubTypesModule, new OpenAPIBindings(),
                 binder -> {
                     binder.bind(boolean.class).annotatedWith(Names.named("is_cloud")).toInstance(configuration.isCloud());
-                    binder.bind(Version.class).toInstance(version);
+                    binder.bind(Version.class).toInstance(Version.from(0, 0, 0));
                     binder.bind(ClassLoader.class).annotatedWith(GraylogClassLoader.class).toInstance(chainingClassLoader);
                     binder.bind(EncryptedValueService.class).toInstance(new EncryptedValueService(UUID.randomUUID().toString()));
                     binder.bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
@@ -112,7 +115,7 @@ public class GenerateOpenApiSpecCommand extends Server {
         System.out.println("Generating OpenAPI specification.");
 
         final var spec = generator.generateOpenApiSpec();
-        final var serialized = outputFile.endsWith(".json") ? Json.pretty(spec) : Yaml.pretty(spec);
+        final var serialized = outputFile.endsWith(".json") ? prettyJson(spec) : prettyYaml(spec);
         final var targetPath = Path.of(outputFile);
         final var parentPath = targetPath.getParent();
 
@@ -132,6 +135,24 @@ public class GenerateOpenApiSpecCommand extends Server {
 
         System.out.println("OpenAPI specification written to " + outputFile);
         System.out.println(f("[took %s ms]", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
+    }
+
+    private String prettyJson(OpenAPI spec) {
+        return pretty(ObjectMapperFactory.createJson31(), spec);
+    }
+
+    private String prettyYaml(OpenAPI spec) {
+        return pretty(ObjectMapperFactory.createYaml31(), spec);
+    }
+
+    private String pretty(ObjectMapper mapper, OpenAPI spec) {
+        // Enable alphabetical ordering of properties for stable output
+        mapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+        try {
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(spec);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize OpenAPI spec as YAML", e);
+        }
     }
 
     private Module extractPluginRestResourcesModule(List<Element> elements) {
@@ -228,6 +249,7 @@ public class GenerateOpenApiSpecCommand extends Server {
         }
 
         @Override
+        @SuppressForbidden("Comparing Guice Annotations")
         public MultibinderBinding<?> visit(MultibinderBinding<?> multibinderBinding) {
             if (Names.named(SYSTEM_REST_RESOURCES).equals(multibinderBinding.getSetKey().getAnnotation())) {
                 return multibinderBinding;

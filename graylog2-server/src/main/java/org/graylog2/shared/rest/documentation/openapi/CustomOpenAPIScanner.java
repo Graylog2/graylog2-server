@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
+import com.google.common.collect.Sets;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.integration.api.OpenApiScanner;
 import jakarta.inject.Inject;
@@ -24,6 +25,7 @@ import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.PublicCloudAPI;
 
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -56,7 +58,8 @@ public class CustomOpenAPIScanner implements OpenApiScanner {
                         pluginRestResources.values().stream().flatMap(Set::stream)
                 )
                 .filter(cls -> !isCloud || cls.isAnnotationPresent(PublicCloudAPI.class))
-                .collect(Collectors.toSet());
+                .sorted(Comparator.comparing(Class::getName))
+                .collect(Collectors.toCollection(Sets::newLinkedHashSet));
     }
 
     @Override

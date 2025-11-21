@@ -52,11 +52,7 @@ public class CustomModelConverter extends ModelResolver {
     @Inject
     public CustomModelConverter(ObjectMapper mapper) {
         super(mapper);
-    }
-
-    @Override
-    public boolean isOpenapi31() {
-        return true;
+        setOpenapi31(true);
     }
 
     @Override
