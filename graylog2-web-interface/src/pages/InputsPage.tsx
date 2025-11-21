@@ -21,10 +21,12 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import DocsHelper from 'util/DocsHelper';
 import useProductName from 'brand-customization/useProductName';
 import { InputsOverview } from 'components/inputs/InputsOveriew';
 import useInputTypes from 'hooks/useInputTypes';
 import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
+import InputsNotifications from 'components/inputs/InputsNotifications';
 
 const isCloud = AppConfig.isCloud();
 
@@ -39,32 +41,34 @@ const InputsPage = () => {
 
   return (
     <DocumentTitle title="Inputs">
-      <div>
-        <PageHeader title="Inputs">
-          {isCloud ? (
-            <>
-              <p>
-                {' '}
-                {productName} cloud accepts data via inputs. There are many types of inputs to choose from, but only
-                some can run directly in the cloud. You can launch and terminate them on this page.
-              </p>
-              <p>
-                If you are missing an input type on this page&apos;s list of available inputs, you can start the input
-                on a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
-              </p>
-            </>
-          ) : (
-            <span>
-              {productName} nodes accept data via inputs. Launch or terminate as many inputs as you want here.
-            </span>
-          )}
-        </PageHeader>
-        <Row className="content">
-          <Col md={12}>
-            <InputsOverview inputTypeDescriptions={inputTypeDescriptions} inputTypes={inputTypes} />
-          </Col>
-        </Row>
-      </div>
+      <InputsNotifications />
+      <PageHeader
+        title="Inputs"
+        documentationLink={{
+          title: 'Inputs documentation',
+          path: DocsHelper.PAGES.INPUTS,
+        }}>
+        {isCloud ? (
+          <>
+            <p>
+              {' '}
+              {productName} cloud accepts data via inputs. There are many types of inputs to choose from, but only some
+              can run directly in the cloud. You can launch and terminate them on this page.
+            </p>
+            <p>
+              If you are missing an input type on this page&apos;s list of available inputs, you can start the input on
+              a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
+            </p>
+          </>
+        ) : (
+          <span>{productName} nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
+        )}
+      </PageHeader>
+      <Row className="content">
+        <Col md={12}>
+          <InputsOverview inputTypeDescriptions={inputTypeDescriptions} inputTypes={inputTypes} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };
