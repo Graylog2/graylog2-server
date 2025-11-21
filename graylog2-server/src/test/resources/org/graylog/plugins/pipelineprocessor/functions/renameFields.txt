@@ -1,0 +1,17 @@
+rule "renameFields"
+when
+  true
+then
+  let rename_map = {
+    old_field_one: "new_field_one",
+    old_field_two: "new_field_two",
+    unchanged_field: "unchanged_field"
+  };
+
+  rename_fields(fields: rename_map);
+
+  rename_fields(fields: {
+    missing: "ignored_new_name",
+    present: "renamed"
+  });
+end
