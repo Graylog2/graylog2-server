@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
+import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
@@ -72,9 +73,9 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -479,16 +480,13 @@ public class IndicesIT extends SearchServerBaseTest {
     @FullBackendTest
     public void setClosingDateMergesExistingMetaDataEntries() {
         final String index = createRandomIndex("foo");
-        client().updateMapping(index, Map.of("_meta", Map.of("existing", "should be kept")));
+        client().updateMappingMeta(index, "existing", "should be kept");
 
         indices.setClosingDate(index, Tools.nowUTC());
 
-        final Map<String, Object> mapping = client().getMapping(index);
-        assertThat(mapping.get("_meta")).satisfies(v -> {
-            assertThat(v).isNotNull();
-            //noinspection unchecked
-            assertThat(((Map<String, Object>) v).get("existing")).isEqualTo("should be kept");
-        });
+        final String existingValue = client().getMappingMetaValue(index, "existing", String.class);
+        Assertions.assertThat(existingValue).isEqualTo("should be kept");
+
         final Optional<DateTime> closingDate = indices.indexClosingDate(index);
         assertThat(closingDate).isNotEmpty();
     }

@@ -40,8 +40,8 @@ public interface GraylogBackend {
 
     String getLogs();
 
-    Optional<MailServerInstance> getEmailServerInstance();
-    Optional<WebhookServerInstance> getWebhookServerInstance();
+    Optional<MailServerContainer> getEmailServerInstance();
+    Optional<WebhookServerContainer> getWebhookServerInstance();
 
     String getSearchLogs();
 }

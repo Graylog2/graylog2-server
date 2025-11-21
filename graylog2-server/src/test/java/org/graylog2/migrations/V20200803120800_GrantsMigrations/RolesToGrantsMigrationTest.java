@@ -28,9 +28,7 @@ import org.graylog.testing.TestUserService;
 import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -73,8 +71,7 @@ class RolesToGrantsMigrationTest {
     private UserService userService;
 
     @BeforeEach
-    void setUp(MongoDBTestService mongodb,
-               MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+    void setUp(MongoCollections mongoCollections,
                GRNRegistry grnRegistry,
                TestUserService userService) {
         when(permissions.readerBasePermissions()).thenReturn(ImmutableSet.of());
@@ -82,10 +79,9 @@ class RolesToGrantsMigrationTest {
 
         this.grnRegistry = grnRegistry;
 
-        roleService = new RoleServiceImpl(
-                new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()), permissions, validator, new ClusterEventBus());
+        roleService = new RoleServiceImpl(mongoCollections, permissions, validator, new ClusterEventBus());
 
-        this.dbGrantService = new DBGrantService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection()));
+        this.dbGrantService = new DBGrantService(mongoCollections);
         this.userService = userService;
         migration = new RolesToGrantsMigration(roleService, userService, dbGrantService, grnRegistry, "admin");
     }

@@ -25,7 +25,9 @@ import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.assertj.core.api.Assertions;
 import org.graylog.failure.FailureSubmissionService;
+import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -33,12 +35,13 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
+import org.graylog2.plugin.Tools;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +84,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
 
     private final FailureSubmissionService failureSubmissionService = mock(FailureSubmissionService.class);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         client().deleteIndices(INDEX_NAME);
         client().createIndex(INDEX_NAME);
@@ -90,7 +93,7 @@ public abstract class MessagesIT extends ElasticsearchBaseTest {
                 failureSubmissionService);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         client().cleanUp();
     }

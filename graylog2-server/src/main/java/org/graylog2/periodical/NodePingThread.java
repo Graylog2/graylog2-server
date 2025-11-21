@@ -16,23 +16,20 @@
  */
 package org.graylog2.periodical;
 
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
+import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
-import java.util.Locale;
 
 @Singleton
 public class NodePingThread extends Periodical {
@@ -59,7 +56,7 @@ public class NodePingThread extends Periodical {
         final boolean isLeader = leaderElectionService.isLeader();
 
         final boolean isProcessing = serverStatus.isProcessing();
-        final LoadBalancerStatus loadBalancerStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
+        final Lifecycle lifecycle = serverStatus.getLifecycle();
 
         ServerNodeDto dto = ServerNodeDto.Builder.builder()
                 .setId(serverStatus.getNodeId().getNodeId())
@@ -67,7 +64,7 @@ public class NodePingThread extends Periodical {
                 .setTransportAddress(httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API).toString())
                 .setHostname(Tools.getLocalCanonicalHostname())
                 .setProcessing(isProcessing)
-                .setLoadBalancerStatus(loadBalancerStatus)
+                .setLifecycle(lifecycle)
                 .build();
         nodeService.ping(dto);
     }

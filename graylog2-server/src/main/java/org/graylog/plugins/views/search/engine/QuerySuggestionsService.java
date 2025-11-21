@@ -19,6 +19,8 @@ package org.graylog.plugins.views.search.engine;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionRequest;
 import org.graylog.plugins.views.search.engine.suggestions.SuggestionResponse;
 
+import java.time.Duration;
+
 public interface QuerySuggestionsService {
-    SuggestionResponse suggest(SuggestionRequest req);
+    SuggestionResponse suggest(SuggestionRequest req, Duration timeout);
 }
