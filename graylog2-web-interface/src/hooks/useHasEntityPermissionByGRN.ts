@@ -17,18 +17,17 @@
 
 import { useMemo } from 'react';
 
-import useCurrentUser from 'hooks/useCurrentUser';
 import getPermissionPrefixByType from 'util/getPermissionPrefixByType';
-import { isPermitted } from 'util/PermissionsMixin';
 import { getValuesFromGRN } from 'logic/permissions/GRN';
+import usePermissions from 'hooks/usePermissions';
 
 const useHasEntityPermissionByGRN = (grn: string, permissionType: string = 'read') => {
   const { id, type } = getValuesFromGRN(grn);
-  const { permissions } = useCurrentUser();
+  const { isPermitted } = usePermissions();
 
   return useMemo(
-    () => isPermitted(permissions, `${getPermissionPrefixByType(type, id)}${permissionType}:${id}`),
-    [id, permissionType, permissions, type],
+    () => isPermitted(`${getPermissionPrefixByType(type, id)}${permissionType}:${id}`),
+    [id, permissionType, isPermitted, type],
   );
 };
 

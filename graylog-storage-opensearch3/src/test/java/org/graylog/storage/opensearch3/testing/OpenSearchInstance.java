@@ -25,7 +25,6 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.collect.ImmutableList;
-import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import org.graylog.shaded.opensearch2.org.apache.http.auth.AuthScope;
 import org.graylog.shaded.opensearch2.org.apache.http.auth.UsernamePasswordCredentials;
@@ -43,6 +42,7 @@ import org.graylog.storage.opensearch3.OpenSearchClient;
 import org.graylog.storage.opensearch3.RestClientProvider;
 import org.graylog.testing.elasticsearch.Adapters;
 import org.graylog.testing.elasticsearch.Client;
+import org.graylog.testing.elasticsearch.ContainerCacheKey;
 import org.graylog.testing.elasticsearch.FixtureImporter;
 import org.graylog.testing.elasticsearch.TestableSearchServerInstance;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
@@ -53,8 +53,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.opensearch.testcontainers.OpenSearchContainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
 import org.testcontainers.utility.DockerImageName;
@@ -64,10 +62,12 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -84,6 +84,8 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     private FixtureImporter fixtureImporter;
     private Adapters adapters;
     private List<String> featureFlags;
+    private static Map<ContainerCacheKey, OpenSearchClient> openSearchClients = new HashMap<>();
+    private static Map<ContainerCacheKey, OfficialOpensearchClient> officialOpensearchClients = new HashMap<>();
 
     public OpenSearchInstance(final boolean cachedInstance, final SearchVersion version, final String hostname, final Network network, final String heapSize, final List<String> featureFlags) {
         this(cachedInstance, version, hostname, network, heapSize, featureFlags, Map.of(), OpensearchSecurity.DISABLED);
@@ -98,11 +100,21 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
     @Override
     public OpenSearchInstance init() {
         super.init();
-        // TODO: Check if client creation can be aware of cache to avoid recreating the client for every test method
-        RestHighLevelClient restHighLevelClient = buildRestClient();
-        this.openSearchClient = new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
-        this.officialOpensearchClient = buildOfficialClient();
-        this.client = new ClientOS(this.openSearchClient, officialOpensearchClient, featureFlags);
+        if (Objects.nonNull(cacheKey)) {
+            if (openSearchClients.containsKey(cacheKey)) {
+                this.openSearchClient = openSearchClients.get(cacheKey);
+                this.officialOpensearchClient = officialOpensearchClients.get(cacheKey);
+            } else {
+                this.openSearchClient = buildClient();
+                this.officialOpensearchClient = buildOfficialClient();
+                openSearchClients.put(cacheKey, openSearchClient);
+                officialOpensearchClients.put(cacheKey, officialOpensearchClient);
+            }
+        } else {
+            this.openSearchClient = buildClient();
+            this.officialOpensearchClient = buildOfficialClient();
+        }
+        this.client = new ClientOS(officialOpensearchClient, featureFlags);
         this.fixtureImporter = new FixtureImporterOS2(this.openSearchClient);
         adapters = new AdaptersOS(openSearchClient, officialOpensearchClient, featureFlags);
         Runtime.getRuntime().addShutdownHook(new Thread(this::close));
@@ -110,6 +122,21 @@ public class OpenSearchInstance extends TestableSearchServerInstance {
             afterContainerCreated();
         }
         return this;
+    }
+
+    @Override
+    public void close() {
+        super.close();
+        if (officialOpensearchClient != null) {
+            officialOpensearchClient.close();
+        }
+        openSearchClients.remove(cacheKey);
+        officialOpensearchClients.remove(cacheKey);
+    }
+
+    private OpenSearchClient buildClient() {
+        RestHighLevelClient restHighLevelClient = buildRestClient();
+        return new OpenSearchClient(restHighLevelClient, new ObjectMapperProvider().get());
     }
 
     private OfficialOpensearchClient buildOfficialClient() {

@@ -16,7 +16,9 @@
  */
 package org.graylog.storage.opensearch3;
 
+import com.github.joschi.jadconfig.util.Duration;
 import org.apache.hc.core5.http.ContentTooLongException;
+import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
@@ -24,13 +26,17 @@ import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
+import org.opensearch.client.opensearch._types.ErrorCause;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -59,6 +65,19 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
             return operation.get().exceptionally(ex -> {
                 throw mapException(ex, errorMessage);
             });
+        } catch (Throwable t) {
+            throw mapException(t, errorMessage);
+        }
+    }
+
+    /**
+     * Uses a timeout to wait for results from an asynchronous request.
+     * Attention: This is a client timeout, not a server timeout. This doesn't mean the request is cancelled after the timeout.
+     */
+    <T> T executeWithClientTimeout(ThrowingAsyncFunction<CompletableFuture<T>> operation, String errorMessage, Duration timeout) {
+        try {
+            CompletableFuture<T> futureResponse = async(operation, errorMessage);
+            return futureResponse.get(timeout.toMilliseconds(), TimeUnit.MILLISECONDS);
         } catch (Throwable t) {
             throw mapException(t, errorMessage);
         }
@@ -105,7 +124,10 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
     public static RuntimeException mapException(Throwable t, String message) {
         if (t instanceof OpenSearchException openSearchException) {
             if (isIndexNotFoundException(openSearchException)) {
-                return new IndexNotFoundException(t.getMessage());
+                return Optional.ofNullable(openSearchException.response().error())
+                        .map(ErrorCause::metadata)
+                        .map(metadata -> IndexNotFoundException.create(message + metadata.get("resource.id").toString(), metadata.get("index").toString()))
+                        .orElse(new IndexNotFoundException(t.getMessage()));
             }
             if (isMasterNotDiscoveredException(openSearchException)) {
                 return new MasterNotDiscoveredException();

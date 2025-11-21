@@ -17,17 +17,15 @@
 package org.graylog2.utilities;
 
 import com.github.joschi.jadconfig.ParameterException;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.Test;
 
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class IPSubnetConverterTest {
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     private final IPSubnetConverter converter = new IPSubnetConverter();
 
@@ -57,15 +55,15 @@ public class IPSubnetConverterTest {
 
     @Test
     public void convertFromThrowsParameterExceptionWithInvalidSubnet() {
-        expectedException.expect(ParameterException.class);
-        expectedException.expectMessage("Invalid subnet: HODOR");
-        converter.convertFrom("127.0.0.1/32, ::1/128, HODOR");
+        Throwable exception = assertThrows(ParameterException.class, () ->
+            converter.convertFrom("127.0.0.1/32, ::1/128, HODOR"));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Invalid subnet: HODOR"));
     }
 
     @Test
     public void convertToThrowsParameterExceptionWithNull() {
-        expectedException.expect(ParameterException.class);
-        expectedException.expectMessage("Couldn't convert IP subnets <null> to string.");
-        converter.convertTo(null);
+        Throwable exception = assertThrows(ParameterException.class, () ->
+            converter.convertTo(null));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't convert IP subnets <null> to string."));
     }
 }
