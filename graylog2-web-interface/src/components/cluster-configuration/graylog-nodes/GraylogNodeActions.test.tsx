@@ -18,8 +18,8 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
-import type { GraylogNode } from './useClusterNodes';
-import ClusterActions from './ClusterActions';
+import type { GraylogNode } from '../graylog-nodes/useClusterGraylogNodes';
+import GraylogNodeActions from '../graylog-nodes/GraylogNodeActions';
 
 const nodeMock: GraylogNode = {
   cluster_id: '600120f7-a111-4ec3-88b0-aee4067fb21d',
@@ -39,11 +39,13 @@ const nodeMock: GraylogNode = {
   timezone: 'Europe/Berlin',
   transport_address: 'http://192.168.64.1:9000/api/',
   version: '6.2.0-SNAPSHOT',
+  id: 'a853111d-85ce-42c0-bc6d-22f7f0fecbb4',
+  metrics: {},
 };
 
-describe('ClusterActions', () => {
+describe('GraylogNodeActions', () => {
   it('opens upon click on More button', async () => {
-    render(<ClusterActions node={nodeMock} />);
+    render(<GraylogNodeActions node={nodeMock} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
@@ -53,7 +55,7 @@ describe('ClusterActions', () => {
   });
 
   it('shows pause message processing menu item when is_processing true', async () => {
-    render(<ClusterActions node={{ ...nodeMock, is_processing: true }} />);
+    render(<GraylogNodeActions node={{ ...nodeMock, is_processing: true }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
@@ -62,7 +64,7 @@ describe('ClusterActions', () => {
   });
 
   it('shows resume message processing menu item when is_processing false', async () => {
-    render(<ClusterActions node={{ ...nodeMock, is_processing: false }} />);
+    render(<GraylogNodeActions node={{ ...nodeMock, is_processing: false }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
@@ -71,7 +73,7 @@ describe('ClusterActions', () => {
   });
 
   it('shows set load balancer to DEAD menu item when lb_status is alive', async () => {
-    render(<ClusterActions node={{ ...nodeMock, lb_status: 'alive' }} />);
+    render(<GraylogNodeActions node={{ ...nodeMock, lb_status: 'alive' }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
@@ -80,7 +82,7 @@ describe('ClusterActions', () => {
   });
 
   it('shows set load balancer to ALIVE menu item when lb_status is not alive', async () => {
-    render(<ClusterActions node={{ ...nodeMock, lb_status: 'dead' }} />);
+    render(<GraylogNodeActions node={{ ...nodeMock, lb_status: 'dead' }} />);
 
     const button = await screen.findByRole('button', { name: /More/i });
     await userEvent.click(button);
