@@ -35,6 +35,9 @@ import static org.graylog2.plugin.Message.FIELD_GL2_MESSAGE_ID;
  */
 public abstract class IndexMapping extends AbstractMapping {
     public static final String TYPE_MESSAGE = "message";
+    public static final String PROPERTIES = "properties";
+    public static final String DYNAMIC_TEMPLATES = "dynamic_templates";
+    public static final String SOURCE = "_source";
 
     @Override
     public Template toTemplate(final IndexSetMappingTemplate indexSetConfig,
@@ -81,9 +84,9 @@ public abstract class IndexMapping extends AbstractMapping {
     protected Map<String, Object> messageMapping(final String analyzer,
                                                  final CustomFieldMappings customFieldMappings) {
         return ImmutableMap.of(
-                "properties", fieldProperties(analyzer, customFieldMappings),
-                "dynamic_templates", dynamicTemplate(),
-                "_source", enabled());
+                PROPERTIES, fieldProperties(analyzer, customFieldMappings),
+                DYNAMIC_TEMPLATES, dynamicTemplate(),
+                SOURCE, enabled());
     }
 
     private Map<String, Map<String, Object>> internalFieldsMapping() {

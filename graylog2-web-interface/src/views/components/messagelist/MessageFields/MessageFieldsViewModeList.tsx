@@ -15,33 +15,38 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import type { MessageFieldsListProps } from 'views/components/messagelist/MessageFields/types';
 import MessageField from 'views/components/messagelist/MessageField';
-import { MessageDetailsDL } from 'views/components/messagelist/MessageFields/MessageFields';
+import { MessageDetailsDefinitionList } from 'components/common';
+import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
 
-const Container = styled.div(
+export const MessageDetailsDL = styled(MessageDetailsDefinitionList)(
   ({ theme }) => css`
-    margin-left: ${theme.spacings.sm};
+    color: ${theme.colors.text.primary};
+
+    dd {
+      &:not(:last-child) {
+        border-bottom: 1px solid ${theme.colors.table.row.divider};
+      }
+    }
   `,
 );
 
-const MessageFieldsViewModeList = ({ fields, message, isFavorite }: MessageFieldsListProps) => {
+const MessageFieldsViewModeList = ({ fields, isFavorite = false }: MessageFieldsListProps) => {
+  const { message } = useContext(MessageFavoriteFieldsContext);
   if (!fields.length) return null;
 
   return (
-    <>
-      <h6>{isFavorite ? 'Favorites' : 'Details'}</h6>
-      <Container>
-        <MessageDetailsDL className="message-details-fields">
-          {fields.map(({ field, value, type }) => (
-            <MessageField key={field} fieldName={field} fieldType={type} message={message} value={value} />
-          ))}
-        </MessageDetailsDL>
-      </Container>
-    </>
+    <div data-testid={`${isFavorite ? 'favorite' : 'rest'}-fields-list`}>
+      <MessageDetailsDL className="message-details-fields">
+        {fields.map(({ field, value, type }) => (
+          <MessageField key={field} fieldName={field} fieldType={type} value={value} message={message} />
+        ))}
+      </MessageDetailsDL>
+    </div>
   );
 };
 

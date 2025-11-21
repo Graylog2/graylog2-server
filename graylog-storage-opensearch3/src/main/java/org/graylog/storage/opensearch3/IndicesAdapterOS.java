@@ -23,10 +23,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
-import jakarta.json.stream.JsonParser;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch3.indextemplates.IndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
@@ -48,7 +49,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
-import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch._types.aggregations.FilterAggregate;
@@ -65,8 +65,8 @@ import org.opensearch.client.opensearch.core.ReindexResponse;
 import org.opensearch.client.opensearch.core.reindex.Destination;
 import org.opensearch.client.opensearch.core.reindex.Source;
 import org.opensearch.client.opensearch.generic.Body;
-import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.opensearch.indices.ForcemergeRequest;
 import org.opensearch.client.opensearch.indices.GetAliasRequest;
@@ -89,7 +89,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -121,7 +120,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
     private final OpenSearchIndicesClient indicesClient;
     private final OpenSearchCatClient catClient;
-    private final OpenSearchGenericClient genericClient;
+    private final PlainJsonApi jsonApi;
+    private final OSSerializationUtils osSerializationUtils;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
     // it assumes that these don't need url encoding. If we exceed the maximum, we request settings for all indices
@@ -135,7 +135,9 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             ClusterStateApi clusterStateApi,
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
-                            ObjectMapper objectMapper) {
+                            ObjectMapper objectMapper,
+                            PlainJsonApi jsonApi,
+                            final OSSerializationUtils osSerializationUtils) {
         this.c = c;
         this.statsApi = statsApi;
         this.clusterStatsApi = clusterStatsApi;
@@ -144,9 +146,10 @@ public class IndicesAdapterOS implements IndicesAdapter {
         this.indexStatisticsBuilder = indexStatisticsBuilder;
         this.objectMapper = objectMapper;
         this.openSearchClient = c.sync();
+        this.jsonApi = jsonApi;
         this.indicesClient = openSearchClient.indices();
         this.catClient = openSearchClient.cat();
-        this.genericClient = openSearchClient.generic();
+        this.osSerializationUtils = osSerializationUtils;
     }
 
     @Override
@@ -205,7 +208,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .settings(createIndexSettings(indexSettings));
         if (mapping != null) {
             try {
-                builder.mappings(typeMappingFromMap(mapping));
+                builder.mappings(osSerializationUtils.fromMap(mapping, TypeMapping._DESERIALIZER));
             } catch (JsonProcessingException e) {
                 throw new RuntimeException(e);
             }
@@ -241,8 +244,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .method("PUT")
                     .body(Body.from(objectMapper.writeValueAsBytes(mapping), "application/json"))
                     .build();
-            c.execute(() -> genericClient.execute(request),
-                    "Unable to update index mapping " + indexName);
+            jsonApi.performRequest(request, "Unable to update index mapping " + indexName);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to update index mapping " + indexName, e);
         }
@@ -256,35 +258,21 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .ignoreUnavailable(true)
                     .expandWildcards(ExpandWildcard.All));
             IndexMappingRecord indexMappingRecord = response.get(index);
-            return typeMappingToMap(indexMappingRecord.mappings());
+            return osSerializationUtils.toMap(indexMappingRecord.mappings());
         }, "Couldn't read mapping of index " + index);
-    }
-
-    private Map<String, Object> typeMappingToMap(TypeMapping mapping) throws JsonProcessingException {
-        return objectMapper.readValue(mapping.toJsonString(), new TypeReference<>() {});
-    }
-
-    private TypeMapping typeMappingFromMap(Map<String, Object> mapping) throws JsonProcessingException {
-        String json = objectMapper.writeValueAsString(mapping);
-        JsonpMapper mapper = c.sync()._transport().jsonpMapper();
-        JsonParser parser = mapper.jsonProvider().createParser(new StringReader(json));
-        return TypeMapping._DESERIALIZER.deserialize(parser, mapper);
     }
 
     @Override
     public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
-        return c.execute(() -> {
-            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b.index(index)
-                    .ignoreUnavailable(true)
-                    .allowNoIndices(true)
-                    .expandWildcards(ExpandWildcard.Open)
-            );
-            org.opensearch.client.opensearch.indices.IndexSettings settings = result.get(index).settings();
-            if (settings == null) {
-                return Map.of();
-            }
-            return objectMapper.readValue(settings.toJsonString(), new TypeReference<>() {});
-        }, "Couldn't read settings of index " + index);
+        Request request = Requests.builder()
+                .method("GET")
+                .endpoint("/" + index + "/_settings")
+                .build();
+        JsonNode jsonNode = jsonApi.performRequest(request, "Unable to retrieve index settings " + index);
+        return Optional.ofNullable(jsonNode.get(index))
+                .map(node -> node.get("settings"))
+                .map(node -> objectMapper.convertValue(node, new TypeReference<Map<String, Object>>() {}))
+                .orElse(Map.of());
     }
 
     /**
@@ -551,7 +539,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public boolean exists(String index) {
         try {
-            indicesClient.get(r -> r.index(index).ignoreUnavailable(false));
+            indicesClient.get(r -> r.index(index).flatSettings(true).ignoreUnavailable(false));
             return true;
         } catch (IOException | OpenSearchException e) {
             if (e instanceof OpenSearchException && e.getMessage().contains("no such index")) {
@@ -572,6 +560,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
         return c.execute(() -> {
             GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
                     .index(indexWildcard)
+                    .flatSettings(true)
                     .expandWildcards(status.stream().map(this::resolveWildcard).collect(Collectors.toList()))
                     .ignoreUnavailable(true)));
             return result.result().keySet();
@@ -630,7 +619,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .flush(true)
         );
 
-        c.execute(() -> OfficialOpensearchClient.withTimeout(indicesClient, timeout).forcemerge(request), "Unable to forcemerge index " + index);
+        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
 
     }
 

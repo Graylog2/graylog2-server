@@ -28,7 +28,10 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.RestHighLevelClient;
 import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS2;
 import org.graylog.storage.opensearch3.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch3.client.OpensearchCredentialsProvider;
-import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS2;
+import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
+import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.IndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
 import org.graylog.storage.opensearch3.sniffer.SnifferBuilder;
 import org.graylog.storage.opensearch3.sniffer.SnifferFilter;
@@ -67,7 +70,7 @@ public class OpenSearch3Module extends VersionAwareModule {
 
     @Override
     protected void configure() {
-        bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverOS2.class);
+        bindForSupportedVersion(StreamsForFieldRetriever.class).to(StreamsForFieldRetrieverOS.class);
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS.class);
@@ -78,7 +81,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         } else {
             bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
-        bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS2.class);
+        bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
         bindForSupportedVersion(MessagesAdapter.class).to(MessagesAdapterOS2.class);
         bindForSupportedVersion(MultiChunkResultRetriever.class).to(PaginationOS2.class);
