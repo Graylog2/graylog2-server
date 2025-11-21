@@ -27,10 +27,9 @@ import type { DataNode } from 'components/datanode/Types';
 const METRIC_NAMES = {
   totalMemory: 'opensearch.os.mem.total_in_bytes',
   usedMemory: 'opensearch.os.mem.used_in_bytes',
-  jvmMemoryHeapUsage: 'jvm.memory.heap.usage',
-  jvmMemoryHeapUsed: 'jvm.memory.heap.used',
-  jvmMemoryHeapMax: 'jvm.memory.heap.max',
-  opensearchJvmMemoryHeapUsedPercent: 'opensearch.jvm.mem.heap_used_percent',
+  jvmMemoryHeapUsed: 'opensearch.jvm.mem.heap_used_in_bytes',
+  jvmMemoryHeapMax: 'opensearch.jvm.mem.heap_max_in_bytes',
+  jvmMemoryHeapUsedPercent: 'opensearch.jvm.mem.heap_used_percent',
   cpuLoadAverage1m: 'opensearch.os.cpu.load_average.1m',
   indexTotal: 'opensearch.indices.indexing.index_total',
   indexTimeInMillis: 'opensearch.indices.indexing.index_time_in_millis',

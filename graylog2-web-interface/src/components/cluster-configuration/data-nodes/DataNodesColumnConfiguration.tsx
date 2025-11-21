@@ -107,7 +107,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
         <SizeAndRatioMetric
           used={entity.metrics?.jvmMemoryHeapUsed}
           max={entity.metrics?.jvmMemoryHeapMax}
-          ratioPercent={entity.metrics?.opensearchJvmMemoryHeapUsedPercent}
+          ratioPercent={entity.metrics?.jvmMemoryHeapUsedPercent}
           warningThreshold={JVM_WARNING_THRESHOLD}
           dangerThreshold={JVM_DANGER_THRESHOLD}
         />
