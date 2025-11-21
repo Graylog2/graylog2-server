@@ -19,24 +19,27 @@ package org.graylog.storage.opensearch3;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.master.AcknowledgedResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.DataStream;
-import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
+import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.ism.IsmApi;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.datastream.Policy;
 import org.graylog2.indexer.datastream.policy.IsmPolicy;
 import org.graylog2.indexer.indices.Template;
 import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.AcknowledgedResponseBase;
+import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.indices.CreateDataStreamRequest;
+import org.opensearch.client.opensearch.indices.DataStream;
+import org.opensearch.client.opensearch.indices.IndexSettings;
+import org.opensearch.client.opensearch.indices.IndexTemplateDataStreamConfiguration;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
+import org.opensearch.client.opensearch.indices.PutIndexTemplateRequest;
+import org.opensearch.client.opensearch.indices.put_index_template.IndexTemplateMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,38 +52,39 @@ public class DataStreamAdapterOS implements DataStreamAdapter {
     private final ObjectMapper objectMapper;
     private final IsmApi ismApi;
     private final OpenSearchIndicesClient indicesClient;
+    private final OSSerializationUtils templateMapper;
+
 
     @Inject
-    public DataStreamAdapterOS(OfficialOpensearchClient opensearchClient, OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi) {
+    public DataStreamAdapterOS(OfficialOpensearchClient opensearchClient, OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi, OSSerializationUtils templateMapper) {
         this.opensearchClient = opensearchClient;
         this.indicesClient = opensearchClient.sync().indices();
         this.client = client;
         this.objectMapper = objectMapper;
         this.ismApi = ismApi;
+        this.templateMapper = templateMapper;
     }
 
     @Override
     public boolean ensureDataStreamTemplate(@Nonnull String templateName, @Nonnull Template template, @Nonnull String timestampField) {
-        final ComposableIndexTemplate.DataStreamTemplate datastreamTemplate =
-                new ComposableIndexTemplate.DataStreamTemplate(new DataStream.TimestampField(timestampField));
-
-        CompressedXContent serializedMapping = null;
         try {
-            serializedMapping = new CompressedXContent(objectMapper.writeValueAsString(template.mappings()));
-        } catch (IOException e) {
-            throw new RuntimeException("Could not serialize mappings for data stream", e);
+            PutIndexTemplateRequest putIndexTemplateRequest = PutIndexTemplateRequest.builder()
+                    .name(templateName)
+                    .dataStream(IndexTemplateDataStreamConfiguration.builder()
+                            .timestampField(t -> t.name(timestampField))
+                            .build())
+                    .indexPatterns(template.indexPatterns())
+                    .template(IndexTemplateMapping.builder()
+                            .mappings(templateMapper.fromMap(template.mappings(), TypeMapping._DESERIALIZER))
+                            .settings(templateMapper.fromMap(template.settings(), IndexSettings._DESERIALIZER))
+                            .build())
+                    .priority(template.order().intValue())
+                    .build();
+            final AcknowledgedResponseBase putTemplateResponse = indicesClient.putIndexTemplate(putIndexTemplateRequest);
+            return putTemplateResponse.acknowledged();
+        } catch (Throwable e) {
+            throw OfficialOpensearchClient.mapException(e, "Unable to create data stream template " + templateName);
         }
-        var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
-        var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), osTemplate, null, template.order(), null, null, datastreamTemplate);
-        var request = new PutComposableIndexTemplateRequest()
-                .name(templateName)
-                .indexTemplate(indexTemplate);
-
-        final AcknowledgedResponse result = client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
-                "Unable to create data stream template " + templateName);
-
-        return result.isAcknowledged();
     }
 
     @VisibleForTesting
@@ -97,7 +101,7 @@ public class DataStreamAdapterOS implements DataStreamAdapter {
         opensearchClient.execute(() -> {
             try {
                 indicesClient.createDataStream(request);
-            } catch (org.opensearch.client.opensearch._types.OpenSearchException e) {
+            } catch (OpenSearchException e) {
                 if (e.response().error().type().equals("resource_already_exists_exception")) {
                     // this is expected, ignore the exception
                     log.debug("Data stream {} already exists, won't be created again", dataStreamName);
@@ -167,7 +171,7 @@ public class DataStreamAdapterOS implements DataStreamAdapter {
     }
 
     @VisibleForTesting
-    List<org.opensearch.client.opensearch.indices.DataStream> getDataStream(@Nonnull String dataStreamName) {
+    List<DataStream> getDataStream(@Nonnull String dataStreamName) {
         return opensearchClient.execute(() -> indicesClient.getDataStream().dataStreams(), "Error getting data streams");
     }
 
