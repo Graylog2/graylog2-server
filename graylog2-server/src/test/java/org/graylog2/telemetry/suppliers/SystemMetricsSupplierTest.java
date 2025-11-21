@@ -16,11 +16,9 @@
  */
 package org.graylog2.telemetry.suppliers;
 
-import org.graylog2.shared.system.stats.StatsService;
-import org.graylog2.shared.system.stats.SystemStats;
-import org.graylog2.shared.system.stats.os.Memory;
-import org.graylog2.shared.system.stats.os.OsStats;
-import org.graylog2.shared.system.stats.os.Processor;
+import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
+import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
+import org.graylog2.telemetry.fixtures.TelemetryFixtures;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +26,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,42 +36,39 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SystemMetricsSupplierTest {
     @Mock
-    private StatsService statsService;
-
-    @Mock
-    private SystemStats systemStats;
-
-    @Mock
-    private OsStats osStats;
-
-    @Mock
-    private Processor processor;
-
-    @Mock
-    private Memory memory;
+    private DBTelemetryClusterInfo dbTelemetryClusterInfo;
 
     @InjectMocks
     private SystemMetricsSupplier systemMetricsSupplier;
 
     @Test
     public void shouldReturnSystemMetrics() {
-        String expectedOsName = System.getProperty("os.name");
-        String expectedOsVersion = System.getProperty("os.version");
+        TelemetryClusterInfoDto nodeInfo1 = TelemetryFixtures.nodeInfo("node-1", true);
+        TelemetryClusterInfoDto nodeInfo2 = TelemetryFixtures.nodeInfo("node-1", false);
 
-        when(statsService.systemStats()).thenReturn(systemStats);
-        when(systemStats.osStats()).thenReturn(osStats);
-        when(osStats.processor()).thenReturn(processor);
-        when(osStats.memory()).thenReturn(memory);
-        when(processor.totalCores()).thenReturn(14);
-        when(memory.total()).thenReturn(48000000000L);
+        when(dbTelemetryClusterInfo.findAll()).thenReturn(List.of(nodeInfo1, nodeInfo2));
 
         Optional<TelemetryEvent> event = systemMetricsSupplier.get();
-
         assertTrue(event.isPresent());
-        assertThat(event.get().metrics())
-                .containsEntry("os_name", expectedOsName)
-                .containsEntry("os_version", expectedOsVersion)
-                .containsEntry("cpu_cores", 14)
-                .containsEntry("total_memory", 48000000000L);
+
+        var nodes = (List<SystemMetricsSupplier.NodeInfo>) event.get().metrics().get("nodes");
+        assertThat(nodes)
+                .hasSize(2)
+                .containsExactlyInAnyOrder(
+                        toNodeInfo(nodeInfo1),
+                        toNodeInfo(nodeInfo2)
+                );
+    }
+
+    private SystemMetricsSupplier.NodeInfo toNodeInfo(TelemetryClusterInfoDto dto) {
+        return new SystemMetricsSupplier.NodeInfo(
+                dto.nodeId(),
+                dto.operatingSystem(),
+                dto.cpuCores(),
+                dto.memoryTotal(),
+                dto.jvmHeapUsed(),
+                dto.jvmHeapCommitted(),
+                dto.jvmHeapMax()
+        );
     }
 }

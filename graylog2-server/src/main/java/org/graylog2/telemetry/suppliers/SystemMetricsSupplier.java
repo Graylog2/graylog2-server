@@ -16,9 +16,10 @@
  */
 package org.graylog2.telemetry.suppliers;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.inject.Inject;
-import org.graylog2.shared.system.stats.StatsService;
-import org.graylog2.shared.system.stats.os.OsStats;
+import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
+import org.graylog2.telemetry.cluster.db.TelemetryClusterInfoDto;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 
@@ -26,24 +27,44 @@ import java.util.Map;
 import java.util.Optional;
 
 public class SystemMetricsSupplier implements TelemetryMetricSupplier {
-    private final StatsService statsService;
+    private final DBTelemetryClusterInfo dbTelemetryClusterInfo;
 
     @Inject
-    public SystemMetricsSupplier(StatsService statsService) {
-        this.statsService = statsService;
+    public SystemMetricsSupplier(DBTelemetryClusterInfo dbTelemetryClusterInfo) {
+        this.dbTelemetryClusterInfo = dbTelemetryClusterInfo;
     }
 
     @Override
     public Optional<TelemetryEvent> get() {
-        final OsStats os = statsService.systemStats().osStats();
-
         Map<String, Object> metrics = Map.of(
-                "os_name", System.getProperty("os.name"),
-                "os_version", System.getProperty("os.version"),
-                "cpu_cores", os.processor().totalCores(),
-                "total_memory", os.memory().total()
+                "nodes", dbTelemetryClusterInfo.findAll().stream()
+                        .map(this::toNodeInfo)
+                        .toList()
         );
 
         return Optional.of(TelemetryEvent.of(metrics));
+    }
+
+    private NodeInfo toNodeInfo(TelemetryClusterInfoDto dto) {
+        return new SystemMetricsSupplier.NodeInfo(
+                dto.nodeId(),
+                dto.operatingSystem(),
+                dto.cpuCores(),
+                dto.memoryTotal(),
+                dto.jvmHeapUsed(),
+                dto.jvmHeapCommitted(),
+                dto.jvmHeapMax()
+        );
+    }
+
+    public record NodeInfo(
+            @JsonProperty("node_id") String nodeId,
+            @JsonProperty("operating_system") String operatingSystem,
+            @JsonProperty("cpu_cores") Integer cpuCores,
+            @JsonProperty("memory_total") Long memoryTotal,
+            @JsonProperty("jvm_heap_used") Long jvmHeapUsed,
+            @JsonProperty("jvm_heap_committed") Long jvmHeapCommitted,
+            @JsonProperty("jvm_heap_max") Long jvmHeapMax
+    ) {
     }
 }
