@@ -25,14 +25,14 @@ import org.graylog.storage.elasticsearch7.MoreSearchAdapterES7;
 import org.graylog.storage.elasticsearch7.PaginationES7;
 import org.graylog.storage.elasticsearch7.SearchRequestFactory;
 import org.graylog.storage.elasticsearch7.testing.ElasticsearchInstanceES7;
+import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.TestResultMessageFactory;
-import org.junit.Rule;
 
 public class MoreSearchAdapterES7UsingPaginationIT extends MoreSearchAdapterIT {
 
-    @Rule
+    @SearchInstance
     public final ElasticsearchInstanceES7 elasticsearch = ElasticsearchInstanceES7.create();
 
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();

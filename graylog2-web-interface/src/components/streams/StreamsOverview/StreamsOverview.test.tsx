@@ -85,7 +85,14 @@ describe('StreamsOverview', () => {
 
   beforeEach(() => {
     asMock(useUserLayoutPreferences).mockReturnValue({
-      data: { ...layoutPreferences, displayedAttributes: ['title', 'description', 'rules'] },
+      data: {
+        ...layoutPreferences,
+        attributes: {
+          title: { status: 'show' },
+          description: { status: 'show' },
+          rules: { status: 'show' },
+        },
+      },
       isInitialLoading: false,
       refetch: () => {},
     });
