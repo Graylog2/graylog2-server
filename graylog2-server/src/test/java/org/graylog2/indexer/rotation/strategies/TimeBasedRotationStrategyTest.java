@@ -19,7 +19,7 @@ package org.graylog2.indexer.rotation.strategies;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.rotation.common.IndexRotator;

@@ -19,7 +19,7 @@ package org.graylog2.migrations;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog2.configuration.RunsWithDataNode;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.datanode.CurrentWriteIndices;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -67,7 +67,7 @@ public class V20240927120300_DataNodeMigrationIndexSet extends Migration {
                                 indexSet.getNewestIndex();
                             } catch (NoTargetIndexException e) {
                                 LOG.info("No existing index found for {}, creating last known index now", indexSetId);
-                                indices.create(currentWriteIndex, indexSet);
+                                indices.create(currentWriteIndex, indexSet.basicIndexSetConfig());
                                 indexSet.setUp();
                             }
                         });

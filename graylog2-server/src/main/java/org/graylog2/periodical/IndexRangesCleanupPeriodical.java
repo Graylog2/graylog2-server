@@ -20,9 +20,8 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -34,7 +33,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 

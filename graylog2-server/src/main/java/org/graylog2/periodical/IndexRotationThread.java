@@ -19,12 +19,12 @@ package org.graylog2.periodical;
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
@@ -90,7 +90,7 @@ public class IndexRotationThread extends Periodical {
     public void doRun() {
         // Point deflector to a new index if required.
         if (cluster.isConnected()) {
-            indexSetRegistry.forEach((indexSet) -> {
+            indexSetRegistry.getAllIndexSets().forEach((indexSet) -> {
                 try {
                     if (indexSet.getConfig().isWritable()) {
                         migrationLockService.tryRun(indexSet, IndexRotationThread.class, () -> {

@@ -29,12 +29,12 @@ import { IndicesActions } from 'stores/indices/IndicesStore';
 type Props = {
   index: IndexInfo;
   indexName: string;
-  indexRange: IndexRange;
-  indexSetId: string;
+  indexRange?: IndexRange;
+  indexSetId?: string;
   isDeflector: boolean;
 };
 
-const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }: Props) => {
+const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = undefined, isDeflector }: Props) => {
   useEffect(() => {
     IndicesActions.subscribe(indexName);
 
@@ -72,6 +72,8 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
       );
     }
 
+    if (!indexSetId) return null;
+
     return (
       <span>
         <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>
@@ -82,7 +84,7 @@ const IndexDetails = ({ index, indexName, indexRange, indexSetId, isDeflector }:
         </Button>
       </span>
     );
-  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex]);
+  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex, indexSetId]);
 
   if (!index || !index.all_shards) {
     return <Spinner />;

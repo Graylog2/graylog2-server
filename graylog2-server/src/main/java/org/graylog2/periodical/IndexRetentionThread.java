@@ -20,11 +20,11 @@ import jakarta.inject.Inject;
 import jakarta.inject.Provider;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -79,7 +79,7 @@ public class IndexRetentionThread extends Periodical {
             return;
         }
 
-        for (final IndexSet indexSet : indexSetRegistry) {
+        for (final IndexSet indexSet : indexSetRegistry.getAllIndexSets()) {
             if (!indexSet.getConfig().isWritable()) {
                 LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
                 continue;

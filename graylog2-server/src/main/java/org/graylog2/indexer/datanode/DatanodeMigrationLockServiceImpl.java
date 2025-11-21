@@ -27,7 +27,7 @@ import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.LockService;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

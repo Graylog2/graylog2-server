@@ -21,7 +21,7 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.common.IndexRotator;

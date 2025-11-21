@@ -17,7 +17,7 @@
 package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.MongoIndexRangeService;

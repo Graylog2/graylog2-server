@@ -23,7 +23,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.messages.ImmutableMessage;
 import org.graylog2.indexer.messages.SerializationContext;
 import org.graylog2.outputs.filter.FilteredMessage;

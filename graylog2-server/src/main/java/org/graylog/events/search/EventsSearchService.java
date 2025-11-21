@@ -23,7 +23,7 @@ import org.apache.shiro.subject.Subject;
 import org.graylog.events.event.EventDto;
 import org.graylog.events.processor.DBEventDefinitionService;
 import org.graylog.events.processor.EventDefinitionDto;
-import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.template.IndexMapping;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.streams.Stream;

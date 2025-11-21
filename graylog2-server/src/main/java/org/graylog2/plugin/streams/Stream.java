@@ -19,7 +19,7 @@ package org.graylog2.plugin.streams;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.joda.time.DateTime;
 
 import java.util.List;

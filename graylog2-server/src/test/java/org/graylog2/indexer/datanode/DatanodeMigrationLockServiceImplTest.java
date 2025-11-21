@@ -22,7 +22,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.cluster.lock.MongoLockService;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.Test;

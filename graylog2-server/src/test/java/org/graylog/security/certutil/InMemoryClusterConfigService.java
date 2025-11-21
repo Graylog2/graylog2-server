@@ -66,8 +66,12 @@ public class InMemoryClusterConfigService implements ClusterConfigService {
 
     @Override
     public <T> int remove(Class<T> type) {
-        final Object removed = storage.remove(AutoValueUtils.getCanonicalName(type));
-        return removed != null ? 1 : 0;
+        return remove(AutoValueUtils.getCanonicalName(type));
+    }
+
+    @Override
+    public int remove(String canonicalName) {
+        return storage.remove(canonicalName) != null ? 1 : 0;
     }
 
     @Override

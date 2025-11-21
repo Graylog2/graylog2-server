@@ -288,6 +288,13 @@ type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
 
 type EntityTypeRouteGenerator = { type: string; route: (id: string) => QualifiedUrl<string> };
 
+type IndexRetentionConfig = {
+  type: string;
+  displayName: string;
+  configComponent: React.ComponentType<IndexRetentionConfigComponentProps>;
+  summaryComponent: React.ComponentType<IndexRetentionSummaryComponentProps>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
@@ -324,6 +331,7 @@ declare module 'graylog-web-plugin/plugin' {
     entityRoutes?: Array<RouteGenerator>;
     entityTypeRoute?: Array<EntityTypeRouteGenerator>;
     entityCreators?: Array<EntityCreator>;
+    indexRetentionConfig?: Array<IndexRetentionConfig>;
   }
   interface PluginMetadata {
     name?: string;

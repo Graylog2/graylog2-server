@@ -21,12 +21,12 @@ import com.google.common.eventbus.EventBus;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog.testing.elasticsearch.SkipDefaultIndexTemplate;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.indexer.IndexMappingFactory;
-import org.graylog2.indexer.MessageIndexTemplateProvider;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
+import org.graylog2.indexer.template.IndexMappingFactory;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
+import static org.graylog2.indexer.template.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MockitoExtension.class)

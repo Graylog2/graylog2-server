@@ -18,8 +18,8 @@ package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indices.Indices;
@@ -79,15 +79,13 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
             return;
         }
         setReadonly();
-        final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexSetRegistry.getAll(), indexName);
+        final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexName);
         createNewSingleIndexRangeJob.execute();
 
         // Update field type information again to make sure we got the latest state
         indexSetRegistry.getForIndex(indexName)
-                .ifPresent(indexSet -> {
-                    indexFieldTypePoller.pollIndex(indexName, indexSet.getConfig().id())
-                            .ifPresent(indexFieldTypesService::upsert);
-                });
+                .flatMap(indexSet -> indexFieldTypePoller.pollIndex(indexName, indexSet.getConfig().id()))
+                .ifPresent(indexFieldTypesService::upsert);
     }
 
     public String getIndex() {

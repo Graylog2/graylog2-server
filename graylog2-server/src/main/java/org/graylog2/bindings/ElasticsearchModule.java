@@ -18,8 +18,8 @@ package org.graylog2.bindings;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.OptionalBinder;
-import org.graylog2.indexer.FailureIndexMappingFactory;
-import org.graylog2.indexer.IndexMappingFactory;
+import org.graylog2.indexer.template.FailureIndexMappingFactory;
+import org.graylog2.indexer.template.IndexMappingFactory;
 import org.graylog2.storage.DetectedSearchVersion;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
