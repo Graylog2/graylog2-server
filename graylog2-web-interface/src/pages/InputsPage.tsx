@@ -21,7 +21,6 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
 import useProductName from 'brand-customization/useProductName';
 
 const isCloud = AppConfig.isCloud();
@@ -50,7 +49,7 @@ const InputsPage = () => {
               </p>
               <p>
                 If you are missing an input type on this page&apos;s list of available inputs, you can start the input
-                on a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
+                on a <Link to="/system/forwarders">Forwarder</Link>.
               </p>
             </>
           ) : (
