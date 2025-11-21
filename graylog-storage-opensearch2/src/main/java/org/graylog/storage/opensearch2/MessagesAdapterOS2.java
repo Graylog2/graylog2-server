@@ -31,6 +31,7 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.AnalyzeReque
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.AnalyzeResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.common.xcontent.XContentType;
 import org.graylog.shaded.opensearch2.org.opensearch.core.rest.RestStatus;
+import org.graylog.storage.exceptions.ParsedOpenSearchException;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Indexable;
