@@ -29,6 +29,8 @@ import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS2;
 import org.graylog.storage.opensearch3.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch3.client.OpensearchCredentialsProvider;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
+import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
 import org.graylog.storage.opensearch3.sniffer.SnifferBuilder;
 import org.graylog.storage.opensearch3.sniffer.SnifferFilter;

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.stream.JsonParser;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
 import org.opensearch.client.json.PlainJsonSerializable;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
@@ -29,6 +30,7 @@ import org.opensearch.client.opensearch._types.mapping.Property;
 
 import java.io.StringReader;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Utility class that helps use our APIs based on maps with OS3, strongly typed, builder-based APIs.
@@ -49,6 +51,16 @@ public class OSSerializationUtils {
         return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
     }
 
+    public Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
+        return map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> JsonData.of(entry.getValue())
+                        )
+                );
+    }
+
     public <T> T fromMap(final Map<String, Object> mapRepresentation,
                          final JsonpDeserializer<T> deserializer) throws JsonProcessingException {
         final String json = this.jsonpMapper.objectMapper().writeValueAsString(mapRepresentation);
@@ -58,14 +70,5 @@ public class OSSerializationUtils {
     public <T> T fromJson(final String json, final JsonpDeserializer<T> deserializer) {
         final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader(json));
         return deserializer.deserialize(parser, jsonpMapper);
-    }
-
-    /**
-     * This is an ugly hack because there is no way to dynamically resolve opensearch property type in os3 client
-     *
-     */
-    public Property propertyOfType(String type) {
-        final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader("{\"type\": \"" + type + "\"}"));
-        return Property._DESERIALIZER.deserialize(parser, jsonpMapper);
     }
 }

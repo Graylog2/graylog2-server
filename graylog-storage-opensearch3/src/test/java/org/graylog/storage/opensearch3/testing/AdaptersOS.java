@@ -19,12 +19,10 @@ package org.graylog.storage.opensearch3.testing;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
-import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
 import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS;
 import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
 import org.graylog.storage.opensearch3.IndicesAdapterOS;
-import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
@@ -35,6 +33,8 @@ import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
+import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -65,13 +65,16 @@ public class AdaptersOS implements Adapters {
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
+    private final OSSerializationUtils osSerializationUtils;
 
     public AdaptersOS(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
         this.client = client;
         this.officialOpensearchClient = officialOpensearchClient;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+        osSerializationUtils = new OSSerializationUtils();
     }
+
 
     @Override
     public CountsAdapter countsAdapter() {
@@ -88,7 +91,7 @@ public class AdaptersOS implements Adapters {
                 new IndexStatisticsBuilder(),
                 objectMapper,
                 new PlainJsonApi(objectMapper, client, officialOpensearchClient),
-                new OSSerializationUtils()
+                osSerializationUtils
         );
     }
 
@@ -136,9 +139,9 @@ public class AdaptersOS implements Adapters {
     @Override
     public IndexTemplateAdapter indexTemplateAdapter() {
         if(featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
-            return new ComposableIndexTemplateAdapter(officialOpensearchClient, objectMapper);
+            return new ComposableIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils);
         } else {
-            return new LegacyIndexTemplateAdapter(officialOpensearchClient, objectMapper);
+            return new LegacyIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils);
         }
     }
 }
