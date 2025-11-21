@@ -40,8 +40,8 @@ public class DataStreamAdapterOSIT {
 
     ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    DataStreamAdapterOS dataStreamAdapter = new DataStreamAdapterOS(openSearchInstance.getOfficialOpensearchClient(), openSearchInstance.openSearchClient(),
-            objectMapper, new IsmApi(openSearchInstance.getOfficialOpensearchClient(), objectMapper), new OSSerializationUtils());
+    DataStreamAdapterOS dataStreamAdapter = new DataStreamAdapterOS(openSearchInstance.getOfficialOpensearchClient(),
+            new IsmApi(openSearchInstance.getOfficialOpensearchClient(), objectMapper), new OSSerializationUtils());
 
 
     @Test

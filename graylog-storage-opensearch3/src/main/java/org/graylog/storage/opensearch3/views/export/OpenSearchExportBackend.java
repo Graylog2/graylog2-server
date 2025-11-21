@@ -32,19 +32,26 @@ import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilde
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.TermsQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch3.TimeRangeQueryFactory;
 import org.graylog2.database.filtering.AttributeFilter;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.opensearch._types.SortOrder;
+import org.opensearch.client.opensearch._types.mapping.FieldType;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
+import org.opensearch.client.opensearch.core.search.Hit;
+import org.opensearch.client.util.ObjectBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -54,6 +61,7 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.queryStringQuery;
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
+import static org.graylog.storage.opensearch3.views.export.SearchAfter.DEFAULT_TIEBREAKER_FIELD;
 
 @SuppressWarnings("rawtypes")
 public class OpenSearchExportBackend implements ExportBackend {
@@ -82,7 +90,7 @@ public class OpenSearchExportBackend implements ExportBackend {
         int totalCount = 0;
 
         while (true) {
-            List<SearchHit> hits = search(command);
+            List<Hit<Map>> hits = search(command);
 
             if (hits.isEmpty()) {
                 publishChunk(chunkCollector, hits, command.fieldsInOrder(), command.timeZone(), SimpleMessageChunk.ChunkOrder.LAST);
@@ -105,80 +113,86 @@ public class OpenSearchExportBackend implements ExportBackend {
         }
     }
 
-    private List<SearchHit> search(ExportMessagesCommand command) {
-        SearchRequest search = prepareSearchRequest(command);
-
-        return requestStrategy.nextChunk(search, command);
+    private List<Hit<Map>> search(ExportMessagesCommand command) {
+        org.opensearch.client.opensearch.core.SearchRequest newSearch = newPrepareSearchRequest(command);
+        return requestStrategy.nextChunk(newSearch, command);
     }
 
-    private SearchRequest prepareSearchRequest(ExportMessagesCommand command) {
-        SearchSourceBuilder ssb = searchSourceBuilderFrom(command);
 
+    private org.opensearch.client.opensearch.core.SearchRequest newPrepareSearchRequest(ExportMessagesCommand command) {
         Set<String> indices = indicesFor(command);
-        return new SearchRequest()
-                .source(ssb)
-                .indices(indices.toArray(new String[0]))
-                .indicesOptions(IndicesOptions.fromOptions(false, false, true, false));
+
+        return org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
+            final LinkedList<String> indexNames = new LinkedList<>(indices);
+            if(!indexNames.isEmpty()) {
+                builder.index(indexNames);
+            }
+            builder.size(command.chunkSize())
+                    .query(query(command))
+                    .sort(s -> s.field(f -> f.field("timestamp").order(SortOrder.Asc)))
+                    .sort(s -> s.field(f -> f.field(DEFAULT_TIEBREAKER_FIELD).order(SortOrder.Asc).unmappedType(FieldType.Keyword)));
+            if (!command.exportAllFields()) {
+                builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(command.fieldsInOrder()))));
+            }
+
+            requestStrategy.configure(builder);
+
+            return builder;
+        });
     }
 
-    private SearchSourceBuilder searchSourceBuilderFrom(ExportMessagesCommand command) {
-        QueryBuilder query = queryFrom(command);
+    private Query query(ExportMessagesCommand command) {
+        final ObjectBuilder<Query> boolQuery = Query.builder().bool(builder -> {
+                    builder
+                            .filter(newQueryStringFilter(command.queryString()))
+                            .filter(newTimestampFilter(command))
+                            .filter(newStreamsFilter(command));
 
-        SearchSourceBuilder ssb = new SearchSourceBuilder()
-                .query(query)
-                .size(command.chunkSize());
-        if (!command.exportAllFields()) {
-            ssb = ssb.fetchSource(command.fieldsInOrder().toArray(new String[]{}), null);
-        }
+                    final List<AttributeFilter> attributeFilters = command.attributeFilters();
+                    if (attributeFilters != null && !attributeFilters.isEmpty()) {
+                        attributeFilters.stream()
+                                .flatMap(attribute -> attribute.toQueryStrings().stream())
+                                .forEach(filterQuery -> builder.filter(q -> q.queryString(qs -> qs.query(filterQuery))));
+                    }
 
-        return requestStrategy.configure(ssb);
+
+                    final Collection<UsedSearchFilter> usedSearchFilters = command.usedSearchFilters();
+                    if (usedSearchFilters != null) {
+                        usedSearchFiltersToQueryStringsMapper.map(usedSearchFilters)
+                                .forEach(filterQueryString -> builder.filter(q -> q.queryString(qs -> qs.query(filterQueryString))));
+                    }
+                    return builder;
+                }
+        );
+        return boolQuery.build();
     }
 
-    private QueryBuilder queryFrom(ExportMessagesCommand command) {
-        final BoolQueryBuilder boolQueryBuilder = boolQuery()
-                .filter(queryStringFilter(command.queryString()))
-                .filter(timestampFilter(command))
-                .filter(streamsFilter(command));
 
-        final List<AttributeFilter> attributeFilters = command.attributeFilters();
-        if (attributeFilters != null && !attributeFilters.isEmpty()) {
-            attributeFilters.stream()
-                    .flatMap(attribute -> attribute.toQueryStrings().stream())
-                    .forEach(filterQuery -> boolQueryBuilder.filter(QueryBuilders.queryStringQuery(filterQuery)));
-        }
-
-        final Collection<UsedSearchFilter> usedSearchFilters = command.usedSearchFilters();
-        if (usedSearchFilters != null) {
-            usedSearchFiltersToQueryStringsMapper.map(usedSearchFilters)
-                    .forEach(filterQueryString -> boolQueryBuilder.filter(queryStringFilter(filterQueryString)));
-        }
-        return boolQueryBuilder;
-    }
-
-    private QueryBuilder queryStringFilter(final ElasticsearchQueryString backendQuery) {
+    private Query newQueryStringFilter(final ElasticsearchQueryString backendQuery) {
         return backendQuery.isEmpty() ?
-                matchAllQuery() :
-                queryStringQuery(backendQuery.queryString()).allowLeadingWildcard(allowLeadingWildcard);
+                Query.builder().matchAll(q -> q).build() :
+                Query.builder().queryString(q -> q.allowLeadingWildcard(allowLeadingWildcard).query(backendQuery.queryString())).build();
     }
 
-    private QueryBuilder queryStringFilter(final String queryString) {
-        ElasticsearchQueryString backendQuery = ElasticsearchQueryString.of(queryString);
-        return queryStringFilter(backendQuery);
+
+    private Query newTimestampFilter(ExportMessagesCommand command) {
+        final RangeQuery timeRangeQuery = TimeRangeQueryFactory.createTimeRangeQuery(command.timeRange());
+        return Query.builder().range(timeRangeQuery).build();
     }
 
-    private QueryBuilder timestampFilter(ExportMessagesCommand command) {
-        return requireNonNull(TimeRangeQueryFactory.create(command.timeRange()));
-    }
-
-    private TermsQueryBuilder streamsFilter(ExportMessagesCommand command) {
-        return termsQuery(Message.FIELD_STREAMS, command.streams());
+    private Query newStreamsFilter(ExportMessagesCommand command) {
+        return Query.builder().term(t -> {
+            t.field(Message.FIELD_STREAMS);
+            command.streams().forEach(s -> t.value(v -> v.stringValue(s)));
+            return t;
+        }).build();
     }
 
     private Set<String> indicesFor(ExportMessagesCommand command) {
         return indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange());
     }
 
-    private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<SearchHit> hits, LinkedHashSet<String> desiredFieldsInOrder, DateTimeZone timeZone, SimpleMessageChunk.ChunkOrder chunkOrder) {
+    private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<Hit<Map>> hits, LinkedHashSet<String> desiredFieldsInOrder, DateTimeZone timeZone, SimpleMessageChunk.ChunkOrder chunkOrder) {
         SimpleMessageChunk chunk = chunkFrom(hits, desiredFieldsInOrder, timeZone, chunkOrder);
 
         try {
@@ -190,7 +204,7 @@ public class OpenSearchExportBackend implements ExportBackend {
         }
     }
 
-    private SimpleMessageChunk chunkFrom(List<SearchHit> hits, LinkedHashSet<String> desiredFieldsInOrder, DateTimeZone timeZone, SimpleMessageChunk.ChunkOrder chunkOrder) {
+    private SimpleMessageChunk chunkFrom(List<Hit<Map>> hits, LinkedHashSet<String> desiredFieldsInOrder, DateTimeZone timeZone, SimpleMessageChunk.ChunkOrder chunkOrder) {
         LinkedHashSet<SimpleMessage> messages = messagesFrom(hits, timeZone);
 
         return SimpleMessageChunk.builder()
@@ -200,9 +214,9 @@ public class OpenSearchExportBackend implements ExportBackend {
                 .build();
     }
 
-    private LinkedHashSet<SimpleMessage> messagesFrom(List<SearchHit> hits, DateTimeZone timeZone) {
+    private LinkedHashSet<SimpleMessage> messagesFrom(List<Hit<Map>> hits, DateTimeZone timeZone) {
         return hits.stream()
-                .map(h -> buildHitWithAllFields(h.getSourceAsMap(), h.getIndex(), timeZone))
+                .map(h -> buildHitWithAllFields(h.source(), h.index(), timeZone))
                 .collect(toCollection(LinkedHashSet::new));
     }
 
