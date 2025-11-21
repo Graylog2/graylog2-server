@@ -26,11 +26,11 @@ import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 import java.util.Map;
 import java.util.Optional;
 
-public class SystemMetricsSupplier implements TelemetryMetricSupplier {
+public class NodesSystemMetricsSupplier implements TelemetryMetricSupplier {
     private final DBTelemetryClusterInfo dbTelemetryClusterInfo;
 
     @Inject
-    public SystemMetricsSupplier(DBTelemetryClusterInfo dbTelemetryClusterInfo) {
+    public NodesSystemMetricsSupplier(DBTelemetryClusterInfo dbTelemetryClusterInfo) {
         this.dbTelemetryClusterInfo = dbTelemetryClusterInfo;
     }
 
@@ -46,7 +46,7 @@ public class SystemMetricsSupplier implements TelemetryMetricSupplier {
     }
 
     private NodeInfo toNodeInfo(TelemetryClusterInfoDto dto) {
-        return new SystemMetricsSupplier.NodeInfo(
+        return new NodesSystemMetricsSupplier.NodeInfo(
                 dto.nodeId(),
                 dto.operatingSystem(),
                 dto.cpuCores(),

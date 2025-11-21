@@ -39,7 +39,7 @@ public class SystemMetricsSupplierTest {
     private DBTelemetryClusterInfo dbTelemetryClusterInfo;
 
     @InjectMocks
-    private SystemMetricsSupplier systemMetricsSupplier;
+    private NodesSystemMetricsSupplier supplier;
 
     @Test
     public void shouldReturnSystemMetrics() {
@@ -48,10 +48,10 @@ public class SystemMetricsSupplierTest {
 
         when(dbTelemetryClusterInfo.findAll()).thenReturn(List.of(nodeInfo1, nodeInfo2));
 
-        Optional<TelemetryEvent> event = systemMetricsSupplier.get();
+        Optional<TelemetryEvent> event = supplier.get();
         assertTrue(event.isPresent());
 
-        var nodes = (List<SystemMetricsSupplier.NodeInfo>) event.get().metrics().get("nodes");
+        var nodes = (List<NodesSystemMetricsSupplier.NodeInfo>) event.get().metrics().get("nodes");
         assertThat(nodes)
                 .hasSize(2)
                 .containsExactlyInAnyOrder(
@@ -60,8 +60,8 @@ public class SystemMetricsSupplierTest {
                 );
     }
 
-    private SystemMetricsSupplier.NodeInfo toNodeInfo(TelemetryClusterInfoDto dto) {
-        return new SystemMetricsSupplier.NodeInfo(
+    private NodesSystemMetricsSupplier.NodeInfo toNodeInfo(TelemetryClusterInfoDto dto) {
+        return new NodesSystemMetricsSupplier.NodeInfo(
                 dto.nodeId(),
                 dto.operatingSystem(),
                 dto.cpuCores(),

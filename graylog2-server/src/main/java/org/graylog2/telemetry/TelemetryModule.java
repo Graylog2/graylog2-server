@@ -30,7 +30,7 @@ import org.graylog2.telemetry.suppliers.EventNotificationsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.DashboardsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.StreamsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.SidecarsVersionSupplier;
-import org.graylog2.telemetry.suppliers.SystemMetricsSupplier;
+import org.graylog2.telemetry.suppliers.NodesSystemMetricsSupplier;
 
 public class TelemetryModule extends PluginModule {
     @Override
@@ -52,6 +52,6 @@ public class TelemetryModule extends PluginModule {
         addTelemetryMetricProvider("Dashboards Metrics", DashboardsMetricsSupplier.class);
         addTelemetryMetricProvider("Streams Metrics", StreamsMetricsSupplier.class);
         addTelemetryMetricProvider("Sidecars Version", SidecarsVersionSupplier.class);
-        addTelemetryMetricProvider("System Metrics", SystemMetricsSupplier.class);
+        addTelemetryMetricProvider("Nodes System Metrics", NodesSystemMetricsSupplier.class);
     }
 }
