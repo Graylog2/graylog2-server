@@ -284,8 +284,7 @@ public class ClientES7 implements Client {
         }
     }
 
-    @Override
-    public void deleteTemplates(String... templates) {
+    private void deleteTemplates(String... templates) {
         if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
             deleteComposableTemplates(templates);
         } else {
@@ -409,7 +408,11 @@ public class ClientES7 implements Client {
     }
 
     @Override
-    public void updateMapping(String index, Map<String, Object> mapping) {
+    public void updateMappingMeta(String index, String key, Object value) {
+        updateMapping(index, Map.of("_meta", Map.of(key, value)));
+    }
+
+    private void updateMapping(String index, Map<String, Object> mapping) {
         final PutMappingRequest request = new PutMappingRequest(index)
                 .source(mapping);
 
@@ -418,13 +421,18 @@ public class ClientES7 implements Client {
     }
 
     @Override
-    public Map<String, Object> getMapping(String index) {
+    public <T> T getMappingMetaValue(String index, String key, Class<T> type) {
         final GetMappingsRequest request = new GetMappingsRequest().indices(index);
 
         final GetMappingsResponse result = client.execute((c, requestOptions) -> c.indices().getMapping(request, requestOptions),
                 "Couldn't read mapping of index " + index);
+        final Map<String, Object> indexMapping = result.mappings().get(index).getSourceAsMap();
 
-        return result.mappings().get(index).sourceAsMap();
+        //noinspection unchecked
+        return (T) Optional.ofNullable(indexMapping.get("_meta"))
+                .map(o -> (Map<String, Object>) o)
+                .map(meta -> meta.get(key))
+                .orElse(null);
     }
 
     private void waitForResult(Callable<Boolean> task) {

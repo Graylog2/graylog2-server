@@ -32,7 +32,7 @@ public class IsmApiIT {
     @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
-    IsmApi ismApi = new IsmApi(openSearchInstance.openSearchClient(), new ObjectMapperProvider().get());
+    IsmApi ismApi = new IsmApi(openSearchInstance.getOfficialOpensearchClient(), new ObjectMapperProvider().get());
 
     @Test
     public void testGetUnknownPolicyReturnsEmpty() {

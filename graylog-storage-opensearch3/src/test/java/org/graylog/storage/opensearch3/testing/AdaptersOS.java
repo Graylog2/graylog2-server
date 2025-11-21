@@ -19,12 +19,10 @@ package org.graylog.storage.opensearch3.testing;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
-import org.graylog.storage.opensearch3.ComposableIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.CountsAdapterOS;
 import org.graylog.storage.opensearch3.IndexFieldTypePollerAdapterOS;
 import org.graylog.storage.opensearch3.IndexToolsAdapterOS2;
 import org.graylog.storage.opensearch3.IndicesAdapterOS;
-import org.graylog.storage.opensearch3.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.MessagesAdapterOS2;
 import org.graylog.storage.opensearch3.NodeAdapterOS;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
@@ -35,6 +33,8 @@ import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
+import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.mapping.FieldMappingApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -84,7 +84,7 @@ public class AdaptersOS implements Adapters {
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client),
+                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils) : new LegacyIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils),
                 new IndexStatisticsBuilder(),
                 objectMapper,
                 new PlainJsonApi(objectMapper, client, officialOpensearchClient),
