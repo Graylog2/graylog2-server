@@ -31,13 +31,11 @@ import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataS
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.inputs.InputRoutingService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
 import java.util.List;
@@ -53,10 +51,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 public class PipelineResourceTest {
     private static final String GRAYLOG_DELETABLE_SCOPE = "GRAYLOG_DELETABLE_SCOPE";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule().strictness(Strictness.STRICT_STUBS);
 
     @Mock
     private PipelineService pipelineService;
@@ -81,7 +78,7 @@ public class PipelineResourceTest {
 
     private PipelineResource pipelineResource;
 
-    @Before
+    @BeforeEach
     public void setup() {
         pipelineResource = new PipelineTestResource(
                 pipelineService, paginatedPipelineService, pipelineRuleParser, connectionsService, inputRoutingService, ruleService, metadataService);

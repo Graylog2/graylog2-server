@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.netflow.v9;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
