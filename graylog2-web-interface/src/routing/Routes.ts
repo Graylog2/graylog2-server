@@ -82,6 +82,7 @@ const Routes = {
   DASHBOARD: {
     NEW: '/dashboards/new',
     SHOW: (id: string) => `/dashboards/${id}`,
+    FULL_SCREEN: (id: string) => `/dashboards/${id}/tv`,
   },
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
