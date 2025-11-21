@@ -136,7 +136,6 @@ export const InputsStore = singletonStore('core.Inputs', () =>
     delete(input) {
       const inputId = input.id;
       const inputTitle = input.title;
-
       const promise = fetch('DELETE', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
 
       promise.then(

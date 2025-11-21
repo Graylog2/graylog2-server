@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -38,6 +39,7 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
@@ -114,8 +116,13 @@ public class InputStatesResource extends AbstractInputsResource {
     public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
-        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
-        inputService.persistDesiredState(input, IOState.Type.RUNNING);
+        checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType());// remove after sharing inputs implemented
+        try {
+            inputService.persistDesiredState(input, IOState.Type.RUNNING);
+        } catch (ValidationException e) {
+            throw new BadRequestException(e);
+        }
+
         final InputCreated result = InputCreated.create(inputId);
         this.serverEventBus.post(result);
 
@@ -134,7 +141,12 @@ public class InputStatesResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
-        inputService.persistDesiredState(input, IOState.Type.SETUP);
+        try {
+            inputService.persistDesiredState(input, IOState.Type.SETUP);
+        } catch (ValidationException e) {
+            throw new BadRequestException(e);
+        }
+
         final InputSetup result = InputSetup.create(inputId);
         this.serverEventBus.post(result);
 
@@ -153,7 +165,12 @@ public class InputStatesResource extends AbstractInputsResource {
         checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         final Input input = inputService.find(inputId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, input.getType()); // remove after sharing inputs implemented
-        inputService.persistDesiredState(input, IOState.Type.STOPPED);
+        try {
+            inputService.persistDesiredState(input, IOState.Type.STOPPED);
+        } catch (ValidationException e) {
+            throw new BadRequestException(e);
+        }
+
         final InputDeleted result = InputDeleted.create(inputId);
         this.serverEventBus.post(result);
 

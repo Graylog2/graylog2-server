@@ -20,12 +20,12 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
 import org.apache.commons.collections.map.HashedMap;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -74,6 +74,8 @@ import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -141,7 +143,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        inputService = new InputServiceImpl(mongoCollections.mongoConnection(), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
+        inputService = new InputServiceImpl(mongoCollections, extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();
@@ -174,12 +176,15 @@ public class InputFacadeTest {
 
     @Test
     public void exportNativeEntity() {
-        final ImmutableMap<String, Object> fields = ImmutableMap.of(
-                MessageInput.FIELD_TITLE, "Input Title",
-                MessageInput.FIELD_TYPE, "org.graylog2.inputs.raw.udp.RawUDPInput",
-                MessageInput.FIELD_CONFIGURATION, Collections.emptyMap()
-        );
-        final InputImpl input = new InputImpl(fields);
+        final InputImpl input = InputImpl.builder()
+                .getId(UUID.randomUUID().toString())
+                .getTitle("Input Title")
+                .getType("org.graylog2.inputs.raw.udp.RawUDPInput")
+                .getConfiguration(Collections.emptyMap())
+                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
+                .getCreatorUserId(UUID.randomUUID().toString())
+                .build();
+
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
         final EntityDescriptor descriptor = EntityDescriptor.create(input.getId(), ModelTypes.INPUT_V1);
@@ -199,13 +204,15 @@ public class InputFacadeTest {
 
     @Test
     public void exportNativeEntityWithEncryptedValues() {
-        final ImmutableMap<String, Object> fields = ImmutableMap.of(
-                MessageInput.FIELD_TITLE, "Input Title",
-                MessageInput.FIELD_TYPE, "org.graylog2.inputs.misc.jsonpath.JsonPathInput",
-                MessageInput.FIELD_CONFIGURATION,
-                Map.of("encrypted_value",
-                        new EncryptedValueService(UUID.randomUUID().toString()).encrypt("secret")));
-        final InputImpl input = new InputImpl(fields);
+        final InputImpl input = InputImpl.builder()
+                .getId(UUID.randomUUID().toString())
+                .getTitle("Input Title")
+                .getType("org.graylog2.inputs.misc.jsonpath.JsonPathInput")
+                .getConfiguration(Map.of("encrypted_value",
+                        new EncryptedValueService(UUID.randomUUID().toString()).encrypt("secret")))
+                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
+                .getCreatorUserId(UUID.randomUUID().toString())
+                .build();
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
         final EntityDescriptor descriptor = EntityDescriptor.create(input.getId(), ModelTypes.INPUT_V1);
@@ -285,10 +292,14 @@ public class InputFacadeTest {
 
     @Test
     public void createExcerpt() {
-        final ImmutableMap<String, Object> fields = ImmutableMap.of(
-                "title", "Dashboard Title"
-        );
-        final InputImpl input = new InputImpl(fields);
+        final InputImpl input = InputImpl.builder()
+                .getId(UUID.randomUUID().toString())
+                .getTitle("Excerpt")
+                .getType("org.graylog2.inputs.raw.udp.RawUDPInput")
+                .getConfiguration(Collections.emptyMap())
+                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
+                .getCreatorUserId(UUID.randomUUID().toString())
+                .build();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
         final EntityExcerpt excerpt = facade.createExcerpt(inputWithExtractors);
 
@@ -472,7 +483,7 @@ public class InputFacadeTest {
                 ValueReference.of(Converter.Type.LOOKUP_TABLE.name()), ReferenceMapUtils.toReferenceMap(lookupTableConfig));
         final List<ConverterEntity> converterEntities = new ArrayList<>(1);
         converterEntities.add(converterEntity);
-        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input.getId()));
         final LookupTableExtractor extractor = (LookupTableExtractor) inputWithExtractors.extractors().iterator().next();
         final ExtractorEntity extractorEntity = ExtractorEntity.create(
                 ValueReference.of(extractor.getTitle()),
@@ -550,7 +561,7 @@ public class InputFacadeTest {
     @MongoDBFixtures("InputFacadeTest.json")
     public void resolveForInstallationGrokPattern() throws NotFoundException {
         final Input input = inputService.find("5ae2ebbeef27464477f0fd8b");
-        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+        final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input.getId()));
         final GrokExtractor grokExtractor = (GrokExtractor) inputWithExtractors.extractors().iterator().next();
         final ExtractorEntity extractorEntity = ExtractorEntity.create(
                 ValueReference.of(grokExtractor.getTitle()),
