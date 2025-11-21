@@ -18,15 +18,18 @@ package org.graylog.storage.opensearch3.views.export;
 
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.client.opensearch.core.search.Hit;
 
 import java.util.List;
+import java.util.Map;
 
 public interface RequestStrategy {
-    List<SearchHit> nextChunk(SearchRequest search, ExportMessagesCommand command);
+    List<Hit<Map>> nextChunk(org.opensearch.client.opensearch.core.SearchRequest newSearch, ExportMessagesCommand command);
 
      default SearchSourceBuilder configure(SearchSourceBuilder ssb) {
         return ssb;
     }
+
+    void configure(org.opensearch.client.opensearch.core.SearchRequest.Builder builder);
 }
