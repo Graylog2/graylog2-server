@@ -779,7 +779,7 @@
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.19.0</version>
+                            <version>2.22.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
