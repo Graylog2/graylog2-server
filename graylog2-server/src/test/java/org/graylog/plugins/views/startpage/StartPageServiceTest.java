@@ -41,7 +41,6 @@ import org.graylog.testing.TestUserServiceExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.lookup.Catalog;
 import org.joda.time.DateTime;
@@ -77,7 +76,7 @@ public class StartPageServiceTest {
 
     @BeforeEach
     public void init(MongoDBTestService mongodb,
-                     MongoJackObjectMapperProvider mongoJackObjectMapperProvider,
+                     MongoCollections mongoCollections,
                      GRNRegistry grnRegistry) {
 
         var user = TestUser.builder().withId("637748db06e1d74da0a54330").withUsername("test").isLocalAdmin(false).build();
@@ -103,9 +102,8 @@ public class StartPageServiceTest {
 
         var eventbus = new EventBus();
         final var connection = mongodb.mongoConnection();
-        final var collections = new MongoCollections(mongoJackObjectMapperProvider, connection);
-        var lastOpenedService = new LastOpenedService(collections, eventbus);
-        var recentActivityService = new RecentActivityService(collections, connection, eventbus, grnRegistry, permissionAndRoleResolver,
+        var lastOpenedService = new LastOpenedService(mongoCollections, eventbus);
+        var recentActivityService = new RecentActivityService(mongoCollections, connection, eventbus, grnRegistry, permissionAndRoleResolver,
                 new DBGrantService(collections), mock(GranteeService.class), new PluggableEntityService(Set.of()), mock(CapabilityRegistry.class));
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());

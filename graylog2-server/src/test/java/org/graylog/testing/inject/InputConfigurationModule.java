@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.testing.inject;
 
-import org.graylog2.indexer.indices.Template;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 
-interface IndexTemplateAdapter {
-    boolean ensureIndexTemplate(String templateName, Template template);
-
-    boolean indexTemplateExists(String templateName);
-
-    boolean deleteIndexTemplate(String templateName);
+public class InputConfigurationModule implements Module {
+    @Override
+    public void configure(Binder binder) {
+        binder.bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
+    }
 }

@@ -18,8 +18,9 @@ package org.graylog2.commands.token;
 
 import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.Configuration;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.security.AccessTokenCipher;
@@ -27,25 +28,24 @@ import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.AccessTokenServiceImpl;
 import org.graylog2.security.PaginatedAccessTokenEntityService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.graylog2.commands.token.AutomationTokenCommandExecution.TOKEN_ID;
 import static org.mockito.Mockito.doReturn;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AutomationTokenCommandExecutionTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private PaginatedAccessTokenEntityService paginatedAccessTokenEntityService;
@@ -59,12 +59,12 @@ public class AutomationTokenCommandExecutionTest {
     private AccessTokenService accessTokenService;
     private AutomationTokenCommandExecution tokenCommandExecution;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
         doReturn("password-secret").when(configuration)
                 .getPasswordSecret();
         accessTokenService =
-                new AccessTokenServiceImpl(mongodb.mongoConnection(), paginatedAccessTokenEntityService, new AccessTokenCipher(configuration), configService, configuration);
+                new AccessTokenServiceImpl(mongoCollections.mongoConnection(), paginatedAccessTokenEntityService, new AccessTokenCipher(configuration), configService, configuration);
         tokenCommandExecution = new AutomationTokenCommandExecution(accessTokenService, configuration);
     }
 

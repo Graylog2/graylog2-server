@@ -14,10 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.testing.completebackend;
+package org.graylog.storage.opensearch3.indextemplates;
 
-import java.net.URI;
+import org.graylog2.indexer.indices.Template;
 
-public interface MailServerInstance {
-    URI getEndpointURI();
+public interface IndexTemplateAdapter {
+    boolean ensureIndexTemplate(String templateName, Template template);
+
+    boolean indexTemplateExists(String templateName);
+
+    boolean deleteIndexTemplate(String templateName);
 }

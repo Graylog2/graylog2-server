@@ -28,11 +28,10 @@ import org.graylog.plugins.map.config.S3GeoIpFileService;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -43,10 +42,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -82,7 +81,7 @@ public class GeoIpResolverEngineTest {
     private InetAddress publicIp;
     private MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
 
         reservedIp = InetAddress.getByName("127.0.0.1");
@@ -114,7 +113,7 @@ public class GeoIpResolverEngineTest {
         metricRegistry = new MetricRegistry();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         metricRegistry.removeMatching(MetricFilter.ALL);
         metricRegistry = null;
@@ -144,11 +143,11 @@ public class GeoIpResolverEngineTest {
         engine.filter(message);
 
         String fieldNotFoundError = String.format(Locale.ENGLISH, "Field '%s' expected", expectedFieldName);
-        Assert.assertTrue(fieldNotFoundError, message.hasField(expectedFieldName));
+        Assertions.assertTrue(message.hasField(expectedFieldName), fieldNotFoundError);
 
         Boolean expectedValue = true;
         String fieldValueError = String.format(Locale.ENGLISH, "Expected value for '%s' is '%s'", expectedFieldName, expectedValue);
-        Assert.assertEquals(fieldValueError, expectedValue, message.getField(expectedFieldName));
+        Assertions.assertEquals(expectedValue, message.getField(expectedFieldName), fieldValueError);
     }
 
     @Test
@@ -184,7 +183,7 @@ public class GeoIpResolverEngineTest {
 
         for (String field : expectedFields) {
             String error = String.format(Locale.ENGLISH, "Field '%s' was not found", field);
-            Assert.assertTrue(error, message.hasField(field));
+            Assertions.assertTrue(message.hasField(field), error);
         }
     }
 
@@ -354,7 +353,7 @@ public class GeoIpResolverEngineTest {
         final Message message = messageFactory.createMessage(messageFields);
         final boolean filtered = resolver.filter(message);
 
-        assertFalse("Message should not be filtered out", filtered);
-        assertEquals("Filter should not add new message fields", messageFields.size(), message.getFields().size());
+        assertFalse(filtered, "Message should not be filtered out");
+        assertEquals(messageFields.size(), message.getFields().size(), "Filter should not add new message fields");
     }
 }

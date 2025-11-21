@@ -22,9 +22,8 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.rest.ValidationApiError;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
@@ -36,7 +35,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ValidationExceptionMapperTest {
-    @BeforeClass
+    @BeforeAll
     public static void setUpInjector() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }

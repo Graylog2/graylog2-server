@@ -24,7 +24,7 @@ import org.graylog.events.notifications.EventNotificationExecutionJob;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,7 +32,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class SlackEventNotificationConfigTest {
 
@@ -175,9 +176,11 @@ public class SlackEventNotificationConfigTest {
 
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void toContentPackEntity() {
-        final SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder().build();
-        slackEventNotificationConfig.toContentPackEntity(EntityDescriptorIds.empty());
+        assertThrows(NullPointerException.class, () -> {
+            final SlackEventNotificationConfig slackEventNotificationConfig = SlackEventNotificationConfig.builder().build();
+            slackEventNotificationConfig.toContentPackEntity(EntityDescriptorIds.empty());
+        });
     }
 }
