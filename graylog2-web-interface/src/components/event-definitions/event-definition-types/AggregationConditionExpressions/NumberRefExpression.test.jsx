@@ -199,7 +199,7 @@ describe('NumberRefExpression', () => {
     expect(handleChange.mock.calls.length).toBe(1);
   });
 
-  it('should send null when aggregation field is cleared', async () => {
+  it('should send null when aggregation field is cleared', () => {
     const expression = {
       expr: 'number-ref',
       ref: 'avg-took_ms',
@@ -220,9 +220,11 @@ describe('NumberRefExpression', () => {
       />,
     );
 
-    const fieldSelect = await screen.findByRole('combobox', { name: /select field/i });
-    await userEvent.click(fieldSelect);
-    await userEvent.keyboard('{Backspace}');
+    const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
+
+    act(() => {
+      fieldSelect.prop('onChange')(null, { action: 'clear' });
+    });
 
     expect(handleChange).toHaveBeenCalledWith({
       conditions: { expr: 'number-ref', ref: 'avg-' },
