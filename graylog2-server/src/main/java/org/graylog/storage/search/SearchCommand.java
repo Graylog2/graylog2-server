@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+package org.graylog.storage.search;
 
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
@@ -31,7 +31,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 @AutoValue
-abstract class SearchCommand {
+public abstract class SearchCommand {
     public abstract String query();
     public abstract Optional<Set<String>> streams();
     public abstract Optional<Sorting> sorting();
@@ -58,14 +58,14 @@ abstract class SearchCommand {
         return new AutoValue_SearchCommand(query, streams, sorting, filter, filters, range, limit, offset, batchSize, highlight);
     }
 
-    static SearchCommand from(SearchesConfig searchesConfig) {
+    public static SearchCommand from(SearchesConfig searchesConfig) {
         return create(searchesConfig.query(), Optional.empty(), Optional.ofNullable(searchesConfig.sorting()),
                 Optional.ofNullable(searchesConfig.filter()), Collections.emptyList(), Optional.of(searchesConfig.range()),
                 OptionalInt.of(searchesConfig.limit()), OptionalInt.of(searchesConfig.offset()),
                 OptionalLong.empty(), true);
     }
 
-    static SearchCommand from(ChunkCommand chunkCommand) {
+    public static SearchCommand from(ChunkCommand chunkCommand) {
         return create(chunkCommand.query(), chunkCommand.streams(), chunkCommand.sorting(),
                 chunkCommand.filter(), chunkCommand.filters(), chunkCommand.range(), chunkCommand.limit(), chunkCommand.offset(),
                 chunkCommand.batchSize(), chunkCommand.highlight());
