@@ -23,8 +23,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.eventbus.EventBus;
 import com.google.common.graph.Graph;
 import org.apache.commons.collections.map.HashedMap;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -76,13 +76,14 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -100,12 +101,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class InputFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -131,9 +130,9 @@ public class InputFacadeTest {
     private InputService inputService;
     private InputFacade facade;
 
-    @Before
+    @BeforeEach
     @SuppressForbidden("Using Executors.newSingleThreadExecutor() is okay in tests")
-    public void setUp() throws Exception {
+    public void setUp(MongoCollections mongoCollections) throws Exception {
         final MetricRegistry metricRegistry = new MetricRegistry();
         final ClusterEventBus clusterEventBus = new ClusterEventBus("cluster-event-bus", Executors.newSingleThreadExecutor());
         final GrokPatternService grokPatternService = new InMemoryGrokPatternService(clusterEventBus);
@@ -144,7 +143,7 @@ public class InputFacadeTest {
                 Executors.newScheduledThreadPool(1));
         final ExtractorFactory extractorFactory = new ExtractorFactory(metricRegistry, grokPatternRegistry, lookupTableService);
         final ConverterFactory converterFactory = new ConverterFactory(lookupTableService);
-        inputService = new InputServiceImpl(new MongoCollections(new MongoJackObjectMapperProvider(objectMapper), mongodb.mongoConnection()), extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
+        inputService = new InputServiceImpl(mongoCollections, extractorFactory, converterFactory, messageInputFactory, clusterEventBus, new ObjectMapperProvider().get());
         final InputRegistry inputRegistry = new InputRegistry();
         Set<PluginMetaData> pluginMetaData = new HashSet<>();
         Map<String, MessageInput.Factory<? extends MessageInput>> inputFactories = new HashMap<>();
@@ -259,7 +258,7 @@ public class InputFacadeTest {
 
 
     @Test
-    @Ignore("Doesn't work without massive amount of mocks")
+    @Disabled("Doesn't work without massive amount of mocks")
     public void createNativeEntity() {
         final Map<String, Object> configuration = new HashMap<>();
         configuration.put("override_source", null);

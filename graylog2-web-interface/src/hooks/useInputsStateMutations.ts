@@ -19,22 +19,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SystemInputStates } from '@graylog/server-api';
 
 import UserNotification from 'util/UserNotification';
-import { InputSummary } from 'hooks/usePaginatedInputs';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { INPUT_STATES_QUERY_KEY } from 'hooks/useInputsStates';
 
 type PROPS = {
   inputId: string;
 };
 
-const startInput = async ({ inputId }: PROPS): Promise<{ id: string }> => {
-  return SystemInputStates.start(inputId);
-};
-const stopInput = async ({ inputId }: PROPS): Promise<{ id: string }> => {
-  return SystemInputStates.stop(inputId);
-};
-const setupInput = async ({ inputId }: PROPS): Promise<{ id: string }> => {
-  return SystemInputStates.setup(inputId);
-};
+const startInput = async ({ inputId }: PROPS): Promise<{ id: string }> => SystemInputStates.start(inputId);
+const stopInput = async ({ inputId }: PROPS): Promise<{ id: string }> => SystemInputStates.stop(inputId);
+const setupInput = async ({ inputId }: PROPS): Promise<{ id: string }> => SystemInputStates.setup(inputId);
 
 const useInputStateMutations = (input: InputSummary) => {
   const queryClient = useQueryClient();

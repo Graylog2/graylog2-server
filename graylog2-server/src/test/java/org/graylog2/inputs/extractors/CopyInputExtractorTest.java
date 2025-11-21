@@ -22,9 +22,9 @@ import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Extractor;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CopyInputExtractorTest extends AbstractExtractorTest {
     private final MessageFactory messageFactory = new TestMessageFactory();

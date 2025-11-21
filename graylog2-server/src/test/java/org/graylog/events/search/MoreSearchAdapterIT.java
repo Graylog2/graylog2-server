@@ -24,8 +24,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +43,7 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
 
     private MoreSearchAdapter toTest;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         toTest = createMoreSearchAdapter();
         importFixture("org/graylog/events/search/more_search_adapter.json");
@@ -212,20 +212,18 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
 
     private void verifyResult(MoreSearch.Result result, int resultIndex, int expectedMessageNumber) {
         assertThat(result.results().get(resultIndex))
-                .satisfies(rm -> {
+                .satisfies(rm ->
                     assertThat(rm.getMessage().getField("number"))
                             .isNotNull()
-                            .isEqualTo(expectedMessageNumber);
-                });
+                            .isEqualTo(expectedMessageNumber));
     }
 
     private void verifyResult(List<ResultMessage> result, int resultIndex, int expectedMessageNumber) {
         assertThat(result)
                 .element(resultIndex)
-                .satisfies(rm -> {
+                .satisfies(rm ->
                     assertThat(rm.getMessage().getField("number"))
                             .isNotNull()
-                            .isEqualTo(expectedMessageNumber);
-                });
+                            .isEqualTo(expectedMessageNumber));
     }
 }

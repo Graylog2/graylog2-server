@@ -20,7 +20,7 @@ import com.github.rholder.retry.RetryException;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.WebhookRequest;
-import org.graylog.testing.completebackend.WebhookServerInstance;
+import org.graylog.testing.completebackend.WebhookServerContainer;
 import org.graylog.testing.completebackend.apis.DefaultStreamMatches;
 import org.graylog.testing.completebackend.apis.GraylogApis;
 import org.graylog.testing.completebackend.apis.Streams;
@@ -43,7 +43,7 @@ public class PivotAggregationSearchIT {
     private static final String indexSetPrefix = "pivot-search-test";
 
     private static GraylogApis apis;
-    private static WebhookServerInstance webhookTester;
+    private static WebhookServerContainer webhookTester;
     private static Client client;
     private String indexSetId;
     private String streamId;

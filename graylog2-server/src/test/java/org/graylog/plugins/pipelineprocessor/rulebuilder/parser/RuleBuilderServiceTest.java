@@ -18,11 +18,13 @@ package org.graylog.plugins.pipelineprocessor.rulebuilder.parser;
 
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilder;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.HashMap;
 
@@ -32,7 +34,8 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class RuleBuilderServiceTest {
 
     private RuleBuilderService ruleBuilderService;
@@ -41,7 +44,7 @@ public class RuleBuilderServiceTest {
     @Mock
     private ActionParser actionParser;
 
-    @Before
+    @BeforeEach
     public void initialize() {
         when(actionParser.getActions()).thenReturn(new HashMap<>());
         ruleBuilderService = new RuleBuilderService(conditionParser, actionParser, new SecureFreemarkerConfigProvider());

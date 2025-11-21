@@ -15,17 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import type { InputDescription } from 'src/stores/inputs/InputTypesStore';
 
 import { SystemInputsTypes } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
-import { InputDescription } from 'src/stores/inputs/InputTypesStore';
 
 type Options = {
   enabled: boolean;
 };
 
 export const fetchInputType = async (type: string): Promise<InputDescription> =>
-  (await SystemInputsTypes.info(type)) as unknown as Object as InputDescription;
+  (await SystemInputsTypes.info(type)) as unknown as object as InputDescription;
 
 const useInputType = (
   type: string,
