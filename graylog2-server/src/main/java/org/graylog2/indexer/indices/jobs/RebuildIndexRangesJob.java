@@ -14,19 +14,33 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.ranges;
+package org.graylog2.indexer.indices.jobs;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+import jakarta.inject.Inject;
+import org.graylog.scheduler.Job;
+import org.graylog.scheduler.JobDefinitionConfig;
+import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.scheduler.JobExecutionContext;
+import org.graylog.scheduler.JobExecutionException;
+import org.graylog.scheduler.JobTriggerData;
+import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.JobTriggerStatus;
+import org.graylog.scheduler.JobTriggerUpdate;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,69 +48,57 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RebuildIndexRangesJob extends SystemJob {
-    public interface Factory {
-        RebuildIndexRangesJob create(Set<IndexSet> indexSets);
-    }
-
+public class RebuildIndexRangesJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(RebuildIndexRangesJob.class);
-    private static final int MAX_CONCURRENCY = 1;
 
-    private volatile boolean cancelRequested = false;
-    private volatile int indicesToCalculate = 0;
-    private final AtomicInteger indicesCalculated = new AtomicInteger(0);
+    public static final String TYPE_NAME = "rebuild-index-ranges-v1";
+    public static final String JOB_ID = "662a07ad68699718ec07b168";
+    public static final JobDefinitionDto DEFINITION_INSTANCE = JobDefinitionDto.builder()
+            .id(JOB_ID) // This is a system entity and the ID MUST NOT change!
+            .title("Rebuild Index Ranges")
+            .description("Runs on demand and calculates ranges for indices that should have one but are missing them.")
+            .config(Config.empty())
+            .build();
 
-    protected final Set<IndexSet> indexSets;
     private final ActivityWriter activityWriter;
-    protected final IndexRangeService indexRangeService;
+    private final IndexRangeService indexRangeService;
 
-    @AssistedInject
-    public RebuildIndexRangesJob(@Assisted Set<IndexSet> indexSets,
-                                 ActivityWriter activityWriter,
+    @Inject
+    public RebuildIndexRangesJob(ActivityWriter activityWriter,
                                  IndexRangeService indexRangeService) {
-        this.indexSets = indexSets;
         this.activityWriter = activityWriter;
         this.indexRangeService = indexRangeService;
     }
 
-    @Override
-    public void requestCancel() {
-        this.cancelRequested = true;
+    public interface Factory extends Job.Factory<RebuildIndexRangesJob> {
+        @Override
+        RebuildIndexRangesJob create(JobDefinitionDto jobDefinition);
     }
 
     @Override
-    public int getProgress() {
-        if (indicesToCalculate <= 0) {
-            return 0;
-        }
-
-        // lolwtfbbqcasting
-        return (int) Math.floor((indicesCalculated.floatValue() / (float) indicesToCalculate) * 100);
-    }
-
-    @Override
-    public String getDescription() {
-        return "Rebuilds index range information.";
-    }
-
-    @Override
-    public void execute() {
+    public JobTriggerUpdate execute(JobExecutionContext ctx) throws JobExecutionException {
         info("Recalculating index ranges.");
+
+        final JobTriggerDto trigger = ctx.trigger();
+        final Data jobData = trigger.data()
+                .map(d -> (Data) d)
+                .orElseThrow(() -> new IllegalArgumentException("RebuildIndexRangesJob job data not found"));
 
         // for each index set we know about
         final ListMultimap<IndexSet, String> indexSets = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (IndexSet indexSet : this.indexSets) {
+        for (IndexSet indexSet : jobData.indexSets()) {
             final String[] managedIndicesNames = indexSet.getManagedIndices();
             for (String name : managedIndicesNames) {
                 indexSets.put(indexSet, name);
             }
         }
 
-        if (indexSets.size() == 0) {
+        if (indexSets.isEmpty()) {
             info("No indices, nothing to calculate.");
-            return;
+            return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
         }
-        indicesToCalculate = indexSets.values().size();
+        final var indicesToCalculate = indexSets.values().size();
+        final AtomicInteger indicesCalculated = new AtomicInteger(0);
 
         Stopwatch sw = Stopwatch.createStarted();
         for (IndexSet indexSet : indexSets.keySet()) {
@@ -128,11 +130,14 @@ public class RebuildIndexRangesJob extends SystemJob {
                     indicesCalculated.incrementAndGet();
                     continue;
                 }
+
+                /* TODO cancelation handling necessary?
                 if (cancelRequested) {
                     info("Stop requested. Not calculating next index range, not updating ranges.");
                     sw.stop();
                     return;
                 }
+                */
 
                 try {
                     final IndexRange indexRange = indexRangeService.calculateRange(index);
@@ -147,6 +152,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         }
 
         info("Done calculating index ranges for " + indicesToCalculate + " indices. Took " + sw.stop().elapsed(TimeUnit.MILLISECONDS) + "ms.");
+        return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
     }
 
     protected void info(String what) {
@@ -154,23 +160,50 @@ public class RebuildIndexRangesJob extends SystemJob {
         activityWriter.write(new Activity(what, RebuildIndexRangesJob.class));
     }
 
-    @Override
-    public boolean providesProgress() {
-        return true;
+    @AutoValue
+    @JsonTypeName(TYPE_NAME)
+    public static abstract class Config implements JobDefinitionConfig {
+        @JsonCreator
+        public static Config create(@JsonProperty("type") String type) {
+            return new AutoValue_RebuildIndexRangesJob_Config(type);
+        }
+
+        public static Config empty() {
+            return create(TYPE_NAME);
+        }
     }
 
-    @Override
-    public boolean isCancelable() {
-        return true;
-    }
+    @AutoValue
+    @JsonTypeName(TYPE_NAME)
+    @JsonDeserialize(builder = Data.Builder.class)
+    public static abstract class Data implements JobTriggerData {
+        private static final String FIELD_INDEX_SETS = "index_sets";
 
-    @Override
-    public int maxConcurrency() {
-        return MAX_CONCURRENCY;
-    }
+        @JsonProperty(FIELD_INDEX_SETS)
+        public abstract Set<IndexSet> indexSets();
 
-    @Override
-    public String getClassName() {
-        return this.getClass().getCanonicalName();
+        public static Builder builder() {
+            return Builder.create();
+        }
+
+        @AutoValue.Builder
+        public static abstract class Builder implements JobTriggerData.Builder<Data.Builder> {
+            @JsonCreator
+            public static Builder create() {
+                return new AutoValue_RebuildIndexRangesJob_Data.Builder()
+                        .type(TYPE_NAME);
+            }
+
+            @JsonProperty(FIELD_INDEX_SETS)
+            public abstract Builder indexSets(Set<IndexSet> indexSets);
+
+            abstract Data autoBuild();
+
+            public Data build() {
+                type(TYPE_NAME);
+                return autoBuild();
+            }
+        }
     }
 }
+

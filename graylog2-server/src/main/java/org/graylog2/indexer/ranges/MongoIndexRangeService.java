@@ -156,6 +156,11 @@ public class MongoIndexRangeService implements IndexRangeService {
     }
 
     @Override
+    public void calculateRangeAndSave(String index) {
+        save(calculateRange(index));
+    }
+
+    @Override
     public void save(IndexRange indexRange) {
         remove(indexRange.indexName());
         collection.insertOne(MongoIndexRange.create(indexRange));
