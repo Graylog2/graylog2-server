@@ -25,7 +25,7 @@ export const isLocalNode = async (nodeId: string) => {
     if (nodeId && _isLocalNode) {
       return _isLocalNode(nodeId);
     }
-  } catch (e) {
+  } catch (_e) {
     // Do nothing
   }
 

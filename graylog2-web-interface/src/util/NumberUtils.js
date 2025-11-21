@@ -44,14 +44,14 @@ const NumberUtils = {
   formatNumber(number) {
     try {
       return numeral(this.normalizeNumber(number)).format('0,0.[00]');
-    } catch (e) {
+    } catch (_e) {
       return number;
     }
   },
   formatPercentage(percentage) {
     try {
       return numeral(this.normalizeNumber(percentage)).format('0.00%');
-    } catch (e) {
+    } catch (_e) {
       return percentage;
     }
   },
