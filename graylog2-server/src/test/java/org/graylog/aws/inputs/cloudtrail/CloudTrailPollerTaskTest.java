@@ -27,12 +27,12 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTimeUtils;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 import java.io.IOException;
@@ -48,7 +48,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class CloudTrailPollerTaskTest {
 
     private static final int BATCH_SIZE = 10;
@@ -69,7 +69,7 @@ public class CloudTrailPollerTaskTest {
     private InputFailureRecorder inputFailureRecorder;
     private static final int DEFAULT_BATCH_SIZE = 5;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         Configuration mockConfig = mock(Configuration.class);
         given(mockInput.getConfiguration()).willReturn(mockConfig);
@@ -83,7 +83,7 @@ public class CloudTrailPollerTaskTest {
                 new AtomicBoolean(false));
     }
 
-    @AfterClass
+    @AfterAll
     public static void releaseFixedDate() {
         DateTimeUtils.setCurrentMillisSystem();
     }
