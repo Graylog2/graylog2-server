@@ -29,8 +29,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.MultiSe
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
 import org.graylog.storage.elasticsearch7.testing.TestMultisearchResponse;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -49,7 +49,7 @@ public class ElasticsearchBackendSearchTypesWithStreamsOverridesTest extends Ela
     private final String stream1Id = "stream1Id";
     private final String stream2Id = "stream2Id";
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final MultiSearchResponse response = TestMultisearchResponse.fromFixture("successfulMultiSearchResponse.json");
         mockCancellableMSearch(response);

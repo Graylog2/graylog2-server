@@ -26,8 +26,8 @@ import org.graylog.events.processor.aggregation.AggregationEventProcessorConfig;
 import org.graylog.security.UserContext;
 import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 public class EventDefinitionDtoTest {
     private EventDefinitionDto testSubject;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         final AggregationEventProcessorConfig configMock = mock(AggregationEventProcessorConfig.class);
         when(configMock.validate(any(UserContext.class))).thenReturn(new ValidationResult());

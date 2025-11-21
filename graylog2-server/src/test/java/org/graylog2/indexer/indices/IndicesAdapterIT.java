@@ -22,8 +22,8 @@ import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.LinkedHashMap;
@@ -40,7 +40,7 @@ public abstract class IndicesAdapterIT extends ElasticsearchBaseTest {
     private static final String TEST_INDEX = "test_index";
     IndicesAdapter indicesAdapter;
 
-    @Before
+    @BeforeEach
     public void setup() {
         client().createIndex(TEST_INDEX);
         client().waitForGreenStatus(TEST_INDEX);

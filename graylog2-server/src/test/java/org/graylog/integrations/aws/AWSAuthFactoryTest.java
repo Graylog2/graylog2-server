@@ -17,8 +17,8 @@
 package org.graylog.integrations.aws;
 
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -29,7 +29,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOf
 public class AWSAuthFactoryTest {
     private AWSAuthFactory awsAuthFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         awsAuthFactory = new AWSAuthFactory();
     }
