@@ -22,8 +22,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import static org.junit.Assert.fail;
-
 public final class WaitUtils {
 
     private static final int TIMEOUT_MS = 10000;

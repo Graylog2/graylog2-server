@@ -23,8 +23,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.rulebuilder.RuleBuilderStep;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,7 +43,7 @@ public class ParserUtilTest {
 
     Configuration configuration;
 
-    @Before
+    @BeforeEach
     public void initializeFreemarkerConfig() {
         SecureFreemarkerConfigProvider secureFreemarkerConfigProvider = new SecureFreemarkerConfigProvider();
         this.configuration = secureFreemarkerConfigProvider.get();

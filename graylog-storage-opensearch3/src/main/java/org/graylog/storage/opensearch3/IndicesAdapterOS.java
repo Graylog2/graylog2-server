@@ -26,6 +26,7 @@ import jakarta.inject.Inject;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
+import org.graylog.storage.opensearch3.indextemplates.IndexTemplateAdapter;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -618,7 +619,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .flush(true)
         );
 
-        c.execute(() -> OfficialOpensearchClient.withTimeout(indicesClient, timeout).forcemerge(request), "Unable to forcemerge index " + index);
+        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
 
     }
 
