@@ -469,7 +469,7 @@ public class IndexSetsResourceTest {
         });
         org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized to access resource id <id>"));
     }
-/*
+
 
     @Test
     public void globalStatsDenied() {
