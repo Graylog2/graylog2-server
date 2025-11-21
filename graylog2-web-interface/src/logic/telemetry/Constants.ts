@@ -428,6 +428,7 @@ export const TELEMETRY_EVENT_TYPE = {
   },
   ENTITY_DATA_TABLE: {
     COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    COLUMN_ORDER_CHANGED: 'Entity Data Table Column Order Changed',
     SORT_CHANGED: 'Entity Data Table Sort Changed',
     PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
     FILTER_CREATED: 'Entity Data Table Filter Created',

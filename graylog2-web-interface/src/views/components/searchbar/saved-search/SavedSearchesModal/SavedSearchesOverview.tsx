@@ -20,10 +20,10 @@ import { useCallback } from 'react';
 import { PaginatedEntityTable } from 'components/common';
 import type View from 'views/logic/views/View';
 import QueryHelper from 'components/common/QueryHelper';
-import { fetchSavedSearches } from 'views/hooks/useSavedSearches';
+import { fetchSavedSearches, queryKey } from 'views/hooks/useSavedSearches';
 import useColumnRenderers from 'views/components/searchbar/saved-search/useColumnRenderes';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
-import { DEFAULT_LAYOUT, COLUMN_ORDER } from 'views/components/searchbar/saved-search/Constants';
+import { DEFAULT_LAYOUT } from 'views/components/searchbar/saved-search/Constants';
 
 import SearchActions from './SearchActions';
 
@@ -57,14 +57,13 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       additionalAttributes={pluggableAttributes.attributes}
       bulkSelection={{ actions: <BulkActions /> }}
       columnRenderers={customColumnRenderers}
-      columnsOrder={COLUMN_ORDER}
       entityActions={renderSavedSearchActions}
       entityAttributesAreCamelCase
       expandedSectionsRenderer={pluggableExpandedSections}
       fetchEntities={fetchSavedSearches}
       focusSearchAfterMount
-      humanName="saved searches"
-      keyFn={(searchParams) => ['saved-searches', 'overview', searchParams]}
+      humanName="Saved Searches"
+      keyFn={queryKey}
       queryHelpComponent={<QueryHelper entityName="search" commonFields={['id', 'title']} />}
       tableLayout={DEFAULT_LAYOUT}
       withoutURLParams

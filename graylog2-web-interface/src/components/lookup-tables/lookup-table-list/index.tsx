@@ -118,7 +118,6 @@ function LookupTableList() {
             <PaginatedEntityTable<LookupTableEntity>
               humanName="lookup tables"
               entityActions={renderActions}
-              columnsOrder={lutListElements.columnOrder}
               queryHelpComponent={queryHelpComponent}
               tableLayout={lutListElements.defaultLayout}
               fetchEntities={handleFetchTables}

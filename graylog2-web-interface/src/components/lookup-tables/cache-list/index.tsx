@@ -98,7 +98,6 @@ function CacheList() {
             <PaginatedEntityTable<CacheEntity>
               humanName="caches"
               entityActions={renderActions}
-              columnsOrder={cacheListElements.columnOrder}
               queryHelpComponent={queryHelpComponent}
               tableLayout={cacheListElements.defaultLayout}
               fetchEntities={handleFetchCaches}

@@ -17,7 +17,7 @@
 import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 
-import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES, COLUMNS_ORDER } from 'components/users/UsersTokenManagement/constants';
+import { DEFAULT_LAYOUT, ADDITIONAL_ATTRIBUTES } from 'components/users/UsersTokenManagement/constants';
 import { Row, Col } from 'components/bootstrap';
 import { fetchTokens, keyFn } from 'components/users/UsersTokenManagement/hooks/useTokens';
 import type { Token } from 'components/users/UsersTokenManagement/hooks/useTokens';
@@ -82,7 +82,6 @@ const TokenManagement = () => {
             queryHelpComponent={
               <QueryHelper entityName="token" commonFields={[]} fieldMap={fieldMap} example={tokenExamples} />
             }
-            columnsOrder={COLUMNS_ORDER}
             additionalAttributes={ADDITIONAL_ATTRIBUTES}
             actionsCellWidth={320}
             entityActions={tokenAction}

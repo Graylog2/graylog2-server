@@ -27,11 +27,13 @@ const preferencesToJSON = <T>({
   sort,
   perPage,
   customPreferences,
+  order,
 }: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
   attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
   custom_preferences: customPreferences,
+  order,
 });
 
 const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
