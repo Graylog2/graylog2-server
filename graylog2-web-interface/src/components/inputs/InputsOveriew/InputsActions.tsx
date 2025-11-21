@@ -17,7 +17,6 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import { InputForm, InputStateControl, StaticFieldForm } from 'components/inputs';
 import { Button, ButtonToolbar, DeleteMenuItem, MenuItem } from 'components/bootstrap';
 import { ConfirmDialog, IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
@@ -38,6 +37,7 @@ import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescripti
 import useInputsStates from 'hooks/useInputsStates';
 import useInputMutations from 'hooks/useInputMutations';
 import { INPUT_SETUP_MODE_FEATURE_FLAG, InputSetupWizard } from 'components/inputs/InputSetupWizard';
+import { InputForm, InputStateControl, StaticFieldForm } from 'components/inputs';
 
 type Props = {
   input: Input;
@@ -57,12 +57,17 @@ type Props = {
   };
 };
 
+const FORWARDER_SERVICE_INPUT = 'org.graylog.plugins.forwarder.input.ForwarderServiceInput';
+const GL2_FORWARDER_INPUT = 'gl2_forwarder_input';
+const GL2_SOURCE_INPUT = 'gl2_source_input';
+
 const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNode }: Props) => {
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState<boolean>(false);
   const [showStaticFieldForm, setShowStaticFieldForm] = useState<boolean>(false);
   const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
   const [showWizard, setShowWizard] = useState<boolean>(false);
   const { data: inputStates, isLoading: isLoadingInputStates } = useInputsStates();
+
   const { updateInput, deleteInput } = useInputMutations();
   const sendTelemetry = useSendTelemetry();
   const { pathname } = useLocation();
@@ -129,10 +134,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
     setShowConfirmDeleteDialog(false);
   };
   const definition = inputTypeDescriptions[input.type];
-  const queryField =
-    input.type === 'org.graylog.plugins.forwarder.input.ForwarderServiceInput'
-      ? 'gl2_forwarder_input'
-      : 'gl2_source_input';
+  const queryField = input.type === FORWARDER_SERVICE_INPUT ? GL2_FORWARDER_INPUT : GL2_SOURCE_INPUT;
 
   return (
     <ButtonToolbar>

@@ -18,13 +18,16 @@ import * as React from 'react';
 
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import { LinkToNode } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 
 type Props = {
   input: InputSummary;
 };
 
 const NodeCell = ({ input }: Props) => {
-  if (input.global && !input.node) return 'All Graylog Nodes';
+  const productName = useProductName();
+
+  if (input.global && !input.node) return `All ${productName} Nodes`;
 
   return (
     <span>

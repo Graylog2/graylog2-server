@@ -15,38 +15,93 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import React from 'react';
+import * as React from 'react';
+import { useState } from 'react';
+import styled from 'styled-components';
 
+import { Button } from 'components/bootstrap';
 import { ConfigurationWell } from 'components/configurationforms';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 import InputStaticFields from 'components/inputs/InputStaticFields';
 import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import SectionGrid from 'components/common/Section/SectionGrid';
 import { ThroughputSection } from 'components/inputs/InputsOveriew';
+import { InputForm } from 'components/inputs';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { getPathnameWithoutId } from 'util/URLUtils';
+import useLocation from 'routing/useLocation';
+import type { ConfiguredInput } from 'components/messageloaders/Types';
+import useInputMutations from 'hooks/useInputMutations';
 
 type Props = {
   input: InputSummary;
   inputTypeDescriptions: InputTypeDescriptionsResponse;
 };
 
+const StyledSpan = styled.span`
+  display: flex;
+  justify-content: flex-end;
+`;
+
 const ExpandedConfigurationSection = ({ input, inputTypeDescriptions }: Props) => {
   const definition = inputTypeDescriptions[input.type] as any;
+  const [showConfigurationForm, setShowConfigurationForm] = useState<boolean>(false);
+  const sendTelemetry = useSendTelemetry();
+  const { pathname } = useLocation();
+  const { updateInput } = useInputMutations();
+
+  const editInput = () => {
+    setShowConfigurationForm(true);
+  };
+  const hanleInputUpdate = async (inputData: ConfiguredInput) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.INPUTS.INPUT_UPDATED, {
+      app_pathname: getPathnameWithoutId(pathname),
+      app_action_value: 'input-edit',
+    });
+
+    await updateInput({ input: inputData, inputId: input.id });
+  };
 
   return (
     <SectionGrid>
       <div>
-        <span>
-          {' '}
-          {input.name} &nbsp; ({input.id})
-        </span>
+        <SectionGrid>
+          <span>
+            {' '}
+            {input.name} &nbsp; ({input.id})
+          </span>
+          <StyledSpan>
+            <Button bsStyle="primary" bsSize="xsmall" onClick={editInput} disabled={definition === undefined}>
+              Edit input
+            </Button>
+          </StyledSpan>
+        </SectionGrid>
         <ConfigurationWell id={input.id} configuration={input.attributes} typeDefinition={definition} />
-        <InputStaticFields input={input} />
       </div>
       <div>
         <span>Throughput / Metrics</span>
         <br />
         <ThroughputSection input={input} />
+        <InputStaticFields input={input} />
       </div>
+      {definition && showConfigurationForm && (
+        <InputForm
+          setShowModal={setShowConfigurationForm}
+          key={`edit-form-input-${input.id}`}
+          globalValue={input.global}
+          nodeValue={input.node}
+          configFields={definition.requested_configuration as unknown as any}
+          description={definition?.description}
+          title={`Editing Input ${input.title}`}
+          titleValue={input.title}
+          typeName={input.type}
+          includeTitleField
+          handleSubmit={hanleInputUpdate}
+          submitButtonText="Update input"
+          values={input.attributes}
+        />
+      )}
     </SectionGrid>
   );
 };
