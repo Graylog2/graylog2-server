@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import * as React from 'react';
 import { act } from 'react';
+import { mount } from 'wrappedEnzyme';
 
 import NumberRefExpression from './NumberRefExpression';
 
