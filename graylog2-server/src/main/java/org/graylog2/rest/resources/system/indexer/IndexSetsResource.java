@@ -57,7 +57,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
+import org.graylog2.indexer.indices.jobs.IndexJobsService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
@@ -67,8 +67,6 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,36 +92,33 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetService indexSetService;
     private final IndexSetRegistry indexSetRegistry;
     private final IndexSetValidator indexSetValidator;
-    private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
-    private final SystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
     private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
     private final IndexSetRestrictionsService indexSetRestrictionsService;
+    private final IndexJobsService indexJobsService;
 
     @Inject
     public IndexSetsResource(final Indices indices,
                              final IndexSetService indexSetService,
                              final IndexSetRegistry indexSetRegistry,
                              final IndexSetValidator indexSetValidator,
-                             final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
+                             final IndexJobsService indexJobsService,
                              final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
         this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
         this.indexSetValidator = indexSetValidator;
-        this.indexSetCleanupJobFactory = requireNonNull(indexSetCleanupJobFactory);
         this.indexSetStatsCreator = indexSetStatsCreator;
         this.clusterConfigService = clusterConfigService;
-        this.systemJobManager = systemJobManager;
         this.tieringStatusService = tieringStatusService;
         this.openIndexSetFilterFactories = openIndexSetFilterFactories;
         this.indexSetRestrictionsService = indexSetRestrictionsService;
+        this.indexJobsService = indexJobsService;
     }
 
     @GET
@@ -380,11 +375,7 @@ public class IndexSetsResource extends RestResource {
             throw new NotFoundException("Couldn't delete index set with ID <" + id + ">");
         } else {
             if (deleteIndices) {
-                try {
-                    systemJobManager.submit(indexSetCleanupJobFactory.create(indexSet));
-                } catch (SystemJobConcurrencyException e) {
-                    LOG.error("Error running system job", e);
-                }
+                indexJobsService.submitIndexSetCleanupJob(indexSet);
             }
         }
     }

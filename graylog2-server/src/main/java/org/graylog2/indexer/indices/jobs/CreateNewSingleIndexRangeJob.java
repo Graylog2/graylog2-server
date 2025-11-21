@@ -31,82 +31,62 @@ import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.JobTriggerUpdate;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicLong;
+public class CreateNewSingleIndexRangeJob implements Job {
+    private static final Logger LOG = LoggerFactory.getLogger(CreateNewSingleIndexRangeJob.class);
 
-public class IndexSetCleanupJob implements Job {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexSetCleanupJob.class);
-
-    public static final String TYPE_NAME = "index-set-cleanup-v1";
-    public static final String JOB_ID = "662a07ad68699718ec07b133";
+    public static final String TYPE_NAME = "create-new-single-index-range-v1";
+    public static final String JOB_ID = "662a07ad68699718ec07b169";
     public static final JobDefinitionDto DEFINITION_INSTANCE = JobDefinitionDto.builder()
             .id(JOB_ID) // This is a system entity and the ID MUST NOT change!
-            .title("Rebuild Index Ranges")
-            .description("Runs on demand and calculates ranges for indices that should have one but are missing them.")
-            .config(Config.empty())
+            .title("Create Index Range")
+            .description("Creates Index Range for a single index.")
+            .config(CreateNewSingleIndexRangeJob.Config.empty())
             .build();
 
     private final Indices indices;
     private final IndexRangeService indexRangeService;
 
     @Inject
-    public IndexSetCleanupJob(final Indices indices,
-                              final MongoIndexRangeService indexRangeService) {
+    public CreateNewSingleIndexRangeJob(Indices indices, IndexRangeService indexRangeService) {
         this.indices = indices;
         this.indexRangeService = indexRangeService;
     }
 
-    public interface Factory extends Job.Factory<IndexSetCleanupJob> {
+    public interface Factory extends Job.Factory<CreateNewSingleIndexRangeJob> {
         @Override
-        IndexSetCleanupJob create(JobDefinitionDto jobDefinition);
+        CreateNewSingleIndexRangeJob create(JobDefinitionDto jobDefinition);
     }
 
     @Override
     public JobTriggerUpdate execute(JobExecutionContext ctx) throws JobExecutionException {
         final JobTriggerDto trigger = ctx.trigger();
-        final Data jobData = trigger.data()
-                .map(d -> (Data) d)
-                .orElseThrow(() -> new IllegalArgumentException("IndexSetCleanupJob job data not found"));
+        final CreateNewSingleIndexRangeJob.Data jobData = trigger.data()
+                .map(d -> (CreateNewSingleIndexRangeJob.Data) d)
+                .orElseThrow(() -> new IllegalArgumentException("CreateNewSingleIndexRangeJob job data not found"));
 
-        final var indexSet = jobData.indexSet();
-        final AtomicLong deleted = new AtomicLong(0L);
+        final var indexName = jobData.indexName();
 
-        final IndexSetConfig config = indexSet.getConfig();
-        final String[] managedIndices = indexSet.getManagedIndices();
-
-        final var total = managedIndices.length;
-
-        try {
-            LOG.info("Deleting index template <{}> from Elasticsearch", config.indexTemplateName());
-            indices.deleteIndexTemplate(indexSet);
-        } catch (Exception e) {
-            LOG.error("Unable to delete index template <{}>", config.indexTemplateName(), e);
+        if (!indices.exists(indexName)) {
+            LOG.debug("Not running job for deleted index <{}>", indexName);
+            return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
         }
 
-        for (String indexName : managedIndices) {
-            /* TODO: check for cancellation
-            if (cancel) {
-                LOG.info("Cancel requested. Deleted <{}> of <{}> indices.", deleted, total);
-                break;
-            }
-            */
-            try {
-                LOG.info("Removing index range information for index: {}", indexName);
-                indexRangeService.remove(indexName);
+        if (indices.isClosed(indexName)) {
+            LOG.debug("Not running job for closed index <{}>", indexName);
+            return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
+        }
 
-                LOG.info("Deleting index <{}> in index set <{}> ({})", indexName, config.id(), config.title());
-                indices.delete(indexName);
-                deleted.incrementAndGet();
-            } catch (Exception e) {
-                LOG.error("Unable to delete index <{}>", indexName, e);
-            }
+        LOG.info("Calculating ranges for index {}.", indexName);
+        try {
+            indexRangeService.calculateRangeAndSave(indexName);
+            LOG.info("Created ranges for index {}.", indexName);
+        } catch (Exception e) {
+            LOG.error("Exception during index range calculation for index " + indexName, e);
         }
 
         return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
@@ -117,7 +97,7 @@ public class IndexSetCleanupJob implements Job {
     public static abstract class Config implements JobDefinitionConfig {
         @JsonCreator
         public static Config create(@JsonProperty("type") String type) {
-            return new AutoValue_IndexSetCleanupJob_Config(type);
+            return new AutoValue_CreateNewSingleIndexRangeJob_Config(type);
         }
 
         public static Config empty() {
@@ -129,10 +109,10 @@ public class IndexSetCleanupJob implements Job {
     @JsonTypeName(TYPE_NAME)
     @JsonDeserialize(builder = Data.Builder.class)
     public static abstract class Data implements JobTriggerData {
-        private static final String FIELD_INDEX_SET = "index_set";
+        private static final String FIELD_INDEX_NAME = "index_name";
 
-        @JsonProperty(FIELD_INDEX_SET)
-        public abstract IndexSet indexSet();
+        @JsonProperty(FIELD_INDEX_NAME)
+        public abstract String indexName();
 
         public static Builder builder() {
             return Builder.create();
@@ -142,12 +122,12 @@ public class IndexSetCleanupJob implements Job {
         public static abstract class Builder implements JobTriggerData.Builder<Data.Builder> {
             @JsonCreator
             public static Builder create() {
-                return new AutoValue_IndexSetCleanupJob_Data.Builder()
+                return new AutoValue_CreateNewSingleIndexRangeJob_Data.Builder()
                         .type(TYPE_NAME);
             }
 
-            @JsonProperty(FIELD_INDEX_SET)
-            public abstract Builder indexSet(IndexSet indexSet);
+            @JsonProperty(FIELD_INDEX_NAME)
+            public abstract Builder indexName(String indexName);
 
             abstract Data autoBuild();
 

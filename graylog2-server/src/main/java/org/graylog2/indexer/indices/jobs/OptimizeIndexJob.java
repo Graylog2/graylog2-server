@@ -16,53 +16,81 @@
  */
 package org.graylog2.indexer.indices.jobs;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
+import com.google.auto.value.AutoValue;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import org.graylog.scheduler.Job;
+import org.graylog.scheduler.JobDefinitionConfig;
+import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.scheduler.JobExecutionContext;
+import org.graylog.scheduler.JobExecutionException;
+import org.graylog.scheduler.JobTriggerData;
+import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.JobTriggerStatus;
+import org.graylog.scheduler.JobTriggerUpdate;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OptimizeIndexJob extends SystemJob {
+public class OptimizeIndexJob implements Job {
     private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
+
+    public static final String TYPE_NAME = "optimize-index-v1";
+    public static final String JOB_ID = "662a07ad68699718ec07b171";
+    public static final JobDefinitionDto DEFINITION_INSTANCE = JobDefinitionDto.builder()
+            .id(JOB_ID) // This is a system entity and the ID MUST NOT change!
+            .title("Optimize Index")
+            .description("Schedules index optimization on the Indexer.")
+            .config(CreateNewSingleIndexRangeJob.Config.empty())
+            .build();
+
     private final Indices indices;
     private final ActivityWriter activityWriter;
+
     private final Duration indexOptimizationTimeout;
+    // TODO: check concurrency in new JobScheduler
     private final int indexOptimizationJobs;
-    private final String index;
-    private final int maxNumSegments;
-    @AssistedInject
-    public OptimizeIndexJob(Indices indices,
-                            ActivityWriter activityWriter,
-                            @Named("elasticsearch_index_optimization_timeout") Duration indexOptimizationTimeout,
-                            @Named("elasticsearch_index_optimization_jobs") int indexOptimizationJobs,
-                            @Assisted String index,
-                            @Assisted int maxNumSegments) {
+
+    @Inject
+    public OptimizeIndexJob(final Indices indices,
+                            final ActivityWriter activityWriter,
+                            final @Named("elasticsearch_index_optimization_timeout") Duration indexOptimizationTimeout,
+                            final @Named("elasticsearch_index_optimization_jobs") int indexOptimizationJobs) {
         this.indices = indices;
         this.activityWriter = activityWriter;
         this.indexOptimizationTimeout = indexOptimizationTimeout;
         this.indexOptimizationJobs = indexOptimizationJobs;
-        this.index = index;
-        this.maxNumSegments = maxNumSegments;
     }
 
-    public String getIndex() {
-        return index;
+    public interface Factory extends Job.Factory<OptimizeIndexJob> {
+        @Override
+        OptimizeIndexJob create(JobDefinitionDto jobDefinition);
     }
 
     @Override
-    public void execute() {
+    public JobTriggerUpdate execute(JobExecutionContext ctx) throws JobExecutionException {
+        final JobTriggerDto trigger = ctx.trigger();
+        final OptimizeIndexJob.Data jobData = trigger.data()
+                .map(d -> (OptimizeIndexJob.Data) d)
+                .orElseThrow(() -> new IllegalArgumentException("OptimizeIndexJob job data not found"));
+
+        final var index = jobData.indexName();
+        final var maxNumSegments = jobData.maxNumSegments();
+
         if (!indices.exists(index)) {
             LOG.debug("Not running job for deleted index <{}>", index);
-            return;
+            return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
         }
         if (indices.isClosed(index)) {
             LOG.debug("Not running job for closed index <{}>", index);
-            return;
+            return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
         }
 
         String msg = "Optimizing index <" + index + ">.";
@@ -70,48 +98,60 @@ public class OptimizeIndexJob extends SystemJob {
         LOG.info(msg);
 
         indices.optimizeIndex(index, maxNumSegments, indexOptimizationTimeout);
+        return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
     }
 
-    @Override
-    public void requestCancel() {
+    @AutoValue
+    @JsonTypeName(TYPE_NAME)
+    public static abstract class Config implements JobDefinitionConfig {
+        @JsonCreator
+        public static Config create(@JsonProperty("type") String type) {
+            return new AutoValue_OptimizeIndexJob_Config(type);
+        }
+
+        public static Config empty() {
+            return create(TYPE_NAME);
+        }
     }
 
-    @Override
-    public int getProgress() {
-        return 0;
-    }
+    @AutoValue
+    @JsonTypeName(TYPE_NAME)
+    @JsonDeserialize(builder = Data.Builder.class)
+    public static abstract class Data implements JobTriggerData {
+        private static final String FIELD_INDEX_NAME = "index_name";
+        private static final String FIELD_MAX_NUM_SEGMENTS_NAME = "max_num_segments";
 
-    @Override
-    public int maxConcurrency() {
-        return indexOptimizationJobs;
-    }
+        @JsonProperty(FIELD_INDEX_NAME)
+        public abstract String indexName();
 
-    @Override
-    public boolean providesProgress() {
-        return false;
-    }
+        @JsonProperty(FIELD_MAX_NUM_SEGMENTS_NAME)
+        public abstract Integer maxNumSegments();
 
-    @Override
-    public boolean isCancelable() {
-        return false;
-    }
+        public static Builder builder() {
+            return Builder.create();
+        }
 
-    @Override
-    public String getDescription() {
-        return "Optimizes an index for read performance.";
-    }
+        @AutoValue.Builder
+        public static abstract class Builder implements JobTriggerData.Builder<Data.Builder> {
+            @JsonCreator
+            public static Builder create() {
+                return new AutoValue_OptimizeIndexJob_Data.Builder()
+                        .type(TYPE_NAME);
+            }
 
-    @Override
-    public String getClassName() {
-        return this.getClass().getCanonicalName();
-    }
+            @JsonProperty(FIELD_INDEX_NAME)
+            public abstract Builder indexName(String indexName);
 
-    @Override
-    public String getInfo() {
-        return "Optimizing index " + index + ".";
-    }
+            @JsonProperty(FIELD_MAX_NUM_SEGMENTS_NAME)
+            public abstract Builder maxNumSegments(Integer maxNumSegments);
 
-    public interface Factory {
-        OptimizeIndexJob create(String index, int maxNumSegments);
+            abstract Data autoBuild();
+
+            public Data build() {
+                type(TYPE_NAME);
+                return autoBuild();
+            }
+        }
     }
 }
+
