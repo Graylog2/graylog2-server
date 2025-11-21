@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -204,6 +205,17 @@ public class MetricUtils {
             //noinspection unchecked
             return (T) metricRegistry.getMetrics().get(name);
         }
+    }
+
+    public static Optional<Long> getGaugeValue(MetricRegistry metricRegistry, String name) {
+        final Metric metric = metricRegistry.getMetrics().get(name);
+        if (metric instanceof Gauge<?>) {
+            final Object value = ((Gauge<?>) metric).getValue();
+            if (value instanceof Number) {
+                return Optional.of(((Number) value).longValue());
+            }
+        }
+        return Optional.empty();
     }
 
     public static void safelyRegisterAll(MetricRegistry metricRegistry, MetricSet metrics) throws IllegalArgumentException {
