@@ -62,6 +62,7 @@ public abstract class EventDto {
     @JsonProperty(FIELD_EVENT_DEFINITION_TYPE)
     public abstract String eventDefinitionType();
 
+    @Nullable
     @JsonProperty(FIELD_EVENT_DEFINITION_ID)
     public abstract String eventDefinitionId();
 
@@ -146,7 +147,7 @@ public abstract class EventDto {
         public abstract Builder eventDefinitionType(String eventDefinitionType);
 
         @JsonProperty(FIELD_EVENT_DEFINITION_ID)
-        public abstract Builder eventDefinitionId(String eventDefinitionId);
+        public abstract Builder eventDefinitionId(@Nullable String eventDefinitionId);
 
         @JsonProperty(FIELD_ORIGIN_CONTEXT)
         public abstract Builder originContext(@Nullable String originContext);
