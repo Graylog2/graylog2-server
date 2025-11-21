@@ -57,7 +57,7 @@ public abstract class SearchServerBaseTest {
         for (var template : templates.entrySet()) {
             final String templateName = template.getKey();
 
-            searchServer.client().putTemplate(templateName, template.getValue());
+            searchServer.adapters().indexTemplateAdapter().ensureIndexTemplate(templateName, template.getValue());
         }
     }
 

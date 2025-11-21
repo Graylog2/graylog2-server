@@ -45,6 +45,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -83,7 +84,7 @@ public class AdaptersES7 implements Adapters {
                 new ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new CatApi(objectMapper, client),
                 new ClusterStateApi(objectMapper, client),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client)
+                indexTemplateAdapter()
         );
     }
 
@@ -123,5 +124,14 @@ public class AdaptersES7 implements Adapters {
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
         return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverES7(client));
+    }
+
+    @Override
+    public IndexTemplateAdapter indexTemplateAdapter() {
+        if(featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            return new ComposableIndexTemplateAdapter(client, objectMapper);
+        } else {
+            return new LegacyIndexTemplateAdapter(client);
+        }
     }
 }
