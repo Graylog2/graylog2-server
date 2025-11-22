@@ -158,7 +158,7 @@ public class McpService {
             }
             case McpSchema.METHOD_TOOLS_LIST -> {
                 LOG.debug("Listing available tools");
-                final List<McpSchema.Tool> toolList = this.tools.values().stream().map(tool -> {
+                final List<McpSchema.Tool> toolList = this.tools.values().stream().filter(Tool::isEnabled).map(tool -> {
                     var builder = McpSchema.Tool.builder()
                             .name(tool.name())
                             .title(tool.title())
@@ -179,27 +179,26 @@ public class McpService {
                     final Tool<?, ?> tool = tools.get(callToolRequest.name());
                     try {
                         final Object result = tool.apply(permissionHelper, callToolRequest.arguments());
-                        if (tool.outputSchema().isPresent()) {
-                            // if we have an output schema we want to return structured content
-                            try {
-                                var structuredContent = objectMapper.convertValue(result,
-                                        new TypeReference<Map<String, Object>>() {
-                                        });
-                                auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
-                                        auditContext);
-                                return Optional.of(new McpSchema.CallToolResult(
-                                        List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
-                                        false,
-                                        structuredContent));
-                            } catch (JsonProcessingException e) {
-                                auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
-                                        auditContext);
-                                throw new RuntimeException(e);
-                            }
-                        } else {
-                            // no schema, just return the string representation directly
+                        if (tool.useStringOutput()) {
+                            // we can just return the string representation directly
                             auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
                             return Optional.of(new McpSchema.CallToolResult(result.toString(), false));
+                        }
+                        // but we normally want to return [un]structured content (regardless of the tool output schema)
+                        try {
+                            var structuredContent = objectMapper.convertValue(result,
+                                    new TypeReference<Map<String, Object>>() {
+                                    });
+                            auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_CALL),
+                                    auditContext);
+                            return Optional.of(new McpSchema.CallToolResult(
+                                    List.of(new McpSchema.TextContent(objectMapper.writeValueAsString(result))),
+                                    false,
+                                    structuredContent));
+                        } catch (JsonProcessingException e) {
+                            auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL),
+                                    auditContext);
+                            throw new RuntimeException(e);
                         }
                     } catch (Exception e) {
                         auditEventSender.failure(auditActor, AuditEventType.create(MCP_TOOL_CALL), auditContext);
@@ -228,5 +227,9 @@ public class McpService {
 
         }
         throw new McpException("Unsupported request method: " + request.method());
+    }
+
+    public Map<String, Tool<?, ?>> getTools() {
+        return tools;
     }
 }

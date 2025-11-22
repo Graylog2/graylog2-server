@@ -1,0 +1,5 @@
+type = "added" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add configuration options for tool output format and output schema."
+
+issues = ["23980"]
+pulls = ["24044"]

@@ -17,9 +17,8 @@
 package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
-import org.graylog.mcp.server.SchemaGeneratorProvider;
+import org.graylog.mcp.server.OutputBuilder;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
@@ -27,37 +26,33 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.web.customization.CustomizationConfig;
+import org.joda.time.format.DateTimeFormat;
 
 import java.util.Locale;
 
 import static org.graylog2.shared.utilities.StringUtils.f;
 
+@Tool.Behavior(readOnly = true, idempotent = true)
 public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOverviewResponse> {
     public static String NAME = "get_system_status";
 
     private final ServerStatus serverStatus;
-    private final CustomizationConfig customizationConfig;
     private final LeaderElectionService leaderElectionService;
 
     @Inject
-    public SystemInfoTool(ObjectMapper objectMapper,
-                          SchemaGeneratorProvider schemaGeneratorProvider,
+    public SystemInfoTool(final ToolContext toolContext,
                           ServerStatus serverStatus,
-                          CustomizationConfig customizationConfig,
                           LeaderElectionService leaderElectionService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+        super(toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("Get %s System Information", customizationConfig.productName()),
+                f("Get %s System Information", toolContext.customizationConfig().productName()),
                 """
                         Returns system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(toolContext.customizationConfig().productName()));
         this.serverStatus = serverStatus;
-        this.customizationConfig = customizationConfig;
         this.leaderElectionService = leaderElectionService;
     }
 
@@ -68,7 +63,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
 
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-            return SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
+            return SystemOverviewResponse.create(f("%s Server", getProductName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
                     serverStatus.getClusterId(),
@@ -82,6 +77,40 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
                     System.getProperty("os.name", "unknown") + " " + System.getProperty("os.version", "unknown"),
                     leaderElectionService.isLeader()
             );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    protected String applyAsText(PermissionHelper permissionHelper, SystemInfoTool.Parameters unused) {
+        try {
+            permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
+
+            return new OutputBuilder()
+                    .h1(f("%s System Information", getProductName()))
+                    .h2(f("%s Server (%s)", getProductName(), ServerVersion.CODENAME))
+                    .paragraph("node_id: " + serverStatus.getNodeId().toString())
+                    .paragraph("cluster_id: " + serverStatus.getClusterId())
+                    .paragraph("version:" + ServerVersion.VERSION.toString())
+                    .paragraph(f("The node is %s and %s at the moment. Its load balancer status is %s",
+                            OutputBuilder.bold(serverStatus.getLifecycle().getDescription().toLowerCase(Locale.ENGLISH)),
+                            OutputBuilder.bold(serverStatus.isProcessing() ? "processing" : "not processing"),
+                            OutputBuilder.bold(serverStatus.getLifecycle().getLoadbalancerStatus().toString().toLowerCase(Locale.ENGLISH))
+                    ))
+                    .paragraph(f("It was started at %s, on %s %s, %s time.",
+                            DateTimeFormat.forPattern("HH:mm:ss").print(serverStatus.getStartedAt()),
+                            DateTimeFormat.forPattern("MMMM").print(serverStatus.getStartedAt()),
+                            serverStatus.getStartedAt().getDayOfMonth(),
+                            serverStatus.getTimezone().toString()
+                            ))
+                    .paragraph(f("The node host is %s, running on %s %s",
+                            OutputBuilder.bold(Tools.getLocalCanonicalHostname()),
+                            System.getProperty("os.name", "unknown"),
+                            System.getProperty("os.version", "unknown")
+                    ))
+                    .paragraph("The node is " + (!leaderElectionService.isLeader() ? "NOT" : "") + "a leader node.")
+                    .toString();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
