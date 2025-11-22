@@ -18,10 +18,17 @@ package org.graylog.mcp.server;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
+import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGenerator;
 import io.modelcontextprotocol.spec.McpSchema;
+import jakarta.inject.Inject;
+import org.graylog.mcp.config.McpConfiguration;
 import org.graylog.mcp.tools.PermissionHelper;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
 import java.util.Optional;
@@ -33,8 +40,20 @@ import java.util.Optional;
  * @param <O> Output type
  */
 public abstract class Tool<P, O> {
+    public record ToolContext(
+            ObjectMapper objectMapper,
+            SchemaGeneratorProvider schemaGeneratorProvider,
+            CustomizationConfig  customizationConfig,
+            ClusterConfigService clusterConfigService
+    ) {
+        @Inject
+        public ToolContext {}
+    }
 
     private final ObjectMapper objectMapper;
+    private final ClusterConfigService clusterConfigService;
+    private final String productName;
+
     private final TypeReference<P> parameterType;
     private final String name;
     private final String title;
@@ -42,6 +61,7 @@ public abstract class Tool<P, O> {
     private final McpSchema.JsonSchema inputSchema;
     private final Map<String, Object> outputSchema;
 
+    @Deprecated
     protected Tool(
             ObjectMapper objectMapper,
             SchemaGeneratorProvider schemaGeneratorProvider,
@@ -49,15 +69,37 @@ public abstract class Tool<P, O> {
             TypeReference<O> outputType,
             String name,
             String title,
-            String description) {
-        this.objectMapper = objectMapper;
+            String description
+    ) {
+        this(
+                new ToolContext(objectMapper, schemaGeneratorProvider, null, null),
+                parameterType,
+                outputType,
+                name,
+                title,
+                description
+        );
+    }
+
+    protected Tool(
+            ToolContext context,
+            TypeReference<P> parameterType,
+            TypeReference<O> outputType,
+            String name,
+            String title,
+            String description
+    ) {
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
 
+        this.objectMapper = context.objectMapper();
+        this.clusterConfigService = context.clusterConfigService();
+        this.productName = context.customizationConfig() != null ? context.customizationConfig().productName() : "";
+
         // Get the schema generator with all contributed modules
-        SchemaGenerator generator = schemaGeneratorProvider.get();
+        SchemaGenerator generator = context.schemaGeneratorProvider().get();
 
         // we can precompute the schema for our parameters, it's statically known
         final var inputSchemaNode = generator.generateSchema(parameterType.getType());
@@ -66,16 +108,41 @@ public abstract class Tool<P, O> {
         } else {
             this.inputSchema = objectMapper.convertValue(inputSchemaNode, McpSchema.JsonSchema.class);
         }
+//        this.inputSchema = generateInputSchema(parameterType);
         // if our tool produces anything other than a String, we want to create a JSON schema for it
-        if (String.class.equals(outputType.getType())) {
-            this.outputSchema = null;
-        } else {
-            this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
+        this.outputSchema = String.class.equals(outputType.getType()) ? null : generateOutputSchema(outputType);
+    }
+
+    private JsonSchema generateSchema(TypeReference<?> type) {
+        try {
+            return new JsonSchemaGenerator(objectMapper)
+                    .generateSchema(objectMapper.getTypeFactory().constructType(type));
+        } catch (JsonMappingException e) {
+            return null;
         }
+    }
+
+    private McpSchema.JsonSchema generateInputSchema(TypeReference<P> type) {
+        JsonSchema schema = generateSchema(type);
+        return schema == null ? null : objectMapper.convertValue(schema, McpSchema.JsonSchema.class);
+    }
+
+    private Map<String, Object> generateOutputSchema(TypeReference<O> type) {
+        JsonSchema schema = generateSchema(type);
+        return schema == null ? null : objectMapper.convertValue(schema, new TypeReference<>() {});
+    }
+
+    protected boolean isOutputSchemaEnabled() {
+        return clusterConfigService != null && clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
+                .enableOutputSchema();
     }
 
     protected ObjectMapper getObjectMapper() {
         return objectMapper;
+    }
+
+    protected String getProductName() {
+        return productName;
     }
 
     @JsonProperty
