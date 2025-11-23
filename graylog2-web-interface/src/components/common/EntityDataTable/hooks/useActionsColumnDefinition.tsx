@@ -60,6 +60,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>(
             size: actionsColWidth,
             header: ActionsHeader,
             enableHiding: false,
+            enableResizing: false,
             cell,
           })
         : null,

@@ -28,6 +28,8 @@ import DragHandle from 'components/common/SortableList/DragHandle';
 
 import type { EntityBase, ColumnMetaContext } from './types';
 
+import Icon from '../Icon';
+
 const Thead = styled.thead(
   ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
@@ -42,6 +44,32 @@ export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; 
     opacity: ${$isDragging ? 0.4 : 1};
     transform: ${$transform};
   `,
+);
+
+const ThInner = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+const LeftCol = styled.div`
+  flex: 1;
+`;
+
+const ResizeButton = styled.div(
+  ({ theme }) => css`
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: col-resize;
+    color: ${theme.colors.gray[70]};
+  `,
+);
+
+const ResizeHandle = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => (
+  <ResizeButton onMouseDown={header.getResizeHandler()} onTouchStart={header.getResizeHandler()}>
+    <Icon name="arrows_outward" />
+  </ResizeButton>
 );
 
 const useSortableCol = (colId: string, disabled: boolean) => {
@@ -84,16 +112,21 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       $width={header.getSize()}
       $transform={transform}
       $isDragging={isDragging}>
-      {columnMeta?.enableColumnOrdering && (
-        <DragHandle
-          index={header.index}
-          dragHandleProps={{ ...attributes, ...listeners }}
-          isDragging={isDragging}
-          itemTitle={columnMeta.label}
-        />
-      )}
-      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-      {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
+      <ThInner>
+        <LeftCol>
+          {columnMeta?.enableColumnOrdering && (
+            <DragHandle
+              index={header.index}
+              dragHandleProps={{ ...attributes, ...listeners }}
+              isDragging={isDragging}
+              itemTitle={columnMeta.label}
+            />
+          )}
+          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+          {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
+        </LeftCol>
+        {header.column.getCanResize() && <ResizeHandle header={header} />}
+      </ThInner>
     </Th>
   );
 };
