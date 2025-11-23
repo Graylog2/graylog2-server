@@ -75,24 +75,26 @@ type Props<Entity extends EntityBase> = {
   selectedEntities: Array<Entity['id']>;
   setInternalAttributeColumnOrder: (columnOrder: Array<string>) => void;
   setSelectedEntities: (rows: Array<string>) => void;
+  setColumnWidthPreferences: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
   sort: Sort | undefined;
 };
 
 const useTable = <Entity extends EntityBase>({
-  layoutPreferences,
-  defaultColumnOrder,
+  columnOrder,
   columnsDefinitions,
+  defaultColumnOrder,
   displayBulkSelectCol,
   entities,
   isEntitySelectable = () => true,
+  layoutPreferences,
   onChangeSelection,
   onLayoutPreferencesChange,
-  setInternalAttributeColumnOrder,
   onSortChange,
   selectedEntities,
+  setColumnWidthPreferences,
+  setInternalAttributeColumnOrder,
   setSelectedEntities,
   sort,
-  columnOrder,
 }: Props<Entity>) => {
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
@@ -182,6 +184,7 @@ const useTable = <Entity extends EntityBase>({
   // eslint-disable-next-line react-hooks/incompatible-library
   return useReactTable({
     columns: columnsDefinitions,
+    columnResizeMode: 'onChange',
     data,
     enableRowSelection: (row) => displayBulkSelectCol && isEntitySelectable(row.original),
     enableSortingRemoval: false,
@@ -192,6 +195,7 @@ const useTable = <Entity extends EntityBase>({
     onColumnVisibilityChange,
     onRowSelectionChange,
     onSortingChange,
+    onColumnSizingChange: setColumnWidthPreferences,
     state: {
       columnOrder,
       columnVisibility,

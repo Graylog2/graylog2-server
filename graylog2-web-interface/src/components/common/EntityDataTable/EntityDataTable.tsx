@@ -265,6 +265,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
     layoutPreferences?.order ?? defaultColumnOrder,
   );
+  const [columnWidthPreferences, setColumnWidthPreferences] = useState<{ [attributeId: string]: number }>({});
+
+  console.log(columnWidthPreferences);
 
   const columnOrder = useVisibleColumnOrder(
     layoutPreferences?.attributes,
@@ -279,6 +282,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
     fixedActionsCellWidth,
     visibleColumns: columnOrder,
+    columnWidthPreferences,
   });
 
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
@@ -295,18 +299,19 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
+    columnOrder,
     columnsDefinitions,
     defaultColumnOrder,
     displayBulkSelectCol,
     entities,
-    columnOrder,
-    setInternalAttributeColumnOrder,
     isEntitySelectable,
     layoutPreferences,
     onChangeSelection,
     onLayoutPreferencesChange,
     onSortChange,
     selectedEntities,
+    setColumnWidthPreferences,
+    setInternalAttributeColumnOrder,
     setSelectedEntities,
     sort: activeSort,
   });
