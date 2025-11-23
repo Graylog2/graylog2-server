@@ -45,10 +45,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
     [columnSchemas, visibleColumns],
   );
-  // eslint-disable-next-line react-hooks/refs
-  const actionsColInnerWidth = fixedActionsCellWidth ?? actionsRef.current?.offsetWidth ?? 0;
-  // eslint-disable-next-line react-hooks/refs
-  const actionsColWidth = actionsColInnerWidth ? actionsColInnerWidth + CELL_PADDING * 2 : 0;
+  const actionsColWidth = fixedActionsCellWidth ? fixedActionsCellWidth + CELL_PADDING * 2 : 0;
 
   const columnWidths = useColumnWidths<Entity>({
     actionsColWidth,

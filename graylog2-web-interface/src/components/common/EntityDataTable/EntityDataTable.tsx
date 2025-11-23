@@ -61,6 +61,7 @@ const ScrollContainer = styled.div`
 const StyledTable = styled(Table)(
   ({ theme }) => css`
     table-layout: fixed;
+    width: auto;
 
     thead > tr > th,
     tbody > tr > td {
@@ -135,7 +136,7 @@ const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
   }, [columnSchemas, customColumnRenderers]);
 
 const useColumnDefinitions = <Entity extends EntityBase, Meta>({
-  actionsColWidth,
+  actionsColMinWidth,
   actionsRef,
   columnRenderersByAttribute,
   columnSchemas,
@@ -146,7 +147,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   entityAttributesAreCamelCase,
   meta,
 }: {
-  actionsColWidth: number;
+  actionsColMinWidth: number;
   actionsRef: React.MutableRefObject<HTMLDivElement>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
@@ -159,7 +160,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol);
-  const actionsCol = useActionsColumnDefinition(displayActionsCol, actionsColWidth, entityActions, actionsRef);
+  const actionsCol = useActionsColumnDefinition(displayActionsCol, actionsColMinWidth, entityActions, actionsRef);
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
     columnSchemas,
     columnRenderersByAttribute,
@@ -269,11 +270,10 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     layoutPreferences?.attributes,
     internalAttributeColumnOrder,
     defaultDisplayedColumns,
-    displayActionsCol,
     displayBulkSelectCol,
   );
 
-  const { tableRef, actionsRef, actionsColWidth, columnWidths } = useElementWidths<Entity, Meta>({
+  const { tableRef, actionsRef, columnWidths } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     displayBulkSelectCol,
@@ -283,7 +283,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsRef,
-    actionsColWidth,
+    actionsColMinWidth: fixedActionsCellWidth,
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
