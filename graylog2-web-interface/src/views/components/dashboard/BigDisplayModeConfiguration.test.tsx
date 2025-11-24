@@ -31,7 +31,6 @@ import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
 jest.mock('routing/useHistory');
 
 const search = Search.create();
