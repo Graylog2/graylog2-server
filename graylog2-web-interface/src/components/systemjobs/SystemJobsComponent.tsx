@@ -27,7 +27,7 @@ type SystemJobsComponentProps = {
   jobs?: Record<
     string,
     {
-      jobs?: any[];
+      jobs?: unknown[];
     }
   >;
 };
@@ -47,9 +47,7 @@ const SystemJobsComponent = ({ jobs = undefined }: SystemJobsComponentProps) => 
     return <Spinner />;
   }
 
-  const jobList = Object.keys(jobs)
-    .map((nodeId) => (jobs[nodeId] ? jobs[nodeId].jobs : []))
-    .reduce((a, b) => a.concat(b), []);
+  const jobList = Object.values(jobs).flatMap((jobsPerNode) => jobsPerNode?.jobs ?? []);
 
   return (
     <Row className="content">
