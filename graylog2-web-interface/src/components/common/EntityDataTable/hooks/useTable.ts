@@ -15,14 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useMemo, useCallback } from 'react';
+import { useEffect, useMemo, useCallback } from 'react';
 import type { ColumnDef, SortingState, Updater, VisibilityState, RowSelectionState } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
 import type { Sort } from 'stores/PaginationTypes';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import type { ColumnPreferences, EntityBase } from '../types';
 import { UTILITY_COLUMNS, ATTRIBUTE_STATUS } from '../Constants';
+
+const COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS = 500;
 
 const columnVisibilityChanges = (prevVisibleColumns: VisibilityState, currVisibleColumns: VisibilityState) => {
   const addedColumns = new Set<string>();
@@ -100,6 +103,10 @@ const useTable = <Entity extends EntityBase>({
 }: Props<Entity>) => {
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
+  const debouncedOnLayoutPreferencesChange = useMemo(
+    () => debounceWithPromise(onLayoutPreferencesChange, COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS),
+    [onLayoutPreferencesChange],
+  );
 
   const onSortingChange = useCallback(
     (updater: Updater<SortingState>) => {
@@ -197,12 +204,12 @@ const useTable = <Entity extends EntityBase>({
         };
       });
 
-      onLayoutPreferencesChange({ attributes: newAttributePreferences });
+      debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
     },
     [
+      debouncedOnLayoutPreferencesChange,
       internalColumnWidthPreferences,
       layoutPreferences?.attributes,
-      onLayoutPreferencesChange,
       setInternalColumnWidthPreferences,
     ],
   );
