@@ -17,7 +17,14 @@
 import URI from 'urijs';
 
 import AppConfig from 'util/AppConfig';
-import { extendedSearchPath, viewsPath } from 'views/Constants';
+import {
+  extendedSearchPath,
+  viewsPath,
+  dashboardsTvPath,
+  showDashboardsPath,
+  newDashboardsPath,
+  dashboardsPath,
+} from 'views/Constants';
 import type { TimeRangeTypes } from 'views/logic/queries/Query';
 
 export const SECURITY_PATH = '/security';
@@ -78,11 +85,11 @@ const Routes = {
     ACTIVITY: `${SECURITY_PATH}/activity`,
   },
   SOURCES: '/sources',
-  DASHBOARDS: '/dashboards',
+  DASHBOARDS: dashboardsPath,
   DASHBOARD: {
-    NEW: '/dashboards/new',
-    SHOW: (id: string) => `/dashboards/${id}`,
-    FULL_SCREEN: (id: string) => `/dashboards/${id}/tv`,
+    NEW: newDashboardsPath,
+    SHOW: showDashboardsPath(),
+    FULL_SCREEN: dashboardsTvPath,
   },
   WELCOME: '/welcome',
   GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
