@@ -16,6 +16,9 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
+import io.swagger.v3.core.util.Json31;
+import io.swagger.v3.core.util.Yaml31;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.OpenApiContextLocator;
@@ -84,6 +87,8 @@ public class OpenAPIContextFactory {
             context.setModelConverters(Set.of(modelConverter));
             context.setOpenApiScanner(scanner);
             context.setOpenApiReader(readerFactory.create(openApiConfiguration));
+            context.setOutputJsonMapper(Json31.mapper().copy().enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS));
+            context.setOutputYamlMapper(Yaml31.mapper().copy().enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS));
             return context.init();
         } catch (OpenApiConfigurationException e) {
             throw new RuntimeException("Unable to set up OpenAPI context" + e);

@@ -17,7 +17,6 @@
 package org.graylog.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
 import com.github.rvesse.airline.annotations.restrictions.Pattern;
@@ -38,7 +37,7 @@ import com.google.inject.spi.DefaultBindingTargetVisitor;
 import com.google.inject.spi.DefaultElementVisitor;
 import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
-import io.swagger.v3.core.util.ObjectMapperFactory;
+import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.commands.Server;
@@ -116,8 +115,8 @@ public class GenerateOpenApiSpecCommand extends Server {
 
         System.out.println("Generating OpenAPI specification.");
 
-        final var spec = openApiContextFactory.getOrCreate("generate-openapi-spec-command").read();
-        final var serialized = outputFile.endsWith(".json") ? prettyJson(spec) : prettyYaml(spec);
+        final var context = openApiContextFactory.getOrCreate("generate-openapi-spec-command");
+        final var serialized = outputFile.endsWith(".json") ? prettyJson(context) : prettyYaml(context);
         final var targetPath = Path.of(outputFile);
         final var parentPath = targetPath.getParent();
 
@@ -139,17 +138,15 @@ public class GenerateOpenApiSpecCommand extends Server {
         System.out.println(f("[took %s ms]", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
     }
 
-    private String prettyJson(OpenAPI spec) {
-        return pretty(ObjectMapperFactory.createJson31(), spec);
+    private String prettyJson(OpenApiContext context) {
+        return pretty(context.getOutputJsonMapper(), context.read());
     }
 
-    private String prettyYaml(OpenAPI spec) {
-        return pretty(ObjectMapperFactory.createYaml31(), spec);
+    private String prettyYaml(OpenApiContext context) {
+        return pretty(context.getOutputYamlMapper(), context.read());
     }
 
     private String pretty(ObjectMapper mapper, OpenAPI spec) {
-        // Enable alphabetical ordering of properties for stable output
-        mapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
         try {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(spec);
         } catch (Exception e) {
