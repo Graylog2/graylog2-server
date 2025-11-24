@@ -101,7 +101,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
-        bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
+        bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class).asEagerSingleton();
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
         bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);
