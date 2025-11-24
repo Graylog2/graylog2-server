@@ -32,7 +32,7 @@ const getVisibleAttributeColumns = (
 
   // Add default columns, which are not explicitly hidden
   defaultDisplayedColumns.forEach((attr) => {
-    if (!userColumnPreferences[attr]) {
+    if (!(userColumnPreferences[attr]?.status === 'hide')) {
       visible.add(attr);
     }
   });

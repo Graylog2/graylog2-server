@@ -75,7 +75,8 @@ type Props<Entity extends EntityBase> = {
   selectedEntities: Array<Entity['id']>;
   setInternalAttributeColumnOrder: (columnOrder: Array<string>) => void;
   setSelectedEntities: (rows: Array<string>) => void;
-  setColumnWidthPreferences: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
+  setInternalColumnWidthPreferences: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
+  internalColumnWidthPreferences: { [colId: string]: number };
   sort: Sort | undefined;
 };
 
@@ -91,7 +92,8 @@ const useTable = <Entity extends EntityBase>({
   onLayoutPreferencesChange,
   onSortChange,
   selectedEntities,
-  setColumnWidthPreferences,
+  internalColumnWidthPreferences,
+  setInternalColumnWidthPreferences,
   setInternalAttributeColumnOrder,
   setSelectedEntities,
   sort,
@@ -170,7 +172,7 @@ const useTable = <Entity extends EntityBase>({
     [entities, onChangeSelection, rowSelection, setSelectedEntities],
   );
 
-  const _onColumnOrderChange = useCallback(
+  const onColumnOrderChange = useCallback(
     (updater: Updater<Array<string>>) => {
       const newColumnOrder = (updater instanceof Function ? updater(columnOrder) : updater).filter(
         (colId) => !UTILITY_COLUMNS.has(colId),
@@ -179,6 +181,30 @@ const useTable = <Entity extends EntityBase>({
       onLayoutPreferencesChange({ order: newColumnOrder });
     },
     [columnOrder, onLayoutPreferencesChange, setInternalAttributeColumnOrder],
+  );
+
+  const onColumnSizingChange = useCallback(
+    (updater: Updater<{ [colId: string]: number }>) => {
+      const newColumnWidths = updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
+      setInternalColumnWidthPreferences(newColumnWidths);
+
+      const newAttributePreferences = { ...(layoutPreferences?.attributes || {}) };
+
+      Object.entries(newColumnWidths).forEach(([colId, width]) => {
+        newAttributePreferences[colId] = {
+          ...newAttributePreferences[colId],
+          width,
+        };
+      });
+
+      onLayoutPreferencesChange({ attributes: newAttributePreferences });
+    },
+    [
+      internalColumnWidthPreferences,
+      layoutPreferences?.attributes,
+      onLayoutPreferencesChange,
+      setInternalColumnWidthPreferences,
+    ],
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -191,11 +217,11 @@ const useTable = <Entity extends EntityBase>({
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     manualSorting: true,
-    onColumnOrderChange: _onColumnOrderChange,
+    onColumnOrderChange,
     onColumnVisibilityChange,
     onRowSelectionChange,
     onSortingChange,
-    onColumnSizingChange: setColumnWidthPreferences,
+    onColumnSizingChange,
     state: {
       columnOrder,
       columnVisibility,

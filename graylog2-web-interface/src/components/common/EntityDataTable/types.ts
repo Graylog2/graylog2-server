@@ -50,6 +50,7 @@ export type ColumnRenderers<Entity extends EntityBase, Meta = unknown> = {
 export type ColumnPreferences = {
   [attributeId: string]: {
     status: 'show' | 'hide';
+    width?: number; // px
   };
 };
 
