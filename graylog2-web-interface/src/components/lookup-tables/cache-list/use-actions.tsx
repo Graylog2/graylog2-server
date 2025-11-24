@@ -15,13 +15,14 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import { useDeleteCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { CacheEntity } from 'components/lookup-tables/types';
 
@@ -34,13 +35,11 @@ function Actions({ cache }: ActionsProps) {
   const sendTelemetry = useSendTelemetry();
   const { deleteCache, deletingCache } = useDeleteCache();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
   const handleEdit = React.useCallback(() => {
-    setModal('CACHE-EDIT');
-    setTitle(cache.name);
-    setEntity(cache);
-  }, [cache, setModal, setTitle, setEntity]);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
+  }, [navigate, cache.name]);
 
   const handleDelete = React.useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {

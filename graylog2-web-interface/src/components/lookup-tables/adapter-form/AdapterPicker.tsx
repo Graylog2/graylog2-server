@@ -14,19 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import styled from 'styled-components';
 import { useField } from 'formik';
-import type { LookupTableCache } from 'src/logic/lookup-tables/types';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import { Button, Input } from 'components/bootstrap';
+import { Input, Button } from 'components/bootstrap';
 import { Select } from 'components/common';
-
-type Props = {
-  onCreateClick: () => void;
-  caches?: LookupTableCache[];
-};
+import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 const StyledSelect = styled(Select)`
   flex: 1 1 auto;
@@ -39,10 +34,15 @@ const StyledButton = styled(Button)`
   white-space: nowrap;
 `;
 
-const CachePicker = ({ onCreateClick, caches = [] }: Props) => {
-  const [, { value, touched, error }, { setTouched, setValue }] = useField('cache_id');
-  const sortedCaches = caches
-    .map((cache) => ({ value: cache.id, label: `${cache.title} (${cache.name})` }))
+type Props = {
+  onCreateClick: () => void;
+  dataAdapters?: Array<LookupTableAdapter>;
+};
+
+function DataAdapterPicker({ onCreateClick, dataAdapters = [] }: Props) {
+  const [, { value, touched, error }, { setTouched, setValue }] = useField('data_adapter_id');
+  const sortedAdapters = dataAdapters
+    .map((adapter: LookupTableAdapter) => ({ value: adapter.id, label: `${adapter.title} (${adapter.name})` }))
     .sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
   const errorMessage = touched ? error : '';
@@ -50,35 +50,32 @@ const CachePicker = ({ onCreateClick, caches = [] }: Props) => {
   return (
     <fieldset>
       <Input
-        id="cache-select"
-        label="Cache"
+        id="data-adapter-select"
+        label="Data Adapter"
         required
-        autoFocus
         bsStyle={errorMessage ? 'error' : undefined}
         labelClassName="d-block mb-1"
         wrapperClassName="d-block"
         formGroupClassName="mb-3">
-        <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
-          {errorMessage || 'Select an existing cache'}
-        </div>
-
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
           <StyledSelect
-            placeholder="Select a cache"
+            placeholder="Select a data adapter"
             clearable={false}
-            options={sortedCaches}
+            options={sortedAdapters}
             onBlur={() => setTouched(true)}
             onChange={(v) => setValue(v)}
             value={value}
           />
-
-          <StyledButton type="button" aria-label="Create Cache" onClick={onCreateClick}>
-            Create Cache
+          <StyledButton type="button" aria-label="Create Data Adapter" onClick={onCreateClick}>
+            Create Data Adapter
           </StyledButton>
+        </div>
+        <div className={`mb-1 ${errorMessage ? 'text-danger' : 'text-muted'}`}>
+          {errorMessage || 'Select an existing data adapter'}
         </div>
       </Input>
     </fieldset>
   );
-};
+}
 
-export default CachePicker;
+export default DataAdapterPicker;
