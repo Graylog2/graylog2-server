@@ -28,7 +28,17 @@ import type { ClusterDataNode } from './useClusterDataNodes';
 import { MetricsColumn, MetricsRow, RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
-export const DEFAULT_VISIBLE_COLUMNS = ['hostname', 'datanode_status', 'memory', 'jvm', 'cpu', 'indexing', 'storage', 'datanode_version', 'opensearch_roles'] as const;
+export const DEFAULT_VISIBLE_COLUMNS = [
+  'hostname',
+  'opensearch_roles',
+  'datanode_version',
+  'datanode_status',
+  'cpu',
+  'memory',
+  'jvm',
+  'indexing',
+  'storage',
+] as const;
 
 const JVM_WARNING_THRESHOLD = 0.7;
 const JVM_DANGER_THRESHOLD = 0.9;
@@ -39,14 +49,14 @@ const STORAGE_DANGER_THRESHOLD = 0.9;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'hostname', title: 'Node', sortable: true },
+  { id: 'opensearch_roles', title: 'Role', sortable: true },
+  { id: 'datanode_version', title: 'Version', sortable: true },
   { id: 'datanode_status', title: 'State', sortable: true },
+  { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
   { id: 'memory', title: 'Memory', sortable: false, isDerived: true },
   { id: 'jvm', title: 'JVM', sortable: false, isDerived: true },
-  { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
   { id: 'indexing', title: 'Indexing', sortable: false, isDerived: true },
   { id: 'storage', title: 'Storage', sortable: false, isDerived: true },
-  { id: 'datanode_version', title: 'Version', sortable: true },
-  { id: 'opensearch_roles', title: 'Role', sortable: true },
 ];
 
 const getRoleLabels = (roles: Array<string>) =>
