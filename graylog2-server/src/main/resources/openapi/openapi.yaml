@@ -13307,6 +13307,42 @@ paths:
             '*/*': {}
 components:
   schemas:
+    ADAuthServiceBackendConfig:
+      allOf:
+      - $ref: "#/components/schemas/AuthServiceBackendConfig"
+      - type: object
+        properties:
+          servers:
+            type: array
+            items:
+              $ref: "#/components/schemas/HostAndPort"
+            properties:
+              empty:
+                type: boolean
+              first:
+                $ref: "#/components/schemas/HostAndPort"
+              last:
+                $ref: "#/components/schemas/HostAndPort"
+          system_user_dn:
+            type: string
+          system_user_password:
+            $ref: "#/components/schemas/EncryptedValue"
+          transport_security:
+            type: string
+            enum:
+            - none
+            - tls
+            - start_tls
+          user_full_name_attribute:
+            type: string
+          user_name_attribute:
+            type: string
+          user_search_base:
+            type: string
+          user_search_pattern:
+            type: string
+          verify_certificates:
+            type: boolean
     AWSInputCreateRequest:
       type: object
       properties:
@@ -13432,15 +13468,134 @@ components:
         page:
           type: integer
           format: int32
-        perPage:
-          type: integer
-          format: int32
         per_page:
           type: integer
           format: int32
-          writeOnly: true
         query:
           type: string
+    AggregationConditions:
+      type: object
+      properties:
+        expression:
+          $ref: "#/components/schemas/ExpressionBoolean"
+    AggregationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/WidgetConfigDTO"
+      - type: object
+        properties:
+          column_limit:
+            type: integer
+            format: int32
+          column_pivots:
+            type: array
+            items:
+              $ref: "#/components/schemas/PivotDTO"
+          event_annotation:
+            type: boolean
+          formatting_settings:
+            $ref: "#/components/schemas/WidgetFormattingSettings"
+          rollup:
+            type: boolean
+          row_limit:
+            type: integer
+            format: int32
+          row_pivots:
+            type: array
+            items:
+              $ref: "#/components/schemas/PivotDTO"
+          series:
+            type: array
+            items:
+              $ref: "#/components/schemas/SeriesDTO"
+          sort:
+            type: array
+            items:
+              $ref: "#/components/schemas/SortConfigDTO"
+          units:
+            type: object
+            additionalProperties:
+              $ref: "#/components/schemas/UnitId"
+          visualization:
+            type: string
+          visualization_config: {}
+    AggregationEventProcessorConfig:
+      type: object
+      properties:
+        conditions:
+          $ref: "#/components/schemas/AggregationConditions"
+        cron_expression:
+          type: string
+        cron_timezone:
+          type: string
+        event_limit:
+          type: integer
+          format: int32
+        execute_every_ms:
+          type: integer
+          format: int64
+        filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/UsedSearchFilter"
+        group_by:
+          type: array
+          items:
+            type: string
+        query:
+          type: string
+        query_parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/Parameter"
+          properties:
+            empty:
+              type: boolean
+          uniqueItems: true
+        search_within_ms:
+          type: integer
+          format: int64
+        series:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeriesSpec"
+        stream_categories:
+          type: array
+          items:
+            type: string
+          properties:
+            empty:
+              type: boolean
+          uniqueItems: true
+        streams:
+          type: array
+          items:
+            type: string
+          properties:
+            empty:
+              type: boolean
+          uniqueItems: true
+        type:
+          type: string
+        use_cron_scheduling:
+          type: boolean
+    AggregationEventProcessorParameters:
+      allOf:
+      - $ref: "#/components/schemas/EventProcessorParameters"
+      - type: object
+        properties:
+          batch_size:
+            type: integer
+            format: int32
+          streams:
+            type: array
+            items:
+              type: string
+            properties:
+              empty:
+                type: boolean
+            uniqueItems: true
+          timerange:
+            $ref: "#/components/schemas/TimeRange"
     AggregationRequestSpec:
       type: object
       properties:
@@ -13529,10 +13684,57 @@ components:
       properties:
         regex:
           type: string
+    And:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionBoolean"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionBoolean"
+          right:
+            $ref: "#/components/schemas/ExpressionBoolean"
+      - $ref: "#/components/schemas/ExpressionDouble"
+    AndFilter:
+      allOf:
+      - $ref: "#/components/schemas/Filter"
+      - type: object
+        properties:
+          filters:
+            type: array
+            items: {}
+            uniqueItems: true
+    AreaVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          axis_type:
+            type: string
+            enum:
+            - linear
+            - logarithmic
+          interpolation:
+            type: string
+            enum:
+            - linear
+            - step-after
+            - spline
+    AttributeFilter:
+      type: object
+      properties:
+        field:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
     AuthServiceBackendConfig:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          active-directory: "#/components/schemas/ADAuthServiceBackendConfig"
+          ldap: "#/components/schemas/LDAPAuthServiceBackendConfig"
       properties:
         type:
           type: string
@@ -13579,6 +13781,22 @@ components:
           uniqueItems: true
         read_only:
           type: boolean
+    AutoInterval:
+      allOf:
+      - $ref: "#/components/schemas/Interval"
+      - type: object
+        properties:
+          scaling:
+            type: number
+            format: double
+    AutoIntervalDTO:
+      allOf:
+      - $ref: "#/components/schemas/IntervalDTO"
+      - type: object
+        properties:
+          scaling:
+            type: number
+            format: double
     AvailableCapability:
       type: object
       properties:
@@ -13625,14 +13843,44 @@ components:
             additionalProperties: {}
         type:
           type: string
+    Average:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+        whole_number:
+          type: boolean
     BackendQuery:
       discriminator:
         propertyName: type
+        mapping:
+          elasticsearch: "#/components/schemas/ElasticsearchQueryString"
       properties:
         type:
           type: string
       required:
       - type
+    BarVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          axis_type:
+            type: string
+            enum:
+            - linear
+            - logarithmic
+          barmode:
+            type: string
+            enum:
+            - stack
+            - overlay
+            - group
+            - relative
     BasicUserResponse:
       type: object
       properties:
@@ -13659,7 +13907,7 @@ components:
     BodyPart:
       type: object
       properties:
-        contentDisposition:
+        content_disposition:
           $ref: "#/components/schemas/ContentDisposition"
         entity: {}
         headers:
@@ -13671,11 +13919,11 @@ components:
           properties:
             empty:
               type: boolean
-        mediaType:
+        media_type:
           $ref: "#/components/schemas/MediaType"
-        messageBodyWorkers:
+        message_body_workers:
           $ref: "#/components/schemas/MessageBodyWorkers"
-        parameterizedHeaders:
+        parameterized_headers:
           type: object
           additionalProperties:
             type: array
@@ -13700,9 +13948,23 @@ components:
         count:
           type: integer
           format: int64
-        startDate:
+        start_date:
           type: string
           format: date-time
+    BucketSpec:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          time: "#/components/schemas/Time"
+          values: "#/components/schemas/Values"
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
     BuildInfo:
       type: object
       properties:
@@ -13736,20 +13998,12 @@ components:
     BulkActionRequest:
       type: object
       properties:
-        collectorIds:
-          type: array
-          items:
-            type: string
         collector_ids:
           type: array
           items:
             type: string
-          writeOnly: true
-        sidecarId:
-          type: string
         sidecar_id:
           type: string
-          writeOnly: true
     BulkActionsRequest:
       type: object
       properties:
@@ -13762,7 +14016,7 @@ components:
     BulkEventsByIds:
       type: object
       properties:
-        eventIds:
+        event_ids:
           type: array
           items:
             type: string
@@ -13917,6 +14171,15 @@ components:
           type: array
           items:
             type: string
+    Cardinality:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
     CatalogIndexResponse:
       type: object
       properties:
@@ -13963,18 +14226,18 @@ components:
       properties:
         issuer:
           type: string
-        serialNumber:
+        serial_number:
           type: integer
         subject:
           type: string
-        subjectAlternativeNames:
+        subject_alternative_names:
           type: array
           items:
             type: string
-        validFrom:
+        valid_from:
           type: string
           format: date-time
-        validTo:
+        valid_to:
           type: string
           format: date-time
     ChangePasswordRequest:
@@ -14015,6 +14278,13 @@ components:
           $ref: "#/components/schemas/Startpage"
         timezone:
           type: string
+    ChartColorMapping:
+      type: object
+      properties:
+        chart_color:
+          type: string
+        field_name:
+          type: string
     ChunkedOutputResultChunk:
       type: object
       properties:
@@ -14023,7 +14293,7 @@ components:
         type:
           type: object
           properties:
-            typeName:
+            type_name:
               type: string
     ChunkedOutputSimpleMessageChunk:
       type: object
@@ -14033,7 +14303,7 @@ components:
         type:
           type: object
           properties:
-            typeName:
+            type_name:
               type: string
     CloneStreamRequest:
       type: object
@@ -14090,40 +14360,40 @@ components:
     ClusterState:
       type: object
       properties:
-        activePrimaryShards:
+        active_primary_shards:
           type: integer
           format: int32
-        activeShards:
+        active_shards:
           type: integer
           format: int32
-        clusterName:
+        cluster_name:
           type: string
-        delayedUnassignedShards:
+        delayed_unassigned_shards:
           type: integer
           format: int32
-        initializingShards:
+        initializing_shards:
           type: integer
           format: int32
-        managerNode:
+        manager_node:
           $ref: "#/components/schemas/ManagerNode"
-        numberOfNodes:
+        number_of_nodes:
           type: integer
           format: int32
-        opensearchNodes:
+        opensearch_nodes:
           type: array
           items:
             $ref: "#/components/schemas/Node"
-        relocatingShards:
+        relocating_shards:
           type: integer
           format: int32
-        shardReplication:
+        shard_replication:
           type: string
           enum:
           - ALL
           - PRIMARIES
         status:
           type: string
-        unassignedShards:
+        unassigned_shards:
           type: integer
           format: int32
     ClusterStats:
@@ -14278,13 +14548,87 @@ components:
         total:
           type: integer
           format: int64
-    Config:
+    CommonEventSummary:
       type: object
-      discriminator:
-        propertyName: type
       properties:
-        type:
+        alert:
+          type: boolean
+        event_definition_id:
           type: string
+        event_keys:
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        message:
+          type: string
+        priority:
+          type: integer
+          format: int64
+        replay_info:
+          $ref: "#/components/schemas/EventReplayInfo"
+        streams:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        timestamp:
+          type: string
+          format: date-time
+    Config:
+      allOf:
+      - $ref: "#/components/schemas/LookupCacheConfiguration"
+      - type: object
+        properties:
+          expire_after_access:
+            type: integer
+            format: int64
+            minimum: 0
+          expire_after_access_unit:
+            type: string
+            enum:
+            - NANOSECONDS
+            - MICROSECONDS
+            - MILLISECONDS
+            - SECONDS
+            - MINUTES
+            - HOURS
+            - DAYS
+          expire_after_write:
+            type: integer
+            format: int64
+            minimum: 0
+          expire_after_write_unit:
+            type: string
+            enum:
+            - NANOSECONDS
+            - MICROSECONDS
+            - MILLISECONDS
+            - SECONDS
+            - MINUTES
+            - HOURS
+            - DAYS
+          ignore_null:
+            type: boolean
+          max_size:
+            type: integer
+            format: int32
+            minimum: 0
+          ttl_empty:
+            type: integer
+            format: int64
+            minimum: 0
+          ttl_empty_unit:
+            type: string
+            enum:
+            - NANOSECONDS
+            - MICROSECONDS
+            - MILLISECONDS
+            - SECONDS
+            - MINUTES
+            - HOURS
+            - DAYS
     ConfigurableTypeInfo:
       type: object
       properties:
@@ -14322,27 +14666,15 @@ components:
     ConfigurationAssignment:
       type: object
       properties:
-        assignedFromTags:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
         assigned_from_tags:
           type: array
           items:
             type: string
           uniqueItems: true
-          writeOnly: true
-        collectorId:
-          type: string
         collector_id:
-          type: string
-          writeOnly: true
-        configurationId:
           type: string
         configuration_id:
           type: string
-          writeOnly: true
     ConfigurationListResponse:
       type: object
       properties:
@@ -14470,19 +14802,19 @@ components:
     ContentDisposition:
       type: object
       properties:
-        creationDate:
+        creation_date:
           type: string
           format: date-time
-        fileName:
+        file_name:
           type: string
-        modificationDate:
+        modification_date:
           type: string
           format: date-time
         parameters:
           type: object
           additionalProperties:
             type: string
-        readDate:
+        read_date:
           type: string
           format: date-time
         size:
@@ -14683,6 +15015,15 @@ components:
         remediation_steps:
           type: string
         title:
+          type: string
+    Count:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
           type: string
     Counter:
       type: object
@@ -14990,9 +15331,9 @@ components:
     CurrentStateInformation:
       type: object
       properties:
-        errorMessage:
+        error_message:
           type: string
-        nextSteps:
+        next_steps:
           type: array
           items:
             type: string
@@ -15077,6 +15418,13 @@ components:
       properties:
         empty:
           type: boolean
+    DashboardStartPage:
+      allOf:
+      - $ref: "#/components/schemas/Startpage"
+      - type: object
+        properties:
+          id:
+            type: string
     Data:
       type: object
       properties:
@@ -15166,9 +15514,6 @@ components:
           - CLEAR
           - REQUEST_CSR
           - REQUEST_CSR_WITH_AUTOSTART
-        certValidUntil:
-          type: string
-          format: date-time
         cert_valid_until:
           type: string
           format: date-time
@@ -15190,7 +15535,7 @@ components:
           - REMOVED
         datanode_version:
           type: string
-        errorMsg:
+        error_msg:
           type: string
         hostname:
           type: string
@@ -15230,7 +15575,7 @@ components:
     DataNodeInformation:
       type: object
       properties:
-        dataNodeStatus:
+        data_node_status:
           type: string
           enum:
           - UNCONFIGURED
@@ -15240,23 +15585,23 @@ components:
           - UNAVAILABLE
           - REMOVING
           - REMOVED
-        datanodeVersion:
+        datanode_version:
           type: string
         hostname:
           type: string
         ip:
           type: string
-        managerNode:
+        manager_node:
           type: boolean
-        nodeName:
+        node_name:
           type: string
-        opensearchVersion:
+        opensearch_version:
           type: string
         roles:
           type: array
           items:
             type: string
-        upgradePossible:
+        upgrade_possible:
           type: boolean
     DataRoutedStream:
       type: object
@@ -15266,17 +15611,30 @@ components:
         from:
           type: string
           format: date-time
-        streamId:
+        stream_id:
           type: string
-        streamName:
+        stream_name:
           type: string
         to:
           type: string
           format: date-time
+    DataTableVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          pinned_columns:
+            type: array
+            items:
+              type: string
+          show_row_numbers:
+            type: boolean
     DataTieringConfig:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          hot_only: "#/components/schemas/HotOnlyDataTieringConfig"
       properties:
         index_lifetime_max:
           $ref: "#/components/schemas/Period"
@@ -15337,19 +15695,19 @@ components:
     DatanodeUpgradeStatus:
       type: object
       properties:
-        clusterHealthy:
+        cluster_healthy:
           type: boolean
-        clusterState:
+        cluster_state:
           $ref: "#/components/schemas/ClusterState"
-        outdatedNodes:
+        outdated_nodes:
           type: array
           items:
             $ref: "#/components/schemas/DataNodeInformation"
-        serverVersion:
+        server_version:
           $ref: "#/components/schemas/Version"
-        shardReplicationEnabled:
+        shard_replication_enabled:
           type: boolean
-        upToDateNodes:
+        up_to_date_nodes:
           type: array
           items:
             $ref: "#/components/schemas/DataNodeInformation"
@@ -15468,16 +15826,16 @@ components:
         millis:
           type: integer
           format: int64
-        standardDays:
+        standard_days:
           type: integer
           format: int64
-        standardHours:
+        standard_hours:
           type: integer
           format: int64
-        standardMinutes:
+        standard_minutes:
           type: integer
           format: int64
-        standardSeconds:
+        standard_seconds:
           type: integer
           format: int64
     DurationFieldType:
@@ -15486,16 +15844,15 @@ components:
         name:
           type: string
     ElasticsearchQueryString:
-      type: object
-      properties:
-        queryString:
-          type: string
-        query_string:
-          type: string
-          writeOnly: true
-        type:
-          type: string
-          writeOnly: true
+      allOf:
+      - $ref: "#/components/schemas/BackendQuery"
+      - type: object
+        properties:
+          query_string:
+            type: string
+          type:
+            type: string
+            writeOnly: true
     ElasticsearchStats:
       type: object
       properties:
@@ -15515,12 +15872,96 @@ components:
           - Red
           - Yellow
           - Green
+    EmailEventNotificationConfig:
+      type: object
+      properties:
+        bcc_emails:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        bcc_emails_lut_key:
+          type: string
+        bcc_emails_lut_name:
+          type: string
+        bcc_users:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        body_template:
+          type: string
+        cc_emails:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        cc_emails_lut_key:
+          type: string
+        cc_emails_lut_name:
+          type: string
+        cc_users:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        email_recipients:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        html_body_template:
+          type: string
+        include_event_procedure:
+          type: boolean
+        lookup_bcc_emails:
+          type: boolean
+        lookup_cc_emails:
+          type: boolean
+        lookup_recipient_emails:
+          type: boolean
+        lookup_reply_to_email:
+          type: boolean
+        lookup_sender_email:
+          type: boolean
+        recipients_lut_key:
+          type: string
+        recipients_lut_name:
+          type: string
+        reply_to:
+          type: string
+        reply_to_lut_key:
+          type: string
+        reply_to_lut_name:
+          type: string
+        sender:
+          type: string
+        sender_lut_key:
+          type: string
+        sender_lut_name:
+          type: string
+        single_email:
+          type: boolean
+        subject:
+          type: string
+          minLength: 1
+        time_zone:
+          $ref: "#/components/schemas/DateTimeZone"
+        type:
+          type: string
+        user_recipients:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+      required:
+      - subject
     EncryptedValue:
       type: object
       properties:
-        deleteValue:
+        delete_value:
           type: boolean
-        keepValue:
+        keep_value:
           type: boolean
         set:
           type: boolean
@@ -15807,6 +16248,16 @@ components:
           $ref: "#/components/schemas/ModelType_HttpView"
         v:
           type: string
+    Equal:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionDouble"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionDouble"
+          right:
+            $ref: "#/components/schemas/ExpressionDouble"
+      - $ref: "#/components/schemas/ExpressionBoolean"
     ErrorStates:
       type: object
       properties:
@@ -16020,10 +16471,60 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Config"
+    EventList:
+      type: object
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttributeFilter"
+        filter:
+          $ref: "#/components/schemas/Filter"
+        filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/UsedSearchFilter"
+        id:
+          type: string
+        name:
+          type: string
+        page:
+          type: integer
+          format: int32
+        per_page:
+          type: integer
+          format: int32
+        query:
+          $ref: "#/components/schemas/BackendQuery"
+        sort:
+          $ref: "#/components/schemas/SortConfig"
+        stream_categories:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        streams:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        timerange:
+          $ref: "#/components/schemas/TimeRange"
+        type:
+          type: string
     EventNotificationConfig:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          email-notification-v1: "#/components/schemas/EmailEventNotificationConfig"
+          http-notification-v1: "#/components/schemas/HTTPEventNotificationConfig"
+          http-notification-v2: "#/components/schemas/HTTPEventNotificationConfigV2"
+          legacy-alarm-callback-notification-v1: "#/components/schemas/LegacyAlarmCallbackEventNotificationConfig"
+          pagerduty-notification-v2: "#/components/schemas/PagerDutyNotificationConfig"
+          slack-notification-v1: "#/components/schemas/SlackEventNotificationConfig"
+          teams-notification-v1: "#/components/schemas/TeamsEventNotificationConfig"
+          teams-notification-v2: "#/components/schemas/TeamsEventNotificationConfigV2"
       properties:
         type:
           type: string
@@ -16040,6 +16541,9 @@ components:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          aggregation-v1: "#/components/schemas/AggregationEventProcessorConfig"
+          system-notifications-v1: "#/components/schemas/SystemNotificationEventProcessorConfig"
       properties:
         type:
           type: string
@@ -16047,6 +16551,9 @@ components:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          aggregation-v1: "#/components/schemas/AggregationEventProcessorParameters"
+          system-notifications-v1: "#/components/schemas/SystemNotificationEventProcessorParameters"
       properties:
         type:
           type: string
@@ -16170,6 +16677,31 @@ components:
           items:
             type: string
           uniqueItems: true
+    EventsWidgetConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/WidgetConfigDTO"
+      - type: object
+        properties:
+          fields:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+          filters:
+            type: array
+            items:
+              $ref: "#/components/schemas/Filter"
+          mode:
+            type: string
+            enum:
+            - List
+            - Number
+          sort:
+            $ref: "#/components/schemas/SortConfig"
+          units:
+            type: object
+            additionalProperties:
+              $ref: "#/components/schemas/UnitId"
     ExecutionInfo:
       type: object
       properties:
@@ -16182,7 +16714,7 @@ components:
     ExecutionState:
       type: object
       properties:
-        additionalParameters:
+        additional_parameters:
           type: object
           additionalProperties: {}
           properties:
@@ -16191,9 +16723,9 @@ components:
         cancel_after_seconds:
           type: integer
           format: int32
-        globalOverride:
+        global_override:
           $ref: "#/components/schemas/ExecutionStateGlobalOverride"
-        parameterBindings:
+        parameter_bindings:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/Binding"
@@ -16210,7 +16742,7 @@ components:
     ExecutionStateGlobalOverride:
       type: object
       properties:
-        keepQueries:
+        keep_queries:
           type: array
           items:
             type: string
@@ -16218,7 +16750,7 @@ components:
             empty:
               type: boolean
           uniqueItems: true
-        keepSearchTypes:
+        keep_search_types:
           type: array
           items:
             type: string
@@ -16237,7 +16769,7 @@ components:
           format: int32
         query:
           $ref: "#/components/schemas/BackendQuery"
-        searchTypes:
+        search_types:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/SearchTypeExecutionState"
@@ -16249,9 +16781,9 @@ components:
     ExplainResult:
       type: object
       properties:
-        queryString:
+        query_string:
           type: string
-        searchedIndexRanges:
+        searched_index_ranges:
           type: array
           items:
             $ref: "#/components/schemas/IndexRangeResult"
@@ -16261,7 +16793,7 @@ components:
       properties:
         search:
           $ref: "#/components/schemas/SearchResult"
-        searchErrors:
+        search_errors:
           type: array
           items:
             $ref: "#/components/schemas/SearchError"
@@ -16280,39 +16812,39 @@ components:
           properties:
             absolute:
               type: boolean
-            fileName:
+            file_name:
               type: object
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
-            fileSystem:
+            file_system:
               type: object
               properties:
-                fileStores: {}
+                file_stores: {}
                 open:
                   type: boolean
-                readOnly:
+                read_only:
                   type: boolean
-                rootDirectories: {}
+                root_directories: {}
                 separator:
                   type: string
-                userPrincipalLookupService: {}
-            nameCount:
+                user_principal_lookup_service: {}
+            name_count:
               type: integer
               format: int32
             parent:
@@ -16320,19 +16852,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
             root:
@@ -16340,19 +16872,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
         data_dir:
@@ -16360,39 +16892,39 @@ components:
           properties:
             absolute:
               type: boolean
-            fileName:
+            file_name:
               type: object
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
-            fileSystem:
+            file_system:
               type: object
               properties:
-                fileStores: {}
+                file_stores: {}
                 open:
                   type: boolean
-                readOnly:
+                read_only:
                   type: boolean
-                rootDirectories: {}
+                root_directories: {}
                 separator:
                   type: string
-                userPrincipalLookupService: {}
-            nameCount:
+                user_principal_lookup_service: {}
+            name_count:
               type: integer
               format: int32
             parent:
@@ -16400,19 +16932,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
             root:
@@ -16420,19 +16952,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
         inputbuffer_processors:
@@ -16459,39 +16991,39 @@ components:
           properties:
             absolute:
               type: boolean
-            fileName:
+            file_name:
               type: object
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
-            fileSystem:
+            file_system:
               type: object
               properties:
-                fileStores: {}
+                file_stores: {}
                 open:
                   type: boolean
-                readOnly:
+                read_only:
                   type: boolean
-                rootDirectories: {}
+                root_directories: {}
                 separator:
                   type: string
-                userPrincipalLookupService: {}
-            nameCount:
+                user_principal_lookup_service: {}
+            name_count:
               type: integer
               format: int32
             parent:
@@ -16499,19 +17031,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
             root:
@@ -16519,19 +17051,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
         processbuffer_processors:
@@ -16554,6 +17086,46 @@ components:
         stream_processing_timeout:
           type: integer
           format: int64
+    ExpressionBoolean:
+      type: object
+      discriminator:
+        propertyName: expr
+        mapping:
+          '!': "#/components/schemas/Not"
+          '&&': "#/components/schemas/And"
+          <: "#/components/schemas/Lesser"
+          <=: "#/components/schemas/LesserEqual"
+          ==: "#/components/schemas/Equal"
+          '>': "#/components/schemas/Greater"
+          '>=': "#/components/schemas/GreaterEqual"
+          group: "#/components/schemas/Group"
+          number: "#/components/schemas/NumberValue"
+          number-ref: "#/components/schemas/NumberReference"
+          "true": "#/components/schemas/True"
+          '||': "#/components/schemas/Or"
+      properties:
+        expr:
+          type: string
+    ExpressionDouble:
+      type: object
+      discriminator:
+        propertyName: expr
+        mapping:
+          '!': "#/components/schemas/Not"
+          '&&': "#/components/schemas/And"
+          <: "#/components/schemas/Lesser"
+          <=: "#/components/schemas/LesserEqual"
+          ==: "#/components/schemas/Equal"
+          '>': "#/components/schemas/Greater"
+          '>=': "#/components/schemas/GreaterEqual"
+          group: "#/components/schemas/Group"
+          number: "#/components/schemas/NumberValue"
+          number-ref: "#/components/schemas/NumberReference"
+          "true": "#/components/schemas/True"
+          '||': "#/components/schemas/Or"
+      properties:
+        expr:
+          type: string
     ExtentFreeList:
       type: object
       properties:
@@ -16799,16 +17371,13 @@ components:
           format: int32
     Filter:
       type: object
-      discriminator:
-        propertyName: type
       properties:
-        filters:
+        field:
+          type: string
+        value:
           type: array
           items:
-            $ref: "#/components/schemas/Filter"
-          uniqueItems: true
-        type:
-          type: string
+            type: string
     FilterOption:
       type: object
       properties:
@@ -16840,12 +17409,12 @@ components:
       type: object
       properties:
         content: {}
-        contentDisposition:
+        content_disposition:
           $ref: "#/components/schemas/ContentDisposition"
         entity: {}
-        fileName:
+        file_name:
           type: string
-        formDataContentDisposition:
+        form_data_content_disposition:
           $ref: "#/components/schemas/FormDataContentDisposition"
         headers:
           type: object
@@ -16856,13 +17425,13 @@ components:
           properties:
             empty:
               type: boolean
-        mediaType:
+        media_type:
           $ref: "#/components/schemas/MediaType"
-        messageBodyWorkers:
+        message_body_workers:
           $ref: "#/components/schemas/MessageBodyWorkers"
         name:
           type: string
-        parameterizedHeaders:
+        parameterized_headers:
           type: object
           additionalProperties:
             type: array
@@ -16882,12 +17451,12 @@ components:
     FormDataContentDisposition:
       type: object
       properties:
-        creationDate:
+        creation_date:
           type: string
           format: date-time
-        fileName:
+        file_name:
           type: string
-        modificationDate:
+        modification_date:
           type: string
           format: date-time
         name:
@@ -16896,7 +17465,7 @@ components:
           type: object
           additionalProperties:
             type: string
-        readDate:
+        read_date:
           type: string
           format: date-time
         size:
@@ -16928,19 +17497,19 @@ components:
     GenerateTokenTTL:
       type: object
       properties:
-        tokenTTL:
+        token_ttl:
           $ref: "#/components/schemas/PeriodDuration"
     GetByIdRequest:
       type: object
       properties:
-        eventDefinitionIds:
+        event_definition_ids:
           type: array
           items:
             type: string
     GetConnectedPipelinesRequest:
       type: object
       properties:
-        streamIds:
+        stream_ids:
           type: array
           items:
             type: string
@@ -16976,6 +17545,25 @@ components:
       - type: object
         properties:
           version: {}
+    Greater:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionBoolean"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionDouble"
+          right:
+            $ref: "#/components/schemas/ExpressionDouble"
+    GreaterEqual:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionDouble"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionDouble"
+          right:
+            $ref: "#/components/schemas/ExpressionDouble"
+      - $ref: "#/components/schemas/ExpressionBoolean"
     GrokPattern:
       type: object
       properties:
@@ -17025,6 +17613,16 @@ components:
           type: string
         string:
           type: string
+    Group:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionBoolean"
+      - type: object
+        properties:
+          child:
+            $ref: "#/components/schemas/ExpressionBoolean"
+          operator:
+            type: string
+      - $ref: "#/components/schemas/ExpressionDouble"
     Grouping:
       type: object
       properties:
@@ -17041,6 +17639,58 @@ components:
           type: string
       required:
       - field
+    HTTPEventNotificationConfig:
+      type: object
+      properties:
+        api_key:
+          type: string
+        api_key_as_header:
+          type: boolean
+        api_secret:
+          $ref: "#/components/schemas/EncryptedValue"
+        basic_auth:
+          $ref: "#/components/schemas/EncryptedValue"
+        skip_tls_verification:
+          type: boolean
+        type:
+          type: string
+        url:
+          type: string
+    HTTPEventNotificationConfigV2:
+      type: object
+      properties:
+        api_key:
+          type: string
+        api_key_as_header:
+          type: boolean
+        api_secret:
+          $ref: "#/components/schemas/EncryptedValue"
+        basic_auth:
+          $ref: "#/components/schemas/EncryptedValue"
+        body_template:
+          type: string
+        content_type:
+          type: string
+          enum:
+          - JSON
+          - FORM_DATA
+          - PLAIN_TEXT
+        headers:
+          type: string
+        method:
+          type: string
+          enum:
+          - POST
+          - PUT
+          - GET
+        skip_tls_verification:
+          type: boolean
+        time_zone:
+          $ref: "#/components/schemas/DateTimeZone"
+        type:
+          type: string
+        url:
+          type: string
     HTTPHeaderAuthConfig:
       type: object
       properties:
@@ -17051,6 +17701,26 @@ components:
           minLength: 1
       required:
       - username_header
+    HeatmapVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          auto_scale:
+            type: boolean
+          color_scale:
+            type: string
+          default_value:
+            type: integer
+            format: int64
+          reverse_scale:
+            type: boolean
+          use_smallest_as_default:
+            type: boolean
+          z_max:
+            type: string
+          z_min:
+            type: string
     HelloWorldResponse:
       type: object
       properties:
@@ -17120,6 +17790,13 @@ components:
           $ref: "#/components/schemas/Os"
         system:
           $ref: "#/components/schemas/System"
+    HotOnlyDataTieringConfig:
+      allOf:
+      - $ref: "#/components/schemas/DataTieringConfig"
+      required:
+      - index_lifetime_max
+      - index_lifetime_min
+      - type
     ImmutableIndexSetField:
       allOf:
       - $ref: "#/components/schemas/IndexSetFieldRestriction"
@@ -17136,6 +17813,17 @@ components:
           $ref: "#/components/schemas/Config"
         last:
           $ref: "#/components/schemas/Config"
+    ImmutableListHostAndPort:
+      type: array
+      items:
+        $ref: "#/components/schemas/HostAndPort"
+      properties:
+        empty:
+          type: boolean
+        first:
+          $ref: "#/components/schemas/HostAndPort"
+        last:
+          $ref: "#/components/schemas/HostAndPort"
     ImmutableListRow:
       type: array
       items:
@@ -17479,7 +18167,7 @@ components:
         updated:
           type: integer
           format: int64
-        versionConflicts:
+        version_conflicts:
           type: integer
           format: int64
     IndexRangeResult:
@@ -17491,11 +18179,11 @@ components:
         end:
           type: integer
           format: int64
-        indexName:
+        index_name:
           type: string
-        isWarmTiered:
+        is_warm_tiered:
           type: boolean
-        streamNames:
+        stream_names:
           type: array
           items:
             type: string
@@ -17529,9 +18217,9 @@ components:
     IndexSet:
       type: object
       properties:
-        activeWriteIndex:
+        active_write_index:
           type: string
-        allIndexAliases:
+        all_index_aliases:
           type: object
           additionalProperties:
             type: array
@@ -17540,19 +18228,19 @@ components:
             uniqueItems: true
         config:
           $ref: "#/components/schemas/IndexSetConfig"
-        indexPrefix:
+        index_prefix:
           type: string
-        indexWildcard:
+        index_wildcard:
           type: string
-        managedIndices:
+        managed_indices:
           type: array
           items:
             type: string
-        newestIndex:
+        newest_index:
           type: string
         up:
           type: boolean
-        writeIndexAlias:
+        write_index_alias:
           type: string
     IndexSetConfig:
       type: object
@@ -18179,22 +18867,15 @@ components:
     InputStateSummary:
       type: object
       properties:
-        detailedMessage:
-          type: string
         detailed_message:
           type: string
-          writeOnly: true
         id:
           type: string
         message_input:
           $ref: "#/components/schemas/InputSummary"
-        startedAt:
-          type: string
-          format: date-time
         started_at:
           type: string
           format: date-time
-          writeOnly: true
         state:
           type: string
     InputStatesList:
@@ -18337,23 +19018,46 @@ components:
         tx_packets:
           type: integer
           format: int64
+    Interval:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          auto: "#/components/schemas/AutoInterval"
+          timeunit: "#/components/schemas/TimeUnitInterval"
+      properties:
+        type:
+          type: string
+    IntervalDTO:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          auto: "#/components/schemas/AutoIntervalDTO"
+          timeunit: "#/components/schemas/TimeUnitIntervalDTO"
+      properties:
+        type:
+          type: string
     JobTriggerData:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          event-processor-execution-v1: "#/components/schemas/Data"
+          notification-execution-v1: "#/components/schemas/Data"
       properties:
         type:
           type: string
     JournalEstimate:
       type: object
       properties:
-        bytesPerMinute:
+        bytes_per_minute:
           type: integer
           format: int64
-        journalSize:
+        journal_size:
           type: integer
           format: int64
-        maxDowntimeMinutes:
+        max_downtime_minutes:
           type: integer
           format: int64
     JournalSummaryResponse:
@@ -18516,39 +19220,39 @@ components:
           properties:
             absolute:
               type: boolean
-            fileName:
+            file_name:
               type: object
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
-            fileSystem:
+            file_system:
               type: object
               properties:
-                fileStores: {}
+                file_stores: {}
                 open:
                   type: boolean
-                readOnly:
+                read_only:
                   type: boolean
-                rootDirectories: {}
+                root_directories: {}
                 separator:
                   type: string
-                userPrincipalLookupService: {}
-            nameCount:
+                user_principal_lookup_service: {}
+            name_count:
               type: integer
               format: int32
             parent:
@@ -18556,19 +19260,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
             root:
@@ -18576,19 +19280,19 @@ components:
               properties:
                 absolute:
                   type: boolean
-                fileSystem:
+                file_system:
                   type: object
                   properties:
-                    fileStores: {}
+                    file_stores: {}
                     open:
                       type: boolean
-                    readOnly:
+                    read_only:
                       type: boolean
-                    rootDirectories: {}
+                    root_directories: {}
                     separator:
                       type: string
-                    userPrincipalLookupService: {}
-                nameCount:
+                    user_principal_lookup_service: {}
+                name_count:
                   type: integer
                   format: int32
         flush_age:
@@ -18690,6 +19394,74 @@ components:
           type: string
         stream_name:
           type: string
+    LDAPAuthServiceBackendConfig:
+      allOf:
+      - $ref: "#/components/schemas/AuthServiceBackendConfig"
+      - type: object
+        properties:
+          email_attributes:
+            type: array
+            items:
+              type: string
+            properties:
+              empty:
+                type: boolean
+              first:
+                type: string
+              last:
+                type: string
+          servers:
+            type: array
+            items:
+              $ref: "#/components/schemas/HostAndPort"
+            properties:
+              empty:
+                type: boolean
+              first:
+                $ref: "#/components/schemas/HostAndPort"
+              last:
+                $ref: "#/components/schemas/HostAndPort"
+          system_user_dn:
+            type: string
+          system_user_password:
+            $ref: "#/components/schemas/EncryptedValue"
+          transport_security:
+            type: string
+            enum:
+            - none
+            - tls
+            - start_tls
+          user_full_name_attribute:
+            type: string
+          user_name_attribute:
+            type: string
+          user_search_base:
+            type: string
+          user_search_pattern:
+            type: string
+          user_unique_id_attribute:
+            type: string
+          verify_certificates:
+            type: boolean
+    Latest:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+    LegacyAlarmCallbackEventNotificationConfig:
+      type: object
+      properties:
+        callback_type:
+          type: string
+        configuration:
+          type: object
+          additionalProperties: {}
+        type:
+          type: string
     LegacyContentPack_HttpView:
       allOf:
       - $ref: "#/components/schemas/ContentPack_HttpView"
@@ -18719,6 +19491,42 @@ components:
               empty:
                 type: boolean
             uniqueItems: true
+    Lesser:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionBoolean"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionDouble"
+          right:
+            $ref: "#/components/schemas/ExpressionDouble"
+      - $ref: "#/components/schemas/ExpressionDouble"
+    LesserEqual:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionBoolean"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionDouble"
+          right:
+            $ref: "#/components/schemas/ExpressionDouble"
+      - $ref: "#/components/schemas/ExpressionDouble"
+    LineVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          axis_type:
+            type: string
+            enum:
+            - linear
+            - logarithmic
+          interpolation:
+            type: string
+            enum:
+            - linear
+            - step-after
+            - spline
     LiteralAllowlistEntry:
       allOf:
       - $ref: "#/components/schemas/AllowlistEntry"
@@ -18742,7 +19550,7 @@ components:
     LogEntry:
       type: object
       properties:
-        logLevel:
+        log_level:
           type: string
           enum:
           - INFO
@@ -18798,6 +19606,9 @@ components:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          guava_cache: "#/components/schemas/Config"
+          none: "#/components/schemas/Config"
       properties:
         type:
           type: string
@@ -18805,6 +19616,18 @@ components:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          GreyNoise: "#/components/schemas/Config"
+          abuse-ch-ransom: "#/components/schemas/Config"
+          csvfile: "#/components/schemas/Config"
+          dnslookup: "#/components/schemas/Config"
+          dsvhttp: "#/components/schemas/Config"
+          httpjsonpath: "#/components/schemas/Config"
+          maxmind_geoip: "#/components/schemas/Config"
+          otx-api: "#/components/schemas/Config"
+          spamhaus-edrop: "#/components/schemas/Config"
+          torexitnode: "#/components/schemas/Config"
+          whois: "#/components/schemas/Config"
       properties:
         type:
           type: string
@@ -18940,7 +19763,7 @@ components:
       properties:
         name:
           type: string
-        nodeUid:
+        node_uid:
           type: string
     MappedFieldTypeDTO:
       type: object
@@ -18986,6 +19809,15 @@ components:
         start:
           type: integer
           format: int32
+    Max:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
     MediaType:
       type: object
       properties:
@@ -18997,9 +19829,9 @@ components:
           type: string
         type:
           type: string
-        wildcardSubtype:
+        wildcard_subtype:
           type: boolean
-        wildcardType:
+        wildcard_type:
           type: boolean
     Memory:
       type: object
@@ -19018,10 +19850,10 @@ components:
       properties:
         complete:
           type: boolean
-        fieldCount:
+        field_count:
           type: integer
           format: int32
-        fieldNames:
+        field_names:
           type: array
           items:
             type: string
@@ -19029,65 +19861,65 @@ components:
         fields:
           type: object
           additionalProperties: {}
-        fieldsEntries: {}
-        filterOut:
+        fields_entries: {}
+        filter_out:
           type: boolean
         id:
           type: string
-        indexSets:
+        index_sets:
           type: array
           items:
             $ref: "#/components/schemas/IndexSet"
           uniqueItems: true
-        inetAddress:
+        inet_address:
           type: object
           properties:
             address:
               type: string
               format: byte
-            anyLocalAddress:
+            any_local_address:
               type: boolean
-            canonicalHostName:
+            canonical_host_name:
               type: string
-            hostAddress:
+            host_address:
               type: string
-            hostName:
+            host_name:
               type: string
-            linkLocalAddress:
+            link_local_address:
               type: boolean
-            loopbackAddress:
+            loopback_address:
               type: boolean
             mcglobal:
               type: boolean
-            mclinkLocal:
+            mclink_local:
               type: boolean
-            mcnodeLocal:
+            mcnode_local:
               type: boolean
-            mcorgLocal:
+            mcorg_local:
               type: boolean
-            mcsiteLocal:
+            mcsite_local:
               type: boolean
-            multicastAddress:
+            multicast_address:
               type: boolean
-            siteLocalAddress:
+            site_local_address:
               type: boolean
-        isSourceInetAddress:
+        is_source_inet_address:
           type: boolean
-        journalOffset:
+        journal_offset:
           type: integer
           format: int64
         message:
           type: string
-        messageId:
+        message_id:
           type: string
-        messageQueueId: {}
-        processingTime:
-          type: string
-          format: date-time
-        receiveTime:
+        message_queue_id: {}
+        processing_time:
           type: string
           format: date-time
-        sequenceNr:
+        receive_time:
+          type: string
+          format: date-time
+        sequence_nr:
           type: integer
           format: int32
         size:
@@ -19095,9 +19927,9 @@ components:
           format: int64
         source:
           type: string
-        sourceInputId:
+        source_input_id:
           type: string
-        streamIds:
+        stream_ids:
           type: array
           items:
             type: string
@@ -19117,6 +19949,82 @@ components:
         events:
           type: integer
           format: int64
+    MessageList:
+      type: object
+      properties:
+        decorators:
+          type: array
+          items:
+            $ref: "#/components/schemas/Decorator"
+        fields:
+          type: array
+          items:
+            type: string
+        filter:
+          $ref: "#/components/schemas/Filter"
+        filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/UsedSearchFilter"
+        id:
+          type: string
+        limit:
+          type: integer
+          format: int32
+        name:
+          type: string
+        offset:
+          type: integer
+          format: int32
+        query:
+          $ref: "#/components/schemas/BackendQuery"
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/Sort"
+        stream_categories:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        streams:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        timerange:
+          $ref: "#/components/schemas/TimeRange"
+        type:
+          type: string
+    MessageListConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/WidgetConfigDTO"
+      - type: object
+        properties:
+          decorators:
+            type: array
+            items:
+              $ref: "#/components/schemas/Decorator"
+          fields:
+            type: array
+            items:
+              type: string
+            properties:
+              empty:
+                type: boolean
+            uniqueItems: true
+          show_message_row:
+            type: boolean
+          show_summary:
+            type: boolean
+          sort:
+            type: array
+            items:
+              $ref: "#/components/schemas/SortConfigDTO"
+          units:
+            type: object
+            additionalProperties:
+              $ref: "#/components/schemas/UnitId"
     MessageParseRequest:
       type: object
       properties:
@@ -19227,16 +20135,16 @@ components:
         count:
           type: integer
           format: int64
-        fifteenMinuteRate:
+        fifteen_minute_rate:
           type: number
           format: double
-        fiveMinuteRate:
+        five_minute_rate:
           type: number
           format: double
-        meanRate:
+        mean_rate:
           type: number
           format: double
-        oneMinuteRate:
+        one_minute_rate:
           type: number
           format: double
     Metric: {}
@@ -19332,6 +20240,15 @@ components:
           - CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED_AND_GRAYLOG_RESTARTED
           - CONFIRM_OLD_CONNECTION_STRING_FROM_CONFIG_REMOVED
           - SHOW_ROLLING_UPGRADE_ASK_TO_SHUTDOWN_OLD_CLUSTER
+    Min:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
     ModelType:
       type: object
       properties:
@@ -19364,11 +20281,11 @@ components:
     MultiPart:
       type: object
       properties:
-        bodyParts:
+        body_parts:
           type: array
           items:
             $ref: "#/components/schemas/BodyPart"
-        contentDisposition:
+        content_disposition:
           $ref: "#/components/schemas/ContentDisposition"
         entity: {}
         headers:
@@ -19380,11 +20297,11 @@ components:
           properties:
             empty:
               type: boolean
-        mediaType:
+        media_type:
           $ref: "#/components/schemas/MediaType"
-        messageBodyWorkers:
+        message_body_workers:
           $ref: "#/components/schemas/MessageBodyWorkers"
-        parameterizedHeaders:
+        parameterized_headers:
           type: object
           additionalProperties:
             type: array
@@ -19398,6 +20315,8 @@ components:
           $ref: "#/components/schemas/Providers"
     MultimapStringRangeInteger:
       type: object
+      additionalProperties:
+        $ref: "#/components/schemas/RangeInteger"
       properties:
         empty:
           type: boolean
@@ -19488,11 +20407,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ConfigurationAssignment"
-        nodeId:
-          type: string
         node_id:
           type: string
-          writeOnly: true
     NodeConfigurationRequest:
       type: object
       properties:
@@ -19622,6 +20538,14 @@ components:
         total:
           type: integer
           format: int32
+    Not:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionDouble"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionBoolean"
+      - $ref: "#/components/schemas/ExpressionBoolean"
     Notification:
       type: object
       properties:
@@ -19635,7 +20559,7 @@ components:
           type: string
         key:
           type: string
-        nodeId:
+        node_id:
           type: string
         severity:
           type: string
@@ -19723,6 +20647,36 @@ components:
         total:
           type: integer
           format: int32
+    NumberReference:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionDouble"
+      - type: object
+        properties:
+          ref:
+            type: string
+      - $ref: "#/components/schemas/ExpressionBoolean"
+    NumberValue:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionDouble"
+      - type: object
+        properties:
+          value:
+            type: number
+            format: double
+      - $ref: "#/components/schemas/ExpressionBoolean"
+    NumberVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          trend:
+            type: boolean
+          trend_preference:
+            type: string
+            enum:
+            - LOWER
+            - NEUTRAL
+            - HIGHER
     ObjectId:
       type: object
       properties:
@@ -19760,6 +20714,25 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IndexInfo"
+    Or:
+      allOf:
+      - $ref: "#/components/schemas/ExpressionBoolean"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/ExpressionBoolean"
+          right:
+            $ref: "#/components/schemas/ExpressionBoolean"
+      - $ref: "#/components/schemas/ExpressionDouble"
+    OrFilter:
+      allOf:
+      - $ref: "#/components/schemas/Filter"
+      - type: object
+        properties:
+          filters:
+            type: array
+            items: {}
+            uniqueItems: true
     OrderExtractorsRequest:
       type: object
       properties:
@@ -19799,12 +20772,12 @@ components:
         configuration:
           type: object
           additionalProperties: {}
-        contentPack:
+        content_pack:
           type: string
-        createdAt:
+        created_at:
           type: string
           format: date-time
-        creatorUserId:
+        creator_user_id:
           type: string
         id:
           type: string
@@ -20111,6 +21084,21 @@ components:
         total:
           type: integer
           format: int64
+    PagerDutyNotificationConfig:
+      type: object
+      properties:
+        client_name:
+          type: string
+        client_url:
+          type: string
+        custom_incident:
+          type: boolean
+        key_prefix:
+          type: string
+        routing_key:
+          type: string
+        type:
+          type: string
     PaginationInfo:
       type: object
       properties:
@@ -20139,6 +21127,8 @@ components:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          value-parameter-v1: "#/components/schemas/ValueParameter"
       properties:
         binding:
           $ref: "#/components/schemas/Binding"
@@ -20199,9 +21189,35 @@ components:
         line:
           type: integer
           format: int32
-        positionInLine:
+        position_in_line:
           type: integer
           format: int32
+        type:
+          type: string
+    Percentage:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        strategy:
+          type: string
+          enum:
+          - COUNT
+          - SUM
+        type:
+          type: string
+    Percentile:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        percentile:
+          type: number
+          format: double
         type:
           type: string
     Period:
@@ -20210,7 +21226,7 @@ components:
         days:
           type: integer
           format: int32
-        fieldTypes:
+        field_types:
           type: array
           items:
             $ref: "#/components/schemas/DurationFieldType"
@@ -20232,7 +21248,7 @@ components:
         periodInternal:
           $ref: "#/components/schemas/ReadablePeriod"
           writeOnly: true
-        periodType:
+        period_type:
           $ref: "#/components/schemas/PeriodType"
         seconds:
           type: integer
@@ -20272,11 +21288,11 @@ components:
             chronology:
               type: object
               properties:
-                calendarType:
+                calendar_type:
                   type: string
                 id:
                   type: string
-                isoBased:
+                iso_based:
                   type: boolean
             days:
               type: integer
@@ -20291,7 +21307,7 @@ components:
               items:
                 type: object
                 properties:
-                  dateBased:
+                  date_based:
                     type: boolean
                   duration:
                     type: object
@@ -20308,9 +21324,9 @@ components:
                         format: int64
                       zero:
                         type: boolean
-                  durationEstimated:
+                  duration_estimated:
                     type: boolean
-                  timeBased:
+                  time_based:
                     type: boolean
             years:
               type: integer
@@ -20322,7 +21338,7 @@ components:
           items:
             type: object
             properties:
-              dateBased:
+              date_based:
                 type: boolean
               duration:
                 type: object
@@ -20339,9 +21355,9 @@ components:
                     format: int64
                   zero:
                     type: boolean
-              durationEstimated:
+              duration_estimated:
                 type: boolean
-              timeBased:
+              time_based:
                 type: boolean
         zero:
           type: boolean
@@ -20371,22 +21387,13 @@ components:
       properties:
         id:
           type: string
-        pipelineIds:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
         pipeline_ids:
           type: array
           items:
             type: string
           uniqueItems: true
-          writeOnly: true
-        streamId:
-          type: string
         stream_id:
           type: string
-          writeOnly: true
     PipelineInterpreterTrace:
       type: object
       properties:
@@ -20398,22 +21405,13 @@ components:
     PipelineReverseConnections:
       type: object
       properties:
-        pipelineId:
-          type: string
         pipeline_id:
           type: string
-          writeOnly: true
-        streamIds:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
         stream_ids:
           type: array
           items:
             type: string
           uniqueItems: true
-          writeOnly: true
     PipelineSource:
       type: object
       properties:
@@ -20442,10 +21440,68 @@ components:
             $ref: "#/components/schemas/StageSource"
         title:
           type: string
+    Pivot:
+      type: object
+      properties:
+        column_groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/BucketSpec"
+        filter:
+          $ref: "#/components/schemas/Filter"
+        filters:
+          type: array
+          items:
+            $ref: "#/components/schemas/UsedSearchFilter"
+        id:
+          type: string
+        name:
+          type: string
+        query:
+          $ref: "#/components/schemas/BackendQuery"
+        rollup:
+          type: boolean
+        row_groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/BucketSpec"
+        series:
+          type: array
+          items:
+            $ref: "#/components/schemas/SeriesSpec"
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortSpec"
+        stream_categories:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        streams:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        timerange:
+          $ref: "#/components/schemas/TimeRange"
+        type:
+          type: string
+    PivotConfigDTO: {}
+    PivotDTO:
+      type: object
+      properties:
+        config: {}
+        fields:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
     PivotResult:
       type: object
       properties:
-        columnNames:
+        column_names:
           type: array
           items:
             type: string
@@ -20471,6 +21527,12 @@ components:
           format: int64
         type:
           type: string
+    PivotSort:
+      allOf:
+      - $ref: "#/components/schemas/SortSpec"
+    PivotSortConfig:
+      allOf:
+      - $ref: "#/components/schemas/SortConfigDTO"
     PluginList:
       type: object
       properties:
@@ -20614,10 +21676,10 @@ components:
     ProvisioningInformation:
       type: object
       properties:
-        certValidUntil:
+        cert_valid_until:
           type: string
           format: date-time
-        errorMsg:
+        error_msg:
           type: string
         status:
           type: string
@@ -20722,7 +21784,7 @@ components:
     QueryExplainResult:
       type: object
       properties:
-        searchTypes:
+        search_types:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/ExplainResult"
@@ -20771,6 +21833,18 @@ components:
       required:
       - last_used
       - query
+    QueryStringFilter:
+      allOf:
+      - $ref: "#/components/schemas/Filter"
+      - type: object
+        properties:
+          filters:
+            type: array
+            items:
+              $ref: "#/components/schemas/Filter"
+            uniqueItems: true
+          query:
+            type: string
     QueryStringUsedDTO:
       type: object
       properties:
@@ -20779,6 +21853,11 @@ components:
           minLength: 1
       required:
       - query_string
+    RangeInteger:
+      type: object
+      properties:
+        empty:
+          type: boolean
     RateMetricsResponse:
       type: object
       properties:
@@ -20800,7 +21879,7 @@ components:
     ReadablePeriod:
       type: object
       properties:
-        periodType:
+        period_type:
           $ref: "#/components/schemas/PeriodType"
     ReaderPermissionResponse:
       type: object
@@ -20942,7 +22021,7 @@ components:
         created:
           type: string
           format: date-time
-        errorMsg:
+        error_msg:
           type: string
         name:
           type: string
@@ -20955,7 +22034,7 @@ components:
           - RUNNING
           - ERROR
           - FINISHED
-        taskId:
+        task_id:
           type: string
         took:
           $ref: "#/components/schemas/Duration"
@@ -21007,10 +22086,10 @@ components:
           type: string
         synchronous:
           type: boolean
-        threadsCount:
+        threads_count:
           type: integer
           format: int32
-        trustUnknownCerts:
+        trust_unknown_certs:
           type: boolean
         user:
           type: string
@@ -21049,6 +22128,10 @@ components:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          events: "#/components/schemas/Result"
+          messages: "#/components/schemas/Result"
+          pivot: "#/components/schemas/PivotResult"
       properties:
         id:
           type: string
@@ -21059,7 +22142,7 @@ components:
     ResultFormat:
       type: object
       properties:
-        executionState:
+        execution_state:
           $ref: "#/components/schemas/ExecutionState"
         fields_in_order:
           type: array
@@ -21071,7 +22154,7 @@ components:
         limit:
           type: integer
           format: int32
-        timeZone:
+        time_zone:
           $ref: "#/components/schemas/DateTimeZone"
         timerange:
           $ref: "#/components/schemas/AbsoluteRange"
@@ -21080,8 +22163,13 @@ components:
     ResultMessage:
       type: object
       properties:
-        highlightRanges:
-          $ref: "#/components/schemas/MultimapStringRangeInteger"
+        highlight_ranges:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/RangeInteger"
+          properties:
+            empty:
+              type: boolean
         index:
           type: string
         message:
@@ -21092,7 +22180,12 @@ components:
         decoration_stats:
           $ref: "#/components/schemas/DecorationStats"
         highlight_ranges:
-          $ref: "#/components/schemas/MultimapStringRangeInteger"
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/RangeInteger"
+          properties:
+            empty:
+              type: boolean
         index:
           type: string
         message:
@@ -21285,13 +22378,9 @@ components:
     RuleBuilderDto:
       type: object
       properties:
-        createdAt:
-          type: string
-          format: date-time
         created_at:
           type: string
           format: date-time
-          writeOnly: true
         description:
           type: string
         errors:
@@ -21301,23 +22390,13 @@ components:
           writeOnly: true
         id:
           type: string
-        modifiedAt:
-          type: string
-          format: date-time
         modified_at:
           type: string
           format: date-time
-          writeOnly: true
-        ruleBuilder:
-          $ref: "#/components/schemas/RuleBuilder"
         rule_builder:
           $ref: "#/components/schemas/RuleBuilder"
-          writeOnly: true
-        simulatorMessage:
-          type: string
         simulator_message:
           type: string
-          writeOnly: true
         source:
           type: string
         title:
@@ -21327,10 +22406,10 @@ components:
       properties:
         complete:
           type: boolean
-        fieldCount:
+        field_count:
           type: integer
           format: int32
-        fieldNames:
+        field_names:
           type: array
           items:
             type: string
@@ -21338,72 +22417,72 @@ components:
         fields:
           type: object
           additionalProperties: {}
-        fieldsEntries: {}
-        filterOut:
+        fields_entries: {}
+        filter_out:
           type: boolean
         id:
           type: string
-        indexSets:
+        index_sets:
           type: array
           items:
             $ref: "#/components/schemas/IndexSet"
           uniqueItems: true
-        inetAddress:
+        inet_address:
           type: object
           properties:
             address:
               type: string
               format: byte
-            anyLocalAddress:
+            any_local_address:
               type: boolean
-            canonicalHostName:
+            canonical_host_name:
               type: string
-            hostAddress:
+            host_address:
               type: string
-            hostName:
+            host_name:
               type: string
-            linkLocalAddress:
+            link_local_address:
               type: boolean
-            loopbackAddress:
+            loopback_address:
               type: boolean
             mcglobal:
               type: boolean
-            mclinkLocal:
+            mclink_local:
               type: boolean
-            mcnodeLocal:
+            mcnode_local:
               type: boolean
-            mcorgLocal:
+            mcorg_local:
               type: boolean
-            mcsiteLocal:
+            mcsite_local:
               type: boolean
-            multicastAddress:
+            multicast_address:
               type: boolean
-            siteLocalAddress:
+            site_local_address:
               type: boolean
-        isSourceInetAddress:
+        is_source_inet_address:
           type: boolean
-        journalOffset:
+        journal_offset:
           type: integer
           format: int64
         message:
           type: string
-        messageId:
+        message_id:
           type: string
-        messageQueueId: {}
-        processingTime:
-          type: string
-          format: date-time
-        receiveTime:
+        message_queue_id: {}
+        processing_time:
           type: string
           format: date-time
-        sequenceNr:
+        receive_time:
+          type: string
+          format: date-time
+        sequence_nr:
           type: integer
           format: int32
-        simulatorActionVariables:
+        simulator_action_variables:
           type: array
           items:
             $ref: "#/components/schemas/PairStringObject"
-        simulatorConditionVariables:
+        simulator_condition_variables:
           type: object
           additionalProperties: {}
         size:
@@ -21411,9 +22490,9 @@ components:
           format: int64
         source:
           type: string
-        sourceInputId:
+        source_input_id:
           type: string
-        streamIds:
+        stream_ids:
           type: array
           items:
             type: string
@@ -21465,13 +22544,9 @@ components:
       properties:
         _scope:
           type: string
-        createdAt:
-          type: string
-          format: date-time
         created_at:
           type: string
           format: date-time
-          writeOnly: true
         description:
           type: string
         errors:
@@ -21481,20 +22556,13 @@ components:
           uniqueItems: true
         id:
           type: string
-        modifiedAt:
-          type: string
-          format: date-time
         modified_at:
           type: string
           format: date-time
-          writeOnly: true
-        ruleBuilder:
+        rule_builder:
           $ref: "#/components/schemas/RuleBuilder"
-        simulatorMessage:
-          type: string
         simulator_message:
           type: string
-          writeOnly: true
         source:
           type: string
         title:
@@ -21506,6 +22574,16 @@ components:
           type: string
         satisfied:
           type: boolean
+    ScatterVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          axis_type:
+            type: string
+            enum:
+            - linear
+            - logarithmic
     SchedulerCtx:
       type: object
       properties:
@@ -21545,7 +22623,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/QueryDTO"
-        skipNoStreamsCheck:
+        skip_no_streams_check:
           type: boolean
     SearchDTOv2:
       type: object
@@ -21643,7 +22721,7 @@ components:
           properties:
             empty:
               type: boolean
-        queryMetadata:
+        query_metadata:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/QueryMetadata"
@@ -21689,10 +22767,21 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/QueryExplainResult"
+    SearchStartPage:
+      allOf:
+      - $ref: "#/components/schemas/Startpage"
+      - type: object
+        properties:
+          id:
+            type: string
     SearchType:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          events: "#/components/schemas/EventList"
+          messages: "#/components/schemas/MessageList"
+          pivot: "#/components/schemas/Pivot"
       properties:
         filter:
           $ref: "#/components/schemas/Filter"
@@ -21706,7 +22795,7 @@ components:
           type: string
         query:
           $ref: "#/components/schemas/BackendQuery"
-        streamCategories:
+        stream_categories:
           type: array
           items:
             type: string
@@ -21761,13 +22850,57 @@ components:
         page:
           type: integer
           format: int32
-        perPage:
+        per_page:
           type: integer
           format: int32
+    SeriesConfigDTO:
+      type: object
+      properties:
+        name:
+          type: string
+        thresholds:
+          type: array
+          items:
+            $ref: "#/components/schemas/ThresholdConfigDTO"
+    SeriesDTO:
+      type: object
+      properties:
+        config:
+          $ref: "#/components/schemas/SeriesConfigDTO"
+        function:
+          type: string
     SeriesDescription:
       type: object
       properties:
         description:
+          type: string
+        type:
+          type: string
+    SeriesSort:
+      allOf:
+      - $ref: "#/components/schemas/SortSpec"
+    SeriesSortConfig:
+      allOf:
+      - $ref: "#/components/schemas/SortConfigDTO"
+    SeriesSpec:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          avg: "#/components/schemas/Average"
+          card: "#/components/schemas/Cardinality"
+          count: "#/components/schemas/Count"
+          latest: "#/components/schemas/Latest"
+          max: "#/components/schemas/Max"
+          min: "#/components/schemas/Min"
+          percentage: "#/components/schemas/Percentage"
+          percentile: "#/components/schemas/Percentile"
+          stddev: "#/components/schemas/StdDev"
+          sum: "#/components/schemas/Sum"
+          sumofsquares: "#/components/schemas/SumOfSquares"
+          variance: "#/components/schemas/Variance"
+      properties:
+        id:
           type: string
         type:
           type: string
@@ -21861,11 +22994,8 @@ components:
           type: object
           additionalProperties:
             type: string
-        onlyActive:
-          type: boolean
         only_active:
           type: boolean
-          writeOnly: true
         order:
           type: string
           enum:
@@ -21927,27 +23057,18 @@ components:
       properties:
         message:
           type: string
-        ruleSource:
-          $ref: "#/components/schemas/RuleSource"
         rule_source:
           $ref: "#/components/schemas/RuleSource"
-          writeOnly: true
     SimulationRequest:
       type: object
       properties:
-        inputId:
-          type: string
         input_id:
           type: string
-          writeOnly: true
         message:
           type: object
           additionalProperties: {}
-        streamId:
-          type: string
         stream_id:
           type: string
-          writeOnly: true
     SimulationResponse:
       type: object
       properties:
@@ -21955,22 +23076,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ResultMessageSummary"
-        simulationTrace:
-          type: array
-          items:
-            $ref: "#/components/schemas/PipelineInterpreterTrace"
         simulation_trace:
           type: array
           items:
             $ref: "#/components/schemas/PipelineInterpreterTrace"
-          writeOnly: true
-        tookMicroseconds:
-          type: integer
-          format: int64
         took_microseconds:
           type: integer
           format: int64
-          writeOnly: true
     SingleFieldSortPreferences:
       allOf:
       - $ref: "#/components/schemas/SortPreferences"
@@ -22027,6 +23139,47 @@ components:
           - GIGABYTES
           - TERABYTES
           - PETABYTES
+    SlackEventNotificationConfig:
+      type: object
+      properties:
+        backlog_size:
+          type: integer
+          format: int64
+        channel:
+          type: string
+          minLength: 1
+        color:
+          type: string
+          minLength: 1
+        custom_message:
+          type: string
+        icon_emoji:
+          type: string
+        icon_url:
+          type: string
+        include_event_procedure:
+          type: boolean
+        include_title:
+          type: boolean
+        link_names:
+          type: boolean
+        notify_channel:
+          type: boolean
+        notify_here:
+          type: boolean
+        time_zone:
+          $ref: "#/components/schemas/DateTimeZone"
+        type:
+          type: string
+        user_name:
+          type: string
+        webhook_url:
+          type: string
+          minLength: 1
+      required:
+      - channel
+      - color
+      - webhook_url
     Snapshot:
       type: object
       properties:
@@ -22057,7 +23210,7 @@ components:
         min:
           type: integer
           format: int64
-        stdDev:
+        std_dev:
           type: number
           format: double
         values:
@@ -22065,7 +23218,61 @@ components:
           items:
             type: integer
             format: int64
+    Sort:
+      type: object
+      properties:
+        field:
+          type: string
+        order:
+          type: string
+          enum:
+          - ASC
+          - DESC
+    SortConfig:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+          - Ascending
+          - Descending
+        field:
+          type: string
+    SortConfigDTO:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          pivot: "#/components/schemas/PivotSortConfig"
+          series: "#/components/schemas/SeriesSortConfig"
+      properties:
+        direction:
+          type: string
+          enum:
+          - Ascending
+          - Descending
+        field:
+          type: string
+        type:
+          type: string
     SortPreferences: {}
+    SortSpec:
+      type: object
+      discriminator:
+        propertyName: type
+        mapping:
+          pivot: "#/components/schemas/PivotSort"
+          series: "#/components/schemas/SeriesSort"
+      properties:
+        direction:
+          type: string
+          enum:
+          - Ascending
+          - Descending
+        field:
+          type: string
+        type:
+          type: string
     Sorting:
       type: object
       properties:
@@ -22119,6 +23326,10 @@ components:
     Startpage:
       discriminator:
         propertyName: type
+        mapping:
+          dashboard: "#/components/schemas/DashboardStartPage"
+          search: "#/components/schemas/SearchStartPage"
+          stream: "#/components/schemas/StreamStartPage"
       properties:
         type:
           type: string
@@ -22131,6 +23342,15 @@ components:
         properties:
           color:
             type: string
+    StdDev:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
     StorageEngine:
       type: object
       properties:
@@ -22143,14 +23363,14 @@ components:
           type: array
           items:
             type: string
-        contentPack:
+        content_pack:
           type: string
-        createdAt:
+        created_at:
           type: string
           format: date-time
-        creatorUserId:
+        creator_user_id:
           type: string
-        defaultStream:
+        default_stream:
           type: boolean
         description:
           type: string
@@ -22163,16 +23383,16 @@ components:
           format: int32
         id:
           type: string
-        indexSet:
+        index_set:
           $ref: "#/components/schemas/IndexSet"
-        indexSetId:
+        index_set_id:
           type: string
-        matchingType:
+        matching_type:
           type: string
           enum:
           - AND
           - OR
-        outputIds:
+        output_ids:
           type: array
           items:
             $ref: "#/components/schemas/ObjectId"
@@ -22184,16 +23404,23 @@ components:
           uniqueItems: true
         paused:
           type: boolean
-        removeMatchesFromDefaultStream:
+        remove_matches_from_default_stream:
           type: boolean
         scope:
           type: string
-        streamRules:
+        stream_rules:
           type: array
           items:
             $ref: "#/components/schemas/StreamRule"
         title:
           type: string
+    StreamCategoryFilter:
+      allOf:
+      - $ref: "#/components/schemas/Filter"
+      - type: object
+        properties:
+          category:
+            type: string
     StreamCreatedResponse:
       type: object
       properties:
@@ -22269,6 +23496,20 @@ components:
       - destination_type
       - stream_id
       - title
+    StreamFilter:
+      allOf:
+      - $ref: "#/components/schemas/Filter"
+      - type: object
+        properties:
+          filters:
+            type: array
+            items:
+              $ref: "#/components/schemas/Filter"
+            uniqueItems: true
+          id:
+            type: string
+          title:
+            type: string
     StreamListResponse:
       type: object
       properties:
@@ -22331,7 +23572,7 @@ components:
     StreamRule:
       type: object
       properties:
-        contentPack:
+        content_pack:
           type: string
         description:
           type: string
@@ -22344,7 +23585,7 @@ components:
           type: string
         inverted:
           type: boolean
-        streamId:
+        stream_id:
           type: string
         type:
           type: string
@@ -22402,6 +23643,13 @@ components:
           type: string
         short_desc:
           type: string
+    StreamStartPage:
+      allOf:
+      - $ref: "#/components/schemas/Startpage"
+      - type: object
+        properties:
+          id:
+            type: string
     StreamsResponse:
       type: object
       properties:
@@ -22473,7 +23721,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SuggestionEntryDTO"
-        sumOtherDocsCount:
+        sum_other_docs_count:
           type: integer
           format: int64
     SuggestionsErrorDTO:
@@ -22500,6 +23748,24 @@ components:
           uniqueItems: true
         timerange:
           $ref: "#/components/schemas/TimeRange"
+    Sum:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
+    SumOfSquares:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
     SupportBundleNodeManifest:
       type: object
       properties:
@@ -22590,7 +23856,7 @@ components:
               items:
                 type: object
                 properties:
-                  dateBased:
+                  date_based:
                     type: boolean
                   duration:
                     type: object
@@ -22607,9 +23873,9 @@ components:
                         format: int64
                       zero:
                         type: boolean
-                  durationEstimated:
+                  duration_estimated:
                     type: boolean
-                  timeBased:
+                  time_based:
                     type: boolean
             zero:
               type: boolean
@@ -22640,6 +23906,70 @@ components:
         started_at:
           type: string
           format: date-time
+    SystemNotificationEventProcessorConfig:
+      type: object
+      properties:
+        type:
+          type: string
+    SystemNotificationEventProcessorParameters:
+      allOf:
+      - $ref: "#/components/schemas/EventProcessorParameters"
+      - type: object
+        properties:
+          notification_details:
+            type: object
+            additionalProperties: {}
+          notification_message:
+            type: string
+          notification_type:
+            type: string
+            enum:
+            - data_node_needs_provisioning
+            - deflector_exists_as_index
+            - multi_master
+            - no_master
+            - es_open_files
+            - es_cluster_red
+            - es_unavailable
+            - no_input_running
+            - input_failed_to_start
+            - input_failing
+            - input_failure_shutdown
+            - check_server_clocks
+            - outdated_version
+            - email_transport_configuration_invalid
+            - email_transport_failed
+            - stream_processing_disabled
+            - gc_too_long
+            - journal_utilization_too_high
+            - journal_uncommitted_messages_deleted
+            - output_disabled
+            - output_failing
+            - index_ranges_recalculation
+            - generic
+            - generic_with_link
+            - es_index_blocked
+            - es_node_disk_watermark_low
+            - es_node_disk_watermark_high
+            - es_node_disk_watermark_flood_stage
+            - es_shard_allocation_maximum
+            - es_version_mismatch
+            - legacy_ldap_config_migration
+            - multi_leader
+            - no_leader
+            - archiving_summary
+            - search_error
+            - sidecar_status_unknown
+            - certificate_needs_renewal
+            - drawdown_license_error
+            - remote_reindex_running
+            - remote_reindex_finished
+            - data_node_version_mismatch
+            - data_tiering_rollover_error
+            - data_node_heap_warning
+          timestamp:
+            type: string
+            format: date-time
     SystemOverviewResponse:
       type: object
       properties:
@@ -22741,23 +24071,57 @@ components:
         retrans_segs:
           type: integer
           format: int64
+    TeamsEventNotificationConfig:
+      type: object
+      properties:
+        backlog_size:
+          type: integer
+          format: int64
+        color:
+          type: string
+          minLength: 1
+        custom_message:
+          type: string
+        icon_url:
+          type: string
+        time_zone:
+          $ref: "#/components/schemas/DateTimeZone"
+        type:
+          type: string
+        webhook_url:
+          type: string
+          minLength: 1
+      required:
+      - color
+      - webhook_url
+    TeamsEventNotificationConfigV2:
+      type: object
+      properties:
+        adaptive_card:
+          type: string
+        backlog_size:
+          type: integer
+          format: int64
+        time_zone:
+          $ref: "#/components/schemas/DateTimeZone"
+        type:
+          type: string
+        webhook_url:
+          type: string
+          minLength: 1
+      required:
+      - webhook_url
     TelemetryUserSettings:
       type: object
       properties:
-        telemetryEnabled:
-          type: boolean
-        telemetryPermissionAsked:
-          type: boolean
         telemetry_enabled:
           type: boolean
-          writeOnly: true
         telemetry_permission_asked:
           type: boolean
-          writeOnly: true
     Template:
       type: object
       properties:
-        indexPatterns:
+        index_patterns:
           type: array
           items:
             type: string
@@ -22798,12 +24162,43 @@ components:
           type: object
           additionalProperties:
             type: boolean
+    TextWidgetConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/WidgetConfigDTO"
+      - type: object
+        properties:
+          text:
+            type: string
+    ThresholdConfigDTO:
+      type: object
+      properties:
+        color:
+          type: string
+          minLength: 1
+        name:
+          type: string
+        value:
+          type: number
+          format: double
+      required:
+      - color
     Throughput:
       type: object
       properties:
         throughput:
           type: integer
           format: int64
+    Time:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+        interval:
+          $ref: "#/components/schemas/Interval"
+        type:
+          type: string
     TimeAndTotalStats:
       type: object
       properties:
@@ -22813,6 +24208,13 @@ components:
         total:
           type: integer
           format: int64
+    TimeHistogramConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/PivotConfigDTO"
+      - type: object
+        properties:
+          interval:
+            $ref: "#/components/schemas/IntervalDTO"
     TimeRange:
       type: object
       discriminator:
@@ -22825,22 +24227,48 @@ components:
       properties:
         type:
           type: string
+    TimeUnitInterval:
+      allOf:
+      - $ref: "#/components/schemas/Interval"
+      - type: object
+        properties:
+          timeunit:
+            type: string
+    TimeUnitIntervalDTO:
+      allOf:
+      - $ref: "#/components/schemas/IntervalDTO"
+      - type: object
+        properties:
+          unit:
+            type: string
+            enum:
+            - seconds
+            - minutes
+            - hours
+            - days
+            - weeks
+            - months
+            - years
+            - auto
+          value:
+            type: integer
+            format: int32
     Timer:
       type: object
       properties:
         count:
           type: integer
           format: int64
-        fifteenMinuteRate:
+        fifteen_minute_rate:
           type: number
           format: double
-        fiveMinuteRate:
+        five_minute_rate:
           type: number
           format: double
-        meanRate:
+        mean_rate:
           type: number
           format: double
-        oneMinuteRate:
+        one_minute_rate:
           type: number
           format: double
         snapshot:
@@ -22970,6 +24398,10 @@ components:
       properties:
         job_name:
           type: string
+    "True":
+      allOf:
+      - $ref: "#/components/schemas/ExpressionBoolean"
+      - $ref: "#/components/schemas/ExpressionDouble"
     Type:
       type: object
       properties:
@@ -23134,23 +24566,23 @@ components:
     ValidationMessageDTO:
       type: object
       properties:
-        beginColumn:
+        begin_column:
           type: integer
           format: int32
-        beginLine:
+        begin_line:
           type: integer
           format: int32
-        endColumn:
+        end_column:
           type: integer
           format: int32
-        endLine:
+        end_line:
           type: integer
           format: int32
-        errorMessage:
+        error_message:
           type: string
-        errorTitle:
+        error_title:
           type: string
-        errorType:
+        error_type:
           type: string
           enum:
           - UNDECLARED_PARAMETER
@@ -23161,14 +24593,14 @@ components:
           - MISSING_LICENSE
           - INVALID_VALUE_TYPE
           - PARAMETER_NOT_ALLOWED
-        relatedProperty:
+        related_property:
           type: string
     ValidationRequestDTO:
       type: object
       properties:
         filter:
           $ref: "#/components/schemas/BackendQuery"
-        parameterBindings:
+        parameter_bindings:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/Binding"
@@ -23197,7 +24629,7 @@ components:
           uniqueItems: true
         timerange:
           $ref: "#/components/schemas/TimeRange"
-        validationMode:
+        validation_mode:
           type: string
           enum:
           - QUERY
@@ -23255,6 +24687,34 @@ components:
         source:
           type: string
         value: {}
+    ValueConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/PivotConfigDTO"
+      - type: object
+        properties:
+          limit:
+            type: integer
+            format: int32
+          skip_empty_values:
+            type: boolean
+    ValueParameter:
+      type: object
+      properties:
+        binding:
+          $ref: "#/components/schemas/Binding"
+        data_type:
+          type: string
+        default_value: {}
+        description:
+          type: string
+        name:
+          type: string
+        optional:
+          type: boolean
+        title:
+          type: string
+        type:
+          type: string
     ValueReference_HttpView:
       type: object
       properties:
@@ -23269,6 +24729,29 @@ components:
           - STRING
           - PARAMETER
         '@value': {}
+    Values:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+        limit:
+          type: integer
+          format: int32
+        skip_empty_values:
+          type: boolean
+        type:
+          type: string
+    Variance:
+      type: object
+      properties:
+        field:
+          type: string
+        id:
+          type: string
+        type:
+          type: string
     Version:
       type: object
       properties:
@@ -23277,24 +24760,24 @@ components:
     Version_HttpView:
       type: object
       properties:
-        buildMetadata:
+        build_metadata:
           type: string
-        majorVersion:
+        major_version:
           type: integer
           format: int32
-        minorVersion:
+        minor_version:
           type: integer
           format: int32
-        normalVersion:
+        normal_version:
           type: string
-        patchVersion:
+        patch_version:
           type: integer
           format: int32
-        preRelease:
+        pre_release:
           type: boolean
-        preReleaseVersion:
+        pre_release_version:
           type: string
-        publicApiStable:
+        public_api_stable:
           type: boolean
         stable:
           type: boolean
@@ -23450,6 +24933,19 @@ components:
           - DASHBOARD
       required:
       - title
+    Viewport:
+      type: object
+      properties:
+        center_x:
+          type: number
+          format: double
+        center_y:
+          type: number
+          format: double
+        zoom:
+          type: integer
+          format: int32
+    VisualizationConfigDTO: {}
     WidgetConfigDTO: {}
     WidgetDTO:
       type: object
@@ -23484,6 +24980,13 @@ components:
           $ref: "#/components/schemas/TimeRange"
         type:
           type: string
+    WidgetFormattingSettings:
+      type: object
+      properties:
+        chart_colors:
+          type: array
+          items:
+            $ref: "#/components/schemas/ChartColorMapping"
     WidgetPositionDTO:
       type: object
       properties:
@@ -23501,3 +25004,10 @@ components:
         parts:
           type: string
           writeOnly: true
+    WorldMapVisualizationConfigDTO:
+      allOf:
+      - $ref: "#/components/schemas/VisualizationConfigDTO"
+      - type: object
+        properties:
+          viewport:
+            $ref: "#/components/schemas/Viewport"
