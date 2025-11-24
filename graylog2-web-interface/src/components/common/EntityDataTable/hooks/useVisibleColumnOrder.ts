@@ -17,7 +17,7 @@
 
 import { useMemo } from 'react';
 
-import { BULK_SELECT_COL_ID, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const getVisibleAttributeColumns = (
@@ -26,7 +26,7 @@ const getVisibleAttributeColumns = (
 ) => {
   const visible = new Set(
     Object.entries(userColumnPreferences)
-      .filter(([, { status }]) => status === 'show')
+      .filter(([, { status }]) => status === ATTRIBUTE_STATUS.show)
       .map(([attr]) => attr),
   );
 

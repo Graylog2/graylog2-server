@@ -22,7 +22,7 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type { Sort } from 'stores/PaginationTypes';
 
 import type { ColumnPreferences, EntityBase } from '../types';
-import { UTILITY_COLUMNS } from '../Constants';
+import { UTILITY_COLUMNS, ATTRIBUTE_STATUS } from '../Constants';
 
 const columnVisibilityChanges = (prevVisibleColumns: VisibilityState, currVisibleColumns: VisibilityState) => {
   const addedColumns = new Set<string>();
@@ -48,11 +48,11 @@ const updateColumnPreferences = (
 
   // only update the preferences for columns which have been shown/hidden by the user
   addedColumns.forEach((col) => {
-    updatedPreferences[col] = { status: 'show' };
+    updatedPreferences[col] = { status: ATTRIBUTE_STATUS.show };
   });
 
   removedColumns.forEach((col) => {
-    updatedPreferences[col] = { status: 'hide' };
+    updatedPreferences[col] = { status: ATTRIBUTE_STATUS.hide };
   });
 
   return updatedPreferences;

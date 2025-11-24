@@ -57,10 +57,10 @@ const useActionsColumnDefinition = <Entity extends EntityBase>(
       columnHelper.display({
         id: ACTIONS_COL_ID,
         size: actionsColWidth,
-        header: displayActionsCol ? ActionsHeader : () => null,
+        header: displayActionsCol ? ActionsHeader : undefined,
         enableHiding: false,
         enableResizing: false,
-        cell,
+        cell: displayActionsCol ? cell : undefined,
       }),
     [actionsColWidth, cell, columnHelper, displayActionsCol],
   );

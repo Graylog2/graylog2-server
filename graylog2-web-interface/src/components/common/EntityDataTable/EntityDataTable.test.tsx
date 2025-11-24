@@ -25,6 +25,7 @@ import useCurrentUser from 'hooks/useCurrentUser';
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 import useSortableItemRectsMock from 'components/common/SortableList/tests/useSortableItemRectsMock';
+import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 import EntityDataTable from './EntityDataTable';
 
@@ -50,9 +51,9 @@ describe('<EntityDataTable />', () => {
   ];
 
   const columnPreferences = {
-    title: { status: 'show' },
-    description: { status: 'show' },
-    status: { status: 'show' },
+    title: { status: ATTRIBUTE_STATUS.show },
+    description: { status: ATTRIBUTE_STATUS.show },
+    status: { status: ATTRIBUTE_STATUS.show },
   } as const;
 
   const defaultDisplayedColumns = ['title', 'description', 'summary', 'status'];
@@ -247,8 +248,8 @@ describe('<EntityDataTable />', () => {
         {...defaultProps}
         layoutPreferences={{
           attributes: {
-            description: { status: 'show' },
-            status: { status: 'show' },
+            description: { status: ATTRIBUTE_STATUS.show },
+            status: { status: ATTRIBUTE_STATUS.show },
           },
         }}
         defaultDisplayedColumns={['description', 'status', 'title']}
@@ -262,8 +263,8 @@ describe('<EntityDataTable />', () => {
 
     expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
       attributes: {
-        description: { status: 'show' },
-        status: { status: 'show' },
+        description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
         title: { status: 'hide' },
       },
     });
@@ -284,7 +285,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         {...defaultProps}
-        layoutPreferences={{ attributes: { ...columnPreferences, 'created_at': { status: 'show' } } }}
+        layoutPreferences={{ attributes: { ...columnPreferences, 'created_at': { status: ATTRIBUTE_STATUS.show } } }}
         entities={dataWithCamelCaseAttributes}
         columnRenderers={{
           attributes: {

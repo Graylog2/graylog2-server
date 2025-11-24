@@ -23,6 +23,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
+import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 const useTableEventHandlers = ({
   updateTableLayout,
@@ -78,7 +79,7 @@ const useTableEventHandlers = ({
           app_section: appSection,
           app_action_value: 'columns-select',
           columns: Object.keys(layoutPreferences.attributes).filter(
-            (key) => layoutPreferences.attributes[key].status === 'show',
+            (key) => layoutPreferences.attributes[key].status === ATTRIBUTE_STATUS.show,
           ),
         });
       }
