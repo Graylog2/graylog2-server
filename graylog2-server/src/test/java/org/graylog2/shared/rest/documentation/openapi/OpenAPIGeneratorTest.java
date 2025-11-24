@@ -65,7 +65,7 @@ class OpenAPIGeneratorTest {
 
         objectMapperConfiguration = new ObjectMapperConfiguration(
                 ObjectMapperProvider.class.getClassLoader(),
-                Set.of(new NamedType(ChildType1.class, "child-type-1"), new NamedType(ChildType2.class, "child-type-2")),
+                Set.of(new NamedType(ChildType3.class, "child-type-3"), new NamedType(ChildType4.class, "child-type-4")),
                 new EncryptedValueService(UUID.randomUUID().toString()),
                 GRNRegistry.createWithBuiltinTypes(),
                 InputConfigurationBeanDeserializerModifier.withoutConfig()
@@ -172,13 +172,6 @@ class OpenAPIGeneratorTest {
         final var openAPI = generator.generateOpenApiSpec();
 
         try {
-            // Verify discriminator mapping uses type aliases, not FQ class names
-            final var parentTypeSchema = openAPI.getComponents().getSchemas().get("ParentType");
-            final var discriminatorMapping = parentTypeSchema.getDiscriminator().getMapping();
-            assertThat(discriminatorMapping)
-                    .containsEntry("child-type-1", "#/components/schemas/ChildType1")
-                    .containsEntry("child-type-2", "#/components/schemas/ChildType2");
-
             // Verify ChildType1 has allOf with ParentType reference
             final Schema<?> childType1Schema = openAPI.getComponents().getSchemas().get("ChildType1");
             final var childType1HasParentRef = childType1Schema.getAllOf().stream()
@@ -193,6 +186,15 @@ class OpenAPIGeneratorTest {
                     .anyMatch(schema -> "#/components/schemas/ParentType".equals(schema.get$ref()));
             assertThat(childType2HasParentRef).isTrue();
 
+            // Verify discriminator mapping uses type aliases, not FQ class names
+            final var parentTypeSchema = openAPI.getComponents().getSchemas().get("ParentType");
+            final var discriminatorMapping = parentTypeSchema.getDiscriminator().getMapping();
+            assertThat(discriminatorMapping)
+                    .hasSize(4)
+                    .containsEntry("child-type-1", "#/components/schemas/ChildType1")
+                    .containsEntry("child-type-2", "#/components/schemas/ChildType2")
+                    .containsEntry("child-type-3", "#/components/schemas/ChildType3")
+                    .containsEntry("child-type-4", "#/components/schemas/ChildType4");
         } catch (AssertionError | NullPointerException e) {
             System.err.println("Test failed. Full OpenAPI spec:");
             System.err.println(Json31.pretty(openAPI));
@@ -310,6 +312,7 @@ class OpenAPIGeneratorTest {
             @JsonSubTypes.Type(value = ChildType1.class, name = "child-type-1"),
             @JsonSubTypes.Type(value = ChildType2.class, name = "child-type-2"),
     })
+    @JsonTypeName("parent-type")
     public interface ParentType {
         String type();
     }
@@ -329,6 +332,24 @@ class OpenAPIGeneratorTest {
         @JsonProperty("type")
         public String type() {
             return "child-type-2";
+        }
+    }
+
+    @JsonTypeName("child-type-3")
+    public record ChildType3(double age) implements ParentType {
+        @Override
+        @JsonProperty("type")
+        public String type() {
+            return "child-type-3";
+        }
+    }
+
+    @JsonTypeName("child-type-4")
+    public record ChildType4(String age) implements ParentType {
+        @Override
+        @JsonProperty("type")
+        public String type() {
+            return "child-type-4";
         }
     }
 }

@@ -16,9 +16,15 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.Annotated;
+import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
+import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -32,8 +38,8 @@ import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -53,6 +59,18 @@ public class CustomModelConverter extends ModelResolver {
     public CustomModelConverter(ObjectMapper mapper) {
         super(mapper);
         setOpenapi31(true);
+        mapper.registerModule(
+                new SimpleModule("subtypesWorkaround", Version.unknownVersion()) {
+                    @Override
+                    public void setupModule(SetupContext context) {
+                        context.insertAnnotationIntrospector(new NopAnnotationIntrospector() {
+                            @Override
+                            public List<NamedType> findSubtypes(Annotated a) {
+                                return CustomModelConverter.this.findRegisteredSubtypes(a);
+                            }
+                        });
+                    }
+                });
     }
 
     @Override
@@ -78,15 +96,21 @@ public class CustomModelConverter extends ModelResolver {
         final var discriminator = super.resolveDiscriminator(type, wrappedContext);
         if (discriminator != null && discriminator.getPropertyName() != null &&
                 (discriminator.getMapping() == null || discriminator.getMapping().isEmpty())) {
-            final var jsonSubTypes = type.getRawClass().getDeclaredAnnotation(JsonSubTypes.class);
-            if (jsonSubTypes != null) {
-                Arrays.stream(jsonSubTypes.value()).forEach(subtype -> {
-                    discriminator.mapping(subtype.name(), RefUtils.constructRef(
-                            wrappedContext.resolve(new AnnotatedType().type(subtype.value())).getName()));
-                });
-            }
+            final var namedClass = _mapper.getDeserializationConfig().introspectClassAnnotations(type).getClassInfo();
+            findRegisteredSubtypes(namedClass).stream()
+                    .filter(NamedType::hasName)
+                    .filter(subtype -> !subtype.getType().equals(type.getRawClass()))
+                    .forEach(subtype -> {
+                        discriminator.mapping(subtype.getName(), RefUtils.constructRef(
+                                wrappedContext.resolve(new AnnotatedType().type(subtype.getType())).getName()));
+                    });
         }
         return discriminator;
+    }
+
+    private List<NamedType> findRegisteredSubtypes(Annotated baseType) {
+        final var config = _mapper.getDeserializationConfig().with(new JacksonAnnotationIntrospector());
+        return (List<NamedType>) _mapper.getSubtypeResolver().collectAndResolveSubtypesByClass(config, (AnnotatedClass) baseType);
     }
 
     /**
