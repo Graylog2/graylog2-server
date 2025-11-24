@@ -77,14 +77,16 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
     null,
     () => onSubmit(),
     'POST',
-    toAWSCloudTrailInputCreateRequest(formData)
+    toAWSCloudTrailInputCreateRequest(formData),
   );
 
   // Derive error state directly from saveInput.error
-  const formError = saveInput.error ? {
-    full_message: saveInput.error,
-    nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
-  } : null;
+  const formError = saveInput.error
+    ? {
+        full_message: saveInput.error,
+        nice_message: <span>We were unable to save your Input, please try again in a few moments.</span>,
+      }
+    : null;
 
   const handleSubmit = () => {
     if (externalInputSubmit) {
@@ -126,7 +128,7 @@ const StepReview = ({ onSubmit, externalInputSubmit = false }: Props) => {
           </li>
           {formData.assumeRoleArn?.value && (
             <li>
-              <strong>AWS Assume Role (ARN)  </strong>
+              <strong>AWS Assume Role (ARN) </strong>
               <span>{formData.assumeRoleArn?.value}</span>
             </li>
           )}

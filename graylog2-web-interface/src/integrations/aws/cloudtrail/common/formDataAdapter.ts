@@ -38,13 +38,13 @@ export const toAWSCloudTrailInputCreateRequest = ({
   name: awsCloudTrailName?.value,
   ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
     ? {
-      aws_access_key: awsAccessKey?.value,
-      aws_secret_key: awsSecretKey?.value,
-    }
+        aws_access_key: awsAccessKey?.value,
+        aws_secret_key: awsSecretKey?.value,
+      }
     : {
-      aws_access_key: key,
-      aws_secret_key: secret,
-    }),
+        aws_access_key: key,
+        aws_secret_key: secret,
+      }),
   polling_interval: pollingInterval?.value,
   enable_throttling: !!awsCloudTrailThrottleEnabled?.value,
   aws_sqs_queue_name: awsCloudTrailSqsQueueName?.value,
@@ -77,13 +77,13 @@ export const toGenericInputCreateRequest = ({
   configuration: {
     ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
       ? {
-        aws_access_key: awsAccessKey?.value,
-        aws_secret_key: awsSecretKey?.value,
-      }
+          aws_access_key: awsAccessKey?.value,
+          aws_secret_key: awsSecretKey?.value,
+        }
       : {
-        aws_access_key: key,
-        aws_secret_key: secret,
-      }),
+          aws_access_key: key,
+          aws_secret_key: secret,
+        }),
     polling_interval: pollingInterval?.value,
     throttling_allowed: !!awsCloudTrailThrottleEnabled?.value,
     aws_sqs_queue_name: awsCloudTrailSqsQueueName?.value,
