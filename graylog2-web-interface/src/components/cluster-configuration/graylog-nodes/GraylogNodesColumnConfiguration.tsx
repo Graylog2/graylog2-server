@@ -83,25 +83,25 @@ const getNodeDisplayName = (node: GraylogNode) => {
 export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
   'lifecycle',
-  'is_processing',
-  'lb_status',
-  'journal',
-  'dataLakeJournal',
   'jvm',
   'buffers',
+  'journal',
+  'dataLakeJournal',
   'throughput',
+  'is_processing',
+  'lb_status',
 ] as const;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'hostname', title: 'Node', sortable: true },
   { id: 'lifecycle', title: 'State', sortable: true },
-  { id: 'is_processing', title: 'Message Processing', sortable: true },
-  { id: 'lb_status', title: 'Load Balancer', sortable: true },
-  { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
-  { id: 'dataLakeJournal', title: 'Data Lake Journal', isDerived: true, sortable: false },
   { id: 'jvm', title: 'JVM', isDerived: true, sortable: false },
   { id: 'buffers', title: 'Buffers', isDerived: true, sortable: false },
+  { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
+  { id: 'dataLakeJournal', title: 'Data Lake Journal', isDerived: true, sortable: false },
   { id: 'throughput', title: 'Throughput', isDerived: true, sortable: false },
+  { id: 'is_processing', title: 'Message Processing', sortable: true },
+  { id: 'lb_status', title: 'Load Balancer', sortable: true },
 ];
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
