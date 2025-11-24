@@ -88,7 +88,7 @@ const Routes = {
   DASHBOARDS: dashboardsPath,
   DASHBOARD: {
     NEW: newDashboardsPath,
-    SHOW: showDashboardsPath(),
+    SHOW: showDashboardsPath,
     FULL_SCREEN: dashboardsTvPath,
   },
   WELCOME: '/welcome',
