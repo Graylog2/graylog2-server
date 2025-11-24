@@ -30,7 +30,6 @@ import FormWrap from '../common/FormWrap';
 import ValidatedInput from '../common/ValidatedInput';
 import AWSAuthenticationTypes from '../authentication/AWSAuthenticationTypes';
 
-
 type StepAuthorizeProps = {
   onSubmit: HandleSubmitType;
   onChange: HandleFieldUpdateType;
@@ -89,11 +88,13 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   const authType = formData.awsAuthenticationType && formData.awsAuthenticationType.value;
 
   const isFormValid = formValidation.isFormValid(
-    ['awsCloudTrailName',
+    [
+      'awsCloudTrailName',
       ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsAccessKey', 'awsSecretKey'] : []),
       'awsCloudTrailSqsRegion',
       'awsCloudTrailS3Region',
-      'awsCloudTrailSqsQueueName'],
+      'awsCloudTrailSqsQueueName',
+    ],
     formData,
   );
 
