@@ -36,6 +36,7 @@ import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
@@ -60,7 +61,7 @@ public class CustomModelConverter extends ModelResolver {
         super(mapper);
         setOpenapi31(true);
         mapper.registerModule(
-                new SimpleModule("subtypesWorkaround", Version.unknownVersion()) {
+                new SimpleModule("registeredSubtypes", Version.unknownVersion()) {
                     @Override
                     public void setupModule(SetupContext context) {
                         context.insertAnnotationIntrospector(new NopAnnotationIntrospector() {
@@ -98,12 +99,10 @@ public class CustomModelConverter extends ModelResolver {
                 (discriminator.getMapping() == null || discriminator.getMapping().isEmpty())) {
             final var namedClass = _mapper.getDeserializationConfig().introspectClassAnnotations(type).getClassInfo();
             findRegisteredSubtypes(namedClass).stream()
-                    .filter(NamedType::hasName)
                     .filter(subtype -> !subtype.getType().equals(type.getRawClass()))
-                    .forEach(subtype -> {
-                        discriminator.mapping(subtype.getName(), RefUtils.constructRef(
-                                wrappedContext.resolve(new AnnotatedType().type(subtype.getType())).getName()));
-                    });
+                    .forEach(subtype ->
+                            discriminator.mapping(StringUtils.defaultString(subtype.getName()), RefUtils.constructRef(
+                                    wrappedContext.resolve(new AnnotatedType().type(subtype.getType())).getName())));
         }
         return discriminator;
     }
