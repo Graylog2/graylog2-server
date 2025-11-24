@@ -37,6 +37,7 @@ import org.graylog.storage.opensearch3.TimeRangeQueryFactory;
 import org.graylog2.database.filtering.AttributeFilter;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTimeZone;
+import org.opensearch.client.opensearch._types.FieldValue;
 import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -54,6 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
@@ -181,11 +183,16 @@ public class OpenSearchExportBackend implements ExportBackend {
     }
 
     private Query newStreamsFilter(ExportMessagesCommand command) {
-        return Query.builder().term(t -> {
+        final ObjectBuilder<Query> quer = Query.builder().terms(t -> {
             t.field(Message.FIELD_STREAMS);
-            command.streams().forEach(s -> t.value(v -> v.stringValue(s)));
+            t.terms(terms -> terms.value(toTerms(command.streams())));
             return t;
-        }).build();
+        });
+        return quer.build();
+    }
+
+    private List<FieldValue> toTerms(Set<String> streams) {
+        return streams.stream().map(stream -> new FieldValue.Builder().stringValue(stream).build()).collect(Collectors.toList());
     }
 
     private Set<String> indicesFor(ExportMessagesCommand command) {

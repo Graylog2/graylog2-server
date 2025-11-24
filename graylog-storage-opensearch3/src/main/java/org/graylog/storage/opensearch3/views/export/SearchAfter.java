@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.views.export;
 
 import jakarta.inject.Inject;
+import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
@@ -51,15 +52,19 @@ public class SearchAfter implements RequestStrategy {
     }
 
     private SearchResponse<Map> search(org.opensearch.client.opensearch.core.SearchRequest newSearch) {
-        final SearchResponse<Map> result = opensearchClient.sync(c -> c.search(newSearch, Map.class), "failed to serarch");
-        if (result.shards().failed() > 0) {
-            final List<String> errors = result.shards().failures().stream()
-                    .map(e -> e.reason().reason())
-                    .distinct()
-                    .toList();
-            throw new ElasticsearchException("Unable to perform export query: ", errors);
+        try {
+            final SearchResponse<Map> result = opensearchClient.sync(c -> c.search(newSearch, Map.class), "failed to serarch");
+            if (result.shards().failed() > 0) {
+                final List<String> errors = result.shards().failures().stream()
+                        .map(e -> e.reason().reason())
+                        .distinct()
+                        .toList();
+                throw new ElasticsearchException("Unable to perform export query: ", errors);
+            }
+            return result;
+        } catch (Throwable e) {
+            throw new ExportException("Unable to complete export: ", new ElasticsearchException(e));
         }
-        return result;
     }
 
     private List<FieldValue> lastHitSortFrom(List<Hit<Map>> hits) {
