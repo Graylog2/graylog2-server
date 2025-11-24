@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.documentation.openapi;
 
 import io.swagger.v3.jaxrs2.integration.resources.BaseOpenApiResource;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.integration.api.OpenApiContext;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -39,8 +40,10 @@ public class OpenApiResource extends BaseOpenApiResource {
     Application app;
 
     @Inject
-    public OpenApiResource(OpenAPIGenerator openApiGenerator) {
-        openApiGenerator.ensureInitializedContext();
+    public OpenApiResource(OpenAPIContextFactory contextFactory) {
+        // This will initialize the OpenAPI context and register it as the default context.
+        // The BaseOpenApiResource by default re-uses this context, if present, instead of configuring a new one.
+        contextFactory.getOrCreate(OpenApiContext.OPENAPI_CONTEXT_ID_DEFAULT);
     }
 
     @GET

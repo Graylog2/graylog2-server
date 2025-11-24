@@ -26,6 +26,6 @@ public class OpenAPIBindings extends Graylog2Module {
         bind(CustomModelConverter.class).asEagerSingleton();
         install(new FactoryModuleBuilder().build(CustomReader.Factory.class));
 
-        bind(OpenAPIGenerator.class).asEagerSingleton();
+        bind(OpenAPIContextFactory.class).asEagerSingleton();
     }
 }

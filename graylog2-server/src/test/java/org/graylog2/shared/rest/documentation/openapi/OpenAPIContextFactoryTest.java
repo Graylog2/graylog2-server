@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import io.swagger.v3.core.util.Json31;
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -36,7 +37,7 @@ import org.graylog2.plugin.Version;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.rest.PublicCloudAPI;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -48,13 +49,16 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class OpenAPIGeneratorTest {
+class OpenAPIContextFactoryTest {
 
-    private OpenAPIGenerator generator;
-    private ObjectMapper objectMapper;
+    private static ObjectMapper objectMapper;
+    private static OpenAPI generatedSpec;
 
-    @BeforeEach
-    void setUp() {
+    // TODO: add test for schema component name conflicts (same class name but in different packages)
+
+
+    @BeforeAll
+    static void beforeAll() {
         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
                 Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class, NotPublicCloudResource.class));
 
@@ -64,31 +68,31 @@ class OpenAPIGeneratorTest {
                 new NamedType(ChildType4.class, "child-type-4")
         );
 
-        generator = new OpenAPIGenerator(
+        final var openAPIContextFactory = new OpenAPIContextFactory(
                 Version.from(1, 0, 0),
                 new CustomOpenAPIScanner(Set.of(RootTestResource.class), pluginRestResources, true),
                 new CustomModelConverter(objectMapper),
                 (config) -> new CustomReader(pluginRestResources, config)
         );
+
+        generatedSpec = openAPIContextFactory.getOrCreate("test-context").read();
     }
 
     @Test
     void createsValidOpenAPIObject() {
-        final var openAPI = generator.generateOpenApiSpec();
-
-        assertThat(openAPI).isNotNull();
-        assertThat(openAPI.getInfo()).isNotNull();
-        assertThat(openAPI.getInfo().getTitle()).isEqualTo("Graylog REST API");
-        assertThat(openAPI.getInfo().getVersion()).isEqualTo("1.0.0");
-        assertThat(openAPI.getInfo().getDescription()).contains("REST API");
-        assertThat(openAPI.getInfo().getContact()).isNotNull();
-        assertThat(openAPI.getInfo().getContact().getName()).isEqualTo("Graylog");
-        assertThat(openAPI.getInfo().getLicense()).isNotNull();
-        assertThat(openAPI.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
+        assertThat(generatedSpec).isNotNull();
+        assertThat(generatedSpec.getInfo()).isNotNull();
+        assertThat(generatedSpec.getInfo().getTitle()).isEqualTo("Graylog REST API");
+        assertThat(generatedSpec.getInfo().getVersion()).isEqualTo("1.0.0");
+        assertThat(generatedSpec.getInfo().getDescription()).contains("REST API");
+        assertThat(generatedSpec.getInfo().getContact()).isNotNull();
+        assertThat(generatedSpec.getInfo().getContact().getName()).isEqualTo("Graylog");
+        assertThat(generatedSpec.getInfo().getLicense()).isNotNull();
+        assertThat(generatedSpec.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
 
         // Verify that paths and schemas are generated
-        assertThat(openAPI.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test", "/plugins/my.plugin.id/subtypes");
-        assertThat(openAPI.getComponents().getSchemas()).isNotEmpty();
+        assertThat(generatedSpec.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test", "/plugins/my.plugin.id/subtypes");
+        assertThat(generatedSpec.getComponents().getSchemas()).isNotEmpty();
     }
 
     @Test
@@ -97,21 +101,20 @@ class OpenAPIGeneratorTest {
         // fields by treating them the same as Optional<Integer>/Optional<Long>/Optional<Double>.
         //
         // See: https://github.com/swagger-api/swagger-core/issues/4717
-        final var generatedOpenAPI = generator.generateOpenApiSpec();
         try {
-            assertThat(generatedOpenAPI).isNotNull();
-            assertThat(generatedOpenAPI.getPaths()).isNotEmpty();
+            assertThat(generatedSpec).isNotNull();
+            assertThat(generatedSpec.getPaths()).isNotEmpty();
 
             // Verify that the /test path exists
-            assertThat(generatedOpenAPI.getPaths()).containsKey("/plugins/my.plugin.id/test");
+            assertThat(generatedSpec.getPaths()).containsKey("/plugins/my.plugin.id/test");
 
             // Verify the schema contains our test endpoint
-            final var postOperation = generatedOpenAPI.getPaths().get("/plugins/my.plugin.id/test").getPost();
+            final var postOperation = generatedSpec.getPaths().get("/plugins/my.plugin.id/test").getPost();
             assertThat(postOperation).isNotNull();
             assertThat(postOperation.getOperationId()).isEqualTo("createTest");
 
             // Verify that OptionalInt/OptionalLong/OptionalDouble are treated the same as Optional<Integer>/Optional<Long>/Optional<Double>
-            final var responseSchema = generatedOpenAPI.getComponents().getSchemas().get("TestResponse");
+            final var responseSchema = generatedSpec.getComponents().getSchemas().get("TestResponse");
             assertThat(responseSchema).isNotNull();
 
             // The ObjectMapper converts camelCase to snake_case
@@ -146,7 +149,7 @@ class OpenAPIGeneratorTest {
             assertThat(rateProperty.getProperties()).isNullOrEmpty();
         } catch (AssertionError | NullPointerException e) {
             System.err.println("Test failed. Full OpenAPI spec:");
-            System.err.println(Json31.pretty(generatedOpenAPI));
+            System.err.println(Json31.pretty(generatedSpec));
             throw e;
         }
     }
@@ -160,25 +163,23 @@ class OpenAPIGeneratorTest {
         assertThat(childType1).isInstanceOf(ChildType1.class);
         assertThat(childType2).isInstanceOf(ChildType2.class);
 
-        final var openAPI = generator.generateOpenApiSpec();
-
         try {
             // Verify ChildType1 has allOf with ParentType reference
-            final Schema<?> childType1Schema = openAPI.getComponents().getSchemas().get("ChildType1");
+            final Schema<?> childType1Schema = generatedSpec.getComponents().getSchemas().get("ChildType1");
             final var childType1HasParentRef = childType1Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
                     .anyMatch(schema -> "#/components/schemas/ParentType".equals(schema.get$ref()));
             assertThat(childType1HasParentRef).isTrue();
 
             // Verify ChildType2 has allOf with ParentType reference
-            final Schema<?> childType2Schema = openAPI.getComponents().getSchemas().get("ChildType2");
+            final Schema<?> childType2Schema = generatedSpec.getComponents().getSchemas().get("ChildType2");
             final var childType2HasParentRef = childType2Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
                     .anyMatch(schema -> "#/components/schemas/ParentType".equals(schema.get$ref()));
             assertThat(childType2HasParentRef).isTrue();
 
             // Verify discriminator mapping uses type aliases, not FQ class names
-            final var parentTypeSchema = openAPI.getComponents().getSchemas().get("ParentType");
+            final var parentTypeSchema = generatedSpec.getComponents().getSchemas().get("ParentType");
             final var discriminatorMapping = parentTypeSchema.getDiscriminator().getMapping();
             assertThat(discriminatorMapping)
                     .hasSize(4)
@@ -188,7 +189,7 @@ class OpenAPIGeneratorTest {
                     .containsEntry("child-type-4", "#/components/schemas/ChildType4");
         } catch (AssertionError | NullPointerException e) {
             System.err.println("Test failed. Full OpenAPI spec:");
-            System.err.println(Json31.pretty(openAPI));
+            System.err.println(Json31.pretty(generatedSpec));
             throw e;
         }
     }

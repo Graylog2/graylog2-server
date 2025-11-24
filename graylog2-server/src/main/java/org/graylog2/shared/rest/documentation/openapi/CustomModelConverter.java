@@ -60,6 +60,11 @@ public class CustomModelConverter extends ModelResolver {
     public CustomModelConverter(ObjectMapper applicationObjectMapper) {
         super(applicationObjectMapper.copy());
         setOpenapi31(true);
+        // Workaround to hook into jackson's subtype resolution mechanism to find all registered subtypes into a
+        // custom annotation processor that we register with the object mapper. Swagger resolves jackson subtypes
+        // only via the mapper's annotation introspectors, and does not consider the registered subtypes. We add
+        // a custom introspector that adds the registered subtypes to the ones found by the other introspectors via
+        // annotations.
         _mapper.registerModule(
                 new SimpleModule("registeredSubtypes", Version.unknownVersion()) {
                     @Override
@@ -76,8 +81,6 @@ public class CustomModelConverter extends ModelResolver {
 
     @Override
     public Schema<?> resolve(AnnotatedType annotatedType, ModelConverterContext context, Iterator<ModelConverter> next) {
-        // TODO: this would be the place to implement dynamic subtype resolving based on the subtypes registered
-        //   with the object mapper. ideally we want oneOf and allOf
         return super.resolve(annotatedType, new CustomConverterContext(context), next);
     }
 
@@ -107,6 +110,8 @@ public class CustomModelConverter extends ModelResolver {
         return discriminator;
     }
 
+    // uses jackson's subtype resolver to find all registered subtypes as well as the subtypes explicitly specified
+    // e.g. in a @JsonSubtypes annotation for a given base type
     private List<NamedType> findRegisteredSubtypes(Annotated baseType) {
         final var config = _mapper.getDeserializationConfig().with(new JacksonAnnotationIntrospector());
         return (List<NamedType>) _mapper.getSubtypeResolver().collectAndResolveSubtypesByClass(config, (AnnotatedClass) baseType);

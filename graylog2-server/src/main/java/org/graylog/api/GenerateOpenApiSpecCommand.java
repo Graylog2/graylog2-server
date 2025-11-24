@@ -52,7 +52,7 @@ import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIBindings;
-import org.graylog2.shared.rest.documentation.openapi.OpenAPIGenerator;
+import org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -110,13 +110,13 @@ public class GenerateOpenApiSpecCommand extends Server {
 
     @Override
     protected void startCommand() {
-        final var generator = injector.getInstance(OpenAPIGenerator.class);
+        final var openApiContextFactory = injector.getInstance(OpenAPIContextFactory.class);
 
         final var stopwatch = Stopwatch.createStarted();
 
         System.out.println("Generating OpenAPI specification.");
 
-        final var spec = generator.generateOpenApiSpec();
+        final var spec = openApiContextFactory.getOrCreate("generate-openapi-spec-command").read();
         final var serialized = outputFile.endsWith(".json") ? prettyJson(spec) : prettyYaml(spec);
         final var targetPath = Path.of(outputFile);
         final var parentPath = targetPath.getParent();

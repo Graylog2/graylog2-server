@@ -34,16 +34,9 @@ import java.util.Set;
 /**
  * Configuration and setup for OpenAPI 3.1 specification generation.
  * This class encapsulates the logic for configuring Swagger/OpenAPI to work with Graylog's REST API.
- *
- * TODO: this class can't really be reused for multiple contexts right now, because it uses the global
- *   default context it. if used outside the usual application lifecycle, e.g. for stub generation or in
- *   tests, this is not ideal. Maybe we should expose the context and provide means to create it with a
- *   user-defined context id.
  */
-// TODO: make the old generator work with the new annotations as an intermediate step
-// TODO: make sure that the reader doesn't run into concurrency issues (call the openapi endpoint in quick succession. maybe we have to bind the resource as a singleton?)
 @Singleton
-public class OpenAPIGenerator {
+public class OpenAPIContextFactory {
 
     private final Version version;
     private final CustomOpenAPIScanner scanner;
@@ -51,33 +44,50 @@ public class OpenAPIGenerator {
     private final CustomReader.Factory readerFactory;
 
     @Inject
-    public OpenAPIGenerator(Version version,
-                            CustomOpenAPIScanner scanner,
-                            CustomModelConverter modelConverter,
-                            CustomReader.Factory readerFactory) {
+    public OpenAPIContextFactory(Version version,
+                                 CustomOpenAPIScanner scanner,
+                                 CustomModelConverter modelConverter,
+                                 CustomReader.Factory readerFactory) {
         this.version = version;
         this.scanner = scanner;
         this.modelConverter = modelConverter;
         this.readerFactory = readerFactory;
     }
 
-    // TODO: create a constructor/factory method to easily create a generator from a non-guice
-    //   context? Probably need to provide Jackson subtypes as a parameter to register with
-    //   the object mapper
-
     /**
-     * Generates and returns the complete OpenAPI specification.
-     * This is useful for testing or exporting the spec without running a server.
+     * Retrieves an existing OpenAPI context by its ID or creates a new one and registers it under the given ID if
+     * it doesn't exist.
+     * <p>
+     * <b>
+     * Contexts are cached globally, so even if you create a completely new {@link OpenAPIContextFactory}
+     * object but reuuse a context-id that was previously used with a different factory object, you will get back the
+     * cached version, which can be confusing. So make sure to use a unique context-id if you don't want this behavior.
+     * </b>>
      *
-     * @return The generated OpenAPI specification
-     * @throws RuntimeException if the OpenAPI generation fails
+     * @param contextId The ID of the OpenAPI context to retrieve or create.
+     * @return The existing or newly created OpenAPI context.
      */
-    public OpenAPI generateOpenApiSpec() {
-        return openAPIContext().read();
-    }
+    public OpenApiContext getOrCreate(String contextId) {
 
-    public void ensureInitializedContext() {
-        openAPIContext();
+        final var ctx = OpenApiContextLocator.getInstance().getOpenApiContext(contextId);
+
+        if (ctx != null) {
+            return ctx;
+        }
+
+        final var openApiConfiguration = swaggerConfig();
+
+        try {
+            final var context = new JaxrsOpenApiContextBuilder<>()
+                    .openApiConfiguration(openApiConfiguration)
+                    .buildContext(false);
+            context.setModelConverters(Set.of(modelConverter));
+            context.setOpenApiScanner(scanner);
+            context.setOpenApiReader(readerFactory.create(openApiConfiguration));
+            return context.init();
+        } catch (OpenApiConfigurationException e) {
+            throw new RuntimeException("Unable to set up OpenAPI context" + e);
+        }
     }
 
     private SwaggerConfiguration swaggerConfig() {
@@ -102,29 +112,4 @@ public class OpenAPIGenerator {
                 .prettyPrint(true)
                 .sortOutput(true);
     }
-
-    private OpenApiContext openAPIContext() {
-
-        final var ctx = OpenApiContextLocator.getInstance().getOpenApiContext(OpenApiContext.OPENAPI_CONTEXT_ID_DEFAULT);
-
-        if (ctx != null) {
-            return ctx;
-        }
-
-        final var openApiConfiguration = swaggerConfig();
-
-        try {
-            final var context = new JaxrsOpenApiContextBuilder<>()
-                    .openApiConfiguration(openApiConfiguration)
-                    .buildContext(false);
-            context.setModelConverters(Set.of(modelConverter));
-            context.setOpenApiScanner(scanner);
-            context.setOpenApiReader(readerFactory.create(openApiConfiguration));
-            return context.init();
-        } catch (OpenApiConfigurationException e) {
-            throw new RuntimeException("Unable to set up OpenAPI context" + e);
-        }
-    }
-
-
 }

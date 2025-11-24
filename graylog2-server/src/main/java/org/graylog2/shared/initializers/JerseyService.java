@@ -65,7 +65,6 @@ import org.graylog2.shared.rest.RequestIdFilter;
 import org.graylog2.shared.rest.RestAccessLogFilter;
 import org.graylog2.shared.rest.VerboseCsrfProtectionFilter;
 import org.graylog2.shared.rest.XHRFilter;
-import org.graylog2.shared.rest.documentation.openapi.OpenAPIGenerator;
 import org.graylog2.shared.rest.exceptionmappers.AnyExceptionClassMapper;
 import org.graylog2.shared.rest.exceptionmappers.BadRequestExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.JsonMappingExceptionMapper;
@@ -107,7 +106,6 @@ import static java.util.Objects.requireNonNull;
 public class JerseyService extends AbstractIdleService {
     public static final String PLUGIN_PREFIX = "/plugins";
     private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
-    private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final HttpConfiguration configuration;
     private final Set<Class<?>> systemRestResources;
@@ -123,7 +121,6 @@ public class JerseyService extends AbstractIdleService {
     private final ErrorPageGenerator errorPageGenerator;
     private final TLSProtocolsConfiguration tlsConfiguration;
     private final int shutdownTimeoutMs;
-    private final OpenAPIGenerator openAPIGenerator;
 
     private HttpServer apiHttpServer = null;
 
@@ -140,8 +137,7 @@ public class JerseyService extends AbstractIdleService {
                          MetricRegistry metricRegistry,
                          ErrorPageGenerator errorPageGenerator,
                          TLSProtocolsConfiguration tlsConfiguration,
-                         @Named("shutdown_timeout") int shutdownTimeoutMs,
-                         OpenAPIGenerator openAPIGenerator) {
+                         @Named("shutdown_timeout") int shutdownTimeoutMs) {
         this.configuration = requireNonNull(configuration, "configuration");
         this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
         this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
@@ -155,7 +151,6 @@ public class JerseyService extends AbstractIdleService {
         this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
         this.tlsConfiguration = requireNonNull(tlsConfiguration);
         this.shutdownTimeoutMs = shutdownTimeoutMs;
-        this.openAPIGenerator = openAPIGenerator;
     }
 
     @Override
