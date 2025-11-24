@@ -16,25 +16,22 @@
  */
 package org.graylog.storage.opensearch3.views.export;
 
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportBackend;
+import org.graylog.plugins.views.search.export.ExportException;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.support.IndicesOptions;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.TermsQueryBuilder;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch3.OfficialOpensearchClient;
 import org.graylog.storage.opensearch3.TimeRangeQueryFactory;
 import org.graylog2.database.filtering.AttributeFilter;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTimeZone;
 import org.opensearch.client.opensearch._types.FieldValue;
@@ -42,6 +39,8 @@ import org.opensearch.client.opensearch._types.SortOrder;
 import org.opensearch.client.opensearch._types.mapping.FieldType;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 import org.opensearch.client.opensearch.core.search.Hit;
 import org.opensearch.client.util.ObjectBuilder;
 import org.slf4j.Logger;
@@ -53,35 +52,37 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toCollection;
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.boolQuery;
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.matchAllQuery;
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.queryStringQuery;
-import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
-import static org.graylog.storage.opensearch3.views.export.SearchAfter.DEFAULT_TIEBREAKER_FIELD;
 
 @SuppressWarnings("rawtypes")
 public class OpenSearchExportBackend implements ExportBackend {
     private static final Logger LOG = LoggerFactory.getLogger(OpenSearchExportBackend.class);
 
+    private static final String DEFAULT_TIEBREAKER_FIELD = Message.GL2_SECOND_SORT_FIELD;
+
     private final IndexLookup indexLookup;
-    private final RequestStrategy requestStrategy;
+
     private final boolean allowLeadingWildcard;
 
     private final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper;
 
+    private final OfficialOpensearchClient opensearchClient;
+
+    // TODO: how about thread safety here?!
+    private Optional<List<FieldValue>> searchAfterValues = Optional.empty();
+
     @Inject
     public OpenSearchExportBackend(IndexLookup indexLookup,
-                                   RequestStrategy requestStrategy,
                                    @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
-                                   final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper) {
+                                   final UsedSearchFiltersToQueryStringsMapper usedSearchFiltersToQueryStringsMapper,
+                                   OfficialOpensearchClient opensearchClient) {
         this.indexLookup = indexLookup;
-        this.requestStrategy = requestStrategy;
+        this.opensearchClient = opensearchClient;
         this.allowLeadingWildcard = allowLeadingWildcard;
         this.usedSearchFiltersToQueryStringsMapper = usedSearchFiltersToQueryStringsMapper;
     }
@@ -116,19 +117,41 @@ public class OpenSearchExportBackend implements ExportBackend {
     }
 
     private List<Hit<Map>> search(ExportMessagesCommand command) {
-        org.opensearch.client.opensearch.core.SearchRequest newSearch = newPrepareSearchRequest(command);
-        return requestStrategy.nextChunk(newSearch, command);
+        SearchResponse<Map> newResult = doSearch(prepareSearchRequest(command));
+        final List<Hit<Map>> hits = newResult.hits().hits();
+        searchAfterValues = lastHitSortFrom(hits);
+        return hits;
+    }
+
+    private SearchResponse<Map> doSearch(SearchRequest searchRequest) {
+        try {
+            final SearchResponse<Map> result = opensearchClient.sync(c -> c.search(searchRequest, Map.class), "failed to serarch");
+            if (result.shards().failed() > 0) {
+                final List<String> errors = result.shards().failures().stream()
+                        .map(e -> e.reason().reason())
+                        .distinct()
+                        .toList();
+                throw new ElasticsearchException("Unable to perform export query: ", errors);
+            }
+            return result;
+        } catch (Throwable e) {
+            throw new ExportException("Unable to complete export: ", new ElasticsearchException(e));
+        }
+    }
+
+    private Optional<List<FieldValue>> lastHitSortFrom(List<Hit<Map>> hits) {
+        return Optional.of(hits)
+                .filter(h -> !h.isEmpty())
+                .map(List::getLast)
+                .map(Hit::sort);
     }
 
 
-    private org.opensearch.client.opensearch.core.SearchRequest newPrepareSearchRequest(ExportMessagesCommand command) {
-        Set<String> indices = indicesFor(command);
+    private SearchRequest prepareSearchRequest(ExportMessagesCommand command) {
+        return SearchRequest.of(builder -> {
 
-        return org.opensearch.client.opensearch.core.SearchRequest.of(builder -> {
-            final LinkedList<String> indexNames = new LinkedList<>(indices);
-            if(!indexNames.isEmpty()) {
-                builder.index(indexNames);
-            }
+            getIndices(command).ifPresent(builder::index);
+
             builder.size(command.chunkSize())
                     .query(query(command))
                     .sort(s -> s.field(f -> f.field("timestamp").order(SortOrder.Asc)))
@@ -137,18 +160,25 @@ public class OpenSearchExportBackend implements ExportBackend {
                 builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(command.fieldsInOrder()))));
             }
 
-            requestStrategy.configure(builder);
+            searchAfterValues.ifPresent(builder::searchAfter);
 
             return builder;
         });
     }
 
+    @Nonnull
+    private Optional<List<String>> getIndices(ExportMessagesCommand command) {
+        return Optional.of(indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange()))
+                .filter(set -> !set.isEmpty())
+                .map(LinkedList::new);
+    }
+
     private Query query(ExportMessagesCommand command) {
         final ObjectBuilder<Query> boolQuery = Query.builder().bool(builder -> {
                     builder
-                            .filter(newQueryStringFilter(command.queryString()))
-                            .filter(newTimestampFilter(command))
-                            .filter(newStreamsFilter(command));
+                            .filter(queryStringFilter(command.queryString()))
+                            .filter(timestampFilter(command))
+                            .filter(streamsFilter(command));
 
                     final List<AttributeFilter> attributeFilters = command.attributeFilters();
                     if (attributeFilters != null && !attributeFilters.isEmpty()) {
@@ -170,33 +200,30 @@ public class OpenSearchExportBackend implements ExportBackend {
     }
 
 
-    private Query newQueryStringFilter(final ElasticsearchQueryString backendQuery) {
+    private Query queryStringFilter(final ElasticsearchQueryString backendQuery) {
         return backendQuery.isEmpty() ?
                 Query.builder().matchAll(q -> q).build() :
                 Query.builder().queryString(q -> q.allowLeadingWildcard(allowLeadingWildcard).query(backendQuery.queryString())).build();
     }
 
 
-    private Query newTimestampFilter(ExportMessagesCommand command) {
+    private Query timestampFilter(ExportMessagesCommand command) {
         final RangeQuery timeRangeQuery = TimeRangeQueryFactory.createTimeRangeQuery(command.timeRange());
         return Query.builder().range(timeRangeQuery).build();
     }
 
-    private Query newStreamsFilter(ExportMessagesCommand command) {
-        final ObjectBuilder<Query> quer = Query.builder().terms(t -> {
-            t.field(Message.FIELD_STREAMS);
-            t.terms(terms -> terms.value(toTerms(command.streams())));
-            return t;
-        });
-        return quer.build();
+    private Query streamsFilter(ExportMessagesCommand command) {
+        return Query.builder().terms(termsQuery -> {
+            termsQuery.field(Message.FIELD_STREAMS);
+            termsQuery.terms(terms -> terms.value(toTerms(command.streams())));
+            return termsQuery;
+        }).build();
     }
 
     private List<FieldValue> toTerms(Set<String> streams) {
-        return streams.stream().map(stream -> new FieldValue.Builder().stringValue(stream).build()).collect(Collectors.toList());
-    }
-
-    private Set<String> indicesFor(ExportMessagesCommand command) {
-        return indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange());
+        return streams.stream()
+                .map(stream -> new FieldValue.Builder().stringValue(stream).build())
+                .collect(Collectors.toList());
     }
 
     private boolean publishChunk(Consumer<SimpleMessageChunk> chunkCollector, List<Hit<Map>> hits, LinkedHashSet<String> desiredFieldsInOrder, DateTimeZone timeZone, SimpleMessageChunk.ChunkOrder chunkOrder) {

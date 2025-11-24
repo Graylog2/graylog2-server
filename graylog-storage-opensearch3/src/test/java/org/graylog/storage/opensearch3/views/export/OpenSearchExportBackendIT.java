@@ -52,7 +52,6 @@ import static org.mockito.Mockito.mock;
 
 public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
-    private IndexLookup indexLookup;
     private OpenSearchExportBackend backend;
     private OpenSearchExportITHelper helper;
 
@@ -71,18 +70,14 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
     @BeforeEach
     public void setUp() {
-        indexLookup = mock(IndexLookup.class);
-        backend = new OpenSearchExportBackend(indexLookup, requestStrategy(), false, new IgnoreSearchFilters());
+        final IndexLookup indexLookup = mock(IndexLookup.class);
+        backend = new OpenSearchExportBackend(indexLookup, false, new IgnoreSearchFilters(), openSearchInstance.getOfficialOpensearchClient());
         helper = new OpenSearchExportITHelper(indexLookup, backend);
     }
 
     @AfterEach
     public void afterEach() {
         openSearchInstance.cleanUp();
-    }
-
-    private RequestStrategy requestStrategy() {
-        return new SearchAfter(openSearchInstance.getOfficialOpensearchClient());
     }
 
     @Test
