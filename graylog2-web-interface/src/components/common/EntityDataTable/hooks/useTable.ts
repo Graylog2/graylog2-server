@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useEffect, useMemo, useCallback } from 'react';
+import { useMemo, useCallback } from 'react';
 import type { ColumnDef, SortingState, Updater, VisibilityState, RowSelectionState } from '@tanstack/react-table';
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
@@ -64,6 +64,7 @@ const updateColumnPreferences = (
 type Props<Entity extends EntityBase> = {
   columnOrder: Array<string>;
   columnsDefinitions: Array<ColumnDef<Entity>>;
+  columnWidths: { [colId: string]: number };
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
@@ -86,6 +87,7 @@ type Props<Entity extends EntityBase> = {
 const useTable = <Entity extends EntityBase>({
   columnOrder,
   columnsDefinitions,
+  columnWidths,
   defaultColumnOrder,
   displayBulkSelectCol,
   entities,
@@ -192,12 +194,14 @@ const useTable = <Entity extends EntityBase>({
 
   const onColumnSizingChange = useCallback(
     (updater: Updater<{ [colId: string]: number }>) => {
-      const newColumnWidths = updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
-      setInternalColumnWidthPreferences(newColumnWidths);
+      const newAttributeWIdthPreferences =
+        updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
+
+      setInternalColumnWidthPreferences(newAttributeWIdthPreferences);
 
       const newAttributePreferences = { ...(layoutPreferences?.attributes || {}) };
 
-      Object.entries(newColumnWidths).forEach(([colId, width]) => {
+      Object.entries(newAttributeWIdthPreferences).forEach(([colId, width]) => {
         newAttributePreferences[colId] = {
           ...newAttributePreferences[colId],
           width,
@@ -234,6 +238,7 @@ const useTable = <Entity extends EntityBase>({
       columnVisibility,
       sorting,
       rowSelection,
+      columnSizing: columnWidths,
     },
   });
 };

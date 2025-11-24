@@ -49,12 +49,14 @@ const calculateColumnWidths = ({
   attributeColumnIds,
   attributeColumnRenderers,
   columnWidthPreferences,
+  bulkSelectColWidth,
 }: {
   actionColMinWidth: number;
   assignableWidth: number;
   attributeColumnRenderers: { [columnId: string]: { staticWidth?: number; width?: number; minWidth?: number } };
   attributeColumnIds: Array<string>;
   columnWidthPreferences: { [key: string]: number };
+  bulkSelectColWidth?: number;
 }) => {
   const totalFlexColumns = attributeColumnIds.reduce((total, id) => {
     const { staticWidth, width = DEFAULT_COL_WIDTH } = attributeColumnRenderers[id] ?? {};
@@ -82,6 +84,7 @@ const calculateColumnWidths = ({
       }),
     ),
     actions: assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionColMinWidth : actionColMinWidth,
+    'bulk-select': bulkSelectColWidth,
   };
 };
 
@@ -125,6 +128,7 @@ const useColumnWidths = <Entity extends EntityBase>({
         attributeColumnIds: columnIds,
         attributeColumnRenderers: columnRenderersByAttribute,
         columnWidthPreferences,
+        bulkSelectColWidth,
       }),
     );
   }, [actionsColWidth, bulkSelectColWidth, columnRenderersByAttribute, columnIds, tableWidth, columnWidthPreferences]);

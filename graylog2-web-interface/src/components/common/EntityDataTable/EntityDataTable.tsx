@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
@@ -53,9 +53,13 @@ import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import TableHead from './TableHead';
 import BulkActionsRow from './BulkActionsRow';
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled.div<{ $columnWidths: Record<string, number> }>`
   width: 100%;
   overflow-x: auto;
+  ${({ $columnWidths }) =>
+    Object.entries($columnWidths || {})
+      .map(([id, width]) => `--header-${id}-size: ${width}px;`)
+      .join('\n')}
 `;
 
 const StyledTable = styled(Table)(
@@ -177,6 +181,41 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   );
 };
 
+const TableComponent = <Entity extends EntityBase>({
+  table,
+  expandedSectionsRenderer = undefined,
+  rowSelection: _rowSelection, // only require for memorization logic
+}: {
+  table: ReturnType<typeof useTable<Entity>>;
+  expandedSectionsRenderer?: {
+    [sectionName: string]: ExpandedSectionRenderer<Entity>;
+  };
+  rowSelection: RowSelectionState;
+}) => (
+  <StyledTable striped condensed hover>
+    <TableHead table={table} />
+    {table.getRowModel().rows.map((row) => (
+      <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
+        <tr>
+          {row.getVisibleCells().map((cell) => (
+            <TableCell key={cell.id} cell={cell} />
+          ))}
+        </tr>
+        <ExpandedSections
+          key={`expanded-sections-${row.id}`}
+          expandedSectionsRenderer={expandedSectionsRenderer}
+          entity={row.original}
+        />
+      </tbody>
+    ))}
+  </StyledTable>
+);
+
+export const MemoizedTableComp = React.memo(
+  TableComponent,
+  (prev, next) => prev.table.options.data === next.table.options.data && prev.rowSelection === next.rowSelection,
+) as typeof TableComponent;
+
 type Props<Entity extends EntityBase, Meta = unknown> = {
   /**
    * Needs to be defined when not all action cells in every row have the same width.
@@ -297,6 +336,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const table = useTable<Entity>({
     columnOrder,
+    columnWidths,
     columnsDefinitions,
     defaultColumnOrder,
     displayBulkSelectCol,
@@ -331,24 +371,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
             </LayoutConfigRow>
           </ActionsRow>
           <TableDndProvider table={table}>
-            <ScrollContainer id="scroll-container" ref={tableRef}>
-              <StyledTable striped condensed hover>
-                <TableHead table={table} />
-                {table.getRowModel().rows.map((row) => (
-                  <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                    <tr>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} cell={cell} />
-                      ))}
-                    </tr>
-                    <ExpandedSections
-                      key={`expanded-sections-${row.id}`}
-                      expandedSectionsRenderer={expandedSectionsRenderer}
-                      entity={row.original}
-                    />
-                  </tbody>
-                ))}
-              </StyledTable>
+            <ScrollContainer id="scroll-container" ref={tableRef} $columnWidths={columnWidths}>
+              <MemoizedTableComp
+                table={table}
+                expandedSectionsRenderer={expandedSectionsRenderer}
+                rowSelection={table.getState().rowSelection}
+              />
             </ScrollContainer>
           </TableDndProvider>
         </ExpandedSectionsProvider>

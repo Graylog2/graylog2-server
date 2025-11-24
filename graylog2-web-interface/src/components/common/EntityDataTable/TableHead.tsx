@@ -35,13 +35,13 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; $transform: string }>(
-  ({ $transform, $width, $isDragging, theme }) => css`
-    width: ${$width ? `${$width}px` : 'auto'};
+export const Th = styled.th<{ $isDragging: boolean; $transform: string; $colId: string }>(
+  ({ $transform, $isDragging, $colId, theme }) => css`
     background-color: ${theme.colors.table.head.background};
     transition: width transform 0.2s ease-in-out;
     opacity: ${$isDragging ? 0.4 : 1};
     transform: ${$transform};
+    width: var(--header-${$colId}-size);
   `,
 );
 
@@ -95,7 +95,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
       key={header.id}
       ref={setNodeRef}
       colSpan={header.colSpan}
-      $width={header.getSize()}
+      $colId={header.column.id}
       $transform={transform}
       $isDragging={isDragging}>
       <ThInner>
