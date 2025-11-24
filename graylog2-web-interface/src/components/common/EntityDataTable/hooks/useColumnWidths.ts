@@ -44,18 +44,20 @@ const assignableTableWidth = ({
 };
 
 const calculateColumnWidths = ({
+  actionColMinWidth,
   assignableWidth,
-  columnIds,
-  columnRenderersByAttribute,
+  attributeColumnIds,
+  attributeColumnRenderers,
   columnWidthPreferences,
 }: {
+  actionColMinWidth: number;
   assignableWidth: number;
-  columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number; width?: number; minWidth?: number } };
-  columnIds: Array<string>;
-  columnWidthPreferences;
+  attributeColumnRenderers: { [columnId: string]: { staticWidth?: number; width?: number; minWidth?: number } };
+  attributeColumnIds: Array<string>;
+  columnWidthPreferences: { [key: string]: number };
 }) => {
-  const totalFlexColumns = columnIds.reduce((total, id) => {
-    const { staticWidth, width = DEFAULT_COL_WIDTH } = columnRenderersByAttribute[id] ?? {};
+  const totalFlexColumns = attributeColumnIds.reduce((total, id) => {
+    const { staticWidth, width = DEFAULT_COL_WIDTH } = attributeColumnRenderers[id] ?? {};
 
     if (columnWidthPreferences[id] ?? staticWidth) {
       return total;
@@ -66,18 +68,21 @@ const calculateColumnWidths = ({
 
   const flexColWidth = assignableWidth / totalFlexColumns;
 
-  return Object.fromEntries(
-    columnIds.map((id) => {
-      const {
-        staticWidth,
-        width = DEFAULT_COL_WIDTH,
-        minWidth = DEFAULT_COL_MIN_WIDTH,
-      } = columnRenderersByAttribute[id] ?? {};
-      const targetWidth = columnWidthPreferences[id] ?? staticWidth ?? flexColWidth * width;
+  return {
+    ...Object.fromEntries(
+      attributeColumnIds.map((id) => {
+        const {
+          staticWidth,
+          width = DEFAULT_COL_WIDTH,
+          minWidth = DEFAULT_COL_MIN_WIDTH,
+        } = attributeColumnRenderers[id] ?? {};
+        const targetWidth = columnWidthPreferences[id] ?? staticWidth ?? flexColWidth * width;
 
-      return [id, !staticWidth && targetWidth < minWidth ? minWidth : targetWidth];
-    }),
-  );
+        return [id, !staticWidth && targetWidth < minWidth ? minWidth : targetWidth];
+      }),
+    ),
+    actions: assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionColMinWidth : actionColMinWidth,
+  };
 };
 
 const useColumnWidths = <Entity extends EntityBase>({
@@ -115,9 +120,10 @@ const useColumnWidths = <Entity extends EntityBase>({
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setColumnWidths(
       calculateColumnWidths({
+        actionColMinWidth: actionsColWidth,
         assignableWidth,
-        columnIds,
-        columnRenderersByAttribute,
+        attributeColumnIds: columnIds,
+        attributeColumnRenderers: columnRenderersByAttribute,
         columnWidthPreferences,
       }),
     );

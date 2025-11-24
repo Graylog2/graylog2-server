@@ -20,7 +20,7 @@ import { useRef, useMemo } from 'react';
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
-import { CELL_PADDING, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import useColumnWidths from 'components/common/EntityDataTable/hooks/useColumnWidths';
 
 type Props<Entity extends EntityBase, Meta> = {
@@ -47,10 +47,8 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
     [columnSchemas, visibleColumns],
   );
-  const actionsColWidth = fixedActionsCellWidth ? fixedActionsCellWidth + CELL_PADDING * 2 : 0;
-
   const columnWidths = useColumnWidths<Entity>({
-    actionsColWidth,
+    actionsColWidth: fixedActionsCellWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
     columnRenderersByAttribute,
     columnIds,
@@ -58,7 +56,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     columnWidthPreferences,
   });
 
-  return { tableRef, actionsRef, columnWidths, actionsColWidth };
+  return { tableRef, actionsRef, columnWidths };
 };
 
 export default useElementWidths;

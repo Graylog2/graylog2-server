@@ -61,7 +61,7 @@ const ScrollContainer = styled.div`
 const StyledTable = styled(Table)(
   ({ theme }) => css`
     table-layout: fixed;
-    width: auto;
+    width: fit-content;
 
     thead > tr > th,
     tbody > tr > td {
@@ -136,7 +136,6 @@ const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
   }, [columnSchemas, customColumnRenderers]);
 
 const useColumnDefinitions = <Entity extends EntityBase, Meta>({
-  actionsColMinWidth,
   actionsRef,
   columnRenderersByAttribute,
   columnSchemas,
@@ -147,7 +146,6 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   entityAttributesAreCamelCase,
   meta,
 }: {
-  actionsColMinWidth: number;
   actionsRef: React.MutableRefObject<HTMLDivElement>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
@@ -160,7 +158,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol);
-  const actionsCol = useActionsColumnDefinition(displayActionsCol, actionsColMinWidth, entityActions, actionsRef);
+  const actionsCol = useActionsColumnDefinition(displayActionsCol, columnWidths.actions, entityActions, actionsRef);
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
     columnSchemas,
     columnRenderersByAttribute,
@@ -267,8 +265,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   );
   const [columnWidthPreferences, setColumnWidthPreferences] = useState<{ [attributeId: string]: number }>({});
 
-  console.log(columnWidthPreferences);
-
   const columnOrder = useVisibleColumnOrder(
     layoutPreferences?.attributes,
     internalAttributeColumnOrder,
@@ -287,7 +283,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsRef,
-    actionsColMinWidth: fixedActionsCellWidth,
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
