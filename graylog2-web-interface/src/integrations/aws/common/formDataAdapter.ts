@@ -79,9 +79,9 @@ export const toGenericInputCreateRequest = ({
           aws_secret_key: awsSecretKey?.value,
         }
       : {
-        aws_access_key: key,
-        aws_secret_key: secret,
-      }),
+          aws_access_key: key,
+          aws_secret_key: secret,
+        }),
     aws_message_type: awsCloudWatchKinesisInputType.value,
     throttling_allowed: !!awsCloudWatchThrottleEnabled.value,
     aws_flow_log_prefix: !!awsCloudWatchAddFlowLogPrefix.value,

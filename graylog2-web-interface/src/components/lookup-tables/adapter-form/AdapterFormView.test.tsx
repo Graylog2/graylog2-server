@@ -19,7 +19,7 @@ import { render, screen } from 'wrappedTestingLibrary';
 
 import mockComponent from 'helpers/mocking/MockComponent';
 
-import DataAdapterCreate from './DataAdapterCreate';
+import DataAdapterFormView from './AdapterFormView';
 
 jest.mock('components/lookup-tables', () => ({
   DataAdapterForm: mockComponent('DataAdapterFormMock'),
@@ -39,7 +39,7 @@ jest.mock('graylog-web-plugin/plugin', () => ({
 describe('<DataAdapterCreate />', () => {
   it('should render with empty parameters', async () => {
     const callback = () => {};
-    render(<DataAdapterCreate saved={callback} onCancel={() => {}} />);
+    render(<DataAdapterFormView saved={callback} onCancel={() => {}} />);
     await screen.findByText(/select data adapter type/i);
   });
 });

@@ -26,8 +26,6 @@ const AWSCloudTrailRoutes = {
   },
 };
 
-
-
 const ApiRoutes = {
   INTEGRATIONS: {
     AWSCloudTrail: {
