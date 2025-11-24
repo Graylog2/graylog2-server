@@ -117,8 +117,8 @@ public class OpenSearchExportBackend implements ExportBackend {
     }
 
     private List<Hit<Map>> search(ExportMessagesCommand command) {
-        SearchResponse<Map> newResult = doSearch(prepareSearchRequest(command));
-        final List<Hit<Map>> hits = newResult.hits().hits();
+        SearchResponse<Map> result = doSearch(createSearchRequest(command));
+        final List<Hit<Map>> hits = result.hits().hits();
         searchAfterValues = lastHitSortFrom(hits);
         return hits;
     }
@@ -147,7 +147,7 @@ public class OpenSearchExportBackend implements ExportBackend {
     }
 
 
-    private SearchRequest prepareSearchRequest(ExportMessagesCommand command) {
+    private SearchRequest createSearchRequest(ExportMessagesCommand command) {
         return SearchRequest.of(builder -> {
 
             getIndices(command).ifPresent(builder::index);
@@ -156,6 +156,7 @@ public class OpenSearchExportBackend implements ExportBackend {
                     .query(query(command))
                     .sort(s -> s.field(f -> f.field("timestamp").order(SortOrder.Asc)))
                     .sort(s -> s.field(f -> f.field(DEFAULT_TIEBREAKER_FIELD).order(SortOrder.Asc).unmappedType(FieldType.Keyword)));
+
             if (!command.exportAllFields()) {
                 builder.source(s -> s.filter(sf -> sf.includes(new LinkedList<>(command.fieldsInOrder()))));
             }
@@ -215,12 +216,12 @@ public class OpenSearchExportBackend implements ExportBackend {
     private Query streamsFilter(ExportMessagesCommand command) {
         return Query.builder().terms(termsQuery -> {
             termsQuery.field(Message.FIELD_STREAMS);
-            termsQuery.terms(terms -> terms.value(toTerms(command.streams())));
+            termsQuery.terms(terms -> terms.value(termsFromStreams(command.streams())));
             return termsQuery;
         }).build();
     }
 
-    private List<FieldValue> toTerms(Set<String> streams) {
+    private List<FieldValue> termsFromStreams(Set<String> streams) {
         return streams.stream()
                 .map(stream -> new FieldValue.Builder().stringValue(stream).build())
                 .collect(Collectors.toList());
