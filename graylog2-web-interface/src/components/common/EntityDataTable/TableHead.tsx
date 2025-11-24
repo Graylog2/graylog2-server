@@ -22,13 +22,12 @@ import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import SortIcon from 'components/common/EntityDataTable/SortIcon';
-import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import DragHandle from 'components/common/SortableList/DragHandle';
 
+import SortIcon from './SortIcon';
+import DndStylesContext from './contexts/DndStylesContext';
+import ResizeHandle from './ResizeHandle';
 import type { EntityBase, ColumnMetaContext } from './types';
-
-import Icon from '../Icon';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -46,31 +45,18 @@ export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; 
   `,
 );
 
-const ThInner = styled.div`
+export const ThInner = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 `;
 
-const LeftCol = styled.div`
+export const LeftCol = styled.div`
   flex: 1;
+  display: flex;
+  align-items: center;
 `;
-
-const ResizeButton = styled.div(
-  ({ theme }) => css`
-    background: transparent;
-    border: 0;
-    padding: 0;
-    cursor: col-resize;
-    color: ${theme.colors.gray[70]};
-  `,
-);
-
-const ResizeHandle = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => (
-  <ResizeButton onMouseDown={header.getResizeHandler()} onTouchStart={header.getResizeHandler()}>
-    <Icon name="arrows_outward" />
-  </ResizeButton>
-);
 
 const useSortableCol = (colId: string, disabled: boolean) => {
   const { setColumnTransform } = useContext(DndStylesContext);
@@ -125,7 +111,9 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
           {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
           {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
         </LeftCol>
-        {header.column.getCanResize() && <ResizeHandle header={header} />}
+        {header.column.getCanResize() && (
+          <ResizeHandle onMouseDown={header.getResizeHandler()} onTouchStart={header.getResizeHandler()} />
+        )}
       </ThInner>
     </Th>
   );

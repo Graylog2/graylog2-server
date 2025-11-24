@@ -24,8 +24,8 @@ import type { DragHandleProps } from 'components/common/SortableList/types';
 export const DRAG_HANDLE_DEFAULT_TITLE = 'Drag or press space to reorder';
 
 const Container = styled.button<{ $isDragging: boolean }>(
-  ({ $isDragging }) => css`
-    margin-right: 5px;
+  ({ $isDragging, theme }) => css`
+    margin-right: ${theme.spacings.xxs};
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
     background: transparent;
     border: 0;

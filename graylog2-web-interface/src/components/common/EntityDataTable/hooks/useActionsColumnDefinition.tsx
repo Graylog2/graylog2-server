@@ -27,6 +27,7 @@ import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
 const ActionsHead = styled.div`
   text-align: right;
+  flex: 1;
 `;
 
 const Actions = styled(ButtonToolbar)`

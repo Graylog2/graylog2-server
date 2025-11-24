@@ -24,6 +24,8 @@ import zIndices from 'theme/z-indices';
 import Icon from 'components/common/Icon';
 import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
+import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
+import { ThInner, LeftCol } from 'components/common/EntityDataTable/TableHead';
 
 const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
@@ -66,11 +68,16 @@ const ThGhostInner = <Entity extends EntityBase>(
 
   return (
     <CustomDragOverlay ref={ref} $minWidth={column.getSize()}>
-      <DragHandle $isDragging>
-        <DragIcon name="drag_indicator" />
-      </DragHandle>
-      {columnMeta.label}
-      {column.getCanSort() && <SortIcon<Entity> column={column} />}
+      <ThInner>
+        <LeftCol>
+          <DragHandle $isDragging>
+            <DragIcon name="drag_indicator" />
+          </DragHandle>
+          {columnMeta.label}
+          {column.getCanSort() && <SortIcon<Entity> column={column} />}
+        </LeftCol>
+        {column.getCanResize() && <ResizeHandle />}
+      </ThInner>
     </CustomDragOverlay>
   );
 };
