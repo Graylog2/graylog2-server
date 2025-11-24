@@ -26,8 +26,10 @@ import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
+import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
+import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,37 +58,44 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
 
     // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider() {
-        this(new ObjectMapperConfiguration(
-                ObjectMapperProvider.class.getClassLoader(),
+        this(ObjectMapperProvider.class.getClassLoader(),
                 Collections.emptySet(),
                 new EncryptedValueService(UUID.randomUUID().toString()),
                 GRNRegistry.createWithBuiltinTypes(),
-                InputConfigurationBeanDeserializerModifier.withoutConfig()));
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 
     // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider(GRNRegistry grnRegistry) {
-        this(new ObjectMapperConfiguration(
-                ObjectMapperProvider.class.getClassLoader(),
+        this(ObjectMapperProvider.class.getClassLoader(),
                 Collections.emptySet(),
                 new EncryptedValueService(UUID.randomUUID().toString()),
                 grnRegistry,
-                InputConfigurationBeanDeserializerModifier.withoutConfig()));
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 
     // WARNING: This constructor should ONLY be used for tests!
     public ObjectMapperProvider(ClassLoader classLoader, Set<NamedType> subtypes) {
-        this(new ObjectMapperConfiguration(
-                classLoader,
+        this(classLoader,
                 subtypes,
                 new EncryptedValueService(UUID.randomUUID().toString()),
                 GRNRegistry.createWithBuiltinTypes(),
-                InputConfigurationBeanDeserializerModifier.withoutConfig()));
+                InputConfigurationBeanDeserializerModifier.withoutConfig());
     }
 
     @Inject
-    public ObjectMapperProvider(ObjectMapperConfiguration objectMapperConfiguration) {
-        this.objectMapper = objectMapperConfiguration.configure(new ObjectMapper());
+    public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
+                                @JacksonSubTypes final Set<NamedType> subtypes,
+                                final EncryptedValueService encryptedValueService,
+                                final GRNRegistry grnRegistry,
+                                final InputConfigurationBeanDeserializerModifier inputConfigurationBeanDeserializerModifier) {
+        final ObjectMapper mapper = new ObjectMapper();
+        this.objectMapper = ObjectMapperConfiguration.configureMapper(mapper,
+                classLoader,
+                subtypes,
+                encryptedValueService,
+                grnRegistry,
+                inputConfigurationBeanDeserializerModifier);
     }
 
     @Override

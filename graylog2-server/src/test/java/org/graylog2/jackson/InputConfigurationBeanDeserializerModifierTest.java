@@ -27,7 +27,6 @@ import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -85,13 +84,11 @@ class InputConfigurationBeanDeserializerModifierTest {
             return Optional.empty();
         };
 
-        final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider(
-                new ObjectMapperConfiguration(
-                        ObjectMapperProvider.class.getClassLoader(),
-                        Collections.emptySet(),
-                        new EncryptedValueService(UUID.randomUUID().toString()),
-                        GRNRegistry.createWithBuiltinTypes(),
-                        new InputConfigurationBeanDeserializerModifier(configProvider)));
+        final ObjectMapperProvider objectMapperProvider = new ObjectMapperProvider(ObjectMapperProvider.class.getClassLoader(),
+                Collections.emptySet(),
+                new EncryptedValueService(UUID.randomUUID().toString()),
+                GRNRegistry.createWithBuiltinTypes(),
+                new InputConfigurationBeanDeserializerModifier(configProvider));
         final InputCreateRequest inputCreateRequest = objectMapperProvider.get().readValue(inputConfig, InputCreateRequest.class);
         assertThat(inputCreateRequest.configuration()).hasEntrySatisfying("encrypted_headers", e -> {
             assertThat(e).isInstanceOf(EncryptedValue.class);

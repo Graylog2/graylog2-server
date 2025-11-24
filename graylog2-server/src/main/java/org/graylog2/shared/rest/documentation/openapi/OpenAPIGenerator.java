@@ -47,19 +47,16 @@ public class OpenAPIGenerator {
 
     private final Version version;
     private final CustomOpenAPIScanner scanner;
-    private final CustomObjectMapperProcessor objectMapperProcessor;
     private final CustomModelConverter modelConverter;
     private final CustomReader.Factory readerFactory;
 
     @Inject
     public OpenAPIGenerator(Version version,
                             CustomOpenAPIScanner scanner,
-                            CustomObjectMapperProcessor objectMapperProcessor,
                             CustomModelConverter modelConverter,
                             CustomReader.Factory readerFactory) {
         this.version = version;
         this.scanner = scanner;
-        this.objectMapperProcessor = objectMapperProcessor;
         this.modelConverter = modelConverter;
         this.readerFactory = readerFactory;
     }
@@ -121,7 +118,6 @@ public class OpenAPIGenerator {
                     .openApiConfiguration(openApiConfiguration)
                     .buildContext(false);
             context.setModelConverters(Set.of(modelConverter));
-            context.setObjectMapperProcessor(objectMapperProcessor);
             context.setOpenApiScanner(scanner);
             context.setOpenApiReader(readerFactory.create(openApiConfiguration));
             return context.init();

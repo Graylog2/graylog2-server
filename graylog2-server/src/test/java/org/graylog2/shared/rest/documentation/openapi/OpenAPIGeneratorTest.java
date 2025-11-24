@@ -31,14 +31,10 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import org.graylog.grn.GRNRegistry;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,33 +45,29 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class OpenAPIGeneratorTest {
 
     private OpenAPIGenerator generator;
-    private ObjectMapperConfiguration objectMapperConfiguration;
+    private ObjectMapper objectMapper;
 
     @BeforeEach
     void setUp() {
         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
                 Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class, NotPublicCloudResource.class));
 
-        objectMapperConfiguration = new ObjectMapperConfiguration(
-                ObjectMapperProvider.class.getClassLoader(),
-                Set.of(new NamedType(ChildType3.class, "child-type-3"), new NamedType(ChildType4.class, "child-type-4")),
-                new EncryptedValueService(UUID.randomUUID().toString()),
-                GRNRegistry.createWithBuiltinTypes(),
-                InputConfigurationBeanDeserializerModifier.withoutConfig()
+        objectMapper = new ObjectMapperProvider().get();
+        objectMapper.registerSubtypes(
+                new NamedType(ChildType3.class, "child-type-3"),
+                new NamedType(ChildType4.class, "child-type-4")
         );
 
         generator = new OpenAPIGenerator(
                 Version.from(1, 0, 0),
                 new CustomOpenAPIScanner(Set.of(RootTestResource.class), pluginRestResources, true),
-                new CustomObjectMapperProcessor(objectMapperConfiguration),
-                new CustomModelConverter(objectMapperConfiguration.configure(new ObjectMapper())),
+                new CustomModelConverter(objectMapper),
                 (config) -> new CustomReader(pluginRestResources, config)
         );
     }
@@ -161,10 +153,9 @@ class OpenAPIGeneratorTest {
 
     @Test
     void handlesJacksonSubtypes() throws Exception {
-        final var mapper = objectMapperConfiguration.configure(new ObjectMapper());
 
-        final var childType1 = mapper.readValue("{\"type\":\"child-type-1\",\"age\":5}", ParentType.class);
-        final var childType2 = mapper.readValue("{\"type\":\"child-type-2\",\"age\":5}", ParentType.class);
+        final var childType1 = objectMapper.readValue("{\"type\":\"child-type-1\",\"age\":5}", ParentType.class);
+        final var childType2 = objectMapper.readValue("{\"type\":\"child-type-2\",\"age\":5}", ParentType.class);
 
         assertThat(childType1).isInstanceOf(ChildType1.class);
         assertThat(childType2).isInstanceOf(ChildType2.class);

@@ -57,10 +57,10 @@ import java.util.OptionalLong;
 public class CustomModelConverter extends ModelResolver {
 
     @Inject
-    public CustomModelConverter(ObjectMapper mapper) {
-        super(mapper);
+    public CustomModelConverter(ObjectMapper applicationObjectMapper) {
+        super(applicationObjectMapper.copy());
         setOpenapi31(true);
-        mapper.registerModule(
+        _mapper.registerModule(
                 new SimpleModule("registeredSubtypes", Version.unknownVersion()) {
                     @Override
                     public void setupModule(SetupContext context) {

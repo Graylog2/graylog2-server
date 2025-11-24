@@ -23,7 +23,6 @@ public class OpenAPIBindings extends Graylog2Module {
     @Override
     protected void configure() {
         bind(CustomOpenAPIScanner.class).asEagerSingleton();
-        bind(CustomObjectMapperProcessor.class).asEagerSingleton();
         bind(CustomModelConverter.class).asEagerSingleton();
         install(new FactoryModuleBuilder().build(CustomReader.Factory.class));
 

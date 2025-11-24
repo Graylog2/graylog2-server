@@ -34,7 +34,6 @@ import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.security.encryption.EncryptedValueMapperConfig;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.shared.bindings.providers.config.ObjectMapperConfiguration;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.junit.jupiter.api.Test;
@@ -78,13 +77,11 @@ public abstract class EncryptedInputConfigMigrationTest {
         when(messageInputFactory.getAvailableInputs())
                 .thenReturn(Map.of(JsonPathInput.class.getCanonicalName(), mock(InputDescription.class)));
 
-        ObjectMapper objectMapper = new ObjectMapperProvider(
-                new ObjectMapperConfiguration(
-                        ObjectMapperProvider.class.getClassLoader(),
-                        Collections.emptySet(),
-                        encryptedValueService,
-                        GRNRegistry.createWithBuiltinTypes(),
-                        new InputConfigurationBeanDeserializerModifier(messageInputFactory))).get();
+        ObjectMapper objectMapper = new ObjectMapperProvider(ObjectMapperProvider.class.getClassLoader(),
+                Collections.emptySet(),
+                encryptedValueService,
+                GRNRegistry.createWithBuiltinTypes(),
+                new InputConfigurationBeanDeserializerModifier(messageInputFactory)).get();
 
         dbObjectMapper = objectMapper.copy();
         EncryptedValueMapperConfig.enableDatabase(dbObjectMapper);
