@@ -53,4 +53,3 @@ const EmbeddedCloudTrailApp = ({ onSubmit = undefined }: Props) => {
 };
 
 export default EmbeddedCloudTrailApp;
-

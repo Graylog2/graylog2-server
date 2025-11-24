@@ -33,8 +33,7 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { overrideSource, awsCloudTrailThrottleEnabled, sqsMessageBatchSize } =
-    formData;
+  const { overrideSource, awsCloudTrailThrottleEnabled, sqsMessageBatchSize } = formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);
@@ -49,7 +48,7 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
     } else {
       handleSqsMessageBatchSizeChange('Please select SQS Message Batch Size between 1 - 10.');
     }
-  }
+  };
 
   return (
     <AdditionalFields title="Advanced Options" visible={isAdvancedOptionsVisible} onToggle={handleToggle}>
@@ -77,7 +76,6 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
         label="SQS Message Batch Size"
         help="The maximum number of messages to query from SQS at a time. The maximum acceptable value is 10."
       />
-
     </AdditionalFields>
   );
 };
