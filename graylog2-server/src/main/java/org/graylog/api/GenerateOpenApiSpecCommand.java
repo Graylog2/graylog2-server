@@ -49,6 +49,7 @@ import org.graylog2.plugin.inject.JacksonSubTypes;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.security.encryption.EncryptedValueService;
 import org.graylog2.shared.SuppressForbidden;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIBindings;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIGenerator;
@@ -102,6 +103,7 @@ public class GenerateOpenApiSpecCommand extends Server {
                     binder.bind(ClassLoader.class).annotatedWith(GraylogClassLoader.class).toInstance(chainingClassLoader);
                     binder.bind(EncryptedValueService.class).toInstance(new EncryptedValueService(UUID.randomUUID().toString()));
                     binder.bind(InputConfigurationBeanDeserializerModifier.class).toInstance(InputConfigurationBeanDeserializerModifier.withoutConfig());
+                    binder.bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class);
                     binder.bind(GRNRegistry.class).toInstance(GRNRegistry.createWithBuiltinTypes());
                 });
     }
