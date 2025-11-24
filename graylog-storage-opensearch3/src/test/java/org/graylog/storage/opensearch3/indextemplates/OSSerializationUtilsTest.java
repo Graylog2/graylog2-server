@@ -139,4 +139,14 @@ class OSSerializationUtilsTest {
         assertEquals(expected.error().metadata().get(metaKey).to(Integer.class), errorResponse.error().metadata().get(metaKey).to(Integer.class));
     }
 
+    @Test
+    void testToJsonMap() {
+        assertEquals(Map.of(), toTest.toJsonDataMap(Map.of()));
+        final Map<String, JsonData> converted = toTest.toJsonDataMap(Map.of("the_number", 42));
+
+        //JsonDataImpl does not implement equals(), so verification is slightly awkward
+        assertEquals(1, converted.size());
+        final JsonData toVerify = converted.get("the_number");
+        assertEquals(42, toVerify.to(Integer.class));
+    }
 }
