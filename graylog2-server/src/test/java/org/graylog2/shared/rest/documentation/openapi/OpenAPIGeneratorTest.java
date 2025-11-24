@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
-import io.swagger.v3.core.util.Json;
+import io.swagger.v3.core.util.Json31;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -105,54 +105,58 @@ class OpenAPIGeneratorTest {
         // fields by treating them the same as Optional<Integer>/Optional<Long>/Optional<Double>.
         //
         // See: https://github.com/swagger-api/swagger-core/issues/4717
-
         final var generatedOpenAPI = generator.generateOpenApiSpec();
+        try {
+            assertThat(generatedOpenAPI).isNotNull();
+            assertThat(generatedOpenAPI.getPaths()).isNotEmpty();
 
-        assertThat(generatedOpenAPI).isNotNull();
-        assertThat(generatedOpenAPI.getPaths()).isNotEmpty();
+            // Verify that the /test path exists
+            assertThat(generatedOpenAPI.getPaths()).containsKey("/plugins/my.plugin.id/test");
 
-        // Verify that the /test path exists
-        assertThat(generatedOpenAPI.getPaths()).containsKey("/plugins/my.plugin.id/test");
+            // Verify the schema contains our test endpoint
+            final var postOperation = generatedOpenAPI.getPaths().get("/plugins/my.plugin.id/test").getPost();
+            assertThat(postOperation).isNotNull();
+            assertThat(postOperation.getOperationId()).isEqualTo("createTest");
 
-        // Verify the schema contains our test endpoint
-        final var postOperation = generatedOpenAPI.getPaths().get("/plugins/my.plugin.id/test").getPost();
-        assertThat(postOperation).isNotNull();
-        assertThat(postOperation.getOperationId()).isEqualTo("createTest");
+            // Verify that OptionalInt/OptionalLong/OptionalDouble are treated the same as Optional<Integer>/Optional<Long>/Optional<Double>
+            final var responseSchema = generatedOpenAPI.getComponents().getSchemas().get("TestResponse");
+            assertThat(responseSchema).isNotNull();
 
-        // Verify that OptionalInt/OptionalLong/OptionalDouble are treated the same as Optional<Integer>/Optional<Long>/Optional<Double>
-        final var responseSchema = generatedOpenAPI.getComponents().getSchemas().get("TestResponse");
-        assertThat(responseSchema).isNotNull();
+            // The ObjectMapper converts camelCase to snake_case
+            final var optionalIntegerProperty = (Schema<?>) responseSchema.getProperties().get("optional_integer");
+            final var countProperty = (Schema<?>) responseSchema.getProperties().get("count");
+            final var optionalLongProperty = (Schema<?>) responseSchema.getProperties().get("optional_long");
+            final var limitProperty = (Schema<?>) responseSchema.getProperties().get("limit");
+            final var optionalDoubleProperty = (Schema<?>) responseSchema.getProperties().get("optional_double");
+            final var rateProperty = (Schema<?>) responseSchema.getProperties().get("rate");
 
-        // The ObjectMapper converts camelCase to snake_case
-        final var optionalIntegerProperty = (Schema<?>) responseSchema.getProperties().get("optional_integer");
-        final var countProperty = (Schema<?>) responseSchema.getProperties().get("count");
-        final var optionalLongProperty = (Schema<?>) responseSchema.getProperties().get("optional_long");
-        final var limitProperty = (Schema<?>) responseSchema.getProperties().get("limit");
-        final var optionalDoubleProperty = (Schema<?>) responseSchema.getProperties().get("optional_double");
-        final var rateProperty = (Schema<?>) responseSchema.getProperties().get("rate");
+            // Optional<Integer> and OptionalInt should both be simple integer schemas with int32 format
+            assertThat(optionalIntegerProperty.getTypes()).containsExactly("integer");
+            assertThat(optionalIntegerProperty.getFormat()).isEqualTo("int32");
+            assertThat(countProperty.getTypes()).containsExactly("integer");
+            assertThat(countProperty.getFormat()).isEqualTo("int32");
 
-        // Optional<Integer> and OptionalInt should both be simple integer schemas with int32 format
-        assertThat(optionalIntegerProperty.getType()).isEqualTo("integer");
-        assertThat(optionalIntegerProperty.getFormat()).isEqualTo("int32");
-        assertThat(countProperty.getType()).isEqualTo("integer");
-        assertThat(countProperty.getFormat()).isEqualTo("int32");
+            // Optional<Long> and OptionalLong should both be simple integer schemas with int64 format
+            assertThat(optionalLongProperty.getTypes()).containsExactly("integer");
+            assertThat(optionalLongProperty.getFormat()).isEqualTo("int64");
+            assertThat(limitProperty.getTypes()).containsExactly("integer");
+            assertThat(limitProperty.getFormat()).isEqualTo("int64");
 
-        // Optional<Long> and OptionalLong should both be simple integer schemas with int64 format
-        assertThat(optionalLongProperty.getType()).isEqualTo("integer");
-        assertThat(optionalLongProperty.getFormat()).isEqualTo("int64");
-        assertThat(limitProperty.getType()).isEqualTo("integer");
-        assertThat(limitProperty.getFormat()).isEqualTo("int64");
+            // Optional<Double> and OptionalDouble should both be simple number schemas with double format
+            assertThat(optionalDoubleProperty.getTypes()).containsExactly("number");
+            assertThat(optionalDoubleProperty.getFormat()).isEqualTo("double");
+            assertThat(rateProperty.getTypes()).containsExactly("number");
+            assertThat(rateProperty.getFormat()).isEqualTo("double");
 
-        // Optional<Double> and OptionalDouble should both be simple number schemas with double format
-        assertThat(optionalDoubleProperty.getType()).isEqualTo("number");
-        assertThat(optionalDoubleProperty.getFormat()).isEqualTo("double");
-        assertThat(rateProperty.getType()).isEqualTo("number");
-        assertThat(rateProperty.getFormat()).isEqualTo("double");
-
-        // None should be objects with {empty, present, asInt/asLong/asDouble} properties
-        assertThat(countProperty.getProperties()).isNullOrEmpty();
-        assertThat(limitProperty.getProperties()).isNullOrEmpty();
-        assertThat(rateProperty.getProperties()).isNullOrEmpty();
+            // None should be objects with {empty, present, asInt/asLong/asDouble} properties
+            assertThat(countProperty.getProperties()).isNullOrEmpty();
+            assertThat(limitProperty.getProperties()).isNullOrEmpty();
+            assertThat(rateProperty.getProperties()).isNullOrEmpty();
+        } catch (AssertionError | NullPointerException e) {
+            System.err.println("Test failed. Full OpenAPI spec:");
+            System.err.println(Json31.pretty(generatedOpenAPI));
+            throw e;
+        }
     }
 
     @Test
@@ -191,7 +195,7 @@ class OpenAPIGeneratorTest {
 
         } catch (AssertionError | NullPointerException e) {
             System.err.println("Test failed. Full OpenAPI spec:");
-            System.err.println(Json.pretty(openAPI));
+            System.err.println(Json31.pretty(openAPI));
             throw e;
         }
     }
