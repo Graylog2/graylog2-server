@@ -20,8 +20,8 @@ import org.graylog2.inputs.codecs.gelf.GELFBulkDroppedMsgService;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -43,7 +43,7 @@ public class GelfCodecTest {
 
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() {
         codec = new GelfCodec(new Configuration(Collections.emptyMap()), aggregator, messageFactory, gelfBulkDroppedMsgService);
     }

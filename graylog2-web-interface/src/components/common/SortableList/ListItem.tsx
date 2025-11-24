@@ -21,47 +21,71 @@ import styled, { css } from 'styled-components';
 import { ListGroupItem } from 'components/bootstrap';
 import { Icon } from 'components/common';
 
-import type { DraggableProps, DragHandleProps, ListItemType, CustomListItemRender, CustomContentRender } from './types';
+import type { ListItemType, CustomListItemRender, CustomContentRender, DragHandleProps } from './types';
+
+const DRAG_HANDLE_DEFAULT_TITLE = 'Drag or press space to reorder';
 
 type Props<ItemType extends ListItemType> = {
   alignItemContent?: 'flex-start' | 'center';
   className?: string;
-  customListItemRender?: CustomListItemRender<ItemType>;
   customContentRender?: CustomContentRender<ItemType>;
+  customListItemRender?: CustomListItemRender<ItemType>;
   disableDragging?: boolean;
-  displayOverlayInPortal: boolean;
-  draggableProps: DraggableProps;
   dragHandleProps: DragHandleProps;
   index: number;
+  isDragging: boolean;
   item: ItemType;
 };
 
-const StyledListGroupItem = styled(ListGroupItem)<{ $alignItemContent: 'flex-start' | 'center' }>(
+const StyledListGroupItem = styled(ListGroupItem)<{
+  $alignItemContent: 'flex-start' | 'center';
+}>(
   ({ $alignItemContent }) => css`
     display: flex;
     align-items: ${$alignItemContent};
   `,
 );
 
-const DragHandle = styled.div`
-  margin-right: 5px;
-`;
+const DragHandle = styled.button<{ $isDragging: boolean }>(
+  ({ $isDragging }) => css`
+    margin-right: 5px;
+    cursor: ${$isDragging ? 'grabbing' : 'grab'};
+    background: transparent;
+    border: 0;
+    padding: 0;
+  `,
+);
 
 const ListItem = <ItemType extends ListItemType>(
   {
     alignItemContent = 'flex-start',
-    item,
-    index,
     className = undefined,
-    customListItemRender = undefined,
     customContentRender = undefined,
+    customListItemRender = undefined,
     disableDragging = false,
-    draggableProps,
     dragHandleProps,
+    index,
+    isDragging,
+    item,
   }: Props<ItemType>,
   ref: React.ForwardedRef<HTMLLIElement>,
 ) => {
   const itemContent = customContentRender ? customContentRender({ item, index }) : item.title;
+  const dragHandleTitle =
+    typeof item.title === 'string'
+      ? `${DRAG_HANDLE_DEFAULT_TITLE} ${item.title.toLocaleLowerCase()}`
+      : `${DRAG_HANDLE_DEFAULT_TITLE}`;
+
+  const dragHandle = disableDragging ? null : (
+    <DragHandle
+      {...dragHandleProps}
+      $isDragging={isDragging}
+      title={dragHandleTitle}
+      aria-label={dragHandleTitle}
+      data-sortable-index={index}>
+      <Icon name="drag_indicator" />
+    </DragHandle>
+  );
 
   if (customListItemRender) {
     return (
@@ -69,8 +93,7 @@ const ListItem = <ItemType extends ListItemType>(
         {customListItemRender({
           className,
           disableDragging,
-          draggableProps: draggableProps,
-          dragHandleProps: dragHandleProps,
+          dragHandle,
           index,
           item,
           ref,
@@ -80,16 +103,8 @@ const ListItem = <ItemType extends ListItemType>(
   }
 
   return (
-    <StyledListGroupItem
-      $alignItemContent={alignItemContent}
-      ref={ref}
-      className={className}
-      containerProps={{ ...draggableProps }}>
-      {!disableDragging && (
-        <DragHandle {...dragHandleProps} data-testid={`sortable-item-${item.id}`}>
-          <Icon name="drag_indicator" />
-        </DragHandle>
-      )}
+    <StyledListGroupItem $alignItemContent={alignItemContent} ref={ref} className={className}>
+      {dragHandle}
       {itemContent}
     </StyledListGroupItem>
   );

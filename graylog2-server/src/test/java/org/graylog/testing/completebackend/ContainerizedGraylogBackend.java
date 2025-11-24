@@ -17,6 +17,7 @@
 package org.graylog.testing.completebackend;
 
 import com.google.common.base.Stopwatch;
+import com.mongodb.client.MongoDatabase;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.testing.completebackend.ContainerizedGraylogBackendServicesProvider.Services;
@@ -25,7 +26,6 @@ import org.graylog.testing.graylognode.MavenPackager;
 import org.graylog.testing.graylognode.NodeContainerConfig;
 import org.graylog.testing.graylognode.NodeInstance;
 import org.graylog.testing.mongodb.MongoDBFixtureImporter;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         LOG.info("Running backend with SearchServer version {} (instance: {})", searchServer.version(), searchServer.instanceId());
 
         if (config.importLicenses()) {
-            createLicenses(mongoDB, "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
+            createLicenses(mongoDB.mongoConnection().getMongoDatabase(), "GRAYLOG_LICENSE_STRING", "GRAYLOG_SECURITY_LICENSE_STRING");
         }
 
         LOG.info("Creating server instance \"{}\"", config.serverProduct().name());
@@ -75,7 +75,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         try {
             final var nodeContainerConfig = new NodeContainerConfig(
                     services.getNetwork(),
-                    MongoDBInstance.internalUri(),
+                    mongoDB.internalUri(),
                     PASSWORD_SECRET,
                     ROOT_PASSWORD_SHA_2,
                     searchServer.internalUri(),
@@ -119,7 +119,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         return new ContainerizedGraylogBackend(config);
     }
 
-    private void createLicenses(final MongoDBInstance mongoDBInstance, final String... licenseStrs) {
+    private void createLicenses(final MongoDatabase mongoDatabase, final String... licenseStrs) {
         final List<String> licenses = Arrays.stream(licenseStrs)
                 .map(System::getenv)
                 .filter(StringUtils::isNotBlank)
@@ -129,7 +129,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             ServiceLoader<TestLicenseImporter> loader = ServiceLoader.load(TestLicenseImporter.class);
             String clusterId = null;
             for (TestLicenseImporter importer : loader) {
-                final Optional<String> licenseClusterId = importer.importLicenses(mongoDBInstance, licenses);
+                final Optional<String> licenseClusterId = importer.importLicenses(mongoDatabase, licenses);
                 if (licenseClusterId.isPresent() && clusterId == null) {
                     clusterId = licenseClusterId.get();
                 }
@@ -139,7 +139,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
             } else {
                 LOG.debug("Setting cluster id to {} from imported licenses", clusterId);
                 new MongoDBFixtureImporter(Collections.emptyList()).importData(
-                        mongoDBInstance.mongoConnection().getMongoDatabase(), """
+                        mongoDatabase, """
                                   {
                                   "cluster_config": [
                                     {
@@ -174,7 +174,7 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
 
     @Override
     public void dropCollection(String collectionName) {
-        services.getMongoDBInstance().dropCollection(collectionName);
+        services.getMongoDBInstance().mongoCollection(collectionName).drop();
     }
 
     @Override
@@ -202,12 +202,12 @@ public class ContainerizedGraylogBackend implements GraylogBackend, AutoCloseabl
         return services.getNetwork();
     }
 
-    public Optional<MailServerInstance> getEmailServerInstance() {
+    public Optional<MailServerContainer> getEmailServerInstance() {
         return Optional.ofNullable(services.getMailServerContainer());
     }
 
     @Override
-    public Optional<WebhookServerInstance> getWebhookServerInstance() {
+    public Optional<WebhookServerContainer> getWebhookServerInstance() {
         return Optional.ofNullable(services.getWebhookServerContainer());
     }
 

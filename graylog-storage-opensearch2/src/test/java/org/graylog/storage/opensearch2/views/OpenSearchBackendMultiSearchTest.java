@@ -31,11 +31,12 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.MultiSearchRe
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
 import org.graylog.storage.opensearch2.testing.TestMultisearchResponse;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,14 +45,14 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class OpenSearchBackendMultiSearchTest extends OpenSearchBackendGeneratedRequestTestBase {
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     private SearchJob searchJob;
     private Query query;
 
-    @Before
+    @BeforeEach
     public void setUpFixtures() {
         final Set<SearchType> searchTypes = Set.of(
                 Pivot.builder()
