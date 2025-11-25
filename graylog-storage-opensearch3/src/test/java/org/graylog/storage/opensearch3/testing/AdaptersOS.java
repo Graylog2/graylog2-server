@@ -44,6 +44,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -64,13 +65,16 @@ public class AdaptersOS implements Adapters {
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
+    private final OSSerializationUtils osSerializationUtils;
 
     public AdaptersOS(@Deprecated OpenSearchClient client, OfficialOpensearchClient officialOpensearchClient, List<String> featureFlags) {
         this.client = client;
         this.officialOpensearchClient = officialOpensearchClient;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+        osSerializationUtils = new OSSerializationUtils();
     }
+
 
     @Override
     public CountsAdapter countsAdapter() {
@@ -79,12 +83,11 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public IndicesAdapter indicesAdapter() {
-        final OSSerializationUtils osSerializationUtils = new OSSerializationUtils();
         return new IndicesAdapterOS(officialOpensearchClient,
                 new org.graylog.storage.opensearch3.stats.StatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.stats.ClusterStatsApi(officialOpensearchClient),
                 new org.graylog.storage.opensearch3.cluster.ClusterStateApi(officialOpensearchClient),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils) : new LegacyIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils),
+                indexTemplateAdapter(),
                 new IndexStatisticsBuilder(),
                 objectMapper,
                 new PlainJsonApi(objectMapper, client, officialOpensearchClient),
@@ -133,4 +136,12 @@ public class AdaptersOS implements Adapters {
         return new IndexFieldTypePollerAdapterOS(new FieldMappingApi(officialOpensearchClient), configuration, new StreamsForFieldRetrieverOS(officialOpensearchClient));
     }
 
+    @Override
+    public IndexTemplateAdapter indexTemplateAdapter() {
+        if(featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            return new ComposableIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils);
+        } else {
+            return new LegacyIndexTemplateAdapter(officialOpensearchClient, osSerializationUtils);
+        }
+    }
 }

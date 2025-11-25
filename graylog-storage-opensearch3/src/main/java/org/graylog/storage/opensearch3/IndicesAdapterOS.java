@@ -26,7 +26,6 @@ import jakarta.inject.Inject;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
-import org.graylog.storage.opensearch3.indextemplates.IndexTemplateAdapter;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
@@ -36,6 +35,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.ShardsInfo;
@@ -51,17 +51,19 @@ import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.FilterAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MinAggregate;
-import org.opensearch.client.opensearch._types.aggregations.MultiTermsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.MultiTermsBucket;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.cat.IndicesRequest;
 import org.opensearch.client.opensearch.cat.IndicesResponse;
 import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
 import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
 import org.opensearch.client.opensearch.core.ReindexResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.reindex.Destination;
 import org.opensearch.client.opensearch.core.reindex.Source;
 import org.opensearch.client.opensearch.generic.Body;
@@ -626,23 +628,19 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
-        org.opensearch.client.opensearch.core.SearchRequest request = org.opensearch.client.opensearch.core.SearchRequest.of(r -> r
+
+        Aggregation aggregation = Aggregation.builder()
+                .filter(f -> f.exists(e -> e.field(Message.FIELD_TIMESTAMP)))
+                .aggregations(Map.of(
+                        "ts_min", Aggregation.of(b -> b.min(m -> m.field(Message.FIELD_TIMESTAMP))),
+                        "ts_max", Aggregation.of(b -> b.max(m -> m.field(Message.FIELD_TIMESTAMP))),
+                        "streams", Aggregation.of(b -> b.terms(t -> t.field(Message.FIELD_STREAMS).size(Integer.MAX_VALUE)))
+                ))
+                .build();
+
+        SearchRequest request = SearchRequest.of(r -> r
                 .index(index)
-                .aggregations("agg", a -> a
-                        .filter(f -> f.exists(e -> e.field(Message.FIELD_TIMESTAMP)))
-                )
-                .aggregations("ts_min", sub -> sub
-                        .min(m -> m.field(Message.FIELD_TIMESTAMP))
-                )
-                .aggregations("ts_max", sub -> sub
-                        .max(m -> m.field(Message.FIELD_TIMESTAMP))
-                )
-                .aggregations("streams", sub -> sub
-                        .terms(t -> t
-                                .field(Message.FIELD_STREAMS)
-                                .size(Integer.MAX_VALUE)
-                        )
-                )
+                .aggregations("agg", aggregation)
                 .searchType(org.opensearch.client.opensearch._types.SearchType.DfsQueryThenFetch)
                 .ignoreUnavailable(false)
                 .allowNoIndices(true)
@@ -671,9 +669,9 @@ public class IndicesAdapterOS implements IndicesAdapter {
         final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
-        final MultiTermsAggregate streams = f.aggregations().get("streams").multiTerms();
+        final StringTermsAggregate streams = f.aggregations().get("streams").sterms();
         final List<String> streamIds = streams.buckets().array().stream()
-                .map(MultiTermsBucket::keyAsString)
+                .map(StringTermsBucket::key)
                 .collect(toList());
 
         return IndexRangeStats.create(min, max, streamIds);
