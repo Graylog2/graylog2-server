@@ -87,33 +87,47 @@ public class CustomModelConverter extends ModelResolver {
     /**
      * Resolves the OpenAPI {@link Discriminator} for the given Java type.
      * <p>
-     * If the type is annotated with {@link com.fasterxml.jackson.annotation.JsonSubTypes} and the
-     * discriminator mapping is missing or empty, this method populates the mapping with subtype names
-     * and their corresponding schema references.
+     * If the discriminator mapping is missing or empty, this method populates the mapping with subtype names and their
+     * corresponding schema references from the Jackson annotations and the subtypes registered with the Object mapper.
      * <p>
-     * Without this custom implementation, the discriminator mapping would remain empty unless an explicit @{@link io.swagger.v3.oas.annotations.media.Schema}
-     * annotation was provided.
+     * Without this custom implementation, the discriminator mapping would remain empty unless an explicit
+     * @{@link io.swagger.v3.oas.annotations.media.Schema} annotation was provided.
      */
     @Override
     protected Discriminator resolveDiscriminator(JavaType type, ModelConverterContext context) {
-        final var wrappedContext = new CustomConverterContext(context);
-        final var discriminator = super.resolveDiscriminator(type, wrappedContext);
+        final var discriminator = super.resolveDiscriminator(type, new CustomConverterContext(context));
         if (discriminator != null && discriminator.getPropertyName() != null &&
                 (discriminator.getMapping() == null || discriminator.getMapping().isEmpty())) {
-            final var namedClass = _mapper.getDeserializationConfig().introspectClassAnnotations(type).getClassInfo();
-            findRegisteredSubtypes(namedClass).stream()
-                    .filter(subtype -> !subtype.getType().equals(type.getRawClass()))
-                    .forEach(subtype ->
-                            discriminator.mapping(StringUtils.defaultString(subtype.getName()), RefUtils.constructRef(
-                                    wrappedContext.resolve(new AnnotatedType().type(subtype.getType())).getName())));
+            final var parentClassInfo = _mapper.getSerializationConfig().introspectClassAnnotations(type).getClassInfo();
+            final var subtypes = findRegisteredSubtypes(parentClassInfo);
+
+            for (NamedType subtype : subtypes) {
+                final var subClass = subtype.getType();
+                if (subClass == type.getRawClass()) {
+                    continue; // skip base type
+                }
+
+                // This only works because we are overriding decorateModelName below to not include the JsonView suffix
+                // Otherwise we would have to determine the currently active view, which is not trivial.
+                final var schemaName = _typeName(_mapper.constructType(subClass));
+
+                discriminator.mapping(StringUtils.defaultString(subtype.getName()), RefUtils.constructRef(schemaName));
+            }
         }
         return discriminator;
+    }
+
+    @Override
+    protected String decorateModelName(AnnotatedType type, String originalName) {
+        // Don't add the JsonView suffix to the model name. This will break if we introduce paths with different views
+        // for the same models.
+        return originalName;
     }
 
     // uses jackson's subtype resolver to find all registered subtypes as well as the subtypes explicitly specified
     // e.g. in a @JsonSubtypes annotation for a given base type
     private List<NamedType> findRegisteredSubtypes(Annotated baseType) {
-        final var config = _mapper.getDeserializationConfig().with(new JacksonAnnotationIntrospector());
+        final var config = _mapper.getSerializationConfig().with(new JacksonAnnotationIntrospector());
         return (List<NamedType>) _mapper.getSubtypeResolver().collectAndResolveSubtypesByClass(config, (AnnotatedClass) baseType);
     }
 

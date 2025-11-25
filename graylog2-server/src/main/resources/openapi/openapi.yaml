@@ -6806,7 +6806,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack_HttpView"
+              $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
         description: Content pack
         required: true
       responses:
@@ -7010,7 +7010,7 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: "#/components/schemas/org.graylog.security.shares.CreateEntityRequestOrg.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest_HttpView"
+              $ref: "#/components/schemas/org.graylog.security.shares.CreateEntityRequestOrg.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest"
         description: Content pack installation request
         required: true
       responses:
@@ -13435,7 +13435,6 @@ components:
         snapshot:
           $ref: "#/components/schemas/com.codahale.metrics.Snapshot"
     com.fasterxml.jackson.databind.JsonNode: {}
-    com.fasterxml.jackson.databind.JsonNode_HttpView: {}
     com.fasterxml.jackson.databind.node.ObjectNode: {}
     com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema:
       type: object
@@ -13482,30 +13481,6 @@ components:
           - TERABYTES
           - PETABYTES
     com.github.zafarkhaja.semver.Version:
-      type: object
-      properties:
-        build_metadata:
-          type: string
-        major_version:
-          type: integer
-          format: int32
-        minor_version:
-          type: integer
-          format: int32
-        normal_version:
-          type: string
-        patch_version:
-          type: integer
-          format: int32
-        pre_release:
-          type: boolean
-        pre_release_version:
-          type: string
-        public_api_stable:
-          type: boolean
-        stable:
-          type: boolean
-    com.github.zafarkhaja.semver.Version_HttpView:
       type: object
       properties:
         build_metadata:
@@ -13654,10 +13629,10 @@ components:
       properties:
         empty:
           type: boolean
-    ? com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog2.contentpacks.model.entities.references.ValueReference_HttpView
-    : type: object
+    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog2.contentpacks.model.entities.references.ValueReference:
+      type: object
       additionalProperties:
-        $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference_HttpView"
+        $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference"
       properties:
         empty:
           type: boolean
@@ -13678,17 +13653,6 @@ components:
         empty:
           type: boolean
     com.google.common.collect.ImmutableMapOrg.graylog.grn.GRNOrg.graylog.security.Capability:
-      type: object
-      additionalProperties:
-        type: string
-        enum:
-        - view
-        - manage
-        - own
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapOrg.graylog.grn.GRNOrg.graylog.security.Capability_HttpView:
       type: object
       additionalProperties:
         type: string
@@ -13771,14 +13735,6 @@ components:
         empty:
           type: boolean
       uniqueItems: true
-    com.google.common.collect.ImmutableSetOrg.graylog2.contentpacks.model.constraints.Constraint_HttpView:
-      type: array
-      items:
-        $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint_HttpView"
-      properties:
-        empty:
-          type: boolean
-      uniqueItems: true
     com.google.common.collect.ImmutableSetOrg.graylog2.contentpacks.model.entities.Entity:
       type: array
       items:
@@ -13795,26 +13751,18 @@ components:
         empty:
           type: boolean
       uniqueItems: true
-    com.google.common.collect.ImmutableSetOrg.graylog2.contentpacks.model.entities.Entity_HttpView:
+    com.google.common.collect.ImmutableSetOrg.graylog2.contentpacks.model.entities.NativeEntityDescriptor:
       type: array
       items:
-        $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.Entity_HttpView"
+        $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor"
       properties:
         empty:
           type: boolean
       uniqueItems: true
-    com.google.common.collect.ImmutableSetOrg.graylog2.contentpacks.model.entities.NativeEntityDescriptor_HttpView:
+    com.google.common.collect.ImmutableSetOrg.graylog2.contentpacks.model.parameters.Parameter:
       type: array
       items:
-        $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor_HttpView"
-      properties:
-        empty:
-          type: boolean
-      uniqueItems: true
-    com.google.common.collect.ImmutableSetOrg.graylog2.contentpacks.model.parameters.Parameter_HttpView:
-      type: array
-      items:
-        $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+        $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
       properties:
         empty:
           type: boolean
@@ -13840,7 +13788,6 @@ components:
           type: integer
           format: int32
     com.vdurmont.semver4j.Requirement: {}
-    com.vdurmont.semver4j.Requirement_HttpView: {}
     jakarta.ws.rs.core.MediaType:
       type: object
       properties:
@@ -13891,15 +13838,6 @@ components:
           type: string
           writeOnly: true
     org.bson.types.ObjectId:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date-time
-        timestamp:
-          type: integer
-          format: int32
-    org.bson.types.ObjectId_HttpView:
       type: object
       properties:
         date:
@@ -14113,154 +14051,6 @@ components:
         secret_key:
           type: string
           writeOnly: true
-    org.graylog.events.conditions.Expr.And:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-          right:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-    org.graylog.events.conditions.Expr.Equal:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-          right:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-    org.graylog.events.conditions.Expr.Greater:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-          right:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-    org.graylog.events.conditions.Expr.GreaterEqual:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-          right:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-    org.graylog.events.conditions.Expr.Group:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - type: object
-        properties:
-          child:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-          operator:
-            type: string
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-    org.graylog.events.conditions.Expr.Lesser:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-          right:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-    org.graylog.events.conditions.Expr.LesserEqual:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-          right:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-    org.graylog.events.conditions.Expr.Not:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-    org.graylog.events.conditions.Expr.NumberReference:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - type: object
-        properties:
-          ref:
-            type: string
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-    org.graylog.events.conditions.Expr.NumberValue:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-      - type: object
-        properties:
-          value:
-            type: number
-            format: double
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-    org.graylog.events.conditions.Expr.Or:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - type: object
-        properties:
-          left:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-          right:
-            $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-    org.graylog.events.conditions.Expr.True:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-      - $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Double"
-    org.graylog.events.conditions.ExpressionJava.lang.Boolean:
-      type: object
-      discriminator:
-        mapping:
-          '!': "#/components/schemas/org.graylog.events.conditions.Expr.Not"
-          '&&': "#/components/schemas/org.graylog.events.conditions.Expr.And"
-          <: "#/components/schemas/org.graylog.events.conditions.Expr.Lesser"
-          <=: "#/components/schemas/org.graylog.events.conditions.Expr.LesserEqual"
-          ==: "#/components/schemas/org.graylog.events.conditions.Expr.Equal"
-          '>': "#/components/schemas/org.graylog.events.conditions.Expr.Greater"
-          '>=': "#/components/schemas/org.graylog.events.conditions.Expr.GreaterEqual"
-          group: "#/components/schemas/org.graylog.events.conditions.Expr.Group"
-          number: "#/components/schemas/org.graylog.events.conditions.Expr.NumberValue"
-          number-ref: "#/components/schemas/org.graylog.events.conditions.Expr.NumberReference"
-          "true": "#/components/schemas/org.graylog.events.conditions.Expr.True"
-          '||': "#/components/schemas/org.graylog.events.conditions.Expr.Or"
-        propertyName: expr
-      properties:
-        expr:
-          type: string
-    org.graylog.events.conditions.ExpressionJava.lang.Double:
-      type: object
-      discriminator:
-        mapping:
-          '!': "#/components/schemas/org.graylog.events.conditions.Expr.Not"
-          '&&': "#/components/schemas/org.graylog.events.conditions.Expr.And"
-          <: "#/components/schemas/org.graylog.events.conditions.Expr.Lesser"
-          <=: "#/components/schemas/org.graylog.events.conditions.Expr.LesserEqual"
-          ==: "#/components/schemas/org.graylog.events.conditions.Expr.Equal"
-          '>': "#/components/schemas/org.graylog.events.conditions.Expr.Greater"
-          '>=': "#/components/schemas/org.graylog.events.conditions.Expr.GreaterEqual"
-          group: "#/components/schemas/org.graylog.events.conditions.Expr.Group"
-          number: "#/components/schemas/org.graylog.events.conditions.Expr.NumberValue"
-          number-ref: "#/components/schemas/org.graylog.events.conditions.Expr.NumberReference"
-          "true": "#/components/schemas/org.graylog.events.conditions.Expr.True"
-          '||': "#/components/schemas/org.graylog.events.conditions.Expr.Or"
-        propertyName: expr
-      properties:
-        expr:
-          type: string
     org.graylog.events.context.EventDefinitionContextService.SchedulerCtx:
       type: object
       properties:
@@ -14414,16 +14204,6 @@ components:
             type: boolean
           template:
             type: string
-    org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig:
-      type: object
-      properties:
-        callback_type:
-          type: string
-        configuration:
-          type: object
-          additionalProperties: {}
-        type:
-          type: string
     org.graylog.events.notifications.EventNotificationConfig:
       type: object
       discriminator:
@@ -14480,142 +14260,6 @@ components:
         propertyName: type
       properties:
         type:
-          type: string
-    org.graylog.events.notifications.types.EmailEventNotificationConfig:
-      type: object
-      properties:
-        bcc_emails:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        bcc_emails_lut_key:
-          type: string
-        bcc_emails_lut_name:
-          type: string
-        bcc_users:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        body_template:
-          type: string
-        cc_emails:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        cc_emails_lut_key:
-          type: string
-        cc_emails_lut_name:
-          type: string
-        cc_users:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        email_recipients:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        html_body_template:
-          type: string
-        include_event_procedure:
-          type: boolean
-        lookup_bcc_emails:
-          type: boolean
-        lookup_cc_emails:
-          type: boolean
-        lookup_recipient_emails:
-          type: boolean
-        lookup_reply_to_email:
-          type: boolean
-        lookup_sender_email:
-          type: boolean
-        recipients_lut_key:
-          type: string
-        recipients_lut_name:
-          type: string
-        reply_to:
-          type: string
-        reply_to_lut_key:
-          type: string
-        reply_to_lut_name:
-          type: string
-        sender:
-          type: string
-        sender_lut_key:
-          type: string
-        sender_lut_name:
-          type: string
-        single_email:
-          type: boolean
-        subject:
-          type: string
-          minLength: 1
-        time_zone:
-          $ref: "#/components/schemas/org.joda.time.DateTimeZone"
-        type:
-          type: string
-        user_recipients:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-      required:
-      - subject
-    org.graylog.events.notifications.types.HTTPEventNotificationConfig:
-      type: object
-      properties:
-        api_key:
-          type: string
-        api_key_as_header:
-          type: boolean
-        api_secret:
-          $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
-        basic_auth:
-          $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
-        skip_tls_verification:
-          type: boolean
-        type:
-          type: string
-        url:
-          type: string
-    org.graylog.events.notifications.types.HTTPEventNotificationConfigV2:
-      type: object
-      properties:
-        api_key:
-          type: string
-        api_key_as_header:
-          type: boolean
-        api_secret:
-          $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
-        basic_auth:
-          $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
-        body_template:
-          type: string
-        content_type:
-          type: string
-          enum:
-          - JSON
-          - FORM_DATA
-          - PLAIN_TEXT
-        headers:
-          type: string
-        method:
-          type: string
-          enum:
-          - POST
-          - PUT
-          - GET
-        skip_tls_verification:
-          type: boolean
-        time_zone:
-          $ref: "#/components/schemas/org.joda.time.DateTimeZone"
-        type:
-          type: string
-        url:
           type: string
     org.graylog.events.processor.EventDefinitionDto:
       type: object
@@ -14729,71 +14373,6 @@ components:
       properties:
         type:
           type: string
-    org.graylog.events.processor.aggregation.AggregationConditions:
-      type: object
-      properties:
-        expression:
-          $ref: "#/components/schemas/org.graylog.events.conditions.ExpressionJava.lang.Boolean"
-    org.graylog.events.processor.aggregation.AggregationEventProcessorConfig:
-      type: object
-      properties:
-        conditions:
-          $ref: "#/components/schemas/org.graylog.events.processor.aggregation.AggregationConditions"
-        cron_expression:
-          type: string
-        cron_timezone:
-          type: string
-        event_limit:
-          type: integer
-          format: int32
-        execute_every_ms:
-          type: integer
-          format: int64
-        filters:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter"
-        group_by:
-          type: array
-          items:
-            type: string
-        query:
-          type: string
-        query_parameters:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter"
-          properties:
-            empty:
-              type: boolean
-          uniqueItems: true
-        search_within_ms:
-          type: integer
-          format: int64
-        series:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
-        stream_categories:
-          type: array
-          items:
-            type: string
-          properties:
-            empty:
-              type: boolean
-          uniqueItems: true
-        streams:
-          type: array
-          items:
-            type: string
-          properties:
-            empty:
-              type: boolean
-          uniqueItems: true
-        type:
-          type: string
-        use_cron_scheduling:
-          type: boolean
     org.graylog.events.processor.aggregation.AggregationEventProcessorParameters:
       allOf:
       - $ref: "#/components/schemas/org.graylog.events.processor.EventProcessorParameters"
@@ -14837,11 +14416,6 @@ components:
                 type: string
               last:
                 type: string
-    org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig:
-      type: object
-      properties:
-        type:
-          type: string
     org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters:
       allOf:
       - $ref: "#/components/schemas/org.graylog.events.processor.EventProcessorParameters"
@@ -15115,7 +14689,6 @@ components:
         index_type:
           type: string
     org.graylog.grn.GRN: {}
-    org.graylog.grn.GRN_HttpView: {}
     org.graylog.integrations.aws.resources.requests.AWSInputCreateRequest:
       type: object
       properties:
@@ -15349,102 +14922,6 @@ components:
             $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
       required:
       - api_token
-    org.graylog.integrations.notifications.types.SlackEventNotificationConfig:
-      type: object
-      properties:
-        backlog_size:
-          type: integer
-          format: int64
-        channel:
-          type: string
-          minLength: 1
-        color:
-          type: string
-          minLength: 1
-        custom_message:
-          type: string
-        icon_emoji:
-          type: string
-        icon_url:
-          type: string
-        include_event_procedure:
-          type: boolean
-        include_title:
-          type: boolean
-        link_names:
-          type: boolean
-        notify_channel:
-          type: boolean
-        notify_here:
-          type: boolean
-        time_zone:
-          $ref: "#/components/schemas/org.joda.time.DateTimeZone"
-        type:
-          type: string
-        user_name:
-          type: string
-        webhook_url:
-          type: string
-          minLength: 1
-      required:
-      - channel
-      - color
-      - webhook_url
-    org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfig:
-      type: object
-      properties:
-        backlog_size:
-          type: integer
-          format: int64
-        color:
-          type: string
-          minLength: 1
-        custom_message:
-          type: string
-        icon_url:
-          type: string
-        time_zone:
-          $ref: "#/components/schemas/org.joda.time.DateTimeZone"
-        type:
-          type: string
-        webhook_url:
-          type: string
-          minLength: 1
-      required:
-      - color
-      - webhook_url
-    org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2:
-      type: object
-      properties:
-        adaptive_card:
-          type: string
-        backlog_size:
-          type: integer
-          format: int64
-        time_zone:
-          $ref: "#/components/schemas/org.joda.time.DateTimeZone"
-        type:
-          type: string
-        webhook_url:
-          type: string
-          minLength: 1
-      required:
-      - webhook_url
-    org.graylog.integrations.pagerduty.PagerDutyNotificationConfig:
-      type: object
-      properties:
-        client_name:
-          type: string
-        client_url:
-          type: string
-        custom_incident:
-          type: boolean
-        key_prefix:
-          type: string
-        routing_key:
-          type: string
-        type:
-          type: string
     org.graylog.plugins.datanode.dto.ClusterState:
       type: object
       properties:
@@ -16599,24 +16076,6 @@ components:
           type: string
         type:
           type: string
-    org.graylog.plugins.views.search.ValueParameter:
-      type: object
-      properties:
-        binding:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter.Binding"
-        data_type:
-          type: string
-        default_value: {}
-        description:
-          type: string
-        name:
-          type: string
-        optional:
-          type: boolean
-        title:
-          type: string
-        type:
-          type: string
     org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString:
       allOf:
       - $ref: "#/components/schemas/org.graylog.plugins.views.search.engine.BackendQuery"
@@ -17430,53 +16889,6 @@ components:
           type: string
       required:
       - type
-    org.graylog.plugins.views.search.searchtypes.MessageList:
-      type: object
-      properties:
-        decorators:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog2.decorators.Decorator"
-        fields:
-          type: array
-          items:
-            type: string
-        filter:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.Filter"
-        filters:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter"
-        id:
-          type: string
-        limit:
-          type: integer
-          format: int32
-        name:
-          type: string
-        offset:
-          type: integer
-          format: int32
-        query:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.engine.BackendQuery"
-        sort:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.Sort"
-        stream_categories:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        streams:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        timerange:
-          $ref: "#/components/schemas/org.graylog2.plugin.indexer.searches.timeranges.TimeRange"
-        type:
-          type: string
     org.graylog.plugins.views.search.searchtypes.MessageList.Result:
       allOf:
       - $ref: "#/components/schemas/org.graylog.plugins.views.search.SearchType.Result"
@@ -17493,16 +16905,6 @@ components:
           total_results:
             type: integer
             format: int64
-    org.graylog.plugins.views.search.searchtypes.Sort:
-      type: object
-      properties:
-        field:
-          type: string
-        order:
-          type: string
-          enum:
-          - ASC
-          - DESC
     org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary:
       type: object
       properties:
@@ -17531,47 +16933,6 @@ components:
         timestamp:
           type: string
           format: date-time
-    org.graylog.plugins.views.search.searchtypes.events.EventList:
-      type: object
-      properties:
-        attributes:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog2.database.filtering.AttributeFilter"
-        filter:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.Filter"
-        filters:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter"
-        id:
-          type: string
-        name:
-          type: string
-        page:
-          type: integer
-          format: int32
-        per_page:
-          type: integer
-          format: int32
-        query:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.engine.BackendQuery"
-        sort:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.events.EventList.SortConfig"
-        stream_categories:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        streams:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        timerange:
-          $ref: "#/components/schemas/org.graylog2.plugin.indexer.searches.timeranges.TimeRange"
-        type:
-          type: string
     org.graylog.plugins.views.search.searchtypes.events.EventList.Result:
       allOf:
       - $ref: "#/components/schemas/org.graylog.plugins.views.search.SearchType.Result"
@@ -17584,77 +16945,6 @@ components:
           total_results:
             type: integer
             format: int64
-    org.graylog.plugins.views.search.searchtypes.events.EventList.SortConfig:
-      type: object
-      properties:
-        direction:
-          type: string
-          enum:
-          - ASC
-          - DESC
-        field:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec:
-      type: object
-      discriminator:
-        mapping:
-          time: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time"
-          values: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values"
-        propertyName: type
-      properties:
-        fields:
-          type: array
-          items:
-            type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.Pivot:
-      type: object
-      properties:
-        column_groups:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec"
-        filter:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.Filter"
-        filters:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter"
-        id:
-          type: string
-        name:
-          type: string
-        query:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.engine.BackendQuery"
-        rollup:
-          type: boolean
-        row_groups:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec"
-        series:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
-        sort:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SortSpec"
-        stream_categories:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        streams:
-          type: array
-          items:
-            type: string
-          uniqueItems: true
-        timerange:
-          $ref: "#/components/schemas/org.graylog2.plugin.indexer.searches.timeranges.TimeRange"
-        type:
-          type: string
     org.graylog.plugins.views.search.searchtypes.pivot.PivotResult:
       type: object
       properties:
@@ -17730,219 +17020,6 @@ components:
         source:
           type: string
         value: {}
-    org.graylog.plugins.views.search.searchtypes.pivot.PivotSort:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SortSpec"
-    org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SortSpec"
-    org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec:
-      type: object
-      discriminator:
-        mapping:
-          avg: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Average"
-          card: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality"
-          count: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Count"
-          latest: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Latest"
-          max: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Max"
-          min: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Min"
-          percentage: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage"
-          percentile: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile"
-          stddev: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev"
-          sum: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Sum"
-          sumofsquares: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares"
-          variance: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Variance"
-        propertyName: type
-      properties:
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.SortSpec:
-      type: object
-      discriminator:
-        mapping:
-          pivot: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.PivotSort"
-          series: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort"
-        propertyName: type
-      properties:
-        direction:
-          type: string
-          enum:
-          - Ascending
-          - Descending
-        field:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval"
-      - type: object
-        properties:
-          scaling:
-            type: number
-            format: double
-    org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval:
-      type: object
-      discriminator:
-        mapping:
-          auto: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval"
-          timeunit: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval"
-        propertyName: type
-      properties:
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time:
-      type: object
-      properties:
-        fields:
-          type: array
-          items:
-            type: string
-        interval:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval"
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval"
-      - type: object
-        properties:
-          timeunit:
-            type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values:
-      type: object
-      properties:
-        fields:
-          type: array
-          items:
-            type: string
-        limit:
-          type: integer
-          format: int32
-        skip_empty_values:
-          type: boolean
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Average:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-        whole_number:
-          type: boolean
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Count:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Latest:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Max:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Min:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        strategy:
-          type: string
-          enum:
-          - COUNT
-          - SUM
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        percentile:
-          type: number
-          format: double
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Sum:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.searchtypes.pivot.series.Variance:
-      type: object
-      properties:
-        field:
-          type: string
-        id:
-          type: string
-        type:
-          type: string
     org.graylog.plugins.views.search.timeranges.OffsetRange:
       allOf:
       - $ref: "#/components/schemas/org.graylog2.plugin.indexer.searches.timeranges.TimeRange"
@@ -19043,13 +18120,13 @@ components:
           $ref: "#/components/schemas/org.graylog.plugins.views.search.views.ViewDTO"
         share_request:
           $ref: "#/components/schemas/org.graylog.security.shares.EntityShareRequest"
-    ? org.graylog.security.shares.CreateEntityRequestOrg.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest_HttpView
+    ? org.graylog.security.shares.CreateEntityRequestOrg.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest
     : type: object
       properties:
         entity:
-          $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest_HttpView"
+          $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest"
         share_request:
-          $ref: "#/components/schemas/org.graylog.security.shares.EntityShareRequest_HttpView"
+          $ref: "#/components/schemas/org.graylog.security.shares.EntityShareRequest"
     org.graylog.security.shares.CreateEntityRequestOrg.graylog2.rest.resources.streams.requests.CreateStreamRequest:
       type: object
       properties:
@@ -19067,16 +18144,6 @@ components:
           uniqueItems: true
         selected_grantee_capabilities:
           $ref: "#/components/schemas/com.google.common.collect.ImmutableMapOrg.graylog.grn.GRNOrg.graylog.security.Capability"
-    org.graylog.security.shares.EntityShareRequest_HttpView:
-      type: object
-      properties:
-        selected_collections:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.grn.GRN_HttpView"
-          uniqueItems: true
-        selected_grantee_capabilities:
-          $ref: "#/components/schemas/com.google.common.collect.ImmutableMapOrg.graylog.grn.GRNOrg.graylog.security.Capability_HttpView"
     org.graylog.security.shares.EntityShareResponse:
       type: object
       properties:
@@ -19560,79 +18627,13 @@ components:
         stream_processing_timeout:
           type: integer
           format: int64
-    org.graylog2.contentpacks.model.ContentPackInstallation_HttpView:
-      type: object
-      properties:
-        _id:
-          $ref: "#/components/schemas/org.bson.types.ObjectId_HttpView"
-        comment:
-          type: string
-        content_pack_id:
-          type: string
-        content_pack_revision:
-          type: integer
-          format: int32
-        created_at:
-          type: string
-          format: date-time
-        created_by:
-          type: string
-        entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor_HttpView"
-          properties:
-            empty:
-              type: boolean
-          uniqueItems: true
-        parameters:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference_HttpView"
-          properties:
-            empty:
-              type: boolean
-    org.graylog2.contentpacks.model.ContentPackUninstallDetails_HttpView:
-      type: object
-      properties:
-        entities:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor_HttpView"
-          uniqueItems: true
-    org.graylog2.contentpacks.model.ContentPackV1_HttpView:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack_HttpView"
-      - type: object
-        properties:
-          created_at:
-            type: string
-            format: date-time
-          entities:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.Entity_HttpView"
-            properties:
-              empty:
-                type: boolean
-            uniqueItems: true
-          parameters:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
-            properties:
-              empty:
-                type: boolean
-            uniqueItems: true
-          server_version:
-            $ref: "#/components/schemas/com.github.zafarkhaja.semver.Version_HttpView"
-    org.graylog2.contentpacks.model.ContentPack_HttpView:
+    org.graylog2.contentpacks.model.ContentPack:
       type: object
       discriminator:
         mapping:
           ? ""
-          : "#/components/schemas/org.graylog2.contentpacks.model.LegacyContentPack_HttpView"
-          "1": "#/components/schemas/org.graylog2.contentpacks.model.ContentPackV1_HttpView"
+          : "#/components/schemas/org.graylog2.contentpacks.model.LegacyContentPack"
+          "1": "#/components/schemas/org.graylog2.contentpacks.model.ContentPackV1"
         propertyName: v
       properties:
         description:
@@ -19653,15 +18654,58 @@ components:
           type: string
         vendor:
           type: string
-    org.graylog2.contentpacks.model.LegacyContentPack_HttpView:
+    org.graylog2.contentpacks.model.ContentPackInstallation:
+      type: object
+      properties:
+        _id:
+          $ref: "#/components/schemas/org.bson.types.ObjectId"
+        comment:
+          type: string
+        content_pack_id:
+          type: string
+        content_pack_revision:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor"
+          properties:
+            empty:
+              type: boolean
+          uniqueItems: true
+        parameters:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference"
+          properties:
+            empty:
+              type: boolean
+    org.graylog2.contentpacks.model.ContentPackUninstallDetails:
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor"
+          uniqueItems: true
+    org.graylog2.contentpacks.model.ContentPackV1:
       allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack_HttpView"
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
       - type: object
         properties:
+          created_at:
+            type: string
+            format: date-time
           entities:
             type: array
             items:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.Entity_HttpView"
+              $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.Entity"
             properties:
               empty:
                 type: boolean
@@ -19669,7 +18713,30 @@ components:
           parameters:
             type: array
             items:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+              $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
+            properties:
+              empty:
+                type: boolean
+            uniqueItems: true
+          server_version:
+            $ref: "#/components/schemas/com.github.zafarkhaja.semver.Version"
+    org.graylog2.contentpacks.model.LegacyContentPack:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
+      - type: object
+        properties:
+          entities:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.Entity"
+            properties:
+              empty:
+                type: boolean
+            uniqueItems: true
+          parameters:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
             properties:
               empty:
                 type: boolean
@@ -19677,19 +18744,12 @@ components:
           requires:
             type: array
             items:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint_HttpView"
+              $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint"
             properties:
               empty:
                 type: boolean
             uniqueItems: true
     org.graylog2.contentpacks.model.ModelType:
-      type: object
-      properties:
-        name:
-          type: string
-        version:
-          type: string
-    org.graylog2.contentpacks.model.ModelType_HttpView:
       type: object
       properties:
         name:
@@ -19706,46 +18766,22 @@ components:
       properties:
         type:
           type: string
-    org.graylog2.contentpacks.model.constraints.ConstraintCheckResult_HttpView:
+    org.graylog2.contentpacks.model.constraints.ConstraintCheckResult:
       type: object
       properties:
         constraint:
-          $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint_HttpView"
+          $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint"
         fulfilled:
           type: boolean
-    org.graylog2.contentpacks.model.constraints.Constraint_HttpView:
-      type: object
-      discriminator:
-        mapping:
-          plugin-version: "#/components/schemas/org.graylog2.contentpacks.model.constraints.PluginVersionConstraint_HttpView"
-          server-version: "#/components/schemas/org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint_HttpView"
-        propertyName: type
-      properties:
-        type:
-          type: string
     org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint:
       allOf:
       - $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint"
       - type: object
         properties:
           version: {}
-    org.graylog2.contentpacks.model.constraints.GraylogVersionConstraint_HttpView:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint_HttpView"
-      - type: object
-        properties:
-          version: {}
     org.graylog2.contentpacks.model.constraints.PluginVersionConstraint:
       allOf:
       - $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint"
-      - type: object
-        properties:
-          plugin:
-            type: string
-          version: {}
-    org.graylog2.contentpacks.model.constraints.PluginVersionConstraint_HttpView:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint_HttpView"
       - type: object
         properties:
           plugin:
@@ -19794,34 +18830,7 @@ components:
                 type: boolean
             uniqueItems: true
           data: {}
-    org.graylog2.contentpacks.model.entities.EntityV1_HttpView:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.Entity_HttpView"
-      - type: object
-        properties:
-          constraints:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.Constraint_HttpView"
-            properties:
-              empty:
-                type: boolean
-            uniqueItems: true
-          data: {}
-    org.graylog2.contentpacks.model.entities.Entity_HttpView:
-      type: object
-      discriminator:
-        mapping:
-          "1": "#/components/schemas/org.graylog2.contentpacks.model.entities.EntityV1_HttpView"
-        propertyName: v
-      properties:
-        id:
-          type: string
-        type:
-          $ref: "#/components/schemas/org.graylog2.contentpacks.model.ModelType_HttpView"
-        v:
-          type: string
-    org.graylog2.contentpacks.model.entities.NativeEntityDescriptor_HttpView:
+    org.graylog2.contentpacks.model.entities.NativeEntityDescriptor:
       type: object
       properties:
         content_pack_entity_id:
@@ -19833,8 +18842,8 @@ components:
         title:
           type: string
         type:
-          $ref: "#/components/schemas/org.graylog2.contentpacks.model.ModelType_HttpView"
-    org.graylog2.contentpacks.model.entities.references.ValueReference_HttpView:
+          $ref: "#/components/schemas/org.graylog2.contentpacks.model.ModelType"
+    org.graylog2.contentpacks.model.entities.references.ValueReference:
       type: object
       properties:
         '@type':
@@ -19848,55 +18857,55 @@ components:
           - STRING
           - PARAMETER
         '@value': {}
-    org.graylog2.contentpacks.model.parameters.BooleanParameter_HttpView:
+    org.graylog2.contentpacks.model.parameters.BooleanParameter:
       allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
       - type: object
         properties:
           default_value:
             type: boolean
-    org.graylog2.contentpacks.model.parameters.DoubleParameter_HttpView:
+    org.graylog2.contentpacks.model.parameters.DoubleParameter:
       allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
       - type: object
         properties:
           default_value:
             type: number
             format: double
-    org.graylog2.contentpacks.model.parameters.FloatParameter_HttpView:
+    org.graylog2.contentpacks.model.parameters.FloatParameter:
       allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
       - type: object
         properties:
           default_value:
             type: number
             format: float
-    org.graylog2.contentpacks.model.parameters.IntegerParameter_HttpView:
+    org.graylog2.contentpacks.model.parameters.IntegerParameter:
       allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
       - type: object
         properties:
           default_value:
             type: integer
             format: int32
-    org.graylog2.contentpacks.model.parameters.LongParameter_HttpView:
+    org.graylog2.contentpacks.model.parameters.LongParameter:
       allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
       - type: object
         properties:
           default_value:
             type: integer
             format: int64
-    org.graylog2.contentpacks.model.parameters.Parameter_HttpView:
+    org.graylog2.contentpacks.model.parameters.Parameter:
       type: object
       discriminator:
         mapping:
-          boolean: "#/components/schemas/org.graylog2.contentpacks.model.parameters.BooleanParameter_HttpView"
-          double: "#/components/schemas/org.graylog2.contentpacks.model.parameters.DoubleParameter_HttpView"
-          float: "#/components/schemas/org.graylog2.contentpacks.model.parameters.FloatParameter_HttpView"
-          integer: "#/components/schemas/org.graylog2.contentpacks.model.parameters.IntegerParameter_HttpView"
-          long: "#/components/schemas/org.graylog2.contentpacks.model.parameters.LongParameter_HttpView"
-          string: "#/components/schemas/org.graylog2.contentpacks.model.parameters.StringParameter_HttpView"
+          boolean: "#/components/schemas/org.graylog2.contentpacks.model.parameters.BooleanParameter"
+          double: "#/components/schemas/org.graylog2.contentpacks.model.parameters.DoubleParameter"
+          float: "#/components/schemas/org.graylog2.contentpacks.model.parameters.FloatParameter"
+          integer: "#/components/schemas/org.graylog2.contentpacks.model.parameters.IntegerParameter"
+          long: "#/components/schemas/org.graylog2.contentpacks.model.parameters.LongParameter"
+          string: "#/components/schemas/org.graylog2.contentpacks.model.parameters.StringParameter"
         propertyName: type
       properties:
         default_value: {}
@@ -19916,9 +18925,9 @@ components:
           - LONG
           - STRING
           - PARAMETER
-    org.graylog2.contentpacks.model.parameters.StringParameter_HttpView:
+    org.graylog2.contentpacks.model.parameters.StringParameter:
       allOf:
-      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter_HttpView"
+      - $ref: "#/components/schemas/org.graylog2.contentpacks.model.parameters.Parameter"
       - type: object
         properties:
           default_value:
@@ -19976,15 +18985,6 @@ components:
           type: string
         source:
           type: string
-    org.graylog2.database.filtering.AttributeFilter:
-      type: object
-      properties:
-        field:
-          type: string
-        value:
-          type: array
-          items:
-            type: string
     org.graylog2.database.suggestions.EntitySuggestion:
       type: object
       properties:
@@ -21650,7 +20650,7 @@ components:
             empty:
               type: boolean
           uniqueItems: true
-    org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest_HttpView:
+    org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationRequest:
       type: object
       properties:
         comment:
@@ -21658,19 +20658,19 @@ components:
         parameters:
           type: object
           additionalProperties:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference_HttpView"
-    org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationsResponse_HttpView:
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference"
+    org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationsResponse:
       type: object
       properties:
         installations:
           type: array
           items:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPackInstallation_HttpView"
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPackInstallation"
           uniqueItems: true
         total:
           type: integer
           format: int64
-    org.graylog2.rest.models.system.contentpacks.responses.ContentPackList_HttpView:
+    org.graylog2.rest.models.system.contentpacks.responses.ContentPackList:
       type: object
       properties:
         content_pack_metadata:
@@ -21678,39 +20678,39 @@ components:
           additionalProperties:
             type: object
             additionalProperties:
-              $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata_HttpView"
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata"
           writeOnly: true
         content_packs:
           type: array
           items:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack_HttpView"
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
           uniqueItems: true
         content_packs_metadata:
           type: object
           additionalProperties:
             type: object
             additionalProperties:
-              $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata_HttpView"
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata"
         total:
           type: integer
           format: int64
-    org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata_HttpView:
+    org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata:
       type: object
       properties:
         installation_count:
           type: integer
           format: int32
-    org.graylog2.rest.models.system.contentpacks.responses.ContentPackResponse_HttpView:
+    org.graylog2.rest.models.system.contentpacks.responses.ContentPackResponse:
       type: object
       properties:
         constraints_result:
           type: array
           items:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.ConstraintCheckResult_HttpView"
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.ConstraintCheckResult"
           uniqueItems: true
         content_pack:
-          $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack_HttpView"
-    org.graylog2.rest.models.system.contentpacks.responses.ContentPackRevisions_HttpView:
+          $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
+    org.graylog2.rest.models.system.contentpacks.responses.ContentPackRevisions:
       type: object
       properties:
         constraints_result:
@@ -21718,12 +20718,12 @@ components:
           additionalProperties:
             type: array
             items:
-              $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.ConstraintCheckResult_HttpView"
+              $ref: "#/components/schemas/org.graylog2.contentpacks.model.constraints.ConstraintCheckResult"
             uniqueItems: true
         content_pack_revisions:
           type: object
           additionalProperties:
-            $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack_HttpView"
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
     org.graylog2.rest.models.system.deflector.responses.DeflectorSummary:
       type: object
       properties:
