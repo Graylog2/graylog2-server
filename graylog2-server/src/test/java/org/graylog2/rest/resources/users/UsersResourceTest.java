@@ -41,10 +41,10 @@ import org.graylog2.rest.models.users.responses.Token;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenImpl;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.MongoDBSessionService;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.UserSessionTerminationService;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
@@ -57,13 +57,14 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.UserConfiguration;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.threeten.extra.PeriodDuration;
 
 import java.time.Duration;
@@ -78,8 +79,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
@@ -89,6 +90,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class UsersResourceTest {
 
     private static final String USERNAME = "username";
@@ -103,9 +106,6 @@ public class UsersResourceTest {
     private static final String ADMIN_OBJECT_ID = new ObjectId().toHexString();
     public static final String ALLOWED_ROLE_LOWER_CASE = TestUsersResource.ALLOWED_ROLE.toLowerCase(Locale.US);
 
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
     @Mock
     private UsersResource usersResource;
     @Mock
@@ -117,7 +117,7 @@ public class UsersResourceTest {
     @Mock
     private RoleService roleService;
     @Mock
-    private MongoDBSessionService sessionService;
+    private SessionService sessionService;
     @Mock
     private Subject subject;
     @Mock
@@ -133,7 +133,7 @@ public class UsersResourceTest {
 
     UserImplFactory userImplFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         userImplFactory = new UserImplFactory(new Configuration(),
                 new Permissions(ImmutableSet.of(new RestPermissions())), clusterConfigService);
@@ -163,7 +163,7 @@ public class UsersResourceTest {
         when(subject.getPrincipal()).thenReturn(creator.getName());
 
         final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD));
-        Assert.assertEquals(201, response.getStatus());
+        Assertions.assertEquals(201, response.getStatus());
         verify(userManagementService).create(isA(UserImpl.class), eq(creator));
     }
 
@@ -183,7 +183,7 @@ public class UsersResourceTest {
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
-        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <admin>"));
+        assertThat(exception.getMessage()).contains("Not authorized to access resource id <admin>");
     }
 
     @Test
@@ -208,7 +208,7 @@ public class UsersResourceTest {
         when(subject.getPrincipal()).thenReturn(creator.getName());
 
         ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD)));
-        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
+        assertThat(exception.getMessage()).contains("Not authorized to access resource id <ADMIN>");
     }
 
     @Test
@@ -449,7 +449,7 @@ public class UsersResourceTest {
 
         public TestUsersResource(UserManagementService userManagementService, PaginatedUserService paginatedUserService,
                                  AccessTokenService accessTokenService, RoleService roleService,
-                                 MongoDBSessionService sessionService, HttpConfiguration configuration,
+                                 SessionService sessionService, HttpConfiguration configuration,
                                  Subject subject, UserSessionTerminationService sessionTerminationService,
                                  DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
                                  ClusterConfigService clusterConfigService, UserService userService) {

@@ -16,23 +16,38 @@
  */
 package org.graylog.storage.opensearch3;
 
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuilder;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.opensearch.client.json.JsonData;
+import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
+import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 
 import javax.annotation.Nullable;
 
 public class TimeRangeQueryFactory {
+
+    @Deprecated
     @Nullable
-    public static RangeQueryBuilder create(TimeRange range) {
+    public static org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuilder create(TimeRange range) {
         if (range == null) {
             return null;
         }
 
-        return QueryBuilders.rangeQuery(Message.FIELD_TIMESTAMP)
+        return org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.rangeQuery(Message.FIELD_TIMESTAMP)
                 .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
                 .lt(Tools.buildElasticSearchTimeFormat(range.getTo()));
+    }
+
+    @Nullable
+    public static RangeQuery createTimeRangeQuery(TimeRange range) {
+        if (range == null) {
+            return null;
+        }
+        return QueryBuilders.range()
+                .field(Message.FIELD_TIMESTAMP)
+                .gte(JsonData.of(Tools.buildElasticSearchTimeFormat(range.getFrom())))
+                .lt(JsonData.of(Tools.buildElasticSearchTimeFormat(range.getTo())))
+                .build();
     }
 }

@@ -35,6 +35,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.ShardsInfo;
@@ -50,22 +51,24 @@ import org.joda.time.DateTimeZone;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.opensearch._types.ExpandWildcard;
 import org.opensearch.client.opensearch._types.OpenSearchException;
+import org.opensearch.client.opensearch._types.aggregations.Aggregation;
 import org.opensearch.client.opensearch._types.aggregations.FilterAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MaxAggregate;
 import org.opensearch.client.opensearch._types.aggregations.MinAggregate;
-import org.opensearch.client.opensearch._types.aggregations.MultiTermsAggregate;
-import org.opensearch.client.opensearch._types.aggregations.MultiTermsBucket;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsAggregate;
+import org.opensearch.client.opensearch._types.aggregations.StringTermsBucket;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;
 import org.opensearch.client.opensearch.cat.IndicesRequest;
 import org.opensearch.client.opensearch.cat.IndicesResponse;
 import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
 import org.opensearch.client.opensearch.cat.indices.IndicesRecord;
 import org.opensearch.client.opensearch.core.ReindexResponse;
+import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.reindex.Destination;
 import org.opensearch.client.opensearch.core.reindex.Source;
 import org.opensearch.client.opensearch.generic.Body;
-import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.generic.Request;
+import org.opensearch.client.opensearch.generic.Requests;
 import org.opensearch.client.opensearch.indices.CreateIndexRequest;
 import org.opensearch.client.opensearch.indices.ForcemergeRequest;
 import org.opensearch.client.opensearch.indices.GetAliasRequest;
@@ -119,7 +122,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     private final org.opensearch.client.opensearch.OpenSearchClient openSearchClient;
     private final OpenSearchIndicesClient indicesClient;
     private final OpenSearchCatClient catClient;
-    private final OpenSearchGenericClient genericClient;
+    private final PlainJsonApi jsonApi;
     private final OSSerializationUtils osSerializationUtils;
 
     // this is the maximum amount of bytes that the index list is supposed to fill in a request,
@@ -135,6 +138,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                             IndexTemplateAdapter indexTemplateAdapter,
                             IndexStatisticsBuilder indexStatisticsBuilder,
                             ObjectMapper objectMapper,
+                            PlainJsonApi jsonApi,
                             final OSSerializationUtils osSerializationUtils) {
         this.c = c;
         this.statsApi = statsApi;
@@ -144,9 +148,9 @@ public class IndicesAdapterOS implements IndicesAdapter {
         this.indexStatisticsBuilder = indexStatisticsBuilder;
         this.objectMapper = objectMapper;
         this.openSearchClient = c.sync();
+        this.jsonApi = jsonApi;
         this.indicesClient = openSearchClient.indices();
         this.catClient = openSearchClient.cat();
-        this.genericClient = openSearchClient.generic();
         this.osSerializationUtils = osSerializationUtils;
     }
 
@@ -242,8 +246,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .method("PUT")
                     .body(Body.from(objectMapper.writeValueAsBytes(mapping), "application/json"))
                     .build();
-            c.execute(() -> genericClient.execute(request),
-                    "Unable to update index mapping " + indexName);
+            jsonApi.performRequest(request, "Unable to update index mapping " + indexName);
         } catch (JsonProcessingException e) {
             throw new RuntimeException("Unable to update index mapping " + indexName, e);
         }
@@ -263,18 +266,15 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Map<String, Object> getStructuredIndexSettings(@Nonnull String index) {
-        return c.execute(() -> {
-            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b.index(index)
-                    .ignoreUnavailable(true)
-                    .allowNoIndices(true)
-                    .expandWildcards(ExpandWildcard.Open)
-            );
-            org.opensearch.client.opensearch.indices.IndexSettings settings = result.get(index).settings();
-            if (settings == null) {
-                return Map.of();
-            }
-            return objectMapper.readValue(settings.toJsonString(), new TypeReference<>() {});
-        }, "Couldn't read settings of index " + index);
+        Request request = Requests.builder()
+                .method("GET")
+                .endpoint("/" + index + "/_settings")
+                .build();
+        JsonNode jsonNode = jsonApi.performRequest(request, "Unable to retrieve index settings " + index);
+        return Optional.ofNullable(jsonNode.get(index))
+                .map(node -> node.get("settings"))
+                .map(node -> objectMapper.convertValue(node, new TypeReference<Map<String, Object>>() {}))
+                .orElse(Map.of());
     }
 
     /**
@@ -541,7 +541,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public boolean exists(String index) {
         try {
-            indicesClient.get(r -> r.index(index).ignoreUnavailable(false));
+            indicesClient.get(r -> r.index(index).flatSettings(true).ignoreUnavailable(false));
             return true;
         } catch (IOException | OpenSearchException e) {
             if (e instanceof OpenSearchException && e.getMessage().contains("no such index")) {
@@ -562,6 +562,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
         return c.execute(() -> {
             GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
                     .index(indexWildcard)
+                    .flatSettings(true)
                     .expandWildcards(status.stream().map(this::resolveWildcard).collect(Collectors.toList()))
                     .ignoreUnavailable(true)));
             return result.result().keySet();
@@ -620,29 +621,26 @@ public class IndicesAdapterOS implements IndicesAdapter {
                 .flush(true)
         );
 
-        c.execute(() -> OfficialOpensearchClient.withTimeout(indicesClient, timeout).forcemerge(request), "Unable to forcemerge index " + index);
+        String errorMessage = "Force merge of index " + index + " did not complete in " + timeout.toString() + ", not waiting for completion any longer.";
+        c.executeWithClientTimeout((asyncClient) -> asyncClient.indices().forcemerge(request), errorMessage, timeout);
 
     }
 
     @Override
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
-        org.opensearch.client.opensearch.core.SearchRequest request = org.opensearch.client.opensearch.core.SearchRequest.of(r -> r
+
+        Aggregation aggregation = Aggregation.builder()
+                .filter(f -> f.exists(e -> e.field(Message.FIELD_TIMESTAMP)))
+                .aggregations(Map.of(
+                        "ts_min", Aggregation.of(b -> b.min(m -> m.field(Message.FIELD_TIMESTAMP))),
+                        "ts_max", Aggregation.of(b -> b.max(m -> m.field(Message.FIELD_TIMESTAMP))),
+                        "streams", Aggregation.of(b -> b.terms(t -> t.field(Message.FIELD_STREAMS).size(Integer.MAX_VALUE)))
+                ))
+                .build();
+
+        SearchRequest request = SearchRequest.of(r -> r
                 .index(index)
-                .aggregations("agg", a -> a
-                        .filter(f -> f.exists(e -> e.field(Message.FIELD_TIMESTAMP)))
-                )
-                .aggregations("ts_min", sub -> sub
-                        .min(m -> m.field(Message.FIELD_TIMESTAMP))
-                )
-                .aggregations("ts_max", sub -> sub
-                        .max(m -> m.field(Message.FIELD_TIMESTAMP))
-                )
-                .aggregations("streams", sub -> sub
-                        .terms(t -> t
-                                .field(Message.FIELD_STREAMS)
-                                .size(Integer.MAX_VALUE)
-                        )
-                )
+                .aggregations("agg", aggregation)
                 .searchType(org.opensearch.client.opensearch._types.SearchType.DfsQueryThenFetch)
                 .ignoreUnavailable(false)
                 .allowNoIndices(true)
@@ -671,9 +669,9 @@ public class IndicesAdapterOS implements IndicesAdapter {
         final DateTime max = new DateTime(maxUnixTime, DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
-        final MultiTermsAggregate streams = f.aggregations().get("streams").multiTerms();
+        final StringTermsAggregate streams = f.aggregations().get("streams").sterms();
         final List<String> streamIds = streams.buckets().array().stream()
-                .map(MultiTermsBucket::keyAsString)
+                .map(StringTermsBucket::key)
                 .collect(toList());
 
         return IndexRangeStats.create(min, max, streamIds);

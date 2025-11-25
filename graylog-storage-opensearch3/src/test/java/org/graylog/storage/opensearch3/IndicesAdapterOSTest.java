@@ -23,6 +23,7 @@ import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.graylog.storage.opensearch3.stats.ClusterStatsApi;
 import org.graylog.storage.opensearch3.stats.IndexStatisticsBuilder;
 import org.graylog.storage.opensearch3.stats.StatsApi;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.FlushStats;
 import org.opensearch.client.opensearch.cat.OpenSearchCatClient;
-import org.opensearch.client.opensearch.generic.OpenSearchGenericClient;
 import org.opensearch.client.opensearch.indices.OpenSearchIndicesClient;
 import org.opensearch.client.opensearch.indices.stats.IndexStats;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
@@ -67,6 +67,8 @@ class IndicesAdapterOSTest {
     private IndexTemplateAdapter indexTemplateAdapter;
     @Mock
     private IndexStatisticsBuilder indexStatisticsBuilder;
+    @Mock
+    private PlainJsonApi jsonApi;
 
     @BeforeEach
     void setUp() {
@@ -74,7 +76,6 @@ class IndicesAdapterOSTest {
         when(opensearchClient.sync()).thenReturn(client);
         when(client.indices()).thenReturn(mock(OpenSearchIndicesClient.class));
         when(client.cat()).thenReturn(mock(OpenSearchCatClient.class));
-        when(client.generic()).thenReturn(mock(OpenSearchGenericClient.class));
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         toTest = new IndicesAdapterOS(
                 opensearchClient,
@@ -84,7 +85,8 @@ class IndicesAdapterOSTest {
                 indexTemplateAdapter,
                 indexStatisticsBuilder,
                 objectMapper,
-                new OSSerializationUtils(objectMapper, opensearchClient)
+                jsonApi,
+                new OSSerializationUtils()
         );
     }
 
