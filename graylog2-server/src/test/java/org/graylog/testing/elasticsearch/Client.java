@@ -51,10 +51,6 @@ public interface Client {
 
     void removeAliasMapping(String indexName, String alias);
 
-    boolean templateExists(String templateName);
-
-    void putTemplate(String templateName, Template source);
-
     void waitForGreenStatus(String... indices);
 
     void refreshNode();
