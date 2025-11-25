@@ -20,25 +20,22 @@ import styled, { css } from 'styled-components';
 
 import Icon from 'components/common/Icon';
 
-const ResizeButton = styled.button(
+const Container = styled.div(
   ({ theme }) => css`
-    background: transparent;
-    border: 0;
-    padding: 0;
     cursor: col-resize;
     color: ${theme.colors.gray[70]};
   `,
 );
 
 type Props = {
-  onMouseDown?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  onTouchStart?: (event: React.TouchEvent<HTMLButtonElement>) => void;
+  onMouseDown?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
+  onTouchStart?: (event: React.TouchEvent<HTMLDivElement>) => void;
 };
 
 const ResizeHandle = ({ onMouseDown = undefined, onTouchStart = undefined }: Props) => (
-  <ResizeButton onMouseDown={onMouseDown} onTouchStart={onTouchStart}>
+  <Container onMouseDown={onMouseDown} onTouchStart={onTouchStart} role="separator">
     <Icon name="arrows_outward" />
-  </ResizeButton>
+  </Container>
 );
 
 export default ResizeHandle;
