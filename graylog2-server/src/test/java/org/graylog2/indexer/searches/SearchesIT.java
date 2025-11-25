@@ -33,7 +33,6 @@ import org.graylog2.indexer.ranges.IndexRangeComparator;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.ChunkedResult;
-import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultChunk;
 import org.graylog2.indexer.results.ResultMessage;
@@ -169,7 +168,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                 streamService,
                 indices,
                 indexSetRegistry,
-                createSearchesAdapter()
+                createSearchesAdapter(),
+                searchServer().adapters().countsAdapter()
         );
     }
 
@@ -181,11 +181,12 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
     public void testCountWithoutFilter() throws Exception {
         importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
-        CountResult result = searches.count("*", AbsoluteRange.create(
+        long result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
-        assertThat(result.count()).isEqualTo(10L);
+        assertThat(result).isEqualTo(10L);
     }
 
     @Test
@@ -215,33 +216,34 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
             }
         };
         when(streamService.load(STREAM_ID)).thenReturn(stream);
-        CountResult result = searches.count("*", AbsoluteRange.create(
+        long result = searches.count("*", AbsoluteRange.create(
                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
                 "streams:" + STREAM_ID);
 
-        assertThat(result.count()).isEqualTo(4L);
+        assertThat(result).isEqualTo(4L);
     }
 
     @Test
     public void testCountWithInvalidFilter() throws Exception {
         importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
-        CountResult result = searches.count("*", AbsoluteRange.create(
+        long result = searches.count("*", AbsoluteRange.create(
                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
                 "foobar-not-a-filter");
 
-        assertThat(result.count()).isEqualTo(0L);
+        assertThat(result).isEqualTo(0L);
     }
 
     @Test
-    public void countRecordsMetrics() throws Exception {
+    public void countRecordsMetrics() {
         importFixture("org/graylog2/indexer/searches/SearchesIT.json");
 
-        CountResult result = searches.count("*", AbsoluteRange.create(
+        searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
         assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);

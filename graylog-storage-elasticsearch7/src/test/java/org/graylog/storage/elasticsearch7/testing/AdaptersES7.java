@@ -73,7 +73,8 @@ public class AdaptersES7 implements Adapters {
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterES7(client);
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
+        return new CountsAdapterES7(client, searchRequestFactory);
     }
 
     @Override
@@ -103,10 +104,7 @@ public class AdaptersES7 implements Adapters {
         final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
         final Scroll scroll = new Scroll(client, scrollResultFactory, searchRequestFactory);
         return new SearchesAdapterES7(resultMessageFactory, client, scroll, searchRequestFactory);
     }

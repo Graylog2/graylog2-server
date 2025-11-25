@@ -69,7 +69,8 @@ public class AdaptersOS2 implements Adapters {
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterOS2(client);
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
+        return new CountsAdapterOS2(client, searchRequestFactory);
     }
 
     @Override
@@ -98,10 +99,7 @@ public class AdaptersOS2 implements Adapters {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
         return new SearchesAdapterOS2(client,
                 new Scroll(client,
                         scrollResultFactory,

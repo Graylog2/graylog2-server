@@ -16,35 +16,65 @@
  */
 package org.graylog.storage.elasticsearch7;
 
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchRequest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog2.indexer.counts.CountsAdapter;
-
 import jakarta.inject.Inject;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountRequest;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.client.core.CountResponse;
+import org.graylog.storage.search.SearchCommand;
+import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.searches.SearchesConfig;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
+import java.util.Set;
 
 public class CountsAdapterES7 implements CountsAdapter {
     private final ElasticsearchClient client;
+    private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public CountsAdapterES7(ElasticsearchClient client) {
+    public CountsAdapterES7(final ElasticsearchClient client,
+                            final SearchRequestFactory searchRequestFactory) {
         this.client = client;
+        this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
-    public long totalCount(List<String> indices) {
-        final SearchSourceBuilder query = new SearchSourceBuilder()
-                .query(QueryBuilders.matchAllQuery())
-                .size(0)
-                .trackTotalHits(true);
-        final SearchRequest searchRequest = new SearchRequest(indices.toArray(new String[0]))
-                .source(query);
+    public long totalCount(final List<String> indices) {
+        final CountResponse result = client.execute(
+                (restClient, requestOptions) ->
+                        restClient.count(
+                                new CountRequest(indices.toArray(new String[0])),
+                                requestOptions
+                        ),
+                "Fetching message count failed for indices"
+        );
+        return result.getCount();
+    }
 
-        final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
+    @Override
+    public long count(final Set<String> affectedIndices,
+                      final String query,
+                      final TimeRange range,
+                      final String filter) {
+        final SearchesConfig config = SearchesConfig.builder()
+                .query(query)
+                .filter(filter)
+                .range(range)
+                .limit(0)
+                .offset(0)
+                .build();
 
-        return result.getHits().getTotalHits().value;
+        final CountResponse result = client.execute(
+                (restClient, requestOptions) ->
+                        restClient.count(
+                                new CountRequest(
+                                        affectedIndices.toArray(new String[0]),
+                                        searchRequestFactory.createQueryBuilder(SearchCommand.from(config))
+                                ),
+                                requestOptions
+                        ),
+                "Fetching message count failed for indices"
+        );
+        return result.getCount();
     }
 }

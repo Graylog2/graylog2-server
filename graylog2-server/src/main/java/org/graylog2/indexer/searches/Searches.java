@@ -21,15 +21,18 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSortedSet;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.results.ChunkedResult;
-import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
@@ -38,10 +41,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,6 +69,7 @@ public class Searches {
     private final Indices indices;
     private final IndexSetRegistry indexSetRegistry;
     private final SearchesAdapter searchesAdapter;
+    private final CountsAdapter countsAdapter;
 
     @Inject
     public Searches(IndexRangeService indexRangeService,
@@ -77,7 +77,8 @@ public class Searches {
                     StreamService streamService,
                     Indices indices,
                     IndexSetRegistry indexSetRegistry,
-                    SearchesAdapter searchesAdapter) {
+                    SearchesAdapter searchesAdapter,
+                    final CountsAdapter countsAdapter) {
         this.indexRangeService = requireNonNull(indexRangeService, "indexRangeService");
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
@@ -87,22 +88,18 @@ public class Searches {
         this.indices = requireNonNull(indices, "indices");
         this.indexSetRegistry = requireNonNull(indexSetRegistry, "indexSetRegistry");
         this.searchesAdapter = searchesAdapter;
+        this.countsAdapter = countsAdapter;
     }
 
-    public CountResult count(String query, TimeRange range) {
-        return count(query, range, null);
-    }
-
-    public CountResult count(String query, TimeRange range, String filter) {
+    public long count(String query, TimeRange range, String filter) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
-            return CountResult.empty();
+            return 0;
         }
 
-        final CountResult result = searchesAdapter.count(affectedIndices, query, range, filter);
-
-        recordEsMetrics(result.tookMs(), range);
-
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        final long result = countsAdapter.count(affectedIndices, query, range, filter);
+        recordEsMetrics(stopwatch.elapsed(TimeUnit.MILLISECONDS), range); //TODO: maybe those metrics should not be recorded at all, those are just counts...?
         return result;
     }
 

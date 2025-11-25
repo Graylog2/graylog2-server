@@ -31,6 +31,7 @@ import org.graylog.storage.opensearch3.PlainJsonApi;
 import org.graylog.storage.opensearch3.Scroll;
 import org.graylog.storage.opensearch3.ScrollResultOS2;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
+import org.graylog.storage.opensearch3.SearchRequestFactoryOS;
 import org.graylog.storage.opensearch3.SearchesAdapterOS;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
 import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
@@ -78,7 +79,8 @@ public class AdaptersOS implements Adapters {
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterOS(officialOpensearchClient);
+        final SearchRequestFactoryOS searchRequestFactory = new SearchRequestFactoryOS(true);
+        return new CountsAdapterOS(officialOpensearchClient, searchRequestFactory);
     }
 
     @Override
@@ -110,10 +112,7 @@ public class AdaptersOS implements Adapters {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
+        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
         return new SearchesAdapterOS(client,
                 new Scroll(client,
                         scrollResultFactory,

@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.alerts.AbstractAlertCondition;
-import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
@@ -177,8 +176,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             final AbsoluteRange range = AbsoluteRange.create(relativeRange.getFrom(), relativeRange.getTo());
 
             final String filter = buildQueryFilter(stream.getId(), query);
-            final CountResult result = searches.count("*", range, filter);
-            final long count = result.count();
+            final long count = searches.count("*", range, filter);
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
 

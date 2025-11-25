@@ -17,7 +17,6 @@
 package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AlertConditionTest;
-import org.graylog2.indexer.results.CountResult;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -30,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class MessageCountAlertConditionTest extends AlertConditionTest {
@@ -125,10 +123,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
     }
 
     private void searchCountShouldReturn(long count) {
-        final CountResult countResult = mock(CountResult.class);
-        when(countResult.count()).thenReturn(count);
-
-        when(searches.count(anyString(), any(TimeRange.class), anyString())).thenReturn(countResult);
+        when(searches.count(anyString(), any(TimeRange.class), anyString())).thenReturn(count);
     }
 
     private MessageCountAlertCondition getMessageCountAlertCondition(Map<String, Object> parameters, String title) {

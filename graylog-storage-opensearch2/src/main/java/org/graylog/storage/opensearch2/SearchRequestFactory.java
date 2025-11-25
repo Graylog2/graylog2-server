@@ -43,6 +43,7 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.queryStringQuery;
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
 
+@Deprecated
 public class SearchRequestFactory {
     private static final Sorting DEFAULT_SORTING = new Sorting("_doc", Sorting.Direction.ASC);
     private final boolean allowHighlighting;
@@ -72,7 +73,7 @@ public class SearchRequestFactory {
         return searchSourceBuilder;
     }
 
-    public SearchSourceBuilder create(SearchCommand searchCommand) {
+    public BoolQueryBuilder createQueryBuilder(final SearchCommand searchCommand) {
         final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
         final QueryBuilder queryBuilder = translateQueryString(query);
 
@@ -88,6 +89,11 @@ public class SearchRequestFactory {
                 .must(queryBuilder);
         filterQueryBuilder.ifPresent(filteredQueryBuilder::filter);
         rangeQueryBuilder.ifPresent(filteredQueryBuilder::filter);
+        return filteredQueryBuilder;
+    }
+
+    public SearchSourceBuilder create(SearchCommand searchCommand) {
+        final BoolQueryBuilder filteredQueryBuilder = createQueryBuilder(searchCommand);
 
         applyStreamsFilter(filteredQueryBuilder, searchCommand);
 

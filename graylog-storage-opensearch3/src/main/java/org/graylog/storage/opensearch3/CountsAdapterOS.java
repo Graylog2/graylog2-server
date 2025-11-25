@@ -16,20 +16,29 @@
  */
 package org.graylog.storage.opensearch3;
 
-import org.graylog2.indexer.counts.CountsAdapter;
-
 import jakarta.inject.Inject;
+import org.graylog.storage.search.SearchCommand;
+import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.searches.SearchesConfig;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.opensearch.client.opensearch.core.CountRequest;
+import org.opensearch.client.opensearch.core.CountResponse;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class CountsAdapterOS implements CountsAdapter {
 
     private final OfficialOpensearchClient client;
+    private final SearchRequestFactoryOS searchRequestFactory;
 
     @Inject
-    public CountsAdapterOS(OfficialOpensearchClient client) {
+    public CountsAdapterOS(final OfficialOpensearchClient client,
+                           final SearchRequestFactoryOS searchRequestFactory) {
         this.client = client;
+        this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
@@ -39,6 +48,30 @@ public class CountsAdapterOS implements CountsAdapter {
         } catch (IOException e) {
             throw new RuntimeException("Fetching message count failed for indices " + indices, e);
         }
+    }
 
+    @Override
+    public long count(final Set<String> affectedIndices,
+                      final String query,
+                      final TimeRange range,
+                      final String filter) {
+        final SearchesConfig config = SearchesConfig.builder()
+                .query(query)
+                .filter(filter)
+                .range(range)
+                .limit(0)
+                .offset(0)
+                .build();
+        try {
+            final CountResponse count = client.sync().count(
+                    CountRequest.builder()
+                            .index(new ArrayList<>(affectedIndices))
+                            .query(searchRequestFactory.createQueryBuilder(SearchCommand.from(config)))
+                            .build()
+            );
+            return count.count();
+        } catch (IOException e) {
+            throw new RuntimeException("Fetching message count failed", e);
+        }
     }
 }
