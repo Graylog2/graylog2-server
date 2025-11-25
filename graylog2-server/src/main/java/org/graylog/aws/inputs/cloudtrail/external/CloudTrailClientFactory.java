@@ -19,12 +19,12 @@ package org.graylog.aws.inputs.cloudtrail.external;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Nullable;
 import jakarta.ws.rs.BadRequestException;
+import org.graylog.aws.AWSProxyUtils;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
@@ -38,7 +38,8 @@ public class CloudTrailClientFactory {
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailClientFactory.class);
 
     /**
-     * Check if the provided AWS credentials are valid by attempting to receive messages from the specified SQS queue.
+     * Check if the provided AWS credentials are valid by attempting to receive
+     * messages from the specified SQS queue.
      *
      * @param sqsQueueName        The URL of the SQS queue to check
      * @param credentialsProvider AWS credentials provider
@@ -48,12 +49,9 @@ public class CloudTrailClientFactory {
      */
     public String checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion, @Nullable URI proxyUri) throws Exception {
         try {
-            ApacheHttpClient.Builder httpClientBuilder = ApacheHttpClient.builder();
-            if (proxyUri != null) {
-                httpClientBuilder.proxyConfiguration(CloudTrailS3Client.buildProxyConfiguration(proxyUri));
-            }
-            try (SqsClient client = SqsClient.builder().
-                    credentialsProvider(credentialsProvider)
+            try (SqsClient client = SqsClient.builder()
+                    .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyUri))
+                    .credentialsProvider(credentialsProvider)
                     .region(Region.of(awsRegion))
                     .build()) {
                 ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
