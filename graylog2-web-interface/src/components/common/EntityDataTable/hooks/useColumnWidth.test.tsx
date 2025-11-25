@@ -61,6 +61,8 @@ describe('useColumnWidths hook test', () => {
     );
 
     expect(result.current).toEqual({
+      actions: 50,
+      'bulk-select': 20,
       description: 300,
       title: 300,
     });

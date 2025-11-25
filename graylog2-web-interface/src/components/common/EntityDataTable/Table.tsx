@@ -15,12 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Table as TableType } from '@tanstack/react-table';
+import type { Row, HeaderGroup } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
 
 import { Table as BaseTable } from 'components/bootstrap';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import TableCell from 'components/common/EntityDataTable/TableCell';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
 
@@ -47,24 +47,35 @@ const StyledTable = styled(BaseTable)(
   `,
 );
 
+const Td = styled.td<{ $colId: string }>(
+  ({ $colId }) => css`
+    word-break: break-word;
+    opacity: var(--col-${$colId}-opacity, 1);
+    transform: var(--col-${$colId}-transform, 'none');
+    transition: width transform 0.2s ease-in-out;
+  `,
+);
+
 type Props<Entity extends EntityBase> = {
-  table: TableType<Entity>;
   expandedSectionsRenderer:
     | {
         [sectionName: string]: ExpandedSectionRenderer<Entity>;
       }
     | undefined;
-  rows: any;
+  rows: Array<Row<Entity>>;
+  headerGroups: Array<HeaderGroup<Entity>>;
 };
 
-const Table = <Entity extends EntityBase>({ table, expandedSectionsRenderer, rows }: Props<Entity>) => (
+const Table = <Entity extends EntityBase>({ expandedSectionsRenderer, rows, headerGroups }: Props<Entity>) => (
   <StyledTable striped condensed hover>
-    <TableHead table={table} />
+    <TableHead headerGroups={headerGroups} />
     {rows.map((row) => (
       <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
         <tr>
           {row.getVisibleCells().map((cell) => (
-            <TableCell key={cell.id} cell={cell} />
+            <Td key={cell.id} $colId={cell.column.id}>
+              {flexRender(cell.column.columnDef.cell, cell.getContext())}
+            </Td>
           ))}
         </tr>
         <ExpandedSections

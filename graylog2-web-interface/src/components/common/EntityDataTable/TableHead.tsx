@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useContext, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
-import type { Table, Header } from '@tanstack/react-table';
+import type { Header, HeaderGroup } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -34,13 +34,12 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $width: number | undefined; $isDragging: boolean; $transform: string }>(
-  ({ $transform, $width, $isDragging, theme }) => css`
-    width: ${$width ? `${$width}px` : 'auto'};
+export const Th = styled.th<{ $colId: string }>(
+  ({ $colId, theme }) => css`
+    width: var(--col-${$colId}-size);
     background-color: ${theme.colors.table.head.background};
-    transition: width transform 0.2s ease-in-out;
-    opacity: ${$isDragging ? 0.4 : 1};
-    transform: ${$transform};
+    opacity: var(--col-${$colId}-opacity, 1);
+    transform: var(--col-${$colId}-transform, 'none');
   `,
 );
 
@@ -64,26 +63,19 @@ const useSortableCol = (colId: string, disabled: boolean) => {
     isDragging,
     listeners,
     setNodeRef,
-    transform: cssTransform,
     setActivatorNodeRef,
   };
 };
 
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
-  const { attributes, isDragging, listeners, setNodeRef, transform } = useSortableCol(
+  const { attributes, isDragging, listeners, setNodeRef } = useSortableCol(
     header.column.id,
     !columnMeta?.enableColumnOrdering,
   );
 
   return (
-    <Th
-      key={header.id}
-      ref={setNodeRef}
-      colSpan={header.colSpan}
-      $width={header.getSize()}
-      $transform={transform}
-      $isDragging={isDragging}>
+    <Th key={header.id} ref={setNodeRef} colSpan={header.colSpan} $colId={header.column.id}>
       {columnMeta?.enableColumnOrdering && (
         <DragHandle
           index={header.index}
@@ -98,9 +90,13 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
   );
 };
 
-const TableHead = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => (
+type Props<Entity extends EntityBase> = {
+  headerGroups: Array<HeaderGroup<Entity>>;
+};
+
+const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
   <Thead>
-    {table.getHeaderGroups().map((headerGroup) => (
+    {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
           <TableHeaderCell key={header.id} header={header} />
@@ -109,4 +105,5 @@ const TableHead = <Entity extends EntityBase>({ table }: { table: Table<Entity> 
     ))}
   </Thead>
 );
+
 export default TableHead;

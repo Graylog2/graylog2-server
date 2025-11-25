@@ -38,6 +38,7 @@ import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
 import Table from 'components/common/EntityDataTable/Table';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 
 import type {
   ColumnRenderers,
@@ -50,10 +51,26 @@ import type {
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import BulkActionsRow from './BulkActionsRow';
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled.div<{
+  $columnWidths: { [_attributeId: string]: number };
+  $activeColId: string | null;
+  $columnTransform: { [_attributeId: string]: string };
+}>(
+  ({ $columnWidths, $activeColId, $columnTransform }) => `
   width: 100%;
   overflow-x: auto;
-`;
+
+  ${Object.entries($columnWidths)
+    .map(([id, width]) => `--col-${id}-size: ${width}px;`)
+    .join('\n')}
+
+  ${$activeColId ? `--col-${$activeColId}-opacity: 0.4;` : ''}
+
+  ${Object.entries($columnTransform)
+    .map(([id, transform]) => `--col-${id}-transform: ${transform};`)
+    .join('\n')}
+`,
+);
 
 const ActionsRow = styled.div`
   display: flex;
@@ -287,6 +304,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     sort: activeSort,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
+
   return (
     <MetaDataProvider<Meta> meta={meta}>
       <SelectedEntitiesProvider<Entity> table={table} selectedEntities={selectedEntities}>
@@ -304,13 +324,22 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
             </LayoutConfigRow>
           </ActionsRow>
           <TableDndProvider table={table}>
-            <ScrollContainer id="scroll-container" ref={tableRef}>
-              <Table<Entity>
-                table={table}
-                expandedSectionsRenderer={expandedSectionsRenderer}
-                rows={table.getRowModel().rows}
-              />
-            </ScrollContainer>
+            <DndStylesContext.Consumer>
+              {({ activeColId, columnTransform }) => (
+                <ScrollContainer
+                  id="scroll-container"
+                  ref={tableRef}
+                  $columnWidths={columnWidths}
+                  $activeColId={activeColId}
+                  $columnTransform={columnTransform}>
+                  <Table<Entity>
+                    expandedSectionsRenderer={expandedSectionsRenderer}
+                    headerGroups={headerGroups}
+                    rows={table.getRowModel().rows}
+                  />
+                </ScrollContainer>
+              )}
+            </DndStylesContext.Consumer>
           </TableDndProvider>
         </ExpandedSectionsProvider>
       </SelectedEntitiesProvider>
