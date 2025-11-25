@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import React from 'react';
 import styled from 'styled-components';
 
 import { Label } from 'components/bootstrap';
@@ -62,3 +63,11 @@ export const RoleLabel = styled(Label)`
   justify-content: center;
   gap: 4px;
 `;
+
+export const MetricPlaceholder = () => (
+  <MetricsColumn>
+    <SecondaryText>
+      <span>N/A</span>
+    </SecondaryText>
+  </MetricsColumn>
+);

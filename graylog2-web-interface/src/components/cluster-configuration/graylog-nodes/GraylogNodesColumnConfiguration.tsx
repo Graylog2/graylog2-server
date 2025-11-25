@@ -25,7 +25,7 @@ import type { GraylogNode } from './useClusterGraylogNodes';
 
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 import { buildRatioIndicator, computeRatio } from '../shared-components/RatioIndicator';
-import { MetricsColumn, MetricsRow, NodePrimary, SecondaryText, StyledLabel } from '../shared-components/NodeMetricsLayout';
+import { MetricPlaceholder, MetricsColumn, MetricsRow, NodePrimary, SecondaryText, StyledLabel } from '../shared-components/NodeMetricsLayout';
 
 const JOURNAL_WARNING_THRESHOLD = 0.25;
 const JOURNAL_DANGER_THRESHOLD = 0.5;
@@ -48,7 +48,11 @@ const renderBufferRow = (
   return (
     <MetricsRow key={label}>
       <span>{label}</span>
-      {ratioIndicator}
+      {ratioIndicator ?? (
+        <SecondaryText>
+          <span>N/A</span>
+        </SecondaryText>
+      )}
     </MetricsRow>
   );
 };
@@ -63,10 +67,12 @@ const formatThroughput = (value: number | undefined | null) => {
   return formatted ? `${formatted} msg/s` : '';
 };
 
-const renderThroughputRow = (label: string, value: number | undefined | null) => (
+const renderThroughputRow = (label: string, formattedValue: string | undefined | null) => (
   <MetricsRow key={label}>
     <span>{label}</span>
-    <span>{formatThroughput(value)}</span>
+    <SecondaryText>
+      <span>{formattedValue || 'N/A'}</span>
+    </SecondaryText>
   </MetricsRow>
 );
 
@@ -235,6 +241,12 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           },
         ];
 
+        const hasBufferMetrics = rows.some(({ usage, size }) => computeRatio(usage, size) != null);
+
+        if (!hasBufferMetrics) {
+          return <MetricPlaceholder />;
+        }
+
         return (
           <MetricsColumn>
             {rows.map(({ label, usage, size }) => renderBufferRow(label, usage, size))}
@@ -245,9 +257,15 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     throughput: {
       renderCell: (_value, entity) => {
         const rows = [
-          { label: 'In', value: entity.metrics?.throughputIn },
-          { label: 'Out', value: entity.metrics?.throughputOut },
+          { label: 'In', value: formatThroughput(entity.metrics?.throughputIn) },
+          { label: 'Out', value: formatThroughput(entity.metrics?.throughputOut) },
         ];
+
+        const hasThroughput = rows.some(({ value }) => value);
+
+        if (!hasThroughput) {
+          return <MetricPlaceholder />;
+        }
 
         return <MetricsColumn>{rows.map(({ label, value }) => renderThroughputRow(label, value))}</MetricsColumn>;
       },

@@ -19,7 +19,7 @@ import React from 'react';
 import NumberUtils from 'util/NumberUtils';
 
 import { buildRatioIndicator, computeRatio } from './RatioIndicator';
-import { MetricsColumn, MetricsRow } from './NodeMetricsLayout';
+import { MetricPlaceholder, MetricsColumn, MetricsRow } from './NodeMetricsLayout';
 
 type Props = {
   used: number | undefined | null;
@@ -41,7 +41,7 @@ const SizeAndRatioMetric = ({ used, max, warningThreshold, dangerThreshold, rati
   const ratioIndicator = buildRatioIndicator(effectiveRatio, warningThreshold, dangerThreshold);
 
   if (!sizeLabel && !ratioIndicator) {
-    return null;
+    return <MetricPlaceholder />;
   }
 
   return (

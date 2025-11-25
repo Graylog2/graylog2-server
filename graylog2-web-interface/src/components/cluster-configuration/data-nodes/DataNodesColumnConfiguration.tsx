@@ -25,7 +25,7 @@ import Routes from 'routing/Routes';
 
 import type { ClusterDataNode } from './useClusterDataNodes';
 
-import { MetricsColumn, MetricsRow, RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
+import { MetricPlaceholder, MetricsColumn, MetricsRow, RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 export const DEFAULT_VISIBLE_COLUMNS = [
@@ -129,7 +129,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
         const loadLabel = formatNumberValue(loadAverage);
 
         if (!loadLabel) {
-          return null;
+          return <MetricPlaceholder />;
         }
 
         return (
@@ -152,7 +152,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
         const hasContent = totalIndexedLabel || indexingLatencyLabel;
 
         if (!hasContent) {
-          return null;
+          return <MetricPlaceholder />;
         }
 
         return (
