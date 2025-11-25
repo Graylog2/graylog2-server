@@ -16,22 +16,20 @@
  */
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import merge from 'lodash/merge';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { Table, ButtonGroup } from 'components/bootstrap';
+import { ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
-import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
 import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
@@ -39,7 +37,7 @@ import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hoo
 import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
-import TableCell from 'components/common/EntityDataTable/TableCell';
+import Table from 'components/common/EntityDataTable/Table';
 
 import type {
   ColumnRenderers,
@@ -50,34 +48,12 @@ import type {
   ColumnPreferences,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
-import TableHead from './TableHead';
 import BulkActionsRow from './BulkActionsRow';
 
 const ScrollContainer = styled.div`
   width: 100%;
   overflow-x: auto;
 `;
-
-const StyledTable = styled(Table)(
-  ({ theme }) => css`
-    table-layout: fixed;
-
-    thead > tr > th,
-    tbody > tr > td {
-      padding: ${CELL_PADDING}px;
-    }
-
-    && {
-      > tbody:nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-
-      > tbody:nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
-    }
-  `,
-);
 
 const ActionsRow = styled.div`
   display: flex;
@@ -329,23 +305,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
           </ActionsRow>
           <TableDndProvider table={table}>
             <ScrollContainer id="scroll-container" ref={tableRef}>
-              <StyledTable striped condensed hover>
-                <TableHead table={table} />
-                {table.getRowModel().rows.map((row) => (
-                  <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                    <tr>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} cell={cell} />
-                      ))}
-                    </tr>
-                    <ExpandedSections
-                      key={`expanded-sections-${row.id}`}
-                      expandedSectionsRenderer={expandedSectionsRenderer}
-                      entity={row.original}
-                    />
-                  </tbody>
-                ))}
-              </StyledTable>
+              <Table<Entity>
+                table={table}
+                expandedSectionsRenderer={expandedSectionsRenderer}
+                rows={table.getRowModel().rows}
+              />
             </ScrollContainer>
           </TableDndProvider>
         </ExpandedSectionsProvider>
