@@ -255,7 +255,7 @@ public class InputServiceImpl implements InputService {
     @Override
     public Input create(String id, Map<String, Object> fields) {
         InputImpl.Builder builder = buildFromMap(fields);
-        builder.getId(id);
+        builder.setId(id);
         return builder.build();
     }
 
@@ -268,22 +268,22 @@ public class InputServiceImpl implements InputService {
         final DateTime createdAt = (DateTime) fields.getOrDefault(FIELD_CREATED_AT, Tools.nowUTC());
         final boolean isGlobal = (Boolean) fields.getOrDefault(MessageInput.FIELD_GLOBAL, false);
         final InputImpl.Builder builder = InputImpl.builder()
-                .getType((String) fields.get(MessageInput.FIELD_TYPE))
-                .getTitle((String) fields.get(MessageInput.FIELD_TITLE))
-                .getCreatorUserId((String) fields.get(MessageInput.FIELD_CREATOR_USER_ID))
-                .isGlobal(isGlobal)
-                .getDesiredState(IOState.Type.valueOf((String) fields.get(MessageInput.FIELD_DESIRED_STATE)))
-                .getContentPack((String) fields.get(MessageInput.FIELD_CONTENT_PACK))
-                .getConfiguration((Map<String, Object>) fields.get(MessageInput.FIELD_CONFIGURATION))
-                .getCreatedAt(createdAt);
+                .setType((String) fields.get(MessageInput.FIELD_TYPE))
+                .setTitle((String) fields.get(MessageInput.FIELD_TITLE))
+                .setCreatorUserId((String) fields.get(MessageInput.FIELD_CREATOR_USER_ID))
+                .setGlobal(isGlobal)
+                .setDesiredState(IOState.Type.valueOf((String) fields.get(MessageInput.FIELD_DESIRED_STATE)))
+                .setContentPack((String) fields.get(MessageInput.FIELD_CONTENT_PACK))
+                .setConfiguration((Map<String, Object>) fields.get(MessageInput.FIELD_CONFIGURATION))
+                .setCreatedAt(createdAt);
 
         final List<Map<String, String>> staticFields = (List<Map<String, String>>) fields.get(MessageInput.FIELD_STATIC_FIELDS);
         if (staticFields != null && !staticFields.isEmpty()) {
-            builder.staticFields(staticFields);
+            builder.setEmbeddedStaticFields(staticFields);
         }
 
         if (!isGlobal) {
-            builder.getNodeId((String) fields.get(MessageInput.FIELD_NODE_ID));
+            builder.setNodeId((String) fields.get(MessageInput.FIELD_NODE_ID));
         }
 
         return builder;
@@ -706,7 +706,7 @@ public class InputServiceImpl implements InputService {
                 }
             }
         }
-        return modified ? input.toBuilder().getConfiguration(newConfig).build() : input;
+        return modified ? input.toBuilder().setConfiguration(newConfig).build() : input;
     }
 
     @Override

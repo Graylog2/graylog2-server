@@ -25,7 +25,6 @@ import com.google.common.graph.Graph;
 import org.apache.commons.collections.map.HashedMap;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.ModelTypes;
@@ -177,12 +176,12 @@ public class InputFacadeTest {
     @Test
     public void exportNativeEntity() {
         final InputImpl input = InputImpl.builder()
-                .getId(UUID.randomUUID().toString())
-                .getTitle("Input Title")
-                .getType("org.graylog2.inputs.raw.udp.RawUDPInput")
-                .getConfiguration(Collections.emptyMap())
-                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
-                .getCreatorUserId(UUID.randomUUID().toString())
+                .setId(UUID.randomUUID().toString())
+                .setTitle("Input Title")
+                .setType("org.graylog2.inputs.raw.udp.RawUDPInput")
+                .setConfiguration(Collections.emptyMap())
+                .setCreatedAt(DateTime.now(DateTimeZone.UTC))
+                .setCreatorUserId(UUID.randomUUID().toString())
                 .build();
 
         final ImmutableList<Extractor> extractors = ImmutableList.of();
@@ -205,13 +204,13 @@ public class InputFacadeTest {
     @Test
     public void exportNativeEntityWithEncryptedValues() {
         final InputImpl input = InputImpl.builder()
-                .getId(UUID.randomUUID().toString())
-                .getTitle("Input Title")
-                .getType("org.graylog2.inputs.misc.jsonpath.JsonPathInput")
-                .getConfiguration(Map.of("encrypted_value",
+                .setId(UUID.randomUUID().toString())
+                .setTitle("Input Title")
+                .setType("org.graylog2.inputs.misc.jsonpath.JsonPathInput")
+                .setConfiguration(Map.of("encrypted_value",
                         new EncryptedValueService(UUID.randomUUID().toString()).encrypt("secret")))
-                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
-                .getCreatorUserId(UUID.randomUUID().toString())
+                .setCreatedAt(DateTime.now(DateTimeZone.UTC))
+                .setCreatorUserId(UUID.randomUUID().toString())
                 .build();
         final ImmutableList<Extractor> extractors = ImmutableList.of();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, extractors);
@@ -293,12 +292,12 @@ public class InputFacadeTest {
     @Test
     public void createExcerpt() {
         final InputImpl input = InputImpl.builder()
-                .getId(UUID.randomUUID().toString())
-                .getTitle("Excerpt")
-                .getType("org.graylog2.inputs.raw.udp.RawUDPInput")
-                .getConfiguration(Collections.emptyMap())
-                .getCreatedAt(DateTime.now(DateTimeZone.UTC))
-                .getCreatorUserId(UUID.randomUUID().toString())
+                .setId(UUID.randomUUID().toString())
+                .setTitle("Excerpt")
+                .setType("org.graylog2.inputs.raw.udp.RawUDPInput")
+                .setConfiguration(Collections.emptyMap())
+                .setCreatedAt(DateTime.now(DateTimeZone.UTC))
+                .setCreatorUserId(UUID.randomUUID().toString())
                 .build();
         final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input);
         final EntityExcerpt excerpt = facade.createExcerpt(inputWithExtractors);
