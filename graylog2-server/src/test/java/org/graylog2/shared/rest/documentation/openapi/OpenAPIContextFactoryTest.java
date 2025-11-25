@@ -54,13 +54,11 @@ class OpenAPIContextFactoryTest {
     private static ObjectMapper objectMapper;
     private static OpenAPI generatedSpec;
 
-    // TODO: add test for schema component name conflicts (same class name but in different packages)
-
-
     @BeforeAll
     static void beforeAll() {
         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
-                Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class, NotPublicCloudResource.class));
+                Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class,
+                        NotPublicCloudResource.class, SchemaConflictResource.class));
 
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
@@ -91,7 +89,9 @@ class OpenAPIContextFactoryTest {
         assertThat(generatedSpec.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
 
         // Verify that paths and schemas are generated
-        assertThat(generatedSpec.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test", "/plugins/my.plugin.id/subtypes");
+        assertThat(generatedSpec.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test",
+                "/plugins/my.plugin.id/subtypes", "/plugins/my.plugin.id/response-schema-name-conflict/pkg1",
+                "/plugins/my.plugin.id/response-schema-name-conflict/pkg2");
         assertThat(generatedSpec.getComponents().getSchemas()).isNotEmpty();
     }
 
@@ -114,7 +114,8 @@ class OpenAPIContextFactoryTest {
             assertThat(postOperation.getOperationId()).isEqualTo("createTest");
 
             // Verify that OptionalInt/OptionalLong/OptionalDouble are treated the same as Optional<Integer>/Optional<Long>/Optional<Double>
-            final var responseSchema = generatedSpec.getComponents().getSchemas().get("TestResponse");
+            final var responseSchema = generatedSpec.getComponents().getSchemas()
+                    .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.TestResponse");
             assertThat(responseSchema).isNotNull();
 
             // The ObjectMapper converts camelCase to snake_case
@@ -165,28 +166,48 @@ class OpenAPIContextFactoryTest {
 
         try {
             // Verify ChildType1 has allOf with ParentType reference
-            final Schema<?> childType1Schema = generatedSpec.getComponents().getSchemas().get("ChildType1");
+            final Schema<?> childType1Schema = generatedSpec.getComponents().getSchemas()
+                    .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType1");
             final var childType1HasParentRef = childType1Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
-                    .anyMatch(schema -> "#/components/schemas/ParentType".equals(schema.get$ref()));
+                    .anyMatch(schema ->
+                            "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType".equals(schema.get$ref()));
             assertThat(childType1HasParentRef).isTrue();
 
             // Verify ChildType2 has allOf with ParentType reference
-            final Schema<?> childType2Schema = generatedSpec.getComponents().getSchemas().get("ChildType2");
+            final Schema<?> childType2Schema = generatedSpec.getComponents().getSchemas()
+                    .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType2");
             final var childType2HasParentRef = childType2Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
-                    .anyMatch(schema -> "#/components/schemas/ParentType".equals(schema.get$ref()));
+                    .anyMatch(schema ->
+                            "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType".equals(schema.get$ref()));
             assertThat(childType2HasParentRef).isTrue();
 
             // Verify discriminator mapping uses type aliases, not FQ class names
-            final var parentTypeSchema = generatedSpec.getComponents().getSchemas().get("ParentType");
+            final var parentTypeSchema = generatedSpec.getComponents().getSchemas()
+                    .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType");
             final var discriminatorMapping = parentTypeSchema.getDiscriminator().getMapping();
             assertThat(discriminatorMapping)
                     .hasSize(4)
-                    .containsEntry("child-type-1", "#/components/schemas/ChildType1")
-                    .containsEntry("child-type-2", "#/components/schemas/ChildType2")
-                    .containsEntry("child-type-3", "#/components/schemas/ChildType3")
-                    .containsEntry("child-type-4", "#/components/schemas/ChildType4");
+                    .containsEntry("child-type-1", "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType1")
+                    .containsEntry("child-type-2", "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType2")
+                    .containsEntry("child-type-3", "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType3")
+                    .containsEntry("child-type-4", "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType4");
+        } catch (AssertionError | NullPointerException e) {
+            System.err.println("Test failed. Full OpenAPI spec:");
+            System.err.println(Json31.pretty(generatedSpec));
+            throw e;
+        }
+    }
+
+    @Test
+    void handlesSchemaNameConflict() throws Exception {
+        try {
+            // Verify ChildType1 has allOf with ParentType reference
+            final var schemas = generatedSpec.getComponents().getSchemas();
+            assertThat(schemas.keySet())
+                    .filteredOn(key -> key.contains("ConflictingResponse"))
+                    .hasSize(2);
         } catch (AssertionError | NullPointerException e) {
             System.err.println("Test failed. Full OpenAPI spec:");
             System.err.println(Json31.pretty(generatedSpec));
@@ -342,6 +363,27 @@ class OpenAPIContextFactoryTest {
         @JsonProperty("type")
         public String type() {
             return "child-type-4";
+        }
+    }
+
+    @PublicCloudAPI
+    @Path("/response-schema-name-conflict")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class SchemaConflictResource implements PluginRestResource {
+
+        @NoAuditEvent("Test")
+        @GET
+        @Path("pkg1")
+        public org.graylog2.shared.rest.documentation.openapi.pkg1.ConflictingResponse getPkg1() {
+            return new org.graylog2.shared.rest.documentation.openapi.pkg1.ConflictingResponse(true);
+        }
+
+        @NoAuditEvent("Test")
+        @GET
+        @Path("pkg2")
+        public org.graylog2.shared.rest.documentation.openapi.pkg2.ConflictingResponse getPkg2() {
+            return new org.graylog2.shared.rest.documentation.openapi.pkg2.ConflictingResponse(true);
         }
     }
 }

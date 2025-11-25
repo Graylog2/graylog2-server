@@ -29,6 +29,7 @@ import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
 import io.swagger.v3.core.jackson.ModelResolver;
+import io.swagger.v3.core.jackson.TypeNameResolver;
 import io.swagger.v3.core.util.Json;
 import io.swagger.v3.core.util.RefUtils;
 import io.swagger.v3.oas.models.media.Discriminator;
@@ -55,10 +56,9 @@ import java.util.OptionalLong;
  * {@link OptionalLong}, {@link OptionalDouble}) during schema generation.
  */
 public class CustomModelConverter extends ModelResolver {
-
     @Inject
     public CustomModelConverter(ObjectMapper applicationObjectMapper) {
-        super(applicationObjectMapper.copy());
+        super(applicationObjectMapper.copy(), fqnTypeNameResolver());
         setOpenapi31(true);
         // Workaround to hook into jackson's subtype resolution mechanism to find all registered subtypes into a
         // custom annotation processor that we register with the object mapper. Swagger resolves jackson subtypes
@@ -115,6 +115,13 @@ public class CustomModelConverter extends ModelResolver {
     private List<NamedType> findRegisteredSubtypes(Annotated baseType) {
         final var config = _mapper.getDeserializationConfig().with(new JacksonAnnotationIntrospector());
         return (List<NamedType>) _mapper.getSubtypeResolver().collectAndResolveSubtypesByClass(config, (AnnotatedClass) baseType);
+    }
+
+    // A TypeNameResolver that uses fully qualified names for type names
+    private static TypeNameResolver fqnTypeNameResolver() {
+        final var resolver = new TypeNameResolver() {};
+        resolver.setUseFqn(true);
+        return resolver;
     }
 
     /**
