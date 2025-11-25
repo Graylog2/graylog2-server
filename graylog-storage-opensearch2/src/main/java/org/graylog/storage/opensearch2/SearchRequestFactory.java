@@ -43,7 +43,6 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.queryStringQuery;
 import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders.termsQuery;
 
-@Deprecated
 public class SearchRequestFactory {
     private static final Sorting DEFAULT_SORTING = new Sorting("_doc", Sorting.Direction.ASC);
     private final boolean allowHighlighting;
