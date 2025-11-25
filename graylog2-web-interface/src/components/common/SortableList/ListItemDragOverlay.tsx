@@ -26,9 +26,9 @@ import type { CustomContentRender, CustomListItemRender, ListItemType } from 'co
 
 const SortableListItemOverlay = styled(ListItem)`
   box-shadow:
-    rgba(0, 0, 0, 0.05) 0 1px 3px 0,
-    rgba(0, 0, 0, 0.05) 0 28px 23px -7px,
-    rgba(0, 0, 0, 0.04) 0 12px 12px -7px;
+    rgb(0 0 0 / 5%) 0 1px 3px 0,
+    rgb(0 0 0 / 5%) 0 28px 23px -7px,
+    rgb(0 0 0 / 4%) 0 12px 12px -7px;
 `;
 
 type Props<ItemType extends ListItemType> = {
