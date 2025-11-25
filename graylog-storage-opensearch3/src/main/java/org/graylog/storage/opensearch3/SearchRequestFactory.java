@@ -72,7 +72,7 @@ public class SearchRequestFactory {
         return searchSourceBuilder;
     }
 
-    public SearchSourceBuilder create(SearchCommand searchCommand) {
+    private BoolQueryBuilder createQueryBuilder(final SearchCommand searchCommand) {
         final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
         final QueryBuilder queryBuilder = translateQueryString(query);
 
@@ -88,6 +88,11 @@ public class SearchRequestFactory {
                 .must(queryBuilder);
         filterQueryBuilder.ifPresent(filteredQueryBuilder::filter);
         rangeQueryBuilder.ifPresent(filteredQueryBuilder::filter);
+        return filteredQueryBuilder;
+    }
+
+    public SearchSourceBuilder create(SearchCommand searchCommand) {
+        final BoolQueryBuilder filteredQueryBuilder = createQueryBuilder(searchCommand);
 
         applyStreamsFilter(filteredQueryBuilder, searchCommand);
 
