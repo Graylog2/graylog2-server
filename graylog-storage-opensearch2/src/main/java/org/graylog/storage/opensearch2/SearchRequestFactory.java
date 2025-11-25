@@ -26,11 +26,13 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSource
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.slice.SliceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
+import org.graylog.storage.search.SearchCommand;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.search.QueryStringUtils;
 
 import java.util.Optional;
 import java.util.Set;
@@ -71,17 +73,14 @@ public class SearchRequestFactory {
     }
 
     public SearchSourceBuilder create(SearchCommand searchCommand) {
-        final String query = normalizeQuery(searchCommand.query());
-
-        final QueryBuilder queryBuilder = isWildcardQuery(query)
-                ? matchAllQuery()
-                : queryStringQuery(query).allowLeadingWildcard(allowLeadingWildcardSearches);
+        final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
+        final QueryBuilder queryBuilder = translateQueryString(query);
 
         final Optional<BoolQueryBuilder> rangeQueryBuilder = searchCommand.range()
                 .map(TimeRangeQueryFactory::create)
                 .map(rangeQuery -> boolQuery().must(rangeQuery));
         final Optional<BoolQueryBuilder> filterQueryBuilder = searchCommand.filter()
-                .filter(filter -> !isWildcardQuery(filter))
+                .filter(filter -> !QueryStringUtils.isEmptyOrMatchAllQueryString(filter))
                 .map(QueryBuilders::queryStringQuery)
                 .map(queryStringQuery -> boolQuery().must(queryStringQuery));
 
@@ -110,10 +109,10 @@ public class SearchRequestFactory {
         return searchSourceBuilder;
     }
 
-    private QueryBuilder translateQueryString(String queryString) {
-        return (queryString.isEmpty() || queryString.trim().equals("*"))
-                ? QueryBuilders.matchAllQuery()
-                : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
+    private QueryBuilder translateQueryString(final String queryString) {
+        return QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
+                ? matchAllQuery()
+                : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcardSearches);
     }
 
     private void applyHighlighting(SearchSourceBuilder searchSourceBuilder, SearchCommand searchCommand) {
@@ -159,17 +158,4 @@ public class SearchRequestFactory {
         final Sorting sorting = command.sorting().orElse(DEFAULT_SORTING);
         searchSourceBuilder.sort(sorting.getField(), SortOrder.valueOf(sorting.getUppercasedDirection()));
     }
-
-
-    private boolean isWildcardQuery(String filter) {
-        return normalizeQuery(filter).equals("*");
-    }
-
-    private String normalizeQuery(String query) {
-        if (query == null || query.trim().isEmpty()) {
-            return "*";
-        }
-        return query.trim();
-    }
-
 }

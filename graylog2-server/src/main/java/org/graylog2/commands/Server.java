@@ -268,6 +268,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                         .setLeader(leaderElectionService.isLeader())
                         .setTransportAddress(httpConfiguration.getHttpPublishUri().toString())
                         .setHostname(Tools.getLocalCanonicalHostname())
+                        .setProcessing(serverStatus.isProcessing())
+                        .setLifecycle(serverStatus.getLifecycle())
                         .build());
         serverStatus.setLocalMode(isLocal());
         if (leaderElectionService.isLeader() && !nodeService.isOnlyLeader(serverStatus.getNodeId())) {

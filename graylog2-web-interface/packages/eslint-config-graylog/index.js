@@ -153,6 +153,7 @@ export default [
       ],
       'sort-imports': 'off', // disabled in favor of 'import/order'
       'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
+      'jsx-a11y/no-autofocus': 'off',
       'max-classes-per-file': 'off',
       'max-len': 'off',
       'new-cap': 'off',

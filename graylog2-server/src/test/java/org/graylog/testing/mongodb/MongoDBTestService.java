@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.mongodb;
 
+import com.google.common.io.Resources;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
@@ -26,6 +27,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Network;
 
+import java.net.URL;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import static java.util.Objects.requireNonNull;
@@ -39,34 +44,38 @@ public class MongoDBTestService implements AutoCloseable {
     private static final String DEFAULT_DATABASE_NAME = "graylog";
 
     private final MongoDBContainer container;
+    private final MongoDBVersion version;
     private MongoConnectionImpl mongoConnection;
 
     /**
-     * Create service instance with the default version and network.
+     * Create service instance with the default version and network and start it immediately.
      *
      * @return the service instance
      */
-    public static MongoDBTestService create(Network network) {
-        return new MongoDBTestService(MongoDBContainer.create(network));
+    public static MongoDBTestService createStarted(Network network) {
+        return createStarted(MongoDBVersion.DEFAULT, network);
     }
 
     /**
-     * Create service instance with the given version and network.
+     * Create service instance with the given version and network and start it immediately.
      *
      * @return the service instance
      */
-    public static MongoDBTestService create(MongoDBVersion version, Network network) {
-        return new MongoDBTestService(MongoDBContainer.create(version, network));
+    public static MongoDBTestService createStarted(MongoDBVersion version, Network network) {
+        final var mongoDBTestService = new MongoDBTestService(MongoDBContainer.create(version, network), version);
+        mongoDBTestService.start();
+        return mongoDBTestService;
     }
 
-    private MongoDBTestService(MongoDBContainer container) {
+    private MongoDBTestService(MongoDBContainer container, MongoDBVersion version) {
         this.container = requireNonNull(container, "container cannot be null");
+        this.version = version;
     }
 
     /**
      * Starts the service and establishes a client connection. Will do nothing if service is already running.
      */
-    public void start() {
+    private void start() {
         if (container.isRunning()) {
             return;
         }
@@ -157,7 +166,7 @@ public class MongoDBTestService implements AutoCloseable {
         return container.getContainerId();
     }
 
-    public static String internalUri() {
+    public String internalUri() {
         return uriWithHostAndPort(MongoDBContainer.NETWORK_ALIAS, MongoDBContainer.MONGODB_PORT);
     }
 
@@ -167,5 +176,24 @@ public class MongoDBTestService implements AutoCloseable {
 
     private static String uriWithHostAndPort(String hostname, int port) {
         return String.format(Locale.US, "mongodb://%s:%d/%s", hostname, port, DEFAULT_DATABASE_NAME);
+    }
+
+
+    public void importFixtures(List<URL> fixtureResources) {
+        if (!fixtureResources.isEmpty()) {
+            new MongoDBFixtureImporter(fixtureResources).importResources(mongoDatabase());
+        }
+    }
+
+    public void importFixture(String resourceName, Class<?> testClass) {
+        if (!Paths.get(resourceName).isAbsolute()) {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(testClass, resourceName))).importResources(mongoDatabase());
+        } else {
+            new MongoDBFixtureImporter(Arrays.asList(Resources.getResource(resourceName))).importResources(mongoDatabase());
+        }
+    }
+
+    public MongoDBVersion version() {
+        return version;
     }
 }

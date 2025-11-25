@@ -22,8 +22,7 @@ import org.glassfish.jersey.test.TestProperties;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import jakarta.ws.rs.CookieParam;
 import jakarta.ws.rs.FormParam;
 import jakarta.ws.rs.HeaderParam;

@@ -22,11 +22,11 @@ import Immutable from 'immutable';
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
 import ViewLoaderContext from 'views/logic/ViewLoaderContext';
-import useSavedSearches from 'views/hooks/useSavedSearches';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { adminUser } from 'fixtures/users';
 import useCurrentUser from 'hooks/useCurrentUser';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import { fetchSavedSearches } from 'views/hooks/useSavedSearches';
 
 import SavedSearchesModal from './SavedSearchesModal';
 
@@ -63,7 +63,11 @@ const createPaginatedSearches = (count = 1) => {
   };
 };
 
-jest.mock('views/hooks/useSavedSearches');
+jest.mock('views/hooks/useSavedSearches', () => ({
+  ...jest.requireActual('views/hooks/useSavedSearches'),
+  fetchSavedSearches: jest.fn(),
+}));
+
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences');
 jest.mock('hooks/useCurrentUser');
@@ -77,25 +81,14 @@ describe('SavedSearchesModal', () => {
   const defaultPaginatedSearches = createPaginatedSearches();
 
   beforeEach(() => {
-    asMock(useSavedSearches).mockReturnValue({
-      data: defaultPaginatedSearches,
-      refetch: () => {},
-      isInitialLoading: false,
-    });
-
+    asMock(fetchSavedSearches).mockResolvedValue(defaultPaginatedSearches);
     asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
   describe('render the SavedSearchesModal', () => {
     it('should render empty', async () => {
-      const paginatedSavedSearches = createPaginatedSearches(0);
-
-      asMock(useSavedSearches).mockReturnValue({
-        data: paginatedSavedSearches,
-        refetch: () => {},
-        isInitialLoading: false,
-      });
+      asMock(fetchSavedSearches).mockResolvedValue(createPaginatedSearches(0));
 
       render(
         <SavedSearchesModal
@@ -105,17 +98,11 @@ describe('SavedSearchesModal', () => {
         />,
       );
 
-      await screen.findByText('No saved searches have been created yet.');
+      await screen.findByText('No saved searches have been found.');
     });
 
     it('should render with views', async () => {
-      const paginatedSavedSearches = createPaginatedSearches(2);
-
-      asMock(useSavedSearches).mockReturnValue({
-        data: paginatedSavedSearches,
-        refetch: () => {},
-        isInitialLoading: false,
-      });
+      asMock(fetchSavedSearches).mockResolvedValue(createPaginatedSearches(2));
 
       render(
         <SavedSearchesModal
