@@ -17,8 +17,11 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { SystemInputs } from '@graylog/server-api';
+
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
+
 import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
+
 import { defaultOnError } from 'util/conditional/onError';
 
 const INITIAL_DATA = {
