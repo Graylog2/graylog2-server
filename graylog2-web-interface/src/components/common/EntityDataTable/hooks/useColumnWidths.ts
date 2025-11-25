@@ -16,7 +16,12 @@
  */
 import { useState, useLayoutEffect } from 'react';
 
-import { DEFAULT_COL_MIN_WIDTH, DEFAULT_COL_WIDTH } from 'components/common/EntityDataTable/Constants';
+import {
+  DEFAULT_COL_MIN_WIDTH,
+  DEFAULT_COL_WIDTH,
+  ACTIONS_COL_ID,
+  BULK_SELECT_COL_ID,
+} from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
@@ -83,8 +88,9 @@ const calculateColumnWidths = ({
         return [id, !staticWidth && targetWidth < minWidth ? minWidth : targetWidth];
       }),
     ),
-    actions: assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionColMinWidth : actionColMinWidth,
-    'bulk-select': bulkSelectColWidth,
+    [ACTIONS_COL_ID]:
+      assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionColMinWidth : actionColMinWidth,
+    [BULK_SELECT_COL_ID]: bulkSelectColWidth,
   };
 };
 

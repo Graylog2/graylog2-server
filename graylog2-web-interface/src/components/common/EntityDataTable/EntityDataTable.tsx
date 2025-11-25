@@ -16,22 +16,20 @@
  */
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import merge from 'lodash/merge';
 import type { ColumnDef, Table as TableType } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 
-import { Table, ButtonGroup } from 'components/bootstrap';
+import { ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
-import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
 import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
@@ -39,7 +37,8 @@ import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hoo
 import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
-import TableCell from 'components/common/EntityDataTable/TableCell';
+import Table from 'components/common/EntityDataTable/Table';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 
 import type {
   ColumnRenderers,
@@ -50,38 +49,27 @@ import type {
   ColumnPreferences,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
-import TableHead from './TableHead';
 import BulkActionsRow from './BulkActionsRow';
 
-const ScrollContainer = styled.div<{ $columnWidths: Record<string, number> }>`
+const ScrollContainer = styled.div<{
+  $columnWidths: { [_attributeId: string]: number };
+  $activeColId: string | null;
+  $columnTransform: { [_attributeId: string]: string };
+}>(
+  ({ $columnWidths, $activeColId, $columnTransform }) => `
   width: 100%;
   overflow-x: auto;
-  ${({ $columnWidths }) =>
-    Object.entries($columnWidths || {})
-      .map(([id, width]) => `--header-${id}-size: ${width}px;`)
-      .join('\n')}
-`;
 
-const StyledTable = styled(Table)(
-  ({ theme }) => css`
-    table-layout: fixed;
-    width: fit-content;
+  ${Object.entries($columnWidths)
+    .map(([id, width]) => `--col-${id}-size: ${width}px;`)
+    .join('\n')}
 
-    thead > tr > th,
-    tbody > tr > td {
-      padding: ${CELL_PADDING}px;
-    }
+  ${$activeColId ? `--col-${$activeColId}-opacity: 0.4;` : ''}
 
-    && {
-      > tbody:nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-
-      > tbody:nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
-    }
-  `,
+  ${Object.entries($columnTransform)
+    .map(([id, transform]) => `--col-${id}-transform: ${transform};`)
+    .join('\n')}
+`,
 );
 
 const ActionsRow = styled.div`
@@ -366,11 +354,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     sort: activeSort,
   });
 
-  const { rowSelection, columnOrder: currentColumnOrder } = table.getState();
-  const tableRenderState = useMemo(
-    () => ({ rowSelection, data: table.options.data, columnOrder: currentColumnOrder }),
-    [rowSelection, table.options.data, currentColumnOrder],
-  );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
@@ -395,13 +380,22 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
             </LayoutConfigRow>
           </ActionsRow>
           <TableDndProvider table={table}>
-            <ScrollContainer id="scroll-container" ref={tableRef} $columnWidths={columnWidths}>
-              <MemoizedTableComp
-                table={table}
-                expandedSectionsRenderer={expandedSectionsRenderer}
-                rerenderState={tableRenderState}
-              />
-            </ScrollContainer>
+            <DndStylesContext.Consumer>
+              {({ activeColId, columnTransform }) => (
+                <ScrollContainer
+                  id="scroll-container"
+                  ref={tableRef}
+                  $columnWidths={columnWidths}
+                  $activeColId={activeColId}
+                  $columnTransform={columnTransform}>
+                  <Table<Entity>
+                    expandedSectionsRenderer={expandedSectionsRenderer}
+                    headerGroups={headerGroups}
+                    rows={table.getRowModel().rows}
+                  />
+                </ScrollContainer>
+              )}
+            </DndStylesContext.Consumer>
           </TableDndProvider>
         </ExpandedSectionsProvider>
       </SelectedEntitiesProvider>

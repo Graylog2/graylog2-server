@@ -18,15 +18,19 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.stream.JsonParser;
+import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
 import org.opensearch.client.json.PlainJsonSerializable;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
+import org.opensearch.client.opensearch._types.mapping.Property;
 
 import java.io.StringReader;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Utility class that helps use our APIs based on maps with OS3, strongly typed, builder-based APIs.
@@ -42,8 +46,19 @@ public class OSSerializationUtils {
         this.jsonpMapper = new JacksonJsonpMapper();
     }
 
+
     public Map<String, Object> toMap(final PlainJsonSerializable openSearchSerializableObject) throws JsonProcessingException {
         return this.jsonpMapper.objectMapper().readValue(openSearchSerializableObject.toJsonString(), new TypeReference<>() {});
+    }
+
+    public Map<String, JsonData> toJsonDataMap(final Map<String, Object> map) {
+        return map.entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                                Map.Entry::getKey,
+                                entry -> JsonData.of(entry.getValue())
+                        )
+                );
     }
 
     public <T> T fromMap(final Map<String, Object> mapRepresentation,
