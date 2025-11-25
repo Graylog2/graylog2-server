@@ -18,6 +18,7 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import jakarta.inject.Inject;
 import org.graylog.storage.opensearch3.OfficialOpensearchClient;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Template;
 import org.opensearch.client.opensearch._types.AcknowledgedResponseBase;
 import org.opensearch.client.opensearch._types.mapping.TypeMapping;

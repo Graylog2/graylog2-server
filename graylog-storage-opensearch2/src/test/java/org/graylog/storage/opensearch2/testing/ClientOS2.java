@@ -53,13 +53,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetIndexTemp
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.GetMappingsResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.IndexTemplateMetadata;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutComposableIndexTemplateRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutIndexTemplateRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.client.indices.PutMappingRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.cluster.health.ClusterHealthStatus;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.ComposableIndexTemplate;
-import org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.MappingMetadata;
-import org.graylog.shaded.opensearch2.org.opensearch.common.compress.CompressedXContent;
 import org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
@@ -67,12 +62,10 @@ import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.IndexState;
-import org.graylog2.indexer.indices.Template;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -206,69 +199,6 @@ public class ClientOS2 implements Client {
                         .path("properties")
                         .fields()
         );
-    }
-
-    private boolean composableTemplateExists(String templateName) {
-        var request = new GetComposableIndexTemplateRequest("");
-        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
-        return result.getIndexTemplates()
-                .keySet()
-                .stream()
-                .anyMatch(indexTemplate -> indexTemplate.equals(templateName));
-    }
-
-    private boolean legacyTemplateExists(String templateName) {
-        var request = new GetIndexTemplatesRequest("*");
-        var result = client.execute((c, requestOptions) -> c.indices().getIndexTemplate(request, requestOptions));
-        return result.getIndexTemplates()
-                .stream()
-                .anyMatch(indexTemplate -> indexTemplate.name().equals(templateName));
-    }
-
-    @Override
-    public boolean templateExists(String templateName) {
-        return featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? composableTemplateExists(templateName) : legacyTemplateExists(templateName);
-    }
-
-    private void putComposableTemplate(String templateName, Template template) {
-        var serializedMapping = serialize(template.mappings());
-        var settings = org.graylog.shaded.opensearch2.org.opensearch.common.settings.Settings.builder().loadFromMap(template.settings()).build();
-        var osTemplate = new org.graylog.shaded.opensearch2.org.opensearch.cluster.metadata.Template(settings, serializedMapping, null);
-        var indexTemplate = new ComposableIndexTemplate(template.indexPatterns(), osTemplate, null, template.order(), null, null);
-        var request = new PutComposableIndexTemplateRequest()
-                .name(templateName)
-                .indexTemplate(indexTemplate);
-        client.execute((c, requestOptions) -> c.indices().putIndexTemplate(request, requestOptions),
-                "Unable to put template " + templateName);
-    }
-
-    private void putLegacyTemplate(String templateName, Template template) {
-        var source = Map.of(
-                "index_patterns", template.indexPatterns(),
-                "mappings", template.mappings(),
-                "settings", template.settings(),
-                "order", template.order()
-        );
-        var request = new PutIndexTemplateRequest(templateName).source(source);
-        client.execute((c, requestOptions) -> c.indices().putTemplate(request, requestOptions),
-                "Unable to put template " + templateName);
-    }
-
-    @Override
-    public void putTemplate(String templateName, Template template) {
-        if (featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
-            putComposableTemplate(templateName, template);
-        } else {
-            putLegacyTemplate(templateName, template);
-        }
-    }
-
-    private CompressedXContent serialize(Object obj) {
-        try {
-            return new CompressedXContent(objectMapper.writeValueAsString(obj));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void deleteComposableTemplates(String... templates) {
