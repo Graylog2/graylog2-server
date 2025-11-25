@@ -18,6 +18,7 @@ import type { DefaultTheme } from 'styled-components';
 
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type { UnitTypeMapper } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export const layoutMapperWith4AxisFor4series = {
   fieldNameToAxisCountMapper: {
@@ -42,7 +43,7 @@ export const layoutMapperWith4AxisFor4series = {
     'avg(field1)': 'time',
     'avg(field2)': 'size',
     'avg(field3)': 'percent',
-    'count()': 'withoutUnit',
+    'count()': DEFAULT_AXIS_KEY,
   },
   unitTypeMapper: {
     percent: {
@@ -57,7 +58,7 @@ export const layoutMapperWith4AxisFor4series = {
       axisCount: 1,
       axisKeyName: 'yaxis',
     },
-    withoutUnit: {
+    [DEFAULT_AXIS_KEY]: {
       axisCount: 4,
       axisKeyName: 'yaxis4',
     },
@@ -95,7 +96,7 @@ export const layoutMapperWith4AxisFor6series = {
     'avg(field1)': 'time',
     'avg(field2)': 'size',
     'avg(field3)': 'percent',
-    'count()': 'withoutUnit',
+    'count()': DEFAULT_AXIS_KEY,
     'latest(field3)': 'percent',
     'sum(field2)': 'size',
   },
@@ -112,7 +113,7 @@ export const layoutMapperWith4AxisFor6series = {
       axisCount: 1,
       axisKeyName: 'yaxis',
     },
-    withoutUnit: {
+    [DEFAULT_AXIS_KEY]: {
       axisCount: 4,
       axisKeyName: 'yaxis4',
     },
@@ -305,7 +306,7 @@ export const unitTypeMapper4Charts: UnitTypeMapper = {
     axisCount: 3,
     axisKeyName: 'yaxis3',
   },
-  withoutUnit: {
+  [DEFAULT_AXIS_KEY]: {
     axisCount: 4,
     axisKeyName: 'yaxis4',
   },

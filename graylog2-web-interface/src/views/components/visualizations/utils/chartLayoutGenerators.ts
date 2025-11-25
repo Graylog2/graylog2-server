@@ -37,7 +37,6 @@ import {
   DEFAULT_AXIS_KEY,
   TIME_AXIS_LABELS_QUANTITY,
   DECIMAL_PLACES,
-  Y_POSITION_AXIS_STEP,
   NO_FIELD_NAME_SERIES,
 } from 'views/components/visualizations/Constants';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
@@ -46,19 +45,11 @@ import type { PieHoverTemplateSettings } from 'views/components/visualizations/h
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
-type DefaultAxisKey = 'withoutUnit';
+type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
-export const getYAxisPosition = (axisCount: number) => {
-  const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
+export const getTickLabelShift = (axisCount: number) => (axisCount > 2 ? 80 : 10);
 
-  if (axisCount % 2 === 0) {
-    return 1 - diff + Y_POSITION_AXIS_STEP;
-  }
-
-  return diff;
-};
-
-const getYAxisSide = (axisCount: number) => {
+export const getYAxisSide = (axisCount: number) => {
   if (axisCount % 2 === 0) {
     return 'right';
   }
@@ -66,20 +57,13 @@ const getYAxisSide = (axisCount: number) => {
   return 'left';
 };
 
-const getTicklabelPositionSettings = (axisCount: number) => {
-  switch (axisCount) {
-    case 4:
-      return { ticklabelposition: 'inside' };
-    default:
-      return {};
-  }
-};
-
 const getYAxisPositioningSettings = (axisCount: number) => ({
-  position: getYAxisPosition(axisCount),
   side: getYAxisSide(axisCount),
   overlaying: axisCount > 1 ? 'y' : undefined,
-  ...getTicklabelPositionSettings(axisCount),
+  automargin: true,
+  autoshift: true,
+  ticklabelposition: 'outside',
+  ticklabelstandoff: getTickLabelShift(axisCount),
 });
 
 const defaultSettings = {
@@ -146,11 +130,12 @@ const getUnitLayoutWithData = (
   axisCount: number,
   values: Array<any>,
   theme: DefaultTheme,
+  visualizationAxisTitle: string,
 ) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
-  ...getDefaultPlotYLayoutSettings(theme),
+  ...getDefaultPlotYLayoutSettings(theme, visualizationAxisTitle),
 });
 
 type SeriesName = string;
@@ -295,8 +280,13 @@ export const generateLayouts = ({
   return Object.fromEntries(
     Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
       const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
+      const visualizationAxisTitle =
+        'axisConfig' in config.visualizationConfig ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.title : null;
 
-      return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme)];
+      return [
+        axisKeyName,
+        getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme, visualizationAxisTitle),
+      ];
     }),
   );
 };

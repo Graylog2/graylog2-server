@@ -19,18 +19,14 @@ import { useCallback, useMemo } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled from 'styled-components';
 import isFunction from 'lodash/isFunction';
-import Immutable from 'immutable';
-import capitalize from 'lodash/capitalize';
 
-import { Input, Checkbox, Col } from 'components/bootstrap';
+import { Input, Checkbox } from 'components/bootstrap';
 import Select from 'components/common/Select';
 import usePluginEntities from 'hooks/usePluginEntities';
 import { defaultCompare } from 'logic/DefaultCompare';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
-import { TIMESTAMP_FIELD, thresholdsSupportedVisualizations } from 'views/Constants';
+import { TIMESTAMP_FIELD } from 'views/Constants';
 import { DateType } from 'views/logic/aggregationbuilder/Pivot';
-import type { FieldUnitsFormValues } from 'views/types';
-import { FormikInput } from 'components/common';
 
 import VisualizationConfigurationOptions from './VisualizationConfigurationOptions';
 import VisualizationElement from './VisualizationElement';
@@ -99,41 +95,6 @@ const VisualizationConfiguration = () => {
     return fields({ formValues: values });
   }, [currentVisualizationType.config?.fields, values]);
 
-  const hasNumberAxis = useMemo(() => {
-    const formMetrics = values?.metrics ?? [];
-    const formUnits: FieldUnitsFormValues = values?.units ?? {};
-
-    return formMetrics.some((metric) => {
-      const metricField = metric?.field;
-
-      return !formUnits?.[metricField];
-    });
-  }, [values?.metrics, values?.units]);
-
-  const axis = useMemo<Immutable.Map<string, Array<{ field: string; abbrev: string }>>>(() => {
-    const formUnits: FieldUnitsFormValues = values?.units ?? {};
-
-    return Object.entries(formUnits)
-      .reduce(
-        (res, [field, unit]) => {
-          const abbrev = unit.abbrev;
-          const unitType = unit.unitType;
-          if (abbrev && unitType) {
-            const curAxis = res.get(unitType) ?? [];
-            curAxis.push(field);
-
-            return res.set(unitType, curAxis);
-          }
-
-          return res;
-        },
-        Immutable.Map(hasNumberAxis ? { numbers: [], 'x-axis': [] } : { 'x-axis': [] }),
-      )
-      .toJS();
-  }, [hasNumberAxis, values?.units]);
-
-  const showAxisLabelsSettings = thresholdsSupportedVisualizations.includes(values?.visualization?.type);
-
   return (
     <ElementConfigurationContainer elementTitle={VisualizationElement.title}>
       <Field name="visualization.type">
@@ -181,38 +142,6 @@ const VisualizationConfiguration = () => {
         </Field>
       )}
       <VisualizationConfigurationOptions name="visualization.config" fields={configurationOptionFields} />
-      {showAxisLabelsSettings && (
-        <>
-          <Col sm={11}>
-            <Field name={'visualization.showAxisLabels'}>
-              {({ field: { name } }) => (
-                <FormikInput
-                  type="checkbox"
-                  wrapperClassName="col-sm-12"
-                  label="Show axis labels"
-                  id={`${name}-input`}
-                  name={name}
-                />
-              )}
-            </Field>
-          </Col>
-          {values?.visualization?.showAxisLabels &&
-            Object.entries(axis)?.map(([axisName, fields]) => (
-              <Col sm={12} key={axisName}>
-                <FormikInput
-                  id="axis-label"
-                  label={<>{capitalize(axisName)}</>}
-                  bsSize="small"
-                  placeholder="Specify axis label"
-                  name={`visualization.axisLabels.${axisName}`}
-                  labelClassName="col-sm-3"
-                  wrapperClassName="col-sm-9"
-                  help={`${fields.join(', ')}`}
-                />
-              </Col>
-            ))}
-        </>
-      )}
     </ElementConfigurationContainer>
   );
 };

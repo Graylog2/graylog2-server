@@ -17,8 +17,7 @@
 import type { DefaultTheme } from 'styled-components';
 
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
-
-const getDefaultPlotYLayoutSettings = (theme: DefaultTheme) => {
+const getDefaultPlotYLayoutSettings = (theme: DefaultTheme, visualizationAxisTitle: string = '') => {
   const fontSettings = getDefaultPlotFontSettings(theme);
 
   return {
@@ -27,6 +26,9 @@ const getDefaultPlotYLayoutSettings = (theme: DefaultTheme) => {
     tickfont: fontSettings,
     title: {
       font: fontSettings,
+      text: visualizationAxisTitle,
+      automargin: true,
+      standoff: 10,
     },
   };
 };

@@ -19,8 +19,12 @@ import { Field, getIn, useFormikContext } from 'formik';
 import styled from 'styled-components';
 
 import type { ConfigurationField } from 'views/types';
-import type { VisualizationConfigFormValues } from 'views/components/aggregationwizard/WidgetConfigForm';
+import type {
+  VisualizationConfigFormValues,
+  WidgetConfigFormValues,
+} from 'views/components/aggregationwizard/WidgetConfigForm';
 import { HoverForHelp } from 'components/common';
+import TextField from 'views/components/aggregationwizard/visualization/configurationFields/TextField';
 
 import BooleanField from './configurationFields/BooleanField';
 import NumericField from './configurationFields/NumericField';
@@ -32,7 +36,7 @@ const TitleLabelWithHelp = styled.div`
   align-items: center;
 `;
 
-const TitleHoverForHelp = styled((props) => <HoverForHelp {...props} />)`
+const TitleHoverForHelp = styled((props: React.ComponentProps<typeof HoverForHelp>) => <HoverForHelp {...props} />)`
   margin-left: 5px;
 `;
 
@@ -46,6 +50,8 @@ const componentForType = (type: string) => {
       return NumericField;
     case 'multi-select':
       return MultiSelectField;
+    case 'text':
+      return TextField;
     default:
       throw new Error(`Invalid configuration field type: ${type}`);
   }
@@ -74,6 +80,7 @@ export type FieldComponentProps = {
   onChange: (e: React.ChangeEvent<any>) => void;
   error: string | undefined;
   values: any;
+  inputHelp?: string;
 };
 
 type Props = {
@@ -82,16 +89,18 @@ type Props = {
 };
 
 const VisualizationConfigurationOptions = ({ name: namePrefix, fields }: Props) => {
-  const { values } = useFormikContext();
+  const { values } = useFormikContext<WidgetConfigFormValues>();
   const visualizationConfig: VisualizationConfigFormValues = getIn(values, namePrefix);
 
   return (
     <>
       {fields
-        ?.filter((field) => (field.isShown ? field.isShown(visualizationConfig) : true))
+        ?.filter((field) => (field.isShown ? field.isShown(visualizationConfig, values) : true))
         .map((field) => {
           const Component = componentForType(field.type);
           const title = titleForField(field);
+          const inputHelp =
+            typeof field.inputHelp === 'function' ? field.inputHelp(visualizationConfig, values) : undefined;
 
           return (
             <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
@@ -105,6 +114,7 @@ const VisualizationConfigurationOptions = ({ name: namePrefix, fields }: Props) 
                   error={error}
                   field={field}
                   title={title}
+                  inputHelp={inputHelp}
                 />
               )}
             </Field>

@@ -22,10 +22,18 @@ import BarVisualizationConfig, {
   DEFAULT_BARMODE,
 } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
-import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { axisTypes, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type {
+  AxisType,
+  XYVisualizationConfigFormValues,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import {
+  DEFAULT_AXIS_CONFIG,
+  axisTypes,
+  DEFAULT_AXIS_TYPE,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import xyAxisConfigFields from 'views/components/visualizations/xyAxisConfigFields';
 
-type BarVisualizationConfigFormValues = {
+export type BarVisualizationConfigFormValues = XYVisualizationConfigFormValues & {
   barmode: 'group' | 'stack' | 'relative' | 'overlay';
   axisType: AxisType;
 };
@@ -41,13 +49,15 @@ const barChart: VisualizationType<
   displayName: 'Bar Chart',
   component: BarVisualization,
   config: {
-    createConfig: () => ({ barmode: DEFAULT_BARMODE, axisType: DEFAULT_AXIS_TYPE }),
+    createConfig: () => ({ barmode: DEFAULT_BARMODE, axisType: DEFAULT_AXIS_TYPE, axisConfig: DEFAULT_AXIS_CONFIG }),
     fromConfig: (config: BarVisualizationConfig | undefined) => ({
       barmode: config?.barmode ?? DEFAULT_BARMODE,
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
+      showAxisLabels: Object.values(config.axisConfig).some(({ title }) => !!title),
+      axisConfig: config.axisConfig,
     }),
     toConfig: (formValues: BarVisualizationConfigFormValues) =>
-      BarVisualizationConfig.create(formValues.barmode, formValues.axisType),
+      BarVisualizationConfig.create(formValues.barmode, formValues.axisType, formValues.axisConfig),
     fields: [
       {
         name: 'barmode',
@@ -101,6 +111,7 @@ const barChart: VisualizationType<
         options: axisTypes,
         required: true,
       },
+      ...xyAxisConfigFields,
     ],
   },
   capabilities: ['event-annotations'],

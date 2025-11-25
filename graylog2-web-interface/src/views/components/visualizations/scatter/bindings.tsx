@@ -17,12 +17,18 @@
 import type { VisualizationType } from 'views/types';
 import ScatterVisualization from 'views/components/visualizations/scatter/ScatterVisualization';
 import { hasAtLeastOneMetric } from 'views/components/visualizations/validations';
-import type { AxisType } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import { DEFAULT_AXIS_TYPE, axisTypes } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type { AxisType, ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import {
+  DEFAULT_AXIS_CONFIG,
+  DEFAULT_AXIS_TYPE,
+  axisTypes,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
+import xyAxisConfigFields from 'views/components/visualizations/xyAxisConfigFields';
 
 type ScatterVisualizationConfigFormValues = {
   axisType: AxisType;
+  axisConfig: ChartAxisConfig;
 };
 
 const validate = hasAtLeastOneMetric('Scatter plot');
@@ -36,9 +42,13 @@ const scatterChart: VisualizationType<
   displayName: 'Scatter Plot',
   component: ScatterVisualization,
   config: {
-    createConfig: () => ({ axisType: DEFAULT_AXIS_TYPE }),
-    fromConfig: (config) => ({ axisType: config?.axisType ?? DEFAULT_AXIS_TYPE }),
-    toConfig: (formValues) => ScatterVisualizationConfig.create(formValues.axisType),
+    createConfig: () => ({ axisType: DEFAULT_AXIS_TYPE, axisConfig: DEFAULT_AXIS_CONFIG }),
+    fromConfig: (config) => ({
+      axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
+      showAxisLabels: Object.values(config.axisConfig).some(({ title }) => !!title),
+      axisConfig: config.axisConfig,
+    }),
+    toConfig: (formValues) => ScatterVisualizationConfig.create(formValues.axisType, formValues.axisConfig),
     fields: [
       {
         name: 'axisType',
@@ -47,6 +57,7 @@ const scatterChart: VisualizationType<
         options: axisTypes,
         required: true,
       },
+      ...xyAxisConfigFields,
     ],
   },
   capabilities: ['event-annotations'],

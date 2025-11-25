@@ -1,0 +1,82 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import capitalize from 'lodash/capitalize';
+
+import type { XYVisualizationConfigFormValues } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
+import type { ConfigurationField, FieldUnitType } from 'views/types';
+import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
+
+const getNumericAxisMetrics = (values: WidgetConfigFormValues) => {
+  const units = values?.units ?? {};
+  const metrics = values?.metrics ?? [];
+
+  return metrics
+    .filter(({ field }) => !(units?.[field]?.unitType && units?.[field]?.abbrev))
+    .map((metric) => metric.name ?? `${metric.function}(${metric.field ?? ''})`);
+};
+
+const getAxisMetrics = (unitType: FieldUnitType, values: WidgetConfigFormValues) => {
+  const units = values?.units ?? {};
+  const metrics = values?.metrics ?? [];
+
+  const unitTypeFields = new Set(
+    Object.entries(units)
+      .filter(([_, unit]) => unit.unitType === unitType && unit.abbrev)
+      .map(([field]) => field),
+  );
+
+  return metrics
+    .filter(({ field }) => unitTypeFields.has(field))
+    .map((metric) => metric.name ?? `${metric.function}(${metric.field ?? ''})`);
+};
+
+const getUnitTypeFields = (): Array<ConfigurationField> =>
+  ['percent', 'time', 'size'].map((unitType: FieldUnitType) => ({
+    name: `axisConfig.${unitType}.title`,
+    title: capitalize(unitType),
+    type: 'text',
+    isShown: (formValues: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
+      formValues.showAxisLabels && !!getAxisMetrics(unitType, widgetConfigFormValues).length,
+    inputHelp: (_: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
+      getAxisMetrics(unitType, widgetConfigFormValues).join(', '),
+  }));
+const xyAxisConfigFields: Array<ConfigurationField> = [
+  {
+    name: 'showAxisLabels',
+    title: 'Show axis labels',
+    type: 'boolean',
+  },
+  {
+    name: 'axisConfig.xaxis.title',
+    title: 'X-axis',
+    type: 'text',
+    isShown: (formValues: XYVisualizationConfigFormValues) => formValues.showAxisLabels,
+  },
+  {
+    name: `axisConfig.${DEFAULT_AXIS_KEY}.title`,
+    title: 'Number',
+    type: 'text',
+    isShown: (formValues: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
+      !!getNumericAxisMetrics(widgetConfigFormValues).length && formValues.showAxisLabels,
+    inputHelp: (_: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
+      getNumericAxisMetrics(widgetConfigFormValues).join(', '),
+  },
+  ...getUnitTypeFields(),
+];
+
+export default xyAxisConfigFields;
