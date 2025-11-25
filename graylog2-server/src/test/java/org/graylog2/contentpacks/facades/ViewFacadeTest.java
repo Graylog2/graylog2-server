@@ -313,10 +313,10 @@ public class ViewFacadeTest {
         final ViewStateEntity viewStateEntity = ViewStateEntity.builder()
                 .fields(ImmutableSet.of())
                 .titles(Titles.empty())
-                .widgets(ImmutableSet.of())
-                .widgetMapping(ImmutableMap.of())
-                .widgetPositions(ImmutableMap.of())
-                .formatting(FormattingSettings.builder().highlighting(ImmutableSet.of()).build())
+                .widgets(Set.of())
+                .widgetMapping(Map.of())
+                .widgetPositions(Map.of())
+                .formatting(FormattingSettings.builder().highlighting(List.of()).build())
                 .displayModeSettings(DisplayModeSettings.empty())
                 .build();
         String newViewId = "5def958063303ae5f68edead";
