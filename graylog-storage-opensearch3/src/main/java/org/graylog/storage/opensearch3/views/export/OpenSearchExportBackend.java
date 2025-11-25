@@ -73,9 +73,6 @@ public class OpenSearchExportBackend implements ExportBackend {
 
     private final OfficialOpensearchClient opensearchClient;
 
-    // TODO: how about thread safety here?!
-    private Optional<List<FieldValue>> searchAfterValues = Optional.empty();
-
     @Inject
     public OpenSearchExportBackend(IndexLookup indexLookup,
                                    @Named("allow_leading_wildcard_searches") boolean allowLeadingWildcard,
@@ -92,8 +89,10 @@ public class OpenSearchExportBackend implements ExportBackend {
         boolean isFirstChunk = true;
         int totalCount = 0;
 
+        SearchAfterValues searchAfterValues = SearchAfterValues.empty();
+
         while (true) {
-            List<Hit<Map>> hits = search(command);
+            List<Hit<Map>> hits = search(command, searchAfterValues);
 
             if (hits.isEmpty()) {
                 publishChunk(chunkCollector, hits, command.fieldsInOrder(), command.timeZone(), SimpleMessageChunk.ChunkOrder.LAST);
@@ -116,11 +115,10 @@ public class OpenSearchExportBackend implements ExportBackend {
         }
     }
 
-    private List<Hit<Map>> search(ExportMessagesCommand command) {
-        SearchResponse<Map> result = doSearch(createSearchRequest(command));
-        final List<Hit<Map>> hits = result.hits().hits();
-        searchAfterValues = lastHitSortFrom(hits);
-        return hits;
+    private List<Hit<Map>> search(ExportMessagesCommand command, SearchAfterValues searchAfterValues) {
+        SearchResponse<Map> result = doSearch(createSearchRequest(command, searchAfterValues));
+        searchAfterValues.update(result);
+        return result.hits().hits();
     }
 
     private SearchResponse<Map> doSearch(SearchRequest searchRequest) {
@@ -139,15 +137,7 @@ public class OpenSearchExportBackend implements ExportBackend {
         }
     }
 
-    private Optional<List<FieldValue>> lastHitSortFrom(List<Hit<Map>> hits) {
-        return Optional.of(hits)
-                .filter(h -> !h.isEmpty())
-                .map(List::getLast)
-                .map(Hit::sort);
-    }
-
-
-    private SearchRequest createSearchRequest(ExportMessagesCommand command) {
+    private SearchRequest createSearchRequest(ExportMessagesCommand command, SearchAfterValues searchAfterValues) {
         return SearchRequest.of(builder -> {
 
             getIndices(command).ifPresent(builder::index);
