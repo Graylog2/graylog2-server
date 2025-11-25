@@ -34,4 +34,3 @@ const CloudTrailApp = () => (
 );
 
 export default CloudTrailApp;
-
