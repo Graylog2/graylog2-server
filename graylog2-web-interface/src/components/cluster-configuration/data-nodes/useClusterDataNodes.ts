@@ -19,6 +19,7 @@ import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 import type { SearchParams } from 'stores/PaginationTypes';
 import type { DataNode } from 'components/datanode/Types';
 import useDataNodes, { type DataNodeResponse } from 'components/datanode/hooks/useDataNodes';
+import useShowDatanodeMigration from 'components/datanode/hooks/useShowDatanodeMigration';
 
 import useAddMetricsToDataNodes, { type DataNodeMetrics } from './useAddMetricsToDataNodes';
 
@@ -58,6 +59,7 @@ const useClusterDataNodes = (
   } = options ?? {};
   const [pollingEnabled, setPollingEnabled] = useState(initialPollingEnabled);
   const effectiveRefetchInterval = pollingEnabled ? refetchInterval : false;
+  const { isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
 
   const {
     data,
@@ -66,7 +68,10 @@ const useClusterDataNodes = (
     error,
   } = useDataNodes(searchParams, { enabled }, effectiveRefetchInterval);
 
-  const nodesWithMetrics = useAddMetricsToDataNodes(data.list, { refetchInterval: effectiveRefetchInterval, enabled });
+  const nodesWithMetrics = useAddMetricsToDataNodes(data.list, {
+    refetchInterval: effectiveRefetchInterval,
+    enabled: enabled && isDatanodeConfiguredAndUsed,
+  });
 
   const dataWithMetrics = useMemo<ClusterDataNodeResponse>(
     () => ({
