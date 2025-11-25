@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
+package org.graylog2.indexer.indices;
 
-import org.graylog2.indexer.indices.Template;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
+import org.graylog2.storage.DetectedSearchVersion;
+import org.graylog2.storage.SearchVersion;
+import org.graylog2.storage.VersionAwareProvider;
 
-interface IndexTemplateAdapter {
-    boolean ensureIndexTemplate(String templateName, Template template);
+import java.util.Map;
 
-    boolean indexTemplateExists(String templateName);
-
-    boolean deleteIndexTemplate(String templateName);
+public class IndexTemplateAdapterProvider extends VersionAwareProvider<IndexTemplateAdapter> {
+    @Inject
+    public IndexTemplateAdapterProvider(@DetectedSearchVersion SearchVersion version, Map<SearchVersion, Provider<IndexTemplateAdapter>> pluginBindings) {
+        super(version, pluginBindings);
+    }
 }
