@@ -16,21 +16,24 @@
  */
 package org.graylog.events.search;
 
+import jakarta.annotation.Nonnull;
+import org.assertj.core.api.Assertions;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import jakarta.annotation.Nonnull;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -61,6 +64,26 @@ public abstract class MoreSearchAdapterIT extends ElasticsearchBaseTest {
             verifyResult(result, i, expectedNumberOfMessages - i);
         }
     }
+
+    @Test
+    public void eventsHistogram() {
+        final MoreSearch.Histogram result = toTest.eventHistogram("*", AbsoluteRange.create("2015-01-01 01:00:00.000", "2022-01-01 01:00:00.000"), Set.of(INDEX_NAME), ALL_STREAMS,"*", Set.of(), ZoneId.of("Europe/Vienna"), Map.of());
+        Assertions.assertThat(result.buckets().alerts())
+                .hasSize(85);
+        Assertions.assertThat(result.buckets().events())
+                .hasSize(85);
+
+        final List<MoreSearch.Histogram.Bucket> alerts = result.buckets().alerts().stream().filter(b -> b.count() > 0).toList();
+        Assertions.assertThat(alerts)
+                .extracting(a -> a.startDate().getYear())
+                .contains(2015, 2017, 2021);
+
+        final List<MoreSearch.Histogram.Bucket> events = result.buckets().events().stream().filter(b -> b.count() > 0).toList();
+        Assertions.assertThat(events)
+                .extracting(a -> a.startDate().getYear())
+                .contains(2016, 2018, 2019, 2020);
+    }
+
 
     @Test
     public void eventSearchGetsPaginatedMessages() {

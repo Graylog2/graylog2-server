@@ -17,13 +17,10 @@
 package org.graylog.storage.opensearch3;
 
 import jakarta.inject.Inject;
-import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightField;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ResultMessageFactory;
+import org.opensearch.client.opensearch.core.search.Hit;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,16 +34,8 @@ public class OS2ResultMessageFactory {
         this.messageFactory = messageFactory;
     }
 
-    public ResultMessage fromSearchHit(SearchHit hit) {
-        final Map<String, List<String>> highlights = hit.getHighlightFields().entrySet()
-                .stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, OS2ResultMessageFactory::highlightsFromFragments));
-        return messageFactory.parseFromSource(hit.getId(), hit.getIndex(), hit.getSourceAsMap(), highlights);
+    public ResultMessage fromSearchHit(Hit<Map> hit) {
+        return messageFactory.parseFromSource(hit.id(), hit.index(), hit.source(), hit.highlight());
     }
 
-    private static List<String> highlightsFromFragments(Map.Entry<String, HighlightField> entry) {
-        return Arrays.stream(entry.getValue().fragments())
-                .map(Text::toString)
-                .collect(Collectors.toList());
-    }
 }
