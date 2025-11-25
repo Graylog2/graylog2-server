@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import merge from 'lodash/merge';
-import type { ColumnDef, Table as TableType } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { ButtonGroup } from 'components/bootstrap';
@@ -44,9 +44,9 @@ import type {
   ColumnRenderers,
   ColumnSchema,
   EntityBase,
-  ExpandedSectionRenderer,
   ColumnRenderersByAttribute,
   ColumnPreferences,
+  ExpandedSectionRenderers,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import BulkActionsRow from './BulkActionsRow';
@@ -169,54 +169,9 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   );
 };
 
-type TableComponentProps<Entity extends EntityBase> = {
-  table: TableType<Entity>;
-  expandedSectionsRenderer?: {
-    [sectionName: string]: ExpandedSectionRenderer<Entity>;
-  };
-  rerenderState: {
-    rowSelection: ReturnType<TableType<Entity>['getState']>['rowSelection'];
-    data: TableType<Entity>['options']['data'];
-    columnOrder: ReturnType<TableType<Entity>['getState']>['columnOrder'];
-  };
-};
-
-const TableComponent = <Entity extends EntityBase>({
-  table,
-  expandedSectionsRenderer = undefined,
-  rerenderState: _rerenderState,
-}: TableComponentProps<Entity>) => (
-  <StyledTable striped condensed hover>
-    <TableHead table={table} />
-    {table.getRowModel().rows.map((row) => (
-      <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-        <tr>
-          {row.getVisibleCells().map((cell) => (
-            <TableCell key={cell.id} cell={cell} />
-          ))}
-        </tr>
-        <ExpandedSections
-          key={`expanded-sections-${row.id}`}
-          expandedSectionsRenderer={expandedSectionsRenderer}
-          entity={row.original}
-        />
-      </tbody>
-    ))}
-  </StyledTable>
-);
-
-export const MemoizedTableComp = React.memo(
-  TableComponent,
-  (prev, next) => prev.rerenderState === next.rerenderState,
-) as typeof TableComponent;
-
 type Props<Entity extends EntityBase, Meta = unknown> = {
-  /**
-   * Needs to be defined when not all action cells in every row have the same width.
-   * When they have the same width, the column width will be calculated automatically.
-   * Should not include the actions col padding. Should be the max width an action cell can have.
-   */
-  actionsCellWidth?: number;
+  /** Min width of actions cell **/
+  minActionsCellWidth?: number;
   /** Currently active sort */
   activeSort?: Sort;
   /**
@@ -242,14 +197,13 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** The table data. */
   entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
-  expandedSectionsRenderer?: {
-    [sectionName: string]: ExpandedSectionRenderer<Entity>;
-  };
+  expandedSectionsRenderers?: ExpandedSectionRenderers<Entity>;
+  /** User layout preferences */
   layoutPreferences: {
     attributes?: ColumnPreferences;
     order?: Array<string>;
   };
-  /** Function to handle changes of column visibility, width and order */
+  /** Function to handle update of user layout preferences */
   onLayoutPreferencesChange: ({
     attributes,
     order,
@@ -273,14 +227,14 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
  * Flexible data table component which allows defining custom column renderers.
  */
 const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
-  actionsCellWidth: fixedActionsCellWidth = undefined,
+  minActionsCellWidth: fixedActionsCellWidth = undefined,
   activeSort = undefined,
   entityAttributesAreCamelCase,
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
   entities,
-  expandedSectionsRenderer = undefined,
+  expandedSectionsRenderers = undefined,
   onLayoutPreferencesChange,
   defaultDisplayedColumns,
   defaultColumnOrder,
@@ -389,7 +343,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                   $activeColId={activeColId}
                   $columnTransform={columnTransform}>
                   <Table<Entity>
-                    expandedSectionsRenderer={expandedSectionsRenderer}
+                    expandedSectionsRenderers={expandedSectionsRenderers}
                     headerGroups={headerGroups}
                     rows={table.getRowModel().rows}
                   />

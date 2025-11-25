@@ -22,7 +22,7 @@ import styled, { css } from 'styled-components';
 import { Table as BaseTable } from 'components/bootstrap';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
-import type { EntityBase, ExpandedSectionRenderer } from 'components/common/EntityDataTable/types';
+import type { EntityBase, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
 
 import TableHead from './TableHead';
 
@@ -57,16 +57,12 @@ const Td = styled.td<{ $colId: string }>(
 );
 
 type Props<Entity extends EntityBase> = {
-  expandedSectionsRenderer:
-    | {
-        [sectionName: string]: ExpandedSectionRenderer<Entity>;
-      }
-    | undefined;
+  expandedSectionsRenderers: ExpandedSectionRenderers<Entity> | undefined;
   rows: Array<Row<Entity>>;
   headerGroups: Array<HeaderGroup<Entity>>;
 };
 
-const Table = <Entity extends EntityBase>({ expandedSectionsRenderer, rows, headerGroups }: Props<Entity>) => (
+const Table = <Entity extends EntityBase>({ expandedSectionsRenderers, rows, headerGroups }: Props<Entity>) => (
   <StyledTable striped condensed hover>
     <TableHead headerGroups={headerGroups} />
     {rows.map((row) => (
@@ -80,7 +76,7 @@ const Table = <Entity extends EntityBase>({ expandedSectionsRenderer, rows, head
         </tr>
         <ExpandedSections
           key={`expanded-sections-${row.id}`}
-          expandedSectionsRenderer={expandedSectionsRenderer}
+          expandedSectionsRenderers={expandedSectionsRenderers}
           entity={row.original}
         />
       </tbody>

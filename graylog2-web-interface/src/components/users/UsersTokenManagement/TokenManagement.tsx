@@ -83,7 +83,7 @@ const TokenManagement = () => {
               <QueryHelper entityName="token" commonFields={[]} fieldMap={fieldMap} example={tokenExamples} />
             }
             additionalAttributes={ADDITIONAL_ATTRIBUTES}
-            actionsCellWidth={320}
+            minActionsCellWidth={320}
             entityActions={tokenAction}
             tableLayout={DEFAULT_LAYOUT}
             fetchEntities={fetchTokens}

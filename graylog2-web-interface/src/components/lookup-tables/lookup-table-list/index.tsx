@@ -122,7 +122,7 @@ function LookupTableList() {
               tableLayout={lutListElements.defaultLayout}
               fetchEntities={handleFetchTables}
               keyFn={lookupTablesKeyFn}
-              actionsCellWidth={100}
+              minActionsCellWidth={100}
               entityAttributesAreCamelCase={false}
               columnRenderers={columnRenderers}
             />

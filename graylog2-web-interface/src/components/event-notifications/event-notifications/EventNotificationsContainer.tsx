@@ -113,7 +113,7 @@ const EventNotificationsContainer = () => {
       tableLayout={defaultLayout}
       fetchEntities={fetchEntities}
       additionalAttributes={additionalAttributes}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionsRenderers={expandedSections}
       keyFn={keyFn}
       bulkSelection={{ actions: <BulkActions /> }}
       entityAttributesAreCamelCase

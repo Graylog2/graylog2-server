@@ -18,12 +18,13 @@ import * as React from 'react';
 import { useMemo } from 'react';
 import styled from 'styled-components';
 
+import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import { useTableEventHandlers } from 'components/common/EntityDataTable';
 import { Spinner, PaginatedList, SearchForm, NoSearchResult, EntityDataTable } from 'components/common';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
-import type { EntityBase, DefaultLayout } from 'components/common/EntityDataTable/types';
+import type { EntityBase, DefaultLayout, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
 import EntityFilters from 'components/common/EntityFilters';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import TableFetchContextProvider from 'components/common/PaginatedEntityTable/TableFetchContextProvider';
@@ -31,7 +32,6 @@ import type { PaginatedResponse, FetchOptions } from 'components/common/Paginate
 import useFetchEntities from 'components/common/PaginatedEntityTable/useFetchEntities';
 import useOnRefresh from 'components/common/PaginatedEntityTable/useOnRefresh';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
-import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 
 import { useWithLocalState, useWithURLParams } from './useFiltersAndPagination';
 
@@ -67,13 +67,13 @@ type InnerProps = {
 };
 
 const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
-  actionsCellWidth = 160,
+  minActionsCellWidth = 160,
   additionalAttributes = [],
   bulkSelection = undefined,
   columnRenderers,
   entityActions,
   entityAttributesAreCamelCase,
-  expandedSectionsRenderer = undefined,
+  expandedSectionsRenderers = undefined,
   fetchEntities,
   fetchOptions,
   filterValueRenderers = undefined,
@@ -189,14 +189,14 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
               }}
               defaultColumnOrder={tableLayout.defaultColumnOrder}
               onLayoutPreferencesChange={onLayoutPreferencesChange}
-              expandedSectionsRenderer={expandedSectionsRenderer}
+              expandedSectionsRenderers={expandedSectionsRenderers}
               bulkSelection={bulkSelection}
               onSortChange={onSortChange}
               onPageSizeChange={onPageSizeChange}
               pageSize={layoutConfig.pageSize}
               activeSort={layoutConfig.sort}
               entityActions={entityActions}
-              actionsCellWidth={actionsCellWidth}
+              minActionsCellWidth={minActionsCellWidth}
               columnRenderers={columnRenderers}
               columnSchemas={columnSchemas}
               entityAttributesAreCamelCase={entityAttributesAreCamelCase}
@@ -244,13 +244,13 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
 };
 
 type Props<T, M> = {
-  actionsCellWidth?: EntityDataTableProps['actionsCellWidth'];
+  minActionsCellWidth?: EntityDataTableProps['minActionsCellWidth'];
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
-  expandedSectionsRenderer?: EntityDataTableProps['expandedSectionsRenderer'];
+  expandedSectionsRenderers?: ExpandedSectionRenderers<T>;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];

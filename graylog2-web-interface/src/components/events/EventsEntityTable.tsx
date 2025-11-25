@@ -56,8 +56,8 @@ const EventsEntityTable = () => {
         tableLayout={eventsTableElements.defaultLayout}
         fetchEntities={_fetchEvents}
         keyFn={keyFn}
-        actionsCellWidth={110}
-        expandedSectionsRenderer={expandedSections}
+        minActionsCellWidth={110}
+        expandedSectionsRenderers={expandedSections}
         entityAttributesAreCamelCase={false}
         filterValueRenderers={FilterValueRenderers}
         columnRenderers={columnRenderers}

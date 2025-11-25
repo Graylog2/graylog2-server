@@ -58,7 +58,7 @@ const ProfilesList = () => {
       fetchEntities={fetchIndexSetFieldTypeProfiles}
       keyFn={keyFn}
       entityAttributesAreCamelCase
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionsRenderers={expandedSections}
       columnRenderers={customColumnRenderers}
       searchPlaceholder="Search for profile name"
     />

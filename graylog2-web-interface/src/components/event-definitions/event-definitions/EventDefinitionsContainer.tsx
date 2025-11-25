@@ -100,7 +100,7 @@ const EventDefinitionsContainer = () => {
       entityActions={renderEventDefinitionActions}
       keyFn={keyFn}
       entityAttributesAreCamelCase={false}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionsRenderers={expandedSections}
       filterValueRenderers={FilterValueRenderers}
       columnRenderers={getCustomColumnRenderers(pluggableColumnRenderers)}
       bulkSelection={bulkSelection}

@@ -111,7 +111,7 @@ const IndexSetFieldTypesList = () => {
       fetchEntities={(searchParams) => fetchIndexSetFieldTypes(indexSetId, searchParams)}
       keyFn={keyFn}
       bulkSelection={bulkSelection}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionsRenderers={expandedSections}
       entityAttributesAreCamelCase
       filterValueRenderers={FilterValueRenderers}
       columnRenderers={customColumnRenderers}

@@ -81,6 +81,10 @@ export type ExpandedSectionRenderer<Entity> = {
   disableHeader?: boolean;
 };
 
+export type ExpandedSectionRenderers<Entity> = {
+  [sectionName: string]: ExpandedSectionRenderer<Entity>;
+};
+
 export type DefaultLayout = {
   entityTableId: string;
   defaultSort: Sort;
