@@ -14,14 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
-
-import org.graylog2.indexer.indices.Template;
-
-interface IndexTemplateAdapter {
-    boolean ensureIndexTemplate(String templateName, Template template);
-
-    boolean indexTemplateExists(String templateName);
-
-    boolean deleteIndexTemplate(String templateName);
-}
+// eslint-disable-next-line import/prefer-default-export
+export { default as DataAdapterFormView } from './AdapterFormView';

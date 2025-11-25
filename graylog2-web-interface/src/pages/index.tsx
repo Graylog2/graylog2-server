@@ -70,8 +70,11 @@ const LoadingPage = loadAsync(() => import(/* webpackChunkName: "LoadingPage" */
 const LoggersPage = loadAsync(() => import('./LoggersPage'));
 const LoginPage = loadAsync(() => import(/* webpackChunkName: "LoginPage" */ 'pages/LoginPage'));
 const LUTCachesPage = loadAsync(() => import('./LUTCachesPage'));
+const LUTCachesFormPage = loadAsync(() => import('./LUTCachesFormPage'));
 const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
+const LUTDataAdaptersFormPage = loadAsync(() => import('./LUTDataAdaptersFormPage'));
 const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
+const LUTFormPage = loadAsync(() => import('./LUTFormPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
@@ -168,8 +171,11 @@ export {
   LoggersPage,
   LoginPage,
   LUTCachesPage,
+  LUTCachesFormPage,
   LUTDataAdaptersPage,
+  LUTDataAdaptersFormPage,
   LUTTablesPage,
+  LUTFormPage,
   NodeInputsPage,
   NotFoundPage,
   PipelineDetailsPage,

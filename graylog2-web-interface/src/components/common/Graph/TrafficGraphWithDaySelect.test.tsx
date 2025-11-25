@@ -14,32 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import mockComponent from 'helpers/mocking/MockComponent';
+import TrafficGraphWithDaySelect from './TrafficGraphWithDaySelect';
 
-import DataAdapterCreate from './DataAdapterCreate';
+describe('TrafficGraphWithDaySelect', () => {
+  it('does not throw error when `traffic` is `undefined`', async () => {
+    render(<TrafficGraphWithDaySelect traffic={{}} />);
 
-jest.mock('components/lookup-tables', () => ({
-  DataAdapterForm: mockComponent('DataAdapterFormMock'),
-}));
-
-jest.mock('graylog-web-plugin/plugin', () => ({
-  PluginStore: {
-    exports: () => [
-      {
-        type: 'someType',
-        displayName: 'Some Mocked Data Adapter Type',
-      },
-    ],
-  },
-}));
-
-describe('<DataAdapterCreate />', () => {
-  it('should render with empty parameters', async () => {
-    const callback = () => {};
-    render(<DataAdapterCreate saved={callback} onCancel={() => {}} />);
-    await screen.findByText(/select data adapter type/i);
+    await screen.findByText('Outgoing traffic');
   });
 });
