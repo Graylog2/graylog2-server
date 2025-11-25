@@ -17,7 +17,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
-import { Button, Col as BSCol } from 'components/bootstrap';
+import { Col as BSCol } from 'components/bootstrap';
 import { Icon } from 'components/common';
 import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
 import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
@@ -26,6 +26,7 @@ import Cache from 'components/lookup-tables/Cache';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
 import type { LookupTable, LookupTableAdapter, LookupTableCache } from 'logic/lookup-tables/types';
 
+import LookupTableDetails from './lookup-table-details';
 import PurgeCache from './purge-cache';
 import TestLookup from './test-lookup';
 
@@ -54,17 +55,15 @@ type Props = {
   dataAdapter: LookupTableAdapter;
 };
 
-function LookupTableDetails({ table, cache, dataAdapter }: Props) {
+function LookupTableView({ table, cache, dataAdapter }: Props) {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
   const { double, setDouble } = useModalContext();
   const [showAttached, setShowAttached] = React.useState<string>();
-  const { setModal, setTitle, setEntity } = useModalContext();
 
-  const handleEdit = () => {
-    setModal('LUT-EDIT');
-    setTitle(table.name);
-    setEntity(table);
-  };
+  const canEdit = React.useMemo(
+    () => !loadingScopePermissions && scopePermissions.is_mutable,
+    [loadingScopePermissions, scopePermissions],
+  );
 
   const handleShowAttached = (type: string) => () => {
     setDouble(showAttached === type ? !double : true);
@@ -76,45 +75,7 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
   return (
     <Row $align="stretch" $gap="lg">
       <Col $gap="lg" $width={double ? '50%' : '100%'} style={{ flexShrink: 0 }}>
-        <Col $gap="xs">
-          <Row $align="flex-end" $justify="space-between">
-            <h2>Description</h2>
-            {!loadingScopePermissions && scopePermissions?.is_mutable && (
-              <Button bsStyle="primary" bsSize="sm" onClick={handleEdit} name="edit_square">
-                Edit
-              </Button>
-            )}
-          </Row>
-          <Description>{table.description}</Description>
-        </Col>
-        {(table.default_single_value || table.default_multi_value) && (
-          <DataWell style={{ overflow: 'auto' }}>
-            <Col $gap="xs">
-              {table.default_single_value && (
-                <Row>
-                  <span style={{ width: 208 }}>Default single value</span>
-                  <Row $gap="md">
-                    <code>{table.default_single_value}</code>
-                    <span>
-                      <Description>({table.default_single_value_type.toLowerCase()})</Description>
-                    </span>
-                  </Row>
-                </Row>
-              )}
-              {table.default_multi_value && (
-                <Row>
-                  <span style={{ width: 208 }}>Default multi value</span>
-                  <Row $gap="md">
-                    <code>{table.default_multi_value}</code>
-                    <span>
-                      <Description>({table.default_multi_value_type.toLowerCase()})</Description>
-                    </span>
-                  </Row>
-                </Row>
-              )}
-            </Col>
-          </DataWell>
-        )}
+        <LookupTableDetails table={table} canEdit={canEdit} />
         <Col $gap="xs">
           <h2>Attached</h2>
           <DataWell style={{ overflow: 'auto' }}>
@@ -178,4 +139,4 @@ function LookupTableDetails({ table, cache, dataAdapter }: Props) {
   );
 }
 
-export default LookupTableDetails;
+export default LookupTableView;

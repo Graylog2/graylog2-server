@@ -47,19 +47,21 @@ export type ColumnRenderers<Entity extends EntityBase, Meta = unknown> = {
   types?: { [type: string]: ColumnRenderer<Entity, Meta> };
 };
 
+export type ColumnPreferences = {
+  [attributeId: string]: {
+    status: 'show' | 'hide';
+  };
+};
+
 export type TableLayoutPreferences<T = { [key: string]: unknown }> = {
-  displayedAttributes?: Array<string>;
+  attributes?: ColumnPreferences;
   sort?: Sort;
   perPage?: number;
   customPreferences?: T;
 };
 
 export type TableLayoutPreferencesJSON<T = { [key: string]: unknown }> = {
-  attributes?: {
-    [attributeId: string]: {
-      status: 'show' | 'hide';
-    };
-  };
+  attributes?: ColumnPreferences;
   sort?: {
     field: string;
     order: 'asc' | 'desc';

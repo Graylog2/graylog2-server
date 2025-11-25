@@ -22,12 +22,13 @@ import jakarta.ws.rs.InternalServerErrorException;
 import jakarta.ws.rs.container.ContainerRequestContext;
 import jakarta.ws.rs.container.ResourceInfo;
 import org.graylog2.storage.providers.ElasticsearchVersionProvider;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.lang.reflect.Method;
 
@@ -38,9 +39,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class SupportedSearchVersionFilterTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private ResourceInfo resourceInfo;
@@ -54,7 +55,7 @@ public class SupportedSearchVersionFilterTest {
     private final SearchVersion elasticSearchV7 = SearchVersion.create(SearchVersion.Distribution.ELASTICSEARCH, Version.of(7, 0));
     private SupportedSearchVersionFilter filter;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         filter = new SupportedSearchVersionFilter(resourceInfo, versionProvider);
     }
@@ -101,9 +102,8 @@ public class SupportedSearchVersionFilterTest {
         when(resourceInfo.getResourceMethod()).thenReturn(resourceMethod);
         when(versionProvider.get()).thenReturn(elasticSearchV6);
 
-        Exception exception = assertThrows(InternalServerErrorException.class, () -> {
-            filter.filter(requestContext);
-        });
+        Exception exception = assertThrows(InternalServerErrorException.class, () ->
+            filter.filter(requestContext));
 
         assertTrue(exception.getMessage().contains("OpenSearch"));
         verify(versionProvider, times(1)).get();
@@ -116,9 +116,8 @@ public class SupportedSearchVersionFilterTest {
         when(resourceInfo.getResourceMethod()).thenReturn(resourceMethod);
         when(versionProvider.get()).thenReturn(elasticSearchV6);
 
-        Exception exception = assertThrows(InternalServerErrorException.class, () -> {
-            filter.filter(requestContext);
-        });
+        Exception exception = assertThrows(InternalServerErrorException.class, () ->
+            filter.filter(requestContext));
 
         assertTrue(exception.getMessage().contains("Elasticsearch ^7"));
         verify(versionProvider, times(1)).get();
@@ -142,9 +141,8 @@ public class SupportedSearchVersionFilterTest {
         when(resourceInfo.getResourceMethod()).thenReturn(resourceMethod);
         when(versionProvider.get()).thenReturn(elasticSearchV7);
 
-        Exception exception = assertThrows(InternalServerErrorException.class, () -> {
-            filter.filter(requestContext);
-        });
+        Exception exception = assertThrows(InternalServerErrorException.class, () ->
+            filter.filter(requestContext));
 
         assertTrue(exception.getMessage().contains("Elasticsearch ^6") && exception.getMessage().contains("OpenSearch 1.0"));
         verify(versionProvider, times(1)).get();

@@ -26,6 +26,7 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.Search
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.slice.SliceBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
+import org.graylog.storage.search.SearchCommand;
 import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
