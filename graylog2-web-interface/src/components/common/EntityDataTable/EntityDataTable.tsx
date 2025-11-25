@@ -18,7 +18,7 @@ import * as React from 'react';
 import { useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
-import type { ColumnDef, RowSelectionState } from '@tanstack/react-table';
+import type { ColumnDef, Table as TableType } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 
 import { Table, ButtonGroup } from 'components/bootstrap';
@@ -181,17 +181,22 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   );
 };
 
-const TableComponent = <Entity extends EntityBase>({
-  table,
-  expandedSectionsRenderer = undefined,
-  rowSelection: _rowSelection, // only require for memorization logic
-}: {
-  table: ReturnType<typeof useTable<Entity>>;
+type TableComponentProps<Entity extends EntityBase> = {
+  table: TableType<Entity>;
   expandedSectionsRenderer?: {
     [sectionName: string]: ExpandedSectionRenderer<Entity>;
   };
-  rowSelection: RowSelectionState;
-}) => (
+  rerenderState: {
+    rowSelection: ReturnType<TableType<Entity>['getState']>['rowSelection'];
+    data: TableType<Entity>['options']['data'];
+    columnOrder: ReturnType<TableType<Entity>['getState']>['columnOrder'];
+  };
+};
+
+const TableComponent = <Entity extends EntityBase>({
+  table,
+  expandedSectionsRenderer = undefined,
+}: TableComponentProps<Entity>) => (
   <StyledTable striped condensed hover>
     <TableHead table={table} />
     {table.getRowModel().rows.map((row) => (
@@ -213,7 +218,7 @@ const TableComponent = <Entity extends EntityBase>({
 
 export const MemoizedTableComp = React.memo(
   TableComponent,
-  (prev, next) => prev.table.options.data === next.table.options.data && prev.rowSelection === next.rowSelection,
+  (prev, next) => prev.rerenderState === next.rerenderState,
 ) as typeof TableComponent;
 
 type Props<Entity extends EntityBase, Meta = unknown> = {
@@ -336,11 +341,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const table = useTable<Entity>({
     columnOrder,
-    columnWidths,
     columnsDefinitions,
     defaultColumnOrder,
     displayBulkSelectCol,
     entities,
+    columnWidths,
     internalColumnWidthPreferences,
     isEntitySelectable,
     layoutPreferences,
@@ -353,6 +358,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     setSelectedEntities,
     sort: activeSort,
   });
+
+  const { rowSelection, columnOrder: currentColumnOrder } = table.getState();
+  const tableRenderState = useMemo(
+    () => ({ rowSelection, data: table.options.data, columnOrder: currentColumnOrder }),
+    [rowSelection, table.options.data, currentColumnOrder],
+  );
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
@@ -375,7 +386,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               <MemoizedTableComp
                 table={table}
                 expandedSectionsRenderer={expandedSectionsRenderer}
-                rowSelection={table.getState().rowSelection}
+                rerenderState={tableRenderState}
               />
             </ScrollContainer>
           </TableDndProvider>
