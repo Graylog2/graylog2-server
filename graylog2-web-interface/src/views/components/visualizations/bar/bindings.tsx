@@ -31,7 +31,7 @@ import {
   axisTypes,
   DEFAULT_AXIS_TYPE,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import xyAxisConfigFields from 'views/components/visualizations/xyAxisConfigFields';
+import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
 
 export type BarVisualizationConfigFormValues = XYVisualizationConfigFormValues & {
   barmode: 'group' | 'stack' | 'relative' | 'overlay';
@@ -53,11 +53,14 @@ const barChart: VisualizationType<
     fromConfig: (config: BarVisualizationConfig | undefined) => ({
       barmode: config?.barmode ?? DEFAULT_BARMODE,
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
-      showAxisLabels: Object.values(config.axisConfig).some(({ title }) => !!title),
-      axisConfig: config.axisConfig,
+      ...fromAxisConfig(config),
     }),
     toConfig: (formValues: BarVisualizationConfigFormValues) =>
-      BarVisualizationConfig.create(formValues.barmode, formValues.axisType, formValues.axisConfig),
+      BarVisualizationConfig.create(
+        formValues.barmode,
+        formValues.axisType,
+        formValues.showAxisLabels ? formValues.axisConfig : DEFAULT_AXIS_CONFIG,
+      ),
     fields: [
       {
         name: 'barmode',

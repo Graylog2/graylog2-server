@@ -16,7 +16,10 @@
  */
 import capitalize from 'lodash/capitalize';
 
-import type { XYVisualizationConfigFormValues } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type {
+  XYVisualizationConfigFormValues,
+  XYVisualization,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import type { ConfigurationField, FieldUnitType } from 'views/types';
 import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
@@ -55,6 +58,12 @@ const getUnitTypeFields = (): Array<ConfigurationField> =>
     inputHelp: (_: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
       getAxisMetrics(unitType, widgetConfigFormValues).join(', '),
   }));
+
+export const fromAxisConfig = (config: XYVisualization) => ({
+  showAxisLabels: Object.values(config?.axisConfig ?? {}).some(({ title }) => !!title),
+  axisConfig: config?.axisConfig,
+});
+
 const xyAxisConfigFields: Array<ConfigurationField> = [
   {
     name: 'showAxisLabels',

@@ -16,7 +16,7 @@
  */
 
 export const DECIMAL_PLACES = 1;
-export const DEFAULT_AXIS_KEY = 'withoutUnit';
+export const DEFAULT_AXIS_KEY = 'number';
 export const TIME_AXIS_LABELS_QUANTITY = 4;
 export const NO_FIELD_NAME_SERIES = 'no_field_name_series';
 

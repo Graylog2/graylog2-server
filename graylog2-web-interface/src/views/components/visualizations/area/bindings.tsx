@@ -26,12 +26,13 @@ import {
   axisTypes,
   DEFAULT_AXIS_TYPE,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
-import xyAxisConfigFields from 'views/components/visualizations/xyAxisConfigFields';
+import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
 
 type AreaVisualizationConfigFormValues = {
   interpolation: InterpolationType;
   axisType: AxisType;
   axisConfig: ChartAxisConfig;
+  showAxisLabels: boolean;
 };
 
 const validate = hasAtLeastOneMetric('Area chart');
@@ -53,11 +54,14 @@ const areaChart: VisualizationType<
     fromConfig: (config: AreaVisualizationConfig) => ({
       interpolation: config?.interpolation,
       axisType: config?.axisType,
-      showAxisLabels: Object.values(config.axisConfig).some(({ title }) => !!title),
-      axisConfig: config.axisConfig,
+      ...fromAxisConfig(config),
     }),
     toConfig: (formValues: AreaVisualizationConfigFormValues) =>
-      AreaVisualizationConfig.create(formValues.interpolation, formValues.axisType, formValues.axisConfig),
+      AreaVisualizationConfig.create(
+        formValues.interpolation,
+        formValues.axisType,
+        formValues.showAxisLabels ? formValues.axisConfig : DEFAULT_AXIS_CONFIG,
+      ),
     fields: [
       {
         name: 'interpolation',
@@ -72,11 +76,6 @@ const areaChart: VisualizationType<
         type: 'select',
         options: axisTypes,
         required: true,
-      },
-      {
-        name: 'showAxisConfig',
-        title: 'Show axis labels',
-        type: 'boolean',
       },
       ...xyAxisConfigFields,
     ],

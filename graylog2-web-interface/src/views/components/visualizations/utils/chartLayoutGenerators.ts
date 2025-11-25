@@ -281,7 +281,9 @@ export const generateLayouts = ({
     Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
       const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
       const visualizationAxisTitle =
-        'axisConfig' in config.visualizationConfig ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.title : null;
+        config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
+          ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.title
+          : null;
 
       return [
         axisKeyName,

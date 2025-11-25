@@ -74,8 +74,8 @@ const useChartLayoutSettingsWithCustomUnits = ({
     });
 
     const visualizationConfigTitle =
-      'axisConfig' in config.visualizationConfig
-        ? (config?.visualizationConfig?.axisConfig as ChartAxisConfig).xaxis?.title
+      config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
+        ? (config?.visualizationConfig?.axisConfig as ChartAxisConfig)?.xaxis?.title
         : undefined;
     const _layouts: Partial<Layout> = {
       ...generatedLayouts,

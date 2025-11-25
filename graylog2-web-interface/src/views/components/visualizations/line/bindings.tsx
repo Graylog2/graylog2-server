@@ -26,12 +26,13 @@ import {
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type { InterpolationType } from 'views/Constants';
 import { DEFAULT_INTERPOLATION, interpolationTypes } from 'views/Constants';
-import xyAxisConfigFields from 'views/components/visualizations/xyAxisConfigFields';
+import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
 
 type LineVisualizationConfigFormValues = {
   interpolation: InterpolationType;
   axisType: AxisType;
   axisConfig: ChartAxisConfig;
+  showAxisLabels: boolean;
 };
 
 const validate = hasAtLeastOneMetric('Line chart');
@@ -53,11 +54,14 @@ const lineChart: VisualizationType<
     fromConfig: (config: LineVisualizationConfig | undefined) => ({
       interpolation: config?.interpolation ?? DEFAULT_INTERPOLATION,
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
-      showAxisLabels: Object.values(config.axisConfig).some(({ title }) => !!title),
-      axisConfig: config.axisConfig,
+      ...fromAxisConfig(config),
     }),
     toConfig: (formValues: LineVisualizationConfigFormValues) =>
-      LineVisualizationConfig.create(formValues.interpolation, formValues.axisType, formValues.axisConfig),
+      LineVisualizationConfig.create(
+        formValues.interpolation,
+        formValues.axisType,
+        formValues.showAxisLabels ? formValues.axisConfig : DEFAULT_AXIS_CONFIG,
+      ),
     fields: [
       {
         name: 'interpolation',

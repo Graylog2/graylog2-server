@@ -24,11 +24,12 @@ import {
   axisTypes,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import ScatterVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/ScatterVisualizationConfig';
-import xyAxisConfigFields from 'views/components/visualizations/xyAxisConfigFields';
+import xyAxisConfigFields, { fromAxisConfig } from 'views/components/visualizations/xyAxisConfigFields';
 
 type ScatterVisualizationConfigFormValues = {
   axisType: AxisType;
   axisConfig: ChartAxisConfig;
+  showAxisLabels: boolean;
 };
 
 const validate = hasAtLeastOneMetric('Scatter plot');
@@ -45,10 +46,13 @@ const scatterChart: VisualizationType<
     createConfig: () => ({ axisType: DEFAULT_AXIS_TYPE, axisConfig: DEFAULT_AXIS_CONFIG }),
     fromConfig: (config) => ({
       axisType: config?.axisType ?? DEFAULT_AXIS_TYPE,
-      showAxisLabels: Object.values(config.axisConfig).some(({ title }) => !!title),
-      axisConfig: config.axisConfig,
+      ...fromAxisConfig(config),
     }),
-    toConfig: (formValues) => ScatterVisualizationConfig.create(formValues.axisType, formValues.axisConfig),
+    toConfig: (formValues) =>
+      ScatterVisualizationConfig.create(
+        formValues.axisType,
+        formValues.showAxisLabels ? formValues.axisConfig : DEFAULT_AXIS_CONFIG,
+      ),
     fields: [
       {
         name: 'axisType',
