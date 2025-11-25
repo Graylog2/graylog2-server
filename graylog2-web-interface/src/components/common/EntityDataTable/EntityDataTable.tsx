@@ -261,7 +261,13 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
     order?: Array<string>;
   };
   /** Function to handle changes of column visibility, width and order */
-  onLayoutPreferencesChange: ({ attributes, order }: { attributes?: ColumnPreferences; order?: Array<string> }) => void;
+  onLayoutPreferencesChange: ({
+    attributes,
+    order,
+  }: {
+    attributes?: ColumnPreferences;
+    order?: Array<string>;
+  }) => Promise<void>;
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */
@@ -377,7 +383,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 {displayPageSizeSelect && (
                   <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
                 )}
-                <ColumnsVisibilitySelect<Entity> table={table} />
+                <ColumnsVisibilitySelect<Entity>
+                  table={table}
+                  onLayoutPreferencesChange={onLayoutPreferencesChange}
+                  defaultColumnOrder={defaultColumnOrder}
+                  setInternalAttributeColumnOrder={setInternalAttributeColumnOrder}
+                  setInternalColumnWidthPreferences={setInternalColumnWidthPreferences}
+                />
               </ButtonGroup>
             </LayoutConfigRow>
           </ActionsRow>

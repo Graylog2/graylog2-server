@@ -19,9 +19,10 @@ import * as React from 'react';
 import type { Column, Table } from '@tanstack/react-table';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Checkbox, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Checkbox, DropdownButton, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
+import type { EntityBase, ColumnMetaContext, ColumnPreferences } from 'components/common/EntityDataTable/types';
+import { Icon } from 'components/common';
 
 const StyledDropdownButton = styled(DropdownButton)`
   ~ .dropdown-menu {
@@ -74,25 +75,55 @@ const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<
 };
 
 type Props<Entity> = {
+  defaultColumnOrder: Array<string>;
+  onLayoutPreferencesChange: ({
+    attributes,
+    order,
+  }: {
+    attributes?: ColumnPreferences;
+    order?: Array<string>;
+  }) => Promise<void>;
+  setInternalAttributeColumnOrder: (columnOrder: Array<string>) => void;
+  setInternalColumnWidthPreferences: (columnWidths: { [attributeId: string]: number }) => void;
   table: Table<Entity>;
 };
 
-const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table }: Props<Entity>) => (
-  <StyledDropdownButton
-    title="Columns"
-    bsSize="small"
-    pullRight
-    aria-label="Configure visible columns"
-    id="columns-visibility-select"
-    bsStyle="default"
-    closeOnItemClick={false}>
-    {table
-      .getAllLeafColumns()
-      .filter((column) => column.getCanHide())
-      .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
-      .map((column) => (
-        <ColumnListItem<Entity> column={column} key={column.id} />
-      ))}
-  </StyledDropdownButton>
-);
+const ColumnsVisibilitySelect = <Entity extends EntityBase>({
+  defaultColumnOrder,
+  onLayoutPreferencesChange,
+  setInternalAttributeColumnOrder,
+  setInternalColumnWidthPreferences,
+  table,
+}: Props<Entity>) => {
+  const resetLayoutPreferences = () => {
+    onLayoutPreferencesChange({ attributes: null, order: null }).then(() => {
+      setInternalAttributeColumnOrder(defaultColumnOrder);
+      setInternalColumnWidthPreferences({});
+    });
+  };
+
+  return (
+    <StyledDropdownButton
+      title="Columns"
+      bsSize="small"
+      pullRight
+      aria-label="Configure visible columns"
+      id="columns-visibility-select"
+      bsStyle="default"
+      closeOnItemClick={false}>
+      {table
+        .getAllLeafColumns()
+        .filter((column) => column.getCanHide())
+        .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
+        .map((column) => (
+          <ColumnListItem<Entity> column={column} key={column.id} />
+        ))}
+      <MenuItem divider />
+      <DeleteMenuItem onSelect={resetLayoutPreferences}>
+        <Icon name="reopen_window" /> Reset all columns
+      </DeleteMenuItem>
+    </StyledDropdownButton>
+  );
+};
+
 export default ColumnsVisibilitySelect;

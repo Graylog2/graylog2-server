@@ -84,17 +84,25 @@ const useTableEventHandlers = ({
         });
       }
 
+      if (layoutPreferences.attributes === null && layoutPreferences.order === null) {
+        sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
+          app_pathname: getPathnameWithoutId(pathname),
+          app_section: appSection,
+          app_action_value: 'columns-select',
+        });
+      }
+
       const newLayoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> } = {};
 
-      if (layoutPreferences.order) {
+      if ('order' in layoutPreferences) {
         newLayoutPreferences.order = layoutPreferences.order;
       }
 
-      if (layoutPreferences.attributes) {
+      if ('attributes' in layoutPreferences) {
         newLayoutPreferences.attributes = layoutPreferences.attributes;
       }
 
-      updateTableLayout(newLayoutPreferences);
+      return updateTableLayout(newLayoutPreferences);
     },
     [appSection, pathname, sendTelemetry, updateTableLayout],
   );

@@ -73,7 +73,7 @@ describe('<EntityDataTable />', () => {
     defaultColumnOrder: defaultDisplayedColumns,
     layoutPreferences: { attributes: columnPreferences },
     entities: data,
-    onLayoutPreferencesChange: () => {},
+    onLayoutPreferencesChange: () => Promise.resolve(),
     onSortChange: () => {},
     entityAttributesAreCamelCase: true,
     columnSchemas,
@@ -268,6 +268,34 @@ describe('<EntityDataTable />', () => {
         title: { status: 'hide' },
       },
     });
+  });
+
+  it('should reset layout preferences via reset all columns action', async () => {
+    const onLayoutPreferencesChange = jest.fn().mockResolvedValue(undefined);
+
+    const initialLayoutPreferences = {
+      attributes: {
+        title: { status: ATTRIBUTE_STATUS.hide },
+        description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
+      },
+      order: ['status', 'description', 'title'],
+    };
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        defaultDisplayedColumns={['title', 'description', 'status']}
+        defaultColumnOrder={['title', 'description', 'status']}
+        layoutPreferences={initialLayoutPreferences}
+        onLayoutPreferencesChange={onLayoutPreferencesChange}
+      />,
+    );
+
+    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /reset all columns/i }));
+
+    await waitFor(() => expect(onLayoutPreferencesChange).toHaveBeenCalledWith({ attributes: null, order: null }));
   });
 
   it('should hande entities with camel case attributes', async () => {
