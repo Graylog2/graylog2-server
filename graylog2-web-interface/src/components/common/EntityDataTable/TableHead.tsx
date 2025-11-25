@@ -23,6 +23,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import DragHandle from 'components/common/SortableList/DragHandle';
+import { columnTransformVar, columnOpacityVar, columnWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
 import SortIcon from './SortIcon';
 import DndStylesContext from './contexts/DndStylesContext';
@@ -37,10 +38,10 @@ const Thead = styled.thead(
 
 export const Th = styled.th<{ $colId: string }>(
   ({ $colId, theme }) => css`
-    width: var(--col-${$colId}-size);
+    width: var(${columnWidthVar($colId)});
+    opacity: var(${columnOpacityVar($colId)}, 1);
+    transform: var(${columnTransformVar($colId)}, 'none');
     background-color: ${theme.colors.table.head.background};
-    opacity: var(--col-${$colId}-opacity, 1);
-    transform: var(--col-${$colId}-transform, 'none');
   `,
 );
 

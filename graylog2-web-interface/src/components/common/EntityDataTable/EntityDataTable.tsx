@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
@@ -39,6 +39,7 @@ import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hoo
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
+import { columnTransformVar, columnWidthVar, columnOpacityVar } from 'components/common/EntityDataTable/CSSVariables';
 
 import type {
   ColumnRenderers,
@@ -56,20 +57,20 @@ const ScrollContainer = styled.div<{
   $activeColId: string | null;
   $columnTransform: { [_attributeId: string]: string };
 }>(
-  ({ $columnWidths, $activeColId, $columnTransform }) => `
-  width: 100%;
-  overflow-x: auto;
+  ({ $columnWidths, $activeColId, $columnTransform }) => css`
+    width: 100%;
+    overflow-x: auto;
 
-  ${Object.entries($columnWidths)
-    .map(([id, width]) => `--col-${id}-size: ${width}px;`)
-    .join('\n')}
+    ${Object.entries($columnWidths)
+      .map(([id, width]) => `${columnWidthVar(id)}: ${width}px;`)
+      .join('\n')}
 
-  ${$activeColId ? `--col-${$activeColId}-opacity: 0.4;` : ''}
+    ${$activeColId ? `${columnOpacityVar($activeColId)}: 0.4;` : ''}
 
   ${Object.entries($columnTransform)
-    .map(([id, transform]) => `--col-${id}-transform: ${transform};`)
-    .join('\n')}
-`,
+      .map(([id, transform]) => `${columnTransformVar(id)}: ${transform};`)
+      .join('\n')}
+  `,
 );
 
 const ActionsRow = styled.div`
