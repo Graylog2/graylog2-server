@@ -17,6 +17,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
 import { ClusterInputState } from '@graylog/server-api';
+
 import { defaultOnError } from 'util/conditional/onError';
 import type { InputSummary } from 'hooks/usePaginatedInputs';
 

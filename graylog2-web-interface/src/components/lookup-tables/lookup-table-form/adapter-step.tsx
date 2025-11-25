@@ -1,0 +1,95 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import * as React from 'react';
+import { useFormikContext } from 'formik';
+
+import { Spinner } from 'components/common';
+import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
+import useScopePermissions from 'hooks/useScopePermissions';
+import usePluginEntities from 'hooks/usePluginEntities';
+import { useFetchDataAdapter, useFetchAllDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
+import DataAdapter from 'components/lookup-tables/DataAdapter';
+import DataAdapterPicker from 'components/lookup-tables/adapter-form/AdapterPicker';
+import DataAdapterFormView from 'components/lookup-tables/adapter-form/AdapterFormView';
+import type { LookupTable, LookupTableAdapter } from 'logic/lookup-tables/types';
+
+function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
+  const plugins = usePluginEntities('lookupTableAdapters');
+  const adapterPlugin = React.useMemo(
+    () => plugins.find((p: any) => p.type === dataAdapter?.config?.type),
+    [dataAdapter?.config?.type, plugins],
+  );
+  const DocComponent = React.useMemo(() => adapterPlugin.documentationComponent, [adapterPlugin]);
+
+  return (
+    <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">
+      <DataAdapter dataAdapter={dataAdapter} noEdit />
+      {DocComponent && <DocComponent dataAdapterId={dataAdapter?.id} />}
+    </RowContainer>
+  );
+}
+
+function DataAdapterFormStep() {
+  const { values, setFieldValue } = useFormikContext<LookupTable>();
+  const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
+  const { allDataAdapters, loadingAllDataAdapters } = useFetchAllDataAdapters();
+  const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(values.data_adapter_id);
+  const [showForm, setShowForm] = React.useState<boolean>(false);
+  const showAdapter = React.useMemo(() => values.data_adapter_id, [values.data_adapter_id]);
+
+  const canModify = React.useMemo(
+    () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
+    [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
+  );
+
+  const onSaved = (newDataAdapter: LookupTableAdapter) => {
+    setFieldValue('data_adapter_id', newDataAdapter.id);
+    setShowForm(false);
+  };
+
+  const onCancel = () => {
+    setFieldValue('data_adapter_id', '');
+    setShowForm(false);
+  };
+
+  const onCreateClick = () => {
+    onCancel();
+    setTimeout(() => setShowForm(true), 100);
+  };
+
+  return (
+    <ColContainer $gap="lg" $align="center">
+      {loadingAllDataAdapters ? (
+        <RowContainer>
+          <Spinner text="Loading data adapters..." />
+        </RowContainer>
+      ) : (
+        <>
+          {canModify && !showForm && (
+            <RowContainer>
+              <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
+            </RowContainer>
+          )}
+          {showAdapter && !loadingDataAdapter && <AdapterReadOnly dataAdapter={dataAdapter} />}
+          {showForm && !showAdapter && <DataAdapterFormView onCancel={onCancel} saved={onSaved} isStep />}
+        </>
+      )}
+    </ColContainer>
+  );
+}
+
+export default DataAdapterFormStep;
