@@ -75,55 +75,31 @@ const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<
 };
 
 type Props<Entity> = {
-  defaultColumnOrder: Array<string>;
-  onLayoutPreferencesChange: ({
-    attributes,
-    order,
-  }: {
-    attributes?: ColumnPreferences;
-    order?: Array<string>;
-  }) => Promise<void>;
-  setInternalAttributeColumnOrder: (columnOrder: Array<string>) => void;
-  setInternalColumnWidthPreferences: (columnWidths: { [attributeId: string]: number }) => void;
+  onResetLayoutPreferences: () => void;
   table: Table<Entity>;
 };
 
-const ColumnsVisibilitySelect = <Entity extends EntityBase>({
-  defaultColumnOrder,
-  onLayoutPreferencesChange,
-  setInternalAttributeColumnOrder,
-  setInternalColumnWidthPreferences,
-  table,
-}: Props<Entity>) => {
-  const resetLayoutPreferences = () => {
-    onLayoutPreferencesChange({ attributes: null, order: null }).then(() => {
-      setInternalAttributeColumnOrder(defaultColumnOrder);
-      setInternalColumnWidthPreferences({});
-    });
-  };
-
-  return (
-    <StyledDropdownButton
-      title="Columns"
-      bsSize="small"
-      pullRight
-      aria-label="Configure visible columns"
-      id="columns-visibility-select"
-      bsStyle="default"
-      closeOnItemClick={false}>
-      {table
-        .getAllLeafColumns()
-        .filter((column) => column.getCanHide())
-        .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
-        .map((column) => (
-          <ColumnListItem<Entity> column={column} key={column.id} />
-        ))}
-      <MenuItem divider />
-      <DeleteMenuItem onSelect={resetLayoutPreferences}>
-        <Icon name="reopen_window" /> Reset all columns
-      </DeleteMenuItem>
-    </StyledDropdownButton>
-  );
-};
+const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayoutPreferences }: Props<Entity>) => (
+  <StyledDropdownButton
+    title="Columns"
+    bsSize="small"
+    pullRight
+    aria-label="Configure visible columns"
+    id="columns-visibility-select"
+    bsStyle="default"
+    closeOnItemClick={false}>
+    {table
+      .getAllLeafColumns()
+      .filter((column) => column.getCanHide())
+      .sort((col1, col2) => defaultCompare(colLabel<Entity>(col1), colLabel<Entity>(col2)))
+      .map((column) => (
+        <ColumnListItem<Entity> column={column} key={column.id} />
+      ))}
+    <MenuItem divider />
+    <DeleteMenuItem onSelect={onResetLayoutPreferences}>
+      <Icon name="reopen_window" /> Reset all columns
+    </DeleteMenuItem>
+  </StyledDropdownButton>
+);
 
 export default ColumnsVisibilitySelect;

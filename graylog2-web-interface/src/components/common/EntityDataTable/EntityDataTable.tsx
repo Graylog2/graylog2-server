@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -312,6 +312,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
 
+  const resetLayoutPreferences = useCallback(() => {
+    onLayoutPreferencesChange({ attributes: null, order: null }).then(() => {
+      setInternalAttributeColumnOrder(defaultColumnOrder);
+      setInternalColumnWidthPreferences({});
+    });
+  }, [defaultColumnOrder, onLayoutPreferencesChange]);
+
   return (
     <MetaDataProvider<Meta> meta={meta}>
       <SelectedEntitiesProvider<Entity> table={table} selectedEntities={selectedEntities}>
@@ -326,6 +333,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 )}
                 <ColumnsVisibilitySelect<Entity>
                   table={table}
+                  onResetLayoutPreferences={resetLayoutPreferences}
                   onLayoutPreferencesChange={onLayoutPreferencesChange}
                   defaultColumnOrder={defaultColumnOrder}
                   setInternalAttributeColumnOrder={setInternalAttributeColumnOrder}
