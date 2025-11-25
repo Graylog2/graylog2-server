@@ -31,7 +31,7 @@ const useTableEventHandlers = ({
   setQuery,
   appSection,
 }: {
-  updateTableLayout: (preferences: TableLayoutPreferences) => void;
+  updateTableLayout: (preferences: TableLayoutPreferences) => Promise<void>;
   paginationQueryParameter: PaginationQueryParameterResult;
   setQuery: (query: string) => void;
   appSection: string;

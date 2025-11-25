@@ -37,8 +37,6 @@ const TableCell = <Entity extends EntityBase>({ cell }: { cell: Cell<Entity, unk
   const isDragging = activeColId === cell.column.id;
   const transform = columnTransform[cell.column.id];
 
-  console.log('render cell ', cell.column.id);
-
   return (
     <Td $isDragging={isDragging} $transform={transform}>
       {flexRender(cell.column.columnDef.cell, cell.getContext())}

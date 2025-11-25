@@ -194,14 +194,14 @@ const useTable = <Entity extends EntityBase>({
 
   const onColumnSizingChange = useCallback(
     (updater: Updater<{ [colId: string]: number }>) => {
-      const newAttributeWIdthPreferences =
+      const newAttributeWidthPreferences =
         updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
 
-      setInternalColumnWidthPreferences(newAttributeWIdthPreferences);
+      setInternalColumnWidthPreferences(newAttributeWidthPreferences);
 
       const newAttributePreferences = { ...(layoutPreferences?.attributes || {}) };
 
-      Object.entries(newAttributeWIdthPreferences).forEach(([colId, width]) => {
+      Object.entries(newAttributeWidthPreferences).forEach(([colId, width]) => {
         newAttributePreferences[colId] = {
           ...newAttributePreferences[colId],
           width,

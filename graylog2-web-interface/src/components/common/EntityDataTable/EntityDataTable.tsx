@@ -196,6 +196,7 @@ type TableComponentProps<Entity extends EntityBase> = {
 const TableComponent = <Entity extends EntityBase>({
   table,
   expandedSectionsRenderer = undefined,
+  rerenderState: _rerenderState,
 }: TableComponentProps<Entity>) => (
   <StyledTable striped condensed hover>
     <TableHead table={table} />
