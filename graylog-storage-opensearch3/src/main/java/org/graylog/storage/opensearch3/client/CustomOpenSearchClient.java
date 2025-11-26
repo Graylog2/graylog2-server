@@ -46,6 +46,10 @@ public class CustomOpenSearchClient extends OpenSearchClient {
     public <TDocument> SearchResponse<TDocument> search(SearchRequest request, Class<TDocument> tDocumentClass) throws IOException, OpenSearchException {
         final MsearchResponse<TDocument> multiSearchResponse = super.msearch(req -> req.searches(serializationUtils.toMsearch(request)), tDocumentClass);
         final MultiSearchResponseItem<TDocument> resp = multiSearchResponse.responses().getFirst();
+        if (resp.isFailure()) {
+            throw new OpenSearchException(resp.failure());
+        }
+        // if it's not failure, then it has to be a result, right?
         return resp.result();
     }
 

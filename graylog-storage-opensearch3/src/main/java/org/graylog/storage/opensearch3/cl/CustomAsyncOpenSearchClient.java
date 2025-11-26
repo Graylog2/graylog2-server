@@ -42,6 +42,7 @@ public class CustomAsyncOpenSearchClient extends OpenSearchAsyncClient {
     @Override
     public <TDocument> CompletableFuture<SearchResponse<TDocument>> search(SearchRequest request, Class<TDocument> tDocumentClass) throws IOException, OpenSearchException {
         return super.msearch(msearch -> msearch.searches(serializationUtils.toMsearch(request)), tDocumentClass)
+                // TODO: error handling?
                 .thenApply(result -> result.responses().getFirst().result());
     }
 }
