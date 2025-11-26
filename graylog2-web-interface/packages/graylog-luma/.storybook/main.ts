@@ -1,6 +1,6 @@
 // This file has been automatically migrated to valid ESM format by Storybook.
 /* eslint-disable no-param-reassign */
-import path, { dirname } from 'path';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
 import TsconfigPaths from 'tsconfig-paths-webpack-plugin';
@@ -30,17 +30,6 @@ const config: StorybookConfig = {
         }),
       ];
     }
-
-    // storybookConfig.resolve ??= {};
-    //
-    // storybookConfig.resolve.plugins = storybookConfig.resolve.plugins || [];
-    // storybookConfig.resolve.plugins.push(
-    //   new TsconfigPaths({
-    //     extensions: storybookConfig.resolve.extensions,
-    //     configFile: path.resolve(__dirname, '../../../tsconfig.json'),
-    //   }),
-    // );
-    //
 
     return sbConfig;
   },

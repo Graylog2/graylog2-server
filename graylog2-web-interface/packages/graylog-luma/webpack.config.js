@@ -1,21 +1,24 @@
 import path from 'path';
+
 import mainAppWebpackConfig from '../../webpack.config.js';
 
 export default async ({ config }) => {
-  // Use the main app's config as a base
-  // eslint-disable-next-line no-param-reassign
-  config = mainAppWebpackConfig;
-
-  // You can still extend or override specific rules for Storybook if needed
-  // Example:
-  // config.module.rules.push({
-  //   test: /\.css$/,
-  //   use: ['style-loader', 'css-loader'],
-  //   include: path.resolve(__dirname, '../'),
-  // });
-  config.resolve.alias = {
-    '@graylog': path.resolve(__dirname, '../../src/'),
+  // Merge the main app's config with Storybook's config
+  const mergedConfig = {
+    ...config,
+    ...mainAppWebpackConfig,
+    resolve: {
+      ...(config.resolve || {}), // Keep existing Storybook resolve settings)
+      ...(mainAppWebpackConfig.resolve || {}), // Merge in main app resolve settings
+      alias: {
+        ...(config.resolve ? config.resolve.alias : {}), // Existing Storybook aliases
+        ...(mainAppWebpackConfig.resolve && mainAppWebpackConfig.resolve.alias
+          ? mainAppWebpackConfig.resolve.alias
+          : {}), // Main app aliases
+        '@graylog': path.resolve(__dirname, '../../src/'),
+      },
+    },
   };
 
-  return config;
+  return mergedConfig;
 };
