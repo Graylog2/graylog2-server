@@ -277,7 +277,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnWidthPreferences: internalColumnWidthPreferences,
   });
 
-  const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
+  const columnDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsRef,
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
@@ -291,11 +291,12 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const table = useTable<Entity>({
     columnOrder,
-    columnsDefinitions,
+    columnRenderersByAttribute,
+    columnWidths,
+    columnDefinitions,
     defaultColumnOrder,
     displayBulkSelectCol,
     entities,
-    columnWidths,
     internalColumnWidthPreferences,
     isEntitySelectable,
     layoutPreferences,

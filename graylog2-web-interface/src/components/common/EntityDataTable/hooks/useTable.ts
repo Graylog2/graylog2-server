@@ -22,8 +22,8 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type { Sort } from 'stores/PaginationTypes';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 
-import type { ColumnPreferences, EntityBase } from '../types';
-import { UTILITY_COLUMNS, ATTRIBUTE_STATUS } from '../Constants';
+import type { ColumnPreferences, EntityBase, ColumnRenderersByAttribute } from '../types';
+import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, DEFAULT_COL_MIN_WIDTH } from '../Constants';
 
 const COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS = 500;
 
@@ -63,7 +63,8 @@ const updateColumnPreferences = (
 
 type Props<Entity extends EntityBase> = {
   columnOrder: Array<string>;
-  columnsDefinitions: Array<ColumnDef<Entity>>;
+  columnDefinitions: Array<ColumnDef<Entity>>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnWidths: { [colId: string]: number };
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
@@ -86,7 +87,8 @@ type Props<Entity extends EntityBase> = {
 
 const useTable = <Entity extends EntityBase>({
   columnOrder,
-  columnsDefinitions,
+  columnDefinitions,
+  columnRenderersByAttribute,
   columnWidths,
   defaultColumnOrder,
   displayBulkSelectCol,
@@ -119,8 +121,8 @@ const useTable = <Entity extends EntityBase>({
   );
 
   const columnVisibility = useMemo(
-    () => Object.fromEntries(columnsDefinitions.map(({ id }) => [id, columnOrder.includes(id)])),
-    [columnsDefinitions, columnOrder],
+    () => Object.fromEntries(columnDefinitions.map(({ id }) => [id, columnOrder.includes(id)])),
+    [columnDefinitions, columnOrder],
   );
 
   const onColumnVisibilityChange = useCallback(
@@ -197,11 +199,18 @@ const useTable = <Entity extends EntityBase>({
       const newAttributeWidthPreferences =
         updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
 
-      setInternalColumnWidthPreferences(newAttributeWidthPreferences);
+      const clampedAttributeWidths = Object.fromEntries(
+        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
+          colId,
+          Math.max(width, columnRenderersByAttribute[colId]?.minWidth ?? DEFAULT_COL_MIN_WIDTH),
+        ]),
+      );
+
+      setInternalColumnWidthPreferences(clampedAttributeWidths);
 
       const newAttributePreferences = { ...(layoutPreferences?.attributes || {}) };
 
-      Object.entries(newAttributeWidthPreferences).forEach(([colId, width]) => {
+      Object.entries(clampedAttributeWidths).forEach(([colId, width]) => {
         newAttributePreferences[colId] = {
           ...newAttributePreferences[colId],
           width,
@@ -220,7 +229,7 @@ const useTable = <Entity extends EntityBase>({
 
   // eslint-disable-next-line react-hooks/incompatible-library
   return useReactTable({
-    columns: columnsDefinitions,
+    columns: columnDefinitions,
     columnResizeMode: 'onChange',
     data,
     enableRowSelection: (row) => displayBulkSelectCol && isEntitySelectable(row.original),
