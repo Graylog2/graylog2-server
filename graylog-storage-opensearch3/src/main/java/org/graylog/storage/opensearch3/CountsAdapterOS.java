@@ -48,6 +48,7 @@ public class CountsAdapterOS implements CountsAdapter {
                     SearchRequest.of(sr -> sr
                             .index(indices)
                             .trackTotalHits(t -> t.enabled(true))
+                            .size(0)
                     ),
                     Void.class);
             return response.hits().total().value();
@@ -66,8 +67,9 @@ public class CountsAdapterOS implements CountsAdapter {
             final SearchResponse<Void> response = client.sync().search(
                     SearchRequest.of(sr -> sr
                             .index(affectedIndices.stream().toList())
-                            .trackTotalHits(t -> t.enabled(true))
                             .query(queryOS)
+                            .trackTotalHits(t -> t.enabled(true))
+                            .size(0)
                     ),
                     Void.class);
             return CountResult.create(response.hits().total().value(), response.took());
