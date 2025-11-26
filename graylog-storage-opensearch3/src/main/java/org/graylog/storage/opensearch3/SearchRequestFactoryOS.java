@@ -39,7 +39,7 @@ public class SearchRequestFactoryOS {
         this.allowLeadingWildcardSearches = allowLeadingWildcardSearches;
     }
 
-    public Query createQueryBuilder(final SearchCommand searchCommand) {
+    public Query createQuery(final SearchCommand searchCommand) {
         final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
         BoolQuery.Builder topQueryBuilder;
         if (QueryStringUtils.isEmptyOrMatchAllQueryString(query)) {

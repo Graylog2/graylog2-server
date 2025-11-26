@@ -17,9 +17,14 @@
 package org.graylog.storage.opensearch3;
 
 import jakarta.inject.Inject;
+import org.graylog.storage.search.SearchCommand;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.results.CountResult;
+import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.opensearch.client.opensearch._types.query_dsl.Query;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.SearchResponse;
 
 import java.io.IOException;
 import java.util.List;
@@ -38,31 +43,43 @@ public class CountsAdapterOS implements CountsAdapter {
     }
 
     @Override
-    public long totalCount(List<String> indices) {
+    public long totalCount(final List<String> indices) {
         try {
-            return client.sync().count(requestBuilder -> requestBuilder.index(indices)).count();
+            final SearchResponse<Void> response = client.sync().search(
+                    SearchRequest.of(sr -> sr
+                            .index(indices)
+                    ),
+                    Void.class);
+            return response.hits().total().value();
         } catch (IOException e) {
             throw new RuntimeException("Fetching message count failed for indices " + indices, e);
         }
-
     }
 
     @Override
-    public CountResult count(Set<String> affectedIndices, String query, TimeRange range, String filter) {
-        return null;//TODO
-//        final SearchesConfig config = SearchesConfig.builder()
-//                .query(query)
-//                .range(range)
-//                .filter(filter)
-//                .limit(0)
-//                .offset(0)
-//                .build();
-//        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
-//        final SearchRequest searchRequest = new SearchRequest(affectedIndices.toArray(new String[0]))
-//                .source(searchSourceBuilder);
-//
-//        final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
-//
-//        return CountResult.create(result.getHits().getTotalHits().value, result.getTook().getMillis());
+    public CountResult count(final Set<String> affectedIndices,
+                             final String query,
+                             final TimeRange range,
+                             final String filter) {
+        try {
+            final SearchesConfig config = SearchesConfig.builder()
+                    .query(query)
+                    .range(range)
+                    .filter(filter)
+                    .limit(0)
+                    .offset(0)
+                    .build();
+            final Query queryOS = searchRequestFactory.createQuery(SearchCommand.from(config));
+            final SearchResponse<Void> response = client.sync().search(
+                    SearchRequest.of(sr -> sr
+                            .index(affectedIndices.stream().toList())
+                            .query(queryOS)
+                    ),
+                    Void.class);
+            return CountResult.create(response.hits().total().value(), response.took());
+        } catch (IOException e) {
+            throw new RuntimeException("Fetching message count failed for indices " + affectedIndices, e);
+        }
+
     }
 }
