@@ -24,7 +24,7 @@ import DndStylesContext from './DndStylesContext';
 const DndStylesProvider = ({ children }: React.PropsWithChildren) => {
   const [columnTransform, setColumnTransform] = useState<{ [colId: string]: string }>({});
   const dndContext = useDndContext();
-  const activeColId = dndContext.active?.id as string;
+  const activeColId = dndContext.active?.id.toString();
 
   const contextValue = useMemo(
     () => ({

@@ -18,7 +18,6 @@ import { useCallback } from 'react';
 
 import type { Sort } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
@@ -41,7 +40,6 @@ const useTableEventHandlers = ({
   const onPageSizeChange = useCallback(
     (newPageSize: number) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.PAGE_SIZE_CHANGED, {
-        app_pathname: getPathnameWithoutId(pathname),
         app_section: appSection,
         app_action_value: 'page-size-select',
         page_size: newPageSize,
@@ -65,7 +63,6 @@ const useTableEventHandlers = ({
     (layoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> }) => {
       if (layoutPreferences.order) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMN_ORDER_CHANGED, {
-          app_pathname: getPathnameWithoutId(pathname),
           app_section: appSection,
           app_action_value: 'column-order-change',
           column_order: layoutPreferences.order,
@@ -74,7 +71,6 @@ const useTableEventHandlers = ({
 
       if (layoutPreferences.attributes) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
-          app_pathname: getPathnameWithoutId(pathname),
           app_section: appSection,
           app_action_value: 'columns-select',
           columns: Object.keys(layoutPreferences.attributes).filter(
@@ -105,7 +101,6 @@ const useTableEventHandlers = ({
   const onSortChange = useCallback(
     (newSort: Sort) => {
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SORT_CHANGED, {
-        app_pathname: getPathnameWithoutId(pathname),
         app_section: appSection,
         app_action_value: 'sort-select',
         sort: newSort,
