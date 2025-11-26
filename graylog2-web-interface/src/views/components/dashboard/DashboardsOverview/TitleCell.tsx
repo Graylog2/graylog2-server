@@ -30,7 +30,7 @@ const missingRequirements = (requires: Requirements, requirementsProvided: Array
 const RequirementsList = ({ requirements }: { requirements: Requirements }) => (
   <div>
     {Object.values(requirements).map(({ url, name }) => (
-      <a href={url} target="_blank" rel="noopener noreferrer">
+      <a key={name} href={url} target="_blank" rel="noopener noreferrer">
         <strong>{name}</strong>
       </a>
     ))}
@@ -57,7 +57,7 @@ const TitleCell = ({ dashboard: { id, requires, title }, requirementsProvided }:
     );
   }
 
-  return <Link to={Routes.pluginRoute('DASHBOARDS_VIEWID')(id)}>{title}</Link>;
+  return <Link to={Routes.DASHBOARD.SHOW(id)}>{title}</Link>;
 };
 
 export default TitleCell;
