@@ -271,11 +271,32 @@ type CreatorTelemetryEvent = {
   section: string;
   actionValue: string;
 };
+
+export interface PermissionEntity {
+  dashboards: true;
+  streams: true;
+  users: true;
+  alerts: true;
+  eventdefinitions: true;
+  inputs: true;
+  eventnotifications: true;
+  pipeline: true;
+  indexsets: true;
+}
+type Entity = keyof PermissionEntity;
+type Verb = 'create' | 'view' | 'edit' | 'delete' | 'manage';
+type Id = string;
+type VerbPermission = `${Entity}:${Verb}`;
+type EntityIDPermission = `${VerbPermission}:${Id}`;
+
+type Permission = VerbPermission | EntityIDPermission;
+type Permissions = Permission | Array<Permission>;
+
 interface EntityCreator {
   id: string;
   title: string;
   path: QualifiedUrl<string>;
-  permissions?: string | Array<string>;
+  permissions?: Permissions;
   telemetryEvent?: CreatorTelemetryEvent;
 }
 
