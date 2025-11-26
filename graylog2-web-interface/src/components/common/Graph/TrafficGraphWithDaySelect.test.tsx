@@ -14,14 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2;
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import org.graylog2.indexer.indices.Template;
+import TrafficGraphWithDaySelect from './TrafficGraphWithDaySelect';
 
-interface IndexTemplateAdapter {
-    boolean ensureIndexTemplate(String templateName, Template template);
+describe('TrafficGraphWithDaySelect', () => {
+  it('does not throw error when `traffic` is `undefined`', async () => {
+    render(<TrafficGraphWithDaySelect traffic={{}} />);
 
-    boolean indexTemplateExists(String templateName);
-
-    boolean deleteIndexTemplate(String templateName);
-}
+    await screen.findByText('Outgoing traffic');
+  });
+});
