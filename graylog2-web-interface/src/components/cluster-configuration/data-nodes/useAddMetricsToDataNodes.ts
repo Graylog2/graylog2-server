@@ -100,12 +100,17 @@ type UseAddMetricsToDataNodesOptions = {
 };
 
 const useAddMetricsToDataNodes = <Node extends Pick<DataNode, 'hostname'>>(
-  nodes: ReadonlyArray<Node>,
+  nodes: ReadonlyArray<Node> | null | undefined,
   { refetchInterval = false, enabled = true }: UseAddMetricsToDataNodesOptions = {},
 ): Array<Node & { metrics: DataNodeMetrics }> => {
-  const hostnames = useMemo(
-    () => Array.from(new Set(nodes.map(({ hostname }) => hostname))).sort(),
+  const safeNodes = useMemo(
+    () => (nodes ?? []).filter((node): node is Node => Boolean(node?.hostname)),
     [nodes],
+  );
+
+  const hostnames = useMemo(
+    () => Array.from(new Set(safeNodes.map(({ hostname }) => hostname))).sort(),
+    [safeNodes],
   );
 
   const { data: metricsByHostname = {} } = useQuery({
@@ -117,11 +122,11 @@ const useAddMetricsToDataNodes = <Node extends Pick<DataNode, 'hostname'>>(
 
   return useMemo(
     () =>
-      nodes.map((node) => ({
+      safeNodes.map((node) => ({
         ...node,
         metrics: metricsByHostname[node.hostname] ?? buildMetricsWithDefaults(),
       })),
-    [metricsByHostname, nodes],
+    [metricsByHostname, safeNodes],
   );
 };
 

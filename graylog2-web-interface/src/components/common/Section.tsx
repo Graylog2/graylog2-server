@@ -117,7 +117,7 @@ const Section = ({
     <Container $opened={opened} $collapsible={collapsible}>
       <Header $opened={opened} $collapsible={collapsible} onClick={onHeaderClick}>
         <FlexWrapper>
-          {collapseButtonPosition !== 'right' && collapseButton}
+          {collapseButtonPosition === 'left' && collapseButton}
           {preHeaderSection && (
             <FlexWrapper
               onClick={(e) => {

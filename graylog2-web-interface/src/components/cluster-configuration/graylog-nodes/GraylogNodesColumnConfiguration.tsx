@@ -16,75 +16,22 @@
  */
 import React from 'react';
 
-import { Link } from 'components/common/router';
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
-import Routes from 'routing/Routes';
-import NumberUtils from 'util/NumberUtils';
 
 import type { GraylogNode } from './useClusterGraylogNodes';
+import BuffersMetricsCell from './cells/BuffersMetricsCell';
+import HostnameCell from './cells/HostnameCell';
+import LifecycleCell from './cells/LifecycleCell';
+import LoadBalancerStatusCell from './cells/LoadBalancerStatusCell';
+import ProcessingStateCell from './cells/ProcessingStateCell';
+import ThroughputMetricsCell from './cells/ThroughputMetricsCell';
 
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
-import { buildRatioIndicator, computeRatio } from '../shared-components/RatioIndicator';
-import { MetricPlaceholder, MetricsColumn, MetricsRow, NodePrimary, SecondaryText, StyledLabel } from '../shared-components/NodeMetricsLayout';
 
 const JOURNAL_WARNING_THRESHOLD = 0.25;
 const JOURNAL_DANGER_THRESHOLD = 0.5;
 const JVM_WARNING_THRESHOLD = 0.7;
 const JVM_DANGER_THRESHOLD = 0.9;
-const BUFFER_WARNING_THRESHOLD = 0.7;
-const BUFFER_DANGER_THRESHOLD = 0.9;
-
-const renderBufferRow = (
-  label: string,
-  usage: number | undefined | null,
-  size: number | undefined | null,
-) => {
-  const ratioIndicator = buildRatioIndicator(
-    computeRatio(usage, size),
-    BUFFER_WARNING_THRESHOLD,
-    BUFFER_DANGER_THRESHOLD,
-  );
-
-  return (
-    <MetricsRow key={label}>
-      <span>{label}</span>
-      {ratioIndicator ?? (
-        <SecondaryText>
-          <span>N/A</span>
-        </SecondaryText>
-      )}
-    </MetricsRow>
-  );
-};
-
-const formatThroughput = (value: number | undefined | null) => {
-  if (value == null) {
-    return '';
-  }
-
-  const formatted = NumberUtils.formatNumber(value);
-
-  return formatted ? `${formatted} msg/s` : '';
-};
-
-const renderThroughputRow = (label: string, formattedValue: string | undefined | null) => (
-  <MetricsRow key={label}>
-    <span>{label}</span>
-    <SecondaryText>
-      <span>{formattedValue || 'N/A'}</span>
-    </SecondaryText>
-  </MetricsRow>
-);
-
-const getNodeDisplayName = (node: GraylogNode) => {
-  const nodeNameParts = [node.short_node_id, node.hostname].filter(Boolean);
-
-  if (nodeNameParts.length) {
-    return nodeNameParts.join(' / ');
-  }
-
-  return node.node_id ?? node.hostname ?? node.id;
-};
 
 export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
@@ -113,82 +60,16 @@ export const createColumnDefinitions = (): Array<ColumnSchema> => [
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
     hostname: {
-      renderCell: (_value, entity) => {
-        const nodeId = entity.node_id;
-        const nodeName = getNodeDisplayName(entity);
-
-        return (
-          <NodePrimary>
-            {nodeId ? <Link to={Routes.SYSTEM.CLUSTER.NODE_SHOW(nodeId)}>{nodeName}</Link> : nodeName}
-            {entity.is_leader && (
-              <SecondaryText>
-                <StyledLabel bsSize="xs">Leader</StyledLabel>
-              </SecondaryText>
-            )}
-          </NodePrimary>
-        );
-      },
+      renderCell: (_value, entity) => <HostnameCell node={entity} />,
     },
     lifecycle: {
-      renderCell: (_value, entity) => {
-        const lifecycleStatus = entity.lifecycle?.toUpperCase();
-
-        if (!lifecycleStatus) {
-          return null;
-        }
-
-        return (
-          <MetricsColumn>
-            <MetricsRow>
-              <StyledLabel
-                bsStyle={lifecycleStatus === 'RUNNING' ? 'success' : 'warning'}
-                bsSize="xs"
-                title={lifecycleStatus}
-                aria-label={lifecycleStatus}>
-                {lifecycleStatus}
-              </StyledLabel>
-            </MetricsRow>
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => <LifecycleCell node={entity} />,
     },
     is_processing: {
-      renderCell: (_value, entity) => {
-        if (entity.is_processing == null) {
-          return null;
-        }
-
-        const status = entity.is_processing ? 'ENABLED' : 'DISABLED';
-
-        return (
-          <MetricsColumn>
-            <MetricsRow>
-              <StyledLabel bsStyle={entity.is_processing ? 'success' : 'warning'} bsSize="xs" aria-label={`Message processing ${status}`}>
-                {status}
-              </StyledLabel>
-            </MetricsRow>
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => <ProcessingStateCell node={entity} />,
     },
     lb_status: {
-      renderCell: (_value, entity) => {
-        const status = entity.lb_status?.toUpperCase();
-
-        if (!status) {
-          return null;
-        }
-
-        return (
-          <MetricsColumn>
-            <MetricsRow>
-              <StyledLabel bsStyle={status === 'ALIVE' ? 'success' : 'warning'} bsSize="xs" aria-label={`Load balancer ${status}`}>
-                {status}
-              </StyledLabel>
-            </MetricsRow>
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => <LoadBalancerStatusCell node={entity} />,
     },
     journal: {
       renderCell: (_value, entity) => (
@@ -222,53 +103,10 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
       ),
     },
     buffers: {
-      renderCell: (_value, entity) => {
-        const rows = [
-          {
-            label: 'Input',
-            usage: entity.metrics?.bufferInputUsage,
-            size: entity.metrics?.bufferInputSize,
-          },
-          {
-            label: 'Process',
-            usage: entity.metrics?.bufferProcessUsage,
-            size: entity.metrics?.bufferProcessSize,
-          },
-          {
-            label: 'Output',
-            usage: entity.metrics?.bufferOutputUsage,
-            size: entity.metrics?.bufferOutputSize,
-          },
-        ];
-
-        const hasBufferMetrics = rows.some(({ usage, size }) => computeRatio(usage, size) != null);
-
-        if (!hasBufferMetrics) {
-          return <MetricPlaceholder />;
-        }
-
-        return (
-          <MetricsColumn>
-            {rows.map(({ label, usage, size }) => renderBufferRow(label, usage, size))}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => <BuffersMetricsCell node={entity} />,
     },
     throughput: {
-      renderCell: (_value, entity) => {
-        const rows = [
-          { label: 'In', value: formatThroughput(entity.metrics?.throughputIn) },
-          { label: 'Out', value: formatThroughput(entity.metrics?.throughputOut) },
-        ];
-
-        const hasThroughput = rows.some(({ value }) => value);
-
-        if (!hasThroughput) {
-          return <MetricPlaceholder />;
-        }
-
-        return <MetricsColumn>{rows.map(({ label, value }) => renderThroughputRow(label, value))}</MetricsColumn>;
-      },
+      renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
     },
   },
 });

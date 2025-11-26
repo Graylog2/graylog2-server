@@ -20,12 +20,13 @@ import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityData
 import { Link } from 'components/common/router';
 import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusCell';
 import type { DataNode } from 'components/datanode/Types';
-import NumberUtils from 'util/NumberUtils';
 import Routes from 'routing/Routes';
 
 import type { ClusterDataNode } from './useClusterDataNodes';
+import CpuMetricsCell from './cells/CpuMetricsCell';
+import IndexingMetricsCell from './cells/IndexingMetricsCell';
 
-import { MetricPlaceholder, MetricsColumn, MetricsRow, RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
+import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 export const DEFAULT_VISIBLE_COLUMNS = [
@@ -69,21 +70,8 @@ const getRoleLabels = (roles: Array<string>) =>
 const getDataNodeRoles = (dataNode: DataNode) =>
   dataNode.opensearch_roles?.map((currentRole) => currentRole.trim()).filter(Boolean) ?? [];
 
-const formatNumberValue = (value: number | undefined | null, suffix = '') =>
-  value == null ? '' : `${NumberUtils.formatNumber(value)}${suffix}`;
-
 const calculateUsedFsBytes = (total: number | undefined | null, available: number | undefined | null) =>
   total != null && available != null ? total - available : undefined;
-
-const formatIndexLatency = (total: number | undefined | null, timeInMillis: number | undefined | null) => {
-  if (total == null || timeInMillis == null || timeInMillis === 0) {
-    return '';
-  }
-
-  const latency = timeInMillis / total;
-
-  return `${NumberUtils.formatNumber(latency)} ms/op`;
-};
 
 export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
   attributes: {
@@ -124,58 +112,15 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
       ),
     },
     cpu: {
-      renderCell: (_value, entity) => {
-        const loadAverage = entity.metrics?.cpuLoadAverage1m;
-        const loadLabel = formatNumberValue(loadAverage);
-
-        if (!loadLabel) {
-          return <MetricPlaceholder />;
-        }
-
-        return (
-          <MetricsColumn>
-            <MetricsRow>
-              <span>Load (1m)</span>
-              <SecondaryText>
-                <span>{loadLabel}</span>
-              </SecondaryText>
-            </MetricsRow>
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => <CpuMetricsCell loadAverage={entity.metrics?.cpuLoadAverage1m} />,
     },
     indexing: {
-      renderCell: (_value, entity) => {
-        const totalIndexed = entity.metrics?.indexTotal;
-        const totalIndexedLabel = formatNumberValue(totalIndexed);
-        const indexingLatencyLabel = formatIndexLatency(entity.metrics?.indexTotal, entity.metrics?.indexTimeInMillis);
-        const hasContent = totalIndexedLabel || indexingLatencyLabel;
-
-        if (!hasContent) {
-          return <MetricPlaceholder />;
-        }
-
-        return (
-          <MetricsColumn>
-            {totalIndexedLabel && (
-              <MetricsRow>
-                <span>Docs</span>
-                <SecondaryText>
-                  <span>{totalIndexedLabel}</span>
-                </SecondaryText>
-              </MetricsRow>
-            )}
-            {indexingLatencyLabel && (
-              <MetricsRow>
-                <span>Latency</span>
-                <SecondaryText>
-                  <span>{indexingLatencyLabel}</span>
-                </SecondaryText>
-              </MetricsRow>
-            )}
-          </MetricsColumn>
-        );
-      },
+      renderCell: (_value, entity) => (
+        <IndexingMetricsCell
+          totalIndexed={entity.metrics?.indexTotal}
+          indexTimeInMillis={entity.metrics?.indexTimeInMillis}
+        />
+      ),
     },
     storage: {
       renderCell: (_value, entity) => (

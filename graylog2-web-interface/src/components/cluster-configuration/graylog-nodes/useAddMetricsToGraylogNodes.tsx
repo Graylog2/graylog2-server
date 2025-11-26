@@ -47,10 +47,17 @@ const EMPTY_METRICS: GraylogNodeMetrics = METRIC_SHORT_NAMES.reduce(
 );
 
 const useAddMetricsToGraylogNodes = <Node extends { node_id: string }>(
-  nodes: ReadonlyArray<Node>,
+  nodes: ReadonlyArray<Node> | null | undefined,
 ): Array<Node & { metrics: GraylogNodeMetrics }> => {
   const { metrics } = useStore(MetricsStore);
-  const nodeIdentifiers = useMemo(() => Array.from(new Set(nodes.map((node) => node.node_id))), [nodes]);
+  const safeNodes = useMemo(
+    () => (nodes ?? []).filter((node): node is Node => Boolean(node?.node_id)),
+    [nodes],
+  );
+  const nodeIdentifiers = useMemo(
+    () => Array.from(new Set(safeNodes.map((node) => node.node_id))),
+    [safeNodes],
+  );
 
   useEffect(() => {
     if (!nodeIdentifiers.length) {
@@ -82,11 +89,11 @@ const useAddMetricsToGraylogNodes = <Node extends { node_id: string }>(
 
   return useMemo(
     () =>
-      nodes.map((node) => ({
+      safeNodes.map((node) => ({
         ...node,
         metrics: metricsByNodeId[node.node_id] ?? {},
       })),
-    [metricsByNodeId, nodes],
+    [metricsByNodeId, safeNodes],
   );
 };
 

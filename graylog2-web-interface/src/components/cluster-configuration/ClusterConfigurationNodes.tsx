@@ -19,6 +19,7 @@ import styled from 'styled-components';
 
 import { Col, Row, SegmentedControl } from 'components/bootstrap';
 import { SearchForm } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 
 import GraylogNodesExpandable from './graylog-nodes/GraylogNodesExpandable';
 import DataNodesExpandable from './data-nodes/DataNodesExpandable';
@@ -40,20 +41,23 @@ const ControlsWrapper = styled.div`
 
 type NodeType = 'all' | 'graylog' | 'data';
 
-const NODE_TYPE_OPTIONS = [
-  { label: 'All Nodes', value: 'all' as NodeType },
-  { label: 'Graylog Nodes', value: 'graylog' as NodeType },
-  { label: 'Data Nodes', value: 'data' as NodeType },
-];
-
 const ALL_NODES_PAGE_SIZE = 10;
 const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
 const ALL_NODES_REFETCH_INTERVAL = 5000;
 const SINGLE_NODE_TYPE_REFETCH_INTERVAL = 10000;
 
 const ClusterConfigurationNodes = () => {
+  const productName = useProductName();
   const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const nodeTypeOptions = useMemo(
+    () => [
+      { label: 'All Nodes', value: 'all' as NodeType },
+      { label: `${productName} Nodes`, value: 'graylog' as NodeType },
+      { label: 'Data Nodes', value: 'data' as NodeType },
+    ],
+    [productName],
+  );
   const normalizedSearch = useMemo(() => searchQuery.trim(), [searchQuery]);
   const handleSearch = useCallback((query: string) => setSearchQuery(query), []);
   const handleResetSearch = useCallback(() => setSearchQuery(''), []);
@@ -79,7 +83,7 @@ const ClusterConfigurationNodes = () => {
           />
           <SegmentedControl<NodeType>
             value={activeNodeType}
-            data={NODE_TYPE_OPTIONS}
+            data={nodeTypeOptions}
             onChange={(value) => setActiveNodeType(value)}
           />
         </ControlsWrapper>
