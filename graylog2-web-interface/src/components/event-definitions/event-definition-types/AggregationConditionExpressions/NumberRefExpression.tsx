@@ -106,7 +106,9 @@ const NumberRefExpression = ({
 
   const handleAggregationFieldChange = useCallback(
     (nextField) => {
-      handleFieldChange('field', nextField);
+      const normalizedField = nextField === '' ? null : nextField;
+
+      handleFieldChange('field', normalizedField);
     },
     [handleFieldChange],
   );

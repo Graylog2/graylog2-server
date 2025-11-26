@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { mount } from 'wrappedEnzyme';
+import * as React from 'react';
 import { act } from 'react';
+import { mount } from 'wrappedEnzyme';
 
 import NumberRefExpression from './NumberRefExpression';
 
@@ -197,5 +197,41 @@ describe('NumberRefExpression', () => {
     });
 
     expect(handleChange.mock.calls.length).toBe(1);
+  });
+
+  it('should send null when aggregation field is cleared', () => {
+    const expression = {
+      expr: 'number-ref',
+      ref: 'avg-took_ms',
+    };
+    const initialSeries = { id: 'avg-took_ms', type: 'avg', field: 'took_ms' };
+    const definition = eventDefinition([initialSeries]);
+    const handleChange = jest.fn();
+
+    const wrapper = mount(
+      <NumberRefExpression
+        eventDefinition={definition}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={handleChange}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
+    );
+
+    const fieldSelect = wrapper.find('Select Select.aggregation-function-field').at(0);
+
+    act(() => {
+      fieldSelect.prop('onChange')(null, { action: 'clear' });
+    });
+
+    expect(handleChange).toHaveBeenCalledWith({
+      conditions: { expr: 'number-ref', ref: 'avg-' },
+      series: [
+        { field: 'took_ms', id: 'avg-took_ms', type: 'avg' },
+        { field: null, id: 'avg-', type: 'avg' },
+      ],
+    });
   });
 });
