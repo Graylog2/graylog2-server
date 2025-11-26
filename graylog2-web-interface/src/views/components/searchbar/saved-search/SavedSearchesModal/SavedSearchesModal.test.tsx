@@ -82,7 +82,7 @@ describe('SavedSearchesModal', () => {
 
   beforeEach(() => {
     asMock(fetchSavedSearches).mockResolvedValue(defaultPaginatedSearches);
-    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
+    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutateAsync: () => {} });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 

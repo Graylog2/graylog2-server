@@ -52,7 +52,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
     onSuccess: () => refetch(),
   });
 
-  return { mutate: mutateAsync };
+  return { mutateAsync };
 };
 
 export default useUpdateUserLayoutPreferences;

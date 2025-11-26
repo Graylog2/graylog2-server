@@ -93,7 +93,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   topRightCol = undefined,
   withoutURLParams = false,
 }: Props<T, M> & InnerProps) => {
-  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
+  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
 
   const {
