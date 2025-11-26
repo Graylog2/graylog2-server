@@ -333,8 +333,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
-    overlaying: undefined,
-    position: 0,
+    range: [0, 0.21],
     rangemode: 'tozero',
     side: 'left',
     tickfont: {
@@ -342,24 +341,29 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 10,
     ticktext: ['55 ms', '105 ms', '160 ms', '210 ms'],
     tickvals: [0.055, 0.105, 0.16, 0.21],
-    range: [0, 0.21],
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis2: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 1,
+    range: [0, 525],
     rangemode: 'tozero',
     side: 'right',
     tickfont: {
@@ -367,24 +371,28 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 10,
     ticktext: ['135 B', '265 B', '395 B', '525 B'],
     tickvals: [135, 265, 395, 525],
-    range: [0, 525],
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis3: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 0.1,
     rangemode: 'tozero',
     side: 'left',
     tickfont: {
@@ -393,21 +401,26 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: '.1%',
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 80,
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis4: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 0.9,
     rangemode: 'tozero',
     side: 'right',
     tickfont: {
@@ -416,13 +429,17 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: ',~r',
-    ticklabelposition: 'inside',
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 80,
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
 };

@@ -25,7 +25,7 @@ import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarV
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import useWidgetUnits from 'views/components/visualizations/hooks/useWidgetUnits';
 import useFeature from 'hooks/useFeature';
-import { UNIT_FEATURE_FLAG } from 'views/components/visualizations/Constants';
+import { UNIT_FEATURE_FLAG, AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
 import useXAxisTicksAndType from 'views/components/visualizations/hooks/useXAxisTicksAndType';
 import getThresholdShapes from 'views/components/visualizations/utils/getThresholdShapes';
 import type { ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
@@ -83,7 +83,7 @@ const useChartLayoutSettingsWithCustomUnits = ({
       annotations: thresholdsAnnotations,
       hovermode: 'x',
       xaxis: {
-        title: { text: visualizationConfigTitle, standoff: 10 },
+        title: { text: visualizationConfigTitle, standoff: AXIS_LABEL_MARGIN },
         ...ticksAndTypeConfig,
       },
     };

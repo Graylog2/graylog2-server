@@ -17,6 +17,7 @@
 import type { DefaultTheme } from 'styled-components';
 
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
+import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
 const getDefaultPlotYLayoutSettings = (theme: DefaultTheme, visualizationAxisTitle: string = '') => {
   const fontSettings = getDefaultPlotFontSettings(theme);
 
@@ -28,7 +29,7 @@ const getDefaultPlotYLayoutSettings = (theme: DefaultTheme, visualizationAxisTit
       font: fontSettings,
       text: visualizationAxisTitle,
       automargin: true,
-      standoff: 10,
+      standoff: AXIS_LABEL_MARGIN,
     },
   };
 };

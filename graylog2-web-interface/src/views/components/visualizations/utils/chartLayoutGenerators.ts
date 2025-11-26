@@ -38,6 +38,8 @@ import {
   TIME_AXIS_LABELS_QUANTITY,
   DECIMAL_PLACES,
   NO_FIELD_NAME_SERIES,
+  TICK_VALS_SECOND_MARGIN,
+  TICK_VALS_FIRST_MARGIN,
 } from 'views/components/visualizations/Constants';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
@@ -47,7 +49,8 @@ import formatValueWithUnitLabel from 'views/components/visualizations/utils/form
 
 type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
-export const getTickLabelShift = (axisCount: number) => (axisCount > 2 ? 80 : 10);
+export const getTickLabelShift = (axisCount: number) =>
+  axisCount > 2 ? TICK_VALS_SECOND_MARGIN : TICK_VALS_FIRST_MARGIN;
 
 export const getYAxisSide = (axisCount: number) => {
   if (axisCount % 2 === 0) {
