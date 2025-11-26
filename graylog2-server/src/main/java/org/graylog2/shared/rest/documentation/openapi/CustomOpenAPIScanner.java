@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.NonApiResource;
 import org.graylog2.shared.rest.PublicCloudAPI;
 
 import java.util.Comparator;
@@ -57,6 +58,7 @@ public class CustomOpenAPIScanner implements OpenApiScanner {
                         systemRestResources.stream(),
                         pluginRestResources.values().stream().flatMap(Set::stream)
                 )
+                .filter(cls -> !cls.isAnnotationPresent(NonApiResource.class))
                 .filter(cls -> !isCloud || cls.isAnnotationPresent(PublicCloudAPI.class))
                 .sorted(Comparator.comparing(Class::getName))
                 .collect(Collectors.toCollection(Sets::newLinkedHashSet));
