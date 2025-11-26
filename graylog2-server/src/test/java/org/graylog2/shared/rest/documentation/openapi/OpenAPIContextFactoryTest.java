@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.core.util.Json31;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
@@ -48,6 +49,7 @@ import java.util.OptionalLong;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 
 class OpenAPIContextFactoryTest {
 
@@ -58,7 +60,7 @@ class OpenAPIContextFactoryTest {
     static void beforeAll() {
         final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources =
                 Map.of("my.plugin.id", Set.of(TestResource.class, TestResource2.class,
-                        NotPublicCloudResource.class, SchemaConflictResource.class));
+                        NotPublicCloudResource.class, SchemaConflictResource.class, ImmutableMapsResource.class));
 
         objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(
@@ -91,7 +93,7 @@ class OpenAPIContextFactoryTest {
         // Verify that paths and schemas are generated
         assertThat(generatedSpec.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test",
                 "/plugins/my.plugin.id/subtypes", "/plugins/my.plugin.id/response-schema-name-conflict/pkg1",
-                "/plugins/my.plugin.id/response-schema-name-conflict/pkg2");
+                "/plugins/my.plugin.id/response-schema-name-conflict/pkg2", "/plugins/my.plugin.id/immutable-maps");
         assertThat(generatedSpec.getComponents().getSchemas()).isNotEmpty();
     }
 
@@ -203,11 +205,28 @@ class OpenAPIContextFactoryTest {
     @Test
     void handlesSchemaNameConflict() throws Exception {
         try {
-            // Verify ChildType1 has allOf with ParentType reference
             final var schemas = generatedSpec.getComponents().getSchemas();
             assertThat(schemas.keySet())
                     .filteredOn(key -> key.contains("ConflictingResponse"))
                     .hasSize(2);
+        } catch (AssertionError | NullPointerException e) {
+            System.err.println("Test failed. Full OpenAPI spec:");
+            System.err.println(Json31.pretty(generatedSpec));
+            throw e;
+        }
+    }
+
+    @Test
+    void usesMapSchemaForImmutableMaps() throws Exception {
+        try {
+            // Verify ChildType1 has allOf with ParentType reference
+            final Schema<?> mapSchema = generatedSpec.getPaths().get("/plugins/my.plugin.id/immutable-maps")
+                    .getGet().getResponses().get("default").getContent().get("application/json").getSchema();
+            assertThat(mapSchema.getTypes()).containsOnly("object");
+            assertThat(mapSchema.getAdditionalProperties()).asInstanceOf(type(Schema.class))
+                    .satisfies(valueSchema ->
+                            assertThat(((Schema<?>) valueSchema).getTypes()).containsOnly("boolean"));
+            assertThat(mapSchema.getProperties()).isNullOrEmpty();
         } catch (AssertionError | NullPointerException e) {
             System.err.println("Test failed. Full OpenAPI spec:");
             System.err.println(Json31.pretty(generatedSpec));
@@ -295,6 +314,40 @@ class OpenAPIContextFactoryTest {
         }
     }
 
+    @PublicCloudAPI
+    @Path("/response-schema-name-conflict")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class SchemaConflictResource implements PluginRestResource {
+
+        @NoAuditEvent("Test")
+        @GET
+        @Path("pkg1")
+        public org.graylog2.shared.rest.documentation.openapi.pkg1.ConflictingResponse getPkg1() {
+            return new org.graylog2.shared.rest.documentation.openapi.pkg1.ConflictingResponse(true);
+        }
+
+        @NoAuditEvent("Test")
+        @GET
+        @Path("pkg2")
+        public org.graylog2.shared.rest.documentation.openapi.pkg2.ConflictingResponse getPkg2() {
+            return new org.graylog2.shared.rest.documentation.openapi.pkg2.ConflictingResponse(true);
+        }
+    }
+
+    @PublicCloudAPI
+    @Path("/immutable-maps")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public static class ImmutableMapsResource implements PluginRestResource {
+
+        @NoAuditEvent("Test")
+        @GET
+        public ImmutableMap<String, Boolean> get() {
+            return ImmutableMap.of("key", true);
+        }
+    }
+
     public record TestRequest(
             String name,
             Optional<String> description,
@@ -317,9 +370,6 @@ class OpenAPIContextFactoryTest {
             OptionalDouble rate
     ) {}
 
-    // TODO: at the moment, subtypes are only correctly handled when they are statically annotated with @JsonSubTypes
-    //   We need this to work with subtypes that come from plugins and are registered with the ObjectMapper at runtime,
-    //   but this will require changes to the model resolver.
     @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type")
     @JsonSubTypes({
             @JsonSubTypes.Type(value = ChildType1.class, name = "child-type-1"),
@@ -363,27 +413,6 @@ class OpenAPIContextFactoryTest {
         @JsonProperty("type")
         public String type() {
             return "child-type-4";
-        }
-    }
-
-    @PublicCloudAPI
-    @Path("/response-schema-name-conflict")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    public static class SchemaConflictResource implements PluginRestResource {
-
-        @NoAuditEvent("Test")
-        @GET
-        @Path("pkg1")
-        public org.graylog2.shared.rest.documentation.openapi.pkg1.ConflictingResponse getPkg1() {
-            return new org.graylog2.shared.rest.documentation.openapi.pkg1.ConflictingResponse(true);
-        }
-
-        @NoAuditEvent("Test")
-        @GET
-        @Path("pkg2")
-        public org.graylog2.shared.rest.documentation.openapi.pkg2.ConflictingResponse getPkg2() {
-            return new org.graylog2.shared.rest.documentation.openapi.pkg2.ConflictingResponse(true);
         }
     }
 }

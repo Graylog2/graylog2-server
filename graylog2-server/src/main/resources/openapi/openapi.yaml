@@ -13581,68 +13581,6 @@ components:
           $ref: "#/components/schemas/org.graylog.security.authservice.backend.LDAPAuthServiceBackendConfig.HostAndPort"
         last:
           $ref: "#/components/schemas/org.graylog.security.authservice.backend.LDAPAuthServiceBackendConfig.HostAndPort"
-    com.google.common.collect.ImmutableMapJava.lang.StringJava.lang.Object:
-      type: object
-      additionalProperties: {}
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog.events.fields.EventFieldSpec:
-      type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog.events.fields.EventFieldSpec"
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog.events.search.EventsSearchResult.ContextEntity:
-      type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog.events.search.EventsSearchResult.ContextEntity"
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog.plugins.views.search.Parameter:
-      type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter"
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog.plugins.views.search.Parameter.Binding:
-      type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter.Binding"
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride:
-      type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride"
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog.plugins.views.search.rest.SearchTypeExecutionState:
-      type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.SearchTypeExecutionState"
-      properties:
-        empty:
-          type: boolean
-    com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog2.contentpacks.model.entities.references.ValueReference:
-      type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference"
-      properties:
-        empty:
-          type: boolean
-    ? com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog2.rest.models.system.responses.LocalesResponse.LocaleDescription
-    : type: object
-      additionalProperties:
-        $ref: "#/components/schemas/org.graylog2.rest.models.system.responses.LocalesResponse.LocaleDescription"
-      properties:
-        empty:
-          type: boolean
     com.google.common.collect.ImmutableMapOrg.graylog.grn.GRNJava.util.CollectionOrg.graylog.security.entities.EntityDescriptor:
       type: object
       additionalProperties:
@@ -14281,9 +14219,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog.events.fields.EventFieldSpec"
-          properties:
-            empty:
-              type: boolean
         id:
           type: string
         key_spec:
@@ -14660,14 +14595,13 @@ components:
       type: object
       properties:
         event_definitions:
-          $ref: "#/components/schemas/com.google.common.collect.ImmutableMapJava.lang.StringOrg.graylog.events.search.EventsSearchResult.ContextEntity"
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/org.graylog.events.search.EventsSearchResult.ContextEntity"
         streams:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog.events.search.EventsSearchResult.ContextEntity"
-          properties:
-            empty:
-              type: boolean
     org.graylog.events.search.EventsSearchResult.ContextEntity:
       type: object
       properties:
@@ -16019,9 +15953,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter"
-          properties:
-            empty:
-              type: boolean
         query_metadata:
           type: object
           additionalProperties:
@@ -16335,9 +16266,6 @@ components:
         additional_parameters:
           type: object
           additionalProperties: {}
-          properties:
-            empty:
-              type: boolean
         cancel_after_seconds:
           type: integer
           format: int32
@@ -16347,16 +16275,10 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter.Binding"
-          properties:
-            empty:
-              type: boolean
         queries:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride"
-          properties:
-            empty:
-              type: boolean
     org.graylog.plugins.views.search.rest.ExecutionStateGlobalOverride:
       type: object
       properties:
@@ -16391,9 +16313,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.SearchTypeExecutionState"
-          properties:
-            empty:
-              type: boolean
         timerange:
           $ref: "#/components/schemas/org.graylog2.plugin.indexer.searches.timeranges.TimeRange"
     org.graylog.plugins.views.search.rest.FieldTypesForStreamsRequest:
@@ -16590,9 +16509,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter.Binding"
-          properties:
-            empty:
-              type: boolean
         parameters:
           type: array
           items:
@@ -18683,9 +18599,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.references.ValueReference"
-          properties:
-            empty:
-              type: boolean
     org.graylog2.contentpacks.model.ContentPackUninstallDetails:
       type: object
       properties:
@@ -21589,9 +21502,6 @@ components:
           type: object
           additionalProperties:
             $ref: "#/components/schemas/org.graylog2.rest.models.system.responses.LocalesResponse.LocaleDescription"
-          properties:
-            empty:
-              type: boolean
     org.graylog2.rest.models.system.responses.LocalesResponse.LocaleDescription:
       type: object
       properties:

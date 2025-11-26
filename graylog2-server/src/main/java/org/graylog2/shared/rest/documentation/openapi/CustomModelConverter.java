@@ -25,6 +25,7 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -81,6 +82,34 @@ public class CustomModelConverter extends ModelResolver {
 
     @Override
     public Schema<?> resolve(AnnotatedType annotatedType, ModelConverterContext context, Iterator<ModelConverter> next) {
+
+        // Handle Guava ImmutableMap by treating it as a regular Map for schema generation
+        if (annotatedType != null && annotatedType.getType() != null) {
+            final JavaType javaType = _mapper.constructType(annotatedType.getType());
+
+            if (ImmutableMap.class.isAssignableFrom(javaType.getRawClass())) {
+
+                final JavaType keyType = javaType.getKeyType();
+                final JavaType valueType = javaType.getContentType();
+
+                // OpenAPI maps must have string keys, so only support that case
+                if (keyType != null && keyType.getRawClass() == String.class && valueType != null) {
+
+                    // Reconstruct an AnnotatedType for a Map<String, V> and forward to superclass
+                    final JavaType mapType = _mapper.getTypeFactory().constructMapType(Map.class, String.class,
+                            valueType.getRawClass());
+                    final AnnotatedType replacementType = new AnnotatedType()
+                            .type(mapType)
+                            .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
+                            .ctxAnnotations(annotatedType.getCtxAnnotations())
+                            .resolveAsRef(annotatedType.isResolveAsRef())
+                            .schemaProperty(annotatedType.isSchemaProperty());
+
+                    return super.resolve(replacementType, context, next);
+                }
+            }
+        }
+
         return super.resolve(annotatedType, new CustomConverterContext(context), next);
     }
 
@@ -91,6 +120,7 @@ public class CustomModelConverter extends ModelResolver {
      * corresponding schema references from the Jackson annotations and the subtypes registered with the Object mapper.
      * <p>
      * Without this custom implementation, the discriminator mapping would remain empty unless an explicit
+     *
      * @{@link io.swagger.v3.oas.annotations.media.Schema} annotation was provided.
      */
     @Override
