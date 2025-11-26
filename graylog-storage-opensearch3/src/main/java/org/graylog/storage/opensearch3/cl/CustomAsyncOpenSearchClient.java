@@ -21,6 +21,7 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
+import org.opensearch.client.transport.OpenSearchTransport;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
@@ -28,8 +29,8 @@ import java.util.concurrent.CompletableFuture;
 public class CustomAsyncOpenSearchClient extends OpenSearchAsyncClient {
     private final OSSerializationUtils serializationUtils;
 
-    public CustomAsyncOpenSearchClient(OpenSearchAsyncClient delegate) {
-        super(delegate._transport());
+    public CustomAsyncOpenSearchClient(OpenSearchTransport transport) {
+        super(transport);
         this.serializationUtils = new OSSerializationUtils();
     }
 
