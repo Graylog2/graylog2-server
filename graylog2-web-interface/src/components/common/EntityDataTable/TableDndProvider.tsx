@@ -21,7 +21,6 @@ import { arrayMove, horizontalListSortingStrategy, SortableContext } from '@dnd-
 import type { DragStartEvent, DragEndEvent } from '@dnd-kit/core';
 import {
   PointerSensor,
-  closestCenter,
   DndContext,
   useSensors,
   useSensor,
@@ -38,6 +37,7 @@ import { UTILITY_COLUMNS } from 'components/common/EntityDataTable/Constants';
 import ThDragOverlay from 'components/common/EntityDataTable/ThDragOverlay';
 import DndStylesProvider from 'components/common/EntityDataTable/contexts/DndStylesProvider';
 import zIndices from 'theme/z-indices';
+import useDndCollisionDetection from 'components/common/EntityDataTable/hooks/useDndCollisionDetection';
 
 type Props<Entity extends EntityBase> = React.PropsWithChildren<{
   table: Table<Entity>;
@@ -45,6 +45,9 @@ type Props<Entity extends EntityBase> = React.PropsWithChildren<{
 
 const TableDndProvider = <Entity extends EntityBase>({ children = undefined, table }: Props<Entity>) => {
   const [activeId, setActiveId] = useState<number | string | null>(null);
+  const columnOrder = table.getState().columnOrder;
+  const draggableColumns = useMemo(() => columnOrder.filter((id) => !UTILITY_COLUMNS.has(id)), [columnOrder]);
+  const { collisionDetection, setLastOverId } = useDndCollisionDetection(draggableColumns);
 
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -52,19 +55,22 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
     useSensor(PointerSensor, {}),
     useSensor(KeyboardSensor, {}),
   );
-  const handleDragStart = useCallback((event: DragStartEvent) => {
-    const { active } = event;
-
-    setActiveId(active.id);
-  }, []);
+  const handleDragStart = useCallback(
+    ({ active }: DragStartEvent) => {
+      setActiveId(active.id);
+      setLastOverId(active.id);
+    },
+    [setLastOverId],
+  );
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event;
-      if (active && over && active.id !== over.id) {
+
+      if (active && over?.id && active.id !== over.id) {
         table.setColumnOrder((curColumnOrder) => {
-          const oldIndex = curColumnOrder.indexOf(active.id as string);
-          const newIndex = curColumnOrder.indexOf(over.id as string);
+          const oldIndex = curColumnOrder.indexOf(active.id.toString());
+          const newIndex = curColumnOrder.indexOf(over.id.toString());
 
           return arrayMove(curColumnOrder, oldIndex, newIndex);
         });
@@ -73,12 +79,9 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
     [table],
   );
 
-  const columnOrder = table.getState().columnOrder;
-  const draggableColumns = useMemo(() => columnOrder.filter((id) => !UTILITY_COLUMNS.has(id)), [columnOrder]);
-
   return (
     <DndContext
-      collisionDetection={closestCenter}
+      collisionDetection={collisionDetection}
       onDragEnd={handleDragEnd}
       onDragStart={handleDragStart}
       sensors={sensors}>

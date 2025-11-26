@@ -30,10 +30,10 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
     background-color: ${theme.colors.global.contentBackground};
     z-index: ${zIndices.dropdownMenu};
     padding: ${theme.spacings.xs};
-    width: min-content;
+    width: ${$minWidth}px;
     font-weight: bold;
     white-space: nowrap;
-    min-width: ${$minWidth}px;
+    max-width: 300px;
     box-shadow:
       rgba(0, 0, 0, 0.05) 0 1px 3px 0,
       rgba(0, 0, 0, 0.05) 0 28px 23px -7px,
