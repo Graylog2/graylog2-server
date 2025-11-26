@@ -46,11 +46,12 @@ type GeneratedLayout = {
   tickvals: Array<number>;
   ticktext: Array<string>;
 };
+
+const getMaxDailyValue = (arr: Array<number>) => arr.reduce((a, b) => Math.max(a, b), 0);
+
 const TrafficGraph = ({ width, traffic, trafficLimit = undefined }: Props) => {
   const theme = useTheme();
   const isCloud = AppConfig.isCloud();
-
-  const getMaxDailyValue = (arr: Array<number>) => arr.reduce((a, b) => Math.max(a, b));
 
   const yValues = useMemo(() => Object.values(traffic), [traffic]);
 

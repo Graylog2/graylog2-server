@@ -14,21 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+package org.graylog2.search;
 
-import useHistory from 'routing/useHistory';
+public class QueryStringUtils {
 
-import AWSCloudTrailRoutes from './common/Routes';
+    public static boolean isEmptyOrMatchAllQueryString(final String queryString) {
+        return normalizeQuery(queryString).equals("*");
+    }
 
-const CloudTrailInputConfiguration = () => {
-  const history = useHistory();
-
-  useEffect(() => {
-    const url = AWSCloudTrailRoutes.INTEGRATIONS.AWSCloudTrail.ACTIVITYAPI.index;
-    history.push(url);
-  }, [history]);
-
-  return null;
-};
-
-export default CloudTrailInputConfiguration;
+    public static String normalizeQuery(final String queryString) {
+        if (queryString == null || queryString.trim().isEmpty()) {
+            return "*";
+        }
+        return queryString.trim();
+    }
+}
