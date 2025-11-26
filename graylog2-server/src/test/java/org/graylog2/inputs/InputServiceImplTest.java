@@ -255,6 +255,19 @@ public class InputServiceImplTest {
     }
 
     @Test
+    public void inputWithOutDesiredStateDefaultsToRunning() {
+        Map<String, Object> localFields = Map.of(
+                MessageInput.FIELD_TYPE, "test type",
+                MessageInput.FIELD_TITLE, "test title",
+                MessageInput.FIELD_CREATOR_USER_ID, "creator-1",
+                MessageInput.FIELD_CONFIGURATION, Map.of("foo", "bar")
+        );
+
+        Input result = inputService.create(localFields);
+        assertThat(result.getDesiredState()).isEqualTo(IOState.Type.RUNNING);
+    }
+
+    @Test
     public void saveInput() throws Exception {
         InputImpl newInput = createTestInput();
 
@@ -340,7 +353,7 @@ public class InputServiceImplTest {
                 .setCreatorUserId("admin")
                 .setCreatedAt(Tools.nowUTC())
                 .setConfiguration(Map.of("k", "v"))
-                .setDesiredState(IOState.Type.RUNNING)
+                .setPersistedDesiredState(IOState.Type.RUNNING)
                 .setGlobal(true)
                 .build();
     }

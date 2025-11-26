@@ -118,7 +118,13 @@ public abstract class InputImpl implements Input, MongoEntity {
 
     @Nullable
     @JsonProperty(FIELD_DESIRED_STATE)
-    public abstract IOState.Type getDesiredState();
+    public abstract IOState.Type getPersistedDesiredState();
+
+    @Override
+    public IOState.Type getDesiredState() {
+        final IOState.Type persistedDesiredState = getPersistedDesiredState();
+        return persistedDesiredState != null ? persistedDesiredState : IOState.Type.RUNNING;
+    }
 
     public static Builder builder() {
         return Builder.create();
@@ -166,14 +172,14 @@ public abstract class InputImpl implements Input, MongoEntity {
         public abstract Builder setNodeId(String nodeId);
 
         @JsonProperty(FIELD_DESIRED_STATE)
-        public abstract Builder setDesiredState(IOState.Type desiredState);
+        public abstract Builder setPersistedDesiredState(IOState.Type desiredState);
 
         public abstract InputImpl build();
     }
 
     @Override
     public Input withDesiredState(IOState.Type desiredState) {
-        return toBuilder().setDesiredState(desiredState).build();
+        return toBuilder().setPersistedDesiredState(desiredState).build();
     }
 
     @Override

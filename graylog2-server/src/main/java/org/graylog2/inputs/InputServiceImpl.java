@@ -272,10 +272,18 @@ public class InputServiceImpl implements InputService {
                 .setTitle((String) fields.get(MessageInput.FIELD_TITLE))
                 .setCreatorUserId((String) fields.get(MessageInput.FIELD_CREATOR_USER_ID))
                 .setGlobal(isGlobal)
-                .setDesiredState(IOState.Type.valueOf((String) fields.get(MessageInput.FIELD_DESIRED_STATE)))
-                .setContentPack((String) fields.get(MessageInput.FIELD_CONTENT_PACK))
                 .setConfiguration((Map<String, Object>) fields.get(MessageInput.FIELD_CONFIGURATION))
                 .setCreatedAt(createdAt);
+
+        final String desiredStateStr = (String) fields.get(MessageInput.FIELD_DESIRED_STATE);
+        if (desiredStateStr != null && !desiredStateStr.isBlank()) {
+            builder.setPersistedDesiredState(IOState.Type.valueOf(desiredStateStr));
+        }
+
+        final String contentPack = (String) fields.get(MessageInput.FIELD_CONTENT_PACK);
+        if (contentPack != null && !contentPack.isBlank()) {
+            builder.setContentPack(contentPack);
+        }
 
         final List<Map<String, String>> staticFields = (List<Map<String, String>>) fields.get(MessageInput.FIELD_STATIC_FIELDS);
         if (staticFields != null && !staticFields.isEmpty()) {
