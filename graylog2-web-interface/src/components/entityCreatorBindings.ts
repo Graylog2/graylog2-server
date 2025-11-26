@@ -41,7 +41,7 @@ const entityCreatorBindings: PluginExports = {
     {
       id: 'Dashboard',
       title: 'Create dashboard',
-      path: Routes.DASHBOARD_NEW,
+      path: Routes.DASHBOARD.NEW,
       telemetryEvent: {
         type: TELEMETRY_EVENT_TYPE.DASHBOARD_ACTION.DASHBOARD_CREATE_CLICKED,
         section: 'dashboard',
