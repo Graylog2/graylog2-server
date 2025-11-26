@@ -208,7 +208,7 @@
         <assertj-core.version>3.27.6</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.2.3</equalsverifier.version>
+        <equalsverifier.version>4.2.4</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.1</junit-jupiter.version>
         <mockito.version>5.20.0</mockito.version>
@@ -697,7 +697,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>versions-maven-plugin</artifactId>
-                    <version>2.20.0</version>
+                    <version>2.20.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
