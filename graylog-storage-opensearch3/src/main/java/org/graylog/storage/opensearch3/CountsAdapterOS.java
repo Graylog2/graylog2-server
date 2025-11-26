@@ -16,20 +16,25 @@
  */
 package org.graylog.storage.opensearch3;
 
-import org.graylog2.indexer.counts.CountsAdapter;
-
 import jakarta.inject.Inject;
+import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.results.CountResult;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 public class CountsAdapterOS implements CountsAdapter {
 
     private final OfficialOpensearchClient client;
+    private final SearchRequestFactoryOS searchRequestFactory;
 
     @Inject
-    public CountsAdapterOS(OfficialOpensearchClient client) {
+    public CountsAdapterOS(final OfficialOpensearchClient client,
+                           final SearchRequestFactoryOS searchRequestFactory) {
         this.client = client;
+        this.searchRequestFactory = searchRequestFactory;
     }
 
     @Override
@@ -40,5 +45,24 @@ public class CountsAdapterOS implements CountsAdapter {
             throw new RuntimeException("Fetching message count failed for indices " + indices, e);
         }
 
+    }
+
+    @Override
+    public CountResult count(Set<String> affectedIndices, String query, TimeRange range, String filter) {
+        return null;//TODO
+//        final SearchesConfig config = SearchesConfig.builder()
+//                .query(query)
+//                .range(range)
+//                .filter(filter)
+//                .limit(0)
+//                .offset(0)
+//                .build();
+//        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
+//        final SearchRequest searchRequest = new SearchRequest(affectedIndices.toArray(new String[0]))
+//                .source(searchSourceBuilder);
+//
+//        final SearchResponse result = client.search(searchRequest, "Fetching message count failed for indices ");
+//
+//        return CountResult.create(result.getHits().getTotalHits().value, result.getTook().getMillis());
     }
 }
