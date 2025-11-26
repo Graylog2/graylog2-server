@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,12 +74,18 @@ public class CustomModelConverter extends ModelResolver {
                         context.insertAnnotationIntrospector(new NopAnnotationIntrospector() {
                             @Override
                             public List<NamedType> findSubtypes(Annotated a) {
-                                return CustomModelConverter.this.findRegisteredSubtypes(a);
+                                // Only return registered subtypes if this class declares @JsonTypeInfo
+                                // (i.e., it's the actual owner of the polymorphic hierarchy)
+                                if (a instanceof AnnotatedClass ac && ac.getAnnotation(JsonTypeInfo.class) != null) {
+                                    return CustomModelConverter.this.findRegisteredSubtypes(a);
+                                }
+                                return super.findSubtypes(a);
                             }
                         });
                     }
                 });
     }
+
 
     @Override
     public Schema<?> resolve(AnnotatedType annotatedType, ModelConverterContext context, Iterator<ModelConverter> next) {

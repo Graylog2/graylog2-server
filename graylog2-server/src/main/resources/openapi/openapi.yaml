@@ -13989,6 +13989,131 @@ components:
         secret_key:
           type: string
           writeOnly: true
+    org.graylog.events.conditions.BooleanExpression:
+      type: object
+      discriminator:
+        mapping:
+          '!': "#/components/schemas/org.graylog.events.conditions.Expr.Not"
+          '&&': "#/components/schemas/org.graylog.events.conditions.Expr.And"
+          <: "#/components/schemas/org.graylog.events.conditions.Expr.Lesser"
+          <=: "#/components/schemas/org.graylog.events.conditions.Expr.LesserEqual"
+          ==: "#/components/schemas/org.graylog.events.conditions.Expr.Equal"
+          '>': "#/components/schemas/org.graylog.events.conditions.Expr.Greater"
+          '>=': "#/components/schemas/org.graylog.events.conditions.Expr.GreaterEqual"
+          group: "#/components/schemas/org.graylog.events.conditions.Expr.Group"
+          "true": "#/components/schemas/org.graylog.events.conditions.Expr.True"
+          '||': "#/components/schemas/org.graylog.events.conditions.Expr.Or"
+        propertyName: expr
+      properties:
+        expr:
+          type: string
+    org.graylog.events.conditions.Expr.And:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+          right:
+            $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+    org.graylog.events.conditions.Expr.Equal:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+          right:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+    org.graylog.events.conditions.Expr.Greater:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+          right:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+    org.graylog.events.conditions.Expr.GreaterEqual:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+          right:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+    org.graylog.events.conditions.Expr.Group:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          child:
+            $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+          operator:
+            type: string
+    org.graylog.events.conditions.Expr.Lesser:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+          right:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+    org.graylog.events.conditions.Expr.LesserEqual:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+          right:
+            $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+    org.graylog.events.conditions.Expr.Not:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+    org.graylog.events.conditions.Expr.NumberReference:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+      - type: object
+        properties:
+          ref:
+            type: string
+    org.graylog.events.conditions.Expr.NumberValue:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.NumberExpression"
+      - type: object
+        properties:
+          value:
+            type: number
+            format: double
+    org.graylog.events.conditions.Expr.Or:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+      - type: object
+        properties:
+          left:
+            $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+          right:
+            $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+    org.graylog.events.conditions.Expr.True:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+    org.graylog.events.conditions.NumberExpression:
+      type: object
+      discriminator:
+        mapping:
+          number: "#/components/schemas/org.graylog.events.conditions.Expr.NumberValue"
+          number-ref: "#/components/schemas/org.graylog.events.conditions.Expr.NumberReference"
+        propertyName: expr
+      properties:
+        expr:
+          type: string
     org.graylog.events.context.EventDefinitionContextService.SchedulerCtx:
       type: object
       properties:
@@ -14142,6 +14267,16 @@ components:
             type: boolean
           template:
             type: string
+    org.graylog.events.legacy.LegacyAlarmCallbackEventNotificationConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          callback_type:
+            type: string
+          configuration:
+            type: object
+            additionalProperties: {}
     org.graylog.events.notifications.EventNotificationConfig:
       type: object
       discriminator:
@@ -14199,6 +14334,142 @@ components:
       properties:
         type:
           type: string
+    org.graylog.events.notifications.types.EmailEventNotificationConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          bcc_emails:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+          bcc_emails_lut_key:
+            type: string
+          bcc_emails_lut_name:
+            type: string
+          bcc_users:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+          body_template:
+            type: string
+          cc_emails:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+          cc_emails_lut_key:
+            type: string
+          cc_emails_lut_name:
+            type: string
+          cc_users:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+          email_recipients:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+          html_body_template:
+            type: string
+          include_event_procedure:
+            type: boolean
+          lookup_bcc_emails:
+            type: boolean
+          lookup_cc_emails:
+            type: boolean
+          lookup_recipient_emails:
+            type: boolean
+          lookup_reply_to_email:
+            type: boolean
+          lookup_sender_email:
+            type: boolean
+          recipients_lut_key:
+            type: string
+          recipients_lut_name:
+            type: string
+          reply_to:
+            type: string
+          reply_to_lut_key:
+            type: string
+          reply_to_lut_name:
+            type: string
+          sender:
+            type: string
+          sender_lut_key:
+            type: string
+          sender_lut_name:
+            type: string
+          single_email:
+            type: boolean
+          subject:
+            type: string
+            minLength: 1
+          time_zone:
+            $ref: "#/components/schemas/org.joda.time.DateTimeZone"
+          user_recipients:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+      required:
+      - subject
+    org.graylog.events.notifications.types.HTTPEventNotificationConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          api_key:
+            type: string
+          api_key_as_header:
+            type: boolean
+          api_secret:
+            $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
+          basic_auth:
+            $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
+          skip_tls_verification:
+            type: boolean
+          url:
+            type: string
+    org.graylog.events.notifications.types.HTTPEventNotificationConfigV2:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          api_key:
+            type: string
+          api_key_as_header:
+            type: boolean
+          api_secret:
+            $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
+          basic_auth:
+            $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
+          body_template:
+            type: string
+          content_type:
+            type: string
+            enum:
+            - JSON
+            - FORM_DATA
+            - PLAIN_TEXT
+          headers:
+            type: string
+          method:
+            type: string
+            enum:
+            - POST
+            - PUT
+            - GET
+          skip_tls_verification:
+            type: boolean
+          time_zone:
+            $ref: "#/components/schemas/org.joda.time.DateTimeZone"
+          url:
+            type: string
     org.graylog.events.processor.EventDefinitionDto:
       type: object
       properties:
@@ -14308,6 +14579,71 @@ components:
       properties:
         type:
           type: string
+    org.graylog.events.processor.aggregation.AggregationConditions:
+      type: object
+      properties:
+        expression:
+          $ref: "#/components/schemas/org.graylog.events.conditions.BooleanExpression"
+    org.graylog.events.processor.aggregation.AggregationEventProcessorConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.processor.EventProcessorConfig"
+      - type: object
+        properties:
+          conditions:
+            $ref: "#/components/schemas/org.graylog.events.processor.aggregation.AggregationConditions"
+          cron_expression:
+            type: string
+          cron_timezone:
+            type: string
+          event_limit:
+            type: integer
+            format: int32
+          execute_every_ms:
+            type: integer
+            format: int64
+          filters:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter"
+          group_by:
+            type: array
+            items:
+              type: string
+          query:
+            type: string
+          query_parameters:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter"
+            properties:
+              empty:
+                type: boolean
+            uniqueItems: true
+          search_within_ms:
+            type: integer
+            format: int64
+          series:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+          stream_categories:
+            type: array
+            items:
+              type: string
+            properties:
+              empty:
+                type: boolean
+            uniqueItems: true
+          streams:
+            type: array
+            items:
+              type: string
+            properties:
+              empty:
+                type: boolean
+            uniqueItems: true
+          use_cron_scheduling:
+            type: boolean
     org.graylog.events.processor.aggregation.AggregationEventProcessorParameters:
       allOf:
       - $ref: "#/components/schemas/org.graylog.events.processor.EventProcessorParameters"
@@ -14351,6 +14687,9 @@ components:
                 type: string
               last:
                 type: string
+    org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.processor.EventProcessorConfig"
     org.graylog.events.processor.systemnotification.SystemNotificationEventProcessorParameters:
       allOf:
       - $ref: "#/components/schemas/org.graylog.events.processor.EventProcessorParameters"
@@ -14856,6 +15195,102 @@ components:
             $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
       required:
       - api_token
+    org.graylog.integrations.notifications.types.SlackEventNotificationConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          backlog_size:
+            type: integer
+            format: int64
+          channel:
+            type: string
+            minLength: 1
+          color:
+            type: string
+            minLength: 1
+          custom_message:
+            type: string
+          icon_emoji:
+            type: string
+          icon_url:
+            type: string
+          include_event_procedure:
+            type: boolean
+          include_title:
+            type: boolean
+          link_names:
+            type: boolean
+          notify_channel:
+            type: boolean
+          notify_here:
+            type: boolean
+          time_zone:
+            $ref: "#/components/schemas/org.joda.time.DateTimeZone"
+          user_name:
+            type: string
+          webhook_url:
+            type: string
+            minLength: 1
+      required:
+      - channel
+      - color
+      - webhook_url
+    org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          backlog_size:
+            type: integer
+            format: int64
+          color:
+            type: string
+            minLength: 1
+          custom_message:
+            type: string
+          icon_url:
+            type: string
+          time_zone:
+            $ref: "#/components/schemas/org.joda.time.DateTimeZone"
+          webhook_url:
+            type: string
+            minLength: 1
+      required:
+      - color
+      - webhook_url
+    org.graylog.integrations.notifications.types.microsoftteams.TeamsEventNotificationConfigV2:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          adaptive_card:
+            type: string
+          backlog_size:
+            type: integer
+            format: int64
+          time_zone:
+            $ref: "#/components/schemas/org.joda.time.DateTimeZone"
+          webhook_url:
+            type: string
+            minLength: 1
+      required:
+      - webhook_url
+    org.graylog.integrations.pagerduty.PagerDutyNotificationConfig:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.events.notifications.EventNotificationConfig"
+      - type: object
+        properties:
+          client_name:
+            type: string
+          client_url:
+            type: string
+          custom_incident:
+            type: boolean
+          key_prefix:
+            type: string
+          routing_key:
+            type: string
     org.graylog.plugins.datanode.dto.ClusterState:
       type: object
       properties:
@@ -16007,6 +16442,9 @@ components:
           type: string
         type:
           type: string
+    org.graylog.plugins.views.search.ValueParameter:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.Parameter"
     org.graylog.plugins.views.search.elasticsearch.ElasticsearchQueryString:
       allOf:
       - $ref: "#/components/schemas/org.graylog.plugins.views.search.engine.BackendQuery"
@@ -16805,6 +17243,29 @@ components:
           type: string
       required:
       - type
+    org.graylog.plugins.views.search.searchtypes.MessageList:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.SearchType"
+      - type: object
+        properties:
+          decorators:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog2.decorators.Decorator"
+          fields:
+            type: array
+            items:
+              type: string
+          limit:
+            type: integer
+            format: int32
+          offset:
+            type: integer
+            format: int32
+          sort:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.Sort"
     org.graylog.plugins.views.search.searchtypes.MessageList.Result:
       allOf:
       - $ref: "#/components/schemas/org.graylog.plugins.views.search.SearchType.Result"
@@ -16821,6 +17282,16 @@ components:
           total_results:
             type: integer
             format: int64
+    org.graylog.plugins.views.search.searchtypes.Sort:
+      type: object
+      properties:
+        field:
+          type: string
+        order:
+          type: string
+          enum:
+          - ASC
+          - DESC
     org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary:
       type: object
       properties:
@@ -16849,6 +17320,23 @@ components:
         timestamp:
           type: string
           format: date-time
+    org.graylog.plugins.views.search.searchtypes.events.EventList:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.SearchType"
+      - type: object
+        properties:
+          attributes:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog2.database.filtering.AttributeFilter"
+          page:
+            type: integer
+            format: int32
+          per_page:
+            type: integer
+            format: int32
+          sort:
+            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.events.EventList.SortConfig"
     org.graylog.plugins.views.search.searchtypes.events.EventList.Result:
       allOf:
       - $ref: "#/components/schemas/org.graylog.plugins.views.search.SearchType.Result"
@@ -16861,6 +17349,53 @@ components:
           total_results:
             type: integer
             format: int64
+    org.graylog.plugins.views.search.searchtypes.events.EventList.SortConfig:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+          - ASC
+          - DESC
+        field:
+          type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec:
+      type: object
+      discriminator:
+        mapping:
+          time: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time"
+          values: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values"
+        propertyName: type
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+        type:
+          type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.Pivot:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.SearchType"
+      - type: object
+        properties:
+          column_groups:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec"
+          rollup:
+            type: boolean
+          row_groups:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec"
+          series:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+          sort:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SortSpec"
     org.graylog.plugins.views.search.searchtypes.pivot.PivotResult:
       type: object
       properties:
@@ -16936,6 +17471,187 @@ components:
         source:
           type: string
         value: {}
+    org.graylog.plugins.views.search.searchtypes.pivot.PivotSort:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SortSpec"
+    org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SortSpec"
+    org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec:
+      type: object
+      discriminator:
+        mapping:
+          avg: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Average"
+          card: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality"
+          count: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Count"
+          latest: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Latest"
+          max: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Max"
+          min: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Min"
+          percentage: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage"
+          percentile: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile"
+          stddev: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev"
+          sum: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Sum"
+          sumofsquares: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares"
+          variance: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.series.Variance"
+        propertyName: type
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.SortSpec:
+      type: object
+      discriminator:
+        mapping:
+          pivot: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.PivotSort"
+          series: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort"
+        propertyName: type
+      properties:
+        direction:
+          type: string
+          enum:
+          - Ascending
+          - Descending
+        field:
+          type: string
+        type:
+          type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval"
+      - type: object
+        properties:
+          scaling:
+            type: number
+            format: double
+    org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval:
+      type: object
+      discriminator:
+        mapping:
+          auto: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval"
+          timeunit: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval"
+        propertyName: type
+      properties:
+        type:
+          type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.buckets.Time:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec"
+      - type: object
+        properties:
+          interval:
+            $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval"
+    org.graylog.plugins.views.search.searchtypes.pivot.buckets.TimeUnitInterval:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.buckets.Interval"
+      - type: object
+        properties:
+          timeunit:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.buckets.Values:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec"
+      - type: object
+        properties:
+          limit:
+            type: integer
+            format: int32
+          skip_empty_values:
+            type: boolean
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Average:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+          whole_number:
+            type: boolean
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Cardinality:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Count:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Latest:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Max:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Min:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+          strategy:
+            type: string
+            enum:
+            - COUNT
+            - SUM
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+          percentile:
+            type: number
+            format: double
+    org.graylog.plugins.views.search.searchtypes.pivot.series.StdDev:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Sum:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.SumOfSquares:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
+    org.graylog.plugins.views.search.searchtypes.pivot.series.Variance:
+      allOf:
+      - $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec"
+      - type: object
+        properties:
+          field:
+            type: string
     org.graylog.plugins.views.search.timeranges.OffsetRange:
       allOf:
       - $ref: "#/components/schemas/org.graylog2.plugin.indexer.searches.timeranges.TimeRange"
@@ -17221,380 +17937,6 @@ components:
       - type: object
         properties:
           color:
-            type: string
-    org.graylog.plugins.views.search.views.widgets.aggregation.AggregationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.WidgetConfigDTO"
-      - type: object
-        properties:
-          column_limit:
-            type: integer
-            format: int32
-          column_pivots:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.PivotDTO"
-          event_annotation:
-            type: boolean
-          formatting_settings:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.WidgetFormattingSettings"
-          rollup:
-            type: boolean
-          row_limit:
-            type: integer
-            format: int32
-          row_pivots:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.PivotDTO"
-          series:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.SeriesDTO"
-          sort:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO"
-          units:
-            type: object
-            additionalProperties:
-              $ref: "#/components/schemas/org.graylog.plugins.formatting.units.model.UnitId"
-          visualization:
-            type: string
-          visualization_config: {}
-    org.graylog.plugins.views.search.views.widgets.aggregation.AreaVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          axis_type:
-            type: string
-            enum:
-            - linear
-            - logarithmic
-          interpolation:
-            type: string
-            enum:
-            - linear
-            - step-after
-            - spline
-    org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.IntervalDTO"
-      - type: object
-        properties:
-          scaling:
-            type: number
-            format: double
-    org.graylog.plugins.views.search.views.widgets.aggregation.BarVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          axis_type:
-            type: string
-            enum:
-            - linear
-            - logarithmic
-          barmode:
-            type: string
-            enum:
-            - stack
-            - overlay
-            - group
-            - relative
-    org.graylog.plugins.views.search.views.widgets.aggregation.ChartColorMapping:
-      type: object
-      properties:
-        chart_color:
-          type: string
-        field_name:
-          type: string
-    org.graylog.plugins.views.search.views.widgets.aggregation.DataTableVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          pinned_columns:
-            type: array
-            items:
-              type: string
-          show_row_numbers:
-            type: boolean
-    org.graylog.plugins.views.search.views.widgets.aggregation.HeatmapVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          auto_scale:
-            type: boolean
-          color_scale:
-            type: string
-          default_value:
-            type: integer
-            format: int64
-          reverse_scale:
-            type: boolean
-          use_smallest_as_default:
-            type: boolean
-          z_max:
-            type: string
-          z_min:
-            type: string
-    org.graylog.plugins.views.search.views.widgets.aggregation.IntervalDTO:
-      type: object
-      discriminator:
-        mapping:
-          auto: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDTO"
-          timeunit: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO"
-        propertyName: type
-      properties:
-        type:
-          type: string
-    org.graylog.plugins.views.search.views.widgets.aggregation.LineVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          axis_type:
-            type: string
-            enum:
-            - linear
-            - logarithmic
-          interpolation:
-            type: string
-            enum:
-            - linear
-            - step-after
-            - spline
-    org.graylog.plugins.views.search.views.widgets.aggregation.NumberVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          trend:
-            type: boolean
-          trend_preference:
-            type: string
-            enum:
-            - LOWER
-            - NEUTRAL
-            - HIGHER
-    org.graylog.plugins.views.search.views.widgets.aggregation.PivotConfigDTO: {}
-    org.graylog.plugins.views.search.views.widgets.aggregation.PivotDTO:
-      type: object
-      properties:
-        config: {}
-        fields:
-          type: array
-          items:
-            type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.views.widgets.aggregation.ScatterVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          axis_type:
-            type: string
-            enum:
-            - linear
-            - logarithmic
-    org.graylog.plugins.views.search.views.widgets.aggregation.SeriesConfigDTO:
-      type: object
-      properties:
-        name:
-          type: string
-        thresholds:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.ThresholdConfigDTO"
-    org.graylog.plugins.views.search.views.widgets.aggregation.SeriesDTO:
-      type: object
-      properties:
-        config:
-          $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.SeriesConfigDTO"
-        function:
-          type: string
-    org.graylog.plugins.views.search.views.widgets.aggregation.ThresholdConfigDTO:
-      type: object
-      properties:
-        color:
-          type: string
-          minLength: 1
-        name:
-          type: string
-        value:
-          type: number
-          format: double
-      required:
-      - color
-    org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.PivotConfigDTO"
-      - type: object
-        properties:
-          interval:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.IntervalDTO"
-    org.graylog.plugins.views.search.views.widgets.aggregation.TimeUnitIntervalDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.IntervalDTO"
-      - type: object
-        properties:
-          unit:
-            type: string
-            enum:
-            - seconds
-            - minutes
-            - hours
-            - days
-            - weeks
-            - months
-            - years
-            - auto
-          value:
-            type: integer
-            format: int32
-    org.graylog.plugins.views.search.views.widgets.aggregation.ValueConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.PivotConfigDTO"
-      - type: object
-        properties:
-          limit:
-            type: integer
-            format: int32
-          skip_empty_values:
-            type: boolean
-    org.graylog.plugins.views.search.views.widgets.aggregation.Viewport:
-      type: object
-      properties:
-        center_x:
-          type: number
-          format: double
-        center_y:
-          type: number
-          format: double
-        zoom:
-          type: integer
-          format: int32
-    org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO: {}
-    org.graylog.plugins.views.search.views.widgets.aggregation.WidgetFormattingSettings:
-      type: object
-      properties:
-        chart_colors:
-          type: array
-          items:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.ChartColorMapping"
-    org.graylog.plugins.views.search.views.widgets.aggregation.WorldMapVisualizationConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.VisualizationConfigDTO"
-      - type: object
-        properties:
-          viewport:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.Viewport"
-    org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO"
-    org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO"
-    org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO:
-      type: object
-      discriminator:
-        mapping:
-          pivot: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.sort.PivotSortConfig"
-          series: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.sort.SeriesSortConfig"
-        propertyName: type
-      properties:
-        direction:
-          type: string
-          enum:
-          - Ascending
-          - Descending
-        field:
-          type: string
-        type:
-          type: string
-    org.graylog.plugins.views.search.views.widgets.events.EventsWidgetConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.WidgetConfigDTO"
-      - type: object
-        properties:
-          fields:
-            type: array
-            items:
-              type: string
-            uniqueItems: true
-          filters:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.events.Filter"
-          mode:
-            type: string
-            enum:
-            - List
-            - Number
-          sort:
-            $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.events.EventsWidgetConfigDTO.SortConfig"
-          units:
-            type: object
-            additionalProperties:
-              $ref: "#/components/schemas/org.graylog.plugins.formatting.units.model.UnitId"
-    org.graylog.plugins.views.search.views.widgets.events.EventsWidgetConfigDTO.SortConfig:
-      type: object
-      properties:
-        direction:
-          type: string
-          enum:
-          - Ascending
-          - Descending
-        field:
-          type: string
-    org.graylog.plugins.views.search.views.widgets.events.Filter:
-      type: object
-      properties:
-        field:
-          type: string
-        value:
-          type: array
-          items:
-            type: string
-    org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.WidgetConfigDTO"
-      - type: object
-        properties:
-          decorators:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog2.decorators.Decorator"
-          fields:
-            type: array
-            items:
-              type: string
-            properties:
-              empty:
-                type: boolean
-            uniqueItems: true
-          show_message_row:
-            type: boolean
-          show_summary:
-            type: boolean
-          sort:
-            type: array
-            items:
-              $ref: "#/components/schemas/org.graylog.plugins.views.search.views.widgets.aggregation.sort.SortConfigDTO"
-          units:
-            type: object
-            additionalProperties:
-              $ref: "#/components/schemas/org.graylog.plugins.formatting.units.model.UnitId"
-    org.graylog.plugins.views.search.views.widgets.text.TextWidgetConfigDTO:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog.plugins.views.search.views.WidgetConfigDTO"
-      - type: object
-        properties:
-          text:
             type: string
     org.graylog.plugins.views.storage.migration.RemoteReindexParams:
       type: object
@@ -18898,6 +19240,15 @@ components:
           type: string
         source:
           type: string
+    org.graylog2.database.filtering.AttributeFilter:
+      type: object
+      properties:
+        field:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
     org.graylog2.database.suggestions.EntitySuggestion:
       type: object
       properties:

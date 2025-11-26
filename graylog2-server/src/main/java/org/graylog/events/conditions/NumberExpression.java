@@ -16,19 +16,21 @@
  */
 package org.graylog.events.conditions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Base interface for expression types. See {@link BooleanExpression} and {@link NumberExpression}
- * for the concrete polymorphic type hierarchies.
+ * Marker interface for expressions that evaluate to a numeric (Double) value.
  */
-public interface Expression<T> {
-    String FIELD_EXPR = "expr";
-
-    @JsonProperty(FIELD_EXPR)
-    String expr();
-
-    @JsonIgnore
-    T accept(ExpressionVisitor visitor);
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.EXISTING_PROPERTY,
+        property = Expression.FIELD_EXPR,
+        visible = true
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Expr.NumberValue.class, name = Expr.NumberValue.EXPR),
+        @JsonSubTypes.Type(value = Expr.NumberReference.class, name = Expr.NumberReference.EXPR),
+})
+public interface NumberExpression extends Expression<Double> {
 }

@@ -185,6 +185,24 @@ class OpenAPIContextFactoryTest {
                             "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType".equals(schema.get$ref()));
             assertThat(childType2HasParentRef).isTrue();
 
+            // Verify ChildType3 has allOf with ParentType reference
+            final Schema<?> childType3Schema = generatedSpec.getComponents().getSchemas()
+                    .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType3");
+            final var childType3HasParentRef = childType3Schema.getAllOf().stream()
+                    .map(s -> (Schema<?>) s)
+                    .anyMatch(schema ->
+                            "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType".equals(schema.get$ref()));
+            assertThat(childType3HasParentRef).isTrue();
+
+            // Verify ChildType4 has allOf with ParentType reference
+            final Schema<?> childType4Schema = generatedSpec.getComponents().getSchemas()
+                    .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType4");
+            final var childType4HasParentRef = childType4Schema.getAllOf().stream()
+                    .map(s -> (Schema<?>) s)
+                    .anyMatch(schema ->
+                            "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType".equals(schema.get$ref()));
+            assertThat(childType4HasParentRef).isTrue();
+
             // Verify discriminator mapping uses type aliases, not FQ class names
             final var parentTypeSchema = generatedSpec.getComponents().getSchemas()
                     .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType");
