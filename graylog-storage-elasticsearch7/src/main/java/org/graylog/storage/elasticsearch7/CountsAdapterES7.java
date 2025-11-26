@@ -23,10 +23,10 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuil
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.results.CountResult;
-import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class CountsAdapterES7 implements CountsAdapter {
@@ -59,14 +59,8 @@ public class CountsAdapterES7 implements CountsAdapter {
                              final String query,
                              final TimeRange range,
                              final String filter) {
-        final SearchesConfig config = SearchesConfig.builder()
-                .query(query)
-                .range(range)
-                .filter(filter)
-                .limit(0)
-                .offset(0)
-                .build();
-        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config)
+        final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+                .query(searchRequestFactory.createQueryBuilder(query, Optional.ofNullable(range), Optional.ofNullable(filter)))
                 .size(0)
                 .trackTotalHits(true);
         final SearchRequest searchRequest = new SearchRequest(affectedIndices.toArray(new String[0]))
