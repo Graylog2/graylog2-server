@@ -28,17 +28,19 @@ import org.graylog2.indexer.searches.ChunkCommand;
 
 import java.util.Set;
 
-public class PaginationOS2 implements MultiChunkResultRetriever {
+public class PaginationOS implements MultiChunkResultRetriever {
     private final ResultMessageFactory resultMessageFactory;
     private final OpenSearchClient client;
+    private final OfficialOpensearchClient opensearchClient;
     private final SearchRequestFactory searchRequestFactory;
 
     @Inject
-    public PaginationOS2(final ResultMessageFactory resultMessageFactory,
-                         final OpenSearchClient client,
-                         final SearchRequestFactory searchRequestFactory) {
+    public PaginationOS(final ResultMessageFactory resultMessageFactory,
+                        final OpenSearchClient client, OfficialOpensearchClient opensearchClient,
+                        final SearchRequestFactory searchRequestFactory) {
         this.resultMessageFactory = resultMessageFactory;
         this.client = client;
+        this.opensearchClient = opensearchClient;
         this.searchRequestFactory = searchRequestFactory;
     }
 
