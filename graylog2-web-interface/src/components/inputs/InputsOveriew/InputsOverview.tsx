@@ -80,7 +80,6 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
         queryHelpComponent={<QueryHelper entityName={entityName} />}
         entityActions={entityActions}
         tableLayout={tableLayout}
-        fetchEntities={fetchInputs}
         fetchEntities={fetchEntities}
         expandedSectionsRenderer={expandedSections}
         keyFn={keyFn}

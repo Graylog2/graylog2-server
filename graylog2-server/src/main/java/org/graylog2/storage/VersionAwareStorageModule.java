@@ -38,6 +38,8 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapterProvider;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
@@ -89,6 +91,7 @@ public class VersionAwareStorageModule extends AbstractModule {
         bind(NodeAdapter.class).toProvider(NodeAdapterProvider.class);
         bind(IndexFieldTypePollerAdapter.class).toProvider(IndexFieldTypePollerAdapterProvider.class);
         bind(IndexToolsAdapter.class).toProvider(IndexToolsAdapterProvider.class);
+        bind(IndexTemplateAdapter.class).toProvider(IndexTemplateAdapterProvider.class);
         bind(V20170607164210_MigrateReopenedIndicesToAliases.ClusterState.class)
                 .toProvider(V20170607164210_MigrateReopenedIndicesToAliasesClusterStateAdapterProvider.class);
         bind(V20200730000000_AddGl2MessageIdFieldAliasForEvents.ElasticsearchAdapter.class)
