@@ -18,7 +18,7 @@ package org.graylog.storage.opensearch3;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog.storage.search.SearchCommand;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.search.QueryStringUtils;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
@@ -39,8 +39,10 @@ public class SearchRequestFactoryOS {
         this.allowLeadingWildcardSearches = allowLeadingWildcardSearches;
     }
 
-    public Query createQuery(final SearchCommand searchCommand) {
-        final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
+    public Query createQuery(final String queryString,
+                             final Optional<TimeRange> range,
+                             final Optional<String> filter) {
+        final String query = QueryStringUtils.normalizeQuery(queryString);
         BoolQuery.Builder topQueryBuilder;
         if (QueryStringUtils.isEmptyOrMatchAllQueryString(query)) {
             topQueryBuilder = QueryBuilders.bool()
@@ -60,13 +62,12 @@ public class SearchRequestFactoryOS {
                     );
         }
 
-
-        final Optional<BoolQuery.Builder> rangeQueryBuilder = searchCommand.range()
+        final Optional<BoolQuery.Builder> rangeQueryBuilder = range
                 .map(TimeRangeQueryFactory::createTimeRangeQuery)
                 .map(rangeQuery -> QueryBuilders.bool().must(rangeQuery.toQuery()));
-        final Optional<BoolQuery.Builder> filterQueryBuilder = searchCommand.filter()
-                .filter(filter -> !QueryStringUtils.isEmptyOrMatchAllQueryString(filter))
-                .map(filter -> QueryBuilders.queryString().query(filter).build().toQuery())
+        final Optional<BoolQuery.Builder> filterQueryBuilder = filter
+                .filter(f -> !QueryStringUtils.isEmptyOrMatchAllQueryString(f))
+                .map(f -> QueryBuilders.queryString().query(f).build().toQuery())
                 .map(queryStringQuery -> QueryBuilders.bool().must(queryStringQuery));
 
 
