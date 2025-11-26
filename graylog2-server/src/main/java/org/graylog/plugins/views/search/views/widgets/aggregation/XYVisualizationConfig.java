@@ -55,7 +55,7 @@ public interface XYVisualizationConfig {
         xaxis;
     }
 
-    record SingleAxisConfig(@JsonProperty Optional<String> title) {}
+    record SingleAxisConfig(@JsonProperty Optional<String> title, @JsonProperty Optional<String> color) {}
 
     class AxisConfig extends HashMap<UnitType, SingleAxisConfig> {}
 
