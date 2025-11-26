@@ -118,10 +118,10 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public List<Input> all() {
-        final List<Input> result = new ArrayList<>();
+        final ImmutableList.Builder<Input> result = ImmutableList.builder();
         collection.find().forEach(result::add);
 
-        return result;
+        return result.build();
     }
 
     @Override
@@ -141,21 +141,21 @@ public class InputServiceImpl implements InputService {
 
     @Override
     public List<Input> allOfThisNode(final String nodeId) {
-        final List<Input> result = new ArrayList<>();
+        final ImmutableList.Builder<Input> result = ImmutableList.builder();
         collection.find(or(
                 eq(MessageInput.FIELD_NODE_ID, nodeId),
                 eq(MessageInput.FIELD_GLOBAL, true)
         )).forEach(e -> result.add(withEncryptedFields(e)));
 
-        return result;
+        return result.build();
     }
 
     @Override
     public List<Input> allByType(final String type) {
-        final List<Input> result = new ArrayList<>();
+        final ImmutableList.Builder<Input> result = ImmutableList.builder();
         collection.find(eq(MessageInput.FIELD_TYPE, type)).forEach(e -> result.add(withEncryptedFields(e)));
 
-        return result;
+        return result.build();
     }
 
     /**
@@ -165,9 +165,9 @@ public class InputServiceImpl implements InputService {
      */
     @Override
     public List<String> findIdsByTitle(String title) {
-        final List<String> result = new ArrayList<>();
+        final ImmutableList.Builder<String> result = ImmutableList.builder();
         collection.find(regex(InputImpl.FIELD_TITLE, title, "i")).forEach(input -> result.add(input.getId()));
-        return result;
+        return result.build();
     }
 
     @Override
