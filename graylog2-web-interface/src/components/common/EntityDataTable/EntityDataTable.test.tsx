@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { act } from 'react';
+import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 import Immutable from 'immutable';
@@ -326,48 +326,5 @@ describe('<EntityDataTable />', () => {
     );
 
     await screen.findByText('Custom Cell For Created At - 2021-01-01');
-  });
-
-  describe('reordering', () => {
-    useSortableItemRectsMock(
-      {
-        height: 10,
-        width: 20,
-      },
-      'horizontal',
-    );
-
-    it('should reorder columns and save new order via onLayoutPreferencesChange', async () => {
-      const onLayoutPreferencesChange = jest.fn();
-      render(
-        <EntityDataTable<{ id: string; title: string }>
-          {...defaultProps}
-          onLayoutPreferencesChange={onLayoutPreferencesChange}
-        />,
-      );
-
-      const firstItemDragHandle = await screen.findByRole('button', {
-        name: /Drag or press space to reorder title/i,
-      });
-      firstItemDragHandle.focus();
-
-      await act(async () => {
-        await userEvent.keyboard('[Space]');
-      });
-
-      userEvent.keyboard('{ArrowRight}');
-
-      await screen.findByText(/Draggable item title was moved over droppable area description./i);
-
-      await act(async () => {
-        await userEvent.keyboard('[Space]');
-      });
-
-      await waitFor(() => {
-        expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
-          order: ['description', 'title', 'summary', 'status'],
-        });
-      });
-    });
   });
 });

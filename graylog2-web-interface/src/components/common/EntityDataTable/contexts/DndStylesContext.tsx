@@ -19,9 +19,11 @@ import * as React from 'react';
 
 import { singleton } from 'logic/singleton';
 
+type ColumnTransforms = { [colId: string]: string };
+
 type DndStylesContextValue = {
-  setColumnTransform: React.Dispatch<React.SetStateAction<{ [colId: string]: string }>>;
-  columnTransform: { [colId: string]: string };
+  setColumnTransform: (updater: (prev: ColumnTransforms) => ColumnTransforms) => void;
+  columnTransform: ColumnTransforms;
   activeColId: string;
 };
 

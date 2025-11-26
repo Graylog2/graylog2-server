@@ -84,7 +84,7 @@ const useSortableCol = (colId: string, disabled: boolean) => {
 
 const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
-  const { attributes, isDragging, listeners, setNodeRef } = useSortableCol(
+  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
     header.column.id,
     !columnMeta?.enableColumnOrdering,
   );
@@ -95,7 +95,7 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
         <LeftCol>
           {columnMeta?.enableColumnOrdering && (
             <DragHandle
-              index={header.index}
+              ref={setActivatorNodeRef}index={header.index}
               dragHandleProps={{ ...attributes, ...listeners }}
               isDragging={isDragging}
               itemTitle={columnMeta.label}

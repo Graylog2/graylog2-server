@@ -72,10 +72,6 @@ jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences');
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('routing/Routes', () => ({
-  getPluginRoute: (x) => () => x,
-}));
-
 describe('SavedSearchesModal', () => {
   useWindowConfirmMock();
   const defaultPaginatedSearches = createPaginatedSearches();
