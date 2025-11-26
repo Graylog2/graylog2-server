@@ -65,7 +65,7 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
       optionsCopy.filters = Immutable.OrderedMap(options.filters).set('node_id', [node.node_id]);
     }
 
-    return fetchInputs(options);
+    return fetchInputs(optionsCopy);
   };
 
   return (
