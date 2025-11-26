@@ -28,10 +28,10 @@ import ThroughputMetricsCell from './cells/ThroughputMetricsCell';
 
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
-const JOURNAL_WARNING_THRESHOLD = 0.25;
-const JOURNAL_DANGER_THRESHOLD = 0.5;
-const JVM_WARNING_THRESHOLD = 0.7;
-const JVM_DANGER_THRESHOLD = 0.9;
+const JOURNAL_WARNING_THRESHOLD = 0.1;
+const JOURNAL_DANGER_THRESHOLD = 0.4;
+const BUFFER_WARNING_THRESHOLD = 0.95;
+const JVM_WARNING_THRESHOLD = 0.95;
 
 export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
@@ -98,12 +98,16 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           used={entity.metrics?.jvmMemoryHeapUsed}
           max={entity.metrics?.jvmMemoryHeapMax}
           warningThreshold={JVM_WARNING_THRESHOLD}
-          dangerThreshold={JVM_DANGER_THRESHOLD}
         />
       ),
     },
     buffers: {
-      renderCell: (_value, entity) => <BuffersMetricsCell node={entity} />,
+      renderCell: (_value, entity) => (
+        <BuffersMetricsCell
+          node={entity}
+          warningThreshold={BUFFER_WARNING_THRESHOLD}
+        />
+      ),
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,

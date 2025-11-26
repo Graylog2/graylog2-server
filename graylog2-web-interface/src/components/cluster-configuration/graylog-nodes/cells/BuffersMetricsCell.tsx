@@ -16,22 +16,27 @@
  */
 import React from 'react';
 
-import type { GraylogNode } from '../useClusterGraylogNodes';
 import { buildRatioIndicator, computeRatio } from '../../shared-components/RatioIndicator';
 import { MetricPlaceholder, MetricsColumn, MetricsRow, SecondaryText } from '../../shared-components/NodeMetricsLayout';
+import type { GraylogNode } from '../useClusterGraylogNodes';
 
 type Props = {
   node: GraylogNode;
+  warningThreshold?: number;
+  dangerThreshold?: number;
 };
 
-const BUFFER_WARNING_THRESHOLD = 0.7;
-const BUFFER_DANGER_THRESHOLD = 0.9;
-
-const renderBufferRow = (label: string, usage: number | undefined | null, size: number | undefined | null) => {
+const renderBufferRow = (
+  label: string,
+  usage: number | undefined | null,
+  size: number | undefined | null,
+  warningThreshold: number,
+  dangerThreshold: number,
+) => {
   const ratioIndicator = buildRatioIndicator(
     computeRatio(usage, size),
-    BUFFER_WARNING_THRESHOLD,
-    BUFFER_DANGER_THRESHOLD,
+    warningThreshold,
+    dangerThreshold,
   );
 
   return (
@@ -46,7 +51,7 @@ const renderBufferRow = (label: string, usage: number | undefined | null, size: 
   );
 };
 
-const BuffersMetricsCell = ({ node }: Props) => {
+const BuffersMetricsCell = ({ node, warningThreshold = Number.NaN, dangerThreshold = Number.NaN }: Props) => {
   const rows = [
     {
       label: 'Input',
@@ -71,7 +76,11 @@ const BuffersMetricsCell = ({ node }: Props) => {
     return <MetricPlaceholder />;
   }
 
-  return <MetricsColumn>{rows.map(({ label, usage, size }) => renderBufferRow(label, usage, size))}</MetricsColumn>;
+  return (
+    <MetricsColumn>
+      {rows.map(({ label, usage, size }) => renderBufferRow(label, usage, size, warningThreshold, dangerThreshold))}
+    </MetricsColumn>
+  );
 };
 
 export default BuffersMetricsCell;

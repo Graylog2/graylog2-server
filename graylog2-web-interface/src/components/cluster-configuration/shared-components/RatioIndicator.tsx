@@ -39,11 +39,11 @@ export const computeRatio = (used: number | undefined | null, max: number | unde
 
 type Props = {
   ratio: number | undefined | null;
-  warningThreshold: number;
-  dangerThreshold: number;
+  warningThreshold?: number;
+  dangerThreshold?: number;
 };
 
-const RatioIndicator = ({ ratio, warningThreshold, dangerThreshold }: Props) => {
+const RatioIndicator = ({ ratio, warningThreshold = Number.NaN, dangerThreshold = Number.NaN }: Props) => {
   if (ratio === undefined || ratio === null) {
     return null;
   }
@@ -71,8 +71,8 @@ const RatioIndicator = ({ ratio, warningThreshold, dangerThreshold }: Props) => 
 
 export const buildRatioIndicator = (
   ratio: number | undefined | null,
-  warningThreshold: number,
-  dangerThreshold: number,
+  warningThreshold?: number,
+  dangerThreshold?: number,
 ) => (ratio == null ? null : <RatioIndicator ratio={ratio} warningThreshold={warningThreshold} dangerThreshold={dangerThreshold} />);
 
 export default RatioIndicator;

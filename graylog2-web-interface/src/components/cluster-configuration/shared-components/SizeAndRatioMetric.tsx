@@ -24,15 +24,15 @@ import { MetricPlaceholder, MetricsColumn, MetricsRow } from './NodeMetricsLayou
 type Props = {
   used: number | undefined | null;
   max: number | undefined | null;
-  warningThreshold: number;
-  dangerThreshold: number;
+  warningThreshold?: number;
+  dangerThreshold?: number;
   ratio?: number | undefined | null;
   ratioPercent?: number | undefined | null;
 };
 
 const formatBytes = (value: number | undefined | null) => (value == null ? '' : NumberUtils.formatBytes(value));
 
-const SizeAndRatioMetric = ({ used, max, warningThreshold, dangerThreshold, ratio = undefined, ratioPercent = undefined }: Props) => {
+const SizeAndRatioMetric = ({ used, max, warningThreshold = undefined, dangerThreshold = undefined, ratio = undefined, ratioPercent = undefined }: Props) => {
   const usedLabel = formatBytes(used);
   const maxLabel = formatBytes(max);
   const sizeLabel = [usedLabel, maxLabel].filter(Boolean).join(' / ');

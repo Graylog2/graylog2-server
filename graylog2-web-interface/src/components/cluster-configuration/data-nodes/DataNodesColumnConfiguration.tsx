@@ -41,12 +41,10 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'storage',
 ] as const;
 
-const JVM_WARNING_THRESHOLD = 0.7;
-const JVM_DANGER_THRESHOLD = 0.9;
-const MEMORY_WARNING_THRESHOLD = 0.25;
-const MEMORY_DANGER_THRESHOLD = 0.5;
+const JVM_WARNING_THRESHOLD = 0.95;
+const MEMORY_WARNING_THRESHOLD = 0.95;
 const STORAGE_WARNING_THRESHOLD = 0.7;
-const STORAGE_DANGER_THRESHOLD = 0.9;
+const STORAGE_DANGER_THRESHOLD = 0.8;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'hostname', title: 'Node', sortable: true },
@@ -96,7 +94,6 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           used={entity.metrics?.usedMemory}
           max={entity.metrics?.totalMemory}
           warningThreshold={MEMORY_WARNING_THRESHOLD}
-          dangerThreshold={MEMORY_DANGER_THRESHOLD}
         />
       ),
     },
@@ -107,7 +104,6 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           max={entity.metrics?.jvmMemoryHeapMax}
           ratioPercent={entity.metrics?.jvmMemoryHeapUsedPercent}
           warningThreshold={JVM_WARNING_THRESHOLD}
-          dangerThreshold={JVM_DANGER_THRESHOLD}
         />
       ),
     },
