@@ -16,10 +16,13 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
+import com.google.common.collect.MapDifference;
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
@@ -30,6 +33,7 @@ import org.graylog2.shared.initializers.JerseyService;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -40,8 +44,6 @@ public class CustomReader extends Reader {
     }
 
     private final Map<Class<? extends PluginRestResource>, String> prefixes;
-
-    private final Paths handledPaths = new Paths();
 
     @Inject
     public CustomReader(final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
@@ -63,32 +65,35 @@ public class CustomReader extends Reader {
 
     /**
      * We are overriding the read method to add a prefix to the paths of plugin REST resources.
-     * We do this by clearing the paths that the reader has added to the spec for each resource class and track the
-     * paths ourselves, adding the prefix if necessary. At the end of each read invocation, we set the paths to
-     * our current state, so that the final OpenAPI spec contains all paths with the correct prefixes.
+     * We are tracking which paths are added with each invocation and correct them accordingly, if needed.
      */
     @Override
     public synchronized OpenAPI read(Class<?> cls, String parentPath, String parentMethod, boolean isSubresource, RequestBody parentRequestBody, ApiResponses parentResponses, Set<String> parentTags, List<Parameter> parentParameters, Set<Class<?>> scannedResources) {
         final var pathPrefix = prefixes.get(cls);
 
-        getPaths().clear();
-
-        final var openAPI = super.read(cls, parentPath, parentMethod, isSubresource, parentRequestBody, parentResponses, parentTags, parentParameters, scannedResources);
-
-        final var newPaths = Optional.ofNullable(getPaths()).orElse(new Paths());
-
         if (pathPrefix == null) {
-            handledPaths.putAll(newPaths);
+            return super.read(cls, parentPath, parentMethod, isSubresource, parentRequestBody, parentResponses,
+                    parentTags, parentParameters, scannedResources);
         } else {
-            newPaths.forEach((path, pathItem) -> {
-                final var newKey = path.startsWith("/") ? pathPrefix + path : pathPrefix + "/" + path;
-                handledPaths.put(newKey, pathItem);
+            final Map<String, PathItem> oldPaths = getPaths() != null ? Map.copyOf(getPaths()) : Map.of();
+
+            final OpenAPI openAPI = super.read(cls, parentPath, parentMethod, isSubresource, parentRequestBody, parentResponses, parentTags, parentParameters, scannedResources);
+
+            final Map<String, PathItem> newPaths = Optional.ofNullable(getPaths()).orElse(new Paths());
+            final MapDifference<String, PathItem> difference = Maps.difference(oldPaths, newPaths);
+
+            getPaths().clear();
+
+            getPaths().putAll(difference.entriesOnlyOnLeft());
+
+            difference.entriesOnlyOnRight().forEach((path, pathItem) -> {
+                final var newKey = Objects.requireNonNull(path).startsWith("/")
+                        ? pathPrefix + path
+                        : pathPrefix + "/" + path;
+                getPaths().put(newKey, pathItem);
             });
+
+            return openAPI;
         }
-
-        getPaths().clear();
-        getPaths().putAll(handledPaths);
-
-        return openAPI;
     }
 }
