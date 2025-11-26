@@ -18,15 +18,18 @@ package org.graylog.storage.opensearch3.indextemplates;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.json.stream.JsonParser;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
+import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.PlainJsonSerializable;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
-import org.opensearch.client.opensearch._types.mapping.Property;
+import org.opensearch.client.opensearch.core.SearchRequest;
+import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
+import org.opensearch.client.opensearch.core.msearch.MultisearchHeader;
+import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
 import java.io.StringReader;
 import java.util.Map;
@@ -70,5 +73,24 @@ public class OSSerializationUtils {
     public <T> T fromJson(final String json, final JsonpDeserializer<T> deserializer) {
         final JsonParser parser = jsonpMapper.jsonProvider().createParser(new StringReader(json));
         return deserializer.deserialize(parser, jsonpMapper);
+    }
+
+    public RequestItem toMsearch(SearchRequest request) {
+        final JsonpMapper mapper = new JacksonJsonpMapper();
+        final JsonParser parser = mapper.jsonProvider().createParser(new StringReader(request.toJsonString()));
+        final MultisearchBody multisearchBody = MultisearchBody._DESERIALIZER.deserialize(parser, mapper);
+        return RequestItem.of(req -> req.body(multisearchBody).header(reqHeader(request)));
+    }
+
+    private static MultisearchHeader reqHeader(SearchRequest request) {
+        return MultisearchHeader.of(builder -> builder
+                .index(request.index())
+                .allowNoIndices(request.allowNoIndices())
+                .expandWildcards(request.expandWildcards())
+                .searchType(request.searchType())
+                .ignoreUnavailable(request.ignoreUnavailable())
+                .preference(request.preference())
+                .requestCache(request.requestCache())
+                .routing(request.routing()));
     }
 }
