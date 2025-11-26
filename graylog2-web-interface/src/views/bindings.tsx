@@ -161,9 +161,9 @@ const exports: PluginExports = {
   },
   routes: [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: App },
-    { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
+    { path: dashboardsTvPath(), component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: dashboardsPath, component: DashboardsPage },
-    { path: showDashboardsPath, component: ShowViewPage, parentComponent: App },
+    { path: showDashboardsPath(), component: ShowViewPage, parentComponent: App },
 
     { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
