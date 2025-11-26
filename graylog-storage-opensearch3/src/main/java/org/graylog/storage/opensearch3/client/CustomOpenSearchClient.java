@@ -19,8 +19,6 @@ package org.graylog.storage.opensearch3.client;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.OpenSearchException;
-import org.opensearch.client.opensearch.core.CountRequest;
-import org.opensearch.client.opensearch.core.CountResponse;
 import org.opensearch.client.opensearch.core.MsearchResponse;
 import org.opensearch.client.opensearch.core.SearchRequest;
 import org.opensearch.client.opensearch.core.SearchResponse;
@@ -51,10 +49,5 @@ public class CustomOpenSearchClient extends OpenSearchClient {
         }
         // if it's not failure, then it has to be a result, right?
         return resp.result();
-    }
-
-    @Override
-    public CountResponse count(CountRequest request) throws IOException, OpenSearchException {
-        return super.count(request);
     }
 }
