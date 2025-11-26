@@ -66,7 +66,9 @@ public class CountsAdapterES7 implements CountsAdapter {
                 .limit(0)
                 .offset(0)
                 .build();
-        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config);
+        final SearchSourceBuilder searchSourceBuilder = searchRequestFactory.create(config)
+                .size(0)
+                .trackTotalHits(true);
         final SearchRequest searchRequest = new SearchRequest(affectedIndices.toArray(new String[0]))
                 .source(searchSourceBuilder);
 
