@@ -21,7 +21,7 @@ import type { Column, Table } from '@tanstack/react-table';
 import { defaultCompare } from 'logic/DefaultCompare';
 import { Checkbox, DropdownButton, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
-import type { EntityBase, ColumnMetaContext, ColumnPreferences } from 'components/common/EntityDataTable/types';
+import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 import { Icon } from 'components/common';
 
 const StyledDropdownButton = styled(DropdownButton)`

@@ -332,14 +332,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 {displayPageSizeSelect && (
                   <PageSizeSelect pageSize={pageSize} showLabel={false} onChange={onPageSizeChange} />
                 )}
-                <ColumnsVisibilitySelect<Entity>
-                  table={table}
-                  onResetLayoutPreferences={resetLayoutPreferences}
-                  onLayoutPreferencesChange={onLayoutPreferencesChange}
-                  defaultColumnOrder={defaultColumnOrder}
-                  setInternalAttributeColumnOrder={setInternalAttributeColumnOrder}
-                  setInternalColumnWidthPreferences={setInternalColumnWidthPreferences}
-                />
+                <ColumnsVisibilitySelect<Entity> table={table} onResetLayoutPreferences={resetLayoutPreferences} />
               </ButtonGroup>
             </LayoutConfigRow>
           </ActionsRow>
