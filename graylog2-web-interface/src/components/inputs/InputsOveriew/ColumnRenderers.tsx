@@ -57,8 +57,8 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
         </ExpandedSectionToggleWrapper>
       ),
     },
-    node: {
-      renderCell: (_type: string, input: InputSummary) => (
+    node_id: {
+      renderCell: (_node: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>
           <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
@@ -69,6 +69,18 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
         <ExpandedSectionToggleWrapper id={input.id}>
           <ThroughputCell input={input} />
         </ExpandedSectionToggleWrapper>
+      ),
+    },
+    address: {
+      renderCell: (_address: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>
+          {input.attributes?.bind_address || 'N/A'}
+        </ExpandedSectionToggleWrapper>
+      ),
+    },
+    port: {
+      renderCell: (_port: string, input: InputSummary) => (
+        <ExpandedSectionToggleWrapper id={input.id}>{input.attributes?.port || 'N/A'}</ExpandedSectionToggleWrapper>
       ),
     },
   },
