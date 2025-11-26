@@ -84,7 +84,7 @@ public class CustomReader extends Reader {
 
             getPaths().clear();
 
-            getPaths().putAll(difference.entriesOnlyOnLeft());
+            getPaths().putAll(difference.entriesInCommon());
 
             difference.entriesOnlyOnRight().forEach((path, pathItem) -> {
                 final var newKey = Objects.requireNonNull(path).startsWith("/")

@@ -19,6 +19,7 @@ package org.graylog.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.rvesse.airline.annotations.Arguments;
 import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.github.rvesse.airline.annotations.restrictions.Pattern;
 import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.google.common.base.Stopwatch;
@@ -39,6 +40,9 @@ import com.google.inject.spi.Element;
 import com.google.inject.spi.Elements;
 import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.parser.OpenAPIV3Parser;
+import io.swagger.v3.parser.core.models.ParseOptions;
+import io.swagger.v3.parser.core.models.SwaggerParseResult;
 import org.graylog.grn.GRNRegistry;
 import org.graylog2.commands.Server;
 import org.graylog2.jackson.InputConfigurationBeanDeserializerModifier;
@@ -69,6 +73,9 @@ public class GenerateOpenApiSpecCommand extends Server {
 
     private static final TypeLiteral<Class<? extends PluginRestResource>> PLUGIN_REST_RESOURCE_TYPE =
             new TypeLiteral<>() {};
+
+    @Option(name = {"--skip-spec-validation"}, description = "Skip validation of the generated OpenAPI specification.")
+    private boolean skipValidation = false;
 
     @Arguments(title = "Output file path", description = "File to write the OpenAPI specification to. " +
             "If the file already exists, it will be silently overwritten. " +
@@ -111,12 +118,24 @@ public class GenerateOpenApiSpecCommand extends Server {
     protected void startCommand() {
         final var openApiContextFactory = injector.getInstance(OpenAPIContextFactory.class);
 
-        final var stopwatch = Stopwatch.createStarted();
+        final var generationStopwatch = Stopwatch.createStarted();
 
         System.out.println("Generating OpenAPI specification.");
 
         final var context = openApiContextFactory.getOrCreate("generate-openapi-spec-command");
         final var serialized = outputFile.endsWith(".json") ? prettyJson(context) : prettyYaml(context);
+
+        System.out.println(f("Generation completed. [took %s ms]", generationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
+
+        final var validationStopwatch = Stopwatch.createStarted();
+        System.out.println("Validating OpenAPI specification.");
+
+        if (!skipValidation) {
+            validateOpenApiSpec(serialized);
+        }
+
+        System.out.println(f("Validation completed. [took %s ms]", validationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
+
         final var targetPath = Path.of(outputFile);
         final var parentPath = targetPath.getParent();
 
@@ -135,7 +154,22 @@ public class GenerateOpenApiSpecCommand extends Server {
         }
 
         System.out.println("OpenAPI specification written to " + outputFile);
-        System.out.println(f("[took %s ms]", stopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
+    }
+
+    private void validateOpenApiSpec(String serializedSpec) {
+        final var parseOptions = new ParseOptions();
+        parseOptions.setResolve(true);
+        parseOptions.setResolveFully(true);
+
+        final SwaggerParseResult result = new OpenAPIV3Parser().readContents(serializedSpec, null, parseOptions);
+
+        if (result.getMessages() != null && !result.getMessages().isEmpty()) {
+            System.err.println("OpenAPI specification validation failed:");
+            result.getMessages().forEach(msg -> System.err.println("  - " + msg));
+            System.exit(1);
+        }
+
+        System.out.println("OpenAPI specification is valid.");
     }
 
     private String prettyJson(OpenApiContext context) {

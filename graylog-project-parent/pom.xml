@@ -331,6 +331,11 @@
                 <version>${swagger.version}</version>
             </dependency>
             <dependency>
+                <groupId>io.swagger.parser.v3</groupId>
+                <artifactId>swagger-parser</artifactId>
+                <version>${swagger-parser.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>com.squareup.retrofit2</groupId>
                 <artifactId>retrofit</artifactId>
                 <version>${retrofit.version}</version>
