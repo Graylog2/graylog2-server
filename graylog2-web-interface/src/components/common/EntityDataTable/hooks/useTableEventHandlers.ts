@@ -82,7 +82,6 @@ const useTableEventHandlers = ({
 
       if (layoutPreferences.attributes === null && layoutPreferences.order === null) {
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
-          app_pathname: getPathnameWithoutId(pathname),
           app_section: appSection,
           app_action_value: 'columns-select',
         });
