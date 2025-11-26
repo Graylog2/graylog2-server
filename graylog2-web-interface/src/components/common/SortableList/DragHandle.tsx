@@ -40,7 +40,7 @@ type Props = {
   index: number;
 };
 
-const DragHandle = ({ itemTitle = undefined, dragHandleProps, isDragging, index }: Props) => {
+const DragHandle = ({ itemTitle = undefined, dragHandleProps, isDragging, index }: Props, ref: React.Ref<HTMLButtonElement>) => {
   const dragHandleTitle =
     typeof itemTitle === 'string'
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${itemTitle.toLocaleLowerCase()}`
@@ -49,6 +49,7 @@ const DragHandle = ({ itemTitle = undefined, dragHandleProps, isDragging, index 
   return (
     <Container
       {...dragHandleProps}
+      ref={ref}
       $isDragging={isDragging}
       title={dragHandleTitle}
       aria-label={dragHandleTitle}
@@ -58,4 +59,4 @@ const DragHandle = ({ itemTitle = undefined, dragHandleProps, isDragging, index 
   );
 };
 
-export default DragHandle;
+export default React.forwardRef(DragHandle);
