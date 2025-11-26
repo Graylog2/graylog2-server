@@ -134,7 +134,7 @@ type BaseField = {
   helpComponent?: React.ComponentType;
   inputHelp?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) => string;
   description?: string;
-  isShown?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) => boolean;
+  isShown?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues?: WidgetConfigFormValues) => boolean;
 };
 
 type BaseRequiredField = BaseField & {

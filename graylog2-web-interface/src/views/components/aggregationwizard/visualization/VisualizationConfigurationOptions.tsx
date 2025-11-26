@@ -40,7 +40,7 @@ const TitleHoverForHelp = styled((props: React.ComponentProps<typeof HoverForHel
   margin-left: 5px;
 `;
 
-const componentForType = (type: string) => {
+const componentForType = (type: string): React.FC<FieldComponentProps> => {
   switch (type) {
     case 'select':
       return SelectField;
