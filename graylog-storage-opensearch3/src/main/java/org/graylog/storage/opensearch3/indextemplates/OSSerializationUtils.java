@@ -23,12 +23,9 @@ import jakarta.inject.Singleton;
 import jakarta.json.stream.JsonParser;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpDeserializer;
-import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.PlainJsonSerializable;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
 import org.opensearch.client.opensearch.core.SearchRequest;
-import org.opensearch.client.opensearch.core.msearch.MultisearchBody;
-import org.opensearch.client.opensearch.core.msearch.MultisearchHeader;
 import org.opensearch.client.opensearch.core.msearch.RequestItem;
 
 import java.io.StringReader;
@@ -76,21 +73,44 @@ public class OSSerializationUtils {
     }
 
     public RequestItem toMsearch(SearchRequest request) {
-        final JsonpMapper mapper = new JacksonJsonpMapper();
-        final JsonParser parser = mapper.jsonProvider().createParser(new StringReader(request.toJsonString()));
-        final MultisearchBody multisearchBody = MultisearchBody._DESERIALIZER.deserialize(parser, mapper);
-        return RequestItem.of(req -> req.body(multisearchBody).header(reqHeader(request)));
-    }
-
-    private static MultisearchHeader reqHeader(SearchRequest request) {
-        return MultisearchHeader.of(builder -> builder
-                .index(request.index())
-                .allowNoIndices(request.allowNoIndices())
-                .expandWildcards(request.expandWildcards())
-                .searchType(request.searchType())
-                .ignoreUnavailable(request.ignoreUnavailable())
-                .preference(request.preference())
-                .requestCache(request.requestCache())
-                .routing(request.routing()));
+        return RequestItem.of(req -> req
+                .body(mbody -> mbody
+                        .aggregations(request.aggregations())
+                        .query(request.query())
+                        .from(request.from())
+                        .minScore(request.minScore())
+                        .postFilter(request.postFilter())
+                        .searchAfter(request.searchAfter())
+                        .size(request.size())
+                        .sort(request.sort())
+                        .trackScores(request.trackScores())
+                        .trackTotalHits(request.trackTotalHits())
+                        .suggest(request.suggest())
+                        .highlight(request.highlight())
+                        .source(request.source())
+                        .scriptFields(request.scriptFields())
+                        .seqNoPrimaryTerm(request.seqNoPrimaryTerm())
+                        .storedFields(request.storedFields())
+                        .explain(request.explain())
+                        .fields(request.fields())
+                        .docvalueFields(request.docvalueFields())
+                        .indicesBoost(request.indicesBoost())
+                        .collapse(request.collapse())
+                        .version(request.version())
+                        .timeout(request.timeout())
+                        .rescore(request.rescore())
+                        .ext(request.ext())
+                )
+                .header(header -> header
+                        .allowNoIndices(request.allowNoIndices())
+                        .expandWildcards(request.expandWildcards())
+                        .ignoreUnavailable(request.ignoreUnavailable())
+                        .index(request.index())
+                        .preference(request.preference())
+                        .requestCache(request.requestCache())
+                        .routing(request.routing())
+                        .searchType(request.searchType())
+                )
+        );
     }
 }

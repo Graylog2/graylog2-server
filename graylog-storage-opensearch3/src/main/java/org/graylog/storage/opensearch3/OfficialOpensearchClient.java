@@ -19,8 +19,6 @@ package org.graylog.storage.opensearch3;
 import com.github.joschi.jadconfig.util.Duration;
 import org.apache.hc.core5.http.ContentTooLongException;
 import org.graylog.storage.exceptions.ParsedOpenSearchException;
-import org.graylog.storage.opensearch3.cl.CustomAsyncOpenSearchClient;
-import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
 import org.graylog2.indexer.BatchSizeTooLargeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
@@ -41,23 +39,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class OfficialOpensearchClient {
-
-    private final OpenSearchClient sync;
-    private final OpenSearchAsyncClient async;
-
-    public OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
-        this.sync = new CustomOpenSearchClient(sync);
-        this.async = new CustomAsyncOpenSearchClient(async);
-    }
-
-    public OpenSearchClient sync() {
-        return sync;
-    }
-
-    public OpenSearchAsyncClient async() {
-        return async;
-    }
+public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncClient async) {
 
     private static final Logger LOG = LoggerFactory.getLogger(OfficialOpensearchClient.class);
     private static final Pattern invalidWriteTarget = Pattern.compile("no write index is defined for alias \\[(?<target>[\\w_]+)\\]");
