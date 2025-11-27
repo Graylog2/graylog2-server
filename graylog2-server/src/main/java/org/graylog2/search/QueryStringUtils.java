@@ -14,27 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.search;
 
-import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+public class QueryStringUtils {
 
-import EntityListItem from 'components/welcome/EntityListItem';
-import { createGRN } from 'logic/permissions/GRN';
+    public static boolean isEmptyOrMatchAllQueryString(final String queryString) {
+        return normalizeQuery(queryString).equals("*");
+    }
 
-const grn = createGRN('dashboard', '1');
-
-describe('EntityListItem', () => {
-  it('Show type', async () => {
-    render(<EntityListItem grn={grn} title="Title 1" />);
-
-    await screen.findByText('dashboard');
-  });
-
-  it('Show correct link', async () => {
-    render(<EntityListItem grn={grn} title="Title 1" />);
-
-    const link = await screen.findByText('Title 1');
-
-    expect(link).toHaveAttribute('href', '/dashboards/1');
-  });
-});
+    public static String normalizeQuery(final String queryString) {
+        if (queryString == null || queryString.trim().isEmpty()) {
+            return "*";
+        }
+        return queryString.trim();
+    }
+}
