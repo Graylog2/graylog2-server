@@ -102,7 +102,7 @@ function CacheList() {
               tableLayout={cacheListElements.defaultLayout}
               fetchEntities={handleFetchCaches}
               keyFn={cachesKeyFn}
-              minActionsCellWidth={100}
+              actionsCellWidth={100}
               entityAttributesAreCamelCase={false}
               columnRenderers={columnRenderers}
             />

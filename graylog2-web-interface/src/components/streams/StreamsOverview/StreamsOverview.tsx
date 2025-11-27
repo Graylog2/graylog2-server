@@ -88,7 +88,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
       tableLayout={defaultLayout}
       fetchEntities={fetchEntities}
       keyFn={keyFn}
-      minActionsCellWidth={220}
+      actionsCellWidth={220}
       expandedSectionRenderers={expandedSections}
       bulkSelection={{ actions: bulkActions }}
       entityAttributesAreCamelCase={false}

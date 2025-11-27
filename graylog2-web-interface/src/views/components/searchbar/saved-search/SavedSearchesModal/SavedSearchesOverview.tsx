@@ -53,7 +53,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
 
   return (
     <PaginatedEntityTable<View>
-      minActionsCellWidth={120}
+      actionsCellWidth={120}
       additionalAttributes={pluggableAttributes.attributes}
       bulkSelection={{ actions: <BulkActions /> }}
       columnRenderers={customColumnRenderers}

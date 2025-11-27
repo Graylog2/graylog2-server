@@ -67,7 +67,7 @@ type InnerProps = {
 };
 
 const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
-  minActionsCellWidth = 160,
+  actionsCellWidth = 160,
   additionalAttributes = [],
   bulkSelection = undefined,
   columnRenderers,
@@ -204,7 +204,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
               pageSize={layoutConfig.pageSize}
               activeSort={layoutConfig.sort}
               entityActions={entityActions}
-              minActionsCellWidth={minActionsCellWidth}
+              minActionsCellWidth={actionsCellWidth}
               columnRenderers={columnRenderers}
               columnSchemas={columnSchemas}
               entityAttributesAreCamelCase={entityAttributesAreCamelCase}
@@ -252,7 +252,7 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
 };
 
 type Props<T, M> = {
-  minActionsCellWidth?: EntityDataTableProps['minActionsCellWidth'];
+  actionsCellWidth?: EntityDataTableProps['minActionsCellWidth'];
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
