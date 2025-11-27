@@ -57,7 +57,7 @@ export type TableElement<T extends EntityBase> = {
     entityId: string;
     entityType: string;
   }>;
-  useCondition: () => true;
+  useCondition: () => boolean;
 };
 
 declare module 'graylog-web-plugin/plugin' {
