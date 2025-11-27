@@ -35,7 +35,6 @@ const useTableEventHandlers = ({
   setQuery: (query: string) => void;
   appSection: string;
 }) => {
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const onPageSizeChange = useCallback(
@@ -49,7 +48,7 @@ const useTableEventHandlers = ({
       paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
       updateTableLayout({ perPage: newPageSize });
     },
-    [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+    [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout],
   );
 
   const onSearch = useCallback(
@@ -99,7 +98,7 @@ const useTableEventHandlers = ({
 
       return updateTableLayout(newLayoutPreferences);
     },
-    [appSection, pathname, sendTelemetry, updateTableLayout],
+    [appSection, sendTelemetry, updateTableLayout],
   );
 
   const onSearchReset = useCallback(() => {
@@ -117,7 +116,7 @@ const useTableEventHandlers = ({
       paginationQueryParameter.resetPage();
       updateTableLayout({ sort: newSort });
     },
-    [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+    [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout],
   );
 
   return {
