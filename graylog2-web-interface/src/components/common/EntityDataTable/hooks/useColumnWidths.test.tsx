@@ -42,6 +42,7 @@ describe('useColumnWidths hook test', () => {
     );
 
     expect(result.current).toEqual({
+      actions: 0,
       description: 400,
       title: 200,
     });
@@ -64,6 +65,7 @@ describe('useColumnWidths hook test', () => {
     );
 
     expect(result.current).toEqual({
+      actions: 0,
       description: 300,
       title: 300,
     });
@@ -79,16 +81,18 @@ describe('useColumnWidths hook test', () => {
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
+        actionsColWidth: 110,
+        bulkSelectColWidth: 20,
         columnRenderersByAttribute,
         columnIds,
       }),
     );
 
     expect(result.current).toEqual({
-      actions: 50,
+      actions: 110,
       'bulk-select': 20,
-      description: 353.3333333333333,
-      title: 176.66666666666666,
+      description: 313,
+      title: 157,
     });
   });
 });

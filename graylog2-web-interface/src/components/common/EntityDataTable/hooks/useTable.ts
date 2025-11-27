@@ -220,6 +220,7 @@ const useTable = <Entity extends EntityBase>({
       debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
     },
     [
+      columnRenderersByAttribute,
       debouncedOnLayoutPreferencesChange,
       internalColumnWidthPreferences,
       layoutPreferences?.attributes,

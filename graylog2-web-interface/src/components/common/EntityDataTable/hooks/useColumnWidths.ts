@@ -38,10 +38,10 @@ const assignableTableWidth = ({
   columnRenderersByAttribute: { [columnId: string]: { staticWidth?: number } };
   columnIds: Array<string>;
   tableWidth: number;
-  columnWidthPreferences: { [key: string]: number };
+  columnWidthPreferences: { [key: string]: number } | undefined;
 }) => {
   const staticColWidths = columnIds.reduce(
-    (total, id) => total + (columnWidthPreferences[id] ?? columnRenderersByAttribute[id]?.staticWidth ?? 0),
+    (total, id) => total + (columnWidthPreferences?.[id] ?? columnRenderersByAttribute[id]?.staticWidth ?? 0),
     0,
   );
 
@@ -60,13 +60,13 @@ const calculateColumnWidths = ({
   assignableWidth: number;
   attributeColumnRenderers: { [columnId: string]: { staticWidth?: number; width?: number; minWidth?: number } };
   attributeColumnIds: Array<string>;
-  columnWidthPreferences: { [key: string]: number };
+  columnWidthPreferences: { [key: string]: number } | undefined;
   bulkSelectColWidth?: number;
 }) => {
   const totalFlexColumns = attributeColumnIds.reduce((total, id) => {
     const { staticWidth, width = DEFAULT_COL_WIDTH } = attributeColumnRenderers[id] ?? {};
 
-    if (columnWidthPreferences[id] ?? staticWidth) {
+    if (columnWidthPreferences?.[id] ?? staticWidth) {
       return total;
     }
 
@@ -83,14 +83,14 @@ const calculateColumnWidths = ({
           width = DEFAULT_COL_WIDTH,
           minWidth = DEFAULT_COL_MIN_WIDTH,
         } = attributeColumnRenderers[id] ?? {};
-        const targetWidth = columnWidthPreferences[id] ?? staticWidth ?? flexColWidth * width;
+        const targetWidth = columnWidthPreferences?.[id] ?? staticWidth ?? Math.round(flexColWidth * width);
 
         return [id, !staticWidth && targetWidth < minWidth ? minWidth : targetWidth];
       }),
     ),
     [ACTIONS_COL_ID]:
       assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionColMinWidth : actionColMinWidth,
-    [BULK_SELECT_COL_ID]: bulkSelectColWidth,
+    ...(bulkSelectColWidth ? { [BULK_SELECT_COL_ID]: bulkSelectColWidth } : {}),
   };
 };
 
@@ -107,7 +107,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnIds: Array<string>;
   tableWidth: number;
-  columnWidthPreferences: { [key: string]: number };
+  columnWidthPreferences: { [key: string]: number } | undefined;
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
 

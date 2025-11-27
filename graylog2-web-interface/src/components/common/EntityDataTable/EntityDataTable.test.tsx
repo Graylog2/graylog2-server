@@ -24,7 +24,6 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
-import useSortableItemRectsMock from 'components/common/SortableList/tests/useSortableItemRectsMock';
 import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 import EntityDataTable from './EntityDataTable';
