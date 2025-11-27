@@ -3,6 +3,7 @@ package org.graylog2.events;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
@@ -122,13 +123,16 @@ class ClusterEventPeriodicalPerformanceTest {
 
             running.set(false);
 
-            final var stats = mongodb.mongoDatabase().runCommand(new Document("serverStatus", 1));
-            final var ops = stats.get("opcounters", Document.class);
-
-            final var reads = ops.getLong("query");
-            final var writes = Stream.of("insert", "update", "delete").map(ops::getLong).reduce(Long::sum);
-
-            LOG.info("Reads = " + reads + ", Writes = " + writes);
+            printStatistics(mongodb.mongoDatabase());
         }
+    }
+
+    private void printStatistics(MongoDatabase database) {
+        final var stats = database.runCommand(new Document("serverStatus", 1));
+        final var ops = stats.get("opcounters", Document.class);
+        final var reads = ops.getLong("query");
+        final var writes = Stream.of("insert", "update", "delete").map(ops::getLong).reduce(Long::sum).orElseThrow();
+
+        LOG.info("Reads = " + reads + ", Writes = " + writes);
     }
 }
