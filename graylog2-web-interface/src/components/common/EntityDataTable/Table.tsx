@@ -57,12 +57,12 @@ const Td = styled.td<{ $colId: string }>(
 );
 
 type Props<Entity extends EntityBase> = {
-  expandedSectionsRenderers: ExpandedSectionRenderers<Entity> | undefined;
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
   rows: Array<Row<Entity>>;
   headerGroups: Array<HeaderGroup<Entity>>;
 };
 
-const Table = <Entity extends EntityBase>({ expandedSectionsRenderers, rows, headerGroups }: Props<Entity>) => (
+const Table = <Entity extends EntityBase>({ expandedSectionRenderers, rows, headerGroups }: Props<Entity>) => (
   <StyledTable striped condensed hover>
     <TableHead headerGroups={headerGroups} />
     {rows.map((row) => (
@@ -76,7 +76,7 @@ const Table = <Entity extends EntityBase>({ expandedSectionsRenderers, rows, hea
         </tr>
         <ExpandedSections
           key={`expanded-sections-${row.id}`}
-          expandedSectionsRenderers={expandedSectionsRenderers}
+          expandedSectionRenderers={expandedSectionRenderers}
           entity={row.original}
         />
       </tbody>

@@ -89,7 +89,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
       fetchEntities={fetchEntities}
       keyFn={keyFn}
       minActionsCellWidth={220}
-      expandedSectionsRenderers={expandedSections}
+      expandedSectionRenderers={expandedSections}
       bulkSelection={{ actions: bulkActions }}
       entityAttributesAreCamelCase={false}
       filterValueRenderers={FilterValueRenderers}

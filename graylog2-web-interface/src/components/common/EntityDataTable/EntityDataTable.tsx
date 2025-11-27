@@ -198,7 +198,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   /** The table data. */
   entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
-  expandedSectionsRenderers?: ExpandedSectionRenderers<Entity>;
+  expandedSectionRenderers?: ExpandedSectionRenderers<Entity>;
   /** User layout preferences */
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -235,7 +235,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
   entities,
-  expandedSectionsRenderers = undefined,
+  expandedSectionRenderers = undefined,
   onLayoutPreferencesChange,
   defaultDisplayedColumns,
   defaultColumnOrder,
@@ -346,7 +346,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                   $activeColId={activeColId}
                   $columnTransform={columnTransform}>
                   <Table<Entity>
-                    expandedSectionsRenderers={expandedSectionsRenderers}
+                    expandedSectionRenderers={expandedSectionRenderers}
                     headerGroups={headerGroups}
                     rows={table.getRowModel().rows}
                   />

@@ -73,7 +73,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   columnRenderers,
   entityActions,
   entityAttributesAreCamelCase,
-  expandedSectionsRenderers = undefined,
+  expandedSectionRenderers = undefined,
   fetchEntities,
   fetchOptions,
   filterValueRenderers = undefined,
@@ -189,7 +189,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
               }}
               defaultColumnOrder={tableLayout.defaultColumnOrder}
               onLayoutPreferencesChange={onLayoutPreferencesChange}
-              expandedSectionsRenderers={expandedSectionsRenderers}
+              expandedSectionRenderers={expandedSectionRenderers}
               bulkSelection={bulkSelection}
               onSortChange={onSortChange}
               onPageSizeChange={onPageSizeChange}
@@ -250,7 +250,7 @@ type Props<T, M> = {
   columnRenderers: EntityDataTableProps['columnRenderers'];
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
-  expandedSectionsRenderers?: ExpandedSectionRenderers<T>;
+  expandedSectionRenderers?: ExpandedSectionRenderers<T>;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];

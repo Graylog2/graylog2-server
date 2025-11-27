@@ -59,7 +59,7 @@ const SavedSearchesOverview = ({ activeSavedSearchId, deleteSavedSearch, onLoadS
       columnRenderers={customColumnRenderers}
       entityActions={renderSavedSearchActions}
       entityAttributesAreCamelCase
-      expandedSectionsRenderers={pluggableExpandedSections}
+      expandedSectionRenderers={pluggableExpandedSections}
       fetchEntities={fetchSavedSearches}
       focusSearchAfterMount
       humanName="Saved Searches"
