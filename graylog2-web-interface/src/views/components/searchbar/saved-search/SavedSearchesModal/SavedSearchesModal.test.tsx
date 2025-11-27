@@ -94,7 +94,7 @@ describe('SavedSearchesModal', () => {
         />,
       );
 
-      await screen.findByText('No saved searches have been found.');
+      await screen.findByText(/No saved searches have been found./i);
     });
 
     it('should render with views', async () => {
