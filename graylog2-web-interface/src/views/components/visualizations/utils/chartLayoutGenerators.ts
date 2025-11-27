@@ -20,7 +20,7 @@ import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
 import type { DefaultTheme } from 'styled-components';
 
-import type { FieldUnitType } from 'views/types';
+import type {DefaultAxisKey, FieldUnitType} from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
@@ -46,8 +46,6 @@ import getFieldNameFromTrace from 'views/components/visualizations/utils/getFiel
 import type { PieHoverTemplateSettings } from 'views/components/visualizations/hooks/usePieChartDataSettingsWithCustomUnits';
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
-
-type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
 export const getTickLabelShift = (axisCount: number) =>
   axisCount > 2 ? TICK_VALS_SECOND_MARGIN : TICK_VALS_FIRST_MARGIN;
@@ -133,12 +131,12 @@ const getUnitLayoutWithData = (
   axisCount: number,
   values: Array<any>,
   theme: DefaultTheme,
-  { title, color }: { title?: string; color?: string } = {},
+  config: AggregationWidgetConfig,
 ) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
-  ...getDefaultPlotYLayoutSettings(theme, title, color),
+  ...getDefaultPlotYLayoutSettings(theme, unitTypeKey, config),
 });
 
 type SeriesName = string;
@@ -283,23 +281,8 @@ export const generateLayouts = ({
   return Object.fromEntries(
     Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
       const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
-      const visualizationAxisTitle =
-        config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
-          ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.title
-          : null;
 
-      const visualizationAxisColor =
-        config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
-          ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.color
-          : null;
-
-      return [
-        axisKeyName,
-        getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme, {
-          title: visualizationAxisTitle,
-          color: visualizationAxisColor,
-        }),
-      ];
+      return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme, config)];
     }),
   );
 };
