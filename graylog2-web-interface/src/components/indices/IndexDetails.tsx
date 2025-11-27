@@ -47,7 +47,9 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really recalculate the index ranges for index ${indexName}?`)) {
       IndexRangesActions.recalculateIndex(indexName).then(() => {
-        IndicesActions.list(indexSetId);
+        if (indexSetId) {
+          IndicesActions.list(indexSetId);
+        }
       });
     }
   }, [indexName, indexSetId]);
@@ -56,7 +58,9 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
     // eslint-disable-next-line no-alert
     if (window.confirm(`Really delete index ${indexName}?`)) {
       IndicesActions.delete(indexName).then(() => {
-        IndicesActions.list(indexSetId);
+        if (indexSetId) {
+          IndicesActions.list(indexSetId);
+        }
       });
     }
   }, [indexName, indexSetId]);
@@ -72,8 +76,6 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
       );
     }
 
-    if (!indexSetId) return null;
-
     return (
       <span>
         <Button bsStyle="warning" bsSize="xs" onClick={_onRecalculateIndex}>
@@ -84,7 +86,7 @@ const IndexDetails = ({ index, indexName, indexRange = undefined, indexSetId = u
         </Button>
       </span>
     );
-  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex, indexSetId]);
+  }, [isDeflector, _onDeleteIndex, _onRecalculateIndex]);
 
   if (!index || !index.all_shards) {
     return <Spinner />;
