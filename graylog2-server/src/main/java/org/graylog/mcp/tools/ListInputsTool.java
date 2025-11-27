@@ -17,10 +17,13 @@
 package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.inputs.InputService;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
@@ -28,6 +31,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -42,31 +46,39 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
 
     private final InputService inputService;
     private final Map<String, InputDescription> availableInputs;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
-    public ListInputsTool(final ToolContext toolContext,
-                          InputService inputService,
-                          MessageInputFactory messageInputFactory) {
+    public ListInputsTool(InputService inputService,
+                          MessageInputFactory messageInputFactory,
+                          final CustomizationConfig customizationConfig,
+                          final ObjectMapper objectMapper,
+                          final ClusterConfigService clusterConfigService,
+                          final SchemaGeneratorProvider schemaGeneratorProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("List %s Inputs", toolContext.customizationConfig().productName()),
+                f("List %s Inputs", customizationConfig.productName()),
                 f("""
                         List all configured %s inputs. Returns detailed information about each input including type (syslog, GELF, etc.), current state (running/stopped),
                         configuration parameters, and throughput statistics. Use this to monitor input health, troubleshoot data ingestion issues, or understand what types of
                         logs are being collected. No parameters required.
-                        """, toolContext.customizationConfig().productName()));
+                        """, customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.inputService = inputService;
         this.availableInputs = messageInputFactory.getAvailableInputs();
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListInputsTool.Parameters unused) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        pw.append(getProductName()).append("Inputs:");
+        pw.append(customizationConfig.productName()).append("Inputs:");
         try (var inputs = inputService.all().stream()) {
             inputs.filter(input -> permissionHelper.isPermitted(RestPermissions.INPUTS_READ, input.getId()))
                     .map(input -> {

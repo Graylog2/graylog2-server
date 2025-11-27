@@ -18,10 +18,14 @@ package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Map;
 
@@ -34,14 +38,21 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     private final StreamService streamService;
 
     @Inject
-    public ListStreamsTool(final ToolContext toolContext, StreamService streamService) {
+    public ListStreamsTool(StreamService streamService,
+                           final CustomizationConfig customizationConfig,
+                           final ObjectMapper objectMapper,
+                           final ClusterConfigService clusterConfigService,
+                           final SchemaGeneratorProvider schemaGeneratorProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("List all %s Streams", toolContext.customizationConfig().productName()),
-                f("List all available streams in the %s instance.", toolContext.customizationConfig().productName()));
+                f("List all %s Streams", customizationConfig.productName()),
+                f("List all available streams in the %s instance.", customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.streamService = streamService;
     }
 

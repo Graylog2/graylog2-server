@@ -17,14 +17,18 @@
 package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.Locale;
 
@@ -35,23 +39,31 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
 
     private final ServerStatus serverStatus;
     private final LeaderElectionService leaderElectionService;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
-    public SystemInfoTool(final ToolContext toolContext,
-                          ServerStatus serverStatus,
-                          LeaderElectionService leaderElectionService) {
+    public SystemInfoTool(ServerStatus serverStatus,
+                          LeaderElectionService leaderElectionService,
+                          final CustomizationConfig customizationConfig,
+                          final ObjectMapper objectMapper,
+                          final ClusterConfigService clusterConfigService,
+                          final SchemaGeneratorProvider schemaGeneratorProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("Get %s System Information", toolContext.customizationConfig().productName()),
+                f("Get %s System Information", customizationConfig.productName()),
                 """
                         Returns system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """.formatted(toolContext.customizationConfig().productName()));
+                        """.formatted(customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.serverStatus = serverStatus;
         this.leaderElectionService = leaderElectionService;
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
@@ -61,7 +73,7 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
 
             permissionHelper.checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
-            return SystemOverviewResponse.create(f("%s Server", getProductName()),
+            return SystemOverviewResponse.create(f("%s Server", customizationConfig.productName()),
                     ServerVersion.CODENAME,
                     serverStatus.getNodeId().toString(),
                     serverStatus.getClusterId(),

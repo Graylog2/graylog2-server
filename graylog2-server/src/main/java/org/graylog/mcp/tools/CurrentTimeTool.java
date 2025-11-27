@@ -17,9 +17,13 @@
 package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
+import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -37,17 +41,22 @@ public class CurrentTimeTool extends Tool<CurrentTimeTool.Parameters, String> {
     public static String NAME = "get_current_time";
 
     @Inject
-    public CurrentTimeTool(final ToolContext toolContext) {
+    public CurrentTimeTool(final CustomizationConfig customizationConfig,
+                           final ObjectMapper objectMapper,
+                           final ClusterConfigService clusterConfigService,
+                           final SchemaGeneratorProvider schemaGeneratorProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
                 "Get current time",
                 f(
                         "Return the current time from the %s server in ISO‑8601 UTC format.",
-                        toolContext.customizationConfig().productName()
-                )
+                        customizationConfig.productName()
+                ),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
         );
     }
 
