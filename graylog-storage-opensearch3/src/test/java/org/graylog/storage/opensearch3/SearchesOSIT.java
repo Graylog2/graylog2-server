@@ -21,7 +21,7 @@ import org.graylog.testing.elasticsearch.SearchInstance;
 import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.searches.SearchesIT;
 
-public class SearchesOS2IT extends SearchesIT {
+public class SearchesOSIT extends SearchesIT {
     @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
