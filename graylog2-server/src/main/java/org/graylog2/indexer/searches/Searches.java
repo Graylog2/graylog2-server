@@ -27,6 +27,7 @@ import jakarta.inject.Singleton;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -68,6 +69,7 @@ public class Searches {
     private final Indices indices;
     private final IndexSetRegistry indexSetRegistry;
     private final SearchesAdapter searchesAdapter;
+    private final CountsAdapter countsAdapter;
 
     @Inject
     public Searches(IndexRangeService indexRangeService,
@@ -75,7 +77,8 @@ public class Searches {
                     StreamService streamService,
                     Indices indices,
                     IndexSetRegistry indexSetRegistry,
-                    SearchesAdapter searchesAdapter) {
+                    SearchesAdapter searchesAdapter,
+                    final CountsAdapter countsAdapter) {
         this.indexRangeService = requireNonNull(indexRangeService, "indexRangeService");
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
@@ -85,22 +88,17 @@ public class Searches {
         this.indices = requireNonNull(indices, "indices");
         this.indexSetRegistry = requireNonNull(indexSetRegistry, "indexSetRegistry");
         this.searchesAdapter = searchesAdapter;
+        this.countsAdapter = countsAdapter;
     }
 
-    public CountResult count(String query, TimeRange range) {
-        return count(query, range, null);
-    }
-
-    public CountResult count(String query, TimeRange range, String filter) {
+    public CountResult count(final String query, final TimeRange range, final String filter) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
             return CountResult.empty();
         }
 
-        final CountResult result = searchesAdapter.count(affectedIndices, query, range, filter);
-
+        final CountResult result = countsAdapter.count(affectedIndices, query, range, filter);
         recordEsMetrics(result.tookMs(), range);
-
         return result;
     }
 
@@ -223,7 +221,7 @@ public class Searches {
     }
 
     @VisibleForTesting
-    Set<String> determineAffectedIndices(TimeRange range, @Nullable String filter) {
+    Set<String> determineAffectedIndices(final TimeRange range, @Nullable final String filter) {
         return extractIndexNamesFromIndexRanges(determineAffectedIndicesWithRanges(range, filter));
     }
 
@@ -234,7 +232,7 @@ public class Searches {
     }
 
     @VisibleForTesting
-    Set<IndexRange> determineAffectedIndicesWithRanges(TimeRange range, @Nullable String filter) {
+    Set<IndexRange> determineAffectedIndicesWithRanges(final TimeRange range, @Nullable final String filter) {
         final Optional<String> streamId = extractStreamId(filter);
         IndexSet indexSet = null;
         // if we are searching in a stream, we are further restricting the indices using the currently
