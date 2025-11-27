@@ -34,7 +34,7 @@ const useFormattedFields = (favoriteFields: Array<string>) => {
 
       const value = message?.formatted_fields?.[field];
 
-      return { value, field, type, id: field };
+      return { value, field, type, id: field, title: field };
     },
     [fieldTypes, message?.formatted_fields],
   );

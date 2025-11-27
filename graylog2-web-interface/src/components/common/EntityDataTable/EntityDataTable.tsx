@@ -16,27 +16,29 @@
  */
 import * as React from 'react';
 import { useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import merge from 'lodash/merge';
-import { flexRender, createColumnHelper, type ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef } from '@tanstack/react-table';
+import { createColumnHelper } from '@tanstack/react-table';
 
-import { Table, ButtonGroup } from 'components/bootstrap';
+import { ButtonGroup } from 'components/bootstrap';
 import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
 import useCurrentUser from 'hooks/useCurrentUser';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
 import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
 import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDataProvider';
-import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
 import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
 import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
 import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
+import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
+import Table from 'components/common/EntityDataTable/Table';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 
 import type {
   ColumnRenderers,
@@ -47,33 +49,27 @@ import type {
   ColumnPreferences,
 } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
-import TableHead from './TableHead';
 import BulkActionsRow from './BulkActionsRow';
 
-const ScrollContainer = styled.div`
+const ScrollContainer = styled.div<{
+  $columnWidths: { [_attributeId: string]: number };
+  $activeColId: string | null;
+  $columnTransform: { [_attributeId: string]: string };
+}>(
+  ({ $columnWidths, $activeColId, $columnTransform }) => `
   width: 100%;
   overflow-x: auto;
-`;
 
-const StyledTable = styled(Table)(
-  ({ theme }) => css`
-    table-layout: fixed;
+  ${Object.entries($columnWidths)
+    .map(([id, width]) => `--col-${id}-size: ${width}px;`)
+    .join('\n')}
 
-    thead > tr > th,
-    tbody > tr > td {
-      padding: ${CELL_PADDING}px;
-    }
+  ${$activeColId ? `--col-${$activeColId}-opacity: 0.4;` : ''}
 
-    && {
-      > tbody:nth-of-type(even) > tr {
-        background-color: ${theme.colors.table.row.backgroundStriped};
-      }
-
-      > tbody:nth-of-type(odd) > tr {
-        background-color: ${theme.colors.table.row.background};
-      }
-    }
-  `,
+  ${Object.entries($columnTransform)
+    .map(([id, transform]) => `--col-${id}-transform: ${transform};`)
+    .join('\n')}
+`,
 );
 
 const ActionsRow = styled.div`
@@ -88,10 +84,6 @@ const LayoutConfigRow = styled.div`
   display: flex;
   align-items: center;
   gap: 5px;
-`;
-
-const Td = styled.td`
-  word-break: break-word;
 `;
 
 const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
@@ -151,7 +143,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   actionsRef: React.MutableRefObject<HTMLDivElement>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
-  columnWidths: { [attributeId: string]: number };
+  columnWidths: { [_attributeId: string]: number };
   displayActionsCol: boolean;
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
@@ -206,17 +198,20 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   columnSchemas: Array<ColumnSchema>;
   /** Custom cell and header renderer for a column. Column ids need to be snake case. */
   columnRenderers?: ColumnRenderers<Entity, Meta>;
-  /** Define default columns order. Column ids need to be snake case. */
-  columnsOrder?: Array<string>;
   defaultDisplayedColumns: Array<string>;
+  defaultColumnOrder: Array<string>;
   /** The table data. */
   entities: ReadonlyArray<Entity>;
   /** Allows you to extend a row with additional information * */
   expandedSectionsRenderer?: {
     [sectionName: string]: ExpandedSectionRenderer<Entity>;
   };
-  /** Function to handle changes of columns visibility */
-  onColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
+  layoutPreferences: {
+    attributes?: ColumnPreferences;
+    order?: Array<string>;
+  };
+  /** Function to handle changes of column visibility, width and order */
+  onLayoutPreferencesChange: ({ attributes, order }: { attributes?: ColumnPreferences; order?: Array<string> }) => void;
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */
@@ -225,8 +220,6 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   pageSize?: number;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
-  /** Which columns should be displayed. */
-  columnPreferences?: ColumnPreferences;
   /** Meta data. */
   meta?: Meta;
 };
@@ -241,20 +234,19 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
   columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
-  columnsOrder: attributeColumnsOder = [],
   entities,
   expandedSectionsRenderer = undefined,
-  onColumnPreferencesChange,
+  onLayoutPreferencesChange,
+  defaultDisplayedColumns,
+  defaultColumnOrder,
+  entityActions = undefined,
+  layoutPreferences,
+  meta = undefined,
   onPageSizeChange = undefined,
   onSortChange,
   pageSize = undefined,
-  entityActions = undefined,
-  columnPreferences = undefined,
-  defaultDisplayedColumns,
-  meta = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
-
   const displayActionsCol = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
@@ -262,9 +254,13 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
 
-  const visibleColumnOrder = useVisibleColumnOrder(
-    columnPreferences,
-    attributeColumnsOder,
+  const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
+    layoutPreferences?.order ?? defaultColumnOrder,
+  );
+
+  const columnOrder = useVisibleColumnOrder(
+    layoutPreferences?.attributes,
+    internalAttributeColumnOrder,
     defaultDisplayedColumns,
     displayActionsCol,
     displayBulkSelectCol,
@@ -275,7 +271,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnSchemas: authorizedColumnSchemas,
     displayBulkSelectCol,
     fixedActionsCellWidth,
-    visibleColumns: visibleColumnOrder,
+    visibleColumns: columnOrder,
   });
 
   const columnsDefinitions = useColumnDefinitions<Entity, Meta>({
@@ -292,19 +288,24 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   });
 
   const table = useTable<Entity>({
-    columnPreferences,
     columnsDefinitions,
+    defaultColumnOrder,
     displayBulkSelectCol,
     entities,
+    columnOrder,
+    setInternalAttributeColumnOrder,
     isEntitySelectable,
+    layoutPreferences,
     onChangeSelection,
-    onColumnPreferencesChange,
+    onLayoutPreferencesChange,
     onSortChange,
     selectedEntities,
     setSelectedEntities,
     sort: activeSort,
-    visibleColumnOrder,
   });
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
@@ -322,25 +323,24 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               </ButtonGroup>
             </LayoutConfigRow>
           </ActionsRow>
-          <ScrollContainer id="scroll-container" ref={tableRef}>
-            <StyledTable striped condensed hover>
-              <TableHead table={table} />
-              {table.getRowModel().rows.map((row) => (
-                <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
-                  <tr>
-                    {row.getVisibleCells().map((cell) => (
-                      <Td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</Td>
-                    ))}
-                  </tr>
-                  <ExpandedSections
-                    key={`expanded-sections-${row.id}`}
+          <TableDndProvider table={table}>
+            <DndStylesContext.Consumer>
+              {({ activeColId, columnTransform }) => (
+                <ScrollContainer
+                  id="scroll-container"
+                  ref={tableRef}
+                  $columnWidths={columnWidths}
+                  $activeColId={activeColId}
+                  $columnTransform={columnTransform}>
+                  <Table<Entity>
                     expandedSectionsRenderer={expandedSectionsRenderer}
-                    entity={row.original}
+                    headerGroups={headerGroups}
+                    rows={table.getRowModel().rows}
                   />
-                </tbody>
-              ))}
-            </StyledTable>
-          </ScrollContainer>
+                </ScrollContainer>
+              )}
+            </DndStylesContext.Consumer>
+          </TableDndProvider>
         </ExpandedSectionsProvider>
       </SelectedEntitiesProvider>
     </MetaDataProvider>
