@@ -321,7 +321,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
       setInternalAttributeColumnOrder(defaultColumnOrder);
       setInternalColumnWidthPreferences({});
     });
-  }, [defaultColumnOrder, onLayoutPreferencesChange]);
+  }, [defaultColumnOrder, onResetLayoutPreferences]);
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
