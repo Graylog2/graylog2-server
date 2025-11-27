@@ -42,8 +42,6 @@ export const Th = styled.th<{ $colId: string }>(
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, 'none');
     background-color: ${theme.colors.table.head.background};
-    opacity: var(--col-${$colId}-opacity, 1);
-    transform: var(--col-${$colId}-transform, 'none');
   `,
 );
 
