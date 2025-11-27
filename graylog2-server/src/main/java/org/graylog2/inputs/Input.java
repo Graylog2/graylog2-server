@@ -36,7 +36,7 @@ public interface Input {
 
     String getCreatorUserId();
 
-    Boolean isGlobal();
+    boolean isGlobal();
 
     String getContentPack();
 

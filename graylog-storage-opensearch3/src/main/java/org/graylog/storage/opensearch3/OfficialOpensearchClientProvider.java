@@ -32,6 +32,8 @@ import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.Timeout;
+import org.graylog.storage.opensearch3.cl.CustomAsyncOpenSearchClient;
+import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
@@ -39,6 +41,8 @@ import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.transport.OpenSearchTransport;
 import org.opensearch.client.transport.httpclient5.ApacheHttpClient5TransportBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import java.net.URI;
@@ -65,6 +69,7 @@ import java.util.List;
  */
 public class OfficialOpensearchClientProvider implements Provider<OfficialOpensearchClient> {
 
+    private static Logger log = LoggerFactory.getLogger(OfficialOpensearchClientProvider.class);
 
     private final Supplier<OfficialOpensearchClient> clientCache;
 
@@ -84,6 +89,8 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
 
     @Nonnull
     private static OfficialOpensearchClient createClient(List<URI> uris, IndexerJwtAuthToken indexerJwtAuthToken, CredentialsProvider credentialsProvider, ElasticsearchClientConfiguration clientConfiguration) {
+
+        log.info("Initializing OpenSearch client");
 
         final HttpHost[] hosts = uris.stream().map(uri -> new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort())).toArray(HttpHost[]::new);
 
@@ -144,7 +151,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         });
 
         final OpenSearchTransport transport = builder.build();
-        return new OfficialOpensearchClient(new OpenSearchClient(transport), new OpenSearchAsyncClient(transport));
+        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport));
     }
 
     private static Timeout timeout(Duration duration) {

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import * as Immutable from 'immutable';
 
 import type { NodeInfo } from 'stores/nodes/NodesStore';
 import { keyFn, fetchInputs } from 'hooks/usePaginatedInputs';
@@ -29,6 +30,7 @@ import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescripti
 import useInputsStates from 'hooks/useInputsStates';
 import useTableElements from 'components/inputs/InputsOveriew/useTableElements';
 import { IfPermitted } from 'components/common';
+import type { SearchParams } from 'stores/PaginationTypes';
 
 type Input = {
   id: string;
@@ -56,7 +58,15 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
     inputTypeDescriptions,
   });
   const columnRenderers = useMemo(() => customColumnRenderers({ inputTypes, inputStates }), [inputTypes, inputStates]);
+  const fetchEntities = (options: SearchParams) => {
+    const optionsCopy = { ...options };
 
+    if (node) {
+      optionsCopy.filters = Immutable.OrderedMap(options.filters).set('node_id', [node.node_id]);
+    }
+
+    return fetchInputs(optionsCopy);
+  };
 
   return (
     <div>
@@ -72,7 +82,7 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
         queryHelpComponent={<QueryHelper entityName={entityName} />}
         entityActions={entityActions}
         tableLayout={tableLayout}
-        fetchEntities={fetchInputs}
+        fetchEntities={fetchEntities}
         expandedSectionsRenderer={expandedSections}
         keyFn={keyFn}
         actionsCellWidth={300}

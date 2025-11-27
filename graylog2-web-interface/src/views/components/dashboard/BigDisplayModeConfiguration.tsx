@@ -142,7 +142,7 @@ const redirectToBigDisplayMode = (
 ): void => {
   unsetWidgetFocusing();
 
-  history.push(new URI(Routes.pluginRoute('DASHBOARDS_TV_VIEWID')(view.id)).search(config).toString());
+  history.push(new URI(Routes.DASHBOARD.FULL_SCREEN(view.id)).search(config).toString());
 };
 
 const createQueryFromConfiguration = (

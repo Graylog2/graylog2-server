@@ -182,11 +182,11 @@ public class InputServiceImplTest {
         final EncryptedValue secret = encryptedValueService.encrypt("secret");
         final EncryptedValue secret2 = encryptedValueService.encrypt("secret2");
         final InputImpl newInput = InputImpl.builder()
-                .getTitle("test title")
-                .getType("test type")
-                .getCreatorUserId("test creator")
-                .getCreatedAt(new DateTime(DateTimeZone.UTC))
-                .getConfiguration(Map.of(
+                .setTitle("test title")
+                .setType("test type")
+                .setCreatorUserId("test creator")
+                .setCreatedAt(new DateTime(DateTimeZone.UTC))
+                .setConfiguration(Map.of(
                         "encrypted", secret,
                         "encrypted2", secret2
                 ))
@@ -252,6 +252,19 @@ public class InputServiceImplTest {
         assertThat(result.getCreatedAt()).isNotNull();
         assertThat(result.getStaticFields()).containsEntry("static_key", "static_value");
 
+    }
+
+    @Test
+    public void inputWithOutDesiredStateDefaultsToRunning() {
+        Map<String, Object> localFields = Map.of(
+                MessageInput.FIELD_TYPE, "test type",
+                MessageInput.FIELD_TITLE, "test title",
+                MessageInput.FIELD_CREATOR_USER_ID, "creator-1",
+                MessageInput.FIELD_CONFIGURATION, Map.of("foo", "bar")
+        );
+
+        Input result = inputService.create(localFields);
+        assertThat(result.getDesiredState()).isEqualTo(IOState.Type.RUNNING);
     }
 
     @Test
@@ -335,13 +348,13 @@ public class InputServiceImplTest {
 
     private InputImpl createTestInput() {
         return InputImpl.builder()
-                .getTitle("input title")
-                .getType("prototype")
-                .getCreatorUserId("admin")
-                .getCreatedAt(Tools.nowUTC())
-                .getConfiguration(Map.of("k", "v"))
-                .getDesiredState(IOState.Type.RUNNING)
-                .isGlobal(true)
+                .setTitle("input title")
+                .setType("prototype")
+                .setCreatorUserId("admin")
+                .setCreatedAt(Tools.nowUTC())
+                .setConfiguration(Map.of("k", "v"))
+                .setPersistedDesiredState(IOState.Type.RUNNING)
+                .setGlobal(true)
                 .build();
     }
 }

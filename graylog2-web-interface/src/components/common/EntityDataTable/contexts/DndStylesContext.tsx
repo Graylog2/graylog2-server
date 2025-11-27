@@ -14,14 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7;
 
-import org.graylog2.indexer.indices.Template;
+import * as React from 'react';
 
-interface IndexTemplateAdapter {
-    boolean ensureIndexTemplate(String templateName, Template template);
+import { singleton } from 'logic/singleton';
 
-    boolean indexTemplateExists(String templateName);
+type ColumnTransforms = { [colId: string]: string };
 
-    boolean deleteIndexTemplate(String templateName);
-}
+type DndStylesContextValue = {
+  setColumnTransform: (updater: (prev: ColumnTransforms) => ColumnTransforms) => void;
+  columnTransform: ColumnTransforms;
+  activeColId: string;
+};
+
+const DndStylesContext = React.createContext<DndStylesContextValue | undefined>(undefined);
+
+export default singleton('contexts.DndStylesContext', () => DndStylesContext);
