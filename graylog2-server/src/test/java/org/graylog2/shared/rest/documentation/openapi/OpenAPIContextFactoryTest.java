@@ -54,7 +54,7 @@ import static org.assertj.core.api.InstanceOfAssertFactories.type;
 class OpenAPIContextFactoryTest {
 
     private static ObjectMapper objectMapper;
-    private static OpenAPI generatedSpec;
+    private static OpenAPI generatedDescription;
 
     @BeforeAll
     static void beforeAll() {
@@ -75,26 +75,26 @@ class OpenAPIContextFactoryTest {
                 (config) -> new CustomReader(pluginRestResources, config)
         );
 
-        generatedSpec = openAPIContextFactory.getOrCreate("test-context").read();
+        generatedDescription = openAPIContextFactory.getOrCreate("test-context").read();
     }
 
     @Test
     void createsValidOpenAPIObject() {
-        assertThat(generatedSpec).isNotNull();
-        assertThat(generatedSpec.getInfo()).isNotNull();
-        assertThat(generatedSpec.getInfo().getTitle()).isEqualTo("Graylog REST API");
-        assertThat(generatedSpec.getInfo().getVersion()).isEqualTo("1.0.0");
-        assertThat(generatedSpec.getInfo().getDescription()).contains("REST API");
-        assertThat(generatedSpec.getInfo().getContact()).isNotNull();
-        assertThat(generatedSpec.getInfo().getContact().getName()).isEqualTo("Graylog");
-        assertThat(generatedSpec.getInfo().getLicense()).isNotNull();
-        assertThat(generatedSpec.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
+        assertThat(generatedDescription).isNotNull();
+        assertThat(generatedDescription.getInfo()).isNotNull();
+        assertThat(generatedDescription.getInfo().getTitle()).isEqualTo("Graylog REST API");
+        assertThat(generatedDescription.getInfo().getVersion()).isEqualTo("1.0.0");
+        assertThat(generatedDescription.getInfo().getDescription()).contains("REST API");
+        assertThat(generatedDescription.getInfo().getContact()).isNotNull();
+        assertThat(generatedDescription.getInfo().getContact().getName()).isEqualTo("Graylog");
+        assertThat(generatedDescription.getInfo().getLicense()).isNotNull();
+        assertThat(generatedDescription.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
 
         // Verify that paths and schemas are generated
-        assertThat(generatedSpec.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test",
+        assertThat(generatedDescription.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test",
                 "/plugins/my.plugin.id/subtypes", "/plugins/my.plugin.id/response-schema-name-conflict/pkg1",
                 "/plugins/my.plugin.id/response-schema-name-conflict/pkg2", "/plugins/my.plugin.id/immutable-maps");
-        assertThat(generatedSpec.getComponents().getSchemas()).isNotEmpty();
+        assertThat(generatedDescription.getComponents().getSchemas()).isNotEmpty();
     }
 
     @Test
@@ -104,19 +104,19 @@ class OpenAPIContextFactoryTest {
         //
         // See: https://github.com/swagger-api/swagger-core/issues/4717
         try {
-            assertThat(generatedSpec).isNotNull();
-            assertThat(generatedSpec.getPaths()).isNotEmpty();
+            assertThat(generatedDescription).isNotNull();
+            assertThat(generatedDescription.getPaths()).isNotEmpty();
 
             // Verify that the /test path exists
-            assertThat(generatedSpec.getPaths()).containsKey("/plugins/my.plugin.id/test");
+            assertThat(generatedDescription.getPaths()).containsKey("/plugins/my.plugin.id/test");
 
             // Verify the schema contains our test endpoint
-            final var postOperation = generatedSpec.getPaths().get("/plugins/my.plugin.id/test").getPost();
+            final var postOperation = generatedDescription.getPaths().get("/plugins/my.plugin.id/test").getPost();
             assertThat(postOperation).isNotNull();
             assertThat(postOperation.getOperationId()).isEqualTo("createTest");
 
             // Verify that OptionalInt/OptionalLong/OptionalDouble are treated the same as Optional<Integer>/Optional<Long>/Optional<Double>
-            final var responseSchema = generatedSpec.getComponents().getSchemas()
+            final var responseSchema = generatedDescription.getComponents().getSchemas()
                     .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.TestResponse");
             assertThat(responseSchema).isNotNull();
 
@@ -151,8 +151,8 @@ class OpenAPIContextFactoryTest {
             assertThat(limitProperty.getProperties()).isNullOrEmpty();
             assertThat(rateProperty.getProperties()).isNullOrEmpty();
         } catch (AssertionError | NullPointerException e) {
-            System.err.println("Test failed. Full OpenAPI spec:");
-            System.err.println(Json31.pretty(generatedSpec));
+            System.err.println("Test failed. Full OpenAPI description:");
+            System.err.println(Json31.pretty(generatedDescription));
             throw e;
         }
     }
@@ -168,7 +168,7 @@ class OpenAPIContextFactoryTest {
 
         try {
             // Verify ChildType1 has allOf with ParentType reference
-            final Schema<?> childType1Schema = generatedSpec.getComponents().getSchemas()
+            final Schema<?> childType1Schema = generatedDescription.getComponents().getSchemas()
                     .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType1");
             final var childType1HasParentRef = childType1Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
@@ -177,7 +177,7 @@ class OpenAPIContextFactoryTest {
             assertThat(childType1HasParentRef).isTrue();
 
             // Verify ChildType2 has allOf with ParentType reference
-            final Schema<?> childType2Schema = generatedSpec.getComponents().getSchemas()
+            final Schema<?> childType2Schema = generatedDescription.getComponents().getSchemas()
                     .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType2");
             final var childType2HasParentRef = childType2Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
@@ -186,7 +186,7 @@ class OpenAPIContextFactoryTest {
             assertThat(childType2HasParentRef).isTrue();
 
             // Verify ChildType3 has allOf with ParentType reference
-            final Schema<?> childType3Schema = generatedSpec.getComponents().getSchemas()
+            final Schema<?> childType3Schema = generatedDescription.getComponents().getSchemas()
                     .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType3");
             final var childType3HasParentRef = childType3Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
@@ -195,7 +195,7 @@ class OpenAPIContextFactoryTest {
             assertThat(childType3HasParentRef).isTrue();
 
             // Verify ChildType4 has allOf with ParentType reference
-            final Schema<?> childType4Schema = generatedSpec.getComponents().getSchemas()
+            final Schema<?> childType4Schema = generatedDescription.getComponents().getSchemas()
                     .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType4");
             final var childType4HasParentRef = childType4Schema.getAllOf().stream()
                     .map(s -> (Schema<?>) s)
@@ -204,7 +204,7 @@ class OpenAPIContextFactoryTest {
             assertThat(childType4HasParentRef).isTrue();
 
             // Verify discriminator mapping uses type aliases, not FQ class names
-            final var parentTypeSchema = generatedSpec.getComponents().getSchemas()
+            final var parentTypeSchema = generatedDescription.getComponents().getSchemas()
                     .get("org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ParentType");
             final var discriminatorMapping = parentTypeSchema.getDiscriminator().getMapping();
             assertThat(discriminatorMapping)
@@ -214,8 +214,8 @@ class OpenAPIContextFactoryTest {
                     .containsEntry("child-type-3", "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType3")
                     .containsEntry("child-type-4", "#/components/schemas/org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactoryTest.ChildType4");
         } catch (AssertionError | NullPointerException e) {
-            System.err.println("Test failed. Full OpenAPI spec:");
-            System.err.println(Json31.pretty(generatedSpec));
+            System.err.println("Test failed. Full OpenAPI description:");
+            System.err.println(Json31.pretty(generatedDescription));
             throw e;
         }
     }
@@ -223,13 +223,13 @@ class OpenAPIContextFactoryTest {
     @Test
     void handlesSchemaNameConflict() throws Exception {
         try {
-            final var schemas = generatedSpec.getComponents().getSchemas();
+            final var schemas = generatedDescription.getComponents().getSchemas();
             assertThat(schemas.keySet())
                     .filteredOn(key -> key.contains("ConflictingResponse"))
                     .hasSize(2);
         } catch (AssertionError | NullPointerException e) {
-            System.err.println("Test failed. Full OpenAPI spec:");
-            System.err.println(Json31.pretty(generatedSpec));
+            System.err.println("Test failed. Full OpenAPI description:");
+            System.err.println(Json31.pretty(generatedDescription));
             throw e;
         }
     }
@@ -238,7 +238,7 @@ class OpenAPIContextFactoryTest {
     void usesMapSchemaForImmutableMaps() throws Exception {
         try {
             // Verify ChildType1 has allOf with ParentType reference
-            final Schema<?> mapSchema = generatedSpec.getPaths().get("/plugins/my.plugin.id/immutable-maps")
+            final Schema<?> mapSchema = generatedDescription.getPaths().get("/plugins/my.plugin.id/immutable-maps")
                     .getGet().getResponses().get("default").getContent().get("application/json").getSchema();
             assertThat(mapSchema.getTypes()).containsOnly("object");
             assertThat(mapSchema.getAdditionalProperties()).asInstanceOf(type(Schema.class))
@@ -246,8 +246,8 @@ class OpenAPIContextFactoryTest {
                             assertThat(((Schema<?>) valueSchema).getTypes()).containsOnly("boolean"));
             assertThat(mapSchema.getProperties()).isNullOrEmpty();
         } catch (AssertionError | NullPointerException e) {
-            System.err.println("Test failed. Full OpenAPI spec:");
-            System.err.println(Json31.pretty(generatedSpec));
+            System.err.println("Test failed. Full OpenAPI description:");
+            System.err.println(Json31.pretty(generatedDescription));
             throw e;
         }
     }

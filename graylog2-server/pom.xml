@@ -1223,7 +1223,7 @@
                         <artifactId>exec-maven-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>generate-openapi-spec</id>
+                                <id>generate-openapi-description</id>
                                 <phase>compile</phase>
                                 <goals>
                                     <goal>java</goal>
@@ -1231,7 +1231,7 @@
                                 <configuration>
                                     <mainClass>org.graylog2.bootstrap.Main</mainClass>
                                     <arguments>
-                                        <argument>openapi-spec</argument>
+                                        <argument>openapi-description</argument>
                                         <argument>-np</argument>
                                         <argument>-f</argument>
                                         <argument>${openapi.server.config.file}</argument>
@@ -1244,11 +1244,11 @@
                                         </systemProperty>
                                         <systemProperty>
                                             <key>graylog.data_dir</key>
-                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-spec-generation-data-${maven.build.timestamp}</value>
+                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-data-${maven.build.timestamp}</value>
                                         </systemProperty>
                                         <systemProperty>
                                             <key>graylog.node_id_file</key>
-                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-spec-generation-node-id-${maven.build.timestamp}</value>
+                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-node-id-${maven.build.timestamp}</value>
                                         </systemProperty>
                                     </systemProperties>
                                 </configuration>

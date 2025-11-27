@@ -68,18 +68,18 @@ import java.util.concurrent.TimeUnit;
 import static org.graylog2.plugin.inject.Graylog2Module.SYSTEM_REST_RESOURCES;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-@Command(name = "openapi-spec", description = "Generates an OpenAPI specification for the Graylog REST API.")
-public class GenerateOpenApiSpecCommand extends Server {
+@Command(name = "openapi-description", description = "Generates an OpenAPI description for the Graylog REST API.")
+public class GenerateOpenApiDescriptionCommand extends Server {
 
     private static final TypeLiteral<Class<? extends PluginRestResource>> PLUGIN_REST_RESOURCE_TYPE =
             new TypeLiteral<>() {};
 
-    @Option(name = {"--skip-spec-validation"}, description = "Skip validation of the generated OpenAPI specification.")
+    @Option(name = {"--skip-validation"}, description = "Skip validation of the generated OpenAPI description.")
     private boolean skipValidation = false;
 
-    @Arguments(title = "Output file path", description = "File to write the OpenAPI specification to. " +
+    @Arguments(title = "Output file path", description = "File to write the OpenAPI description to. " +
             "If the file already exists, it will be silently overwritten. " +
-            "The format of the generated spec will be determined by the file extension (json or yaml).")
+            "The format of the generated description will be determined by the file extension (json or yaml).")
     @Pattern(pattern = "^.+\\.(json|yaml|yml)$", description = "Output file must have a .json, .yaml or .yml extension.")
     @Required
     private String outputFile;
@@ -93,7 +93,7 @@ public class GenerateOpenApiSpecCommand extends Server {
     protected Injector doCreateInjector(List<Module> modules) {
 
         // We don't want to actually create the injector, because that would execute a lot of code that we have
-        // in the constructors of our components. We only want to inspect the guice bindings
+        // in the constructors of our components. We only want to indescriptiont the guice bindings
         final var moduleElements = Elements.getElements(modules);
 
         final var pluginRestResourcesModule = extractPluginRestResourcesModule(moduleElements);
@@ -120,56 +120,59 @@ public class GenerateOpenApiSpecCommand extends Server {
 
         final var generationStopwatch = Stopwatch.createStarted();
 
-        System.out.println("Generating OpenAPI specification.");
+        System.out.println("Generating OpenAPI description...");
 
-        final var context = openApiContextFactory.getOrCreate("generate-openapi-spec-command");
+        final var context = openApiContextFactory.getOrCreate("generate-openapi-description-command");
         final var serialized = outputFile.endsWith(".json") ? prettyJson(context) : prettyYaml(context);
 
         System.out.println(f("Generation completed. [took %s ms]", generationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
 
-        final var validationStopwatch = Stopwatch.createStarted();
-        System.out.println("Validating OpenAPI specification.");
+        if (skipValidation) {
+            System.out.println("Skipping description validation.");
+        } else {
+            final var validationStopwatch = Stopwatch.createStarted();
+            System.out.println("Validating description...");
 
-        if (!skipValidation) {
-            validateOpenApiSpec(serialized);
+            validate(serialized);
+            System.out.println(f("Validation completed. [took %s ms]", validationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
         }
-
-        System.out.println(f("Validation completed. [took %s ms]", validationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
 
         final var targetPath = Path.of(outputFile);
         final var parentPath = targetPath.getParent();
 
+        System.out.println("Writing description to file:" + outputFile);
+
         if ((Files.exists(targetPath) && !Files.isWritable(targetPath)) || !Files.isWritable(parentPath)) {
-            System.out.println("Cannot write to specified file: " + outputFile);
+            System.out.println("Cannot write to file. Make sure that the following path is writeable: " + outputFile);
             System.exit(1);
         }
         if (Files.exists(targetPath)) {
-            System.out.println("Overwriting existing file: " + outputFile);
+            System.out.println("Overwriting existing file...");
         }
 
         try {
             Files.writeString(targetPath, serialized);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to write OpenAPI spec to file " + outputFile, e);
+            throw new RuntimeException("Failed to write OpenAPI description to file: " + outputFile, e);
         }
 
-        System.out.println("OpenAPI specification written to " + outputFile);
+        System.out.println("OpenAPI description written.");
     }
 
-    private void validateOpenApiSpec(String serializedSpec) {
+    private void validate(String document) {
         final var parseOptions = new ParseOptions();
         parseOptions.setResolve(true);
         parseOptions.setResolveFully(true);
 
-        final SwaggerParseResult result = new OpenAPIV3Parser().readContents(serializedSpec, null, parseOptions);
+        final SwaggerParseResult result = new OpenAPIV3Parser().readContents(document, null, parseOptions);
 
         if (result.getMessages() != null && !result.getMessages().isEmpty()) {
-            System.err.println("OpenAPI specification validation failed:");
+            System.err.println("OpenAPI description validation failed:");
             result.getMessages().forEach(msg -> System.err.println("  - " + msg));
             System.exit(1);
         }
 
-        System.out.println("OpenAPI specification is valid.");
+        System.out.println("OpenAPI description is valid.");
     }
 
     private String prettyJson(OpenApiContext context) {
@@ -180,11 +183,11 @@ public class GenerateOpenApiSpecCommand extends Server {
         return pretty(context.getOutputYamlMapper(), context.read());
     }
 
-    private String pretty(ObjectMapper mapper, OpenAPI spec) {
+    private String pretty(ObjectMapper mapper, OpenAPI description) {
         try {
-            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(spec);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(description);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to serialize OpenAPI spec as YAML", e);
+            throw new RuntimeException("Failed to serialize OpenAPI description as YAML", e);
         }
     }
 

@@ -18,7 +18,7 @@ package org.graylog2.commands;
 
 import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
-import org.graylog.api.GenerateOpenApiSpecCommand;
+import org.graylog.api.GenerateOpenApiDescriptionCommand;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.bootstrap.CliCommandsProvider;
 import org.graylog2.bootstrap.commands.MigrateCmd;
@@ -44,6 +44,6 @@ public class ServerCommandsProvider implements CliCommandsProvider {
                                 JournalDecode.class
                         ));
         builder.withCommand(AutomationTokenCommand.class);
-        builder.withCommand(GenerateOpenApiSpecCommand.class);
+        builder.withCommand(GenerateOpenApiDescriptionCommand.class);
     }
 }

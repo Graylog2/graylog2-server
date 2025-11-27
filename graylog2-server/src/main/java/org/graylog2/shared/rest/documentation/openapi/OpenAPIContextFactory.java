@@ -35,7 +35,7 @@ import org.graylog2.plugin.Version;
 import java.util.Set;
 
 /**
- * Configuration and setup for OpenAPI 3.1 specification generation.
+ * Configuration and setup for OpenAPI 3.1 description generation.
  * This class encapsulates the logic for configuring Swagger/OpenAPI to work with Graylog's REST API.
  */
 @Singleton
@@ -109,7 +109,7 @@ public class OpenAPIContextFactory {
 
         final var openAPI = new OpenAPI()
                 .info(info);
-        // TODO: add server and security spec
+        // TODO: add server and security
 
         return new SwaggerConfiguration()
                 .openAPI31(true)

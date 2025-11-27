@@ -76,7 +76,7 @@ public class CustomModelConverter extends ModelResolver {
                             public List<NamedType> findSubtypes(Annotated a) {
                                 // Only return registered subtypes if this class declares @JsonTypeInfo
                                 // (i.e., it's the actual owner of the polymorphic hierarchy)
-                                if (a instanceof AnnotatedClass ac && ac.getAnnotation(JsonTypeInfo.class) != null) {
+                                if (a instanceof AnnotatedClass ac && ac.hasAnnotation(JsonTypeInfo.class)) {
                                     return CustomModelConverter.this.findRegisteredSubtypes(a);
                                 }
                                 return super.findSubtypes(a);

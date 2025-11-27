@@ -23,10 +23,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Marks a REST resource as public cloud API. This affects the visibility of the resource in the OpenAPI spec and
+ * Marks a REST resource as public cloud API. This affects the visibility of the resource in the OpenAPI description and
  * API browser.
  * <p>
- * If this annotation is missing on a resource, it will not be included in the OpenAPI spec and API browser. However,
+ * If this annotation is missing on a resource, it will not be included in the OpenAPI definition and API browser. However,
  * it's endpoints are still accessible unless other means of restriction are in place (e.g. {@link HideOnCloud}).
  */
 @Documented
