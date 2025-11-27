@@ -19,7 +19,6 @@ import { useCallback } from 'react';
 import type { Sort } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
 
@@ -34,7 +33,6 @@ const useTableEventHandlers = ({
   setQuery: (query: string) => void;
   appSection: string;
 }) => {
-  const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
 
   const onPageSizeChange = useCallback(
@@ -48,7 +46,7 @@ const useTableEventHandlers = ({
       paginationQueryParameter.setPagination({ page: 1, pageSize: newPageSize });
       updateTableLayout({ perPage: newPageSize });
     },
-    [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+    [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout],
   );
 
   const onSearch = useCallback(
@@ -91,7 +89,7 @@ const useTableEventHandlers = ({
 
       updateTableLayout(newLayoutPreferences);
     },
-    [appSection, pathname, sendTelemetry, updateTableLayout],
+    [appSection, sendTelemetry, updateTableLayout],
   );
 
   const onSearchReset = useCallback(() => {
@@ -109,7 +107,7 @@ const useTableEventHandlers = ({
       paginationQueryParameter.resetPage();
       updateTableLayout({ sort: newSort });
     },
-    [appSection, paginationQueryParameter, pathname, sendTelemetry, updateTableLayout],
+    [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout],
   );
 
   return {
