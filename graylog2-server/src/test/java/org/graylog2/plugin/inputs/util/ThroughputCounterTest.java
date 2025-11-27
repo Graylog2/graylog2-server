@@ -22,10 +22,10 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -37,14 +37,14 @@ public class ThroughputCounterTest {
     private EmbeddedChannel channel;
     private ThroughputCounter throughputCounter;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         eventLoopGroup = new NioEventLoopGroup(4);
         throughputCounter = new ThroughputCounter(eventLoopGroup);
         channel = new EmbeddedChannel(throughputCounter);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         eventLoopGroup.shutdownGracefully();
         channel.close().syncUninterruptibly();
@@ -62,7 +62,7 @@ public class ThroughputCounterTest {
     }
 
     @Test
-    @Ignore("Flaky test")
+    @Disabled("Flaky test")
     public void counterReturnsReadBytes() throws InterruptedException {
         final ByteBuf byteBuf = Unpooled.copiedBuffer("Test", StandardCharsets.US_ASCII);
         channel.writeInbound(byteBuf);
@@ -79,7 +79,7 @@ public class ThroughputCounterTest {
     }
 
     @Test
-    @Ignore("Flaky test")
+    @Disabled("Flaky test")
     public void counterReturnsWrittenBytes() throws InterruptedException {
         final ByteBuf byteBuf = Unpooled.copiedBuffer("Test", StandardCharsets.US_ASCII);
         channel.writeOutbound(byteBuf);

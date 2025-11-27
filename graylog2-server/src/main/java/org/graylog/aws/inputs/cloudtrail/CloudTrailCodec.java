@@ -19,12 +19,14 @@ package org.graylog.aws.inputs.cloudtrail;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.aws.AWS;
 import org.graylog.aws.AWSObjectMapper;
 import org.graylog.aws.inputs.cloudtrail.json.CloudTrailRecord;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.AbstractCodec;
@@ -35,6 +37,9 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import java.util.Optional;
+
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.CK_OVERRIDE_SOURCE;
+import static org.graylog.aws.inputs.cloudtrail.CloudTrailInput.Config.getOverrideSourceFieldDefinition;
 
 public class CloudTrailCodec extends AbstractCodec {
     public static final String NAME = "AWSCloudTrail";
@@ -54,12 +59,17 @@ public class CloudTrailCodec extends AbstractCodec {
     public Optional<Message> decodeSafe(@Nonnull RawMessage rawMessage) {
         try {
             final CloudTrailRecord record = objectMapper.readValue(rawMessage.getPayload(), CloudTrailRecord.class);
-            final String source = configuration.getString(Config.CK_OVERRIDE_SOURCE, "aws-cloudtrail");
-            final Message message = messageFactory.createMessage(record.getConstructedMessage(), source, DateTime.parse(record.eventTime));
+            final Message message = messageFactory.createMessage(record.getConstructedMessage(), "aws-cloudtrail", DateTime.parse(record.eventTime));
 
             message.addFields(record.additionalFieldsAsMap());
             message.addField("full_message", record.getFullMessage());
             message.addField(AWS.SOURCE_GROUP_IDENTIFIER, true);
+
+            // Apply override_source if configured
+            final String overrideSourceValue = configuration.getString(CK_OVERRIDE_SOURCE);
+            if (StringUtils.isNotBlank(overrideSourceValue)) {
+                message.setSource(overrideSourceValue);
+            }
 
             return Optional.of(message);
         } catch (Exception e) {
@@ -84,5 +94,11 @@ public class CloudTrailCodec extends AbstractCodec {
 
     @ConfigClass
     public static class Config extends AbstractCodec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest r = new ConfigurationRequest();
+            r.addField(getOverrideSourceFieldDefinition());
+            return r;
+        }
     }
 }

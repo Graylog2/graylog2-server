@@ -27,6 +27,10 @@ import org.graylog2.telemetry.suppliers.ShardsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.LookupTablesSupplier;
 import org.graylog2.telemetry.suppliers.EventDefinitionsMetricsSupplier;
 import org.graylog2.telemetry.suppliers.EventNotificationsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.DashboardsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.StreamsMetricsSupplier;
+import org.graylog2.telemetry.suppliers.SidecarsVersionSupplier;
+import org.graylog2.telemetry.suppliers.NodesSystemMetricsSupplier;
 
 public class TelemetryModule extends PluginModule {
     @Override
@@ -45,5 +49,9 @@ public class TelemetryModule extends PluginModule {
         addTelemetryMetricProvider("Lookup Tables Metrics", LookupTablesSupplier.class);
         addTelemetryMetricProvider("Event Definitions Metrics", EventDefinitionsMetricsSupplier.class);
         addTelemetryMetricProvider("Event Notifications Metrics", EventNotificationsMetricsSupplier.class);
+        addTelemetryMetricProvider("Dashboards Metrics", DashboardsMetricsSupplier.class);
+        addTelemetryMetricProvider("Streams Metrics", StreamsMetricsSupplier.class);
+        addTelemetryMetricProvider("Sidecars Version", SidecarsVersionSupplier.class);
+        addTelemetryMetricProvider("Nodes System Metrics", NodesSystemMetricsSupplier.class);
     }
 }

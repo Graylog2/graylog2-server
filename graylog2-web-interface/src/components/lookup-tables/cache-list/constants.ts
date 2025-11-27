@@ -58,6 +58,6 @@ export const cacheListElements = {
     defaultPageSize: 20,
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
     defaultDisplayedAttributes: ['title', 'description', 'name', 'entries', 'hit_rate', 'throughput'],
+    defaultColumnOrder: ['title', 'description', 'name', 'entries', 'hit_rate', 'throughput'],
   },
-  columnOrder: ['title', 'description', 'name', 'entries', 'hit_rate', 'throughput'],
 };

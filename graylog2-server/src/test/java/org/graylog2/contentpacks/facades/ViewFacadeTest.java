@@ -48,8 +48,9 @@ import org.graylog.plugins.views.search.views.widgets.aggregation.AutoIntervalDT
 import org.graylog.plugins.views.search.views.widgets.aggregation.TimeHistogramConfigDTO;
 import org.graylog.plugins.views.search.views.widgets.messagelist.MessageListConfigDTO;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.contentpacks.EntityDescriptorIds;
 import org.graylog2.contentpacks.model.ModelId;
@@ -81,9 +82,9 @@ import org.graylog2.streams.StreamMock;
 import org.graylog2.users.UserImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.Collections;
 import java.util.List;
@@ -95,16 +96,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MongoDBExtension.class)
 public class ViewFacadeTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
     public static class TestSearchDBService extends SearchDbService {
-        protected TestSearchDBService(MongoConnection mongoConnection,
-                                      MongoJackObjectMapperProvider mapper) {
-            super(new MongoCollections(mapper, mongoConnection), dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
+        protected TestSearchDBService(MongoCollections mongoCollections) {
+            super(mongoCollections, dto -> new SearchRequirements(Collections.emptySet(), dto), new IgnoreSearchFilters());
         }
     }
 
@@ -132,8 +131,8 @@ public class ViewFacadeTest {
     private UserService userService;
     private EntityRegistrar entityRegistrar;
 
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(MongoDBTestService dbTestService) {
         objectMapper.registerSubtypes(new NamedType(AggregationConfigDTO.class, AggregationConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(MessageListConfigDTO.class, MessageListConfigDTO.NAME));
         objectMapper.registerSubtypes(new NamedType(TimeHistogramConfigDTO.class, TimeHistogramConfigDTO.NAME));
@@ -147,10 +146,10 @@ public class ViewFacadeTest {
         objectMapper.registerSubtypes(MessageList.class);
         objectMapper.registerSubtypes(Pivot.class);
         objectMapper.registerSubtypes(EventList.class);
-        final MongoConnection mongoConnection = mongodb.mongoConnection();
+        final MongoConnection mongoConnection = dbTestService.mongoConnection();
         final MongoJackObjectMapperProvider mapper = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoCollections mongoCollections = new MongoCollections(mapper, mongoConnection);
-        searchDbService = new TestSearchDBService(mongoConnection, mapper);
+        final var mongoCollections = new MongoCollections(mapper, mongoConnection);
+        searchDbService = new TestSearchDBService(mongoCollections);
         viewService = new TestViewService(null, mongoCollections);
         viewSummaryService = new TestViewSummaryService(mongoCollections);
         userService = mock(UserService.class);
@@ -317,7 +316,7 @@ public class ViewFacadeTest {
                 .widgets(Set.of())
                 .widgetMapping(Map.of())
                 .widgetPositions(Map.of())
-                .formatting(FormattingSettings.builder().highlighting(Set.of()).build())
+                .formatting(FormattingSettings.builder().highlighting(List.of()).build())
                 .displayModeSettings(DisplayModeSettings.empty())
                 .build();
         String newViewId = "5def958063303ae5f68edead";
