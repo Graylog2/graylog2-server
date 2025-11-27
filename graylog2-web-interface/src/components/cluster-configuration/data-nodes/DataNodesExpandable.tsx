@@ -90,23 +90,31 @@ const DataNodesExpandable = ({
       onTitleCountClick={onSelectNodeType ?? null}
       headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
-      {!isLoading && !isLoadingLayout && dataNodes.length === 0 ? (
-        <EmptyState>No Data Nodes found.</EmptyState>
-      ) : (
-        <EntityDataTable<ClusterDataNode>
-          entities={dataNodes}
-          defaultDisplayedColumns={defaultDisplayedColumns}
-          defaultColumnOrder={defaultColumnOrder}
-          layoutPreferences={layoutPreferences}
-          onLayoutPreferencesChange={handleLayoutPreferencesChange}
-          onSortChange={handleSortChange}
-          activeSort={searchParams.sort}
-          entityAttributesAreCamelCase
-          entityActions={renderActions}
-          columnSchemas={columnSchemas}
-          columnRenderers={columnRenderers}
-        />
-      )}
+      {(() => {
+        if (isLoading || isLoadingLayout) {
+          return <Spinner />;
+        }
+
+        if (dataNodes.length === 0) {
+          return <EmptyState>No Data Nodes found.</EmptyState>;
+        }
+
+        return (
+          <EntityDataTable<ClusterDataNode>
+            entities={dataNodes}
+            defaultDisplayedColumns={defaultDisplayedColumns}
+            defaultColumnOrder={defaultColumnOrder}
+            layoutPreferences={layoutPreferences}
+            onLayoutPreferencesChange={handleLayoutPreferencesChange}
+            onSortChange={handleSortChange}
+            activeSort={searchParams.sort}
+            entityAttributesAreCamelCase
+            entityActions={renderActions}
+            columnSchemas={columnSchemas}
+            columnRenderers={columnRenderers}
+          />
+        );
+      })()}
     </ClusterNodesSectionWrapper>
   );
 };

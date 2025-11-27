@@ -70,24 +70,31 @@ const GraylogNodesExpandable = ({
       onTitleCountClick={onSelectNodeType ?? null}
       headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
-      {!isLoading && !isLoadingLayout && graylogNodes.length === 0 ? (
-        <EmptyState>No Graylog Nodes found.</EmptyState>
-      ) : (
-        <EntityDataTable<GraylogNode>
-          entities={graylogNodes}
-          defaultDisplayedColumns={defaultDisplayedColumns}
-          defaultColumnOrder={defaultColumnOrder}
-          layoutPreferences={layoutPreferences}
-          onLayoutPreferencesChange={handleLayoutPreferencesChange}
-          onSortChange={handleSortChange}
-          activeSort={searchParams.sort}
-          entityAttributesAreCamelCase={false}
-          entityActions={renderActions}
-          columnSchemas={columnSchemas}
-          columnRenderers={columnRenderers}
-          actionsCellWidth={160}
-        />
-      )}
+      {(() => {
+        if (isLoading || isLoadingLayout) {
+          return <Spinner />;
+        }
+        if (graylogNodes.length === 0) {
+          return <EmptyState>No Graylog Nodes found.</EmptyState>;
+        }
+
+        return (
+          <EntityDataTable<GraylogNode>
+            entities={graylogNodes}
+            defaultDisplayedColumns={defaultDisplayedColumns}
+            defaultColumnOrder={defaultColumnOrder}
+            layoutPreferences={layoutPreferences}
+            onLayoutPreferencesChange={handleLayoutPreferencesChange}
+            onSortChange={handleSortChange}
+            activeSort={searchParams.sort}
+            entityAttributesAreCamelCase={false}
+            entityActions={renderActions}
+            columnSchemas={columnSchemas}
+            columnRenderers={columnRenderers}
+            actionsCellWidth={160}
+          />
+        );
+      })()}
     </ClusterNodesSectionWrapper>
   );
 };
