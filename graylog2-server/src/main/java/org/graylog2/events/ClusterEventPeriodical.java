@@ -24,13 +24,12 @@ import com.google.common.eventbus.Subscribe;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.FindIterable;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
-import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
@@ -55,6 +54,9 @@ public class ClusterEventPeriodical extends Periodical {
     private final ObjectMapper objectMapper;
     private final EventBus serverEventBus;
     private final RestrictedChainingClassLoader chainingClassLoader;
+    private Offset offset;
+
+    record Offset(long lastSeen, String lastId) {}
 
     @Inject
     public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
@@ -68,6 +70,7 @@ public class ClusterEventPeriodical extends Periodical {
         this.chainingClassLoader = chainingClassLoader;
         this.serverEventBus = serverEventBus;
         this.collection = prepareCollection(mongoConnection, mapperProvider);
+        this.offset = new Offset(System.currentTimeMillis(), null);
 
         clusterEventBus.registerClusterEventSubscriber(this);
     }
@@ -131,7 +134,7 @@ public class ClusterEventPeriodical extends Periodical {
     public void doRun() {
         LOG.debug("Opening MongoDB cursor on \"{}\"", COLLECTION_NAME);
         try {
-            final FindIterable<ClusterEvent> eventsIterable = eventsIterable(nodeId);
+            final FindIterable<ClusterEvent> eventsIterable = eventsIterable(this.offset);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("MongoDB query plan: {}", eventsIterable.explain());
             }
@@ -148,7 +151,7 @@ public class ClusterEventPeriodical extends Periodical {
                         LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
                     }
 
-                    updateConsumers(clusterEvent.id(), nodeId);
+                    this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
                 });
             }
         } catch (Exception e) {
@@ -178,13 +181,13 @@ public class ClusterEventPeriodical extends Periodical {
         }
     }
 
-    private FindIterable<ClusterEvent> eventsIterable(NodeId nodeId) {
-        return collection.find(Filters.nin("consumers", nodeId.getNodeId()))
-                .sort(Sorts.ascending("timestamp"));
-    }
-
-    private void updateConsumers(final String eventId, final NodeId nodeId) {
-        collection.updateOne(MongoUtils.idEq(eventId), Updates.addToSet("consumers", nodeId.getNodeId()));
+    private FindIterable<ClusterEvent> eventsIterable(Offset offset) {
+        final var query = offset.lastId() == null
+                ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen())
+                : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()),
+                Filters.and(Filters.eq(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()), Filters.ne(ClusterEvent.FIELD_ID, offset.lastId())));
+        return collection.find(query)
+                .sort(Sorts.ascending(ClusterEvent.FIELD_TIMESTAMP));
     }
 
     private Object extractPayload(Object payload, String eventClass) {

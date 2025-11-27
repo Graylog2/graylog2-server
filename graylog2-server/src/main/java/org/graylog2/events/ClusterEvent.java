@@ -35,6 +35,9 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 public abstract class ClusterEvent implements MongoEntity {
+    public static final String FIELD_ID = "_id";
+    public static final String FIELD_TIMESTAMP = "timestamp";
+    
     @Id
     @ObjectId
     @Nullable
