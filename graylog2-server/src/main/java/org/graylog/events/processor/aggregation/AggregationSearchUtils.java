@@ -189,7 +189,7 @@ public class AggregationSearchUtils {
             final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
-            // adding the aggregation conditions to the event
+            // adding the aggregation conditions to the event, TODO: is it possible to have identical keys for multiple seriesValues?
             final var aggregationConditions = keyResult.seriesValues().stream()
                     .collect(Collectors.toMap(s -> s.series().literal(), s -> String.valueOf(s.value())));
             event.setAggregationConditions(aggregationConditions);
