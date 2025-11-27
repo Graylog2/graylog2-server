@@ -66,6 +66,7 @@ const ScrollContainer = styled.div<{
       .join('\n')}
 
     ${$activeColId ? `${columnOpacityVar($activeColId)}: 0.4;` : ''}
+    ${$activeColId ? `--col-transition: transform 0.2s ease-in-out;` : ''}
 
     ${Object.entries($columnTransform)
       .map(([id, transform]) => `${columnTransformVar(id)}: ${transform};`)

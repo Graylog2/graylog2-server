@@ -23,7 +23,12 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 import DragHandle from 'components/common/SortableList/DragHandle';
-import { columnTransformVar, columnOpacityVar, columnWidthVar } from 'components/common/EntityDataTable/CSSVariables';
+import {
+  columnTransformVar,
+  columnOpacityVar,
+  columnWidthVar,
+  columnTransition,
+} from 'components/common/EntityDataTable/CSSVariables';
 
 import SortIcon from './SortIcon';
 import DndStylesContext from './contexts/DndStylesContext';
@@ -40,8 +45,9 @@ export const Th = styled.th<{ $colId: string }>(
   ({ $colId, theme }) => css`
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
-    transform: var(${columnTransformVar($colId)}, 'none');
+    transform: var(${columnTransformVar($colId)}, translate3d(0px, 0px, 0));
     background-color: ${theme.colors.table.head.background};
+    transition: var(${columnTransition()}, none);
   `,
 );
 
@@ -95,7 +101,8 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
         <LeftCol>
           {columnMeta?.enableColumnOrdering && (
             <DragHandle
-              ref={setActivatorNodeRef}index={header.index}
+              ref={setActivatorNodeRef}
+              index={header.index}
               dragHandleProps={{ ...attributes, ...listeners }}
               isDragging={isDragging}
               itemTitle={columnMeta.label}

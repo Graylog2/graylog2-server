@@ -23,7 +23,7 @@ import { Table as BaseTable } from 'components/bootstrap';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
-import { columnOpacityVar, columnTransformVar } from 'components/common/EntityDataTable/CSSVariables';
+import { columnOpacityVar, columnTransformVar, columnTransition } from 'components/common/EntityDataTable/CSSVariables';
 
 import TableHead from './TableHead';
 
@@ -52,7 +52,8 @@ const Td = styled.td<{ $colId: string }>(
   ({ $colId }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
-    transform: var(${columnTransformVar($colId)}, 'none');
+    transform: var(${columnTransformVar($colId)}, translate3d(0px, 0px, 0));
+    transition: var(${columnTransition()}, none);
   `,
 );
 
