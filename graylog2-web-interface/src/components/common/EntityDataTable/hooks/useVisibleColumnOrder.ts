@@ -41,17 +41,17 @@ const getVisibleAttributeColumns = (
 };
 const useVisibleColumnOrder = (
   columnPreferences: ColumnPreferences | undefined,
-  attributeColumnsOder: Array<string>,
+  attributeColumnsOrder: Array<string>,
   defaultDisplayedColumns: Array<string>,
   displayActionsCol: boolean,
   displayBulkSelectCol: boolean,
 ) =>
   useMemo(() => {
     const visibleAttributeColumns = getVisibleAttributeColumns(defaultDisplayedColumns, columnPreferences);
-    // Core order: visible attributes in the order defined by attributeColumnsOder
-    const coreOrder = attributeColumnsOder.filter((id) => visibleAttributeColumns.has(id));
-    // Additional: visible attributes not in attributeColumnsOder
-    const additionalVisible = [...visibleAttributeColumns].filter((id) => !attributeColumnsOder.includes(id));
+    // Core order: visible attributes in the order defined by attributeColumnsOrder
+    const coreOrder = attributeColumnsOrder.filter((id) => visibleAttributeColumns.has(id));
+    // Additional: visible attributes not in attributeColumnsOrder
+    const additionalVisible = [...visibleAttributeColumns].filter((id) => !attributeColumnsOrder.includes(id));
 
     return [
       ...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []),
@@ -59,6 +59,6 @@ const useVisibleColumnOrder = (
       ...additionalVisible,
       ...(displayActionsCol ? [ACTIONS_COL_ID] : []),
     ];
-  }, [columnPreferences, defaultDisplayedColumns, attributeColumnsOder, displayBulkSelectCol, displayActionsCol]);
+  }, [columnPreferences, defaultDisplayedColumns, attributeColumnsOrder, displayBulkSelectCol, displayActionsCol]);
 
 export default useVisibleColumnOrder;

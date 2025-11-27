@@ -39,7 +39,7 @@ type Props = {
 const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, hideDelete = false }: Props) => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<View>(null, 'dashboard');
-  const { getDefaultLayout, columnOrder, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
+  const { getDefaultLayout, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
   const customColumnRenderers = useColumnRenderers(pluggableColumnRenderers);
 
   const renderDashboardActions = useCallback(
@@ -62,7 +62,6 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
   return (
     <PaginatedEntityTable<View>
       humanName="dashboards"
-      columnsOrder={columnOrder}
       queryHelpComponent={
         <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
       }

@@ -1,0 +1,5 @@
+type = "a"
+message = "Added the ability to reorder columns in entity tables (alerts overview, streams overview, etc.) via drag and drop."
+
+issues = ["23935"]
+pulls = ["24191"]
