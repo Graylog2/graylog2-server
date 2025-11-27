@@ -60,16 +60,18 @@ public class AdaptersOS2 implements Adapters {
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
+    private final SearchRequestFactory searchRequestFactory;
 
     public AdaptersOS2(OpenSearchClient client, List<String> featureFlags) {
         this.client = client;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+        this.searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
     }
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterOS2(client);
+        return new CountsAdapterOS2(client, searchRequestFactory);
     }
 
     @Override
@@ -98,10 +100,6 @@ public class AdaptersOS2 implements Adapters {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         return new SearchesAdapterOS2(client,
                 new Scroll(client,
                         scrollResultFactory,
