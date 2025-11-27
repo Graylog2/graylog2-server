@@ -78,13 +78,6 @@ const useTableEventHandlers = ({
         });
       }
 
-      if (layoutPreferences.attributes === null && layoutPreferences.order === null) {
-        sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
-          app_section: appSection,
-          app_action_value: 'columns-select',
-        });
-      }
-
       const newLayoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> } = {};
 
       if ('order' in layoutPreferences) {
@@ -99,6 +92,17 @@ const useTableEventHandlers = ({
     },
     [appSection, sendTelemetry, updateTableLayout],
   );
+
+  const onResetLayoutPreferences = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
+      app_section: appSection,
+      app_action_value: 'columns-select',
+    });
+
+    paginationQueryParameter.resetPage();
+
+    return updateTableLayout({ attributes: null, order: null, sort: undefined, perPage: undefined });
+  }, [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout]);
 
   const onSearchReset = useCallback(() => {
     onSearch('');
@@ -121,6 +125,7 @@ const useTableEventHandlers = ({
   return {
     onLayoutPreferencesChange,
     onPageSizeChange,
+    onResetLayoutPreferences,
     onSearch,
     onSearchReset,
     onSortChange,

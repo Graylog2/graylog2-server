@@ -113,7 +113,14 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
 
   const appSection = `${tableLayout.entityTableId}-list`;
 
-  const { onPageSizeChange, onSearch, onSearchReset, onLayoutPreferencesChange, onSortChange } = useTableEventHandlers({
+  const {
+    onLayoutPreferencesChange,
+    onPageSizeChange,
+    onResetLayoutPreferences,
+    onSearch,
+    onSearchReset,
+    onSortChange,
+  } = useTableEventHandlers({
     appSection,
     paginationQueryParameter: paginationState,
     updateTableLayout,
@@ -188,6 +195,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 order: layoutConfig.order,
               }}
               defaultColumnOrder={tableLayout.defaultColumnOrder}
+              onResetLayoutPreferences={onResetLayoutPreferences}
               onLayoutPreferencesChange={onLayoutPreferencesChange}
               expandedSectionRenderers={expandedSectionRenderers}
               bulkSelection={bulkSelection}

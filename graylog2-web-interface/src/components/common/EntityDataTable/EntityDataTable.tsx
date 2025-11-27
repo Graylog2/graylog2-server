@@ -216,6 +216,8 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */
   onPageSizeChange?: (newPageSize: number) => void;
+  /** Function to handle layout preferences reset */
+  onResetLayoutPreferences: () => Promise<void>;
   /** Active page size */
   pageSize?: number;
   /** Actions for each row. */
@@ -228,21 +230,22 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
  * Flexible data table component which allows defining custom column renderers.
  */
 const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
-  minActionsCellWidth: fixedActionsCellWidth = undefined,
   activeSort = undefined,
-  entityAttributesAreCamelCase,
   bulkSelection: { actions, onChangeSelection, initialSelection, isEntitySelectable } = {},
-  columnSchemas,
   columnRenderers: customColumnRenderers = undefined,
-  entities,
-  expandedSectionRenderers = undefined,
-  onLayoutPreferencesChange,
-  defaultDisplayedColumns,
+  columnSchemas,
   defaultColumnOrder,
+  defaultDisplayedColumns,
+  entities,
   entityActions = undefined,
+  entityAttributesAreCamelCase,
+  expandedSectionRenderers = undefined,
   layoutPreferences,
   meta = undefined,
+  minActionsCellWidth: fixedActionsCellWidth = undefined,
+  onLayoutPreferencesChange,
   onPageSizeChange = undefined,
+  onResetLayoutPreferences,
   onSortChange,
   pageSize = undefined,
 }: Props<Entity, Meta>) => {
@@ -314,7 +317,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const headerGroups = useMemo(() => table.getHeaderGroups(), [columnOrder]);
 
   const resetLayoutPreferences = useCallback(() => {
-    onLayoutPreferencesChange({ attributes: null, order: null }).then(() => {
+    onResetLayoutPreferences().then(() => {
       setInternalAttributeColumnOrder(defaultColumnOrder);
       setInternalColumnWidthPreferences({});
     });
