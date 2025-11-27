@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useContext, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
-import type { Header, HeaderGroup } from '@tanstack/react-table';
+import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -36,14 +36,15 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $colId: string }>(
-  ({ $colId, theme }) => css`
+export const Th = styled.th<{ $colId: string; $pinningPosition: ColumnPinningPosition }>(
+  ({ theme, $pinningPosition, $colId }) => css`
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, 'none');
     background-color: ${theme.colors.table.head.background};
     opacity: var(--col-${$colId}-opacity, 1);
     transform: var(--col-${$colId}-transform, 'none');
+    ${$pinningPosition ? `position: sticky; ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;` : ''}
   `,
 );
 
@@ -92,12 +93,18 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
   );
 
   return (
-    <Th key={header.id} ref={setNodeRef} colSpan={header.colSpan} $colId={header.column.id}>
+    <Th
+      key={header.id}
+      ref={setNodeRef}
+      colSpan={header.colSpan}
+      $colId={header.column.id}
+      $pinningPosition={header.column.getIsPinned()}>
       <ThInner>
         <LeftCol>
           {columnMeta?.enableColumnOrdering && (
             <DragHandle
-              ref={setActivatorNodeRef}index={header.index}
+              ref={setActivatorNodeRef}
+              index={header.index}
               dragHandleProps={{ ...attributes, ...listeners }}
               isDragging={isDragging}
               itemTitle={columnMeta.label}

@@ -19,38 +19,73 @@ import * as React from 'react';
 import { useCallback, useMemo } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
+import chroma from 'chroma-js';
 
 import { ButtonToolbar } from 'components/bootstrap';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
+function flattenOver(bgColor, rgbaColor) {
+  const fg = chroma(rgbaColor);
+  const bg = chroma(bgColor);
+
+  const alpha = fg.alpha(); // e.g. 0.1
+  const fgOpaque = fg.alpha(1); // same RGB, full alpha
+
+  // bg * (1 - a) + fg * a  → equivalent to your rgba over bg
+  return chroma.mix(bg, fgOpaque, alpha, 'rgb').hex();
+}
+
 const ActionsHead = styled.div`
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
   flex: 1;
 `;
+
+const ActionsHeadInner = styled.div<{ $width: number }>(
+  ({ $width }) => `
+  width: ${$width}px;
+`,
+);
 
 const Actions = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
 
-const ActionsHeader = () => <ActionsHead>Actions</ActionsHead>;
+const ActionsInner = styled(ButtonToolbar)<{ $isEvenRow: boolean }>(
+  ({ theme, $isEvenRow }) => css`
+    background-color: ${flattenOver(
+      theme.colors.global.contentBackground,
+      $isEvenRow ? theme.colors.global.contentBackground : theme.colors.table.row.backgroundStriped,
+    )};
+  `,
+);
 
 const useActionsColumnDefinition = <Entity extends EntityBase>(
   displayActionsCol: boolean,
   actionsColWidth: number,
   entityActions: (entity: Entity) => React.ReactNode | undefined,
-  colRef: React.MutableRefObject<HTMLDivElement>,
+  minActionsCellWidth: number,
 ) => {
   const columnHelper = createColumnHelper<Entity>();
 
   const cell = useCallback(
     ({ row }: { row: Row<Entity> }) => (
-      <div ref={colRef}>
-        <Actions>{entityActions(row.original)}</Actions>
-      </div>
+      <Actions>
+        <ActionsInner $isEvenRow={row.index % 2 === 0}>{entityActions(row.original)}</ActionsInner>
+      </Actions>
     ),
-    [colRef, entityActions],
+    [entityActions],
+  );
+
+  const header = useCallback(
+    () => (
+      <ActionsHead>
+        <ActionsHeadInner $width={minActionsCellWidth} />
+      </ActionsHead>
+    ),
+    [minActionsCellWidth],
   );
 
   return useMemo(
@@ -58,12 +93,13 @@ const useActionsColumnDefinition = <Entity extends EntityBase>(
       columnHelper.display({
         id: ACTIONS_COL_ID,
         size: actionsColWidth,
-        header: displayActionsCol ? ActionsHeader : undefined,
+        header: displayActionsCol ? header : undefined,
         enableHiding: false,
+        enablePinning: true,
         enableResizing: false,
         cell: displayActionsCol ? cell : undefined,
       }),
-    [actionsColWidth, cell, columnHelper, displayActionsCol],
+    [actionsColWidth, cell, columnHelper, displayActionsCol, header],
   );
 };
 export default useActionsColumnDefinition;

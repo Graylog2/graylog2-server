@@ -138,6 +138,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   entityActions,
   entityAttributesAreCamelCase,
   meta,
+  minActionsCellWidth,
 }: {
   actionsRef: React.MutableRefObject<HTMLDivElement>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
@@ -147,11 +148,17 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
   entityAttributesAreCamelCase: boolean;
+  minActionsCellWidth: number;
   meta: Meta;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol);
-  const actionsCol = useActionsColumnDefinition(displayActionsCol, columnWidths.actions, entityActions, actionsRef);
+  const actionsCol = useActionsColumnDefinition(
+    displayActionsCol,
+    columnWidths.actions,
+    entityActions,
+    minActionsCellWidth,
+  );
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
     columnSchemas,
     columnRenderersByAttribute,
@@ -290,6 +297,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     entityActions,
     entityAttributesAreCamelCase,
     meta,
+    minActionsCellWidth: fixedActionsCellWidth,
   });
 
   const table = useTable<Entity>({

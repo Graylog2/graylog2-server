@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Row, HeaderGroup } from '@tanstack/react-table';
+import type { Row, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
+import chroma from 'chroma-js';
 
 import { Table as BaseTable } from 'components/bootstrap';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
@@ -47,12 +48,13 @@ const StyledTable = styled(BaseTable)(
   `,
 );
 
-const Td = styled.td<{ $colId: string }>(
-  ({ $colId }) => css`
+const Td = styled.td<{ $colId: string; $pinningPosition: ColumnPinningPosition; $isEvenRow: boolean }>(
+  ({ theme, $colId, $pinningPosition }) => css`
     word-break: break-word;
     opacity: var(--col-${$colId}-opacity, 1);
     transform: var(--col-${$colId}-transform, 'none');
     transition: width transform 0.2s ease-in-out;
+    ${$pinningPosition ? `position: sticky; ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;` : ''}
   `,
 );
 
@@ -69,7 +71,7 @@ const Table = <Entity extends EntityBase>({ expandedSectionRenderers, rows, head
       <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
         <tr>
           {row.getVisibleCells().map((cell) => (
-            <Td key={cell.id} $colId={cell.column.id}>
+            <Td key={cell.id} $colId={cell.column.id} $pinningPosition={cell.column.getIsPinned()}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           ))}

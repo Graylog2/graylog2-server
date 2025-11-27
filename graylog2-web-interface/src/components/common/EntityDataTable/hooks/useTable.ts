@@ -23,7 +23,7 @@ import type { Sort } from 'stores/PaginationTypes';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 
 import type { ColumnPreferences, EntityBase, ColumnRenderersByAttribute } from '../types';
-import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, DEFAULT_COL_MIN_WIDTH } from '../Constants';
+import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, DEFAULT_COL_MIN_WIDTH, ACTIONS_COL_ID } from '../Constants';
 
 const COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS = 500;
 
@@ -243,6 +243,11 @@ const useTable = <Entity extends EntityBase>({
     onRowSelectionChange,
     onSortingChange,
     onColumnSizingChange,
+    initialState: {
+      columnPinning: {
+        right: [ACTIONS_COL_ID],
+      },
+    },
     state: {
       columnOrder,
       columnVisibility,
