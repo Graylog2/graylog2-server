@@ -23,6 +23,7 @@ import org.graylog2.search.QueryStringUtils;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
+import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 
 import java.util.Optional;
 
@@ -62,17 +63,15 @@ public class SearchRequestFactoryOS {
                     );
         }
 
-        final Optional<BoolQuery.Builder> rangeQueryBuilder = range
-                .map(TimeRangeQueryFactory::createTimeRangeQuery)
-                .map(rangeQuery -> QueryBuilders.bool().must(rangeQuery.toQuery()));
-        final Optional<BoolQuery.Builder> filterQueryBuilder = filter
+        final Optional<RangeQuery> rangeQuery = range
+                .map(TimeRangeQueryFactory::createTimeRangeQuery);
+        final Optional<Query> filterQuery = filter
                 .filter(f -> !QueryStringUtils.isEmptyOrMatchAllQueryString(f))
-                .map(f -> QueryBuilders.queryString().query(f).build().toQuery())
-                .map(queryStringQuery -> QueryBuilders.bool().must(queryStringQuery));
+                .map(f -> QueryBuilders.queryString().query(f).build().toQuery());
 
 
-        filterQueryBuilder.ifPresent(builder -> topQueryBuilder.filter(builder.build().toQuery()));
-        rangeQueryBuilder.ifPresent(builder -> topQueryBuilder.filter(builder.build().toQuery()));
+        filterQuery.ifPresent(topQueryBuilder::filter);
+        rangeQuery.ifPresent(rQuery -> topQueryBuilder.filter(rQuery.toQuery()));
         return topQueryBuilder.build().toQuery();
     }
 
