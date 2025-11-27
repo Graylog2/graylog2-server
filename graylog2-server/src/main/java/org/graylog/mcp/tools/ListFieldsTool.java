@@ -25,6 +25,7 @@ import com.google.auto.value.AutoValue;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.ToolDependenciesProvider;
 import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
 import org.graylog2.indexer.fieldtypes.MappedFieldTypesService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -38,9 +39,9 @@ public class ListFieldsTool extends Tool<ListFieldsTool.Parameters, ListFieldsTo
     private final MappedFieldTypesService mappedFieldTypesService;
 
     @Inject
-    protected ListFieldsTool(final ToolContext toolContext, MappedFieldTypesService mappedFieldTypesService) {
+    protected ListFieldsTool(MappedFieldTypesService mappedFieldTypesService,
+                             final ToolDependenciesProvider toolDependenciesProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -53,7 +54,8 @@ public class ListFieldsTool extends Tool<ListFieldsTool.Parameters, ListFieldsTo
                 This tool can be scoped to streams to cut down on the noise.
                 Fields can have various properties, such as "enumerable" which means you can aggregate on them, they can be "numeric",
                 making them suitable to use in aggregation metrics, or "full-text-search", which means their content is tokenized
-                """
+                """,
+                toolDependenciesProvider
         );
         this.mappedFieldTypesService = mappedFieldTypesService;
     }

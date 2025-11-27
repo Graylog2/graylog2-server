@@ -37,19 +37,7 @@ import java.util.Optional;
  * @param <O> Output type
  */
 public abstract class Tool<P, O> {
-    public record ToolContext(
-            ObjectMapper objectMapper,
-            SchemaGeneratorProvider schemaGeneratorProvider,
-            CustomizationConfig  customizationConfig,
-            ClusterConfigService clusterConfigService
-    ) {
-        @Inject
-        public ToolContext {}
-    }
-
-    private final ObjectMapper objectMapper;
-    private final ClusterConfigService clusterConfigService;
-    private final String productName;
+    private final ToolDependenciesProvider toolDependenciesProvider;
 
     private final TypeReference<P> parameterType;
     private final String name;
@@ -69,61 +57,54 @@ public abstract class Tool<P, O> {
             String description
     ) {
         this(
-                new ToolContext(objectMapper, schemaGeneratorProvider, null, null),
                 parameterType,
                 outputType,
                 name,
                 title,
-                description
+                description,
+                new ToolDependenciesProvider(objectMapper, schemaGeneratorProvider)
         );
     }
 
     protected Tool(
-            ToolContext context,
             TypeReference<P> parameterType,
             TypeReference<O> outputType,
             String name,
             String title,
-            String description
+            String description,
+            ToolDependenciesProvider toolDependenciesProvider
     ) {
         this.parameterType = parameterType;
         this.name = name;
         this.title = title;
         this.description = description;
 
-        this.objectMapper = context.objectMapper();
-        this.clusterConfigService = context.clusterConfigService();
-        this.productName = context.customizationConfig() != null ? context.customizationConfig().productName() : "";
+        this.toolDependenciesProvider = toolDependenciesProvider;
 
         // Get the schema generator with all contributed modules
-        SchemaGenerator generator = context.schemaGeneratorProvider().get();
+        SchemaGenerator generator = toolDependenciesProvider.getSchemaGenerator();
 
         // we can precompute the schema for our parameters, it's statically known
         final var inputSchemaNode = generator.generateSchema(parameterType.getType());
         if (inputSchemaNode.isEmpty()) {
             this.inputSchema = null;
         } else {
-            this.inputSchema = objectMapper.convertValue(inputSchemaNode, McpSchema.JsonSchema.class);
+            this.inputSchema = getObjectMapper().convertValue(inputSchemaNode, McpSchema.JsonSchema.class);
         }
         // if our tool produces anything other than a String, we want to create a JSON schema for it
         if (String.class.equals(outputType.getType())) {
             this.outputSchema = null;
         } else {
-            this.outputSchema = objectMapper.convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
+            this.outputSchema = getObjectMapper().convertValue(generator.generateSchema(outputType.getType()), new TypeReference<Map<String, Object>>() {});
         }
     }
 
     protected boolean isOutputSchemaEnabled() {
-        return clusterConfigService != null && clusterConfigService.getOrDefault(McpConfiguration.class, McpConfiguration.DEFAULT_VALUES)
-                .enableOutputSchema();
+        return toolDependenciesProvider.getMcpConfiguration().enableOutputSchema();
     }
 
     protected ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
-    protected String getProductName() {
-        return productName;
+        return toolDependenciesProvider.getObjectMapper();
     }
 
     @JsonProperty
@@ -159,7 +140,7 @@ public abstract class Tool<P, O> {
      * @return the return value of the tool call
      */
     public O apply(PermissionHelper permissionHelper, Map<String, Object> parameterMap) {
-        final P p = objectMapper.convertValue(parameterMap, parameterType);
+        final P p = getObjectMapper().convertValue(parameterMap, parameterType);
         return apply(permissionHelper, p);
     }
 

@@ -19,6 +19,7 @@ package org.graylog.mcp.tools;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.ToolDependenciesProvider;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.MongoIndexSet;
@@ -32,6 +33,7 @@ import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -53,23 +55,24 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public ListIndicesTool(final ToolContext toolContext,
-                           Indices indices,
+    public ListIndicesTool(Indices indices,
                            NodeInfoCache nodeInfoCache,
-                           IndexSetRegistry indexSetRegistry) {
+                           IndexSetRegistry indexSetRegistry,
+                           final CustomizationConfig customizationConfig,
+                           final ToolDependenciesProvider toolDependenciesProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("List %s Indices", toolContext.customizationConfig().productName()),
+                f("List %s Indices", customizationConfig.productName()),
                 f("""
                         List all %s indices from the cluster. Returns comprehensive index information including status (open/closed),
                         document counts, storage size, and health metrics. Use this to understand data distribution, identify problematic indices,
                         or before performing queries to understand available data sources. No parameters required.
                         """,
-                        toolContext.customizationConfig().productName()
-                )
+                        customizationConfig.productName()
+                ),
+                toolDependenciesProvider
         );
         this.indices = indices;
         this.nodeInfoCache = nodeInfoCache;

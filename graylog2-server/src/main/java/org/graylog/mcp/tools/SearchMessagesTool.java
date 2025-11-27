@@ -27,11 +27,13 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.ws.rs.DefaultValue;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.ToolDependenciesProvider;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,9 +49,11 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public SearchMessagesTool(final ToolContext toolContext, ScriptingApiService scriptingApiService) {
+    public SearchMessagesTool(ScriptingApiService scriptingApiService,
+                              CustomizationConfig customizationConfig,
+                              ToolDependenciesProvider toolDependenciesProvider
+    ) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -62,7 +66,9 @@ public class SearchMessagesTool extends Tool<SearchMessagesTool.Parameters, Tabu
                         Pass the timerange as a parameter, never put it into the query itself.
                         List the fields you are interested in, as the default fields are "source" and "timestamp" only, which aren't overly useful by themselves.
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
-                        """.formatted(toolContext.customizationConfig().productName()));
+                        """.formatted(customizationConfig.productName()),
+                toolDependenciesProvider
+                );
         this.scriptingApiService = scriptingApiService;
     }
 

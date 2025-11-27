@@ -27,6 +27,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import jakarta.ws.rs.DefaultValue;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.ToolDependenciesProvider;
 import org.graylog.plugins.views.search.rest.scriptingapi.ScriptingApiService;
 import org.graylog.plugins.views.search.rest.scriptingapi.mapping.QueryFailedException;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec;
@@ -34,6 +35,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,9 +51,10 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public AggregateMessagesTool(final ToolContext toolContext, ScriptingApiService scriptingApiService) {
+    public AggregateMessagesTool(ScriptingApiService scriptingApiService,
+                                 final CustomizationConfig customizationConfig,
+                                 final ToolDependenciesProvider toolDependenciesProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -64,7 +67,9 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                         You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
                         For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
-                        """.formatted(toolContext.customizationConfig().productName()));
+                        """.formatted(customizationConfig.productName()),
+                toolDependenciesProvider
+        );
         this.scriptingApiService = scriptingApiService;
     }
 

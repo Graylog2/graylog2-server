@@ -19,6 +19,7 @@ package org.graylog.mcp.tools;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.Tool;
+import org.graylog.mcp.server.ToolDependenciesProvider;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategyConfig;
@@ -27,6 +28,7 @@ import org.graylog2.indexer.rotation.strategies.TimeBasedSizeOptimizingStrategyC
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -38,23 +40,27 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
     public static String NAME = "list_index_sets";
 
     private final IndexSetService indexSetService;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
-    public ListIndexSetsTool(final ToolContext toolContext, IndexSetService indexSetService) {
+    public ListIndexSetsTool(IndexSetService indexSetService,
+                             final CustomizationConfig customizationConfig,
+                             final ToolDependenciesProvider toolDependenciesProvider) {
         super(
-                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("List %s Index Sets", toolContext.customizationConfig().productName()),
+                f("List %s Index Sets", customizationConfig.productName()),
                 """
                         List all %1$s index sets. Returns comprehensive information about index set configurations including rotation policies (time/size based),
                         retention settings (how long data is kept), index prefix patterns, and current state. Use this to understand data lifecycle management,
                         troubleshoot retention issues, or plan storage capacity. Essential for understanding how your log data is organized and managed over time.
                         No parameters required. Returns index set details.
-                        """.formatted(toolContext.customizationConfig().productName())
+                        """.formatted(customizationConfig.productName()),
+                toolDependenciesProvider
         );
         this.indexSetService = indexSetService;
+        this.customizationConfig = customizationConfig;
     }
 
     @Override
@@ -63,7 +69,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
 
         final var indexSets = indexSetService.findAll();
         if (indexSets.isEmpty()) {
-            return f("No index sets found in the %s server.", getProductName());
+            return f("No index sets found in the %s server.", customizationConfig.productName());
         }
 
         final var defaultIndexSet = indexSetService.getDefault();
@@ -76,7 +82,7 @@ public class ListIndexSetsTool extends Tool<ListIndexSetsTool.Parameters, String
         final var sw = new StringWriter();
         final var pw = new PrintWriter(sw);
 
-        pw.println(f("%s Index Sets:", getProductName()));
+        pw.println(f("%s Index Sets:", customizationConfig.productName()));
         indexSetConfigStream.forEach(pw::println);
 
         return sw.toString();
