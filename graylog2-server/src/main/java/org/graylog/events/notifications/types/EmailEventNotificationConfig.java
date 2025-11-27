@@ -69,6 +69,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             "Group By Fields:\n" +
             "${foreach event.group_by_fields field}  ${field.key}: ${field.value}\n" +
             "${end}\n" +
+            "Aggregation Conditions:\n" +
+            "${foreach event.aggregation_conditions condition}  ${condition.key}: ${condition.value}\n" +
+            "${end}\n" +
             "${if backlog}\n" +
             "--- [Backlog] ------------------------------------\n" +
             "Last messages accounting for this alert:\n" +

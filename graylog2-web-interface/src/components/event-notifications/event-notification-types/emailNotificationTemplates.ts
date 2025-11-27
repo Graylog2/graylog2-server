@@ -35,6 +35,9 @@ Fields:
 Group By Fields:
 \${foreach event.group_by_fields field}  \${field.key}: \${field.value}
 \${end}
+Aggregation Conditions:
+\${foreach event.aggregation_conditions condition}  \${condition.key}: \${condition.value}
+\${end}
 \${if backlog}
 --- [Backlog] ------------------------------------
 Last messages accounting for this alert:
@@ -65,6 +68,7 @@ export const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpa
 <tr><td>Source Streams</td><td>\${event.source_streams}</td></tr>
 <tr><td>Fields</td><td><ul style="list-style-type:square;">\${foreach event.fields field}<li>\${field.key}:\${field.value}</li>\${end}<ul></td></tr>
 <tr><td>Group By Fields</td><td><ul style="list-style-type:square;">\${foreach event.group_by_fields field}<li>\${field.key}:\${field.value}</li>\${end}<ul></td></tr>
+<tr><td>Aggregation Conditions</td><td><ul style="list-style-type:square;">\${foreach event.aggregation_conditions condition}<li>\${condition.key}:\${condition.value}</li>\${end}<ul></td></tr>
 </tbody></table>
 \${if backlog}
 <br /><table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
