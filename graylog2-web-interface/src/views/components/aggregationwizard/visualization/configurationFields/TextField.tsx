@@ -17,21 +17,16 @@
 import * as React from 'react';
 import { useCallback } from 'react';
 
-import type { NumericField as NumericFieldType } from 'views/types';
 import { Input } from 'components/bootstrap';
 
 import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
-
-type Props = FieldComponentProps & {
-  field: NumericFieldType;
-};
 
 const createEvent = (name: string, value: number) =>
   ({
     target: { name, value },
   }) as React.ChangeEvent<any>;
 
-const TextField = ({ onChange, value, error, name, title, field, inputHelp }: Props) => {
+const TextField = ({ onChange, value, error, name, title, field, inputHelp }: FieldComponentProps) => {
   const _onChange = useCallback(
     (e: React.ChangeEvent<any>) => {
       onChange(createEvent(e.target.name, e.target.value));
