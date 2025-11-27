@@ -31,6 +31,7 @@ import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.search.QueryStringUtils;
 
@@ -72,15 +73,17 @@ public class SearchRequestFactory {
         return searchSourceBuilder;
     }
 
-    public BoolQueryBuilder createQueryBuilder(final SearchCommand searchCommand) {
-        final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
+    public BoolQueryBuilder createQueryBuilder(final String queryString,
+                                               final Optional<TimeRange> range,
+                                               final Optional<String> filter) {
+        final String query = QueryStringUtils.normalizeQuery(queryString);
         final QueryBuilder queryBuilder = translateQueryString(query);
 
-        final Optional<BoolQueryBuilder> rangeQueryBuilder = searchCommand.range()
+        final Optional<BoolQueryBuilder> rangeQueryBuilder = range
                 .map(TimeRangeQueryFactory::create)
                 .map(rangeQuery -> boolQuery().must(rangeQuery));
-        final Optional<BoolQueryBuilder> filterQueryBuilder = searchCommand.filter()
-                .filter(filter -> !QueryStringUtils.isEmptyOrMatchAllQueryString(filter))
+        final Optional<BoolQueryBuilder> filterQueryBuilder = filter
+                .filter(f -> !QueryStringUtils.isEmptyOrMatchAllQueryString(f))
                 .map(QueryBuilders::queryStringQuery)
                 .map(queryStringQuery -> boolQuery().must(queryStringQuery));
 
@@ -92,7 +95,7 @@ public class SearchRequestFactory {
     }
 
     public SearchSourceBuilder create(SearchCommand searchCommand) {
-        final BoolQueryBuilder filteredQueryBuilder = createQueryBuilder(searchCommand);
+        final BoolQueryBuilder filteredQueryBuilder = createQueryBuilder(searchCommand.query(), searchCommand.range(), searchCommand.filter());
 
         applyStreamsFilter(filteredQueryBuilder, searchCommand);
 

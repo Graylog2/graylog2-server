@@ -81,7 +81,7 @@ const useColumnRenderers = (onLoadSavedSearch: () => void): ColumnRenderers<View
               };
 
               return (
-                <Link onClick={onClick} to={Routes.getPluginRoute('SEARCH_VIEWID')(search.id)}>
+                <Link onClick={onClick} to={Routes.SEARCH_SHOW(search.id)}>
                   {title}
                 </Link>
               );

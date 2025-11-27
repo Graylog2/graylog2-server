@@ -26,7 +26,6 @@ import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
 
 import DashboardsOverview from './DashboardsOverview';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: () => () => '/route' }));
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities');
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 

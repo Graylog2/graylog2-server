@@ -25,7 +25,7 @@ import type { DefaultLayout } from 'components/common/EntityDataTable/types';
 const useNonDisplayedAttributes = (defaultLayout: DefaultLayout) => {
   const { attributes } = useTableFetchContext();
   const {
-    layoutConfig: { columnPreferences = {} },
+    layoutConfig: { attributes: columnPreferences = {} },
     isInitialLoading,
   } = useTableLayout(defaultLayout);
 
