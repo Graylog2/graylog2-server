@@ -50,12 +50,12 @@ const DataNodesExpandable = ({
   refetchInterval = undefined,
 }: Props) => {
   const {
-    columnsOrder,
-    columnPreferences,
     defaultDisplayedColumns,
+    defaultColumnOrder,
+    layoutPreferences,
     searchParams,
     isLoadingLayout,
-    handleColumnPreferencesChange,
+    handleLayoutPreferencesChange,
     handleSortChange,
   } = useClusterDataNodesTableLayout(searchQuery, pageSizeLimit);
   const {
@@ -95,10 +95,10 @@ const DataNodesExpandable = ({
       ) : (
         <EntityDataTable<ClusterDataNode>
           entities={dataNodes}
-          columnsOrder={columnsOrder}
-          columnPreferences={columnPreferences}
           defaultDisplayedColumns={defaultDisplayedColumns}
-          onColumnPreferencesChange={handleColumnPreferencesChange}
+          defaultColumnOrder={defaultColumnOrder}
+          layoutPreferences={layoutPreferences}
+          onLayoutPreferencesChange={handleLayoutPreferencesChange}
           onSortChange={handleSortChange}
           activeSort={searchParams.sort}
           entityAttributesAreCamelCase

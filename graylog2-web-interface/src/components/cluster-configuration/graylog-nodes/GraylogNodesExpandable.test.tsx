@@ -25,12 +25,17 @@ jest.mock('./useClusterGraylogNodes');
 jest.mock('./useClusterGraylogNodesTableLayout');
 
 const defaultLayout = {
-  columnsOrder: ['hostname'],
-  columnPreferences: undefined,
   defaultDisplayedColumns: ['hostname'],
+  defaultColumnOrder: ['hostname'],
+  layoutPreferences: {
+    attributes: undefined,
+    order: undefined,
+    pageSize: 0,
+    sort: { attributeId: 'hostname', direction: 'asc' },
+  },
   searchParams: { sort: { attributeId: 'hostname', direction: 'asc' }, query: '' },
   isLoadingLayout: false,
-  handleColumnPreferencesChange: jest.fn(),
+  handleLayoutPreferencesChange: jest.fn(),
   handleSortChange: jest.fn(),
 };
 

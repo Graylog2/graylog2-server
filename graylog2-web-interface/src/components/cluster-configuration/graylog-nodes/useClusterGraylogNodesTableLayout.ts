@@ -16,7 +16,7 @@
  */
 import { useCallback, useMemo } from 'react';
 
-import useTableLayout from 'components/common/EntityDataTable/hooks/useTableLayout';
+import useTableLayout, { type LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
 import useUpdateUserLayoutPreferences from 'components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences';
 import type { ColumnPreferences, DefaultLayout } from 'components/common/EntityDataTable/types';
 import type { SearchParams, Sort } from 'stores/PaginationTypes';
@@ -28,6 +28,7 @@ const TABLE_LAYOUT: DefaultLayout = {
   defaultSort: { attributeId: 'hostname', direction: 'asc' },
   defaultDisplayedAttributes: [...DEFAULT_VISIBLE_COLUMNS],
   defaultPageSize: 0,
+  defaultColumnOrder: [...DEFAULT_VISIBLE_COLUMNS],
 };
 
 const DEFAULT_SEARCH_PARAMS: SearchParams = {
@@ -38,12 +39,15 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
 };
 
 type UseClusterGraylogNodesTableLayoutReturn = {
-  columnsOrder: Array<string>;
-  columnPreferences?: ColumnPreferences;
   defaultDisplayedColumns: Array<string>;
+  defaultColumnOrder: Array<string>;
+  layoutPreferences: LayoutConfig;
   searchParams: SearchParams;
   isLoadingLayout: boolean;
-  handleColumnPreferencesChange: (newColumnPreferences: ColumnPreferences) => void;
+  handleLayoutPreferencesChange: (newLayoutPreferences: {
+    attributes?: ColumnPreferences;
+    order?: Array<string>;
+  }) => void;
   handleSortChange: (newSort: Sort) => void;
 };
 
@@ -51,13 +55,12 @@ const useClusterGraylogNodesTableLayout = (
   searchQuery = '',
   pageSizeLimit?: number,
 ): UseClusterGraylogNodesTableLayoutReturn => {
-  const columnsOrder = useMemo<Array<string>>(() => [...DEFAULT_VISIBLE_COLUMNS], []);
   const { layoutConfig, isInitialLoading: isLoadingLayout } = useTableLayout(TABLE_LAYOUT);
   const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(TABLE_LAYOUT.entityTableId);
 
-  const handleColumnPreferencesChange = useCallback(
-    (newColumnPreferences: ColumnPreferences) => {
-      updateTableLayout({ attributes: newColumnPreferences });
+  const handleLayoutPreferencesChange = useCallback(
+    ({ attributes, order }: { attributes?: ColumnPreferences; order?: Array<string> }) => {
+      updateTableLayout({ attributes, order });
     },
     [updateTableLayout],
   );
@@ -80,12 +83,12 @@ const useClusterGraylogNodesTableLayout = (
   );
 
   return {
-    columnsOrder,
-    columnPreferences: layoutConfig.columnPreferences,
-    defaultDisplayedColumns: layoutConfig.defaultDisplayedColumns,
+    defaultDisplayedColumns: TABLE_LAYOUT.defaultDisplayedAttributes,
+    defaultColumnOrder: TABLE_LAYOUT.defaultColumnOrder,
+    layoutPreferences: layoutConfig,
     searchParams,
     isLoadingLayout,
-    handleColumnPreferencesChange,
+    handleLayoutPreferencesChange,
     handleSortChange,
   };
 };

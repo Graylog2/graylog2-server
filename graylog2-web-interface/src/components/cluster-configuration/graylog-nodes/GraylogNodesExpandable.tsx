@@ -48,12 +48,12 @@ const GraylogNodesExpandable = ({
   refetchInterval = undefined,
 }: Props) => {
   const {
-    columnsOrder,
-    columnPreferences,
     defaultDisplayedColumns,
+    defaultColumnOrder,
+    layoutPreferences,
     searchParams,
     isLoadingLayout,
-    handleColumnPreferencesChange,
+    handleLayoutPreferencesChange,
     handleSortChange,
   } = useClusterGraylogNodesTableLayout(searchQuery, pageSizeLimit);
   const { nodes: graylogNodes, total: totalGraylogNodes, isLoading } = useClusterGraylogNodes(searchParams, { refetchInterval });
@@ -75,10 +75,10 @@ const GraylogNodesExpandable = ({
       ) : (
         <EntityDataTable<GraylogNode>
           entities={graylogNodes}
-          columnsOrder={columnsOrder}
-          columnPreferences={columnPreferences}
           defaultDisplayedColumns={defaultDisplayedColumns}
-          onColumnPreferencesChange={handleColumnPreferencesChange}
+          defaultColumnOrder={defaultColumnOrder}
+          layoutPreferences={layoutPreferences}
+          onLayoutPreferencesChange={handleLayoutPreferencesChange}
           onSortChange={handleSortChange}
           activeSort={searchParams.sort}
           entityAttributesAreCamelCase={false}
