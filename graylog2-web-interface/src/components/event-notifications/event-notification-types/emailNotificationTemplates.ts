@@ -32,6 +32,9 @@ Timerange End:        \${event.timerange_end}
 Fields:
 \${foreach event.fields field}  \${field.key}: \${field.value}
 \${end}
+Group By Fields:
+\${foreach event.group_by_fields field}  \${field.key}: \${field.value}
+\${end}
 \${if backlog}
 --- [Backlog] ------------------------------------
 Last messages accounting for this alert:
@@ -61,6 +64,7 @@ export const DEFAULT_HTML_BODY_TEMPLATE = `<table width="100%" border="0" cellpa
 <tr><td>Timerange End</td><td>\${event.timerange_end}</td></tr>
 <tr><td>Source Streams</td><td>\${event.source_streams}</td></tr>
 <tr><td>Fields</td><td><ul style="list-style-type:square;">\${foreach event.fields field}<li>\${field.key}:\${field.value}</li>\${end}<ul></td></tr>
+<tr><td>Group By Fields</td><td><ul style="list-style-type:square;">\${foreach event.group_by_fields field}<li>\${field.key}:\${field.value}</li>\${end}<ul></td></tr>
 </tbody></table>
 \${if backlog}
 <br /><table width="100%" border="0" cellpadding="10" cellspacing="0" style="background-color:#f9f9f9;border:none;line-height:1.2"><tbody>
