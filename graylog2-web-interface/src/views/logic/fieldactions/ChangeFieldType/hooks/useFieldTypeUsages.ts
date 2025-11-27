@@ -32,7 +32,7 @@ type Options = {
   enabled: boolean;
 };
 
-export type SortableAttributes = 'index_set_id' | 'index_set_title';
+export type SortableAttrbutes = 'index_set_id' | 'index_set_title';
 
 export const queryKey = (searchParams: SearchParams, field: string, streams: Array<string>) => [
   'fieldTypeUsages',
@@ -43,7 +43,7 @@ export const queryKey = (searchParams: SearchParams, field: string, streams: Arr
 
 export const fetchFieldTypeUsages = async (
   { field, streams }: { field: string; streams: Array<string> },
-  searchParams: SearchParams<SortableAttributes>,
+  searchParams: SearchParams<SortableAttrbutes>,
 ): Promise<{
   list: Array<FieldTypeUsage>;
   pagination: { total: number };
@@ -72,7 +72,7 @@ export const fetchFieldTypeUsages = async (
 
 const useFieldTypeUsages = (
   { streams, field }: { streams: Array<string>; field: string },
-  searchParams: SearchParams<SortableAttributes>,
+  searchParams: SearchParams<SortableAttrbutes>,
   { enabled }: Options = { enabled: true },
 ): {
   data: {
