@@ -189,11 +189,9 @@ public class AggregationSearchUtils {
             final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
-            final var aggregationConditions = new HashMap<String, String>();
-            // adding the conditions/result that were calculated during the aggregations to the event's fields so they can be referenced in notifications
-            keyResult
-                    .seriesValues()
-                    .forEach(seriesValue -> aggregationConditions.put(seriesValue.series().literal(), String.valueOf(seriesValue.value())));
+            // adding the aggregation conditions to the event
+            final var aggregationConditions = keyResult.seriesValues().stream()
+                    .collect(Collectors.toMap(s -> s.series().literal(), s -> String.valueOf(s.value())));
             event.setAggregationConditions(aggregationConditions);
 
             // Ask any event query modifier for its state and collect it into the event modifier state
