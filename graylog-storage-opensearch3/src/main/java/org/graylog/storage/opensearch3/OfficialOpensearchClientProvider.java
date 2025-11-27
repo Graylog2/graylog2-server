@@ -32,6 +32,8 @@ import org.apache.hc.core5.http.nio.ssl.TlsStrategy;
 import org.apache.hc.core5.reactor.ssl.TlsDetails;
 import org.apache.hc.core5.ssl.SSLContextBuilder;
 import org.apache.hc.core5.util.Timeout;
+import org.graylog.storage.opensearch3.cl.CustomAsyncOpenSearchClient;
+import org.graylog.storage.opensearch3.client.CustomOpenSearchClient;
 import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.IndexerHosts;
 import org.graylog2.security.jwt.IndexerJwtAuthToken;
@@ -149,7 +151,7 @@ public class OfficialOpensearchClientProvider implements Provider<OfficialOpense
         });
 
         final OpenSearchTransport transport = builder.build();
-        return new OfficialOpensearchClient(new OpenSearchClient(transport), new OpenSearchAsyncClient(transport));
+        return new OfficialOpensearchClient(new CustomOpenSearchClient(transport), new CustomAsyncOpenSearchClient(transport));
     }
 
     private static Timeout timeout(Duration duration) {

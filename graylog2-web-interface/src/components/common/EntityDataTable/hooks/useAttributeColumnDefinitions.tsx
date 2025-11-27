@@ -79,6 +79,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           meta: {
             label: col.title,
             columnRenderer: columnRenderersByAttribute[col.id],
+            enableColumnOrdering: true,
           },
         };
 

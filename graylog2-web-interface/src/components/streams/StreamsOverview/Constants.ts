@@ -48,20 +48,21 @@ const getStreamTableElements = (
       'throughput',
       'disabled',
     ],
+    defaultColumnOrder: [
+      'title',
+      'index_set_title',
+      'archiving',
+      ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
+      'rules',
+      ...(isPipelineColumnPermitted ? ['pipelines'] : []),
+      ...(pluggableAttributes?.attributeNames || []),
+      'outputs',
+      'throughput',
+      'disabled',
+      'created_at',
+    ],
   };
-  const columnOrder = [
-    'title',
-    'index_set_title',
-    'archiving',
-    ...(streamDataLakeTableElements?.attributeName ? [streamDataLakeTableElements.attributeName] : []),
-    'rules',
-    ...(isPipelineColumnPermitted ? ['pipelines'] : []),
-    ...(pluggableAttributes?.attributeNames || []),
-    'outputs',
-    'throughput',
-    'disabled',
-    'created_at',
-  ];
+
   const additionalAttributes = [
     { id: 'index_set_title', title: 'Index Set', sortable: true, permissions: ['indexsets:read'] },
     { id: 'throughput', title: 'Throughput' },
@@ -75,7 +76,6 @@ const getStreamTableElements = (
 
   return {
     defaultLayout,
-    columnOrder,
     additionalAttributes,
   };
 };
