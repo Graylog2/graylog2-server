@@ -19,7 +19,6 @@ import { useCallback } from 'react';
 import type { Sort } from 'stores/PaginationTypes';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
-import useLocation from 'routing/useLocation';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
 import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
