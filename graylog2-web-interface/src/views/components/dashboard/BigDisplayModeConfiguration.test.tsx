@@ -19,7 +19,6 @@ import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { Optional } from 'utility-types';
 
-import Routes from 'routing/Routes';
 import type { ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -32,7 +31,6 @@ import wrapWithMenu from 'helpers/components/wrapWithMenu';
 
 import BigDisplayModeConfiguration from './BigDisplayModeConfiguration';
 
-jest.mock('routing/Routes', () => ({ pluginRoute: jest.fn() }));
 jest.mock('routing/useHistory');
 
 const search = Search.create();
@@ -120,7 +118,6 @@ describe('BigDisplayModeConfiguration', () => {
     beforeEach(() => {
       history = mockHistory();
       asMock(useHistory).mockReturnValue(history);
-      Routes.pluginRoute = jest.fn(() => (viewId) => `/dashboards/tv/${viewId}`);
     });
 
     it('on form submit', () => {
@@ -131,7 +128,6 @@ describe('BigDisplayModeConfiguration', () => {
 
       fireEvent.submit(form);
 
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10');
     });
 
@@ -146,7 +142,6 @@ describe('BigDisplayModeConfiguration', () => {
 
       fireEvent.submit(form);
 
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=42');
     });
 
@@ -161,7 +156,6 @@ describe('BigDisplayModeConfiguration', () => {
 
       fireEvent.submit(form);
 
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&refresh=10');
     });
 
@@ -177,7 +171,6 @@ describe('BigDisplayModeConfiguration', () => {
 
       fireEvent.submit(form);
 
-      expect(Routes.pluginRoute).toHaveBeenCalledWith('DASHBOARDS_TV_VIEWID');
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10&tabs=1%2C2');
     });
   });
