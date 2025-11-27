@@ -189,10 +189,16 @@ public class AggregationSearchUtils {
             final Message message = messageFactory.createMessage(eventMessage, "", result.effectiveTimerange().to());
             message.addFields(fields);
 
-            // add aggregation key/value fields to events so they can be used in notifications etc.
-            fields.forEach((k, v) -> {
-                if(event.getField(k) == null) event.setField(k, FieldValue.string(String.valueOf(v)));
+            keyResult.seriesValues().forEach(seriesValue -> {
+                String key = "condition_" + seriesValue.series().literal();
+                if(event.getField(key) == null) {
+                    event.setField(key, FieldValue.string(String.valueOf(seriesValue.value())));
+                }
             });
+            // add aggregation key/value fields to events so they can be used in notifications etc.
+            // fields.forEach((k, v) -> {
+            //    if(event.getField(k) == null) event.setField(k, FieldValue.string(String.valueOf(v)));
+            //});
 
             // Ask any event query modifier for its state and collect it into the event modifier state
             final Map<String, Object> eventModifierState = eventQueryModifiers.stream()
