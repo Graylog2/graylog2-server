@@ -136,6 +136,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -544,7 +545,7 @@ public class ContentPackServiceTest {
                 .widgets(ImmutableSet.of(widgetEntity))
                 .widgetMapping(ImmutableMap.of())
                 .widgetPositions(ImmutableMap.of())
-                .formatting(FormattingSettings.builder().highlighting(ImmutableSet.of()).build())
+                .formatting(FormattingSettings.builder().highlighting(List.of()).build())
                 .displayModeSettings(DisplayModeSettings.empty())
                 .build();
         final ViewEntity entity = ViewEntity.builder()
