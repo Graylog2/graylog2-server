@@ -27,6 +27,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.configuration.validators.RetentionStrategyValidator;
 import org.graylog2.configuration.validators.RotationStrategyValidator;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -57,6 +58,7 @@ public class ElasticsearchConfiguration {
     public static final String TIME_SIZE_OPTIMIZING_RETENTION_FIXED_LEEWAY = "time_size_optimizing_retention_fixed_leeway";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE = "time_size_optimizing_rotation_min_shard_size";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE = "time_size_optimizing_rotation_max_shard_size";
+    public static final String TIME_SIZE_OPTIMIZING_ROTATION_OS_MEMORY_FACTOR = "time_size_optimizing_rotation_os_memory_factor";
     public static final String TIME_SIZE_OPTIMIZING_ROTATION_PERIOD = "time_size_optimizing_rotation_period";
     public static final String ALLOW_FLEXIBLE_RETENTION_PERIOD = "allow_flexible_retention_period";
     public static final String INDEX_FIELD_TYPE_REFRESH_INTERVAL = "index_field_type_refresh_interval";
@@ -133,10 +135,13 @@ public class ElasticsearchConfiguration {
     private Period timeSizeOptimizingRotationPeriod = Period.days(1);
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE)
-    private Size timeSizeOptimizingRotationMinShardSize = Size.gigabytes(20);
+    private Size timeSizeOptimizingRotationMinShardSize;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE)
-    private Size timeSizeOptimizingRotationMaxShardSize = Size.gigabytes(20);
+    private Size timeSizeOptimizingRotationMaxShardSize;
+
+    @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_OS_MEMORY_FACTOR)
+    private double timeSizeOptimizingRotationOSMemoryFactor = 0.6;
 
     @Parameter(value = TIME_SIZE_OPTIMIZING_RETENTION_MIN_LIFETIME)
     private Period timeSizeOptimizingRetentionMinLifeTime = IndexLifetimeConfig.DEFAULT_LIFETIME_MIN;
@@ -276,6 +281,10 @@ public class ElasticsearchConfiguration {
         return timeSizeOptimizingRotationMaxShardSize;
     }
 
+    public double getTimeSizeOptimizingRotationOSMemoryFactor() {
+        return timeSizeOptimizingRotationOSMemoryFactor;
+    }
+
     public Period getTimeSizeOptimizingRetentionMinLifeTime() {
         return timeSizeOptimizingRetentionMinLifeTime;
     }
@@ -320,7 +329,8 @@ public class ElasticsearchConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateTimeSizeOptimizingRotation() throws ValidationException {
-        if (getTimeSizeOptimizingRotationMaxShardSize().compareTo(getTimeSizeOptimizingRotationMinShardSize()) < 0) {
+        if (getTimeSizeOptimizingRotationMaxShardSize() != null && getTimeSizeOptimizingRotationMinShardSize() != null &&
+                getTimeSizeOptimizingRotationMaxShardSize().compareTo(getTimeSizeOptimizingRotationMinShardSize()) < 0) {
             throw new ValidationException(f("\"%s=%s\" cannot be larger than \"%s=%s\"",
                     TIME_SIZE_OPTIMIZING_ROTATION_MIN_SHARD_SIZE, getTimeSizeOptimizingRotationMinShardSize(),
                     TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE, getTimeSizeOptimizingRotationMaxShardSize())
@@ -356,5 +366,15 @@ public class ElasticsearchConfiguration {
                     MAX_INDEX_RETENTION_PERIOD + " + leeway", getMaxIndexRetentionPeriod().plus(calculatedLeeway))
             );
         }
+    }
+
+    @VisibleForTesting
+    public void setTimeSizeOptimizingRotationMinShardSize(Size timeSizeOptimizingRotationMinShardSize) {
+        this.timeSizeOptimizingRotationMinShardSize = timeSizeOptimizingRotationMinShardSize;
+    }
+
+    @VisibleForTesting
+    public void setTimeSizeOptimizingRotationMaxShardSize(Size timeSizeOptimizingRotationMaxShardSize) {
+        this.timeSizeOptimizingRotationMaxShardSize = timeSizeOptimizingRotationMaxShardSize;
     }
 }
