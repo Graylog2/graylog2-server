@@ -97,16 +97,35 @@ const VisualizationConfigurationOptions = ({ name: namePrefix, fields }: Props) 
       {fields
         ?.filter((field) => (field.isShown ? field.isShown(visualizationConfig, values) : true))
         .map((field) => {
-          const Component = componentForType(field.type);
           const title = titleForField(field);
           const inputHelp =
             typeof field.inputHelp === 'function' ? field.inputHelp(visualizationConfig, values) : undefined;
 
+          const fieldKey = `${namePrefix}.${field.name}`;
+          const fieldName = `${namePrefix}.${field.name}`;
+
+          if (field?.type === 'custom' && field?.component) {
+            const CustomFieldComponent = field.component;
+
+            return (
+              <CustomFieldComponent
+                key={fieldKey}
+                name={fieldName}
+                field={field}
+                title={title}
+                inputHelp={inputHelp}
+                id={field.id}
+              />
+            );
+          }
+
+          const Component = componentForType(field.type);
+
           return (
-            <Field key={`${namePrefix}.${field.name}`} name={`${namePrefix}.${field.name}`}>
+            <Field key={fieldKey} name={fieldName}>
               {({ field: { name, value, onChange }, meta: { error } }) => (
                 <Component
-                  key={`${namePrefix}.${field.name}`}
+                  key={fieldKey}
                   name={name}
                   value={value}
                   values={values}

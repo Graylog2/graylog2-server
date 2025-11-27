@@ -133,12 +133,12 @@ const getUnitLayoutWithData = (
   axisCount: number,
   values: Array<any>,
   theme: DefaultTheme,
-  visualizationAxisTitle: string,
+  { title, color }: { title?: string; color?: string } = {},
 ) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
-  ...getDefaultPlotYLayoutSettings(theme, visualizationAxisTitle),
+  ...getDefaultPlotYLayoutSettings(theme, title, color),
 });
 
 type SeriesName = string;
@@ -288,9 +288,17 @@ export const generateLayouts = ({
           ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.title
           : null;
 
+      const visualizationAxisColor =
+        config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
+          ? config.visualizationConfig.axisConfig?.[unitTypeKey]?.color
+          : null;
+
       return [
         axisKeyName,
-        getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme, visualizationAxisTitle),
+        getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme, {
+          title: visualizationAxisTitle,
+          color: visualizationAxisColor,
+        }),
       ];
     }),
   );

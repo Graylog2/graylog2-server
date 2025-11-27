@@ -21,10 +21,11 @@ import type {
   XYVisualization,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import type { ConfigurationField, FieldUnitType } from 'views/types';
+import type { ConfigurationField, FieldUnitType, CustomField } from 'views/types';
 import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
+import AxisVisualizationField from 'views/components/aggregationwizard/visualization/configurationFields/AxisVisualizationField';
 
-const getNumericAxisMetrics = (values: WidgetConfigFormValues) => {
+export const getNumericAxisMetrics = (values: WidgetConfigFormValues) => {
   const units = values?.units ?? {};
   const metrics = values?.metrics ?? [];
 
@@ -33,7 +34,7 @@ const getNumericAxisMetrics = (values: WidgetConfigFormValues) => {
     .map((metric) => metric.name ?? `${metric.function}(${metric.field ?? ''})`);
 };
 
-const getAxisMetrics = (unitType: FieldUnitType, values: WidgetConfigFormValues) => {
+export const getAxisMetrics = (unitType: FieldUnitType, values: WidgetConfigFormValues) => {
   const units = values?.units ?? {};
   const metrics = values?.metrics ?? [];
 
@@ -48,11 +49,13 @@ const getAxisMetrics = (unitType: FieldUnitType, values: WidgetConfigFormValues)
     .map((metric) => metric.name ?? `${metric.function}(${metric.field ?? ''})`);
 };
 
-const getUnitTypeFields = (): Array<ConfigurationField> =>
+const getUnitTypeFields = (): Array<CustomField> =>
   ['percent', 'time', 'size'].map((unitType: FieldUnitType) => ({
-    name: `axisConfig.${unitType}.title`,
-    title: capitalize(unitType),
-    type: 'text',
+    name: `axisConfig.${unitType}`,
+    title: `Y-${capitalize(unitType)}`,
+    id: unitType,
+    type: 'custom',
+    component: AxisVisualizationField,
     isShown: (formValues: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
       formValues.showAxisLabels && !!getAxisMetrics(unitType, widgetConfigFormValues).length,
     inputHelp: (_: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
@@ -71,15 +74,19 @@ const xyAxisConfigFields: Array<ConfigurationField> = [
     type: 'boolean',
   },
   {
-    name: 'axisConfig.xaxis.title',
+    name: 'axisConfig.xaxis',
     title: 'X-axis',
-    type: 'text',
+    type: 'custom',
+    id: 'xaxis',
+    component: AxisVisualizationField,
     isShown: (formValues: XYVisualizationConfigFormValues) => formValues.showAxisLabels,
   },
   {
-    name: `axisConfig.${DEFAULT_AXIS_KEY}.title`,
-    title: 'Number',
-    type: 'text',
+    name: `axisConfig.${DEFAULT_AXIS_KEY}`,
+    title: 'Y-number',
+    type: 'custom',
+    id: 'number',
+    component: AxisVisualizationField,
     isShown: (formValues: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>
       !!getNumericAxisMetrics(widgetConfigFormValues).length && formValues.showAxisLabels,
     inputHelp: (_: XYVisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) =>

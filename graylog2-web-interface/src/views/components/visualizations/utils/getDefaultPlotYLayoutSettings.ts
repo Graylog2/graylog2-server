@@ -18,15 +18,23 @@ import type { DefaultTheme } from 'styled-components';
 
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
 import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
-const getDefaultPlotYLayoutSettings = (theme: DefaultTheme, visualizationAxisTitle: string = '') => {
+const getDefaultPlotYLayoutSettings = (
+  theme: DefaultTheme,
+  visualizationAxisTitle: string = '',
+  visualizationAxisColor: string = undefined,
+) => {
   const fontSettings = getDefaultPlotFontSettings(theme);
+  const color = visualizationAxisColor ?? fontSettings.color;
+  const gridColor = visualizationAxisColor
+    ? theme.utils.colorLevel(visualizationAxisColor, -4)
+    : theme.colors.variant.lightest.default;
 
   return {
     automargin: true,
-    gridcolor: theme.colors.variant.lightest.default,
-    tickfont: fontSettings,
+    gridcolor: gridColor,
+    tickfont: { ...fontSettings, color },
     title: {
-      font: fontSettings,
+      font: { ...fontSettings, color },
       text: visualizationAxisTitle,
       automargin: true,
       standoff: AXIS_LABEL_MARGIN,

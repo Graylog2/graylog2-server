@@ -22,11 +22,11 @@ export const axisTypes = ['linear', 'logarithmic'] as const;
 export type AxisType = ArrayElement<typeof axisTypes>;
 
 export type ChartAxisConfig = {
-  [DEFAULT_AXIS_KEY]?: { title: string };
-  percent?: { title: string };
-  time?: { title: string };
-  size?: { title: string };
-  xaxis?: { title: string };
+  [DEFAULT_AXIS_KEY]?: { title?: string; color: string };
+  percent?: { title?: string; color?: string };
+  time?: { title?: string; color?: string };
+  size?: { title?: string; color?: string };
+  xaxis?: { title?: string; color?: string };
 };
 export type XYVisualizationConfigFormValues = {
   showAxisLabels: boolean;
