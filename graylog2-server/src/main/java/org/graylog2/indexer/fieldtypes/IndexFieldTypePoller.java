@@ -19,7 +19,7 @@ package org.graylog2.indexer.fieldtypes;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import jakarta.inject.Inject;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 
 import java.util.Collection;
