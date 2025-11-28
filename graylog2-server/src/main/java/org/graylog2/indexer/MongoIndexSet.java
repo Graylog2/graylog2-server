@@ -28,6 +28,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.indexer.indices.jobs.IndexJobsService;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -79,10 +80,9 @@ public class MongoIndexSet implements IndexSet {
     private final IndexRangeService indexRangeService;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
-    private final SystemJobManager systemJobManager;
-    private final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     private final ActivityWriter activityWriter;
     private final NotificationService notificationService;
+    private final IndexJobsService indexJobsService;
 
     @Inject
     public MongoIndexSet(@Assisted final IndexSetConfig config,
@@ -90,8 +90,7 @@ public class MongoIndexSet implements IndexSet {
                          final NodeId nodeId,
                          final IndexRangeService indexRangeService,
                          final AuditEventSender auditEventSender,
-                         final SystemJobManager systemJobManager,
-                         final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory,
+                         final IndexJobsService indexJobsService,
                          final ActivityWriter activityWriter, NotificationService notificationService
     ) {
         this.config = requireNonNull(config);
@@ -100,10 +99,10 @@ public class MongoIndexSet implements IndexSet {
         this.nodeId = requireNonNull(nodeId);
         this.indexRangeService = requireNonNull(indexRangeService);
         this.auditEventSender = requireNonNull(auditEventSender);
-        this.systemJobManager = requireNonNull(systemJobManager);
-        this.jobFactory = requireNonNull(jobFactory);
         this.activityWriter = requireNonNull(activityWriter);
         this.notificationService = notificationService;
+        this.indexJobsService = requireNonNull(indexJobsService);
+
 
         // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
         final String indexPattern = isNullOrEmpty(config.indexMatchPattern())
@@ -350,12 +349,7 @@ public class MongoIndexSet implements IndexSet {
         // it can happen that an index request still writes to the old deflector target, while we cycled it above.
         // setting the index to readOnly would result in ClusterBlockExceptions in the indexing request.
         // waiting 30 seconds to perform the background task should completely get rid of these errors.
-        final SystemJob setIndexReadOnlyAndCalculateRangeJob = jobFactory.create(indexName);
-        try {
-            systemJobManager.submitWithDelay(setIndexReadOnlyAndCalculateRangeJob, 30, TimeUnit.SECONDS);
-        } catch (SystemJobConcurrencyException e) {
-            LOG.error("Cannot set index <" + indexName + "> to read only and calculate its range. It won't be optimized.", e);
-        }
+        indexJobsService.submitSetIndexReadOnlyAndCalculateRangeJob(indexName);
     }
 
     private void addDeflectorIndexRange(String indexName) {
