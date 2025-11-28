@@ -51,7 +51,6 @@ const EventsEntityTable = () => {
     <EventsRefreshProvider>
       <PaginatedEntityTable<Event, EventsAdditionalData>
         humanName="events"
-        columnsOrder={eventsTableElements.columnOrder}
         queryHelpComponent={<QueryHelper entityName="event" fieldMap={additionalSearchFields} />}
         entityActions={entityActions}
         tableLayout={eventsTableElements.defaultLayout}

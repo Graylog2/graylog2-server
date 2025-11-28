@@ -14,19 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
 
-import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.searches.SearchesIT;
+import * as React from 'react';
 
-public class SearchesOS2IT extends SearchesIT {
-    @SearchInstance
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
+import { singleton } from 'logic/singleton';
 
-    @Override
-    protected SearchServerInstance searchServer() {
-        return this.openSearchInstance;
-    }
-}
+type ColumnTransforms = { [colId: string]: string };
+
+type DndStylesContextValue = {
+  setColumnTransform: (updater: (prev: ColumnTransforms) => ColumnTransforms) => void;
+  columnTransform: ColumnTransforms;
+  activeColId: string;
+};
+
+const DndStylesContext = React.createContext<DndStylesContextValue | undefined>(undefined);
+
+export default singleton('contexts.DndStylesContext', () => DndStylesContext);

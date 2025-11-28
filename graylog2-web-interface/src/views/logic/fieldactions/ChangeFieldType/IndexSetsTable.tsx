@@ -18,10 +18,10 @@ import React, { useMemo, useCallback } from 'react';
 import styled from 'styled-components';
 
 import { PaginatedEntityTable } from 'components/common';
-import { DEFAULT_LAYOUT, COLUMN_ORDER } from 'views/logic/fieldactions/ChangeFieldType/Constants';
+import { DEFAULT_LAYOUT } from 'views/logic/fieldactions/ChangeFieldType/Constants';
 import type { SearchParams } from 'stores/PaginationTypes';
-import type { SortableAttributes } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
-import { fetchFieldTypeUsages, queryKey } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import type { SortableAttrbutes } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
+import { queryKey, fetchFieldTypeUsages } from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeUsages';
 import type { FieldTypeUsage, FieldTypes } from 'views/logic/fieldactions/ChangeFieldType/types';
 import useColumnRenderers from 'views/logic/fieldactions/ChangeFieldType/hooks/useColumnRenderers';
 import BulkActionsDropdown from 'components/common/EntityDataTable/BulkActionsDropdown';
@@ -53,7 +53,7 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
 
   const mappedIndexSets = useMemo(() => mapper(data?.indexSets), [data?.indexSets]);
 
-  const fetchEntities = (searchParams: SearchParams<SortableAttributes>) =>
+  const fetchEntities = (searchParams: SearchParams<SortableAttrbutes>) =>
     fetchFieldTypeUsages({ field, streams: currentStreams }, searchParams);
   const columnRenderers = useColumnRenderers(fieldTypes);
 
@@ -78,7 +78,6 @@ const IndexSetsTable = ({ field, setIndexSetSelection, fieldTypes, initialSelect
       <PaginatedEntityTable<FieldTypeUsage>
         humanName="Index Sets"
         tableLayout={DEFAULT_LAYOUT}
-        columnsOrder={COLUMN_ORDER}
         withoutURLParams
         fetchEntities={fetchEntities}
         keyFn={(searchParams) => queryKey(searchParams, field, currentStreams)}

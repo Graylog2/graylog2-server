@@ -14,19 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.views.export;
+package org.graylog.storage.opensearch3;
 
-import org.graylog.plugins.views.search.export.ExportMessagesCommand;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRequest;
-import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
+import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
+import org.graylog.testing.elasticsearch.SearchInstance;
+import org.graylog.testing.elasticsearch.SearchServerInstance;
+import org.graylog2.indexer.searches.SearchesIT;
 
-import java.util.List;
+public class SearchesOSIT extends SearchesIT {
+    @SearchInstance
+    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
 
-public interface RequestStrategy {
-    List<SearchHit> nextChunk(SearchRequest search, ExportMessagesCommand command);
-
-     default SearchSourceBuilder configure(SearchSourceBuilder ssb) {
-        return ssb;
+    @Override
+    protected SearchServerInstance searchServer() {
+        return this.openSearchInstance;
     }
 }
