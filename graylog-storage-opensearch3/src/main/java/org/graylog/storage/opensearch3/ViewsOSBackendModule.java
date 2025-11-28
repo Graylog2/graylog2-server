@@ -50,8 +50,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.OpenSearchBackend;
 import org.graylog.storage.opensearch3.views.export.OpenSearchExportBackend;
-import org.graylog.storage.opensearch3.views.export.RequestStrategy;
-import org.graylog.storage.opensearch3.views.export.SearchAfter;
 import org.graylog.storage.opensearch3.views.searchtypes.EventListStrategy;
 import org.graylog.storage.opensearch3.views.searchtypes.OSEventListDelegate;
 import org.graylog.storage.opensearch3.views.searchtypes.OSMessageList;
@@ -112,11 +110,6 @@ public class ViewsOSBackendModule extends ViewsModule {
         registerPivotBucketHandler(DateRangeBucket.NAME, OSDateRangeHandler.class);
 
         bindExportBackend().to(OpenSearchExportBackend.class);
-        bindRequestStrategy().to(SearchAfter.class);
-    }
-
-    private LinkedBindingBuilder<RequestStrategy> bindRequestStrategy() {
-        return bind(RequestStrategy.class);
     }
 
     private LinkedBindingBuilder<ExportBackend> bindExportBackend() {
