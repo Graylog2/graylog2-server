@@ -25,6 +25,7 @@ import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -48,7 +49,7 @@ public class IndexJobsService {
                 .jobDefinitionId(jobDefinition.id())
                 .jobDefinitionType(SetIndexReadOnlyAndCalculateRangeJob.TYPE_NAME)
                 // schedule correctly with 30 seconds delay
-                .startTime(DateTime.now().plusSeconds(30))
+                .startTime(DateTime.now(DateTimeZone.UTC).plusSeconds(30))
                 .schedule(OnceJobSchedule.create())
                 .data(data)
                 .build();
