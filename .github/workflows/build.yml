@@ -35,7 +35,7 @@ env:
 jobs:
   build-artifacts:
     name: "Artifacts"
-    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+    runs-on: "${{ vars.RUNNER_4_CORE }}"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -51,7 +51,7 @@ jobs:
 
   frontend-tests:
     name: "Frontend Tests"
-    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+    runs-on: "${{ vars.RUNNER_4_CORE }}"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -67,7 +67,7 @@ jobs:
 
   backend-tests:
     name: "Backend Tests"
-    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+    runs-on: "${{ vars.RUNNER_4_CORE }}"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -83,7 +83,7 @@ jobs:
 
   full-backend-tests:
     name: "Full Backend Tests"
-    runs-on: "blacksmith-4vcpu-ubuntu-2404"
+    runs-on: "${{ vars.RUNNER_4_CORE }}"
 
     strategy:
       fail-fast: false
