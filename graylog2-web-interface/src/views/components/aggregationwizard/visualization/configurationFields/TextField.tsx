@@ -15,52 +15,41 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 
 import { Input } from 'components/bootstrap';
-import Select from 'components/common/Select';
 
 import type { FieldComponentProps } from '../VisualizationConfigurationOptions';
 
-const makeOptions = (options: ReadonlyArray<string | [string, any]>) =>
-  options.map((option) => {
-    if (typeof option === 'string') {
-      return { label: option, value: option };
-    }
-
-    const [label, value] = option;
-
-    return { label, value };
-  });
-
-const createEvent = (name: string, value: any) =>
+const createEvent = (name: string, value: number) =>
   ({
     target: { name, value },
   }) as React.ChangeEvent<any>;
 
-const SelectField = ({ name, field, title, error, value, onChange, inputHelp }: FieldComponentProps) => {
-  if (field.type !== 'select') {
-    throw new Error('Invalid field type passed!');
-  }
+const TextField = ({ onChange, value, error, name, title, field, inputHelp }: FieldComponentProps) => {
+  const _onChange = useCallback(
+    (e: React.ChangeEvent<any>) => {
+      onChange(createEvent(e.target.name, e.target.value));
+    },
+    [onChange],
+  );
 
   return (
     <Input
-      id={`${name}-select`}
+      id={`${name}-input`}
+      bsSize="small"
+      type="text"
+      name={name}
+      onChange={_onChange}
+      value={value ?? ''}
       label={title}
       error={error}
+      placeholder={field.description}
       labelClassName="col-sm-3"
       wrapperClassName="col-sm-9"
-      help={inputHelp}>
-      <Select
-        options={makeOptions(field.options)}
-        aria-label={`Select ${field.title}`}
-        clearable={!field.required}
-        name={name}
-        value={value}
-        size="small"
-        onChange={(newValue) => onChange(createEvent(name, newValue))}
-      />
-    </Input>
+      help={inputHelp}
+    />
   );
 };
 
-export default SelectField;
+export default TextField;

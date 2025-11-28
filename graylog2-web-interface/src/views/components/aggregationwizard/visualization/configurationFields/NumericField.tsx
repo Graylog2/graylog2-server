@@ -31,7 +31,7 @@ const createEvent = (name: string, value: number) =>
     target: { name, value },
   }) as React.ChangeEvent<any>;
 
-const NumericField = ({ onChange, value, error, name, title, field }: Props) => {
+const NumericField = ({ onChange, value, error, name, title, field, inputHelp }: Props) => {
   const _onChange = useCallback(
     (e: React.ChangeEvent<any>) => {
       onChange(createEvent(e.target.name, Number.parseFloat(e.target.value)));
@@ -53,6 +53,7 @@ const NumericField = ({ onChange, value, error, name, title, field }: Props) => 
       step={field.step}
       labelClassName="col-sm-3"
       wrapperClassName="col-sm-9"
+      help={inputHelp}
     />
   );
 };
