@@ -139,12 +139,13 @@ const CreateInputControl = () => {
     });
 
     InputsActions.create(data).then((response: { id: string }) => {
-      resetFields();
       queryClient.invalidateQueries({ queryKey: KEY_PREFIX });
 
       if (inputSetupFeatureFlagIsEnabled && response?.id) {
         setTimeout(() => openWizard(response.id, data), 500);
       }
+
+      resetFields();
     });
   };
 
