@@ -24,6 +24,7 @@ import type { CustomFieldComponentProps } from 'views/types';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import ColorConfigurationPopover from 'views/components/aggregationwizard/ColorConfigurationPopover';
 import { getDefaultLabelColor } from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
+import type {ChartAxisConfig} from "views/logic/aggregationbuilder/visualizations/XYVisualization";
 
 const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldComponentProps) => {
   const theme = useTheme();
@@ -49,6 +50,21 @@ const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldCo
     [name, setFieldValue],
   );
 
+  const validateField = useCallback((value: string) => {
+    const axisConfig: ChartAxisConfig = ('axisConfig' in values.visualization.config) ? values.visualization.config.axisConfig : {};
+    const hasError =
+      'showAxisLabels' in values.visualization.config
+      && values.visualization.config.showAxisLabels
+      && !Object
+        .values(axisConfig)
+        .some(({ color, title: axisTitle }) => color ?? axisTitle)
+      && !value
+
+    if(hasError) return 'At least for one axis should be defined label or color.'
+
+    return null;
+  }, [values.visualization.config])
+
   return (
     <>
       <Col sm={11}>
@@ -61,6 +77,7 @@ const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldCo
           labelClassName="col-sm-3"
           wrapperClassName="col-sm-9"
           help={inputHelp}
+          validate={validateField}
         />
       </Col>
       <Col sm={1}>
