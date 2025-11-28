@@ -29,7 +29,9 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import java.time.ZoneId;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -42,6 +44,7 @@ public abstract class AuthServiceBackendDTO implements BuildableMongoEntity<Auth
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     private static final String FIELD_DEFAULT_ROLES = "default_roles";
+    private static final String FIELD_DEFAULT_USER_TIMEZONE = "default_user_timezone";
     private static final String FIELD_CONFIG = "config";
 
     @Id
@@ -58,6 +61,9 @@ public abstract class AuthServiceBackendDTO implements BuildableMongoEntity<Auth
 
     @JsonProperty(FIELD_DEFAULT_ROLES)
     public abstract Set<String> defaultRoles();
+
+    @JsonProperty(FIELD_DEFAULT_USER_TIMEZONE)
+    public abstract Optional<ZoneId> defaultUserTimezone();
 
     @NotNull
     @JsonProperty(FIELD_CONFIG)
@@ -96,7 +102,8 @@ public abstract class AuthServiceBackendDTO implements BuildableMongoEntity<Auth
         public static Builder create() {
             return new AutoValue_AuthServiceBackendDTO.Builder()
                     .description("")
-                    .defaultRoles(Collections.emptySet());
+                    .defaultRoles(Collections.emptySet())
+                    .defaultUserTimezone(null);
         }
 
         @Id
@@ -112,6 +119,9 @@ public abstract class AuthServiceBackendDTO implements BuildableMongoEntity<Auth
 
         @JsonProperty(FIELD_DEFAULT_ROLES)
         public abstract Builder defaultRoles(Set<String> defaultRoles);
+
+        @JsonProperty(FIELD_DEFAULT_USER_TIMEZONE)
+        public abstract Builder defaultUserTimezone(@Nullable ZoneId defaultUserTimezone);
 
         @JsonProperty(FIELD_CONFIG)
         public abstract Builder config(AuthServiceBackendConfig config);

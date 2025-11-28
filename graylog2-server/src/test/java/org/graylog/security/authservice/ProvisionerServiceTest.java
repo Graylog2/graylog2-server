@@ -35,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,7 +65,7 @@ public class ProvisionerServiceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        provisionerService = new ProvisionerService(userService, DateTimeZone.UTC, new HashMap<>());
+        provisionerService = new ProvisionerService(userService, new HashMap<>());
     }
 
     @Test
@@ -90,6 +91,7 @@ public class ProvisionerServiceTest {
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
         verify(user, times(1)).setFirstLastFullNames(eq(FIRST_NAME), eq(LAST_NAME));
+        verify(user, times(1)).setTimeZone((DateTimeZone) isNull());
     }
 
     @Test
@@ -114,5 +116,6 @@ public class ProvisionerServiceTest {
         provisionerService.provision(userDetails);
         verify(userService, times(1)).save(isA(User.class));
         verify(user, times(1)).setFullName(FULL_NAME);
+        verify(user, times(1)).setTimeZone((DateTimeZone) isNull());
     }
 }
