@@ -102,12 +102,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
       ),
     },
     buffers: {
-      renderCell: (_value, entity) => (
-        <BuffersMetricsCell
-          node={entity}
-          warningThreshold={BUFFER_WARNING_THRESHOLD}
-        />
-      ),
+      renderCell: (_value, entity) => <BuffersMetricsCell node={entity} warningThreshold={BUFFER_WARNING_THRESHOLD} />,
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,

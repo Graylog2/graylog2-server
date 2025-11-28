@@ -40,7 +40,10 @@ type Props = {
   index: number;
 };
 
-const DragHandle = ({ itemTitle = undefined, dragHandleProps, isDragging, index }: Props, ref: React.Ref<HTMLButtonElement>) => {
+const DragHandle = (
+  { itemTitle = undefined, dragHandleProps, isDragging, index }: Props,
+  ref: React.Ref<HTMLButtonElement>,
+) => {
   const dragHandleTitle =
     typeof itemTitle === 'string'
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${itemTitle.toLocaleLowerCase()}`

@@ -32,7 +32,14 @@ type Props = {
 
 const formatBytes = (value: number | undefined | null) => (value == null ? '' : NumberUtils.formatBytes(value));
 
-const SizeAndRatioMetric = ({ used, max, warningThreshold = undefined, dangerThreshold = undefined, ratio = undefined, ratioPercent = undefined }: Props) => {
+const SizeAndRatioMetric = ({
+  used,
+  max,
+  warningThreshold = undefined,
+  dangerThreshold = undefined,
+  ratio = undefined,
+  ratioPercent = undefined,
+}: Props) => {
   const usedLabel = formatBytes(used);
   const maxLabel = formatBytes(max);
   const sizeLabel = [usedLabel, maxLabel].filter(Boolean).join(' / ');

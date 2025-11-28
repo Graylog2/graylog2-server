@@ -52,21 +52,12 @@ const useClusterDataNodes = (
   searchParams?: SearchParams,
   options?: UseClusterDataNodesOptions,
 ): UseClusterDataNodesResult => {
-  const {
-    enabled = true,
-    refetchInterval = DATANODES_REFETCH_INTERVAL,
-    initialPollingEnabled = true,
-  } = options ?? {};
+  const { enabled = true, refetchInterval = DATANODES_REFETCH_INTERVAL, initialPollingEnabled = true } = options ?? {};
   const [pollingEnabled, setPollingEnabled] = useState(initialPollingEnabled);
   const effectiveRefetchInterval = pollingEnabled ? refetchInterval : false;
   const { isDatanodeConfiguredAndUsed } = useShowDatanodeMigration();
 
-  const {
-    data,
-    refetch,
-    isLoading,
-    error,
-  } = useDataNodes(searchParams, { enabled }, effectiveRefetchInterval);
+  const { data, refetch, isLoading, error } = useDataNodes(searchParams, { enabled }, effectiveRefetchInterval);
 
   const nodesWithMetrics = useAddMetricsToDataNodes(data.list, {
     refetchInterval: effectiveRefetchInterval,
