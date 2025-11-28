@@ -191,12 +191,7 @@ public class ClusterEventPeriodical extends Periodical {
                         // This is just used to make sure there is no matching document present.
                         "event_key", UUID.randomUUID().toString()
                 )), new Document(Map.of(
-                        "$set", Map.of(
-                                ClusterEvent.FIELD_PRODUCER, clusterEvent.producer(),
-                                ClusterEvent.FIELD_CONSUMERS, clusterEvent.consumers(),
-                                ClusterEvent.FIELD_EVENT_CLASS, clusterEvent.eventClass(),
-                                ClusterEvent.FIELD_PAYLOAD, clusterEvent.payload()
-                        ),
+                        "$set", clusterEvent,
                         "$currentDate", new Document(ClusterEvent.FIELD_TIMESTAMP, true)
                 )),
                 new UpdateOptions().upsert(true));

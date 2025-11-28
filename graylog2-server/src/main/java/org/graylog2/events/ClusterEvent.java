@@ -18,6 +18,7 @@ package org.graylog2.events;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -52,7 +53,8 @@ public abstract class ClusterEvent implements MongoEntity {
     @Nullable
     public abstract String id();
 
-    @JsonProperty(FIELD_TIMESTAMP)
+    // Ignoring this field during serialization, will be set by server.
+    @JsonIgnore
     public abstract Date timestamp();
 
     @JsonProperty(FIELD_PRODUCER)
