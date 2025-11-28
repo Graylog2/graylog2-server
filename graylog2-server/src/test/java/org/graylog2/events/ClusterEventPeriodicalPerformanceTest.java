@@ -22,10 +22,13 @@ import org.slf4j.LoggerFactory;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
@@ -35,6 +38,11 @@ class ClusterEventPeriodicalPerformanceTest {
     private static final int PRODUCER_COUNT = 5;
     private static final int EVENTS_PER_PRODUCER = 1000;
     private final AtomicBoolean running = new AtomicBoolean(true);
+    private final ThreadFactory threadFactory = r -> {
+        Thread t = new Thread(r);
+        t.setDaemon(true);
+        return t;
+    };
     private MongoDBTestService mongodb;
     private MongoJackObjectMapperProvider objectMapperProvider;
 
@@ -64,67 +72,63 @@ class ClusterEventPeriodicalPerformanceTest {
 
     @Test
     void concurrentAccessDoesNotLeadToWriteAmplification() throws InterruptedException {
+        LOG.info("Starting " + CONSUMER_COUNT + " consumers / " + PRODUCER_COUNT + " producers submitting " + EVENTS_PER_PRODUCER + " events each.");
         final var producerCountdown = new CountDownLatch(PRODUCER_COUNT);
         final var consumerCountdown = new CountDownLatch(CONSUMER_COUNT);
         final var producerStopwatch = Stopwatch.createStarted();
         final var consumerStopwatch = Stopwatch.createStarted();
 
         final var totalCount = 2 * (2 * CONSUMER_COUNT + 2 * PRODUCER_COUNT);
-        try (final var threadPool = Executors.newFixedThreadPool(totalCount, r -> {
-            Thread t = new Thread(r);
-            t.setDaemon(true);
-            return t;
-        })) {
-            for (int i = 0; i < CONSUMER_COUNT; i++) {
-                final var serverEventBus = new EventBus();
-                final var clusterEventBus = new ClusterEventBus();
-                final var periodical = new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
-                        new SimpleNodeId("consumer-" + i), new RestrictedChainingClassLoader(
-                        new ChainingClassLoader(this.getClass().getClassLoader()),
-                        SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus);
-                threadPool.submit(() -> {
-                    while (running.get()) {
-                        periodical.run();
-                        try {
-                            Thread.sleep(Duration.ofSeconds(periodical.getPeriodSeconds()));
-                        } catch (InterruptedException e) {
-                            throw new RuntimeException(e);
-                        }
+        final var threadPool = Executors.newFixedThreadPool(totalCount, threadFactory);
+        for (int i = 0; i < CONSUMER_COUNT; i++) {
+            final var serverEventBus = new EventBus();
+            final var clusterEventBus = new ClusterEventBus();
+            final var periodical = new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
+                    new SimpleNodeId("consumer-" + i), new RestrictedChainingClassLoader(
+                    new ChainingClassLoader(this.getClass().getClassLoader()),
+                    SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus);
+            threadPool.submit(() -> {
+                while (running.get()) {
+                    periodical.run();
+                    try {
+                        Thread.sleep(Duration.ofSeconds(periodical.getPeriodSeconds()));
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
-                });
+                }
+            });
 
-                serverEventBus.register(new EventSubscriber(consumerCountdown::countDown));
-            }
-
-            for (int i = 0; i < PRODUCER_COUNT; i++) {
-                final var serverEventBus = new EventBus();
-                final var clusterEventBus = new ClusterEventBus();
-                final var nodeId = new SimpleNodeId("producer-" + i);
-                final var periodical = new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
-                        nodeId, new RestrictedChainingClassLoader(
-                        new ChainingClassLoader(this.getClass().getClassLoader()),
-                        SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus);
-
-                threadPool.submit(periodical);
-
-                threadPool.submit(() -> {
-                    for (int count = 0; count < EVENTS_PER_PRODUCER; count++) {
-                        clusterEventBus.post(new DummyEvent(nodeId + "-" + count));
-                    }
-                    producerCountdown.countDown();
-                });
-            }
-
-            producerCountdown.await(5, TimeUnit.MINUTES);
-            LOG.info("Producers have finished, took: " + producerStopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms.");
-
-            consumerCountdown.await(10, TimeUnit.MINUTES);
-            LOG.info("Consumers have finished, took: " + consumerStopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms.");
-
-            running.set(false);
-
-            printStatistics(mongodb.mongoDatabase());
+            serverEventBus.register(new EventSubscriber(consumerCountdown::countDown));
         }
+
+        for (int i = 0; i < PRODUCER_COUNT; i++) {
+            final var serverEventBus = new EventBus();
+            final var clusterEventBus = new ClusterEventBus();
+            final var nodeId = new SimpleNodeId("producer-" + i);
+            final var periodical = new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
+                    nodeId, new RestrictedChainingClassLoader(
+                    new ChainingClassLoader(this.getClass().getClassLoader()),
+                    SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus);
+
+            threadPool.submit(periodical);
+
+            threadPool.submit(() -> {
+                for (int count = 0; count < EVENTS_PER_PRODUCER; count++) {
+                    clusterEventBus.post(new DummyEvent(nodeId + "-" + count));
+                }
+                producerCountdown.countDown();
+            });
+        }
+
+        assertThat(producerCountdown.await(5, TimeUnit.MINUTES)).as("Producer latch has not timed out").isTrue();
+        LOG.info("Producers have finished, took: " + producerStopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms.");
+
+        assertThat(consumerCountdown.await(10, TimeUnit.MINUTES)).as("Consumer latch has not timed out").isTrue();
+        LOG.info("Consumers have finished, took: " + consumerStopwatch.elapsed(TimeUnit.MILLISECONDS) + "ms.");
+
+        running.set(false);
+
+        printStatistics(mongodb.mongoDatabase());
     }
 
     private void printStatistics(MongoDatabase database) {
