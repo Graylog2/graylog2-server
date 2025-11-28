@@ -18,7 +18,7 @@ package org.graylog2.datatiering.rotation;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;
 import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingCalculator;

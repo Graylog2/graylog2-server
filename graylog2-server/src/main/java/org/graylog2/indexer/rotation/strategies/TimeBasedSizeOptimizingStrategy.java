@@ -18,7 +18,7 @@ package org.graylog2.indexer.rotation.strategies;
 
 import jakarta.inject.Inject;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.indexer.rotation.common.IndexRotator.Result;
 import org.graylog2.indexer.rotation.tso.IndexLifetimeConfig;

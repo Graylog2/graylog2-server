@@ -17,7 +17,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.rotation.common.IndexRotator;
 import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingCalculator;
