@@ -21,7 +21,7 @@ import type {
   XYVisualization,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import type { ConfigurationField, FieldUnitType, CustomField } from 'views/types';
+import type {ConfigurationField, FieldUnitType, CustomField} from 'views/types';
 import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 import AxisVisualizationField from 'views/components/aggregationwizard/visualization/configurationFields/AxisVisualizationField';
 
@@ -31,7 +31,7 @@ export const getNumericAxisMetrics = (values: WidgetConfigFormValues) => {
 
   return metrics
     .filter(({ field }) => !(units?.[field]?.unitType && units?.[field]?.abbrev))
-    .map((metric) => metric.name ?? `${metric.function}(${metric.field ?? ''})`);
+    .map((metric) => metric.name || `${metric.function}(${metric.field ?? ''})`);
 };
 
 export const getAxisMetrics = (unitType: FieldUnitType, values: WidgetConfigFormValues) => {
@@ -83,7 +83,7 @@ const xyAxisConfigFields: Array<ConfigurationField> = [
   },
   {
     name: `axisConfig.${DEFAULT_AXIS_KEY}`,
-    title: 'Y-number',
+    title: 'Y-Number',
     type: 'custom',
     id: 'number',
     component: AxisVisualizationField,
