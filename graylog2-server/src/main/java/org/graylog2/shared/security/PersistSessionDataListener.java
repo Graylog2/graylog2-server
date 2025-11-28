@@ -37,10 +37,8 @@ public class PersistSessionDataListener implements AuthenticationListener {
         if (info instanceof AuthenticationInfoWithSessionAuthContext(
                 AuthenticationInfo ignored, SessionAuthContext sessionAuthContext
         )) {
-            final var session = SecurityUtils.getSubject().getSession(false);
-            if (session != null) {
-                session.setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
-            }
+            SecurityUtils.getSubject().getSession()
+                    .setAttribute(SessionUtils.AUTH_CONTEXT_SESSION_KEY, sessionAuthContext);
         }
     }
 
