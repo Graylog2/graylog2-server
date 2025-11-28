@@ -14,16 +14,15 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.fieldtypes;
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
-import org.graylog.plugins.views.search.rest.MappedFieldTypeDTO;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import TrafficGraphWithDaySelect from './TrafficGraphWithDaySelect';
 
-import java.util.Collection;
-import java.util.Set;
+describe('TrafficGraphWithDaySelect', () => {
+  it('does not throw error when `traffic` is `undefined`', async () => {
+    render(<TrafficGraphWithDaySelect traffic={{}} />);
 
-public interface MappedFieldTypesService {
-    Set<MappedFieldTypeDTO> fieldTypesByStreamIds(Collection<String> streamIds, TimeRange timeRange);
-
-    Set<MappedFieldTypeDTO> singleFieldTypeByStreamIds(Collection<String> streams, TimeRange timerange, String field);
-}
+    await screen.findByText('Outgoing traffic');
+  });
+});

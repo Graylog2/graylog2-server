@@ -52,7 +52,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class StreamReferenceFacade extends StreamFacade {
     private static final Logger LOG = LoggerFactory.getLogger(StreamReferenceFacade.class);
@@ -157,19 +156,8 @@ public class StreamReferenceFacade extends StreamFacade {
     }
 
     @Override
-    public EntityExcerpt createExcerpt(Stream stream) {
-        return EntityExcerpt.builder()
-                .id(ModelId.of(stream.getTitle()))
-                .type(ModelTypes.STREAM_REF_V1)
-                .title(stream.getTitle())
-                .build();
-    }
-
-    @Override
     public Set<EntityExcerpt> listEntityExcerpts() {
-        return streamService.loadAll().stream()
-                .map(this::createExcerpt)
-                .collect(Collectors.toSet());
+        return Set.of();
     }
 
     public static Entity resolveStreamEntity(String id, Map<EntityDescriptor, Entity> entities) {
