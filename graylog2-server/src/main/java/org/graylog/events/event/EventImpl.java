@@ -61,6 +61,7 @@ public class EventImpl implements Event {
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
+    private Map<String, FieldValue> aggregationConditions = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
     private EventReplayInfo replayInfo;
@@ -304,6 +305,16 @@ public class EventImpl implements Event {
     }
 
     @Override
+    public Map<String, String> getAggregationConditions() {
+        return this.aggregationConditions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().value()));
+    }
+
+    @Override
+    public void setAggregationConditions(Map<String, String> aggregationConditions) {
+        this.aggregationConditions = aggregationConditions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldValue.string(entry.getValue())));
+    }
+
+    @Override
     public EventReplayInfo getReplayInfo() {
         return replayInfo;
     }
@@ -321,6 +332,11 @@ public class EventImpl implements Event {
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
 
         final Map<String, String> groupByFields = this.groupByFields.entrySet()
+                .stream()
+                .filter(entry -> !entry.getValue().isError())
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
+
+        final Map<String, String> aggregationConditions = this.aggregationConditions.entrySet()
                 .stream()
                 .filter(entry -> !entry.getValue().isError())
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
@@ -346,6 +362,7 @@ public class EventImpl implements Event {
                 .alert(getAlert())
                 .fields(ImmutableMap.copyOf(fields))
                 .groupByFields(ImmutableMap.copyOf(groupByFields))
+                .aggregationConditions(ImmutableMap.copyOf(aggregationConditions))
                 .replayInfo(getReplayInfo())
                 .build();
     }
