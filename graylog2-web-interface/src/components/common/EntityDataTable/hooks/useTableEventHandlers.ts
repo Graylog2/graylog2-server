@@ -21,6 +21,7 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
+import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 const useTableEventHandlers = ({
   updateTableLayout,
@@ -28,7 +29,7 @@ const useTableEventHandlers = ({
   setQuery,
   appSection,
 }: {
-  updateTableLayout: (preferences: TableLayoutPreferences) => void;
+  updateTableLayout: (preferences: TableLayoutPreferences) => Promise<void>;
   paginationQueryParameter: PaginationQueryParameterResult;
   setQuery: (query: string) => void;
   appSection: string;
@@ -72,25 +73,36 @@ const useTableEventHandlers = ({
           app_section: appSection,
           app_action_value: 'columns-select',
           columns: Object.keys(layoutPreferences.attributes).filter(
-            (key) => layoutPreferences.attributes[key].status === 'show',
+            (key) => layoutPreferences.attributes[key].status === ATTRIBUTE_STATUS.show,
           ),
         });
       }
 
       const newLayoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> } = {};
 
-      if (layoutPreferences.order) {
+      if ('order' in layoutPreferences) {
         newLayoutPreferences.order = layoutPreferences.order;
       }
 
-      if (layoutPreferences.attributes) {
+      if ('attributes' in layoutPreferences) {
         newLayoutPreferences.attributes = layoutPreferences.attributes;
       }
 
-      updateTableLayout(newLayoutPreferences);
+      return updateTableLayout(newLayoutPreferences);
     },
     [appSection, sendTelemetry, updateTableLayout],
   );
+
+  const onResetLayoutPreferences = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
+      app_section: appSection,
+      app_action_value: 'columns-select',
+    });
+
+    paginationQueryParameter.resetPage();
+
+    return updateTableLayout({ attributes: null, order: null, sort: undefined, perPage: undefined });
+  }, [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout]);
 
   const onSearchReset = useCallback(() => {
     onSearch('');
@@ -113,6 +125,7 @@ const useTableEventHandlers = ({
   return {
     onLayoutPreferencesChange,
     onPageSizeChange,
+    onResetLayoutPreferences,
     onSearch,
     onSearchReset,
     onSortChange,

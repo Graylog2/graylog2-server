@@ -24,6 +24,7 @@ import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
 import type { ColumnSchema } from 'components/common/EntityDataTable/types';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
+import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 import EntityDataTable from './EntityDataTable';
 
@@ -49,9 +50,9 @@ describe('<EntityDataTable />', () => {
   ];
 
   const columnPreferences = {
-    title: { status: 'show' },
-    description: { status: 'show' },
-    status: { status: 'show' },
+    title: { status: ATTRIBUTE_STATUS.show },
+    description: { status: ATTRIBUTE_STATUS.show },
+    status: { status: ATTRIBUTE_STATUS.show },
   } as const;
 
   const defaultDisplayedColumns = ['title', 'description', 'summary', 'status'];
@@ -71,10 +72,11 @@ describe('<EntityDataTable />', () => {
     defaultColumnOrder: defaultDisplayedColumns,
     layoutPreferences: { attributes: columnPreferences },
     entities: data,
-    onLayoutPreferencesChange: () => {},
+    onLayoutPreferencesChange: () => Promise.resolve(),
     onSortChange: () => {},
     entityAttributesAreCamelCase: true,
     columnSchemas,
+    onResetLayoutPreferences: () => Promise.resolve(),
   };
 
   it('should render selected columns and table headers', async () => {
@@ -246,8 +248,8 @@ describe('<EntityDataTable />', () => {
         {...defaultProps}
         layoutPreferences={{
           attributes: {
-            description: { status: 'show' },
-            status: { status: 'show' },
+            description: { status: ATTRIBUTE_STATUS.show },
+            status: { status: ATTRIBUTE_STATUS.show },
           },
         }}
         defaultDisplayedColumns={['description', 'status', 'title']}
@@ -261,11 +263,39 @@ describe('<EntityDataTable />', () => {
 
     expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
       attributes: {
-        description: { status: 'show' },
-        status: { status: 'show' },
+        description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
         title: { status: 'hide' },
       },
     });
+  });
+
+  it('should reset layout preferences via reset all columns action', async () => {
+    const onResetLayoutPreferences = jest.fn().mockResolvedValue(undefined);
+
+    const initialLayoutPreferences = {
+      attributes: {
+        title: { status: ATTRIBUTE_STATUS.hide },
+        description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
+      },
+      order: ['status', 'description', 'title'],
+    };
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        defaultDisplayedColumns={['title', 'description', 'status']}
+        defaultColumnOrder={['title', 'description', 'status']}
+        layoutPreferences={initialLayoutPreferences}
+        onResetLayoutPreferences={onResetLayoutPreferences}
+      />,
+    );
+
+    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /reset all columns/i }));
+
+    await waitFor(() => expect(onResetLayoutPreferences).toHaveBeenCalledTimes(1));
   });
 
   it('should hande entities with camel case attributes', async () => {
@@ -283,7 +313,7 @@ describe('<EntityDataTable />', () => {
     render(
       <EntityDataTable
         {...defaultProps}
-        layoutPreferences={{ attributes: { ...columnPreferences, 'created_at': { status: 'show' } } }}
+        layoutPreferences={{ attributes: { ...columnPreferences, 'created_at': { status: ATTRIBUTE_STATUS.show } } }}
         entities={dataWithCamelCaseAttributes}
         columnRenderers={{
           attributes: {

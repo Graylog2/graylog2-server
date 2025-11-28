@@ -69,7 +69,7 @@ const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, 
       tableLayout={getDefaultLayout(hideAdditionalColumns)}
       fetchEntities={fetchEntities}
       additionalAttributes={additionalAttributes}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       keyFn={keyFn}
       entityAttributesAreCamelCase
       bulkSelection={{ actions: <BulkActions /> }}

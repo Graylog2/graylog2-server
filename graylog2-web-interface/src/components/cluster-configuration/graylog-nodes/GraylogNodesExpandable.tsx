@@ -54,9 +54,14 @@ const GraylogNodesExpandable = ({
     searchParams,
     isLoadingLayout,
     handleLayoutPreferencesChange,
+    resetLayoutPreferences,
     handleSortChange,
   } = useClusterGraylogNodesTableLayout(searchQuery, pageSizeLimit);
-  const { nodes: graylogNodes, total: totalGraylogNodes, isLoading } = useClusterGraylogNodes(searchParams, { refetchInterval });
+  const {
+    nodes: graylogNodes,
+    total: totalGraylogNodes,
+    isLoading,
+  } = useClusterGraylogNodes(searchParams, { refetchInterval });
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
@@ -91,7 +96,8 @@ const GraylogNodesExpandable = ({
             entityActions={renderActions}
             columnSchemas={columnSchemas}
             columnRenderers={columnRenderers}
-            actionsCellWidth={160}
+            onResetLayoutPreferences={resetLayoutPreferences}
+            minActionsCellWidth={160}
           />
         );
       })()}
