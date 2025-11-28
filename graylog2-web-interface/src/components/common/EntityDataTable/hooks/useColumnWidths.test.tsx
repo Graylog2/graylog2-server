@@ -92,7 +92,7 @@ describe('useColumnWidths hook test', () => {
       actions: 110,
       'bulk-select': 20,
       description: 313,
-      title: 157,
+      title: 156,
     });
   });
 });
