@@ -44,8 +44,8 @@ import static org.graylog2.shared.utilities.StringUtils.humanReadableByteCount;
 @Singleton
 public class TimeSizeOptimizingCalculator {
 
+    public static final long FALLBACK_SHARD_SIZE_BYTES = Size.gigabytes(20).toBytes();
     private static final long MIN_SHARD_SIZE_BYTES = Size.gigabytes(5).toBytes();
-    private static final long FALLBACK_SHARD_SIZE_BYTES = Size.gigabytes(20).toBytes();
     // The data_hot role is only used for Elasticsearch nodes
     private static final Set<String> DATA_NODE_ROLES = Set.of("data", "data_hot");
     private final Indices indices;
