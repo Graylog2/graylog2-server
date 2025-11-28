@@ -22,8 +22,8 @@ import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/Aggrega
 import type {DefaultAxisKey, FieldUnitType} from 'views/types';
 const getDefaultPlotYLayoutSettings = (
   theme: DefaultTheme,
-  unitTypeKey: FieldUnitType | DefaultAxisKey,
-  config: AggregationWidgetConfig,
+  unitTypeKey?: FieldUnitType | DefaultAxisKey,
+  config?: AggregationWidgetConfig,
 ) => {
   const visualizationAxisTitle =
     config?.visualizationConfig && 'axisConfig' in config.visualizationConfig
