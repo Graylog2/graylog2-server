@@ -40,4 +40,6 @@ public interface IndexRangeService {
     IndexRange calculateRange(String index);
 
     IndexRange createUnknownRange(String index);
+
+    void calculateRangeAndSave(String index);
 }
