@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.inject.Inject;
 import org.graylog.storage.opensearch3.indextemplates.OSSerializationUtils;
@@ -48,19 +47,15 @@ public class DataStreamAdapterOS implements DataStreamAdapter {
 
     private final Logger log = LoggerFactory.getLogger(DataStreamAdapterOS.class);
     private final OfficialOpensearchClient opensearchClient;
-    private final OpenSearchClient client;
-    private final ObjectMapper objectMapper;
     private final IsmApi ismApi;
     private final OpenSearchIndicesClient indicesClient;
     private final OSSerializationUtils templateMapper;
 
 
     @Inject
-    public DataStreamAdapterOS(OfficialOpensearchClient opensearchClient, OpenSearchClient client, ObjectMapper objectMapper, IsmApi ismApi, OSSerializationUtils templateMapper) {
+    public DataStreamAdapterOS(OfficialOpensearchClient opensearchClient, IsmApi ismApi, OSSerializationUtils templateMapper) {
         this.opensearchClient = opensearchClient;
         this.indicesClient = opensearchClient.sync().indices();
-        this.client = client;
-        this.objectMapper = objectMapper;
         this.ismApi = ismApi;
         this.templateMapper = templateMapper;
     }

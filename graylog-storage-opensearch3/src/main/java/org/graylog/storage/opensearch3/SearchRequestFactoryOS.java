@@ -18,11 +18,12 @@ package org.graylog.storage.opensearch3;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.graylog.storage.search.SearchCommand;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.search.QueryStringUtils;
 import org.opensearch.client.opensearch._types.query_dsl.BoolQuery;
 import org.opensearch.client.opensearch._types.query_dsl.Query;
 import org.opensearch.client.opensearch._types.query_dsl.QueryBuilders;
+import org.opensearch.client.opensearch._types.query_dsl.RangeQuery;
 
 import java.util.Optional;
 
@@ -39,8 +40,10 @@ public class SearchRequestFactoryOS {
         this.allowLeadingWildcardSearches = allowLeadingWildcardSearches;
     }
 
-    public Query createQueryBuilder(final SearchCommand searchCommand) {
-        final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
+    public Query createQuery(final String queryString,
+                             final Optional<TimeRange> range,
+                             final Optional<String> filter) {
+        final String query = QueryStringUtils.normalizeQuery(queryString);
         BoolQuery.Builder topQueryBuilder;
         if (QueryStringUtils.isEmptyOrMatchAllQueryString(query)) {
             topQueryBuilder = QueryBuilders.bool()
@@ -60,18 +63,15 @@ public class SearchRequestFactoryOS {
                     );
         }
 
-
-        final Optional<BoolQuery.Builder> rangeQueryBuilder = searchCommand.range()
-                .map(TimeRangeQueryFactory::createTimeRangeQuery)
-                .map(rangeQuery -> QueryBuilders.bool().must(rangeQuery.toQuery()));
-        final Optional<BoolQuery.Builder> filterQueryBuilder = searchCommand.filter()
-                .filter(filter -> !QueryStringUtils.isEmptyOrMatchAllQueryString(filter))
-                .map(filter -> QueryBuilders.queryString().query(filter).build().toQuery())
-                .map(queryStringQuery -> QueryBuilders.bool().must(queryStringQuery));
+        final Optional<RangeQuery> rangeQuery = range
+                .map(TimeRangeQueryFactory::createTimeRangeQuery);
+        final Optional<Query> filterQuery = filter
+                .filter(f -> !QueryStringUtils.isEmptyOrMatchAllQueryString(f))
+                .map(f -> QueryBuilders.queryString().query(f).build().toQuery());
 
 
-        filterQueryBuilder.ifPresent(builder -> topQueryBuilder.filter(builder.build().toQuery()));
-        rangeQueryBuilder.ifPresent(builder -> topQueryBuilder.filter(builder.build().toQuery()));
+        filterQuery.ifPresent(topQueryBuilder::filter);
+        rangeQuery.ifPresent(rQuery -> topQueryBuilder.filter(rQuery.toQuery()));
         return topQueryBuilder.build().toQuery();
     }
 

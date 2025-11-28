@@ -14,19 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3;
+package org.graylog.plugins.views.search.views.widgets.aggregation;
 
-import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
-import org.graylog.testing.elasticsearch.SearchInstance;
-import org.graylog.testing.elasticsearch.SearchServerInstance;
-import org.graylog2.indexer.searches.SearchesIT;
-
-public class SearchesOS2IT extends SearchesIT {
-    @SearchInstance
-    public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
-
-    @Override
-    protected SearchServerInstance searchServer() {
-        return this.openSearchInstance;
-    }
+public record AxisConfigDTO() {
 }
