@@ -22,6 +22,8 @@ import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQuer
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.slice.SliceBuilder;
@@ -31,6 +33,7 @@ import org.graylog2.indexer.searches.ChunkCommand;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.search.QueryStringUtils;
 
@@ -72,22 +75,27 @@ public class SearchRequestFactory {
         return searchSourceBuilder;
     }
 
-    public SearchSourceBuilder create(SearchCommand searchCommand) {
-        final String query = QueryStringUtils.normalizeQuery(searchCommand.query());
+    public BoolQueryBuilder createQueryBuilder(final String queryString,
+                                               final Optional<TimeRange> range,
+                                               final Optional<String> filter) {
+        final String query = QueryStringUtils.normalizeQuery(queryString);
         final QueryBuilder queryBuilder = translateQueryString(query);
 
-        final Optional<BoolQueryBuilder> rangeQueryBuilder = searchCommand.range()
-                .map(TimeRangeQueryFactory::create)
-                .map(rangeQuery -> boolQuery().must(rangeQuery));
-        final Optional<BoolQueryBuilder> filterQueryBuilder = searchCommand.filter()
-                .filter(filter -> !QueryStringUtils.isEmptyOrMatchAllQueryString(filter))
-                .map(QueryBuilders::queryStringQuery)
-                .map(queryStringQuery -> boolQuery().must(queryStringQuery));
+        final Optional<RangeQueryBuilder> rangeQueryBuilder = range
+                .map(TimeRangeQueryFactory::create);
+        final Optional<QueryStringQueryBuilder> filterQueryBuilder = filter
+                .filter(f -> !QueryStringUtils.isEmptyOrMatchAllQueryString(f))
+                .map(QueryBuilders::queryStringQuery);
 
         final BoolQueryBuilder filteredQueryBuilder = boolQuery()
                 .must(queryBuilder);
         filterQueryBuilder.ifPresent(filteredQueryBuilder::filter);
         rangeQueryBuilder.ifPresent(filteredQueryBuilder::filter);
+        return filteredQueryBuilder;
+    }
+
+    public SearchSourceBuilder create(SearchCommand searchCommand) {
+        final BoolQueryBuilder filteredQueryBuilder = createQueryBuilder(searchCommand.query(), searchCommand.range(), searchCommand.filter());
 
         applyStreamsFilter(filteredQueryBuilder, searchCommand);
 

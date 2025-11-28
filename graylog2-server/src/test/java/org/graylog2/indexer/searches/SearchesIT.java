@@ -169,7 +169,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
                 streamService,
                 indices,
                 indexSetRegistry,
-                createSearchesAdapter()
+                createSearchesAdapter(),
+                searchServer().adapters().countsAdapter()
         );
     }
 
@@ -183,7 +184,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
         assertThat(result.count()).isEqualTo(10L);
     }
@@ -241,7 +243,8 @@ public abstract class SearchesIT extends ElasticsearchBaseTest {
 
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                null);
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);
         assertThat(metricRegistry.getHistograms()).containsKey(RANGES_HISTOGRAM_NAME);
