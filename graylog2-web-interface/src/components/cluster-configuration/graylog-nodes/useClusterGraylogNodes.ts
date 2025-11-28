@@ -19,10 +19,7 @@ import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 import type { SearchParams } from 'stores/PaginationTypes';
 
 import useAddMetricsToGraylogNodes, { type GraylogNodeMetrics } from './useAddMetricsToGraylogNodes';
-import useGraylogNodes, {
-  type GraylogNode as BaseGraylogNode,
-  type GraylogNodesResponse,
-} from './useGraylogNodes';
+import useGraylogNodes, { type GraylogNode as BaseGraylogNode, type GraylogNodesResponse } from './useGraylogNodes';
 
 export type GraylogNode = BaseGraylogNode & { metrics: GraylogNodeMetrics };
 
@@ -61,12 +58,7 @@ const useClusterGraylogNodes = (
   const [pollingEnabled, setPollingEnabled] = useState(initialPollingEnabled);
   const effectiveRefetchInterval = pollingEnabled ? refetchInterval : false;
 
-  const {
-    data,
-    refetch,
-    isLoading,
-    error,
-  } = useGraylogNodes(searchParams, { enabled }, effectiveRefetchInterval);
+  const { data, refetch, isLoading, error } = useGraylogNodes(searchParams, { enabled }, effectiveRefetchInterval);
 
   const nodesWithMetrics = useAddMetricsToGraylogNodes(data.list);
 

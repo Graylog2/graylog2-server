@@ -110,10 +110,9 @@ describe('<ClusterConfigurationNodes />', () => {
     });
 
     expect(useClusterGraylogNodesTableLayout).toHaveBeenCalledTimes(1);
-    expect(useClusterDataNodes).toHaveBeenLastCalledWith(
-      expect.objectContaining({ query: '' }),
-      { refetchInterval: 10000 },
-    );
+    expect(useClusterDataNodes).toHaveBeenLastCalledWith(expect.objectContaining({ query: '' }), {
+      refetchInterval: 10000,
+    });
   });
 
   it('uses child "select node type" handler to switch view', async () => {

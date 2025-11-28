@@ -62,7 +62,7 @@ const RatioIndicator = ({ ratio, warningThreshold = Number.NaN, dangerThreshold 
 
   return (
     <SecondaryText>
-      <StyledLabel bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize='xs'>
+      <StyledLabel bsStyle={exceedsDanger ? 'danger' : 'warning'} bsSize="xs">
         {formattedRatio}
       </StyledLabel>
     </SecondaryText>
@@ -73,6 +73,9 @@ export const buildRatioIndicator = (
   ratio: number | undefined | null,
   warningThreshold?: number,
   dangerThreshold?: number,
-) => (ratio == null ? null : <RatioIndicator ratio={ratio} warningThreshold={warningThreshold} dangerThreshold={dangerThreshold} />);
+) =>
+  ratio == null ? null : (
+    <RatioIndicator ratio={ratio} warningThreshold={warningThreshold} dangerThreshold={dangerThreshold} />
+  );
 
 export default RatioIndicator;

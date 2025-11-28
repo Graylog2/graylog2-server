@@ -68,7 +68,12 @@ const DIALOG_TEXT = {
   },
 };
 
-const DataNodeActions = ({ dataNode, refetch = undefined, displayAs = 'dropdown', onInteractionChange = undefined }: Props) => {
+const DataNodeActions = ({
+  dataNode,
+  refetch = undefined,
+  displayAs = 'dropdown',
+  onInteractionChange = undefined,
+}: Props) => {
   const [showLogsDialog, setShowLogsDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [dialogType, setDialogType] = useState(null);

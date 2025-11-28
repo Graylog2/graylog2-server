@@ -95,23 +95,22 @@ const Section = ({
 
   const onHeaderClick = () => !disableCollapseButton && onToggle();
 
-  const collapseButton =
-    collapsible && (
-      <IconButton
-        data-testid="collapseButton"
-        title={`Toggle ${title.toLowerCase()} section`}
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          if (!disableCollapseButton) {
-            onToggle();
-          }
-        }}
-        disabled={disableCollapseButton}
-        name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-        size="lg"
-      />
-    );
+  const collapseButton = collapsible && (
+    <IconButton
+      data-testid="collapseButton"
+      title={`Toggle ${title.toLowerCase()} section`}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!disableCollapseButton) {
+          onToggle();
+        }
+      }}
+      disabled={disableCollapseButton}
+      name={opened ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+      size="lg"
+    />
+  );
 
   return (
     <Container $opened={opened} $collapsible={collapsible}>
