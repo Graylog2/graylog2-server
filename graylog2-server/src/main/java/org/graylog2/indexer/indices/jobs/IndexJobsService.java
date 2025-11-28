@@ -33,12 +33,75 @@ import java.util.concurrent.TimeUnit;
 public class IndexJobsService {
     private final DBJobDefinitionService jobDefinitionService;
     private final DBJobTriggerService jobTriggerService;
+    private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
 
     @Inject
     public IndexJobsService(final DBJobDefinitionService jobDefinitionService,
-                            final DBJobTriggerService jobTriggerService) {
+                            final DBJobTriggerService jobTriggerService,
+                            final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical) {
         this.jobDefinitionService = jobDefinitionService;
         this.jobTriggerService = jobTriggerService;
+        this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
+    }
+
+    public void submitIndexRangesCleanupJob() {
+        indexRangesCleanupPeriodical.doRun();
+    }
+
+    public void submitOptimizeIndexJob(final String indexName, final int maxNumSegments) {
+        final var jobDefinition = jobDefinitionService.findOrCreate(OptimizeIndexJob.DEFINITION_INSTANCE);
+
+        final var data = OptimizeIndexJob.Data.builder().indexName(indexName).maxNumSegments(maxNumSegments).build();
+        final var trigger = JobTriggerDto.builder()
+                .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType(OptimizeIndexJob.TYPE_NAME)
+                .schedule(OnceJobSchedule.create())
+                .data(data)
+                .build();
+
+        jobTriggerService.create(trigger);
+    }
+
+    public void submitCreateNewSingleIndexRangeJob(final String indexName) {
+        final var jobDefinition = jobDefinitionService.findOrCreate(CreateNewSingleIndexRangeJob.DEFINITION_INSTANCE);
+
+        final var data = CreateNewSingleIndexRangeJob.Data.builder().indexName(indexName).build();
+        final var trigger = JobTriggerDto.builder()
+                .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType(CreateNewSingleIndexRangeJob.TYPE_NAME)
+                .schedule(OnceJobSchedule.create())
+                .data(data)
+                .build();
+
+        jobTriggerService.create(trigger);
+    }
+
+    public void submitRebuildIndexRangesJob(final Set<IndexSet> indexSets) {
+        final var jobDefinition = jobDefinitionService.findOrCreate(RebuildIndexRangesJob.DEFINITION_INSTANCE);
+
+        final var data = RebuildIndexRangesJob.Data.builder().indexSets(indexSets).build();
+        final var trigger = JobTriggerDto.builder()
+                .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType(RebuildIndexRangesJob.TYPE_NAME)
+                .schedule(OnceJobSchedule.create())
+                .data(data)
+                .build();
+
+        jobTriggerService.create(trigger);
+    }
+
+    public void submitIndexSetCleanupJob(final IndexSet indexSet) {
+        final var jobDefinition = jobDefinitionService.findOrCreate(IndexSetCleanupJob.DEFINITION_INSTANCE);
+
+        final var data = IndexSetCleanupJob.Data.builder().indexSet(indexSet).build();
+        final var trigger = JobTriggerDto.builder()
+                .jobDefinitionId(jobDefinition.id())
+                .jobDefinitionType(IndexSetCleanupJob.TYPE_NAME)
+                .schedule(OnceJobSchedule.create())
+                .data(data)
+                .build();
+
+        jobTriggerService.create(trigger);
     }
 
     public void submitSetIndexReadOnlyAndCalculateRangeJob(final String indexName) {

@@ -31,6 +31,7 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.jobs.IndexJobsService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -96,6 +97,8 @@ public class IndexSetsResourceTest {
     private IndexSetStatsCreator indexSetStatsCreator;
     @Mock
     private SystemJobManager systemJobManager;
+    @Mock
+    private IndexJobsService indexJobsService;
     @Mock
     private ClusterConfigService clusterConfigService;
     @Mock
@@ -395,7 +398,6 @@ public class IndexSetsResourceTest {
 
         lenient().when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
-        when(indexSetCleanupJobFactory.create(indexSet)).thenReturn(mock(IndexSetCleanupJob.class));
         when(indexSetRegistry.getDefault()).thenReturn(null);
         when(indexSetService.delete("id")).thenReturn(1);
 
@@ -404,7 +406,7 @@ public class IndexSetsResourceTest {
 
         verify(indexSetRegistry, times(2)).getDefault();
         verify(indexSetService, times(2)).delete("id");
-        verify(systemJobManager, times(1)).submit(any(IndexSetCleanupJob.class));
+        verify(indexJobsService, times(1)).submitIndexSetCleanupJob(indexSet);
         verifyNoMoreInteractions(indexSetService);
     }
 
@@ -439,7 +441,6 @@ public class IndexSetsResourceTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetRegistry.getDefault()).thenReturn(indexSet);
         when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
-        when(indexSetCleanupJobFactory.create(indexSet)).thenReturn(mock(IndexSetCleanupJob.class));
         when(indexSetService.delete("id")).thenReturn(1);
 
         assertThrows(BadRequestException.class, () -> {
@@ -448,7 +449,7 @@ public class IndexSetsResourceTest {
             indexSetsResource.delete("id", true);
 
             verify(indexSetService, never()).delete("id");
-            verify(systemJobManager, never()).submit(any(IndexSetCleanupJob.class));
+            verify(indexJobsService, times(1)).submitIndexSetCleanupJob(indexSet);
             verifyNoMoreInteractions(indexSetService);
         });
     }
@@ -651,8 +652,8 @@ public class IndexSetsResourceTest {
     }
 
     private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
-        return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
-                indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories,
+        return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator,
+                indexSetStatsCreator, clusterConfigService, indexJobsService, () -> permitted, openIndexSetFilterFactories,
                 indexSetRestrictionsService);
     }
 
@@ -661,13 +662,13 @@ public class IndexSetsResourceTest {
         private final Provider<Boolean> permitted;
 
         TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry,
-                     IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
+                     IndexSetValidator indexSetValidator,
                      IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
-                     SystemJobManager systemJobManager, Provider<Boolean> permitted,
+                     IndexJobsService indexJobsService, Provider<Boolean> permitted,
                      Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
-            super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
-                    indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
-                    openIndexSetFilterFactories, indexSetRestrictionsService);
+            super(indices, indexSetService, indexSetRegistry, indexSetValidator,
+                    indexSetStatsCreator, clusterConfigService, mock(DataTieringStatusService.class),
+                    indexJobsService, openIndexSetFilterFactories, indexSetRestrictionsService);
             this.permitted = permitted;
         }
 

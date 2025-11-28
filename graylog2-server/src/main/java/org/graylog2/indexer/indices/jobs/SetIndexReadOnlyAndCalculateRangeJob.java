@@ -40,8 +40,6 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,27 +59,24 @@ public class SetIndexReadOnlyAndCalculateRangeJob implements Job {
 
     private final Indices indices;
     private final IndexRangeService indexRangeService;
-    private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
+    private final IndexJobsService indexJobsService;
     private final IndexSetRegistry indexSetRegistry;
     private final ActivityWriter activityWriter;
     private final IndexFieldTypesService indexFieldTypesService;
     private final IndexFieldTypePoller indexFieldTypePoller;
-    private final SystemJobManager systemJobManager;
 
 
     @Inject
-    public SetIndexReadOnlyAndCalculateRangeJob(final OptimizeIndexJob.Factory optimizeIndexJobFactory,
+    public SetIndexReadOnlyAndCalculateRangeJob(final IndexJobsService indexJobsService,
                                                 final Indices indices,
                                                 final IndexRangeService indexRangeService,
-                                                final SystemJobManager systemJobManager,
                                                 final ActivityWriter activityWriter,
                                                 final IndexSetRegistry indexSetRegistry,
                                                 final IndexFieldTypePoller indexFieldTypePoller,
                                                 final IndexFieldTypesService indexFieldTypesService) {
-        this.optimizeIndexJobFactory = optimizeIndexJobFactory;
+        this.indexJobsService = indexJobsService;
         this.indices = indices;
         this.indexRangeService = indexRangeService;
-        this.systemJobManager = systemJobManager;
         this.activityWriter = activityWriter;
         this.indexSetRegistry = indexSetRegistry;
         this.indexFieldTypePoller = indexFieldTypePoller;
@@ -144,12 +139,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob implements Job {
         activityWriter.write(new Activity("Flushed and set <" + indexName + "> to read-only.", SetIndexReadOnlyAndCalculateRangeJob.class));
 
         if (!indexSet.get().getConfig().indexOptimizationDisabled()) {
-            try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(indexName, indexSet.get().getConfig().indexOptimizationMaxNumSegments()));
-            } catch (SystemJobConcurrencyException e) {
-                // The concurrency limit is very high. This should never happen.
-                LOG.error("Cannot optimize index <" + indexName + ">.", e);
-            }
+            indexJobsService.submitOptimizeIndexJob(indexName, indexSet.get().getConfig().indexOptimizationMaxNumSegments());
         }
     }
 
