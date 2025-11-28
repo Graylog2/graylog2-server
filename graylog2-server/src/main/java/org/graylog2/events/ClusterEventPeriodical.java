@@ -30,7 +30,6 @@ import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.UpdateOptions;
 import jakarta.inject.Inject;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -47,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 public class ClusterEventPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventPeriodical.class);
@@ -188,7 +188,8 @@ public class ClusterEventPeriodical extends Periodical {
 
     private String save(ClusterEvent clusterEvent) {
         final var result = collection.updateOne(new Document(Map.of(
-                        ClusterEvent.FIELD_ID, new ObjectId()
+                        // This is just used to make sure there is no matching document present.
+                        "event_key", UUID.randomUUID().toString()
                 )), new Document(Map.of(
                         "$set", Map.of(
                                 ClusterEvent.FIELD_PRODUCER, clusterEvent.producer(),

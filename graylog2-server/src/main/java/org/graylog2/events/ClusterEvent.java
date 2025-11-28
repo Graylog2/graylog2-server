@@ -18,6 +18,7 @@ package org.graylog2.events;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -37,6 +38,7 @@ import java.util.Set;
 @JsonAutoDetect
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties({"event_key"})
 public abstract class ClusterEvent implements MongoEntity {
     static final String FIELD_ID = "_id";
     static final String FIELD_TIMESTAMP = "timestamp";
