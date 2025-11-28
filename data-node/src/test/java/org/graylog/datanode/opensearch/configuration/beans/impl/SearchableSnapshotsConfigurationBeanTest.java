@@ -280,6 +280,7 @@ class SearchableSnapshotsConfigurationBeanTest {
         try {
             final Configuration configuration = new Configuration();
             final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
+                    "opensearch_config_location", ".",
                     "password_secret", "thisisverysecretpassword"
             ));
             new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
