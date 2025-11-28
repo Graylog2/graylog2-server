@@ -55,6 +55,7 @@ class CsrRequesterImplTest {
                 "node_name", "my-node-name",
                 "hostname", "my-datanode-machine",
                 "opensearch_logs_location", ".",
+                "opensearch_config_location", ".",
                 "node_id_file", "node-id"
         ));
 

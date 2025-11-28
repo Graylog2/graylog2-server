@@ -45,6 +45,7 @@ class SearchableSnapshotsConfigurationBeanTest {
     Configuration defaultConfiguration = datanodeConfiguration(Map.of(
             "node_search_cache_size", "10gb",
             "opensearch_logs_location", ".",
+            "opensearch_config_location", ".",
             "node_id_file", "node-id"
     ));
     @Test
@@ -155,6 +156,7 @@ class SearchableSnapshotsConfigurationBeanTest {
                         "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb",
                         "opensearch_logs_location", ".",
+                        "opensearch_config_location", ".",
                         "node_id_file", "node-id"
                 )),
                 datanodeDirectories(tempDir),
