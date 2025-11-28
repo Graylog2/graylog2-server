@@ -19,11 +19,10 @@ package org.graylog.storage.opensearch3.search;
 import org.graylog.events.search.MoreSearchAdapter;
 import org.graylog.events.search.MoreSearchAdapterIT;
 import org.graylog.plugins.views.search.searchfilters.db.IgnoreSearchFilters;
-import org.graylog.storage.opensearch3.MoreSearchAdapterOS2;
+import org.graylog.storage.opensearch3.MoreSearchAdapterOS;
 import org.graylog.storage.opensearch3.OS2ResultMessageFactory;
 import org.graylog.storage.opensearch3.OpenSearchClient;
-import org.graylog.storage.opensearch3.Scroll;
-import org.graylog.storage.opensearch3.ScrollResultOS2;
+import org.graylog.storage.opensearch3.PaginationOS;
 import org.graylog.storage.opensearch3.SearchRequestFactory;
 import org.graylog.storage.opensearch3.testing.OpenSearchInstance;
 import org.graylog.testing.elasticsearch.SearchInstance;
@@ -31,7 +30,7 @@ import org.graylog.testing.elasticsearch.SearchServerInstance;
 import org.graylog2.indexer.results.ResultMessageFactory;
 import org.graylog2.indexer.results.TestResultMessageFactory;
 
-public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
+public class MoreSearchAdapterOSUsingPaginationIT extends MoreSearchAdapterIT {
 
     @SearchInstance
     public final OpenSearchInstance openSearchInstance = OpenSearchInstance.create();
@@ -46,15 +45,11 @@ public class MoreSearchAdapterOS2UsingScrollIT extends MoreSearchAdapterIT {
     @Override
     protected MoreSearchAdapter createMoreSearchAdapter() {
         final OpenSearchClient client = openSearchInstance.openSearchClient();
-        return new MoreSearchAdapterOS2(client, true,
-                new Scroll(client,
-                        (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
-                                resultMessageFactory, client, initialResult, query, scroll, fields, limit
-                        ),
+        return new MoreSearchAdapterOS(openSearchInstance.getOfficialOpensearchClient(), true,
+                new PaginationOS(resultMessageFactory, client, openSearchInstance.getOfficialOpensearchClient(),
                         new SearchRequestFactory(false, true, new IgnoreSearchFilters())
                 ),
                 new OS2ResultMessageFactory(resultMessageFactory)
-
         );
     }
 }
