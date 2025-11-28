@@ -45,6 +45,7 @@ public class Indices implements GraylogRestApi {
 
     public String defaultIndexSetId() {
         return given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .when()
                 .get("/system/indices/index_sets")
@@ -56,6 +57,7 @@ public class Indices implements GraylogRestApi {
 
     public String createIndexSet(IndexSetCreationRequest indexSetCreationRequest) throws ExecutionException, RetryException {
         final var id = given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -104,6 +106,7 @@ public class Indices implements GraylogRestApi {
     // fails with a 404 if the index set does not exist
     public GraylogApiResponse listOpenIndices(String indexSetId) {
         final ValidatableResponse response = given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -119,6 +122,7 @@ public class Indices implements GraylogRestApi {
     // can be used as in "waitForIndexNames", does not fail if the index set does not exist/is not yet available
     public List<String> listOpenIndicesWithEmptyResultOnError(String indexSetId) {
         final var response = given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -142,6 +146,7 @@ public class Indices implements GraylogRestApi {
 
     private boolean isDeflectorUp(String indexSetId) {
         final var response = given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -164,6 +169,7 @@ public class Indices implements GraylogRestApi {
 
     public void rotateIndexSet(String indexSetId) {
         given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -177,6 +183,7 @@ public class Indices implements GraylogRestApi {
 
     public void deleteIndexSet(String indexSetId, boolean deleteIndices) {
         given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -190,6 +197,7 @@ public class Indices implements GraylogRestApi {
 
     public void deleteIndex(String index) {
         given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -202,6 +210,7 @@ public class Indices implements GraylogRestApi {
 
     public GraylogApiResponse listIndexRanges() {
         final ValidatableResponse response = given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -216,6 +225,7 @@ public class Indices implements GraylogRestApi {
 
     public void rebuildIndexRanges() {
         given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
@@ -229,6 +239,7 @@ public class Indices implements GraylogRestApi {
 
     public String getDeflectorIndex(String indexSetId) {
         final var response = given()
+                .config(api.withGraylogBackendFailureConfig())
                 .spec(api.requestSpecification())
                 .log().ifValidationFails()
                 .when()
