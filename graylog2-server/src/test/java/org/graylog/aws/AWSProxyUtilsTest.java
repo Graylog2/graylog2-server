@@ -12,7 +12,7 @@
  *
  * You should have received a copy of the Server Side Public License
  * along with this program. If not, see
- * <http://www.mongodb.org/licensing/server-side-public-license>.
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 package org.graylog.aws;
 
