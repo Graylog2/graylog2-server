@@ -16,7 +16,12 @@
  */
 import { useState, useLayoutEffect } from 'react';
 
-import { DEFAULT_COL_MIN_WIDTH, DEFAULT_COL_WIDTH } from 'components/common/EntityDataTable/Constants';
+import {
+  DEFAULT_COL_MIN_WIDTH,
+  DEFAULT_COL_WIDTH,
+  ACTIONS_COL_ID,
+  BULK_SELECT_COL_ID,
+} from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
@@ -106,13 +111,15 @@ const useColumnWidths = <Entity extends EntityBase>({
     });
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setColumnWidths(
-      calculateColumnWidths({
+    setColumnWidths({
+      ...(actionsColWidth ? { [ACTIONS_COL_ID]: actionsColWidth } : {}),
+      ...calculateColumnWidths({
         assignableWidth,
         columnIds,
         columnRenderersByAttribute,
       }),
-    );
+      ...(bulkSelectColWidth ? { [BULK_SELECT_COL_ID]: bulkSelectColWidth } : {}),
+    });
   }, [actionsColWidth, bulkSelectColWidth, columnRenderersByAttribute, columnIds, tableWidth]);
 
   return columnWidths;
