@@ -32,6 +32,8 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.graylog2.web.customization.CustomizationConfig;
 
+import org.apache.http.client.utils.URIBuilder;
+
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -116,16 +118,19 @@ public class MessageFactory {
         String streamUrl =
                 StringUtils.appendIfMissing(graylogUrl, "/") + "streams/" + stream.getId() + "/search";
 
-        if (ctx.eventDefinition().isPresent()) {
-            EventDefinitionDto eventDefinitionDto = ctx.eventDefinition().get();
-            if (eventDefinitionDto.config() instanceof AggregationEventProcessorConfig) {
-                String query =
-                        ((AggregationEventProcessorConfig) eventDefinitionDto.config()).query();
-                streamUrl += "?q=" + query;
-            }
-        }
         try {
-            return new Link(new URI(streamUrl).toURL(), stream.getTitle());
+            URIBuilder uriBuilder = new URIBuilder(streamUrl);
+
+            if (ctx.eventDefinition().isPresent()) {
+                EventDefinitionDto eventDefinitionDto = ctx.eventDefinition().get();
+                if (eventDefinitionDto.config() instanceof AggregationEventProcessorConfig) {
+                    String query =
+                            ((AggregationEventProcessorConfig) eventDefinitionDto.config()).query();
+                    uriBuilder.addParameter("q", query);
+                }
+            }
+
+            return new Link(uriBuilder.build().toURL(), stream.getTitle());
         } catch (URISyntaxException | MalformedURLException e) {
             throw new IllegalStateException("Error when building the stream link URL.", e);
         }
