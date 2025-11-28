@@ -16,6 +16,7 @@
  */
 package org.graylog2.telemetry.suppliers;
 
+import com.github.joschi.jadconfig.util.Size;
 import jakarta.inject.Inject;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.cluster.Cluster;
@@ -41,8 +42,8 @@ public class ShardsMetricsSupplier implements TelemetryMetricSupplier {
         Optional<ClusterHealth.ShardStatus> shardStatus = cluster.clusterHealthStats().map(ClusterHealth::shards);
 
         Map<String, Object> metrics = Map.of(
-                "shard_min_size", elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize().getQuantity(),
-                "shard_max_size", elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize().getQuantity(),
+                "shard_min_size", getQuantityValue(elasticsearchConfiguration.getTimeSizeOptimizingRotationMinShardSize()),
+                "shard_max_size", getQuantityValue(elasticsearchConfiguration.getTimeSizeOptimizingRotationMaxShardSize()),
                 "shards_active", shardStatus.map(ClusterHealth.ShardStatus::active).orElse(0),
                 "shards_initializing", shardStatus.map(ClusterHealth.ShardStatus::initializing).orElse(0),
                 "shards_relocating", shardStatus.map(ClusterHealth.ShardStatus::relocating).orElse(0),
@@ -50,5 +51,10 @@ public class ShardsMetricsSupplier implements TelemetryMetricSupplier {
         );
 
         return Optional.of(TelemetryEvent.of(metrics));
+    }
+
+    private Long getQuantityValue(Size timeSizeOptimizingRotationMinShardSize) {
+        return Optional.ofNullable(timeSizeOptimizingRotationMinShardSize)
+                .map(Size::getQuantity).orElse(0L);
     }
 }

@@ -273,10 +273,12 @@ public class ElasticsearchConfiguration {
         return timeSizeOptimizingRotationPeriod;
     }
 
+    @Nullable
     public Size getTimeSizeOptimizingRotationMinShardSize() {
         return timeSizeOptimizingRotationMinShardSize;
     }
 
+    @Nullable
     public Size getTimeSizeOptimizingRotationMaxShardSize() {
         return timeSizeOptimizingRotationMaxShardSize;
     }
