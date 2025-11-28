@@ -1,0 +1,4 @@
+type = "c"
+message = "Backend telemetry is now sent only by the leader node."
+
+pulls = ["24145"]

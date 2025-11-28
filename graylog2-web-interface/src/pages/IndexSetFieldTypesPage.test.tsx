@@ -52,6 +52,7 @@ jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappin
 jest.mock('components/common/PaginatedEntityTable/useFetchEntities', () => jest.fn());
 
 jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
+jest.mock('components/perspectives/hooks/useActivePerspective');
 
 jest.mock('routing/QueryParams', () => ({
   ...jest.requireActual('routing/QueryParams'),
@@ -79,7 +80,12 @@ describe('IndexSetFieldTypesPage', () => {
     asMock(useUserLayoutPreferences).mockReturnValue({
       data: {
         ...layoutPreferences,
-        displayedAttributes: ['field_name', 'origin', 'is_reserved', 'type'],
+        attributes: {
+          field_name: { status: 'show' },
+          origin: { status: 'show' },
+          is_reserved: { status: 'show' },
+          type: { status: 'show' },
+        },
       },
       isInitialLoading: false,
       refetch: () => {},

@@ -45,10 +45,10 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.configuration.DatanodeCertificateRenewedEvent;
+import org.graylog.datanode.configuration.variants.OpensearchCertificates;
 import org.graylog.datanode.opensearch.OpensearchConfigurationChangeEvent;
-import org.graylog.datanode.opensearch.configuration.OpensearchConfiguration;
 import org.graylog.datanode.rest.config.SecuredNodeAnnotationFilter;
-import org.graylog.security.certutil.csr.KeystoreInformation;
 import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -64,6 +64,7 @@ import java.net.URI;
 import java.security.KeyStore;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -94,6 +95,7 @@ public class JerseyService extends AbstractIdleService {
     private final ExecutorService executorService;
 
     private final JwtSecretProvider jwtSecretProvider;
+    private Optional<OpensearchCertificates> certificates = Optional.empty();
 
     @Inject
     public JerseyService(final Configuration configuration,
@@ -120,6 +122,16 @@ public class JerseyService extends AbstractIdleService {
                 configuration.getHttpThreadPoolSize());
     }
 
+
+    @Subscribe
+    public synchronized void handleCertificateRenewal(DatanodeCertificateRenewedEvent event) throws Exception {
+        if (apiHttpServer != null) {
+            LOG.info("Restarting Data node REST API, certificates renewed");
+            shutDown();
+            doStartup();
+        }
+    }
+
     @Subscribe
     public synchronized void handleOpensearchConfigurationChange(OpensearchConfigurationChangeEvent event) throws Exception {
         if (apiHttpServer == null) {
@@ -130,11 +142,12 @@ public class JerseyService extends AbstractIdleService {
             LOG.info("Server configuration changed, restarting Data node REST API to apply security changes");
         }
         shutDown();
-        doStartup(extractSslConfiguration(event.config()));
+        certificates = event.config().certificates();
+        doStartup();
     }
 
-    private SSLEngineConfigurator extractSslConfiguration(OpensearchConfiguration config) {
-        return config.httpCertificate()
+    private SSLEngineConfigurator extractSslConfiguration() {
+        return certificates
                 .map(this::buildSslEngineConfigurator)
                 .orElse(null);
     }
@@ -144,11 +157,12 @@ public class JerseyService extends AbstractIdleService {
         // do nothing, the actual startup will be triggered at the moment opensearch configuration is available
     }
 
-    private void doStartup(SSLEngineConfigurator sslEngineConfigurator) throws Exception {
+    private void doStartup() throws Exception {
+        final SSLEngineConfigurator sslConfiguration = extractSslConfiguration();
         // we need to work around the change introduced in https://github.com/GrizzlyNIO/grizzly-mirror/commit/ba9beb2d137e708e00caf7c22603532f753ec850
         // because the PooledMemoryManager which is default now uses 10% of the heap no matter what
         System.setProperty("org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER", "org.glassfish.grizzly.memory.HeapMemoryManager");
-        startUpApi(sslEngineConfigurator);
+        startUpApi(sslConfiguration);
     }
 
     @Override
@@ -289,17 +303,17 @@ public class JerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    private SSLEngineConfigurator buildSslEngineConfigurator(KeystoreInformation keystoreInformation) {
+    private SSLEngineConfigurator buildSslEngineConfigurator(OpensearchCertificates certificates) {
 
-        if (keystoreInformation == null) {
+        if (certificates == null) {
             throw new IllegalArgumentException("Unreadable to read private key");
         }
 
         final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
-        final char[] password = firstNonNull(keystoreInformation.password(), new char[]{});
+        final char[] password = firstNonNull(certificates.getPassword(), new char[]{});
 
         try {
-            final KeyStore keyStore = keystoreInformation.loadKeystore();
+            final KeyStore keyStore = certificates.getHttpKeystore().get();
             sslContextConfigurator.setKeyStorePass(password);
             sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
 

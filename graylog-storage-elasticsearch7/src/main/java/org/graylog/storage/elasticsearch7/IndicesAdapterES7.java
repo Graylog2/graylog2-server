@@ -73,6 +73,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.indices.ShardsInfo;
@@ -356,16 +357,6 @@ public class IndicesAdapterES7 implements IndicesAdapter {
 
         client.execute((c, requestOptions) -> c.indices().close(request, requestOptions),
                 "Unable to close index " + index);
-    }
-
-    @Override
-    public long numberOfMessages(String index) {
-        final JsonNode result = statsApi.indexStats(index);
-        final JsonNode count = result.path("_all").path("primaries").path("docs").path("count");
-        if (count.isMissingNode()) {
-            throw new RuntimeException("Unable to extract count from response.");
-        }
-        return count.asLong();
     }
 
     private GetSettingsResponse settingsFor(String indexOrAlias) {

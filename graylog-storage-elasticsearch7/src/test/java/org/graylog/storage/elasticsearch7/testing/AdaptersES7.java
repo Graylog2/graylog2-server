@@ -33,7 +33,6 @@ import org.graylog.storage.elasticsearch7.Scroll;
 import org.graylog.storage.elasticsearch7.ScrollResultES7;
 import org.graylog.storage.elasticsearch7.SearchRequestFactory;
 import org.graylog.storage.elasticsearch7.SearchesAdapterES7;
-import org.graylog.storage.elasticsearch7.SortOrderMapper;
 import org.graylog.storage.elasticsearch7.cat.CatApi;
 import org.graylog.storage.elasticsearch7.cluster.ClusterStateApi;
 import org.graylog.storage.elasticsearch7.fieldtypes.streams.StreamsForFieldRetrieverES7;
@@ -46,6 +45,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -64,16 +64,18 @@ public class AdaptersES7 implements Adapters {
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
+    private final SearchRequestFactory searchRequestFactory;
 
     public AdaptersES7(ElasticsearchClient client, List<String> featureFlags) {
         this.client = client;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+        this.searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
     }
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterES7(client);
+        return new CountsAdapterES7(client, searchRequestFactory);
     }
 
     @Override
@@ -84,7 +86,7 @@ public class AdaptersES7 implements Adapters {
                 new ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new CatApi(objectMapper, client),
                 new ClusterStateApi(objectMapper, client),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client)
+                indexTemplateAdapter()
         );
     }
 
@@ -103,11 +105,6 @@ public class AdaptersES7 implements Adapters {
         final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final SortOrderMapper sortOrderMapper = new SortOrderMapper();
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(sortOrderMapper, allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         final Scroll scroll = new Scroll(client, scrollResultFactory, searchRequestFactory);
         return new SearchesAdapterES7(resultMessageFactory, client, scroll, searchRequestFactory);
     }
@@ -125,5 +122,14 @@ public class AdaptersES7 implements Adapters {
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
         return new IndexFieldTypePollerAdapterES7(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverES7(client));
+    }
+
+    @Override
+    public IndexTemplateAdapter indexTemplateAdapter() {
+        if(featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            return new ComposableIndexTemplateAdapter(client, objectMapper);
+        } else {
+            return new LegacyIndexTemplateAdapter(client);
+        }
     }
 }
