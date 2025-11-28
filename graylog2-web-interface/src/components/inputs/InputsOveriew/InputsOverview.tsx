@@ -52,7 +52,7 @@ const entityName = 'input';
 
 const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }: Props) => {
   const { data: inputStates } = useInputsStates();
-  const { columnsOrder, tableLayout, additionalAttributes } = getInputsTableElements();
+  const { tableLayout, additionalAttributes } = getInputsTableElements();
   const { entityActions, expandedSections } = useTableElements({
     inputTypes,
     inputTypeDescriptions,
@@ -77,7 +77,6 @@ const InputsOverview = ({ node = undefined, inputTypeDescriptions, inputTypes }:
       )}
       <PaginatedEntityTable<Input>
         humanName="inputs"
-        columnsOrder={columnsOrder}
         additionalAttributes={additionalAttributes}
         queryHelpComponent={<QueryHelper entityName={entityName} />}
         entityActions={entityActions}

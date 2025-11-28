@@ -27,7 +27,7 @@ type InputsActionsType = {
   list: () => Promise<{ inputs: Array<Input>; total: number }>;
   get: (id: string) => Promise<Input>;
   getOptional: (id: string, showError: boolean) => Promise<Input>;
-  create: (input: ConfiguredInput) => Promise<void>;
+  create: (input: ConfiguredInput) => Promise<{ id: string }>;
   delete: (input: Input) => Promise<void>;
   update: (id: string, input: ConfiguredInput) => Promise<void>;
 };

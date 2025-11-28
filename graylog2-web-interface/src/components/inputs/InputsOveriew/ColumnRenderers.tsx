@@ -42,6 +42,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <TitleCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
+      width: 0.5
     },
     type: {
       renderCell: (type: string, input: InputSummary) => (
@@ -49,6 +50,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <TypeCell type={type} inputTypes={inputTypes} />
         </ExpandedSectionToggleWrapper>
       ),
+      width: 0.5,
     },
     desired_state: {
       renderCell: (_state: string, input: InputSummary) => (
@@ -56,13 +58,15 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <InputStateBadge input={input} inputStates={inputStates} />
         </ExpandedSectionToggleWrapper>
       ),
+      staticWidth: 130,
     },
     node_id: {
-      renderCell: (_node: string, input: InputSummary) => (
+      renderCell: (_type: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>
           <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
+      staticWidth: 130,
     },
     traffic: {
       renderCell: (_traffic: string, input: InputSummary) => (
@@ -70,6 +74,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <ThroughputCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
+      staticWidth: 130,
     },
     address: {
       renderCell: (_address: string, input: InputSummary) => (
@@ -77,11 +82,13 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           {input.attributes?.bind_address || 'N/A'}
         </ExpandedSectionToggleWrapper>
       ),
+      staticWidth: 100,
     },
     port: {
       renderCell: (_port: string, input: InputSummary) => (
         <ExpandedSectionToggleWrapper id={input.id}>{input.attributes?.port || 'N/A'}</ExpandedSectionToggleWrapper>
       ),
+      staticWidth: 100,
     },
   },
 });
