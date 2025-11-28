@@ -22,6 +22,8 @@ import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQuer
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.index.query.RangeQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.slice.SliceBuilder;
@@ -79,13 +81,11 @@ public class SearchRequestFactory {
         final String query = QueryStringUtils.normalizeQuery(queryString);
         final QueryBuilder queryBuilder = translateQueryString(query);
 
-        final Optional<BoolQueryBuilder> rangeQueryBuilder = range
-                .map(TimeRangeQueryFactory::create)
-                .map(rangeQuery -> boolQuery().must(rangeQuery));
-        final Optional<BoolQueryBuilder> filterQueryBuilder = filter
+        final Optional<RangeQueryBuilder> rangeQueryBuilder = range
+                .map(TimeRangeQueryFactory::create);
+        final Optional<QueryStringQueryBuilder> filterQueryBuilder = filter
                 .filter(f -> !QueryStringUtils.isEmptyOrMatchAllQueryString(f))
-                .map(QueryBuilders::queryStringQuery)
-                .map(queryStringQuery -> boolQuery().must(queryStringQuery));
+                .map(QueryBuilders::queryStringQuery);
 
         final BoolQueryBuilder filteredQueryBuilder = boolQuery()
                 .must(queryBuilder);
