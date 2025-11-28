@@ -19,13 +19,12 @@ package org.graylog.aws.notifications;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import jakarta.annotation.Nullable;
-import org.graylog.aws.inputs.cloudtrail.external.CloudTrailS3Client;
+import org.graylog.aws.AWSProxyUtils;
 import org.graylog.aws.sqs.ObjectCreatedPutParseException;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
@@ -46,17 +45,12 @@ public class SQSClient {
     private final InputFailureRecorder inputFailureRecorder;
 
     public SQSClient(String queueName, String region, AwsCredentialsProvider authProvider, ObjectMapper objectMapper,
-                     InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
+            InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
         SqsClientBuilder clientBuilder = SqsClient.builder()
+                .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyUri))
                 .region(Region.of(region))
                 .credentialsProvider(authProvider);
-        
-        // Use CloudTrailS3Client helper to properly handle proxy authentication with username/password
-        if (proxyUri != null) {
-            clientBuilder.httpClientBuilder(ApacheHttpClient.builder()
-                    .proxyConfiguration(CloudTrailS3Client.buildProxyConfiguration(proxyUri)));
-        }
-        
+
         this.sqs = clientBuilder.build();
         this.queueName = queueName;
         this.objectMapper = objectMapper;
