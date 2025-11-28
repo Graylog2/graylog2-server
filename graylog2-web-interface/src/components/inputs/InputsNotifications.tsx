@@ -86,7 +86,7 @@ const InputsNotifications = () => {
       <Col md={12}>
         {hasFailedInputs && (
           <StyledAlert bsStyle="danger" title="Some inputs are in failed state.">
-            One or more inputs are currently failed state. Failed or failing inputs will not receive traffic until
+            One or more inputs are currently in failed state. Failed or failing inputs will not receive traffic until
             fixed.
           </StyledAlert>
         )}
