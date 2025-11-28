@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.opensearch3.views;
 
-import com.google.common.base.MoreObjects;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.views.search.Filter;
@@ -84,13 +83,6 @@ public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
                     .slice(ssb.slice())
                     .query(queryBuilder);
         });
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("elasticsearch query", ssb)
-                .toString();
     }
 
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {

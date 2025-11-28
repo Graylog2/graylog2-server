@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.views.search.engine;
 
+import com.google.common.base.MoreObjects;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -36,12 +37,12 @@ public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryC
     protected final Map<String, S> searchTypeQueries;
     protected final S ssb;
 
-    public IndexerGeneratedQueryContext(Map<Object, Object> contextMap,
-                                        Set<SearchError> errors,
-                                        FieldTypesLookup fieldTypes,
-                                        DateTimeZone timezone,
-                                        S ssb,
-                                        Map<String, S> searchTypeQueries) {
+    public IndexerGeneratedQueryContext(final Map<Object, Object> contextMap,
+                                        final Set<SearchError> errors,
+                                        final FieldTypesLookup fieldTypes,
+                                        final DateTimeZone timezone,
+                                        final S ssb,
+                                        final Map<String, S> searchTypeQueries) {
         this.contextMap = contextMap;
         this.errors = errors;
         this.fieldTypes = fieldTypes;
@@ -84,5 +85,12 @@ public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryC
 
     public String seriesName(final SeriesSpec seriesSpec, final Pivot pivot) {
         return pivot.id() + "-series-" + seriesSpec.id();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("elasticsearch query", ssb)
+                .toString();
     }
 }

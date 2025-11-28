@@ -16,7 +16,6 @@
  */
 package org.graylog.storage.elasticsearch7.views;
 
-import com.google.common.base.MoreObjects;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.views.search.Filter;
@@ -87,13 +86,6 @@ public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
         });
     }
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("elasticsearch query", ssb)
-                .toString();
-    }
-
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {
         return elasticsearchBackend.generateFilterClause(filter);
     }
@@ -105,5 +97,4 @@ public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
     public Optional<MultiBucketsAggregation.Bucket> rowBucket() {
         return Optional.ofNullable(this.rowBucket);
     }
-
 }
