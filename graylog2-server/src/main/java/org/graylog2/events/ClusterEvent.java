@@ -18,6 +18,7 @@ package org.graylog2.events;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import jakarta.validation.constraints.NotEmpty;
@@ -30,46 +31,52 @@ import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class ClusterEvent implements MongoEntity {
-    public static final String FIELD_ID = "_id";
-    public static final String FIELD_TIMESTAMP = "timestamp";
-    
+    static final String FIELD_ID = "_id";
+    static final String FIELD_TIMESTAMP = "timestamp";
+    static final String FIELD_PRODUCER = "producer";
+    static final String FIELD_CONSUMERS = "consumers";
+    static final String FIELD_EVENT_CLASS = "event_class";
+    static final String FIELD_PAYLOAD = "payload";
+
     @Id
     @ObjectId
     @Nullable
     public abstract String id();
 
-    @JsonProperty("timestamp")
-    public abstract long timestamp();
+    @JsonProperty(FIELD_TIMESTAMP)
+    public abstract Date timestamp();
 
-    @JsonProperty("producer")
+    @JsonProperty(FIELD_PRODUCER)
     @Nullable
     public abstract String producer();
 
-    @JsonProperty("consumers")
+    @JsonProperty(FIELD_CONSUMERS)
     @Nullable
     public abstract Set<String> consumers();
 
-    @JsonProperty("event_class")
+    @JsonProperty(FIELD_EVENT_CLASS)
     @Nullable
     public abstract String eventClass();
 
-    @JsonProperty("payload")
+    @JsonProperty(FIELD_PAYLOAD)
     @Nullable
     public abstract Object payload();
 
 
     @JsonCreator
     public static ClusterEvent create(@JsonProperty("id") @Id @ObjectId @Nullable String id,
-                                      @JsonProperty("timestamp") long timestamp,
-                                      @JsonProperty("producer") @Nullable String producer,
-                                      @JsonProperty("consumers") @Nullable Set<String> consumers,
-                                      @JsonProperty("event_class") @Nullable String eventClass,
-                                      @JsonProperty("payload") @Nullable Object payload) {
+                                      @JsonProperty(FIELD_TIMESTAMP) Date timestamp,
+                                      @JsonProperty(FIELD_PRODUCER) @Nullable String producer,
+                                      @JsonProperty(FIELD_CONSUMERS) @Nullable Set<String> consumers,
+                                      @JsonProperty(FIELD_EVENT_CLASS) @Nullable String eventClass,
+                                      @JsonProperty(FIELD_PAYLOAD) @Nullable Object payload) {
         return new AutoValue_ClusterEvent(id, timestamp, producer, consumers, eventClass, payload);
     }
 
@@ -78,7 +85,7 @@ public abstract class ClusterEvent implements MongoEntity {
                                       @NotNull Set<String> excludedNodeIds,
                                       @NotEmpty Object payload) {
         return create(null,
-                DateTime.now(DateTimeZone.UTC).getMillis(),
+                DateTime.now(DateTimeZone.UTC).toDate(),
                 producer,
                 excludedNodeIds,
                 eventClass,

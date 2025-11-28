@@ -27,7 +27,10 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
+import com.mongodb.client.model.UpdateOptions;
 import jakarta.inject.Inject;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
@@ -42,6 +45,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.Date;
+import java.util.Map;
 
 public class ClusterEventPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventPeriodical.class);
@@ -56,7 +61,7 @@ public class ClusterEventPeriodical extends Periodical {
     private final RestrictedChainingClassLoader chainingClassLoader;
     private Offset offset;
 
-    record Offset(long lastSeen, String lastId) {}
+    record Offset(Date lastSeen, String lastId) {}
 
     @Inject
     public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
@@ -70,7 +75,7 @@ public class ClusterEventPeriodical extends Periodical {
         this.chainingClassLoader = chainingClassLoader;
         this.serverEventBus = serverEventBus;
         this.collection = prepareCollection(mongoConnection, mapperProvider);
-        this.offset = new Offset(System.currentTimeMillis(), null);
+        this.offset = new Offset(new Date(), null);
 
         clusterEventBus.registerClusterEventSubscriber(this);
     }
@@ -83,9 +88,9 @@ public class ClusterEventPeriodical extends Periodical {
                 .withWriteConcern(WriteConcern.JOURNALED);
 
         collection.createIndex(Indexes.ascending(
-                "timestamp",
-                "producer",
-                "consumers"));
+                ClusterEvent.FIELD_TIMESTAMP,
+                ClusterEvent.FIELD_PRODUCER,
+                ClusterEvent.FIELD_CONSUMERS));
 
         return collection;
     }
@@ -170,7 +175,7 @@ public class ClusterEventPeriodical extends Periodical {
         final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, Collections.singleton(nodeId.getNodeId()), event);
 
         try {
-            final String id = MongoUtils.insertedIdAsString(collection.insertOne(clusterEvent));
+            final String id = save(clusterEvent);
             // We are handling a locally generated event, so we can speed up processing by posting it to the local event
             // bus immediately. Due to having added the local node id to its list of consumers, it will not be picked up
             // by the db cursor again, avoiding double processing of the event. See #11263 for details.
@@ -179,6 +184,22 @@ public class ClusterEventPeriodical extends Periodical {
         } catch (MongoException e) {
             LOG.error("Couldn't publish cluster event of type <" + className + ">", e);
         }
+    }
+
+    private String save(ClusterEvent clusterEvent) {
+        final var result = collection.updateOne(new Document(Map.of(
+                        ClusterEvent.FIELD_ID, new ObjectId()
+                )), new Document(Map.of(
+                        "$set", Map.of(
+                                ClusterEvent.FIELD_PRODUCER, clusterEvent.producer(),
+                                ClusterEvent.FIELD_CONSUMERS, clusterEvent.consumers(),
+                                ClusterEvent.FIELD_EVENT_CLASS, clusterEvent.eventClass(),
+                                ClusterEvent.FIELD_PAYLOAD, clusterEvent.payload()
+                        ),
+                        "$currentDate", new Document(ClusterEvent.FIELD_TIMESTAMP, true)
+                )),
+                new UpdateOptions().upsert(true));
+        return result.getUpsertedId().asObjectId().getValue().toHexString();
     }
 
     private FindIterable<ClusterEvent> eventsIterable(Offset offset) {
