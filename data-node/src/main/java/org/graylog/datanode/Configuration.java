@@ -35,8 +35,8 @@ import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.docs.DocumentationConstants;
 import org.graylog2.CommonNodeConfiguration;
 import org.graylog2.Configuration.SafeClassesValidator;
-import org.graylog2.configuration.Documentation;
-import org.graylog2.configuration.DocumentationSection;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.configuration.NativeLibPathConfiguration;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.SuppressForbidden;
@@ -535,7 +535,8 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
             final StringBuilder b = new StringBuilder();
 
             if (!file.exists()) {
-                final File parent = file.getParentFile();
+                // getting the absolute path so we always have a parent dir
+                final File parent = file.getAbsoluteFile().getParentFile();
                 if (!parent.isDirectory()) {
                     throw new ValidationException("Parent path " + parent + " for Node ID file at " + path + " is not a directory");
                 } else {
