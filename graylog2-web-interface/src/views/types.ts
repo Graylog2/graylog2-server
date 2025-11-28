@@ -165,18 +165,18 @@ export type TextField = BaseField & {
   type: 'text';
 };
 
-export type CustomFieldComponentProps = {
-  field: ConfigurationField;
-  name: string;
-  title: React.ReactElement;
-  id: string;
-  inputHelp?: string;
-};
-
 export type CustomField = BaseField & {
   type: 'custom';
   id: string;
   component: React.ComponentType<CustomFieldComponentProps>;
+};
+
+export type CustomFieldComponentProps = {
+  field: CustomField;
+  name: string;
+  title: React.ReactElement;
+  id: string;
+  inputHelp?: string;
 };
 
 export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField | TextField | CustomField;

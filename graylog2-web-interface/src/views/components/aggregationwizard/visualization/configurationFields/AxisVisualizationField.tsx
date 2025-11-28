@@ -17,7 +17,6 @@
 import React, { useMemo, useCallback } from 'react';
 import { useFormikContext } from 'formik';
 import { useTheme } from 'styled-components';
-import get from 'lodash/get';
 
 import { Col } from 'components/bootstrap';
 import { FormikInput } from 'components/common';
@@ -31,8 +30,16 @@ const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldCo
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
 
   const curColor = useMemo(
-    () => get(values.visualization.config, `${field.name}.color`) ?? getDefaultLabelColor(theme),
-    [field.name, theme, values.visualization.config],
+    () => {
+      const visualizationConfig = values.visualization.config;
+      const defaultColor = getDefaultLabelColor(theme);
+      if('axisConfig' in visualizationConfig) {
+        return visualizationConfig?.axisConfig?.[field.id]?.color ?? defaultColor
+      }
+
+      return defaultColor;
+    },
+    [field.id, theme, values.visualization.config],
   );
 
   const onColorSelect = useCallback(
