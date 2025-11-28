@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
+type ListDirection = 'vertical' | 'horizontal';
+
 const getSortableItemId = (element: Element) => {
   const childWithId = element.querySelector?.('[data-sortable-index]');
 
@@ -23,24 +25,26 @@ const getSortableItemId = (element: Element) => {
   return sortableIndex ? Number(sortableIndex) : undefined;
 };
 
-const createRect = (index: number, height: number, width: number): DOMRect => {
-  const top = index * height;
+const createRect = (index: number, height: number, width: number, listDirection: ListDirection): DOMRect => {
+  const coordinates = listDirection === 'vertical' ? { x: 0, y: index * height } : { x: index * width, y: 0 };
 
   return DOMRect.fromRect({
-    x: 0,
-    y: top,
+    ...coordinates,
     width,
     height,
   });
 };
 
-const useSortableItemRectsMock = ({
-  height = 10,
-  width = 100,
-}: {
-  height?: number;
-  width?: number;
-} = {}) => {
+const useSortableItemRectsMock = (
+  {
+    height = 10,
+    width = 100,
+  }: {
+    height?: number;
+    width?: number;
+  } = {},
+  listDirection: ListDirection = 'vertical',
+) => {
   let spy: jest.SpyInstance | undefined;
 
   beforeEach(() => {
@@ -50,7 +54,7 @@ const useSortableItemRectsMock = ({
       const sortableIndex = getSortableItemId(this);
 
       if (sortableIndex !== undefined) {
-        return createRect(sortableIndex, height, width);
+        return createRect(sortableIndex, height, width, listDirection);
       }
 
       return originalGetBoundingClientRect.call(this);
