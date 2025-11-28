@@ -18,7 +18,6 @@ package org.graylog.storage.opensearch3.views;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
@@ -75,18 +74,11 @@ public class OSGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
     }
 
     public SearchSourceBuilder searchSourceBuilder(SearchType searchType) {
-        return this.searchTypeQueries.computeIfAbsent(searchType.id(), (ignored) -> {
-            final QueryBuilder queryBuilder = generateFilterClause(searchType.filter())
-                    .map(filterClause -> (QueryBuilder)new BoolQueryBuilder().must(ssb.query()).must(filterClause))
-                    .orElse(ssb.query());
-            return ssb.shallowCopy()
-                    .slice(ssb.slice())
-                    .query(queryBuilder);
-        });
-    }
-
-    private Optional<QueryBuilder> generateFilterClause(Filter filter) {
-        return openSearchBackend.generateFilterClause(filter);
+        return this.searchTypeQueries.computeIfAbsent(searchType.id(), (ignored) -> ssb.shallowCopy()
+                .slice(ssb.slice())
+                .query(openSearchBackend.generateFilterClause(searchType.filter())
+                        .map(filterClause -> (QueryBuilder) new BoolQueryBuilder().must(ssb.query()).must(filterClause))
+                        .orElse(ssb.query())));
     }
 
     public OSGeneratedQueryContext withRowBucket(MultiBucketsAggregation.Bucket rowBucket) {
