@@ -20,5 +20,5 @@ package org.graylog.datanode.configuration;
  * This event will be triggered every time a datanode private key or certificate changes. Other parts of the system,
  * that use the keystore (opensearch process, jersey) should react to this event and refresh their security setups
  */
-public class DatanodeKeystoreChangedEvent {
+public record DatanodeCertificateChangedEvent() {
 }
