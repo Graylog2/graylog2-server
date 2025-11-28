@@ -76,7 +76,7 @@ const ThGhostInner = <Entity extends EntityBase>(
           {columnMeta.label}
           {column.getCanSort() && <SortIcon<Entity> column={column} />}
         </LeftCol>
-        {column.getCanResize() && <ResizeHandle />}
+        {column.getCanResize() && <ResizeHandle colTitle={columnMeta.label} />}
       </ThInner>
     </CustomDragOverlay>
   );

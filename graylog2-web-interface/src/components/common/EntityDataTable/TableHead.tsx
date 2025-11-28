@@ -112,7 +112,11 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
           {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
         </LeftCol>
         {header.column.getCanResize() && (
-          <ResizeHandle onMouseDown={header.getResizeHandler()} onTouchStart={header.getResizeHandler()} />
+          <ResizeHandle
+            onMouseDown={header.getResizeHandler()}
+            onTouchStart={header.getResizeHandler()}
+            colTitle={columnMeta.label}
+          />
         )}
       </ThInner>
     </Th>

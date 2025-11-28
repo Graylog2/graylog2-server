@@ -31,10 +31,16 @@ const Container = styled.div(
 type Props = {
   onMouseDown?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void;
   onTouchStart?: (event: React.TouchEvent<HTMLDivElement>) => void;
+  colTitle: string;
 };
 
-const ResizeHandle = ({ onMouseDown = undefined, onTouchStart = undefined }: Props) => (
-  <Container onMouseDown={onMouseDown} onTouchStart={onTouchStart} role="separator">
+const ResizeHandle = ({ onMouseDown = undefined, onTouchStart = undefined, colTitle }: Props) => (
+  <Container
+    onMouseDown={onMouseDown}
+    onTouchStart={onTouchStart}
+    role="separator"
+    aria-label={`Resize ${colTitle} column`}
+    title={`Resize ${colTitle} column`}>
     <Icon name="arrows_outward" />
   </Container>
 );
