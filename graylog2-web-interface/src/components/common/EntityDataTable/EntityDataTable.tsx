@@ -257,7 +257,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
-
   const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
     layoutPreferences?.order ?? defaultColumnOrder,
   );
