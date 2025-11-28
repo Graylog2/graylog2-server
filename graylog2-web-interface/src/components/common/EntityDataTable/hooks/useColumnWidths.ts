@@ -83,7 +83,7 @@ const calculateColumnWidths = ({
           width = DEFAULT_COL_WIDTH,
           minWidth = DEFAULT_COL_MIN_WIDTH,
         } = attributeColumnRenderers[id] ?? {};
-        const targetWidth = columnWidthPreferences?.[id] ?? staticWidth ?? Math.round(flexColWidth * width);
+        const targetWidth = columnWidthPreferences?.[id] ?? staticWidth ?? Math.floor(flexColWidth * width);
 
         return [id, !staticWidth && targetWidth < minWidth ? minWidth : targetWidth];
       }),
