@@ -22,10 +22,8 @@ import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.views.search.Filter;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
-import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
-import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
@@ -37,19 +35,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
-public class ESGeneratedQueryContext implements GeneratedQueryContext {
+public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder> {
 
     private final ElasticsearchBackend elasticsearchBackend;
-    private final Map<String, SearchSourceBuilder> searchTypeQueries;
-    private final Map<Object, Object> contextMap;
-    private final Set<SearchError> errors;
-    private final SearchSourceBuilder ssb;
-
-    private final FieldTypesLookup fieldTypes;
     private final MultiBucketsAggregation.Bucket rowBucket;
-    private final DateTimeZone timezone;
 
     @AssistedInject
     public ESGeneratedQueryContext(
@@ -58,14 +48,9 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
             @Assisted Collection<SearchError> validationErrors,
             @Assisted DateTimeZone timezone,
             FieldTypesLookup fieldTypes) {
+        super(new HashMap<>(), new HashSet<>(validationErrors), fieldTypes, timezone, ssb, new HashMap<>());
         this.elasticsearchBackend = elasticsearchBackend;
-        this.ssb = ssb;
-        this.fieldTypes = fieldTypes;
-        this.errors = new HashSet<>(validationErrors);
         this.rowBucket = null;
-        this.contextMap = new HashMap<>();
-        this.searchTypeQueries = new HashMap<>();
-        this.timezone = timezone;
     }
 
     private ESGeneratedQueryContext(
@@ -77,14 +62,9 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
             Map<String, SearchSourceBuilder> searchTypeQueries,
             Map<Object, Object> contextMap,
             DateTimeZone timezone) {
+        super(contextMap, new HashSet<>(validationErrors), fieldTypes, timezone, ssb, searchTypeQueries);
         this.elasticsearchBackend = elasticsearchBackend;
-        this.ssb = ssb;
-        this.fieldTypes = fieldTypes;
-        this.errors = new HashSet<>(validationErrors);
         this.rowBucket = rowBucket;
-        this.searchTypeQueries = searchTypeQueries;
-        this.contextMap = contextMap;
-        this.timezone = timezone;
     }
 
     public interface Factory {
@@ -107,15 +87,6 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         });
     }
 
-    Map<String, SearchSourceBuilder> searchTypeQueries() {
-        return this.searchTypeQueries;
-    }
-
-    @Override
-    public Optional<String> getSearchTypeQueryString(String id) {
-        return Optional.ofNullable(searchTypeQueries.get(id)).map(SearchSourceBuilder::toString);
-    }
-
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
@@ -123,30 +94,8 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
                 .toString();
     }
 
-    public Map<Object, Object> contextMap() {
-        return contextMap;
-    }
-
     private Optional<QueryBuilder> generateFilterClause(Filter filter) {
         return elasticsearchBackend.generateFilterClause(filter);
-    }
-
-    public String seriesName(SeriesSpec seriesSpec, Pivot pivot) {
-        return pivot.id() + "-series-" + seriesSpec.id();
-    }
-
-    public Optional<String> fieldType(Set<String> streamIds, String field) {
-        return fieldTypes.getType(streamIds, field);
-    }
-
-    @Override
-    public void addError(SearchError error) {
-        errors.add(error);
-    }
-
-    @Override
-    public Collection<SearchError> errors() {
-        return errors;
     }
 
     public ESGeneratedQueryContext withRowBucket(MultiBucketsAggregation.Bucket rowBucket) {
@@ -157,8 +106,4 @@ public class ESGeneratedQueryContext implements GeneratedQueryContext {
         return Optional.ofNullable(this.rowBucket);
     }
 
-    @Override
-    public DateTimeZone timezone() {
-        return timezone;
-    }
 }
