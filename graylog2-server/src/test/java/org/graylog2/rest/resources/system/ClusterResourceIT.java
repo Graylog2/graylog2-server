@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.cluster.nodes;
+package org.graylog2.rest.resources.system;
 
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
@@ -23,28 +23,30 @@ import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.Configuration;
+import org.graylog2.cluster.NodeServiceImpl;
+import org.graylog2.cluster.nodes.NodeDto;
+import org.graylog2.cluster.nodes.ServerNodeClusterService;
+import org.graylog2.cluster.nodes.ServerNodeDto;
+import org.graylog2.cluster.nodes.ServerNodePaginatedService;
 import org.graylog2.database.MongoCollections;
-import org.graylog2.database.PaginatedList;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
+import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.SortOrder;
-import org.graylog2.rest.resources.system.ClusterResource;
-import org.graylog2.search.SearchQueryParser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-
 @ExtendWith(MongoDBExtension.class)
-class ServerNodePaginatedServiceIT {
+class ClusterResourceIT {
 
-    public static final int STALE_LEADER_TIMEOUT_MS = 180_000;
-
-    private ServerNodePaginatedService serverNodePaginatedService;
-    private SearchQueryParser queryParser;
+    private static final int STALE_LEADER_TIMEOUT_MS = 180_000;
+    private ClusterResource clusterResource;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) throws ValidationException, RepositoryException {
@@ -53,8 +55,37 @@ class ServerNodePaginatedServiceIT {
         serverNodeService.registerServer(node("my-hostname", true, "5ca1ab1e-0000-4000-a000-100000000000"));
         serverNodeService.registerServer(node("aaa-hostname", false, "5ca1ab1e-0000-4000-a000-200000000000"));
         serverNodeService.registerServer(node("zzz-hostname", false, "5ca1ab1e-0000-4000-a000-300000000000"));
-        serverNodePaginatedService = new ServerNodePaginatedService(mongoCollections);
-        queryParser = new SearchQueryParser("hostname", ClusterResource.SERVER_NODE_ENTITY_SEARCH_MAPPINGS);
+        final ServerNodePaginatedService serverNodePaginatedService = new ServerNodePaginatedService(mongoCollections);
+
+        final SimpleNodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
+
+        clusterResource = new ClusterResource(new NodeServiceImpl(serverNodeService), Mockito.mock(ClusterConfigService.class), nodeId, serverNodePaginatedService);
+    }
+
+    @Test
+    void testPaginatedNodesWithSorting() {
+        Assertions.assertThat(clusterResource.nodes(1, 10, "", "hostname", SortOrder.DESCENDING).elements())
+                .hasSize(3)
+                .extracting(NodeDto::getHostname)
+                .containsExactly("zzz-hostname", "my-hostname", "aaa-hostname");
+    }
+
+
+    @Test
+    void testPaginatedNodesWithQueryDefaultField() {
+        Assertions.assertThat(clusterResource.nodes(1, 10, "aaa", "hostname", SortOrder.ASCENDING).elements())
+                .hasSize(1)
+                .extracting(NodeDto::getHostname)
+                .containsExactly("aaa-hostname");
+    }
+
+
+    @Test
+    void testPaginatedNodesWithQueryDefinedField() {
+        Assertions.assertThat(clusterResource.nodes(1, 10, "node_id:100000000000", "hostname", SortOrder.ASCENDING).elements())
+                .hasSize(1)
+                .extracting(NodeDto::getHostname)
+                .containsExactly("my-hostname");
     }
 
     private static NodeDto node(String hostname, boolean leader, String nodeID) {
@@ -68,28 +99,6 @@ class ServerNodePaginatedServiceIT {
                 .build();
     }
 
-    @Test
-    void testSorting() {
-        Assertions.assertThat(resultsWithSorting("hostname", SortOrder.DESCENDING, "").delegate())
-                .hasSize(3)
-                .extracting(NodeDto::getHostname)
-                .containsExactly("zzz-hostname", "my-hostname", "aaa-hostname");
-
-        Assertions.assertThat(resultsWithSorting("hostname", SortOrder.ASCENDING, "").delegate())
-                .hasSize(3)
-                .extracting(NodeDto::getHostname)
-                .containsExactly("aaa-hostname", "my-hostname", "zzz-hostname");
-
-        Assertions.assertThat(resultsWithSorting("hostname", SortOrder.ASCENDING, "").delegate())
-                .hasSize(3)
-                .extracting(NodeDto::getHostname)
-                .containsExactly("aaa-hostname", "my-hostname", "zzz-hostname");
-    }
-
-    private PaginatedList<ServerNodeDto> resultsWithSorting(String field, SortOrder order, String query) {
-        return serverNodePaginatedService.searchPaginated(queryParser.parse(query), order.toBsonSort(field), 1, 10);
-    }
-
     private Configuration configuration(Map<String, String> properties) throws RepositoryException, ValidationException {
         final Configuration configuration = new Configuration();
         final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
@@ -100,4 +109,5 @@ class ServerNodePaginatedServiceIT {
         new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
         return configuration;
     }
+
 }
