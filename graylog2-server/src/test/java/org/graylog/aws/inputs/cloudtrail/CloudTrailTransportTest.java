@@ -77,8 +77,6 @@ public class CloudTrailTransportTest {
     ScheduledFuture mockRunningTask;
     @Mock
     InputFailureRecorder mockInputFailureRecorder;
-
-    // **NEW required mock**
     @Mock
     ClusterConfigService clusterConfigService;
     @Mock

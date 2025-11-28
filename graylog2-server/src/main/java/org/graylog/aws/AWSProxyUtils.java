@@ -62,7 +62,7 @@ public class AWSProxyUtils {
             try {
                 URI cleanProxyUri = new URI(
                         proxyUri.getScheme(),
-                        null, // userInfo - set to null to strip credentials
+                        null,
                         proxyUri.getHost(),
                         proxyUri.getPort(),
                         proxyUri.getPath(),
