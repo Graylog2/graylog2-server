@@ -67,19 +67,18 @@ const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldCo
 
   return (
     <>
-      <Col sm={11}>
-        <FormikInput
-          id={`${name}.title-input`}
-          label={title}
-          bsSize="small"
-          placeholder={field.description}
-          name={`${name}.title`}
-          labelClassName="col-sm-3"
-          wrapperClassName="col-sm-9"
-          help={inputHelp}
-          validate={validateField}
-        />
-      </Col>
+      <FormikInput
+        id={`${name}.title-input`}
+        label={title}
+        bsSize="small"
+        placeholder={field.description}
+        name={`${name}.title`}
+        labelClassName="col-sm-3"
+        wrapperClassName="col-sm-8"
+        formGroupClassName=""
+        help={inputHelp}
+        validate={validateField}
+      />
       <Col sm={1}>
         <ColorConfigurationPopover
           title={`Color configuration for ${field.title}`}
