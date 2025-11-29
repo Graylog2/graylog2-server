@@ -292,7 +292,7 @@ const Metric = ({ index }: Props) => {
       )}
       <Col sm={11}>
         <FormikInput
-          id="name"
+          id={`metric-${index}-name`}
           label={
             <>
               Name <Opt />
