@@ -25,9 +25,10 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
 import type { DataTieringConfig, DataTieringFormValues, DataTieringStatus } from 'components/indices/data-tiering';
 
-export type IndexSetFieldRestriction = {
-  field_name: string;
-  type: 'immutable' | 'immutable_and_hidden';
+export type IndexSetFieldRestrictionType = { type: 'immutable' | 'hidden' };
+
+export type IndexSetFieldRestrictions = {
+  [field_name: string]: Array<IndexSetFieldRestrictionType>;
 };
 
 export type IndexSetConfig = {
@@ -53,7 +54,7 @@ export type IndexSetConfig = {
   writable: boolean;
   default?: boolean;
   use_legacy_rotation?: boolean;
-  field_restrictions?: IndexSetFieldRestriction[];
+  field_restrictions?: IndexSetFieldRestrictions;
 };
 
 export type IndexSet = IndexSetConfig & {
