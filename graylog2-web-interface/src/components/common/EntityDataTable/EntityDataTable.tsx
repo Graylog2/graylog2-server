@@ -262,7 +262,15 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   );
   const [internalColumnWidthPreferences, setInternalColumnWidthPreferences] = useState<{
     [attributeId: string]: number;
-  }>(Object.fromEntries(Object.entries(layoutPreferences?.attributes ?? {}).map(([key, { width }]) => [key, width])));
+  }>(() =>
+    Object.entries(layoutPreferences?.attributes ?? {}).reduce<Record<string, number>>((acc, [key, { width }]) => {
+      if (typeof width === 'number') {
+        acc[key] = width;
+      }
+
+      return acc;
+    }, {}),
+  );
 
   const columnOrder = useVisibleColumnOrder(
     layoutPreferences?.attributes,
