@@ -68,7 +68,6 @@ public class SetIndexReadOnlyAndCalculateRangeJob implements Job {
     private final IndexFieldTypePoller indexFieldTypePoller;
     private final SystemJobManager systemJobManager;
 
-
     @Inject
     public SetIndexReadOnlyAndCalculateRangeJob(final OptimizeIndexJob.Factory optimizeIndexJobFactory,
                                                 final Indices indices,
@@ -117,7 +116,6 @@ public class SetIndexReadOnlyAndCalculateRangeJob implements Job {
         indexSetRegistry.getForIndex(indexName)
                 .flatMap(indexSet -> indexFieldTypePoller.pollIndex(indexName, indexSet.getConfig().id()))
                 .ifPresent(indexFieldTypesService::upsert);
-    }
 
         return JobTriggerUpdate.withStatusAndNoNextTime(JobTriggerStatus.COMPLETE);
     }
