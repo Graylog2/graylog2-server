@@ -72,9 +72,7 @@ const useTableEventHandlers = ({
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
           app_section: appSection,
           app_action_value: 'columns-select',
-          columns: Object.keys(layoutPreferences.attributes).filter(
-            (key) => layoutPreferences.attributes[key].status === ATTRIBUTE_STATUS.show,
-          ),
+          columns: layoutPreferences.attributes,
         });
       }
 
