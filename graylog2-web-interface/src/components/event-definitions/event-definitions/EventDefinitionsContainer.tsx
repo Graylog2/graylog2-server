@@ -82,7 +82,7 @@ const renderEventDefinitionActions = (listItem: EventDefinition) => (
 const EventDefinitionsContainer = () => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<EventDefinition>(null, 'event_definition');
-  const { defaultLayout, columnOrder, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
+  const { defaultLayout, additionalAttributes } = getEventDefinitionTableElements(pluggableAttributes);
   const expandedSections = useMemo(
     () => ({
       ...pluggableExpandedSections,
@@ -93,7 +93,6 @@ const EventDefinitionsContainer = () => {
   return (
     <PaginatedEntityTable<EventDefinition>
       humanName="event definitions"
-      columnsOrder={columnOrder}
       additionalAttributes={additionalAttributes}
       queryHelpComponent={<QueryHelper entityName="event definition" />}
       tableLayout={defaultLayout}

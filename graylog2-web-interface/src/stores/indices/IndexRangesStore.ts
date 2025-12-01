@@ -23,7 +23,7 @@ import fetch from 'logic/rest/FetchProvider';
 import { singletonStore, singletonActions } from 'logic/singleton';
 
 export type IndexRange = {
-  index_name: string;
+  index_name?: string;
   begin: string;
   end: string;
   calculated_at: string;

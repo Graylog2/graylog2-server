@@ -42,7 +42,7 @@ import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
