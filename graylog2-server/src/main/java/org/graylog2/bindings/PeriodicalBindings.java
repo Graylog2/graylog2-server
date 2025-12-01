@@ -22,6 +22,8 @@ import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
 import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningPeriodical;
 import org.graylog2.events.ClusterEventCleanupPeriodical;
 import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.events.Offset;
+import org.graylog2.events.OffsetFromCurrentMongoDBTimeProvider;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
 import org.graylog2.inputs.diagnosis.InputDiagnosisMetricsPeriodical;
 import org.graylog2.periodical.ClusterHealthCheckThread;
@@ -47,6 +49,8 @@ import org.graylog2.telemetry.cluster.TelemetryClusterInfoPeriodical;
 public class PeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
+        bind(Offset.class).toProvider(OffsetFromCurrentMongoDBTimeProvider.class);
+
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(ClusterHealthCheckThread.class);
         periodicalBinder.addBinding().to(ContentPackLoaderPeriodical.class);
