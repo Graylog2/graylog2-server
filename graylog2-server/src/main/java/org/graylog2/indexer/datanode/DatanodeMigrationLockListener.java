@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.datanode;
 
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 
 public interface DatanodeMigrationLockListener {
     void onRetry(IndexSet indexSet, Class<?> caller, long attemptNumber);

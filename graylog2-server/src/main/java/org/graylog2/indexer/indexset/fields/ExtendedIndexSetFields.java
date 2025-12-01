@@ -17,58 +17,40 @@
 package org.graylog2.indexer.indexset.fields;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import org.graylog2.shared.fields.TitleAndDescriptionFields;
-import org.graylog2.validation.SizeInBytes;
 
-import javax.annotation.Nullable;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 
 public interface ExtendedIndexSetFields extends
         TitleAndDescriptionFields,
-        BaseIndexSetFields,
+        ShardsAndReplicasField,
+        RotationAndRetentionFields,
         WritableField,
         IndexAnalyzerField,
-        FieldTypeProfileField {
+        FieldTypeProfileField,
+        IndexTemplateTypeField,
+        IndexPrefixField {
 
-    String FIELD_INDEX_PREFIX = "index_prefix";
     String FIELD_CREATION_DATE = "creation_date";
-    String FIELD_INDEX_TEMPLATE_TYPE = "index_template_type";
-    String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
-
-    @JsonProperty(FIELD_INDEX_PREFIX)
-    @NotBlank
-    @Pattern(regexp = INDEX_PREFIX_REGEX)
-    @SizeInBytes(message = "Index prefix must have a length in bytes between {min} and {max}", min = 1, max = 250)
-    String indexPrefix();
 
     @JsonProperty(FIELD_CREATION_DATE)
     @NotNull
     ZonedDateTime creationDate();
 
-    @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE)
-    Optional<String> indexTemplateType();
 
     interface ExtendedIndexSetFieldsBuilder<T> extends
             TitleAndDescriptionFieldsBuilder<T>,
-            BaseIndexSetFieldsBuilder<T>,
+            ShardsAndReplicasFieldBuilder<T>,
+            RotationAndRetentionFieldsBuilder<T>,
             WritableFieldBuilder<T>,
             IndexAnalyzerFieldBuilder<T>,
-            FieldTypeProfileFieldBuilder<T> {
-
-        @JsonProperty(FIELD_INDEX_PREFIX)
-        T indexPrefix(@NotBlank
-                      @Pattern(regexp = INDEX_PREFIX_REGEX)
-                      @SizeInBytes(message = "Index prefix must have a length in bytes between {min} and {max}", min = 1, max = 250)
-                      String indexPrefix);
+            FieldTypeProfileFieldBuilder<T>,
+            IndexTemplateTypeFieldBuilder<T>,
+            IndexPrefixFieldBuilder<T> {
 
         @JsonProperty(FIELD_CREATION_DATE)
         T creationDate(@NotNull ZonedDateTime creationDate);
 
-        @JsonProperty(FIELD_INDEX_TEMPLATE_TYPE)
-        T indexTemplateType(@Nullable String templateType);
     }
 }
