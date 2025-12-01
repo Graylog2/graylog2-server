@@ -4,7 +4,7 @@ Define custom cell and header renderer:
 import EntityDataTable from './EntityDataTable';
 
 <EntityDataTable
-  visibleColumns={['title', 'description']}
+  columnPreferences={{ title: { status: 'show' }, description: { status: 'show' } }}
   data={[
     {
       id: 'row-id',
@@ -19,7 +19,7 @@ import EntityDataTable from './EntityDataTable';
   columnRenderers={{
     title: {
       renderCell: (listItem) => `The title: ${listItem.title}`,
-      renderHeader: (attribute) => `Custom ${attribute.title}`,
+      renderHeader: (title) => `Custom ${title}`,
     },
   }}
 />;
@@ -31,7 +31,7 @@ Render row actions:
 import EntityDataTable from './EntityDataTable';
 
 <EntityDataTable
-  visibleColumns={['title', 'description']}
+  columnPreferences={{ title: { status: 'show' }, description: { status: 'show' } }}
   data={[
     {
       id: 'row-id',
@@ -57,7 +57,7 @@ Only render a column when the user has the required permissions:
 import EntityDataTable from './EntityDataTable';
 
 <EntityDataTable
-  visibleColumns={['title', 'description']}
+  columnPreferences={{ title: { status: 'show' }, description: { status: 'show' } }}
   data={[
     {
       id: 'row-id',
@@ -90,7 +90,7 @@ Please have a look at the default column renderers defined in the `EntityDataTab
 import EntityDataTable from './EntityDataTable';
 
 <EntityDataTable
-  visibleColumns={['title', 'summary', 'status']}
+  columnPreferences={{ title: { status: 'show' }, description: { status: 'show' }, status: { status: 'show' } }}
   data={[
     {
       id: 'row-id',

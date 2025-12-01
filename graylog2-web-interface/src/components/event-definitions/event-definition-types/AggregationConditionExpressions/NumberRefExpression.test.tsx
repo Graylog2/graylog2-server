@@ -179,4 +179,38 @@ describe('NumberRefExpression', () => {
       ],
     });
   });
+
+  it('should send null when aggregation field is cleared', async () => {
+    const expression = {
+      expr: 'number-ref',
+      ref: 'avg-took_ms',
+    };
+    const initialSeries = { id: 'avg-took_ms', type: 'avg', field: 'took_ms' };
+    const definition = eventDefinition([initialSeries]);
+    const handleChange = jest.fn();
+
+    render(
+      <NumberRefExpression
+        eventDefinition={definition}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={handleChange}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
+    );
+
+    const fieldSelect = await screen.findByRole('combobox', { name: /select field/i });
+    await userEvent.click(fieldSelect);
+    await userEvent.keyboard('{Backspace}');
+
+    expect(handleChange).toHaveBeenCalledWith({
+      conditions: { expr: 'number-ref', ref: 'avg-' },
+      series: [
+        { field: 'took_ms', id: 'avg-took_ms', type: 'avg' },
+        { field: null, id: 'avg-', type: 'avg' },
+      ],
+    });
+  });
 });

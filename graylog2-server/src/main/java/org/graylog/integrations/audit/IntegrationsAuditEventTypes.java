@@ -29,13 +29,14 @@ public class IntegrationsAuditEventTypes implements PluginAuditEventTypes {
     public static final String KINESIS_SETUP_CREATE_STREAM = NAMESPACE + "kinesis_auto_setup:create_stream";
     public static final String KINESIS_SETUP_CREATE_POLICY = NAMESPACE + "kinesis_auto_setup:create_policy";
     public static final String KINESIS_SETUP_CREATE_SUBSCRIPTION = NAMESPACE + "kinesis_auto_setup:create_subscription";
-
+    public static final String AWS_CLOUDTRAIL_INPUT_CREATE = NAMESPACE + "cloudtrail_input:create";
 
     private static final Set<String> EVENT_TYPES = ImmutableSet.<String>builder()
             .add(KINESIS_INPUT_CREATE)
             .add(KINESIS_SETUP_CREATE_STREAM)
             .add(KINESIS_SETUP_CREATE_POLICY)
             .add(KINESIS_SETUP_CREATE_SUBSCRIPTION)
+            .add(AWS_CLOUDTRAIL_INPUT_CREATE)
             .build();
 
     @Override

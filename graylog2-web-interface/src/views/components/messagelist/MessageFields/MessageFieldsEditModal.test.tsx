@@ -46,6 +46,7 @@ jest.mock('views/stores/StreamsStore', () => ({
 
 jest.mock('views/components/messagelist/MessageFields/hooks/useFormattedFields');
 jest.mock('views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsForEditing');
+jest.mock('views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry', () => jest.fn);
 
 const formattedFavorites = [
   {
@@ -53,6 +54,7 @@ const formattedFavorites = [
     type: FieldTypes.STRING(),
     field: 'fav1',
     id: 'fav1',
+    title: 'fv1',
   },
 ];
 const formattedRest = [
@@ -61,6 +63,7 @@ const formattedRest = [
     type: FieldTypes.STRING(),
     field: 'rest1',
     id: 'rest1',
+    title: 'rest1',
   },
 ];
 const message = {
@@ -82,6 +85,7 @@ const renderComponent = () =>
             value={
               {
                 saveFavoriteField: saveFavoriteFields,
+                editableStreams: [],
                 message,
               } as any
             }>
@@ -109,8 +113,9 @@ describe('MessageFieldsEditMode (integration, real components)', () => {
   it('renders headings', async () => {
     renderComponent();
 
-    await screen.findByRole('heading', { name: /favorites/i });
-    await screen.findByRole('heading', { name: /details/i });
+    await screen.findByRole('heading', { name: /favorite fields configuration/i });
+    await screen.findByRole('heading', { name: /^favorite fields$/i });
+    await screen.findByRole('heading', { name: /remaining fields/i });
   });
 
   it('cancel button runs mockedToggleEditMode', async () => {

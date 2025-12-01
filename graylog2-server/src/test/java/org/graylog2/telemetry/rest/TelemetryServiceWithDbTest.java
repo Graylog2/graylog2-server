@@ -16,12 +16,11 @@
  */
 package org.graylog2.telemetry.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.collections4.IteratorUtils;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.cluster.nodes.NodeService;
 import org.graylog2.database.MongoCollections;
@@ -33,6 +32,7 @@ import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.system.stats.StatsService;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.storage.SearchVersion;
 import org.graylog2.system.traffic.TrafficCounterService;
@@ -40,12 +40,14 @@ import org.graylog2.telemetry.cluster.TelemetryClusterService;
 import org.graylog2.telemetry.cluster.db.DBTelemetryClusterInfo;
 import org.graylog2.telemetry.user.db.DBTelemetryUserSettingsService;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.Duration;
 import java.util.Set;
@@ -61,13 +63,10 @@ import static org.graylog2.telemetry.rest.TelemetryTestHelper.USER_TELEMETRY_SET
 import static org.graylog2.telemetry.rest.TelemetryTestHelper.mockTrafficData;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class TelemetryServiceWithDbTest {
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     TrafficCounterService trafficCounterService;
@@ -89,20 +88,25 @@ public class TelemetryServiceWithDbTest {
     ServerStatus serverStatus;
     @Mock
     LeaderElectionService leaderElectionService;
-
+    @Mock
+    MetricRegistry metricRegistry;
     @Mock
     NodeService nodeService;
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    StatsService statsService;
 
     TelemetryService telemetryService;
 
-    @Before
-    public void setUp() {
-        MongoJackObjectMapperProvider mongoJackObjectMapperProvider = new MongoJackObjectMapperProvider(new ObjectMapper());
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
         TelemetryClusterService telemetryClusterService = new TelemetryClusterService(
                 serverStatus,
                 clusterConfigService,
                 leaderElectionService,
-                new DBTelemetryClusterInfo(Duration.ZERO, mongodb.mongoConnection()));
+                new DBTelemetryClusterInfo(Duration.ZERO, mongoCollections),
+                metricRegistry,
+                statsService
+        );
 
         telemetryService = new TelemetryService(
                 true,
@@ -112,7 +116,7 @@ public class TelemetryServiceWithDbTest {
                 elasticClusterAdapter,
                 elasticsearchVersion,
                 new TelemetryResponseFactory(new ObjectMapperProvider().get()),
-                new DBTelemetryUserSettingsService(new MongoCollections(mongoJackObjectMapperProvider, mongodb.mongoConnection())),
+                new DBTelemetryUserSettingsService(mongoCollections),
                 eventBus,
                 telemetryClusterService,
                 "unknown",
@@ -156,6 +160,8 @@ public class TelemetryServiceWithDbTest {
         when(serverStatus.getNodeId()).thenReturn(new SimpleNodeId("1"));
         when(serverStatus.getLifecycle()).thenReturn(Lifecycle.RUNNING);
         when(serverStatus.getTimezone()).thenReturn(DateTimeZone.UTC);
+        when(statsService.systemStats().osStats().memory().total()).thenReturn(-1L);
+        when(statsService.systemStats().osStats().processor().totalCores()).thenReturn(-1);
 
         telemetryService.updateTelemetryClusterData();
         ObjectNode telemetryResponse = telemetryService.getTelemetryResponse(saveUserSettings(true));

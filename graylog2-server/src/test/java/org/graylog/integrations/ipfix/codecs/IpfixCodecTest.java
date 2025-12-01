@@ -23,11 +23,10 @@ import org.graylog.integrations.ipfix.InformationElementDefinitions;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.plugin.configuration.Configuration;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,28 +39,28 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@Ignore("All tests in this class are in development and not yet ready.")
+@Disabled("All tests in this class are in development and not yet ready.")
 public class IpfixCodecTest {
 
-    @Rule
-    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @TempDir
+    public File temporaryFolder;
 
     private IpfixCodec codec;
     private IpfixAggregator ipfixAggregator;
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         ipfixAggregator = new IpfixAggregator();
         codec = new IpfixCodec(Configuration.EMPTY_CONFIGURATION, ipfixAggregator, messageFactory);
     }
 
-    @Ignore("Invalid CK_IPFIX_DEFINITION_PATH does not throw IOException, feature not ready.")
+    @Disabled("Invalid CK_IPFIX_DEFINITION_PATH does not throw IOException, feature not ready.")
     @Test
     public void constructorFailsIfIPFixDefinitionsPathDoesNotExist() throws Exception {
-        final File definitionsFile = temporaryFolder.newFile();
+        final File definitionsFile = File.createTempFile("junit", null, temporaryFolder);
         assertThat(definitionsFile.delete()).isTrue();
         final ImmutableMap<String, Object> configMap = ImmutableMap.of(
                 IpfixCodec.CK_IPFIX_DEFINITION_PATH, definitionsFile.getAbsolutePath());

@@ -35,8 +35,9 @@ import useIsLocalNode from 'views/hooks/useIsLocalNode';
 import FieldTypesContext from 'views/components/contexts/FieldTypesContext';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import MessageFavoriteFieldsProvider from 'views/components/contexts/MessageFavoriteFieldsProvider';
-import useFeature from 'hooks/useFeature';
 import MessageDetailAdditionalContextProvider from 'views/components/contexts/MessageDetailAdditionalContextProvider';
+import useFeature from 'hooks/useFeature';
+import DefaultMessageFields from 'views/components/messagelist/MessageFields/DefaultMessageFields';
 
 import MessageDetailProviders from './MessageDetailProviders';
 import MessageActions from './MessageActions';
@@ -193,7 +194,11 @@ const MessageDetail = ({
                 <MessageAugmentations message={message} />
               </Col>
               <Col md={9}>
-                <MessageFields message={message} fields={messageFields} />
+                {isFavoriteFieldsEnabled ? (
+                  <MessageFields />
+                ) : (
+                  <DefaultMessageFields message={message} fields={messageFields} />
+                )}
               </Col>
             </Row>
           </>

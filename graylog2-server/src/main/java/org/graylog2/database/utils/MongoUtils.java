@@ -26,6 +26,7 @@ import com.mongodb.client.model.Accumulators;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.ReplaceOptions;
+import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.InsertOneResult;
 import jakarta.annotation.Nonnull;
 import org.bson.BsonValue;
@@ -253,15 +254,21 @@ public class MongoUtils<T extends MongoEntity> {
      */
     public Map<String, Long> countByField(String field) {
         final Map<String, Long> counts = new HashMap<>();
+        final String countField = "count";
+
         collection.aggregate(
-                List.of(Aggregates.group("$" + field, Accumulators.sum("count", 1))),
+                List.of(Aggregates.group("$" + field, Accumulators.sum(countField, 1))),
                 Document.class
         ).forEach(doc -> {
-            String id = doc.getString("_id");
+            Object id = doc.get("_id");
             if (id != null) {
-                counts.put(id, doc.getInteger("count").longValue());
+                counts.put(id.toString(), doc.getInteger(countField).longValue());
             }
         });
         return counts;
+    }
+
+    public static Bson removeEmbedded(String fieldName, String key, String value) {
+        return Updates.pull(fieldName, new Document(key, value));
     }
 }

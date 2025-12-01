@@ -15,14 +15,18 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useContext, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
-import { useMemo } from 'react';
+import type { Header, HeaderGroup } from '@tanstack/react-table';
+import { flexRender } from '@tanstack/react-table';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
-import SortIcon from 'components/streams/StreamsOverview/SortIcon';
-import type { Sort } from 'stores/PaginationTypes';
+import SortIcon from 'components/common/EntityDataTable/SortIcon';
+import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
+import DragHandle from 'components/common/SortableList/DragHandle';
 
-import BulkSelectHead from './BulkSelectHead';
-import type { Column, ColumnRenderer, EntityBase, ColumnRenderersByAttribute } from './types';
+import type { EntityBase, ColumnMetaContext } from './types';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -30,97 +34,77 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $width: number | undefined }>(
-  ({ $width, theme }) => css`
-    width: ${$width ? `${$width}px` : 'auto'};
+export const Th = styled.th<{ $colId: string }>(
+  ({ $colId, theme }) => css`
+    width: var(--col-${$colId}-size);
     background-color: ${theme.colors.table.head.background};
+    opacity: var(--col-${$colId}-opacity, 1);
+    transform: var(--col-${$colId}-transform, 'none');
   `,
 );
 
-const TableHeader = <Entity extends EntityBase>({
-  activeSort,
-  column,
-  columnRenderer,
-  onSortChange,
-  colWidth,
-}: {
-  activeSort: Sort;
-  column: Column;
-  columnRenderer: ColumnRenderer<Entity> | undefined;
-  onSortChange: (newSort: Sort) => void;
-  colWidth: number;
-}) => {
-  const content = useMemo(
-    () => (typeof columnRenderer?.renderHeader === 'function' ? columnRenderer.renderHeader(column) : column.title),
-    [column, columnRenderer],
+const useSortableCol = (colId: string, disabled: boolean) => {
+  const { setColumnTransform } = useContext(DndStylesContext);
+  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
+    id: colId,
+    disabled,
+  });
+  const cssTransform = CSS.Translate.toString(transform);
+
+  useLayoutEffect(() => {
+    setColumnTransform((cur) => ({
+      ...cur,
+      [colId]: cssTransform,
+    }));
+  }, [colId, setColumnTransform, cssTransform]);
+
+  return {
+    attributes,
+    isDragging,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+  };
+};
+
+const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
+  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
+    header.column.id,
+    !columnMeta?.enableColumnOrdering,
   );
 
   return (
-    <Th $width={colWidth}>
-      {content}
-
-      {column.sortable && <SortIcon onChange={onSortChange} column={column} activeSort={activeSort} />}
+    <Th key={header.id} ref={setNodeRef} colSpan={header.colSpan} $colId={header.column.id}>
+      {columnMeta?.enableColumnOrdering && (
+        <DragHandle
+          ref={setActivatorNodeRef}
+          index={header.index}
+          dragHandleProps={{ ...attributes, ...listeners }}
+          isDragging={isDragging}
+          itemTitle={columnMeta.label}
+        />
+      )}
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+      {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
     </Th>
   );
 };
 
-const ActionsHead = styled(Th)<{ $width: number | undefined }>(
-  ({ $width }) => css`
-    text-align: right;
-    width: ${$width ? `${$width}px` : 'auto'};
-  `,
-);
-
-const TableHead = <Entity extends EntityBase>({
-  actionsColWidth,
-  activeSort,
-  columns,
-  columnsOrder,
-  columnRenderersByAttribute,
-  columnsWidths,
-  data,
-  displayActionsCol,
-  displayBulkSelectCol,
-  onSortChange,
-}: {
-  actionsColWidth: number | undefined;
-  activeSort: Sort;
-  columns: Array<Column>;
-  columnsWidths: { [columnId: string]: number };
-  columnsOrder: Array<string>;
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
-  data: Readonly<Array<Entity>>;
-  displayActionsCol: boolean;
-  displayBulkSelectCol: boolean;
-  onSortChange: (newSort: Sort) => void;
-}) => {
-  const sortedColumns = useMemo(
-    () => columns.sort((col1, col2) => columnsOrder.indexOf(col1.id) - columnsOrder.indexOf(col2.id)),
-    [columns, columnsOrder],
-  );
-
-  return (
-    <Thead>
-      <tr>
-        {displayBulkSelectCol && <BulkSelectHead data={data} />}
-        {sortedColumns.map((column) => {
-          const columnRenderer = columnRenderersByAttribute[column.id];
-
-          return (
-            <TableHeader<Entity>
-              columnRenderer={columnRenderer}
-              column={column}
-              colWidth={columnsWidths[column.id]}
-              onSortChange={onSortChange}
-              activeSort={activeSort}
-              key={column.title}
-            />
-          );
-        })}
-        {displayActionsCol ? <ActionsHead $width={actionsColWidth}>Actions</ActionsHead> : null}
-      </tr>
-    </Thead>
-  );
+type Props<Entity extends EntityBase> = {
+  headerGroups: Array<HeaderGroup<Entity>>;
 };
+
+const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
+  <Thead>
+    {headerGroups.map((headerGroup) => (
+      <tr key={headerGroup.id}>
+        {headerGroup.headers.map((header) => (
+          <TableHeaderCell key={header.id} header={header} />
+        ))}
+      </tr>
+    ))}
+  </Thead>
+);
 
 export default TableHead;

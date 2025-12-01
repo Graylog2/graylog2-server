@@ -1,0 +1,204 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+
+import { useMemo, useCallback } from 'react';
+import type { ColumnDef, SortingState, Updater, VisibilityState, RowSelectionState } from '@tanstack/react-table';
+import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
+
+import type { Sort } from 'stores/PaginationTypes';
+
+import type { ColumnPreferences, EntityBase } from '../types';
+import { UTILITY_COLUMNS } from '../Constants';
+
+const columnVisibilityChanges = (prevVisibleColumns: VisibilityState, currVisibleColumns: VisibilityState) => {
+  const addedColumns = new Set<string>();
+  const removedColumns = new Set<string>();
+
+  Object.keys(currVisibleColumns).forEach((key) => {
+    if (currVisibleColumns[key] && !prevVisibleColumns[key]) {
+      addedColumns.add(key);
+    } else if (!currVisibleColumns[key] && prevVisibleColumns[key]) {
+      removedColumns.add(key);
+    }
+  });
+
+  return { addedColumns, removedColumns };
+};
+
+const updateColumnPreferences = (
+  addedColumns: Set<string>,
+  removedColumns: Set<string>,
+  columnPreferences: ColumnPreferences | undefined = {},
+) => {
+  const updatedPreferences = { ...columnPreferences };
+
+  // only update the preferences for columns which have been shown/hidden by the user
+  addedColumns.forEach((col) => {
+    updatedPreferences[col] = { status: 'show' };
+  });
+
+  removedColumns.forEach((col) => {
+    updatedPreferences[col] = { status: 'hide' };
+  });
+
+  return updatedPreferences;
+};
+
+type Props<Entity extends EntityBase> = {
+  columnOrder: Array<string>;
+  columnsDefinitions: Array<ColumnDef<Entity>>;
+  defaultColumnOrder: Array<string>;
+  displayBulkSelectCol: boolean;
+  entities: ReadonlyArray<Entity>;
+  isEntitySelectable: (entity: Entity) => boolean | undefined;
+  layoutPreferences: {
+    attributes?: ColumnPreferences;
+    order?: Array<string>;
+  };
+  onChangeSelection: (selectedEntities: Array<Entity['id']>, data: Readonly<Array<Entity>>) => void;
+  onLayoutPreferencesChange: ({ attributes, order }: { attributes?: ColumnPreferences; order?: Array<string> }) => void;
+  onSortChange: (sort: Sort) => void;
+  selectedEntities: Array<Entity['id']>;
+  setInternalAttributeColumnOrder: (columnOrder: Array<string>) => void;
+  setSelectedEntities: (rows: Array<string>) => void;
+  sort: Sort | undefined;
+};
+
+const useTable = <Entity extends EntityBase>({
+  layoutPreferences,
+  defaultColumnOrder,
+  columnsDefinitions,
+  displayBulkSelectCol,
+  entities,
+  isEntitySelectable = () => true,
+  onChangeSelection,
+  onLayoutPreferencesChange,
+  setInternalAttributeColumnOrder,
+  onSortChange,
+  selectedEntities,
+  setSelectedEntities,
+  sort,
+  columnOrder,
+}: Props<Entity>) => {
+  const data = useMemo(() => [...entities], [entities]);
+  const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
+
+  const onSortingChange = useCallback(
+    (updater: Updater<SortingState>) => {
+      const newSorting = updater instanceof Function ? updater(sorting) : updater;
+      onSortChange({ attributeId: newSorting[0].id, direction: newSorting[0].desc ? 'desc' : 'asc' });
+    },
+    [onSortChange, sorting],
+  );
+
+  const columnVisibility = useMemo(
+    () => Object.fromEntries(columnsDefinitions.map(({ id }) => [id, columnOrder.includes(id)])),
+    [columnsDefinitions, columnOrder],
+  );
+
+  const onColumnVisibilityChange = useCallback(
+    (updater: Updater<VisibilityState>) => {
+      const newColumnVisibility = updater instanceof Function ? updater(columnVisibility) : updater;
+      const { addedColumns, removedColumns } = columnVisibilityChanges(columnVisibility, newColumnVisibility);
+
+      const newLayoutPreferences: {
+        attributes?: ColumnPreferences;
+        order?: Array<string>;
+      } = {
+        attributes: updateColumnPreferences(addedColumns, removedColumns, layoutPreferences.attributes),
+      };
+
+      // if user has a custom order, we need to update it to reflect the visibility changes
+      if (layoutPreferences.order) {
+        const newOrder = layoutPreferences.order.filter((colId) => !removedColumns.has(colId));
+
+        // Insert added columns at their default positions or at the end
+        [...addedColumns].forEach((colId) => {
+          const defaultIdx = defaultColumnOrder.indexOf(colId);
+          if (defaultIdx !== -1 && defaultIdx < newOrder.length) {
+            newOrder.splice(defaultIdx, 0, colId);
+          } else {
+            newOrder.push(colId);
+          }
+        });
+
+        newLayoutPreferences.order = newOrder;
+      }
+
+      return onLayoutPreferencesChange(newLayoutPreferences);
+    },
+    [
+      columnVisibility,
+      defaultColumnOrder,
+      layoutPreferences.order,
+      layoutPreferences.attributes,
+      onLayoutPreferencesChange,
+    ],
+  );
+  const rowSelection = useMemo(() => Object.fromEntries(selectedEntities.map((id) => [id, true])), [selectedEntities]);
+
+  const onRowSelectionChange = useCallback(
+    (updater: Updater<RowSelectionState>) => {
+      const newRowSelection = updater instanceof Function ? updater(rowSelection) : updater;
+
+      const newSelection = Object.entries(newRowSelection)
+        .filter(([_id, isSelected]) => isSelected)
+        .map(([id]) => id);
+
+      setSelectedEntities(newSelection);
+
+      if (onChangeSelection) {
+        onChangeSelection(newSelection, entities);
+      }
+    },
+    [entities, onChangeSelection, rowSelection, setSelectedEntities],
+  );
+
+  const _onColumnOrderChange = useCallback(
+    (updater: Updater<Array<string>>) => {
+      const newColumnOrder = (updater instanceof Function ? updater(columnOrder) : updater).filter(
+        (colId) => !UTILITY_COLUMNS.has(colId),
+      );
+      setInternalAttributeColumnOrder(newColumnOrder);
+      onLayoutPreferencesChange({ order: newColumnOrder });
+    },
+    [columnOrder, onLayoutPreferencesChange, setInternalAttributeColumnOrder],
+  );
+
+  // eslint-disable-next-line react-hooks/incompatible-library
+  return useReactTable({
+    columns: columnsDefinitions,
+    data,
+    enableRowSelection: (row) => displayBulkSelectCol && isEntitySelectable(row.original),
+    enableSortingRemoval: false,
+    getCoreRowModel: getCoreRowModel(),
+    getRowId: (row) => row.id,
+    manualSorting: true,
+    onColumnOrderChange: _onColumnOrderChange,
+    onColumnVisibilityChange,
+    onRowSelectionChange,
+    onSortingChange,
+    state: {
+      columnOrder,
+      columnVisibility,
+      sorting,
+      rowSelection,
+    },
+  });
+};
+
+export default useTable;

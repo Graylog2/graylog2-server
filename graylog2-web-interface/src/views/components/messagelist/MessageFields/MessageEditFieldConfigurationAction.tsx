@@ -18,18 +18,25 @@
 import React, { useState, useCallback } from 'react';
 
 import { Button } from 'components/bootstrap';
-import { Icon } from 'components/common';
 import MessageFieldsEditModal from 'views/components/messagelist/MessageFields/MessageFieldsEditModal';
+import useSendFavoriteFieldTelemetry from 'views/components/messagelist/MessageFields/hooks/useSendFavoriteFieldTelemetry';
 
 const MessageEditFieldConfigurationAction = () => {
   const [showModal, setShowModal] = useState(false);
+  const sendFavoriteFieldTelemetry = useSendFavoriteFieldTelemetry();
 
   const toggleEditMode = useCallback(() => setShowModal((prev) => !prev), []);
 
+  const onClick = useCallback(() => {
+    sendFavoriteFieldTelemetry('EDIT_OPEN');
+
+    return toggleEditMode();
+  }, [sendFavoriteFieldTelemetry, toggleEditMode]);
+
   return (
     <>
-      <Button bsSize="small" onClick={toggleEditMode} title="Edit favorite fields">
-        <Icon name="edit_square" /> Edit
+      <Button bsSize="small" onClick={onClick} title="Edit favorite fields">
+        Edit favorite fields
       </Button>
       {showModal && <MessageFieldsEditModal toggleEditMode={toggleEditMode} />}
     </>
