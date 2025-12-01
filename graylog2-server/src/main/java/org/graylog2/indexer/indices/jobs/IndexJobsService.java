@@ -21,8 +21,13 @@ import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
+import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+
+import java.util.Set;
 
 public class IndexJobsService {
     private final DBJobDefinitionService jobDefinitionService;
@@ -70,7 +75,7 @@ public class IndexJobsService {
         jobTriggerService.create(trigger);
     }
 
-    public void submitRebuildIndexRangesJob(final Set<IndexSet> indexSets) {
+    public void submitRebuildIndexRangesJob(final Set<BasicIndexSet> indexSets) {
         final var jobDefinition = jobDefinitionService.findOrCreate(RebuildIndexRangesJob.DEFINITION_INSTANCE);
 
         final var data = RebuildIndexRangesJob.Data.builder().indexSets(indexSets).build();

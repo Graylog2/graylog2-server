@@ -35,7 +35,8 @@ import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.JobTriggerUpdate;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -85,8 +86,8 @@ public class RebuildIndexRangesJob implements Job {
                 .orElseThrow(() -> new IllegalArgumentException("RebuildIndexRangesJob job data not found"));
 
         // for each index set we know about
-        final ListMultimap<IndexSet, String> indexSets = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (IndexSet indexSet : jobData.indexSets()) {
+        final ListMultimap<BasicIndexSet, String> indexSets = MultimapBuilder.hashKeys().arrayListValues().build();
+        for (BasicIndexSet indexSet : jobData.indexSets()) {
             final String[] managedIndicesNames = indexSet.getManagedIndices();
             for (String name : managedIndicesNames) {
                 indexSets.put(indexSet, name);
@@ -101,7 +102,7 @@ public class RebuildIndexRangesJob implements Job {
         final AtomicInteger indicesCalculated = new AtomicInteger(0);
 
         Stopwatch sw = Stopwatch.createStarted();
-        for (IndexSet indexSet : indexSets.keySet()) {
+        for (BasicIndexSet indexSet : indexSets.keySet()) {
             LOG.info("Recalculating index ranges for index set {} ({}): {} indices affected.",
                     indexSet.getConfig().title(),
                     indexSet.getIndexWildcard(),
@@ -180,7 +181,7 @@ public class RebuildIndexRangesJob implements Job {
         private static final String FIELD_INDEX_SETS = "index_sets";
 
         @JsonProperty(FIELD_INDEX_SETS)
-        public abstract Set<IndexSet> indexSets();
+        public abstract Set<BasicIndexSet> indexSets();
 
         public static Builder builder() {
             return Builder.create();
@@ -195,7 +196,7 @@ public class RebuildIndexRangesJob implements Job {
             }
 
             @JsonProperty(FIELD_INDEX_SETS)
-            public abstract Builder indexSets(Set<IndexSet> indexSets);
+            public abstract Builder indexSets(Set<BasicIndexSet> indexSets);
 
             abstract Data autoBuild();
 
