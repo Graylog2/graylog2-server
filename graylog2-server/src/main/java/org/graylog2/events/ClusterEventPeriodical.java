@@ -188,7 +188,8 @@ public class ClusterEventPeriodical extends Periodical {
                         "event_key", UUID.randomUUID().toString()
                 )), new Document(Map.of(
                         "$set", clusterEvent,
-                        "$currentDate", new Document(ClusterEvent.FIELD_TIMESTAMP, true)
+                        "$currentDate", new Document(ClusterEvent.FIELD_TIMESTAMP, true),
+                        "$unset", new Document("event_key", 1)
                 )),
                 new UpdateOptions().upsert(true));
         return result.getUpsertedId().asObjectId().getValue().toHexString();

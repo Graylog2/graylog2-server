@@ -34,7 +34,7 @@ import java.util.Date;
 @JsonAutoDetect
 @AutoValue
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonIgnoreProperties({"event_key", "consumers"})
+@JsonIgnoreProperties({"consumers"})
 public abstract class ClusterEvent implements MongoEntity {
     static final String FIELD_ID = "_id";
     static final String FIELD_TIMESTAMP = "timestamp";
