@@ -25,6 +25,7 @@ import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.SafeClasses;
@@ -61,12 +62,14 @@ class ClusterEventPeriodicalPerformanceTest {
     };
     private MongoDBTestService mongodb;
     private MongoJackObjectMapperProvider objectMapperProvider;
+    private Offset offset;
 
     @BeforeEach
     public void setUp(MongoDBTestService mongodb,
                       MongoJackObjectMapperProvider objectMapperProvider) {
         this.mongodb = mongodb;
         this.objectMapperProvider = objectMapperProvider;
+        this.offset = new OffsetFromCurrentMongoDBTimeProvider(mongodb.mongoConnection()).get();
     }
 
     class EventSubscriber {
@@ -86,6 +89,12 @@ class ClusterEventPeriodicalPerformanceTest {
         }
     }
 
+    private ClusterEventPeriodical createClusterEventPeriodical(NodeId nodeId, EventBus serverEventBus, ClusterEventBus clusterEventBus) {
+        return new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
+                nodeId, new RestrictedChainingClassLoader(new ChainingClassLoader(this.getClass().getClassLoader()),
+                SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus, offset);
+    }
+
     @Test
     void concurrentAccessDoesNotLeadToWriteAmplification() throws InterruptedException {
         LOG.info("Starting " + CONSUMER_COUNT + " consumers / " + PRODUCER_COUNT + " producers submitting " + EVENTS_PER_PRODUCER + " events each.");
@@ -99,10 +108,7 @@ class ClusterEventPeriodicalPerformanceTest {
         for (int i = 0; i < CONSUMER_COUNT; i++) {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
-            final var periodical = new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
-                    new SimpleNodeId("consumer-" + i), new RestrictedChainingClassLoader(
-                    new ChainingClassLoader(this.getClass().getClassLoader()),
-                    SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus);
+            final var periodical = createClusterEventPeriodical(new SimpleNodeId("consumer-" + i), serverEventBus, clusterEventBus);
             threadPool.submit(() -> {
                 while (running.get()) {
                     periodical.run();
@@ -121,10 +127,7 @@ class ClusterEventPeriodicalPerformanceTest {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
             final var nodeId = new SimpleNodeId("producer-" + i);
-            final var periodical = new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
-                    nodeId, new RestrictedChainingClassLoader(
-                    new ChainingClassLoader(this.getClass().getClassLoader()),
-                    SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus);
+            final var periodical = createClusterEventPeriodical(nodeId, serverEventBus, clusterEventBus);
 
             threadPool.submit(periodical);
 

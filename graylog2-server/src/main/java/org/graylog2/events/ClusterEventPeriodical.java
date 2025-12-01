@@ -44,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
 
@@ -61,21 +60,20 @@ public class ClusterEventPeriodical extends Periodical {
     private final RestrictedChainingClassLoader chainingClassLoader;
     private Offset offset;
 
-    record Offset(Date lastSeen, String lastId) {}
-
     @Inject
     public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
                                   final MongoConnection mongoConnection,
                                   final NodeId nodeId,
                                   final RestrictedChainingClassLoader chainingClassLoader,
                                   final EventBus serverEventBus,
-                                  final ClusterEventBus clusterEventBus) {
+                                  final ClusterEventBus clusterEventBus,
+                                  final Offset offset) {
         this.nodeId = nodeId;
         this.objectMapper = mapperProvider.get();
         this.chainingClassLoader = chainingClassLoader;
         this.serverEventBus = serverEventBus;
         this.collection = prepareCollection(mongoConnection, mapperProvider);
-        this.offset = new Offset(new Date(), null);
+        this.offset = offset;
 
         clusterEventBus.registerClusterEventSubscriber(this);
     }
@@ -199,10 +197,11 @@ public class ClusterEventPeriodical extends Periodical {
     }
 
     private FindIterable<ClusterEvent> eventsIterable(Offset offset) {
-        final var query = offset.lastId() == null
+        final var timestampQuery = offset.lastId() == null
                 ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen())
                 : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()),
                 Filters.and(Filters.eq(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()), Filters.ne(ClusterEvent.FIELD_ID, offset.lastId())));
+        final var query = Filters.and(Filters.ne(ClusterEvent.FIELD_PRODUCER, nodeId.toString()), timestampQuery);
         return collection.find(query)
                 .sort(Sorts.ascending(ClusterEvent.FIELD_TIMESTAMP));
     }
