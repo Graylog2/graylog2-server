@@ -266,6 +266,7 @@ export default [
       'testing-library/await-async-events': 'off',
       'testing-library/no-debugging-utils': 'warn',
       'testing-library/prefer-screen-queries': 'off',
+      'testing-library/prefer-user-event': 'error',
       'testing-library/render-result-naming-convention': 'off',
     },
   },
