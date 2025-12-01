@@ -28,17 +28,13 @@ import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetStatsCreator;
-import org.graylog2.indexer.IndexTemplateNotFoundException;
-import org.graylog2.indexer.MessageIndexTemplateProvider;
-import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
@@ -50,6 +46,10 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.indexer.template.IgnoreIndexTemplate;
+import org.graylog2.indexer.template.IndexMappingFactory;
+import org.graylog2.indexer.template.IndexTemplateNotFoundException;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -277,7 +277,7 @@ public class IndicesIT extends SearchServerBaseTest {
 
         assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isFalse();
 
-        indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet.basicIndexSetConfig());
 
         assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isTrue();
         assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
@@ -299,7 +299,7 @@ public class IndicesIT extends SearchServerBaseTest {
 
         indexTemplateAdapter.ensureIndexTemplate(templateName, templateSource);
 
-        indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet.basicIndexSetConfig());
 
         assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
     }
@@ -367,7 +367,7 @@ public class IndicesIT extends SearchServerBaseTest {
     public void ensureIndexTemplateDoesntThrowOnIgnoreIndexTemplateAndExistingTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
-        indices.ensureIndexTemplate(indexSet);
+        indices.ensureIndexTemplate(indexSet.indexTemplateConfig());
 
         assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isTrue();
 
@@ -380,7 +380,7 @@ public class IndicesIT extends SearchServerBaseTest {
                 mock(IndexFieldTypeProfileService.class),
                 mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.indexTemplateConfig())).doesNotThrowAnyException();
 
         assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isTrue();
     }
@@ -414,7 +414,7 @@ public class IndicesIT extends SearchServerBaseTest {
                 mock(IndexFieldTypeProfileService.class),
                 mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.indexTemplateConfig()))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
     }

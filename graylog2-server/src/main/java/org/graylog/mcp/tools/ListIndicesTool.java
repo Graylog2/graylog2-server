@@ -21,10 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.NodeInfoCache;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.indices.util.NumberBasedIndexNameComparator;
@@ -118,7 +118,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     // TODO: find a better way to do this. These are all verbatim from org.graylog2.rest.resources.system.indexer.IndicesResource
 
     public OpenIndicesInfo open(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -130,7 +130,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     public ClosedIndices closed(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -142,7 +142,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
     }
 
     public ClosedIndices reopened(PermissionHelper permissionHelper) {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -161,7 +161,7 @@ public class ListIndicesTool extends Tool<ListIndicesTool.Parameters, String> {
         final Map<String, Boolean> areReopened = this.indices.areReopened(indices);
 
         final List<IndexStatistics> sortedIndexStatistics = indicesStatistics.stream()
-                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)))
+                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(IndexPattern.SEPARATOR)))
                 .toList();
 
         for (IndexStatistics indexStatistics : sortedIndexStatistics) {
