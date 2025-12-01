@@ -41,11 +41,10 @@ public class ESVarianceHandler extends ESPivotSeriesSpecHandler<Variance, Extend
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, Variance pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        Variance pivotSpec,
                                         SearchResponse searchResult,
-                                        ExtendedStats varianceAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        ExtendedStats varianceAggregation) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
     }
 }

@@ -41,11 +41,10 @@ public class ESSumOfSquaresHandler extends ESPivotSeriesSpecHandler<SumOfSquares
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, SumOfSquares pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        SumOfSquares pivotSpec,
                                         SearchResponse searchResult,
-                                        ExtendedStats sumOfSquaresAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        ExtendedStats sumOfSquaresAggregation) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), SumOfSquares.NAME, sumOfSquaresAggregation.getSumOfSquares()));
     }
 }

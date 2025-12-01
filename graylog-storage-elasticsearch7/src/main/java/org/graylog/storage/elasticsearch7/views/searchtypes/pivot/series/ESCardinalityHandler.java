@@ -40,11 +40,10 @@ public class ESCardinalityHandler extends ESPivotSeriesSpecHandler<Cardinality, 
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, Cardinality pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        Cardinality pivotSpec,
                                         SearchResponse searchResult,
-                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Cardinality cardinalityAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Cardinality cardinalityAggregation) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Cardinality.NAME, cardinalityAggregation.getValue()));
     }
 }

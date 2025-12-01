@@ -44,9 +44,7 @@ public class ESPercentilesHandler extends ESPivotSeriesSpecHandler<Percentile, P
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Percentile pivotSpec,
                                         SearchResponse searchResult,
-                                        Percentiles percentilesAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext queryContext) {
+                                        Percentiles percentilesAggregation) {
         Double percentile = percentilesAggregation.percentile(pivotSpec.percentile());
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));
     }

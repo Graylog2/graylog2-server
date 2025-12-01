@@ -41,11 +41,10 @@ public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
     }
 
     @Override
-    public Stream<OSPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot, Average pivotSpec,
+    public Stream<OSPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot,
+                                                                 Average pivotSpec,
                                                                  SearchResponse searchResult,
-                                                                 Avg avgAggregation,
-                                                                 OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                                                 OSGeneratedQueryContext OSGeneratedQueryContext) {
+                                                                 Avg avgAggregation) {
         double value = avgAggregation.getValue();
         if (pivotSpec.wholeNumber()) {
             if (Double.isNaN(value) || Double.isInfinite(value)) {

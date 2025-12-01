@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
@@ -32,15 +33,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.InitialBucket;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import jakarta.inject.Inject;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -87,31 +84,35 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
                                                     Percentage percentage,
                                                     SearchResponse searchResult,
                                                     Object seriesResult,
-                                                    ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                                    ESGeneratedQueryContext esGeneratedQueryContext) {
+                                                    ESSearchTypeHandler<Pivot> searchTypeHandler) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {
                 var seriesSpecBuilder = Sum.builder().id(percentage.id());
                 var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
 
-                yield esSumHandler.handleResult(pivot, seriesSpec, searchResult, seriesResult, searchTypeHandler, esGeneratedQueryContext);
+                yield esSumHandler.handleResult(pivot, seriesSpec, searchResult, seriesResult);
             }
             case COUNT -> {
                 var seriesSpecBuilder = Count.builder().id(percentage.id());
                 var seriesSpec = percentage.field().map(seriesSpecBuilder::field).orElse(seriesSpecBuilder).build();
 
-                yield esCountHandler.handleResult(pivot, seriesSpec, searchResult, seriesResult, searchTypeHandler, esGeneratedQueryContext);
+                yield esCountHandler.handleResult(pivot, seriesSpec, searchResult, seriesResult);
             }
         };
     }
 
     @Override
+    public Stream<Value> doHandleResult(Pivot pivot, Percentage seriesSpec, SearchResponse searchResult, ValueCount valueCount) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Percentage percentage,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
                                         ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        ESGeneratedQueryContext esGeneratedQueryContext,
+                                        MultiBucketsAggregation.Bucket initialBucket) {
         final long value;
         if (valueCount == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
@@ -124,9 +125,8 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var initialBucket = esGeneratedQueryContext.rowBucket().orElseGet(() -> InitialBucket.create(searchResult));
         var rootResult = extractNestedSeriesAggregation(pivot, percentage, initialBucket, esGeneratedQueryContext);
-        var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, searchTypeHandler, esGeneratedQueryContext);
+        var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, searchTypeHandler);
 
         return nestedSeriesResult.map(result -> {
                     var totalResult = (Number) result.value();

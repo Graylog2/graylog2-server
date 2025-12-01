@@ -63,9 +63,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Count count,
                                         SearchResponse searchResult,
-                                        ValueCount valueCount,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext esGeneratedQueryContext) {
+                                        ValueCount valueCount) {
         final Object value;
         if (valueCount == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");

@@ -41,11 +41,10 @@ public class OSSumOfSquaresHandler extends OSPivotSeriesSpecHandler<SumOfSquares
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, SumOfSquares pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        SumOfSquares pivotSpec,
                                         SearchResponse searchResult,
-                                        ExtendedStats sumOfSquaresAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+                                        ExtendedStats sumOfSquaresAggregation) {
         return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), SumOfSquares.NAME, sumOfSquaresAggregation.getSumOfSquares()));
     }
 }

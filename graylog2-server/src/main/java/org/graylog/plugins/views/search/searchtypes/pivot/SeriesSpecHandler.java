@@ -43,10 +43,10 @@ public interface SeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_BUI
     List<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE seriesSpec, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
 
     @SuppressWarnings("unchecked")
-    default Object handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (QUERY_RESULT) queryResult, (AGGREGATION_RESULT) aggregationResult, (SEARCHTYPE_HANDLER) searchTypeHandler, (QUERY_CONTEXT) queryContext);
+    default Object handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult) {
+        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (QUERY_RESULT) queryResult, (AGGREGATION_RESULT) aggregationResult);
     }
 
-    Object doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT result, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
+    Object doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT result);
 
 }

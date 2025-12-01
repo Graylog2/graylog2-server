@@ -63,9 +63,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Count count,
                                         SearchResponse searchResult,
-                                        ValueCount valueCount,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        ValueCount valueCount) {
         final Object value;
         if (valueCount == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
