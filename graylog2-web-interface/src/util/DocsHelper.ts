@@ -47,6 +47,7 @@ const defaultPages = {
   LICENSE_MANAGEMENT: 'setting_up_graylog/operations_license_management.html',
   LOAD_BALANCERS: 'setting_up_graylog/load_balancer_integration.html',
   LOOKUPTABLES: 'making_sense_of_your_log_data/lookup_tables.html',
+  INPUTS: 'getting_in_log_data/inputs.html',
   OPERATIONS_CHANGELOG: 'changelogs/operations_changelog.html',
   OPEN_SEARCH_SETUP: 'setting_up_graylog/opensearch.htm#InstallingOpenSearch',
   PAGE_FLEXIBLE_DATE_CONVERTER: 'making_sense_of_your_log_data/extractors.htm#Normalization',
