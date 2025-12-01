@@ -31,7 +31,7 @@ import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.JobTriggerUpdate;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRangeService;

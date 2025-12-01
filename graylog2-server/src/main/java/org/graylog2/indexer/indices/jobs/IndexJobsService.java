@@ -20,15 +20,9 @@ import jakarta.inject.Inject;
 import org.graylog.scheduler.DBJobDefinitionService;
 import org.graylog.scheduler.DBJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
-import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 public class IndexJobsService {
     private final DBJobDefinitionService jobDefinitionService;

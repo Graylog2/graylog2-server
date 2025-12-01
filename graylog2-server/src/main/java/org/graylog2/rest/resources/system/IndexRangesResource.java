@@ -27,6 +27,7 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -39,8 +40,9 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indices.jobs.IndexJobsService;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -138,7 +140,7 @@ public class IndexRangesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
         indexJobsService.submitIndexRangesCleanupJob();
-        indexJobsService.submitRebuildIndexRangesJob(indexSetRegistry.getAll());
+        indexJobsService.submitRebuildIndexRangesJob(indexSetRegistry.getAllBasicIndexSets());
 
         return Response.accepted().build();
     }
