@@ -21,7 +21,6 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import type { PaginationQueryParameterResult } from 'hooks/usePaginationQueryParameter';
 import type { TableLayoutPreferences, ColumnPreferences } from 'components/common/EntityDataTable/types';
-import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 const useTableEventHandlers = ({
   updateTableLayout,
