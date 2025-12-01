@@ -217,7 +217,7 @@ const useTable = <Entity extends EntityBase>({
         };
       });
 
-      debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
+      return debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
     },
     [
       columnRenderersByAttribute,
