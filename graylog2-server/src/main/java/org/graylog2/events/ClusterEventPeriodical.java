@@ -43,7 +43,6 @@ import org.graylog2.shared.utilities.AutoValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.UUID;
 
@@ -87,8 +86,7 @@ public class ClusterEventPeriodical extends Periodical {
 
         collection.createIndex(Indexes.ascending(
                 ClusterEvent.FIELD_TIMESTAMP,
-                ClusterEvent.FIELD_PRODUCER,
-                ClusterEvent.FIELD_CONSUMERS));
+                ClusterEvent.FIELD_PRODUCER));
 
         return collection;
     }
@@ -170,12 +168,12 @@ public class ClusterEventPeriodical extends Periodical {
         }
 
         final String className = AutoValueUtils.getCanonicalName(event.getClass());
-        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, Collections.singleton(nodeId.getNodeId()), event);
+        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, event);
 
         try {
             final String id = save(clusterEvent);
             // We are handling a locally generated event, so we can speed up processing by posting it to the local event
-            // bus immediately. Due to having added the local node id to its list of consumers, it will not be picked up
+            // bus immediately. Due to filtering on the `producer` field not being equal to the local node id, it will not be picked up
             // by the db cursor again, avoiding double processing of the event. See #11263 for details.
             serverEventBus.post(event);
             LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);

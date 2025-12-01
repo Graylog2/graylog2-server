@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -266,19 +265,6 @@ public class ClusterEventPeriodicalTest {
         assertThat(collection.getNamespace().getCollectionName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.listIndexes()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
-    }
-
-    @Test
-    public void localNodeIsMarkedAsHavingConsumedEvent() {
-        @SuppressWarnings("deprecation")
-        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
-        SimpleEvent event = new SimpleEvent("test");
-
-        clusterEventPeriodical.publishClusterEvent(event);
-
-        DBObject dbObject = collection.findOne();
-
-        assertThat(((BasicDBList) dbObject.get("consumers")).toArray()).isEqualTo(new String[]{nodeId.getNodeId()});
     }
 
     @Test
