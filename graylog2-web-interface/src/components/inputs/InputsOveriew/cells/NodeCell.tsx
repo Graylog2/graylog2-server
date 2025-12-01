@@ -16,27 +16,24 @@
  */
 import * as React from 'react';
 
-import useInputsStates from 'hooks/useInputsStates';
-import MenuItemDotBadge from 'components/navigation/MenuItemDotBadge';
+import type { InputSummary } from 'hooks/usePaginatedInputs';
+import { LinkToNode } from 'components/common';
+import useProductName from 'brand-customization/useProductName';
 
-const InputsDotBadge = ({ text }: { text: string }) => {
-  const { data, isLoading } = useInputsStates();
+type Props = {
+  input: InputSummary;
+};
 
-  if (isLoading) {
-    return null;
-  }
+const NodeCell = ({ input }: Props) => {
+  const productName = useProductName();
 
-  const hasFailedOrSetupInputs = Object.values(data).some((inputStateByNode) =>
-    Object.values(inputStateByNode).some((node) => ['FAILED', 'FAILING', 'SETUP'].includes(node.state)),
-  );
+  if (input.global && !input.node) return `All ${productName} Nodes`;
 
   return (
-    <MenuItemDotBadge
-      text={text}
-      title="Some inputs are in failed state or in setup mode."
-      showDot={hasFailedOrSetupInputs}
-    />
+    <span>
+      <LinkToNode nodeId={input.node} />
+    </span>
   );
 };
 
-export default InputsDotBadge;
+export default NodeCell;
