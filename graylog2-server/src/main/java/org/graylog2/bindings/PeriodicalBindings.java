@@ -49,8 +49,7 @@ import org.graylog2.telemetry.cluster.TelemetryClusterInfoPeriodical;
 public class PeriodicalBindings extends AbstractModule {
     @Override
     protected void configure() {
-        bind(Offset.class).toProvider(OffsetFromCurrentMongoDBTimeProvider.class);
-
+        bind(Offset.class).toProvider(OffsetFromCurrentMongoDBTimeProvider.class).asEagerSingleton();
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(ClusterHealthCheckThread.class);
         periodicalBinder.addBinding().to(ContentPackLoaderPeriodical.class);
