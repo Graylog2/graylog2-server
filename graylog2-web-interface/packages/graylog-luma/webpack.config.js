@@ -1,5 +1,3 @@
-import path from 'path';
-
 import mainAppWebpackConfig from '../../webpack.config.js';
 
 export default async ({ config }) => {
@@ -15,7 +13,6 @@ export default async ({ config }) => {
         ...(mainAppWebpackConfig.resolve && mainAppWebpackConfig.resolve.alias
           ? mainAppWebpackConfig.resolve.alias
           : {}), // Main app aliases
-        '@graylog': path.resolve(__dirname, '../../src/'),
       },
     },
   };
