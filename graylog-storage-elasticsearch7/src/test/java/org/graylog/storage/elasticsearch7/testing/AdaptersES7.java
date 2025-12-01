@@ -64,16 +64,18 @@ public class AdaptersES7 implements Adapters {
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
+    private final SearchRequestFactory searchRequestFactory;
 
     public AdaptersES7(ElasticsearchClient client, List<String> featureFlags) {
         this.client = client;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+        this.searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
     }
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterES7(client);
+        return new CountsAdapterES7(client, searchRequestFactory);
     }
 
     @Override
@@ -103,10 +105,6 @@ public class AdaptersES7 implements Adapters {
         final ScrollResultES7.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultES7(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         final Scroll scroll = new Scroll(client, scrollResultFactory, searchRequestFactory);
         return new SearchesAdapterES7(resultMessageFactory, client, scroll, searchRequestFactory);
     }
