@@ -199,7 +199,7 @@
         <asciitable.version>0.3.2</asciitable.version>
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
-        <poi.version>5.5.0</poi.version>
+        <poi.version>5.5.1</poi.version>
         <mcp-bom.version>0.16.0</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
