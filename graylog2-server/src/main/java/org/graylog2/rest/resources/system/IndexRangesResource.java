@@ -43,24 +43,18 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.basic.BasicIndexSet;
-import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
+import org.graylog2.indexer.indices.jobs.IndexJobsService;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
-import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
-import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.SystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -72,25 +66,16 @@ public class IndexRangesResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
 
     private final IndexRangeService indexRangeService;
-    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
-    private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
+    private final IndexJobsService indexJobsService;
     private final IndexSetRegistry indexSetRegistry;
-    private final SystemJobManager systemJobManager;
-    private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
 
     @Inject
     public IndexRangesResource(IndexRangeService indexRangeService,
-                               RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
-                               CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
                                IndexSetRegistry indexSetRegistry,
-                               SystemJobManager systemJobManager,
-                               IndexRangesCleanupPeriodical indexRangesCleanupPeriodical) {
+                               final IndexJobsService indexJobsService) {
         this.indexRangeService = indexRangeService;
-        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
-        this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.indexSetRegistry = indexSetRegistry;
-        this.systemJobManager = systemJobManager;
-        this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
+        this.indexJobsService = indexJobsService;
     }
 
     @GET
@@ -154,8 +139,8 @@ public class IndexRangesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
-        submitIndexRangesCleanupJob();
-        submitIndexRangesJob(indexSetRegistry.getAllBasicIndexSets());
+        indexJobsService.submitIndexRangesCleanupJob();
+        indexJobsService.submitRebuildIndexRangesJob(indexSetRegistry.getAllBasicIndexSets());
 
         return Response.accepted().build();
     }
@@ -176,9 +161,7 @@ public class IndexRangesResource extends RestResource {
     public Response rebuildIndexSet(@ApiParam(name = "indexSetId") @PathParam("indexSetId") @NotBlank final String indexSetId) {
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
                 .orElseThrow(() -> new jakarta.ws.rs.NotFoundException("Index set <" + indexSetId + "> not found!"));
-
-        submitIndexRangesJob(Collections.singleton(indexSet));
-
+        indexJobsService.submitRebuildIndexRangesJob(Collections.singleton(indexSet));
         return Response.accepted().build();
     }
 
@@ -201,31 +184,7 @@ public class IndexRangesResource extends RestResource {
             throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);
-
-        final SystemJob rebuildJob = singleIndexRangeJobFactory.create(index);
-        try {
-            this.systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(msg);
-            throw new ForbiddenException(msg, e);
-        }
-
+        indexJobsService.submitCreateNewSingleIndexRangeJob(index);
         return Response.accepted().build();
-    }
-
-    public void submitIndexRangesJob(final Set<BasicIndexSet> indexSets) {
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSets);
-        try {
-            this.systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.info(errorMsg, e);
-            throw new ForbiddenException(errorMsg);
-        }
-    }
-
-    private void submitIndexRangesCleanupJob() {
-        this.indexRangesCleanupPeriodical.doRun();
     }
 }
