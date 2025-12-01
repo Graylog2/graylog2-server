@@ -1,4 +1,4 @@
 type = "f"
-message = "Move IndexRangeCalculation on Index Rotation into current scheduler so it persists and survives server restarts."
+message = "Move index range calculation on index rotation into current scheduler so it persists and survives server restarts."
 
 pulls = ["24377", "Graylog2/graylog-plugin-enterprise#12638"]
