@@ -476,7 +476,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
 
         try {
             final Input input = inputService.find(modelId.id());
-            final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+            final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input.getId()));
             return Optional.of(exportNativeEntity(inputWithExtractors, entityDescriptorIds));
         } catch (NotFoundException e) {
             return Optional.empty();
@@ -491,7 +491,7 @@ public class InputFacade implements EntityFacade<InputWithExtractors> {
         final ModelId modelId = entityDescriptor.id();
         try {
             final Input input = inputService.find(modelId.toString());
-            final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input));
+            final InputWithExtractors inputWithExtractors = InputWithExtractors.create(input, inputService.getExtractors(input.getId()));
 
             resolveNativeEntityLookupTable(entityDescriptor, inputWithExtractors, mutableGraph);
             resolveNativeEntityGrokPattern(entityDescriptor, inputWithExtractors, mutableGraph);
