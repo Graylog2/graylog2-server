@@ -222,6 +222,7 @@ public class ElasticsearchConfiguration {
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_MAX_SHARD_SIZE)
     private Size timeSizeOptimizingRotationMaxShardSize;
 
+    @Documentation("tbd")
     @Parameter(value = TIME_SIZE_OPTIMIZING_ROTATION_OS_MEMORY_FACTOR)
     private double timeSizeOptimizingRotationOSMemoryFactor = 0.6;
 
