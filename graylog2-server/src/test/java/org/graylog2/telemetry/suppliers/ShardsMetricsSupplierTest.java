@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class ShardsMetricsSupplierTest {
+class ShardsMetricsSupplierTest {
     @Mock
     private ElasticsearchConfiguration elasticsearchConfiguration;
 
@@ -45,7 +45,7 @@ public class ShardsMetricsSupplierTest {
     private ShardsMetricsSupplier shardsMetricsSupplier;
 
     @Test
-    public void shouldReturnShardMetrics() {
+    void shouldReturnShardMetrics() {
         Size minSize = Size.gigabytes(29L);
         Size maxSize = Size.gigabytes(34L);
         ClusterHealth.ShardStatus shardStatus = ClusterHealth.ShardStatus.create(5, 4, 2, 1);
@@ -66,6 +66,21 @@ public class ShardsMetricsSupplierTest {
                 "shards_initializing", shardStatus.initializing(),
                 "shards_relocating", shardStatus.relocating(),
                 "shards_unassigned", shardStatus.unassigned()
+        ));
+    }
+
+    @Test
+    void shouldReturnShardMetricsWithFallbackValues() {
+        Optional<TelemetryEvent> event = shardsMetricsSupplier.get();
+
+        assertThat(event).isPresent();
+        assertThat(event.get().metrics()).isEqualTo(Map.<String, Object>of(
+                "shard_min_size", 0L,
+                "shard_max_size", 0L,
+                "shards_active", 0,
+                "shards_initializing", 0,
+                "shards_relocating", 0,
+                "shards_unassigned", 0
         ));
     }
 }
