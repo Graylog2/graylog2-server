@@ -21,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import jakarta.annotation.Nonnull;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory;
 import org.joda.time.DateTime;
