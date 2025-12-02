@@ -22,10 +22,17 @@ import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-import SortIcon from 'components/common/EntityDataTable/SortIcon';
-import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import DragHandle from 'components/common/SortableList/DragHandle';
+import {
+  columnTransformVar,
+  columnOpacityVar,
+  columnWidthVar,
+  columnTransition,
+} from 'components/common/EntityDataTable/CSSVariables';
 
+import SortIcon from './SortIcon';
+import DndStylesContext from './contexts/DndStylesContext';
+import ResizeHandle from './ResizeHandle';
 import type { EntityBase, ColumnMetaContext } from './types';
 
 const Thead = styled.thead(
@@ -36,12 +43,26 @@ const Thead = styled.thead(
 
 export const Th = styled.th<{ $colId: string }>(
   ({ $colId, theme }) => css`
-    width: var(--col-${$colId}-size);
+    width: var(${columnWidthVar($colId)});
+    opacity: var(${columnOpacityVar($colId)}, 1);
+    transform: var(${columnTransformVar($colId)}, translate3d(0px, 0px, 0));
     background-color: ${theme.colors.table.head.background};
-    opacity: var(--col-${$colId}-opacity, 1);
-    transform: var(--col-${$colId}-transform, 'none');
+    transition: var(${columnTransition()}, none);
   `,
 );
+
+export const ThInner = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+`;
+
+export const LeftCol = styled.div`
+  flex: 1;
+  display: flex;
+  align-items: center;
+`;
 
 const useSortableCol = (colId: string, disabled: boolean) => {
   const { setColumnTransform } = useContext(DndStylesContext);
@@ -76,17 +97,28 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
 
   return (
     <Th key={header.id} ref={setNodeRef} colSpan={header.colSpan} $colId={header.column.id}>
-      {columnMeta?.enableColumnOrdering && (
-        <DragHandle
-          ref={setActivatorNodeRef}
-          index={header.index}
-          dragHandleProps={{ ...attributes, ...listeners }}
-          isDragging={isDragging}
-          itemTitle={columnMeta.label}
-        />
-      )}
-      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-      {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
+      <ThInner>
+        <LeftCol>
+          {columnMeta?.enableColumnOrdering && (
+            <DragHandle
+              ref={setActivatorNodeRef}
+              index={header.index}
+              dragHandleProps={{ ...attributes, ...listeners }}
+              isDragging={isDragging}
+              itemTitle={columnMeta.label}
+            />
+          )}
+          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+          {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
+        </LeftCol>
+        {header.column.getCanResize() && (
+          <ResizeHandle
+            onMouseDown={header.getResizeHandler()}
+            onTouchStart={header.getResizeHandler()}
+            colTitle={columnMeta.label}
+          />
+        )}
+      </ThInner>
     </Th>
   );
 };
