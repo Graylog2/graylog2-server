@@ -31,6 +31,7 @@ export const MetricsRow = styled.div`
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
+
   span {
     font-size: inherit;
   }
