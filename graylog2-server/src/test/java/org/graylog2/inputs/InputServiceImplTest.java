@@ -165,6 +165,34 @@ public class InputServiceImplTest {
     }
 
     @Test
+    public void createMapAssignsIdWhenMissing() {
+        final Map<String, Object> fields = new HashMap<>();
+        fields.put(MessageInput.FIELD_TITLE, "TestInput");
+        fields.put(MessageInput.FIELD_TYPE, "org.graylog.plugins.Test");
+        fields.put(MessageInput.FIELD_CONFIGURATION, Map.of());
+        fields.put(MessageInput.FIELD_CREATOR_USER_ID, "admin");
+
+        final Input input = inputService.create(fields);
+
+        assertThat(input.getId()).isNotBlank();
+    }
+
+    @Test
+    public void createMapRespectsProvidedId() {
+        final String desiredId = new ObjectId().toHexString();
+        final Map<String, Object> fields = new HashMap<>();
+        fields.put(InputImpl.FIELD_ID, desiredId);
+        fields.put(MessageInput.FIELD_TITLE, "GenericInput");
+        fields.put(MessageInput.FIELD_TYPE, "org.graylog.plugins.GenericInput");
+        fields.put(MessageInput.FIELD_CONFIGURATION, Map.of());
+        fields.put(MessageInput.FIELD_CREATOR_USER_ID, "user");
+
+        final Input input = inputService.create(fields);
+
+        assertThat(input.getId()).isEqualTo(desiredId);
+    }
+
+    @Test
     public void handlesEncryptedValue() throws ValidationException, NotFoundException {
 
         // Setup required to detect fields that need conversion from Map to EncryptedValue when reading
