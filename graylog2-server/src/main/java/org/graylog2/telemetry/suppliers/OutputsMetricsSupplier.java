@@ -17,7 +17,8 @@
 package org.graylog2.telemetry.suppliers;
 
 import jakarta.inject.Inject;
-import org.graylog2.inputs.InputService;
+import jakarta.inject.Singleton;
+import org.graylog2.streams.OutputService;
 import org.graylog2.telemetry.scheduler.TelemetryEvent;
 import org.graylog2.telemetry.scheduler.TelemetryMetricSupplier;
 
@@ -25,19 +26,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public class InputsMetricsSupplier implements TelemetryMetricSupplier {
-    private final InputService inputService;
+@Singleton
+public class OutputsMetricsSupplier implements TelemetryMetricSupplier {
+    private final OutputService outputService;
 
     @Inject
-    public InputsMetricsSupplier(InputService inputService) {
-        this.inputService = inputService;
+    public OutputsMetricsSupplier(OutputService outputService) {
+        this.outputService = outputService;
     }
 
     @Override
     public Optional<TelemetryEvent> get() {
-        Map<String, Object> metrics = new HashMap<>(TypeFormatter.formatAll(inputService.totalCountByType()));
+        //Converting the result of "countByType" to Map<String, Object>:
+        final Map<String, Object> countByType = new HashMap<>(TypeFormatter.formatAll(outputService.countByType()));
 
-        return Optional.of(TelemetryEvent.of((metrics)));
+        return Optional.of(TelemetryEvent.of(countByType));
     }
 
 }
