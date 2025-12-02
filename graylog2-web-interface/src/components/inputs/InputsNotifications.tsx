@@ -79,7 +79,7 @@ const InputsNotifications = () => {
 
   if (!hasStoppedInputs && !hasFailedInputs && !hasSetupInputs) {
     return null;
-  };
+  }
 
   return (
     <Row className="content">

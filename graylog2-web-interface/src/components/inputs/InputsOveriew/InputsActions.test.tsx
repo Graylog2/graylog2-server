@@ -112,7 +112,8 @@ const inputTypeDescriptions = {
   },
 } as unknown as InputTypeDescriptionsResponse;
 
-const renderSUT = (input = baseInput, extraProps = {}) => render(
+const renderSUT = (input = baseInput, extraProps = {}) =>
+  render(
     <InputsActions
       input={input as any}
       inputTypes={{} as any}

@@ -42,7 +42,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <TitleCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      width: 0.5
+      width: 0.5,
     },
     type: {
       renderCell: (type: string, input: InputSummary) => (
