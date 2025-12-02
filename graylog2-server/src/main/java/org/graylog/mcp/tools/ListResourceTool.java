@@ -18,15 +18,12 @@ package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.inject.Inject;
 import org.graylog.grn.GRNType;
 import org.graylog.grn.GRNTypes;
 import org.graylog.mcp.server.ResourceProvider;
-import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
-import org.graylog2.web.customization.CustomizationConfig;
 
 import java.util.List;
 import java.util.Locale;
@@ -40,20 +37,16 @@ public class ListResourceTool extends Tool<ListResourceTool.Parameters, ListReso
     private final Map<GRNType, ? extends ResourceProvider> resourceProviders;
 
     @Inject
-    public ListResourceTool(ObjectMapper objectMapper,
-                            SchemaGeneratorProvider schemaGeneratorProvider,
-                            CustomizationConfig customizationConfig,
-                            Map<GRNType, ? extends ResourceProvider> resourceProviders) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public ListResourceTool(final ToolContext toolContext, Map<GRNType, ? extends ResourceProvider> resourceProviders) {
+        super(toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("List %s Resources", customizationConfig.productName()),
+                f("List %s Resources", toolContext.customizationConfig().productName()),
                 """
                         List all Resources available in %1$s for one resource type out of the following: {stream,dashboard,event_definition}.
                         Returns: A list of tuples with both the GRN and name of each resource.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(toolContext.customizationConfig().productName()));
         this.resourceProviders = resourceProviders;
     }
 
