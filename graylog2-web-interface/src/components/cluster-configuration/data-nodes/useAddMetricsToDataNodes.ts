@@ -56,7 +56,10 @@ const toNodeMetric = (response?: MetricsSummaryResponse): NodeMetric | undefined
     return undefined;
   }
 
-  return response.metrics.reduce<NodeMetric>((acc, metric) => ({ ...acc, [metric.full_name]: metric }), {} as NodeMetric);
+  return response.metrics.reduce<NodeMetric>(
+    (acc, metric) => ({ ...acc, [metric.full_name]: metric }),
+    {} as NodeMetric,
+  );
 };
 
 const extractMetrics = (response?: MetricsSummaryResponse): DataNodeMetrics => {
@@ -88,10 +91,13 @@ const fetchMetricsForHostnames = async (hostnames: string[]) => {
     hostnames.map(async (hostname) => ({ hostname, response: await fetchMetrics(hostname) })),
   );
 
-  return responses.reduce<Record<string, DataNodeMetrics>>((acc, { hostname, response }) => ({
-    ...acc,
-    [hostname]: extractMetrics(response),
-  }), {});
+  return responses.reduce<Record<string, DataNodeMetrics>>(
+    (acc, { hostname, response }) => ({
+      ...acc,
+      [hostname]: extractMetrics(response),
+    }),
+    {},
+  );
 };
 
 type UseAddMetricsToDataNodesOptions = {
@@ -103,15 +109,9 @@ const useAddMetricsToDataNodes = <Node extends Pick<DataNode, 'hostname'>>(
   nodes: ReadonlyArray<Node> | null | undefined,
   { refetchInterval = false, enabled = true }: UseAddMetricsToDataNodesOptions = {},
 ): Array<Node & { metrics: DataNodeMetrics }> => {
-  const safeNodes = useMemo(
-    () => (nodes ?? []).filter((node): node is Node => Boolean(node?.hostname)),
-    [nodes],
-  );
+  const safeNodes = useMemo(() => (nodes ?? []).filter((node): node is Node => Boolean(node?.hostname)), [nodes]);
 
-  const hostnames = useMemo(
-    () => Array.from(new Set(safeNodes.map(({ hostname }) => hostname))).sort(),
-    [safeNodes],
-  );
+  const hostnames = useMemo(() => Array.from(new Set(safeNodes.map(({ hostname }) => hostname))).sort(), [safeNodes]);
 
   const { data: metricsByHostname = {} } = useQuery({
     queryKey: ['datanode-metrics', hostnames],

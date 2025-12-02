@@ -21,7 +21,7 @@ import type {
   XYVisualization,
 } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
-import type {ConfigurationField, FieldUnitType, CustomField} from 'views/types';
+import type { ConfigurationField, FieldUnitType, CustomField } from 'views/types';
 import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 import AxisVisualizationField from 'views/components/aggregationwizard/visualization/configurationFields/AxisVisualizationField';
 

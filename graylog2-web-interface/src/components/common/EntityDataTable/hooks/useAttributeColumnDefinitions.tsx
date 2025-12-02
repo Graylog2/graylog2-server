@@ -76,6 +76,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           header: AttributeHeader<Entity>,
           size: columnWidths[col.id],
           enableHiding: true,
+          enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
           meta: {
             label: col.title,
             columnRenderer: columnRenderersByAttribute[col.id],

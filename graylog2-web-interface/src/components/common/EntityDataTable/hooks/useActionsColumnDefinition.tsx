@@ -27,6 +27,7 @@ import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
 const ActionsHead = styled.div`
   text-align: right;
+  flex: 1;
 `;
 
 const Actions = styled(ButtonToolbar)`
@@ -54,15 +55,14 @@ const useActionsColumnDefinition = <Entity extends EntityBase>(
 
   return useMemo(
     () =>
-      displayActionsCol
-        ? columnHelper.display({
-            id: ACTIONS_COL_ID,
-            size: actionsColWidth,
-            header: ActionsHeader,
-            enableHiding: false,
-            cell,
-          })
-        : null,
+      columnHelper.display({
+        id: ACTIONS_COL_ID,
+        size: actionsColWidth,
+        header: displayActionsCol ? ActionsHeader : undefined,
+        enableHiding: false,
+        enableResizing: false,
+        cell: displayActionsCol ? cell : undefined,
+      }),
     [actionsColWidth, cell, columnHelper, displayActionsCol],
   );
 };
