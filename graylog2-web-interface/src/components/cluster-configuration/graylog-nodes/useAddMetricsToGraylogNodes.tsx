@@ -50,14 +50,8 @@ const useAddMetricsToGraylogNodes = <Node extends { node_id: string }>(
   nodes: ReadonlyArray<Node> | null | undefined,
 ): Array<Node & { metrics: GraylogNodeMetrics }> => {
   const { metrics } = useStore(MetricsStore);
-  const safeNodes = useMemo(
-    () => (nodes ?? []).filter((node): node is Node => Boolean(node?.node_id)),
-    [nodes],
-  );
-  const nodeIdentifiers = useMemo(
-    () => Array.from(new Set(safeNodes.map((node) => node.node_id))),
-    [safeNodes],
-  );
+  const safeNodes = useMemo(() => (nodes ?? []).filter((node): node is Node => Boolean(node?.node_id)), [nodes]);
+  const nodeIdentifiers = useMemo(() => Array.from(new Set(safeNodes.map((node) => node.node_id))), [safeNodes]);
 
   useEffect(() => {
     if (!nodeIdentifiers.length) {

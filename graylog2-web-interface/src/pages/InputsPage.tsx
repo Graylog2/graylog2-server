@@ -56,7 +56,7 @@ const InputsPage = () => {
             </p>
             <p>
               If you are missing an input type on this page&apos;s list of available inputs, you can start the input on
-                a <Link to='/system/forwarders'>Forwarder</Link>.
+              a <Link to="/system/forwarders">Forwarder</Link>.
             </p>
           </>
         ) : (

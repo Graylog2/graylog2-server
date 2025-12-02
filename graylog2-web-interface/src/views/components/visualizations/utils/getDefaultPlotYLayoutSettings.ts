@@ -19,7 +19,7 @@ import type { DefaultTheme } from 'styled-components';
 import getDefaultPlotFontSettings from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
 import { AXIS_LABEL_MARGIN } from 'views/components/visualizations/Constants';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
-import type {DefaultAxisKey, FieldUnitType} from 'views/types';
+import type { DefaultAxisKey, FieldUnitType } from 'views/types';
 const getDefaultPlotYLayoutSettings = (
   theme: DefaultTheme,
   unitTypeKey?: FieldUnitType | DefaultAxisKey,
