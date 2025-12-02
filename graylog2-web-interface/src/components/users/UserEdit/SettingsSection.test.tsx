@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import { List } from 'immutable';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';

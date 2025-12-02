@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { act } from 'wrappedTestingLibrary/hooks';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -343,7 +344,7 @@ describe('<Widget />', () => {
     expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
 
-  it('does not trigger action when clicking cancel after no changes were made', () => {
+  it('does not trigger action when clicking cancel after no changes were made', async () => {
     render(<DummyWidget editing />);
 
     const cancelBtn = screen.getByText('Cancel');
@@ -355,7 +356,7 @@ describe('<Widget />', () => {
     expect(setGlobalOverrideTimerange).not.toHaveBeenCalled();
   });
 
-  it('restores original state of widget config when clicking cancel after changes were made', () => {
+  it('restores original state of widget config when clicking cancel after changes were made', async () => {
     const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
     render(<DummyWidget editing widget={widgetWithConfig} />);
 
@@ -372,7 +373,7 @@ describe('<Widget />', () => {
     expect(updateWidget).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
 
-  it('restores original global override when clicking cancel after changes were made', () => {
+  it('restores original global override when clicking cancel after changes were made', async () => {
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(globalTimerange, globalSearch));
     const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
     const { rerender } = render(<DummyWidget editing widget={widgetWithConfig} />);

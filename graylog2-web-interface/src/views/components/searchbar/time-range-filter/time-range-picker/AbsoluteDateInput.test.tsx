@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import moment from 'moment';
+import userEvent from '@testing-library/user-event';
 
 import { DATE_TIME_FORMATS } from 'util/DateTime';
 
@@ -55,7 +56,7 @@ describe('AbsoluteDateInput', () => {
     expect(defaultProps.onChange).toHaveBeenCalled();
   });
 
-  it('pressing magic wand inserts current date', () => {
+  it('pressing magic wand inserts current date', async () => {
     const output = moment().format(DATE_TIME_FORMATS.complete);
     defaultProps.onChange.mockReturnValueOnce(output);
     const { getByTitle } = render(<AbsoluteDateInput {...defaultProps} />);

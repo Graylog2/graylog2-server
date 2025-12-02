@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 

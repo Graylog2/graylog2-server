@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { act, render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import QueryTitleEditModal from './QueryTitleEditModal';
 

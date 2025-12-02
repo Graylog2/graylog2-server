@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
+import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';

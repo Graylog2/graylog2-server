@@ -16,9 +16,10 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
@@ -163,7 +164,7 @@ describe('<WidgetActionsMenu />', () => {
     expect(mockSetWidgetFocusing).toHaveBeenCalledWith('widget-id');
   });
 
-  it('is updating widget focus context on un-focus', () => {
+  it('is updating widget focus context on un-focus', async () => {
     const mockUnsetWidgetFocusing = jest.fn();
     render(<DummyWidget title="Dummy Widget" isFocused unsetWidgetFocusing={mockUnsetWidgetFocusing} />);
 
@@ -388,11 +389,11 @@ describe('<WidgetActionsMenu />', () => {
 
         await openActionDropdown();
 
-        await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
-
         /* eslint-disable no-console */
         const oldConsoleTrace = console.trace;
         console.trace = jest.fn();
+
+        await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
         await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
 

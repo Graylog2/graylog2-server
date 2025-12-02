@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent } from 'wrappedTestingLibrary';
+import { render } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
+import userEvent from '@testing-library/user-event';
 
 import { adminUser, alice } from 'fixtures/users';
 import asMock from 'helpers/mocking/AsMock';
@@ -171,7 +172,7 @@ describe('SearchPagePreferencesProvider', () => {
     );
   });
 
-  it('should update user preferences on state change', () => {
+  it('should update user preferences on state change', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     const { getByText } = render(<ProviderWithToggleButton />);
 
@@ -190,7 +191,7 @@ describe('SearchPagePreferencesProvider', () => {
     );
   });
 
-  it('should update local storage on preference state change for system admin', () => {
+  it('should update local storage on preference state change for system admin', async () => {
     asMock(useCurrentUser).mockReturnValue(adminUser.toBuilder().readOnly(true).build());
 
     const { getByText } = render(<ProviderWithToggleButton />);

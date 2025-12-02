@@ -17,8 +17,9 @@
 
 // ThresholdFormItem.test.tsx
 import React from 'react';
-import { render, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
+import userEvent from '@testing-library/user-event';
 
 import GraylogThemeProvider from 'theme/GraylogThemeProvider';
 

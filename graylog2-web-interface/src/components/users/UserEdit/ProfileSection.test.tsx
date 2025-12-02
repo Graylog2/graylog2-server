@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { alice } from 'fixtures/users';
 

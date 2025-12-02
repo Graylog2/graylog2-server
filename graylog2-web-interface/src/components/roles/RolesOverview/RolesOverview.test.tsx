@@ -17,6 +17,7 @@
 import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import mockAction from 'helpers/mocking/MockAction';
 import { rolesList as mockRoles } from 'fixtures/roles';

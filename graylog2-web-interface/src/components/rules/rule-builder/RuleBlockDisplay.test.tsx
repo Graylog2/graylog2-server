@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import RuleBlockDisplay from './RuleBlockDisplay';
 import { actionsBlockDict, buildRuleBlock } from './fixtures';

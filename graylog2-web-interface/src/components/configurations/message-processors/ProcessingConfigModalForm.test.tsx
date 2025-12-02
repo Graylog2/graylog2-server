@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { screen, render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import ProcessingConfigModalForm from 'components/configurations/message-processors/ProcessingConfigModalForm';

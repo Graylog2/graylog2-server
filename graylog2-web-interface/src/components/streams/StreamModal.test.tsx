@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';

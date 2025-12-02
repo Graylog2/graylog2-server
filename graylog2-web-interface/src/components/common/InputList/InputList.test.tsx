@@ -90,7 +90,7 @@ describe('InputList Component', () => {
     expect(screen.queryByText(/dir4/i)).not.toBeInTheDocument();
   });
 
-  it('should remove a value when clicking the "X" on the value bubble', () => {
+  it('should remove a value when clicking the "X" on the value bubble', async () => {
     renderComponent(() => {}, ['dir3', 'dir4']);
     let removers = screen.getAllByText(/value\s*remover/i);
 

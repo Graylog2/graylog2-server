@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, within } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import Pagination from './Pagination';
 
@@ -44,7 +45,7 @@ describe('<Pagination />', () => {
     expect(screen.queryByTitle('Active page')).not.toBeInTheDocument();
   });
 
-  it('should return proper page to `onChange`', () => {
+  it('should return proper page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
@@ -56,7 +57,7 @@ describe('<Pagination />', () => {
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage + 1);
   });
 
-  it('should return previous page to `onChange`', () => {
+  it('should return previous page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
@@ -68,7 +69,7 @@ describe('<Pagination />', () => {
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage - 1);
   });
 
-  it('should return last page to `onChange`', () => {
+  it('should return last page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();
@@ -80,7 +81,7 @@ describe('<Pagination />', () => {
     expect(onChangeSpy).toHaveBeenLastCalledWith(totalPages);
   });
 
-  it('should return first page to `onChange`', () => {
+  it('should return first page to `onChange`', async () => {
     const currentPage = 2;
     const totalPages = 10;
     const onChangeSpy = jest.fn();

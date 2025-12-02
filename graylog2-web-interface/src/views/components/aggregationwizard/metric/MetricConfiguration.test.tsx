@@ -16,10 +16,11 @@
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
 import DefaultQueryClientProvider from 'DefaultQueryClientProvider';
 import { act } from 'wrappedTestingLibrary/hooks';
+import userEvent from '@testing-library/user-event';
 
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { SimpleFieldTypesContextProvider } from 'views/components/contexts/TestFieldTypesContextProvider';
@@ -82,7 +83,7 @@ describe('MetricConfiguration', () => {
     renderComponent(baseProps, { metrics: [baseProps.currentMetric], visualization: { type: 'bar' } });
 
     const checkbox = await screen.findByRole('checkbox', { name: /show line thresholds/i });
-    act(() => {
+    await act(async () => {
       await userEvent.click(checkbox);
     });
 

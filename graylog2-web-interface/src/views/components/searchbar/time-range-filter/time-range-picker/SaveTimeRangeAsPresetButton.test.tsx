@@ -17,6 +17,7 @@
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
+import userEvent from '@testing-library/user-event';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
 import { Formik } from 'formik';

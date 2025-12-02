@@ -18,6 +18,7 @@ import * as React from 'react';
 import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
 import { defaultUser } from 'defaultMockValues';
+import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import MockAction from 'helpers/mocking/MockAction';

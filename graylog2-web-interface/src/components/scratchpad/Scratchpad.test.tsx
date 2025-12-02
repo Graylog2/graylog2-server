@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
@@ -49,7 +50,7 @@ describe('<Scratchpad />', () => {
     await screen.findByRole('textbox');
   });
 
-  it('renders & dismisses alert', () => {
+  it('renders & dismisses alert', async () => {
     const { rerender } = render(<SUT />);
 
     const alert = screen.getByRole('alert');
@@ -66,7 +67,7 @@ describe('<Scratchpad />', () => {
     expect(alert).not.toBeInTheDocument();
   });
 
-  it('calls setScratchpadVisibility on close', () => {
+  it('calls setScratchpadVisibility on close', async () => {
     render(<SUT />);
 
     const btnClose = screen.getByRole('button', { name: /close/i });

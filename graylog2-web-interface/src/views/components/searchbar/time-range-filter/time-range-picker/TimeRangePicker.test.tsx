@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
 import userEvent from '@testing-library/user-event';
 import { defaultUser } from 'defaultMockValues';

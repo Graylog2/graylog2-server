@@ -18,6 +18,7 @@ import * as React from 'react';
 import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { Optional } from 'utility-types';
+import userEvent from '@testing-library/user-event';
 
 import type { ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -159,7 +160,7 @@ describe('BigDisplayModeConfiguration', () => {
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&refresh=10');
     });
 
-    it('including selected tabs', () => {
+    it('including selected tabs', async () => {
       const viewWithQueries = createViewWithQueries();
       const { getByLabelText, getByTestId } = render(<SUT view={viewWithQueries} show />);
 

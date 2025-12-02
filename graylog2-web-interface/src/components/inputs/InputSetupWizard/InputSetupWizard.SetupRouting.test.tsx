@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';

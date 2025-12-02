@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Location } from 'history';
+import userEvent from '@testing-library/user-event';
 
 import useLocation from 'routing/useLocation';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';

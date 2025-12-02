@@ -17,6 +17,7 @@
 import { Form, Formik } from 'formik';
 import * as React from 'react';
 import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import FormikInput from './FormikInput';
 

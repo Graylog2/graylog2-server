@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { render, screen, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';

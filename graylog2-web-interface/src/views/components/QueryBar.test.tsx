@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import OriginalQueryBar from 'views/components/QueryBar';

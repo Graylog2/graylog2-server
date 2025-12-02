@@ -16,6 +16,7 @@
  */
 import React from 'react';
 import { fireEvent, render } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 
@@ -42,7 +43,7 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
     expect(container).not.toBeNull();
   });
 
-  it('should add a header', () => {
+  it('should add a header', async () => {
     const updateConfig = jest.fn();
     const { getByTestId, getByText } = render(
       <HTTPJSONPathAdapterFieldSet

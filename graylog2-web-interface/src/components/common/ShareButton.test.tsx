@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { createGRN } from 'logic/permissions/GRN';
 import { asMock } from 'helpers/mocking';

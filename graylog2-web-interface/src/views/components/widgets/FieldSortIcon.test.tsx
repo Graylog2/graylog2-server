@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -53,7 +54,7 @@ describe('FieldSortIcon', () => {
     });
   });
 
-  it('should set ascending sort on click, if field sort is descending', () => {
+  it('should set ascending sort on click, if field sort is descending', async () => {
     const onSortChangeStub = jest.fn(() => Promise.resolve());
     const { getByTitle } = render(
       <FieldSortIcon
@@ -119,11 +120,8 @@ describe('FieldSortIcon', () => {
 
     await userEvent.click(sortIcon);
 
-    expect(setLoadingStateStub).toHaveBeenCalledTimes(1);
-    expect(setLoadingStateStub).toHaveBeenCalledWith(true);
+    expect(setLoadingStateStub).toHaveBeenNthCalledWith(1, true);
 
-    await waitFor(() => expect(setLoadingStateStub).toHaveBeenCalledWith(false));
-
-    expect(setLoadingStateStub).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(setLoadingStateStub).toHaveBeenNthCalledWith(2, false));
   });
 });

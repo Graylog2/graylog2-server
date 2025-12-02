@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';

@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 import { useLocation } from 'react-router-dom';
 import Immutable from 'immutable';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import WidgetFocusProvider from 'views/components/contexts/WidgetFocusProvider';

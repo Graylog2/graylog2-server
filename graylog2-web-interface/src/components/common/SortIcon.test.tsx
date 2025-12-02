@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import SortIcon from 'components/common/SortIcon';
 import Direction from 'views/logic/aggregationbuilder/Direction';

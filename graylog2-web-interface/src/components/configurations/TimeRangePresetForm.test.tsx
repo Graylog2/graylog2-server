@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
 import { fireEvent, render, screen, within, waitFor } from 'wrappedTestingLibrary';

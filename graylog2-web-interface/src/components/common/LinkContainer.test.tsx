@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, waitFor, screen } from 'wrappedTestingLibrary';
-import { fireEvent } from '@testing-library/react';
 import { Route, Routes } from 'react-router-dom';
+import userEvent from '@testing-library/user-event';
 
 import { Button } from 'components/bootstrap';
 

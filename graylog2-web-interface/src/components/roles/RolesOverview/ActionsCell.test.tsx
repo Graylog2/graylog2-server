@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { paginatedUsers } from 'fixtures/userOverviews';
 import { asMock } from 'helpers/mocking';

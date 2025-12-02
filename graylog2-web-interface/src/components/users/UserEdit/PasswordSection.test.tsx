@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';

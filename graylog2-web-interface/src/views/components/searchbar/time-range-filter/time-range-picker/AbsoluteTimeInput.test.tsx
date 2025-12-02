@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { fireEvent, render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import AbsoluteTimeInput from './AbsoluteTimeInput';
 
@@ -36,7 +37,7 @@ describe('AbsoluteTimeInput', () => {
     expect(screen).not.toBeNull();
   });
 
-  it('toggles bod & eod', () => {
+  it('toggles bod & eod', async () => {
     render(<AbsoluteTimeInput {...defaultProps} />);
 
     const toggleBtn = screen.getByRole('button', { name: /toggle between beginning and end of day/i });
