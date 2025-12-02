@@ -84,7 +84,7 @@ describe('IndexSetFieldTypesList', () => {
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
       });
-      fireEvent.click(submit);
+      await userEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
         fields: ['field'],
@@ -100,8 +100,8 @@ describe('IndexSetFieldTypesList', () => {
       const submit = await screen.findByRole('button', {
         name: /remove field type overrides/i,
       });
-      fireEvent.click(checkbox);
-      fireEvent.click(submit);
+      await userEvent.click(checkbox);
+      await userEvent.click(submit);
 
       expect(mockedRemoveCustomFieldTypeMutation).toHaveBeenCalledWith({
         fields: ['field'],

@@ -88,7 +88,7 @@ describe('EditWidgetFrame', () => {
       const searchButton = await screen.findByRole('button', { name: /perform search/i });
 
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
-      fireEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() => expect(executeActiveQuery).toHaveBeenCalledTimes(1));
     });
@@ -109,7 +109,7 @@ describe('EditWidgetFrame', () => {
       });
       await waitFor(() => expect(searchButton).not.toHaveClass('disabled'));
 
-      fireEvent.click(searchButton);
+      await userEvent.click(searchButton);
 
       await waitFor(() =>
         expect(updateWidget).toHaveBeenCalledWith(
@@ -125,7 +125,7 @@ describe('EditWidgetFrame', () => {
       const onSubmit = jest.fn(() => Promise.resolve());
       renderSUT({ onSubmit });
 
-      fireEvent.click(await screen.findByRole('button', { name: /update widget/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /update widget/i }));
 
       await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     });
@@ -134,7 +134,7 @@ describe('EditWidgetFrame', () => {
       const onCancel = jest.fn();
       renderSUT({ onCancel });
 
-      fireEvent.click(await screen.findByRole('button', { name: /cancel/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /cancel/i }));
 
       await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1));
     });

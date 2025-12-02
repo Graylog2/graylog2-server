@@ -52,7 +52,7 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
     render(<HTTPHeaderAuthConfigSection />);
 
     const submitButton = await screen.findByText('Update Config');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledTimes(1));
 
@@ -66,9 +66,9 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
     const enabledHeaderCheckbox = screen.getByLabelText('Enable single sign-on via HTTP header');
     const usernameHeaderInput = screen.getByLabelText('Username header');
 
-    fireEvent.click(enabledHeaderCheckbox);
+    await userEvent.click(enabledHeaderCheckbox);
     fireEvent.change(usernameHeaderInput, { target: { value: 'New-Header' } });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledTimes(1));
 

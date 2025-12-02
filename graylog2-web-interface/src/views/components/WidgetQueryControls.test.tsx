@@ -142,7 +142,7 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
-      fireEvent.click(resetTimeRangeOverrideButton);
+      await userEvent.click(resetTimeRangeOverrideButton);
 
       expect(setGlobalOverrideTimerange).toHaveBeenCalledWith(undefined);
     });
@@ -153,7 +153,7 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
-      fireEvent.click(resetQueryFilterButton);
+      await userEvent.click(resetQueryFilterButton);
 
       expect(setGlobalOverrideQuery).toHaveBeenCalledWith(undefined);
     });
@@ -164,7 +164,7 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetTimeRangeOverrideButton = await screen.findByRole('button', { name: resetTimeRangeButtonTitle });
-      fireEvent.click(resetTimeRangeOverrideButton);
+      await userEvent.click(resetTimeRangeOverrideButton);
       await waitFor(() => expect(executeActiveQuery).toHaveBeenCalled());
     });
 
@@ -174,7 +174,7 @@ describe('WidgetQueryControls', () => {
       renderSUT();
 
       const resetQueryFilterButton = await screen.findByRole('button', { name: resetQueryButtonTitle });
-      fireEvent.click(resetQueryFilterButton);
+      await userEvent.click(resetQueryFilterButton);
       await waitFor(() => expect(executeActiveQuery).toHaveBeenCalled());
     });
 

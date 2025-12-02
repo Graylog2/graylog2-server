@@ -249,7 +249,7 @@ describe('InputsActions', () => {
 
     expect(screen.getByText(/Editing Input Input 3/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Update input'));
+    await userEvent.click(screen.getByText('Update input'));
     expect(updateInputMock).toHaveBeenCalledWith({
       input: expect.objectContaining({ title: 'Input 3' }),
       inputId: 'input3',
@@ -317,7 +317,7 @@ describe('InputsActions', () => {
 
     expect(screen.getByText('Do you really want to delete input Input 3?')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     expect(deleteInputMock).toHaveBeenCalledWith({ inputId: 'input3' });
   });

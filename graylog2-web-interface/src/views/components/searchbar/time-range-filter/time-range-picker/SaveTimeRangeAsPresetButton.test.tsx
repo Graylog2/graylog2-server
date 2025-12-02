@@ -87,7 +87,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     await screen.findByRole('heading', {
       name: /save as preset/i,
@@ -106,7 +106,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     await waitFor(() => {
       expect(screen.queryByText('You already have similar time range in')).not.toBeInTheDocument();
@@ -125,7 +125,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     await screen.findByText('You already have similar time range in');
   });
@@ -142,7 +142,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     const descriptionInput = await screen.findByLabelText('Time range description');
     descriptionInput.focus();
@@ -153,7 +153,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
       name: /save preset/i,
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(mockUpdate).toHaveBeenCalledWith('org.graylog2.indexer.searches.SearchesClusterConfig', {
@@ -185,7 +185,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
       />,
     );
 
-    fireEvent.click(await findOpenButton());
+    await userEvent.click(await findOpenButton());
 
     const descriptionInput = await screen.findByRole('textbox', {
       name: /time range description/i,
@@ -198,7 +198,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
       name: /save preset/i,
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitButton).toHaveAttribute('disabled'));
   });

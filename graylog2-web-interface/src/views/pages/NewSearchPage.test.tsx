@@ -139,7 +139,7 @@ describe('NewSearchPage', () => {
 
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewLoadButton = await findByText('Load view');
-      fireEvent.click(viewLoadButton);
+      await userEvent.click(viewLoadButton);
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
@@ -163,7 +163,7 @@ describe('NewSearchPage', () => {
     it('should be supported', async () => {
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await findByText('Load new view');
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(loadNewView).toHaveBeenCalled());
     });
@@ -171,7 +171,7 @@ describe('NewSearchPage', () => {
     it('should process hooks with query', async () => {
       const { findByText } = render(<SimpleNewSearchPage />);
       const viewCreateButton = await findByText('Load new view');
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 

@@ -41,7 +41,7 @@ describe('FieldSortIcon', () => {
 
     const sortIcon = getByTitle('Sort source Descending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
     const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
 
@@ -66,7 +66,7 @@ describe('FieldSortIcon', () => {
 
     const sortIcon = getByTitle('Sort timestamp Ascending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
     const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'timestamp', Direction.Ascending)];
 
@@ -91,7 +91,7 @@ describe('FieldSortIcon', () => {
 
     const sortIcon = getByTitle('Sort source Descending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
     const expectedSort = [new SortConfig(SortConfig.PIVOT_TYPE, 'source', Direction.Descending)];
 
@@ -117,7 +117,7 @@ describe('FieldSortIcon', () => {
 
     const sortIcon = getByTitle('Sort source Descending');
 
-    fireEvent.click(sortIcon);
+    await userEvent.click(sortIcon);
 
     expect(setLoadingStateStub).toHaveBeenCalledTimes(1);
     expect(setLoadingStateStub).toHaveBeenCalledWith(true);

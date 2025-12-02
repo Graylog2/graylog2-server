@@ -57,7 +57,7 @@ describe('<UndoNavItem />', () => {
   it('Call Undo action on call', async () => {
     render(<RedoNavItemComponent />);
     const undoButton = await screen.findByLabelText('Undo');
-    fireEvent.click(undoButton);
+    await userEvent.click(undoButton);
 
     await waitFor(() => expect(undo).toHaveBeenCalled());
   });

@@ -111,7 +111,7 @@ describe('SidecarFailureTrackingList', () => {
 
     const hideActiveButton = screen.getByRole('button', { name: 'Hide inactive sidecars' });
 
-    fireEvent.click(hideActiveButton);
+    await userEvent.click(hideActiveButton);
     await waitFor(() => expect(toggleShowInactive).toHaveBeenCalled());
   });
 
@@ -123,10 +123,10 @@ describe('SidecarFailureTrackingList', () => {
     const sortByNameButton = screen.getByTitle('node_name');
     const sortByLastSeenButton = screen.getByTitle('last_seen');
 
-    fireEvent.click(sortByNameButton);
+    await userEvent.click(sortByNameButton);
     await waitFor(() => expect(handleSortChange).toHaveBeenCalledWith('node_name'));
 
-    fireEvent.click(sortByLastSeenButton);
+    await userEvent.click(sortByLastSeenButton);
 
     await waitFor(() => expect(handleSortChange).toHaveBeenCalledWith('last_seen'));
   });

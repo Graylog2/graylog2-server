@@ -214,8 +214,8 @@ describe('ChangeFieldTypeModal', () => {
     const submit = await screen.findByTitle(/change field type/i);
 
     const rowCheckboxes = await screen.findAllByTitle(/deselect entity/i);
-    fireEvent.click(rowCheckboxes[1]);
-    fireEvent.click(submit);
+    await userEvent.click(rowCheckboxes[1]);
+    await userEvent.click(submit);
 
     await waitFor(() =>
       expect(putFieldTypeMutationMock).toHaveBeenCalledWith({
@@ -234,7 +234,7 @@ describe('ChangeFieldTypeModal', () => {
 
     const submit = await screen.findByTitle(/change field type/i);
 
-    fireEvent.click(submit);
+    await userEvent.click(submit);
 
     await waitFor(() =>
       expect(putFieldTypeMutationMock).toHaveBeenCalledWith({

@@ -56,7 +56,7 @@ describe('<ContentPackPreview />', () => {
     const onSave = jest.fn();
     render(<ContentPackPreview contentPack={contentPack} onSave={onSave} />);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Create' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Create' }));
 
     await waitFor(() => {
       expect(onSave).toHaveBeenCalled();

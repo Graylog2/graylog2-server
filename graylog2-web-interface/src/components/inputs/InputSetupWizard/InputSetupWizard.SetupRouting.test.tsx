@@ -225,7 +225,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await screen.findByLabelText(/Default Stream/i);
       });
@@ -243,7 +243,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.assertOptionExists('Default Stream', 'Aloho');
 
@@ -266,7 +266,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.assertOptionExists('Default Stream', 'Mora');
 
@@ -289,7 +289,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.chooseOption('Default Stream', 'Aloho');
       });
@@ -315,7 +315,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.chooseOption('Default Stream', 'Aloho');
 
@@ -350,7 +350,7 @@ describe('InputSetupWizard Setup Routing', () => {
         name: /Create Stream/i,
       });
 
-      fireEvent.click(createStreamButton);
+      await userEvent.click(createStreamButton);
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
@@ -361,8 +361,8 @@ describe('InputSetupWizard Setup Routing', () => {
 
       await selectEvent.chooseOption('Select an index set', 'Nox');
 
-      fireEvent.click(removeMatchesCheckbox);
-      fireEvent.click(newPipelineCheckbox);
+      await userEvent.click(removeMatchesCheckbox);
+      await userEvent.click(newPipelineCheckbox);
 
       expect(submitButton).toBeDisabled();
 
@@ -378,7 +378,7 @@ describe('InputSetupWizard Setup Routing', () => {
         name: /Create Stream/i,
       });
 
-      fireEvent.click(createStreamButton);
+      await userEvent.click(createStreamButton);
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
@@ -399,7 +399,7 @@ describe('InputSetupWizard Setup Routing', () => {
         name: /Create Stream/i,
       });
 
-      fireEvent.click(createStreamButton);
+      await userEvent.click(createStreamButton);
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 

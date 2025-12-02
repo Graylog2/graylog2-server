@@ -38,7 +38,7 @@ describe('FavoriteIcon', () => {
     render(<FavoriteIcon isFavorite grn={grn} onChange={onChange} />);
 
     const favIcon = await screen.findByTitle('Remove from favorites');
-    fireEvent.click(favIcon);
+    await userEvent.click(favIcon);
 
     await expect(deleteItem).toHaveBeenCalledWith(grn);
     await expect(onChange).toHaveBeenCalledWith(false);
@@ -48,7 +48,7 @@ describe('FavoriteIcon', () => {
     render(<FavoriteIcon isFavorite={false} grn={grn} onChange={onChange} />);
 
     const favIcon = await screen.findByTitle('Add to favorites');
-    fireEvent.click(favIcon);
+    await userEvent.click(favIcon);
 
     await expect(putItem).toHaveBeenCalledWith(grn);
     await expect(onChange).toHaveBeenCalledWith(true);

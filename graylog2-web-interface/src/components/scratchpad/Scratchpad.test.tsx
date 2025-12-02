@@ -59,7 +59,7 @@ describe('<Scratchpad />', () => {
 
     expect(alert).toBeInTheDocument();
 
-    fireEvent.click(btnGotIt);
+    await userEvent.click(btnGotIt);
 
     rerender(<SUT />);
 
@@ -71,7 +71,7 @@ describe('<Scratchpad />', () => {
 
     const btnClose = screen.getByRole('button', { name: /close/i });
 
-    fireEvent.click(btnClose);
+    await userEvent.click(btnClose);
 
     expect(setScratchpadVisibility).toHaveBeenCalledWith(false);
   });
@@ -96,7 +96,7 @@ describe('<Scratchpad />', () => {
 
     const btnCopy = screen.getByRole('button', { name: /copy/i });
 
-    fireEvent.click(btnCopy);
+    await userEvent.click(btnCopy);
 
     await screen.findByText(/copied!/i);
 
@@ -112,11 +112,11 @@ describe('<Scratchpad />', () => {
 
     const btnClear = screen.getByRole('button', { name: /clear/i });
 
-    fireEvent.click(btnClear);
+    await userEvent.click(btnClear);
 
     const confirmBtn = await screen.findByRole('button', { name: /confirm/i });
 
-    fireEvent.click(confirmBtn);
+    await userEvent.click(confirmBtn);
 
     await screen.findByText(/cleared\./i);
 

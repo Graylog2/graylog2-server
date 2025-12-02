@@ -51,7 +51,7 @@ describe('ElementConfigurationSection', () => {
 
     const addButton = screen.getByTitle('Add a Aggregation Element Title');
 
-    fireEvent.click(addButton);
+    await userEvent.click(addButton);
 
     expect(onCreateMock).toHaveBeenCalledTimes(1);
   });

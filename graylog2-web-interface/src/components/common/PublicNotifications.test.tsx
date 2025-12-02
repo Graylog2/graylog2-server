@@ -124,7 +124,7 @@ describe('PublicNotifications', () => {
       name: /close alert/i,
     });
 
-    fireEvent.click(dismissBtn);
+    await userEvent.click(dismissBtn);
 
     expect(onDismissPublicNotification).toHaveBeenCalledWith(dismissedId);
   });

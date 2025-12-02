@@ -92,7 +92,7 @@ describe('EntityCreateShareFormGroup', () => {
       name: /add collaborator/i,
     });
 
-    fireEvent.click(addCollaborator);
+    await userEvent.click(addCollaborator);
 
     await waitFor(() => {
       expect(EntityShareActions.prepare).toHaveBeenCalledWith('stream', '', null, {

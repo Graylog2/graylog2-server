@@ -146,7 +146,7 @@ describe('StreamModal', () => {
       name: /add collaborator/i,
     });
 
-    fireEvent.click(addCollaborator);
+    await userEvent.click(addCollaborator);
 
     await screen.findByText(/everyone/i);
 

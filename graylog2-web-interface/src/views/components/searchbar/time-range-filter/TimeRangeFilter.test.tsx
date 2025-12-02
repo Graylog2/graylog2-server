@@ -56,7 +56,7 @@ describe('TimeRangeFilter', () => {
       name: /open time range selector/i,
     });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText(/Search Time Range/);
   });
@@ -74,7 +74,7 @@ describe('TimeRangeFilter', () => {
   it('opens date picker dropdown when clicking summary', async () => {
     render(<SUTTimeRangeFilter />);
 
-    fireEvent.click(await screen.findByText(/5 minutes ago/));
+    await userEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByText(/Search Time Range/);
   });
@@ -83,7 +83,7 @@ describe('TimeRangeFilter', () => {
     const onChange = jest.fn();
     render(<SUTTimeRangeFilter value={defaultTimeRange} onChange={onChange} />);
 
-    fireEvent.click(await screen.findByText(/5 minutes ago/));
+    await userEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByText(/Search Time Range/);
 
@@ -94,7 +94,7 @@ describe('TimeRangeFilter', () => {
 
     const submitButton = await screen.findByRole('button', { name: 'Update time range' });
     await waitFor(() => expect(submitButton).toBeEnabled());
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith({
@@ -113,7 +113,7 @@ describe('TimeRangeFilter', () => {
   it('shows all tabs if no `validTypes` prop is passed', async () => {
     render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} />);
 
-    fireEvent.click(await screen.findByText(/5 minutes ago/));
+    await userEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByRole('tab', { name: 'Absolute' });
     await screen.findByRole('tab', { name: 'Keyword' });
@@ -123,7 +123,7 @@ describe('TimeRangeFilter', () => {
   it('shows only valid tabs if `validTypes` prop is passed', async () => {
     render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
 
-    fireEvent.click(await screen.findByText(/5 minutes ago/));
+    await userEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByRole('tab', { name: 'Relative' });
 
@@ -136,7 +136,7 @@ describe('TimeRangeFilter', () => {
 
     const dropdown = await screen.findByRole('button', { name: /open time range preset select/i });
 
-    fireEvent.click(dropdown);
+    await userEvent.click(dropdown);
 
     await screen.findByRole('heading', { name: 'Select time range' });
   });
@@ -159,7 +159,7 @@ describe('TimeRangeFilter', () => {
   it('has no button for non admin users to save current time range as preset', async () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     render(<SUTTimeRangeFilter onChange={() => {}} value={defaultTimeRange} validTypes={['relative']} />);
-    fireEvent.click(await screen.findByText(/5 minutes ago/));
+    await userEvent.click(await screen.findByText(/5 minutes ago/));
 
     await screen.findByText(/search time range/i);
 

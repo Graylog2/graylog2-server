@@ -90,7 +90,7 @@ describe('EntityShareModal', () => {
   it('updates entity share state on submit', async () => {
     render(<SimpleEntityShareModal />);
 
-    fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
+    await userEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
     await waitFor(() => expect(EntityShareActions.update).toHaveBeenCalledTimes(1));
 
@@ -107,7 +107,7 @@ describe('EntityShareModal', () => {
       name: /cancel/i,
     });
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -169,7 +169,7 @@ describe('EntityShareModal', () => {
           name: /add collaborator/i,
         });
 
-        fireEvent.click(submitButton);
+        await userEvent.click(submitButton);
 
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(
@@ -199,7 +199,7 @@ describe('EntityShareModal', () => {
 
       await selectEvent.chooseOption('Search for users and teams', john.title);
 
-      fireEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
+      await userEvent.click(await screen.findByRole('button', { name: /update sharing/i }));
 
       await waitFor(() => {
         expect(window.confirm).toHaveBeenCalledWith(
@@ -270,7 +270,7 @@ describe('EntityShareModal', () => {
 
         const deleteButton = await screen.findByTitle(`Remove sharing for ${grantee.title}`);
 
-        fireEvent.click(deleteButton);
+        await userEvent.click(deleteButton);
 
         await waitFor(() => {
           expect(EntityShareActions.prepare).toHaveBeenCalledWith(

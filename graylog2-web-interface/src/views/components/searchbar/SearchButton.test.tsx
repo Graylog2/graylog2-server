@@ -39,7 +39,7 @@ describe('SearchButton', () => {
       name: /perform search \(changes were made after last search execution\)/i,
     });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onFormSubmit).toHaveBeenCalledTimes(1);
   });
@@ -49,7 +49,7 @@ describe('SearchButton', () => {
 
     const button = screen.getByRole('button', { name: /perform search/i });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onFormSubmit).toHaveBeenCalledTimes(1);
   });

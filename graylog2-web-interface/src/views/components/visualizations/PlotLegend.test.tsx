@@ -91,11 +91,11 @@ describe('PlotLegend', () => {
   it('should set a color when clicking on the color hint', async () => {
     render(<SUT />);
     const colorHints = await screen.findAllByLabelText('Color Hint');
-    fireEvent.click(colorHints[0]);
+    await userEvent.click(colorHints[0]);
 
     await screen.findByRole('heading', { name: /Configuration for name1/i });
     const color = screen.getByTitle('#b71c1c');
-    fireEvent.click(color);
+    await userEvent.click(color);
 
     await waitFor(() => expect(setColor).toHaveBeenCalledWith('name1', '#b71c1c'));
   });
@@ -104,7 +104,7 @@ describe('PlotLegend', () => {
     render(<SUT />);
 
     const value = await screen.findByText('name1');
-    fireEvent.click(value);
+    await userEvent.click(value);
 
     await screen.findByText('Actions');
   });
@@ -129,7 +129,7 @@ describe('PlotLegend', () => {
     render(<SUT chartDataProp={[{ name: `name1${keySeparator}count` }]} />);
 
     const value = await screen.findByText('count');
-    fireEvent.click(value);
+    await userEvent.click(value);
 
     expect(screen.queryByText('Actions')).not.toBeInTheDocument();
   });

@@ -79,7 +79,7 @@ describe('ActionsCell', () => {
       render(<SUT readOnly={false} roleId={customRoleId} roleName={customRoleName} />);
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
-      fireEvent.click(deleteButton);
+      await userEvent.click(deleteButton);
 
       await waitFor(() =>
         expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete role "${customRoleName}"?`),
@@ -103,7 +103,7 @@ describe('ActionsCell', () => {
       render(<SUT readOnly={false} roleId={customRoleId} roleName={customRoleName} />);
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
-      fireEvent.click(deleteButton);
+      await userEvent.click(deleteButton);
 
       await waitFor(() => expect(window.confirm).toHaveBeenCalledWith(confirmMessage));
 

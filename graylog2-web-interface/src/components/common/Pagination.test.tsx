@@ -51,7 +51,7 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open next page'));
+    await userEvent.click(screen.getByLabelText('Open next page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage + 1);
   });
@@ -63,7 +63,7 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open previous page'));
+    await userEvent.click(screen.getByLabelText('Open previous page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(currentPage - 1);
   });
@@ -75,7 +75,7 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open last page'));
+    await userEvent.click(screen.getByLabelText('Open last page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(totalPages);
   });
@@ -87,7 +87,7 @@ describe('<Pagination />', () => {
 
     render(<Pagination currentPage={currentPage} totalPages={totalPages} onChange={onChangeSpy} />);
 
-    fireEvent.click(screen.getByLabelText('Open first page'));
+    await userEvent.click(screen.getByLabelText('Open first page'));
 
     expect(onChangeSpy).toHaveBeenLastCalledWith(1);
   });

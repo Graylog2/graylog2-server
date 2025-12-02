@@ -83,7 +83,7 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT());
 
     const button = screen.getAllByRole('button', { name: /Share/ })[0];
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('EntityShareModal content');
   });
@@ -94,7 +94,7 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT());
 
     const button = screen.getAllByRole('button', { name: /Share/ })[0];
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('EntityShareModal content');
   });

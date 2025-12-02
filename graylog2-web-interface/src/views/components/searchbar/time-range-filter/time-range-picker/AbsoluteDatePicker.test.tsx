@@ -44,7 +44,7 @@ describe('AbsoluteDatePicker', () => {
 
     const input = getByLabelText('Mon Apr 20 2020');
 
-    fireEvent.click(input);
+    await userEvent.click(input);
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('2020-04-20 13:22:46');
   });

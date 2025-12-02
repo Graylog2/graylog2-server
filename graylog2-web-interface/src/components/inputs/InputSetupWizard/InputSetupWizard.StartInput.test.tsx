@@ -179,13 +179,13 @@ const newPipelineConfig = {
 const goToStartInputStep = async () => {
   const nextButton = await screen.findByRole('button', { name: /Next/i });
 
-  fireEvent.click(nextButton);
+  await userEvent.click(nextButton);
 };
 
 const startInput = async () => {
   const startInputButton = await screen.findByRole('button', { name: /Start Input/i });
 
-  fireEvent.click(startInputButton);
+  await userEvent.click(startInputButton);
 };
 
 const createStream = async (newPipeline = false, removeFromDefault = true) => {
@@ -193,7 +193,7 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
     name: /Create Stream/i,
   });
 
-  fireEvent.click(createStreamButton);
+  await userEvent.click(createStreamButton);
 
   await screen.findByRole('heading', { name: /Create new stream/i });
 
@@ -221,15 +221,15 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
   fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
 
   if (!removeFromDefault) {
-    fireEvent.click(removeFromDefaultCheckbox);
+    await userEvent.click(removeFromDefaultCheckbox);
   }
 
   if (!newPipeline) {
-    fireEvent.click(newPipelineCheckbox);
+    await userEvent.click(newPipelineCheckbox);
   }
 
   await waitFor(() => expect(submitButton).toBeEnabled());
-  fireEvent.click(submitButton);
+  await userEvent.click(submitButton);
 };
 
 describe('InputSetupWizard Start Input', () => {
@@ -267,7 +267,7 @@ describe('InputSetupWizard Start Input', () => {
         name: /Select Stream/i,
       });
 
-      fireEvent.click(selectStreamButton);
+      await userEvent.click(selectStreamButton);
 
       await selectEvent.chooseOption('Default Stream', 'One Stream');
 
@@ -296,7 +296,7 @@ describe('InputSetupWizard Start Input', () => {
         name: /Select Stream/i,
       });
 
-      fireEvent.click(selectStreamButton);
+      await userEvent.click(selectStreamButton);
 
       await selectEvent.chooseOption('Default Stream', 'One Stream');
 
@@ -304,7 +304,7 @@ describe('InputSetupWizard Start Input', () => {
         name: /remove matches from ‘default stream’/i,
       });
 
-      fireEvent.click(removeFromDefaultCheckbox);
+      await userEvent.click(removeFromDefaultCheckbox);
       goToStartInputStep();
       startInput();
 

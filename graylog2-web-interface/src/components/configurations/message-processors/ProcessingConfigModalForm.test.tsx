@@ -111,7 +111,7 @@ describe('MessageProcessorsConfig', () => {
       target: { value: 'P1D' },
     });
 
-    fireEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /update configuration/i,
       }),
@@ -140,10 +140,10 @@ describe('MessageProcessorsConfig', () => {
       name: /future timestamp normalization/i,
     });
 
-    fireEvent.click(enableTimestampNormalization);
+    await userEvent.click(enableTimestampNormalization);
     fireEvent.blur(enableTimestampNormalization);
 
-    fireEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /update configuration/i,
       }),

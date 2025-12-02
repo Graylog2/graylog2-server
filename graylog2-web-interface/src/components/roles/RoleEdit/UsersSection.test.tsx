@@ -71,7 +71,7 @@ describe('UsersSection', () => {
     const assignUserButton = await screen.findByRole('button', { name: 'Assign User' });
     await selectEvent.chooseOption('Search for users', bob.username);
 
-    fireEvent.click(assignUserButton);
+    await userEvent.click(assignUserButton);
 
     await waitFor(() => expect(AuthzRolesActions.addMembers).toHaveBeenCalledTimes(1));
 
@@ -97,7 +97,7 @@ describe('UsersSection', () => {
     render(<UsersSection role={exampleRole} />);
 
     const assignUserButton = await screen.findByRole('button', { name: `Remove ${alice.username}` });
-    fireEvent.click(assignUserButton);
+    await userEvent.click(assignUserButton);
 
     await waitFor(() => expect(AuthzRolesActions.removeMember).toHaveBeenCalledWith(exampleRole.id, alice.username));
   });

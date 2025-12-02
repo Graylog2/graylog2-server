@@ -52,7 +52,7 @@ describe('<ShareButton />', () => {
     render(<SimpleShareButton onClick={onClickStub} />);
 
     const button = screen.getByRole('button', { name: /Share/ });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onClickStub).toHaveBeenCalledTimes(1);
   });
@@ -63,7 +63,7 @@ describe('<ShareButton />', () => {
     render(<SimpleShareButton onClick={onClickStub} />);
 
     const button = screen.getByRole('button', { name: /Share/ });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onClickStub).not.toHaveBeenCalled();
   });
@@ -79,7 +79,7 @@ describe('<ShareButton />', () => {
     render(<SimpleShareButton onClick={onClickStub} disabledInfo="Only saved entities can be shared" />);
 
     const button = screen.getByRole('button', { name: /Share/ });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(onClickStub).not.toHaveBeenCalled();
   });

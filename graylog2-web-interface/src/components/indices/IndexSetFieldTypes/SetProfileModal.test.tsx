@@ -71,7 +71,7 @@ describe('IndexSetFieldTypesList', () => {
     renderModal();
     await selectEvent.chooseOption('Select index set profile', 'Profile-2');
     const submit = await screen.findByRole('button', { name: /Set Profile/i });
-    fireEvent.click(submit);
+    await userEvent.click(submit);
 
     expect(setIndexSetFieldTypeProfileMock).toHaveBeenCalledWith({
       profileId: 'profile-id-222',
@@ -87,8 +87,8 @@ describe('IndexSetFieldTypesList', () => {
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,
     });
-    fireEvent.click(checkBox);
-    fireEvent.click(submit);
+    await userEvent.click(checkBox);
+    await userEvent.click(submit);
 
     expect(setIndexSetFieldTypeProfileMock).toHaveBeenCalledWith({
       profileId: 'profile-id-222',
@@ -103,8 +103,8 @@ describe('IndexSetFieldTypesList', () => {
     const checkBox = await screen.findByRole('checkbox', {
       name: /rotate affected indices after change/i,
     });
-    fireEvent.click(checkBox);
-    fireEvent.click(removeButton);
+    await userEvent.click(checkBox);
+    await userEvent.click(removeButton);
 
     expect(removeProfileFromIndexMock).toHaveBeenCalledWith({
       indexSetId: '111',
@@ -115,7 +115,7 @@ describe('IndexSetFieldTypesList', () => {
   it('run removeProfileFromIndex on submit with rotation', async () => {
     renderModal();
     const removeButton = await screen.findByRole('button', { name: /Remove profile/i });
-    fireEvent.click(removeButton);
+    await userEvent.click(removeButton);
 
     expect(removeProfileFromIndexMock).toHaveBeenCalledWith({
       indexSetId: '111',

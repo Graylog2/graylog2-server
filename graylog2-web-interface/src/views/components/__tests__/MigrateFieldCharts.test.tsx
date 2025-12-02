@@ -89,7 +89,7 @@ const renderAndMigrate = async () => {
   render(<MigrateFieldCharts />);
   const migrateButton = await screen.findByText('Migrate');
 
-  fireEvent.click(migrateButton);
+  await userEvent.click(migrateButton);
 
   await waitForElementToBeRemoved(migrateButton);
 };

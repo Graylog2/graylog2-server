@@ -107,7 +107,7 @@ describe('RolesOverview', () => {
     );
 
     const resetSearchButton = await screen.findByRole('button', { name: 'Reset search' });
-    fireEvent.click(resetSearchButton);
+    await userEvent.click(resetSearchButton);
 
     await waitFor(() =>
       expect(AuthzRolesActions.loadRolesPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: '' }),

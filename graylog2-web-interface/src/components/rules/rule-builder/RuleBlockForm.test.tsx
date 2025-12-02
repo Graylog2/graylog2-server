@@ -85,7 +85,7 @@ describe('RuleBlockForm', () => {
     const fieldInput = screen.getByLabelText('field');
     fireEvent.change(fieldInput, { target: { value: 'bar' } });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(mockAdd).toHaveBeenCalledWith({ field: 'bar', message: undefined }));
   });
@@ -99,7 +99,7 @@ describe('RuleBlockForm', () => {
 
     const requiredField = screen.getByLabelText('field');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockAdd).not.toHaveBeenCalled();
 
@@ -124,7 +124,7 @@ describe('RuleBlockForm', () => {
 
     const helpIcon = screen.getByTestId('funcSyntaxHelpIcon');
 
-    fireEvent.click(helpIcon);
+    await userEvent.click(helpIcon);
 
     await screen.findByText('Function Syntax Help');
   });
@@ -137,7 +137,7 @@ describe('RuleBlockForm', () => {
     const fieldInput = screen.getByLabelText('field');
     fireEvent.change(fieldInput, { target: { value: 'bar' } });
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     await waitFor(() => expect(mockCancel).toHaveBeenCalled());
 
@@ -154,7 +154,7 @@ describe('RuleBlockForm', () => {
     const fieldInput = screen.getByLabelText('value');
     fireEvent.change(fieldInput, { target: { value: 'Lumos' } });
 
-    fireEvent.click(updateButton);
+    await userEvent.click(updateButton);
 
     await waitFor(() =>
       expect(mockUpdate).toHaveBeenCalledWith({ indexEnd: 2, start: 1, value: 'Lumos' }, 'substring'),

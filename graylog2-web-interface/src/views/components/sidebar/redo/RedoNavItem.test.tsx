@@ -57,7 +57,7 @@ describe('<RedoNavItem />', () => {
   it('Call redo action on call', async () => {
     render(<RedoNavItemComponent />);
     const redoButton = await screen.findByLabelText('Redo');
-    fireEvent.click(redoButton);
+    await userEvent.click(redoButton);
 
     await waitFor(() => expect(redo).toHaveBeenCalled());
   });

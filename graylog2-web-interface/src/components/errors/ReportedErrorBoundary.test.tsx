@@ -130,7 +130,7 @@ describe('ReportedErrorBoundary', () => {
     await screen.findByText('Missing Permissions');
 
     const link = await screen.findByRole('link', { name: 'Go back' });
-    fireEvent.click(link);
+    await userEvent.click(link);
 
     await screen.findByText('Hello World!');
   });

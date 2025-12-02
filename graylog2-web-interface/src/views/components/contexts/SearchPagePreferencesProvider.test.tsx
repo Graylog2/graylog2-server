@@ -175,7 +175,7 @@ describe('SearchPagePreferencesProvider', () => {
     asMock(useCurrentUser).mockReturnValue(alice);
     const { getByText } = render(<ProviderWithToggleButton />);
 
-    fireEvent.click(getByText('Toggle sidebar pinning'));
+    await userEvent.click(getByText('Toggle sidebar pinning'));
 
     expect(PreferencesActions.saveUserPreferences).toHaveBeenCalledTimes(1);
 
@@ -195,7 +195,7 @@ describe('SearchPagePreferencesProvider', () => {
 
     const { getByText } = render(<ProviderWithToggleButton />);
 
-    fireEvent.click(getByText('Toggle sidebar pinning'));
+    await userEvent.click(getByText('Toggle sidebar pinning'));
 
     expect(Store.set).toHaveBeenCalledTimes(1);
 

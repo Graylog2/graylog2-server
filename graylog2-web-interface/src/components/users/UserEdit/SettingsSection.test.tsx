@@ -49,7 +49,7 @@ describe('<SettingsSection />', () => {
 
     const submitButton = screen.getByText('Update Settings');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
@@ -75,7 +75,7 @@ describe('<SettingsSection />', () => {
 
     await selectEvent.chooseOption('Timeout unit', 'Days');
     await selectEvent.chooseOption('Time Zone', 'Vancouver');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 

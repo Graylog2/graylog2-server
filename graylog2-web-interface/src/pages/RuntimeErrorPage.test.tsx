@@ -43,7 +43,7 @@ describe('RuntimeErrorPage', () => {
 
     const showMoreButton = getByText('Show more');
 
-    fireEvent.click(showMoreButton);
+    await userEvent.click(showMoreButton);
 
     await findByText(/The component stack/);
   });

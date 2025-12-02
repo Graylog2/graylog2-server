@@ -28,7 +28,7 @@ describe('TimeRangeDisplay', () => {
       name: 'Search Time Range, Opens Time Range Selector On Click',
     });
 
-    fireEvent.click(timeRangeDisplay);
+    await userEvent.click(timeRangeDisplay);
 
     expect(toggleShow).toHaveBeenCalled();
   });

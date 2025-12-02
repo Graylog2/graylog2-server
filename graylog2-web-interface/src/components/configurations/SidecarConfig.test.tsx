@@ -58,15 +58,15 @@ describe('SidecarConfig', () => {
 
     const editButton = await screen.findByRole('button', { name: /edit configuration/i });
 
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
 
-    fireEvent.click(
+    await userEvent.click(
       await screen.findByRole('checkbox', {
         name: /override sidecar configuration/i,
       }),
     );
 
-    fireEvent.click(
+    await userEvent.click(
       await screen.findByRole('button', {
         name: /update configuration/i,
       }),

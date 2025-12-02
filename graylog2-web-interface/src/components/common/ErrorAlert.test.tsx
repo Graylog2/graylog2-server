@@ -48,7 +48,7 @@ describe('ErrorAlert', () => {
 
     const closeBtn = await screen.findByRole('button');
 
-    fireEvent.click(closeBtn);
+    await userEvent.click(closeBtn);
 
     expect(onClose).toHaveBeenCalled();
   });

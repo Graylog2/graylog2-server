@@ -143,7 +143,7 @@ describe('StreamSearchPage', () => {
 
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewLoadButton = await findByText('Load view');
-      fireEvent.click(viewLoadButton);
+      await userEvent.click(viewLoadButton);
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
@@ -168,7 +168,7 @@ describe('StreamSearchPage', () => {
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(loadNewViewForStream).toHaveBeenCalled());
 
@@ -180,7 +180,7 @@ describe('StreamSearchPage', () => {
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 

@@ -58,7 +58,7 @@ describe('<RolesSection />', () => {
 
     const assignRoleButton = screen.getByRole('button', { name: 'Assign Role' });
     await selectEvent.chooseOption('Search for roles', notAssignedRole.name);
-    fireEvent.click(assignRoleButton);
+    await userEvent.click(assignRoleButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
@@ -95,7 +95,7 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const unassignRoleButton = screen.getByRole('button', { name: `Remove ${assignedRole1.name}` });
-    fireEvent.click(unassignRoleButton);
+    await userEvent.click(unassignRoleButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 

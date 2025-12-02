@@ -62,7 +62,7 @@ describe('ThresholdFormItem', () => {
   it('renders color hint and opens color picker popover', async () => {
     renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: () => {} });
     const colorHint = await screen.findByLabelText(/Color Hint/i);
-    fireEvent.click(colorHint);
+    await userEvent.click(colorHint);
     await screen.findByText(/Color configuration for threshold/i);
   });
 
@@ -70,7 +70,7 @@ describe('ThresholdFormItem', () => {
     const removeMock = jest.fn();
     renderComponent({ metricIndex: 0, thresholdIndex: 0, onRemove: removeMock });
     const deleteButton = await screen.findByTitle(/Remove threshold/i);
-    fireEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     expect(removeMock).toHaveBeenCalled();
   });

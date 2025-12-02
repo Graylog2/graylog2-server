@@ -71,7 +71,7 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     const submitButton = await screen.findByLabelText('Submit');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });
@@ -86,7 +86,7 @@ describe('IndexSetFieldTypesList', () => {
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
-    fireEvent.click(addMappingButton);
+    await userEvent.click(addMappingButton);
 
     const submitButton = await screen.findByLabelText('Submit');
 
@@ -96,7 +96,7 @@ describe('IndexSetFieldTypesList', () => {
       expect(screen.queryAllByText('String type')).toHaveLength(2);
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });
@@ -111,7 +111,7 @@ describe('IndexSetFieldTypesList', () => {
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
-    fireEvent.click(addMappingButton);
+    await userEvent.click(addMappingButton);
 
     const submitButton = await screen.findByLabelText('Submit');
 
@@ -122,7 +122,7 @@ describe('IndexSetFieldTypesList', () => {
       expect(screen.queryAllByText('http_method')).toHaveLength(2);
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });

@@ -63,7 +63,7 @@ describe('BigDisplayModeConfiguration', () => {
     const { queryByText, findByText } = render(<SUT disabled />);
     const menuItem = await findByText('Full Screen');
 
-    fireEvent.click(menuItem);
+    await userEvent.click(menuItem);
 
     expect(queryByText('Configuring Full Screen')).toBeNull();
   });
@@ -72,7 +72,7 @@ describe('BigDisplayModeConfiguration', () => {
     const { findByText, getByText } = render(<SUT />);
     const menuItem = getByText('Full Screen');
 
-    fireEvent.click(menuItem);
+    await userEvent.click(menuItem);
 
     await findByText('Configuring Full Screen');
   });
@@ -165,7 +165,7 @@ describe('BigDisplayModeConfiguration', () => {
 
       const query1 = getByLabelText('Page#1');
 
-      fireEvent.click(query1);
+      await userEvent.click(query1);
 
       const form = getByTestId('modal-form');
 

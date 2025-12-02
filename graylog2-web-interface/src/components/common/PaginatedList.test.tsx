@@ -69,13 +69,13 @@ describe('PaginatedList', () => {
       </PaginatedList>,
     );
 
-    fireEvent.click(
+    await userEvent.click(
       getByRole('button', {
         name: /configure page size/i,
       }),
     );
 
-    fireEvent.click(await screen.findByRole('menuitem', { name: /100/ }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /100/ }));
 
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
 

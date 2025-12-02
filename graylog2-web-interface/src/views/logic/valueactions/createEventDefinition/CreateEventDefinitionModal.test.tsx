@@ -131,7 +131,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const allButton = await screen.findByText('Exactly this value');
-      fireEvent.click(allButton);
+      await userEvent.click(allButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_EXACT_STRATEGY',
@@ -151,7 +151,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const rowButton = await screen.findByText('Any in row');
-      fireEvent.click(rowButton);
+      await userEvent.click(rowButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_ROW_STRATEGY',
@@ -171,7 +171,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const colButton = await screen.findByText('Any in column');
-      fireEvent.click(colButton);
+      await userEvent.click(colButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_COL_STRATEGY',
@@ -191,7 +191,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const widgetButton = await screen.findByText('Any in widget');
-      fireEvent.click(widgetButton);
+      await userEvent.click(widgetButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_ALL_STRATEGY',
@@ -211,7 +211,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const customButton = await screen.findByText('Custom');
-      fireEvent.click(customButton);
+      await userEvent.click(customButton);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'SET_CUSTOM_STRATEGY',
@@ -231,7 +231,7 @@ describe('CreateEventDefinitionModal', () => {
       renderWithAllChecked();
 
       const checkbox = await screen.findByText('count(action): 400');
-      fireEvent.click(checkbox);
+      await userEvent.click(checkbox);
 
       expect(mockedDispatch).toHaveBeenCalledWith({
         type: 'UPDATE_CHECKED_ITEMS',

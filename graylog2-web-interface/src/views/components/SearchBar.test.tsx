@@ -101,7 +101,7 @@ describe('SearchBar', () => {
 
     asMock(dispatch).mockClear();
 
-    fireEvent.click(searchButton);
+    await userEvent.click(searchButton);
 
     await waitFor(() => expect(dispatch).toHaveBeenCalled());
   });

@@ -59,7 +59,7 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
 
     fireEvent.change(newKeyInput, { target: { value: 'new Key' } });
     fireEvent.change(newValueInput, { target: { value: 'new Value' } });
-    fireEvent.click(addBtn);
+    await userEvent.click(addBtn);
 
     const newConfig = {
       ...config,

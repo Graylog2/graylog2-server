@@ -69,7 +69,7 @@ describe('ConfigurationsPage', () => {
     });
 
     await suppressConsole(async () => {
-      fireEvent.click(sidecarNavItem);
+      await userEvent.click(sidecarNavItem);
 
       return screen.findByText('Boom!');
     });
@@ -85,7 +85,7 @@ describe('ConfigurationsPage', () => {
     });
 
     await suppressConsole(async () => {
-      fireEvent.click(sidecarNavItem);
+      await userEvent.click(sidecarNavItem);
 
       return screen.findByText('It is all good!');
     });

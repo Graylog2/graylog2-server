@@ -89,7 +89,7 @@ describe('QueryTitleEditModal', () => {
     const saveButton = await screen.findByRole('button', { name: /update title/i });
 
     fireEvent.change(titleInput, { target: { value: 'NewTitle' } });
-    fireEvent.click(saveButton);
+    await userEvent.click(saveButton);
 
     expect(onTitleChangeFn).toHaveBeenCalledTimes(1);
     expect(onTitleChangeFn).toHaveBeenCalledWith('NewTitle');
@@ -120,7 +120,7 @@ describe('QueryTitleEditModal', () => {
     // Modal should not be visible after click on cancel
     const cancelButton = getByText('Cancel');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     await waitFor(() => {
       expect(queryByText(modalHeadline)).not.toBeInTheDocument();

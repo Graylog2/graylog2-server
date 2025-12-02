@@ -62,7 +62,7 @@ describe('AbsoluteDateInput', () => {
 
     const insertCurrentDate = getByTitle('Insert current date');
 
-    fireEvent.click(insertCurrentDate);
+    await userEvent.click(insertCurrentDate);
 
     expect(defaultProps.onChange).toHaveReturnedWith(output);
   });

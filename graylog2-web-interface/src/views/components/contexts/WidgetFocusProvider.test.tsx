@@ -111,7 +111,7 @@ describe('WidgetFocusProvider', () => {
 
     const button = await screen.findByRole('button', { name: 'Focus!' });
 
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
@@ -129,7 +129,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Unfocus!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenLastCalledWith('', { replace: true });
   });
@@ -153,7 +153,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&editing=true', { replace: true });
   });
@@ -171,7 +171,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     expect(mockNavigate).toHaveBeenCalledWith('', { replace: true });
   });
@@ -202,11 +202,11 @@ describe('WidgetFocusProvider', () => {
 
     renderSUT(consume);
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Edit' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Edit' }));
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true&editing=true', { replace: true });
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Cancel' }));
 
     expect(mockNavigate).toHaveBeenCalledWith('?focusedId=widget-id&focusing=true', { replace: true });
   });
@@ -248,7 +248,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Unfocus!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // setNewWidget should be dispatched with the focused widget id
     expect(setNewWidget).toHaveBeenCalledWith('widget-id');
@@ -269,7 +269,7 @@ describe('WidgetFocusProvider', () => {
     renderSUT(consume);
 
     const button = await screen.findByRole('button', { name: 'Cancel Edit!' });
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     // setNewWidget should be dispatched with the focused widget id
     expect(setNewWidget).toHaveBeenCalledWith('widget-id');

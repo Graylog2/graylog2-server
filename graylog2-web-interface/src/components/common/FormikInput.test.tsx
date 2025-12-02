@@ -51,7 +51,7 @@ describe('<FormikInput />', () => {
     const usernameInput = getByLabelText('Username');
     const submitButton = getByText('Submit Form');
     fireEvent.change(usernameInput, { target: { value: 'A username' } });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ username: 'A username' }));
   });
@@ -65,7 +65,7 @@ describe('<FormikInput />', () => {
     );
 
     const submitButton = getByText('Submit Form');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ username: 'Initial username' }));
   });
@@ -80,8 +80,8 @@ describe('<FormikInput />', () => {
 
     const newsletterCheckbox = getByLabelText('Newsletter Subscription');
     const submitButton = getByText('Submit Form');
-    fireEvent.click(newsletterCheckbox);
-    fireEvent.click(submitButton);
+    await userEvent.click(newsletterCheckbox);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ newsletter: true }));
   });

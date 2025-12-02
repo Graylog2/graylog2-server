@@ -71,7 +71,7 @@ describe('TimeRangePresetForm', () => {
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const removeButton = await within(timerangeItem).findByTitle('Remove preset');
 
-    fireEvent.click(removeButton);
+    await userEvent.click(removeButton);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       Immutable.List([{ description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } }]),
@@ -82,7 +82,7 @@ describe('TimeRangePresetForm', () => {
     renderForm();
     const addItemButton = await screen.findByLabelText('Add new search time range preset');
 
-    fireEvent.click(addItemButton);
+    await userEvent.click(addItemButton);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       Immutable.List([
@@ -112,13 +112,13 @@ describe('TimeRangePresetForm', () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
-    fireEvent.click(timerangeFilter);
+    await userEvent.click(timerangeFilter);
     const fromInput = await screen.findByTitle('Set the from value');
     fireEvent.change(fromInput, { target: { value: 15 } });
     const submitButton = await screen.findByRole('button', { name: /update time range/i });
 
     await waitFor(() => expect(submitButton).toBeEnabled());
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(mockOnUpdate).toHaveBeenCalledWith(

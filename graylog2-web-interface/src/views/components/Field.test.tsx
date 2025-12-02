@@ -46,7 +46,7 @@ describe('Field', () => {
       );
 
       const title = await screen.findByText('Foo');
-      fireEvent.click(title);
+      await userEvent.click(title);
 
       expect(screen.queryByText('Foo = unknown')).not.toBeInTheDocument();
     });
@@ -59,7 +59,7 @@ describe('Field', () => {
       );
 
       const title = await screen.findByText('Foo');
-      fireEvent.click(title);
+      await userEvent.click(title);
       await screen.findByText('foo = unknown');
     });
   });

@@ -99,7 +99,7 @@ describe('RuleBlockDisplay', () => {
 
     const deleteButton = await screen.findByRole('button', { name: 'Delete' });
 
-    fireEvent.click(deleteButton);
+    await userEvent.click(deleteButton);
 
     expect(mockDelete).toHaveBeenCalled();
   });
@@ -124,7 +124,7 @@ describe('RuleBlockDisplay', () => {
 
     const editButton = await screen.findByRole('button', { name: 'Edit' });
 
-    fireEvent.click(editButton);
+    await userEvent.click(editButton);
 
     expect(mockEdit).toHaveBeenCalled();
   });
@@ -148,7 +148,7 @@ describe('RuleBlockDisplay', () => {
 
     const negationButton = await screen.findByRole('button', { name: 'Not' });
 
-    fireEvent.click(negationButton);
+    await userEvent.click(negationButton);
 
     expect(mockNegate).toHaveBeenCalled();
   });

@@ -97,7 +97,7 @@ describe('InputList Component', () => {
     expect(screen.getByText(/dir3/i)).toBeVisible();
     expect(screen.getByText(/dir4/i)).toBeVisible();
 
-    fireEvent.click(removers[0]);
+    await userEvent.click(removers[0]);
 
     removers = screen.getAllByText(/value\s*remover/i);
 

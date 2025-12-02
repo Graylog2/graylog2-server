@@ -308,10 +308,10 @@ describe('<Widget />', () => {
 
     const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
-    fireEvent.click(actionToggle);
+    await userEvent.click(actionToggle);
     const duplicateBtn = await screen.findByRole('menuitem', { name: /duplicate/i });
 
-    fireEvent.click(duplicateBtn);
+    await userEvent.click(duplicateBtn);
 
     await waitFor(() => expect(duplicateWidget).toHaveBeenCalled());
   });
@@ -325,7 +325,7 @@ describe('<Widget />', () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const cancel = await screen.findByText('Cancel');
-    fireEvent.click(cancel);
+    await userEvent.click(cancel);
 
     await waitFor(() => {
       expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
@@ -336,7 +336,7 @@ describe('<Widget />', () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const updateWidgetButton = getWidgetUpdateButton();
-    fireEvent.click(updateWidgetButton);
+    await userEvent.click(updateWidgetButton);
 
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
@@ -348,7 +348,7 @@ describe('<Widget />', () => {
 
     const cancelBtn = screen.getByText('Cancel');
 
-    fireEvent.click(cancelBtn);
+    await userEvent.click(cancelBtn);
 
     expect(updateWidgetConfig).not.toHaveBeenCalled();
     expect(setGlobalOverrideQuery).not.toHaveBeenCalled();
@@ -361,13 +361,13 @@ describe('<Widget />', () => {
 
     const onChangeBtn = screen.getByText('Click me');
 
-    fireEvent.click(onChangeBtn);
+    await userEvent.click(onChangeBtn);
 
     expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const cancelButton = screen.getByText('Cancel');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     expect(updateWidget).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
@@ -385,7 +385,7 @@ describe('<Widget />', () => {
       rerender(<DummyWidget editing widget={widgetWithConfig} />);
     });
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     expect(setGlobalOverrideQuery).toHaveBeenCalledWith(globalSearch.query_string);
     expect(setGlobalOverrideTimerange).toHaveBeenCalledWith(globalTimerange);
@@ -397,12 +397,12 @@ describe('<Widget />', () => {
 
     const onChangeBtn = screen.getByText('Click me');
 
-    fireEvent.click(onChangeBtn);
+    await userEvent.click(onChangeBtn);
 
     expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const updateWidgetButton = getWidgetUpdateButton();
-    fireEvent.click(updateWidgetButton);
+    await userEvent.click(updateWidgetButton);
 
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 

@@ -83,7 +83,7 @@ describe('ExportModal', () => {
       name: /start download/i,
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
   };
 
   const payload = {

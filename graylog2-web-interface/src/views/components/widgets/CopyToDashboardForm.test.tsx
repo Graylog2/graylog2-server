@@ -69,7 +69,7 @@ describe('CopyToDashboardForm', () => {
 
   const submitModal = async () => {
     const submitButton = await screen.findByRole('button', { name: /submit/i });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
   };
 
   it('should render the modal minimal', async () => {
@@ -111,7 +111,7 @@ describe('CopyToDashboardForm', () => {
     const { getByText } = render(<SUT onCancel={onCancel} />);
     const cancelButton = getByText('Cancel');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     await waitFor(() => {
       expect(onCancel).toHaveBeenCalledTimes(1);
@@ -137,7 +137,7 @@ describe('CopyToDashboardForm', () => {
     const { getByText } = render(<SUT onCopyToDashboard={onSubmit} />);
     const firstView = getByText('view 1');
 
-    fireEvent.click(firstView);
+    await userEvent.click(firstView);
     await submitModal();
 
     await screen.findByRole('button', { name: /submit/i });
@@ -152,7 +152,7 @@ describe('CopyToDashboardForm', () => {
 
     const checkBox = await findByLabelText(/create a new dashboard/i);
 
-    fireEvent.click(checkBox);
+    await userEvent.click(checkBox);
     await submitModal();
 
     await screen.findByRole('button', { name: /submit/i });

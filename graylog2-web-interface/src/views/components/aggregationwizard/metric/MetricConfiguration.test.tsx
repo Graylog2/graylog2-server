@@ -83,7 +83,7 @@ describe('MetricConfiguration', () => {
 
     const checkbox = await screen.findByRole('checkbox', { name: /show line thresholds/i });
     act(() => {
-      fireEvent.click(checkbox);
+      await userEvent.click(checkbox);
     });
 
     await screen.findByTestId('threshold-item-0-0');
@@ -109,7 +109,7 @@ describe('MetricConfiguration', () => {
     renderComponent(baseProps, { metrics: [metricWithThresholds], visualization: { type: 'bar' } });
 
     const addButton = await screen.findByRole('button', { name: /add a threshold/i });
-    fireEvent.click(addButton);
+    await userEvent.click(addButton);
 
     // Should now render two threshold items
     await screen.findByTestId('threshold-item-0-0');

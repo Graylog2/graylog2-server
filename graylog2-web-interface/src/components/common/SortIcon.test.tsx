@@ -55,7 +55,7 @@ describe('SortIcon', () => {
     render(<SortIcon onChange={onChange} activeDirection={Direction.Ascending.direction} />);
     const Button = await screen.findByRole('button');
 
-    fireEvent.click(Button);
+    await userEvent.click(Button);
 
     await expect(onChange).toHaveBeenCalledWith(Direction.Ascending.direction);
   });

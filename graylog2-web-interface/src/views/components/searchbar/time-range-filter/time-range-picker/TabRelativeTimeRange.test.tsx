@@ -124,7 +124,7 @@ describe('TabRelativeTimeRange', () => {
 
     expect(await fromRangeValue()).not.toBeDisabled();
 
-    fireEvent.click(allTimeCheckbox);
+    await userEvent.click(allTimeCheckbox);
 
     expect(await fromRangeValue()).toBeDisabled();
   });
@@ -136,7 +136,7 @@ describe('TabRelativeTimeRange', () => {
 
     expect(await toRangeValue()).toBeDisabled();
 
-    fireEvent.click(nowCheckbox);
+    await userEvent.click(nowCheckbox);
 
     expect(await toRangeValue()).not.toBeDisabled();
   });

@@ -41,12 +41,12 @@ describe('AbsoluteTimeInput', () => {
 
     const toggleBtn = screen.getByRole('button', { name: /toggle between beginning and end of day/i });
 
-    fireEvent.click(toggleBtn);
+    await userEvent.click(toggleBtn);
 
     expect(defaultProps.onChange).toHaveBeenCalled();
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:00:00');
 
-    fireEvent.click(toggleBtn);
+    await userEvent.click(toggleBtn);
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:59:59');
   });

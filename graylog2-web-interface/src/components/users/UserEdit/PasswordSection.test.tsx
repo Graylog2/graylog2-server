@@ -53,7 +53,7 @@ describe('<PasswordSection />', () => {
 
     fireEvent.change(newPasswordInput, { target: { value: 'newpassword' } });
     fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
 
@@ -74,7 +74,7 @@ describe('<PasswordSection />', () => {
     fireEvent.change(passwordInput, { target: { value: 'oldpassword' } });
     fireEvent.change(newPasswordInput, { target: { value: 'newpassword' } });
     fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
 

@@ -120,7 +120,7 @@ describe('IndexSetFieldTypesList', () => {
 
     const customFieldTypeMappingAmount = await within(tableRow2).findByText('3');
 
-    fireEvent.click(customFieldTypeMappingAmount);
+    await userEvent.click(customFieldTypeMappingAmount);
 
     expect(tableRow2.textContent).toContain('Custom Field Mappings');
     expect(tableRow2.textContent).toContain('user_name:String type');

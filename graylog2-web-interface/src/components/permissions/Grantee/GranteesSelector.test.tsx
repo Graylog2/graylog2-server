@@ -33,7 +33,7 @@ describe('GranteesSelector', () => {
 
     const submitButton = getByText('Add Collaborator');
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await findByText('The grantee is required.');
   });

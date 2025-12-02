@@ -42,7 +42,7 @@ describe('<ProfileSection />', () => {
     render(<ProfileSection user={exampleUser} onSubmit={(data) => onSubmitStub(data)} />);
 
     const submitButton = screen.getByText('Update Profile');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
@@ -65,7 +65,7 @@ describe('<ProfileSection />', () => {
     fireEvent.change(firstNameInput, { target: { value: 'New first name' } });
     fireEvent.change(lastNameInput, { target: { value: 'New last name' } });
     fireEvent.change(emailInput, { target: { value: 'newfullname@example.org' } });
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(onSubmitStub).toHaveBeenCalledTimes(1));
 
