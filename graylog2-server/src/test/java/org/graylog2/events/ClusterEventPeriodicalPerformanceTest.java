@@ -109,16 +109,7 @@ class ClusterEventPeriodicalPerformanceTest {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
             final var periodical = createClusterEventPeriodical(new SimpleNodeId("consumer-" + i), serverEventBus, clusterEventBus);
-            threadPool.submit(() -> {
-                while (running.get()) {
-                    periodical.run();
-                    try {
-                        Thread.sleep(Duration.ofSeconds(periodical.getPeriodSeconds()));
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            });
+            threadPool.submit(periodical);
 
             serverEventBus.register(new EventSubscriber(consumerCountdown::countDown));
         }
