@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
 import { Formik } from 'formik';
 import { defaultUser } from 'defaultMockValues';
 import userEvent from '@testing-library/user-event';
@@ -91,7 +91,8 @@ describe('TimeRangeFilter', () => {
     const fromValue = await screen.findByRole('spinbutton', {
       name: /set the from value/i,
     });
-    fireEvent.change(fromValue, { target: { value: 30 } });
+    await userEvent.clear(fromValue);
+    await userEvent.type(fromValue, '30');
 
     const submitButton = await screen.findByRole('button', { name: 'Update time range' });
     await waitFor(() => expect(submitButton).toBeEnabled());

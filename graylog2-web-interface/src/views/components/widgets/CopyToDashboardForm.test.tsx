@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Search from 'views/logic/search/Search';
@@ -169,7 +169,7 @@ describe('CopyToDashboardForm', () => {
 
     const searchInput = screen.getByPlaceholderText('Enter search query...');
 
-    fireEvent.change(searchInput, { target: { value: 'view 1' } });
+    await userEvent.type(searchInput, 'view 1');
 
     await waitFor(() =>
       expect(useDashboards).toHaveBeenCalledWith({

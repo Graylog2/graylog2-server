@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-
-
-
-
-
-
-import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { SEARCH_DEBOUNCE_THRESHOLD } from 'components/common/SearchForm';
 
@@ -137,7 +131,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');
 
-    fireEvent.change(searchInput, { target: { value: '  nodes  ' } });
+    await userEvent.type(searchInput, '  nodes  ');
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD + 10);
     });

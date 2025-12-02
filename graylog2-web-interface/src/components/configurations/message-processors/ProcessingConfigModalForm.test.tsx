@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { screen, render, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { screen, render, waitFor } from 'wrappedTestingLibrary';
 
 import { StoreMock as MockStore } from 'helpers/mocking';
 import ProcessingConfigModalForm from 'components/configurations/message-processors/ProcessingConfigModalForm';
@@ -108,9 +108,8 @@ describe('MessageProcessorsConfig', () => {
       name: /grace period/i,
     });
 
-    fireEvent.change(gracePeriod, {
-      target: { value: 'P1D' },
-    });
+    await userEvent.clear(gracePeriod);
+    await userEvent.type(gracePeriod, 'P1D');
 
     await userEvent.click(
       await screen.findByRole('button', {
@@ -142,7 +141,7 @@ describe('MessageProcessorsConfig', () => {
     });
 
     await userEvent.click(enableTimestampNormalization);
-    fireEvent.blur(enableTimestampNormalization);
+    await userEvent.tab();
 
     await userEvent.click(
       await screen.findByRole('button', {

@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 
@@ -84,7 +84,7 @@ describe('RuleBlockForm', () => {
     const submitButton = await screen.findByRole('button', { name: /add/i });
 
     const fieldInput = screen.getByLabelText('field');
-    fireEvent.change(fieldInput, { target: { value: 'bar' } });
+    await userEvent.type(fieldInput, 'bar');
 
     await userEvent.click(submitButton);
 
@@ -136,7 +136,7 @@ describe('RuleBlockForm', () => {
     const cancelButton = await screen.findByRole('button', { name: /cancel/i });
 
     const fieldInput = screen.getByLabelText('field');
-    fireEvent.change(fieldInput, { target: { value: 'bar' } });
+    await userEvent.type(fieldInput, 'bar');
 
     await userEvent.click(cancelButton);
 
@@ -153,7 +153,8 @@ describe('RuleBlockForm', () => {
     const updateButton = await screen.findByRole('button', { name: /update/i });
 
     const fieldInput = screen.getByLabelText('value');
-    fireEvent.change(fieldInput, { target: { value: 'Lumos' } });
+    await userEvent.clear(fieldInput);
+    await userEvent.type(fieldInput, 'Lumos');
 
     await userEvent.click(updateButton);
 

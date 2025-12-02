@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
@@ -358,7 +358,7 @@ describe('InputSetupWizard Setup Routing', () => {
       const { titleInput, descriptionInput, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
         await getStreamCreateFormFields();
 
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await userEvent.type(descriptionInput, 'Wingardium new stream');
 
       await selectEvent.chooseOption('Select an index set', 'Nox');
 
@@ -367,7 +367,7 @@ describe('InputSetupWizard Setup Routing', () => {
 
       expect(submitButton).toBeDisabled();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      await userEvent.type(titleInput, 'Wingardium');
 
       await waitFor(() => expect(submitButton).toBeEnabled());
     });
@@ -385,8 +385,8 @@ describe('InputSetupWizard Setup Routing', () => {
 
       const { titleInput, descriptionInput } = await getStreamCreateFormFields();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await userEvent.type(titleInput, 'Wingardium');
+      await userEvent.type(descriptionInput, 'Wingardium new stream');
 
       await selectEvent.chooseOption('Select an index set', 'Default');
 
@@ -406,8 +406,8 @@ describe('InputSetupWizard Setup Routing', () => {
 
       const { titleInput, descriptionInput } = await getStreamCreateFormFields();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await userEvent.type(titleInput, 'Wingardium');
+      await userEvent.type(descriptionInput, 'Wingardium new stream');
 
       await selectEvent.chooseOption('Select an index set', 'Nox');
 

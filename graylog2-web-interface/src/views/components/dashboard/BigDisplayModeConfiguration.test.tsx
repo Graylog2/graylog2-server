@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { asElement, fireEvent, render } from 'wrappedTestingLibrary';
+import { asElement, render } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { Optional } from 'utility-types';
-import userEvent from '@testing-library/user-event';
 
 import type { ViewStateMap } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
@@ -93,22 +93,24 @@ describe('BigDisplayModeConfiguration', () => {
     expect(getByText('Page#3')).not.toBeNull();
   });
 
-  it('should not allow strings for the refresh interval', () => {
+  it('should not allow strings for the refresh interval', async () => {
     const { getByLabelText } = render(<SUT show />);
 
     const refreshInterval = asElement(getByLabelText('Refresh Interval'), HTMLInputElement);
 
-    fireEvent.change(refreshInterval, { target: { value: 'a string' } });
+    await userEvent.clear(refreshInterval);
+    await userEvent.type(refreshInterval, 'a string');
 
     expect(refreshInterval.value).toBe('');
   });
 
-  it('should not allow strings for the cycle interval', () => {
+  it('should not allow strings for the cycle interval', async () => {
     const { getByLabelText } = render(<SUT show />);
 
     const cycleInterval = asElement(getByLabelText('Tab cycle interval'), HTMLInputElement);
 
-    fireEvent.change(cycleInterval, { target: { value: 'a string' } });
+    await userEvent.clear(cycleInterval);
+    await userEvent.type(cycleInterval, 'a string');
 
     expect(cycleInterval.value).toBe('');
   });
@@ -121,41 +123,43 @@ describe('BigDisplayModeConfiguration', () => {
       asMock(useHistory).mockReturnValue(history);
     });
 
-    it('on form submit', () => {
+    it('on form submit', async () => {
       const { getByTestId } = render(<SUT show />);
       const form = getByTestId('modal-form');
 
       expect(form).not.toBeNull();
 
-      fireEvent.submit(form);
+      await userEvent.submit(form);
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10');
     });
 
-    it('including changed refresh interval', () => {
+    it('including changed refresh interval', async () => {
       const { getByLabelText, getByTestId } = render(<SUT show />);
 
       const refreshInterval = getByLabelText('Refresh Interval');
 
-      fireEvent.change(refreshInterval, { target: { value: 42 } });
+      await userEvent.clear(refreshInterval);
+      await userEvent.type(refreshInterval, '42');
 
       const form = getByTestId('modal-form');
 
-      fireEvent.submit(form);
+      await userEvent.submit(form);
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=42');
     });
 
-    it('including tab cycle interval setting', () => {
+    it('including tab cycle interval setting', async () => {
       const { getByLabelText, getByTestId } = render(<SUT show />);
 
       const cycleInterval = getByLabelText('Tab cycle interval');
 
-      fireEvent.change(cycleInterval, { target: { value: 4242 } });
+      await userEvent.clear(cycleInterval);
+      await userEvent.type(cycleInterval, '4242');
 
       const form = getByTestId('modal-form');
 
-      fireEvent.submit(form);
+      await userEvent.submit(form);
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&refresh=10');
     });
@@ -170,7 +174,7 @@ describe('BigDisplayModeConfiguration', () => {
 
       const form = getByTestId('modal-form');
 
-      fireEvent.submit(form);
+      await userEvent.submit(form);
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10&tabs=1%2C2');
     });

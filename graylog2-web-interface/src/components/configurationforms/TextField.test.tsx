@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { screen, render, waitFor } from 'wrappedTestingLibrary';
 
 import { passwordTextField, requiredTextField, textAreaField, textField } from 'fixtures/configurationforms';
 
@@ -75,7 +76,8 @@ describe('<TextField>', () => {
 
     const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
-    fireEvent.change(formField, { target: { value: 'new value' } });
+    await userEvent.clear(formField);
+    await userEvent.type(formField, 'new value');
 
     await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_text_field', 'new value'));
   });

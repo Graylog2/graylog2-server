@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import { defaultUser } from 'defaultMockValues';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { defaultUser } from 'defaultMockValues';
 
 import { asMock } from 'helpers/mocking';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -52,8 +52,8 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    fireEvent.change(newPasswordInput, { target: { value: 'newpassword' } });
-    fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
+    await userEvent.type(newPasswordInput, 'newpassword');
+    await userEvent.type(newPasswordRepeatInput, 'newpassword');
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
@@ -72,9 +72,9 @@ describe('<PasswordSection />', () => {
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
     const submitButton = screen.getByText('Change Password');
 
-    fireEvent.change(passwordInput, { target: { value: 'oldpassword' } });
-    fireEvent.change(newPasswordInput, { target: { value: 'newpassword' } });
-    fireEvent.change(newPasswordRepeatInput, { target: { value: 'newpassword' } });
+    await userEvent.type(passwordInput, 'oldpassword');
+    await userEvent.type(newPasswordInput, 'newpassword');
+    await userEvent.type(newPasswordRepeatInput, 'newpassword');
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(UsersActions.changePassword).toHaveBeenCalledTimes(1));
@@ -91,9 +91,9 @@ describe('<PasswordSection />', () => {
     const newPasswordInput = screen.getByLabelText('New Password');
     const newPasswordRepeatInput = screen.getByLabelText('Repeat Password');
 
-    fireEvent.change(newPasswordInput, { target: { value: 'thepassword' } });
-    fireEvent.change(newPasswordRepeatInput, { target: { value: 'notthepassword' } });
-    fireEvent.blur(newPasswordRepeatInput);
+    await userEvent.type(newPasswordInput, 'thepassword');
+    await userEvent.type(newPasswordRepeatInput, 'notthepassword');
+    await userEvent.tab();
 
     await screen.findByText('Passwords do not match');
   });

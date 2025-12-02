@@ -16,7 +16,8 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { adminUser } from 'fixtures/users';
 import MockStore from 'helpers/mocking/StoreMock';
@@ -126,7 +127,7 @@ describe('GraylogClusterOverview', () => {
     const { getByLabelText } = render(<GraylogClusterOverview />);
     const graphDaysSelect = getByLabelText('Days');
 
-    fireEvent.change(graphDaysSelect, { target: { value: 365 } });
+    await userEvent.selectOptions(graphDaysSelect, '365');
 
     await waitFor(() => expect(ClusterTrafficActions.getTraffic).toHaveBeenCalledWith(365));
 

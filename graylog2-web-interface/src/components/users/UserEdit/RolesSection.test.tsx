@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, fireEvent, waitFor, screen, act } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
+import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
@@ -73,7 +73,7 @@ describe('<RolesSection />', () => {
     await act(() => mockLoadRolesPromise.then());
 
     const filterInput = screen.getByPlaceholderText('Enter query to filter');
-    fireEvent.change(filterInput, { target: { value: 'name of an assigned role' } });
+    await userEvent.type(filterInput, 'name of an assigned role');
 
     await waitFor(() => expect(AuthzRolesActions.loadRolesForUser).toHaveBeenCalledTimes(2));
 

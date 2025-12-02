@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, screen, act, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { render, screen, act, waitFor } from 'wrappedTestingLibrary';
 
 import { HTTPHeaderAuthConfigActions } from 'stores/authentication/HTTPHeaderAuthConfigStore';
 import HTTPHeaderAuthConfig from 'logic/authentication/HTTPHeaderAuthConfig';
@@ -68,7 +68,8 @@ describe('<HTTPHeaderAuthConfigSection />', () => {
     const usernameHeaderInput = screen.getByLabelText('Username header');
 
     await userEvent.click(enabledHeaderCheckbox);
-    fireEvent.change(usernameHeaderInput, { target: { value: 'New-Header' } });
+    await userEvent.clear(usernameHeaderInput);
+    await userEvent.type(usernameHeaderInput, 'New-Header');
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(HTTPHeaderAuthConfigActions.update).toHaveBeenCalledTimes(1));

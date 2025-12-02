@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { screen, render, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { screen, render, waitFor } from 'wrappedTestingLibrary';
 
 import SidecarFailureTrackingList from './SidecarFailureTrackingList';
 
@@ -100,7 +100,7 @@ describe('SidecarFailureTrackingList', () => {
     await screen.findByText('Sidecar');
 
     const searchInput = await screen.findByPlaceholderText(/find sidecars/i);
-    fireEvent.change(searchInput, { target: { value: 'demo' } });
+    await userEvent.type(searchInput, 'demo');
 
     await waitFor(() => expect(handleQueryChange).toHaveBeenCalledWith('demo', expect.anything()));
   });

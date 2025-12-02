@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import { Form, Formik } from 'formik';
 import * as React from 'react';
-import { fireEvent, render, waitFor } from 'wrappedTestingLibrary';
-import userEvent from '@testing-library/user-event';
+import { render, waitFor } from 'wrappedTestingLibrary';
 
 import FormikInput from './FormikInput';
 
@@ -51,7 +51,7 @@ describe('<FormikInput />', () => {
 
     const usernameInput = getByLabelText('Username');
     const submitButton = getByText('Submit Form');
-    fireEvent.change(usernameInput, { target: { value: 'A username' } });
+    await userEvent.type(usernameInput, 'A username');
     await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitStub).toHaveBeenCalledWith({ username: 'A username' }));

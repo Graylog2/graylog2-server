@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
-import debounce from 'lodash/debounce';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import debounce from 'lodash/debounce';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
 import { Formik } from 'formik';
@@ -148,7 +148,8 @@ describe('SaveTimeRangeAsPresetButton', () => {
     const descriptionInput = await screen.findByLabelText('Time range description');
     descriptionInput.focus();
 
-    fireEvent.change(descriptionInput, { target: { value: 'My new time range' } });
+    await userEvent.clear(descriptionInput);
+    await userEvent.type(descriptionInput, 'My new time range');
 
     const submitButton = await screen.findByRole('button', {
       name: /save preset/i,
@@ -193,7 +194,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
     });
     descriptionInput.focus();
 
-    fireEvent.change(descriptionInput, { target: { value: '' } });
+    await userEvent.clear(descriptionInput);
 
     const submitButton = await screen.findByRole('button', {
       name: /save preset/i,

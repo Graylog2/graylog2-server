@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import RangeInput from './RangeInput';
 
@@ -55,9 +56,8 @@ describe('<RangeInput />', () => {
     render(SUT(updateConfig));
     const thumb2 = screen.getByText(/4/i);
 
-    fireEvent.focus(thumb2);
-
-    fireEvent.keyDown(thumb2, { key: 'ArrowRight' });
+    await userEvent.click(thumb2);
+    await userEvent.keyboard('{ArrowRight}');
 
     expect(screen.getByText(/5/i)).toBeVisible();
   });

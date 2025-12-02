@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
@@ -83,7 +83,7 @@ describe('<Scratchpad />', () => {
     const textarea = screen.getByRole('textbox');
     textarea.focus();
 
-    fireEvent.change(textarea, { target: { value: 'foo' } });
+    await userEvent.type(textarea, 'foo');
 
     await screen.findByText(/auto saved\./i);
   });
@@ -93,7 +93,7 @@ describe('<Scratchpad />', () => {
 
     const textarea = screen.getByRole('textbox');
     textarea.focus();
-    fireEvent.change(textarea, { target: { value: 'foo' } });
+    await userEvent.type(textarea, 'foo');
 
     const btnCopy = screen.getByRole('button', { name: /copy/i });
 
@@ -109,7 +109,7 @@ describe('<Scratchpad />', () => {
 
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     textarea.focus();
-    fireEvent.change(textarea, { target: { value: 'foo' } });
+    await userEvent.type(textarea, 'foo');
 
     const btnClear = screen.getByRole('button', { name: /clear/i });
 

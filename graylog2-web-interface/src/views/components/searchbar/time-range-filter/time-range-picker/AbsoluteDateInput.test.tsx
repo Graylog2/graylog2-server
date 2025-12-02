@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
-import moment from 'moment';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
+import moment from 'moment';
 
 import { DATE_TIME_FORMATS } from 'util/DateTime';
 
@@ -46,12 +46,13 @@ describe('AbsoluteDateInput', () => {
     expect(screen).not.toBeNull();
   });
 
-  it('calls onChange upon changing the input', () => {
+  it('calls onChange upon changing the input', async () => {
     const { getByPlaceholderText } = render(<AbsoluteDateInput {...defaultProps} />);
 
     const input = getByPlaceholderText(DATE_TIME_FORMATS.default);
 
-    fireEvent.change(input, { target: { value: 'something' } });
+    await userEvent.clear(input);
+    await userEvent.type(input, 'something');
 
     expect(defaultProps.onChange).toHaveBeenCalled();
   });

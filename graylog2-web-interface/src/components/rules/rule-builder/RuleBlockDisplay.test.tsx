@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { fireEvent, render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen } from 'wrappedTestingLibrary';
 
 import RuleBlockDisplay from './RuleBlockDisplay';
 import { actionsBlockDict, buildRuleBlock } from './fixtures';
@@ -96,7 +96,7 @@ describe('RuleBlockDisplay', () => {
       </RuleBuilderProvider>,
     );
 
-    fireEvent.mouseOver(screen.getByText(/\$output_5/i));
+    await userEvent.hover(screen.getByText(/\$output_5/i));
 
     const deleteButton = await screen.findByRole('button', { name: 'Delete' });
 
@@ -121,7 +121,7 @@ describe('RuleBlockDisplay', () => {
       </RuleBuilderProvider>,
     );
 
-    fireEvent.mouseOver(screen.getByText(/\$output_5/i));
+    await userEvent.hover(screen.getByText(/\$output_5/i));
 
     const editButton = await screen.findByRole('button', { name: 'Edit' });
 

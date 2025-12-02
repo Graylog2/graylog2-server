@@ -14,10 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import { List } from 'immutable';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import { List } from 'immutable';
 
 import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
@@ -72,7 +72,8 @@ describe('<SettingsSection />', () => {
 
     await screen.findByText('Hours');
 
-    fireEvent.change(timeoutAmountInput, { target: { value: '40' } });
+    await userEvent.clear(timeoutAmountInput);
+    await userEvent.type(timeoutAmountInput, '40');
 
     await selectEvent.chooseOption('Timeout unit', 'Days');
     await selectEvent.chooseOption('Time Zone', 'Vancouver');

@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { fireEvent, render } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { render } from 'wrappedTestingLibrary';
 
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 
@@ -58,8 +58,8 @@ describe('HTTPJSONPathAdapterFieldSet', () => {
     const newValueInput = getByTestId('newValue');
     const addBtn = getByText('Add');
 
-    fireEvent.change(newKeyInput, { target: { value: 'new Key' } });
-    fireEvent.change(newValueInput, { target: { value: 'new Value' } });
+    await userEvent.type(newKeyInput, 'new Key');
+    await userEvent.type(newValueInput, 'new Value');
     await userEvent.click(addBtn);
 
     const newConfig = {
