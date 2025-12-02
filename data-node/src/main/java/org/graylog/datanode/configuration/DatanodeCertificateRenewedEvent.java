@@ -14,16 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.opensearch.statemachine;
+package org.graylog.datanode.configuration;
 
-public enum OpensearchEvent {
-    PROCESS_PREPARED,
-    PROCESS_STARTED,
-    HEALTH_CHECK_OK,
-    HEALTH_CHECK_FAILED,
-    PROCESS_STOPPED,
-    PROCESS_REMOVE,
-    RESET, // user-triggered action
-    CERTIFICATES_RELOAD,  // reload existing http and transport certificates
-    PROCESS_TERMINATED // failure from outside, not requested
+/**
+ * This event will be triggered every time a datanode certificate gets renewed. The new certificate is issued by the
+ * same issuer.
+ */
+public record DatanodeCertificateRenewedEvent() {
 }
