@@ -36,7 +36,7 @@ public class RenameFields extends AbstractFunction<Void> {
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public RenameFields() {
-        fieldsParam = type("fields", Map.class).ruleBuilderVariable().description("The map of old name keys and new name values.").build();
+        fieldsParam = type("fields", Map.class).ruleBuilderVariable().description("The map of old name keys to new name values.").build();
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
 
@@ -67,7 +67,7 @@ public class RenameFields extends AbstractFunction<Void> {
                 .description("Rename message fields. If no specific message is provided, it performs the renaming operation on the currently processed message.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Rename fields")
-                .ruleBuilderTitle("Rename field '${old_field}' to '${new_field}' in the message")
+                .ruleBuilderTitle("Rename fields from map '${fields}'")
                 .ruleBuilderFunctionGroup(RuleBuilderFunctionGroup.MESSAGE)
                 .build();
     }
