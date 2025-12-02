@@ -27,6 +27,7 @@ import type { ValueGroups, OnClickPopoverDropdownProps } from 'views/components/
 const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClickPopoverDropdownProps) => {
   const { rowPivotValues, columnPivotValues, metricValue } = useMemo<ValueGroups>(() => {
     if (!clickPoint || !config) return {};
+
     const traceColor = getHoverSwatchColor(clickPoint);
     const splitNames: Array<string | number> = (clickPoint.data.originalName ?? clickPoint.data.name).split(
       keySeparator,
@@ -64,10 +65,12 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
   }, [clickPoint, config]);
 
   const formatedPercentageValue = useMemo(() => {
-    const { value, unit } = getPrettifiedValue(clickPoint?.percent, { abbrev: 'd%', unitType: 'percent' });
+    if (!clickPoint.percent) return clickPoint.text;
+
+    const { value, unit } = getPrettifiedValue(clickPoint.percent, { abbrev: 'd%', unitType: 'percent' });
 
     return formatValueWithUnitLabel(value, unit?.abbrev);
-  }, [clickPoint?.percent]);
+  }, [clickPoint.percent, clickPoint.text]);
 
   return (
     <Popover.Dropdown title={formatedPercentageValue}>
