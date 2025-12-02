@@ -15,8 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-
-import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import DocsHelper from 'util/DocsHelper';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -58,9 +56,7 @@ const EventsPage = () => (
       </span>
     </PageHeader>
 
-    <Row className="content">
-      <Col md={12}>{AlertsPageComponent()}</Col>
-    </Row>
+    {AlertsPageComponent()}
   </DocumentTitle>
 );
 
