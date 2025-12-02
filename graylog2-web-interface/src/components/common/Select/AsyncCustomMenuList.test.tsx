@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import AsyncCustomMenuList from './AsyncCustomMenuList';
 
@@ -51,7 +50,7 @@ describe('CustomMenuList', () => {
 
     expect(list).toBeInTheDocument();
 
-    await userEvent.scroll(list);
+    await fireEvent.scroll(list);
 
     await waitFor(() => expect(loadOptions).toHaveBeenCalled());
   });

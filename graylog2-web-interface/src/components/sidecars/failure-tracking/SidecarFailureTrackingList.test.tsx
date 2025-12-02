@@ -100,7 +100,7 @@ describe('SidecarFailureTrackingList', () => {
     await screen.findByText('Sidecar');
 
     const searchInput = await screen.findByPlaceholderText(/find sidecars/i);
-    await userEvent.type(searchInput, 'demo');
+    await userEvent.type(searchInput, '{selectall}demo');
 
     await waitFor(() => expect(handleQueryChange).toHaveBeenCalledWith('demo', expect.anything()));
   });

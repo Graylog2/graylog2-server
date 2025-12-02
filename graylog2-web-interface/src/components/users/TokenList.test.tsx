@@ -99,8 +99,7 @@ describe('<TokenList />', () => {
     await userEvent.type(nameInput, 'hans');
 
     const ttlInput = await screen.findByLabelText('Token TTL');
-    await userEvent.clear(ttlInput);
-    await userEvent.type(ttlInput, 'PT72H');
+    await userEvent.type(ttlInput, '{selectall}PT72H');
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
     await userEvent.click(createToken);

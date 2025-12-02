@@ -16,7 +16,7 @@
  */
 import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { asElement, render } from 'wrappedTestingLibrary';
+import { asElement, render, screen } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { Optional } from 'utility-types';
 
@@ -124,57 +124,49 @@ describe('BigDisplayModeConfiguration', () => {
     });
 
     it('on form submit', async () => {
-      const { getByTestId } = render(<SUT show />);
-      const form = getByTestId('modal-form');
+      render(<SUT show />);
+      const submit = await screen.findByRole('button', { name: /start full screen view/i });
 
-      expect(form).not.toBeNull();
-
-      await userEvent.submit(form);
+      await userEvent.click(submit);
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10');
     });
 
     it('including changed refresh interval', async () => {
-      const { getByLabelText, getByTestId } = render(<SUT show />);
+      render(<SUT show />);
 
-      const refreshInterval = getByLabelText('Refresh Interval');
+      const refreshInterval = screen.getByLabelText('Refresh Interval');
 
       await userEvent.clear(refreshInterval);
       await userEvent.type(refreshInterval, '42');
 
-      const form = getByTestId('modal-form');
-
-      await userEvent.submit(form);
+      await userEvent.click(await screen.findByRole('button', { name: /start full screen view/i }));
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=42');
     });
 
     it('including tab cycle interval setting', async () => {
-      const { getByLabelText, getByTestId } = render(<SUT show />);
+      render(<SUT show />);
 
-      const cycleInterval = getByLabelText('Tab cycle interval');
+      const cycleInterval = screen.getByLabelText('Tab cycle interval');
 
       await userEvent.clear(cycleInterval);
       await userEvent.type(cycleInterval, '4242');
 
-      const form = getByTestId('modal-form');
-
-      await userEvent.submit(form);
+      await userEvent.click(await screen.findByRole('button', { name: /start full screen view/i }));
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=4242&refresh=10');
     });
 
     it('including selected tabs', async () => {
       const viewWithQueries = createViewWithQueries();
-      const { getByLabelText, getByTestId } = render(<SUT view={viewWithQueries} show />);
+      render(<SUT view={viewWithQueries} show />);
 
-      const query1 = getByLabelText('Page#1');
+      const query1 = screen.getByLabelText('Page#1');
 
       await userEvent.click(query1);
 
-      const form = getByTestId('modal-form');
-
-      await userEvent.submit(form);
+      await userEvent.click(await screen.findByRole('button', { name: /start full screen view/i }));
 
       expect(history.push).toHaveBeenCalledWith('/dashboards/tv/deadbeef?interval=30&refresh=10&tabs=1%2C2');
     });

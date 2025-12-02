@@ -50,7 +50,7 @@ describe('<TitleField>', () => {
 
     const titleField = screen.getByLabelText(/title/i);
     await userEvent.clear(titleField);
-    await userEvent.type(titleField, 'New title');
+    await userEvent.paste(titleField, 'New title');
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('title', 'New title'));
   });

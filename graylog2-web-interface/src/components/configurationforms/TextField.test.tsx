@@ -16,7 +16,7 @@
  */
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { screen, render, waitFor } from 'wrappedTestingLibrary';
+import { screen, render } from 'wrappedTestingLibrary';
 
 import { passwordTextField, requiredTextField, textAreaField, textField } from 'fixtures/configurationforms';
 
@@ -72,14 +72,13 @@ describe('<TextField>', () => {
   it('should call onChange when value changes', async () => {
     const updateFunction = jest.fn();
 
-    render(<SUT onChange={updateFunction} value={textField.default_value} />);
+    render(<SUT onChange={updateFunction} value="" />);
 
     const formField = screen.getByLabelText(textField.human_name, { exact: false });
 
-    await userEvent.clear(formField);
-    await userEvent.type(formField, 'new value');
+    await userEvent.paste(formField, 'new value');
 
-    await waitFor(() => expect(updateFunction).toHaveBeenCalledWith('example_text_field', 'new value'));
+    expect(updateFunction).toHaveBeenLastCalledWith('example_text_field', 'new value');
   });
 
   it('should render a password field', () => {
