@@ -85,7 +85,7 @@ const Wizard = ({ show, input, onClose }: Props) => {
   const orderedStepsConfig = orderedSteps.map((step) => steps[step]);
 
   return (
-    <Modal show onHide={onClose} backdrop={false}>
+    <Modal show onHide={onClose}>
       <Modal.Header>Input Setup Wizard</Modal.Header>
       <Modal.Body>
         <InputSetupWizardStepsProvider>

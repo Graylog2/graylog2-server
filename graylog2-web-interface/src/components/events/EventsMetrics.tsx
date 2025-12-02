@@ -67,7 +67,7 @@ const EventsMetrics = ({ children = undefined, expanded: initialExpanded, onExpa
 type Props = React.PropsWithChildren<{}>;
 const EventsMetricsBarrier = ({ children = undefined }: Props) => {
   const { entityTableId } = useTableFetchContext();
-  const { mutate: updatePreferences } = useUpdateUserLayoutPreferences(entityTableId);
+  const { mutateAsync: updatePreferences } = useUpdateUserLayoutPreferences(entityTableId);
   const { data, isInitialLoading: isLoadingPreferences } = useUserLayoutPreferences<{ showMetrics: boolean }>(
     entityTableId,
   );

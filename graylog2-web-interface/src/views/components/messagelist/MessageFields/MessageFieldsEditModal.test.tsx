@@ -54,6 +54,7 @@ const formattedFavorites = [
     type: FieldTypes.STRING(),
     field: 'fav1',
     id: 'fav1',
+    title: 'fv1',
   },
 ];
 const formattedRest = [
@@ -62,6 +63,7 @@ const formattedRest = [
     type: FieldTypes.STRING(),
     field: 'rest1',
     id: 'rest1',
+    title: 'rest1',
   },
 ];
 const message = {
