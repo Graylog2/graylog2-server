@@ -53,10 +53,7 @@ class CsrRequesterImplTest {
     void testSAN(@TempDir Path tempDir) throws Exception {
         final Configuration configuration = DatanodeTestUtils.datanodeConfiguration(Map.of(
                 "node_name", "my-node-name",
-                "hostname", "my-datanode-machine",
-                "opensearch_logs_location", ".",
-                "opensearch_config_location", ".",
-                "node_id_file", "node-id"
+                "hostname", "my-datanode-machine"
         ));
 
         final DatanodeKeystore datanodeKeystore = new DatanodeKeystore(DatanodeTestUtils.tempDirectories(tempDir), "foobar", new EventBus());

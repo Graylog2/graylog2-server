@@ -104,8 +104,7 @@ class ClusterResourceIT {
         final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
                 "password_secret", "thisisverysecretpassword",
                 "root_password_sha2", "aaaaa",
-                "data_dir", "/tmp",
-                "node_id_file", "./node-id"
+                "data_dir", "/tmp"
         ));
         new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
         return configuration;
