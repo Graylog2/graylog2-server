@@ -29,8 +29,9 @@ import org.graylog.scheduler.capabilities.SchedulerCapabilitiesService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.IntervalJobSchedule;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.utils.MongoUtils;
@@ -38,12 +39,13 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.List;
@@ -63,15 +65,12 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class DBJobTriggerServiceTest {
     private static final String NODE_ID = "node-1";
     private static final Duration EXPIRATION_DURATION = Duration.minutes(5);
-
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
 
@@ -80,11 +79,10 @@ public class DBJobTriggerServiceTest {
 
     private DBJobTriggerService dbJobTriggerService;
     private final JobSchedulerTestClock clock = new JobSchedulerTestClock(DateTime.parse("2019-07-29T00:00:00.000Z"));
-    private MongoJackObjectMapperProvider mapperProvider;
     private MongoCollections mongoCollections;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp(MongoDBTestService dbTestService) throws Exception {
         lenient().when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
 
         ObjectMapper objectMapper = new ObjectMapperProvider().get();
@@ -92,8 +90,8 @@ public class DBJobTriggerServiceTest {
         objectMapper.registerSubtypes(new NamedType(OnceJobSchedule.class, OnceJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestJobTriggerData.class, TestJobTriggerData.TYPE_NAME));
 
-        mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        this.mongoCollections = new MongoCollections(mapperProvider, mongodb.mongoConnection());
+        final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
+        mongoCollections = new MongoCollections(mapperProvider, dbTestService.mongoConnection());
         this.dbJobTriggerService = serviceWithClock(clock);
     }
 

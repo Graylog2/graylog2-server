@@ -18,43 +18,40 @@ package org.graylog.events.processor.aggregation;
 
 import com.github.rholder.retry.RetryException;
 import org.graylog.testing.completebackend.Lifecycle;
-import org.graylog.testing.completebackend.WebhookServerInstance;
+import org.graylog.testing.completebackend.WebhookServerContainer;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
-import org.junit.jupiter.api.BeforeEach;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import java.util.concurrent.ExecutionException;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = {SearchServer.DATANODE_DEV}, withWebhookServerEnabled = true)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class EventNotificationsResourceIT {
-    private final GraylogApis graylogApis;
-    private final WebhookServerInstance webhookTester;
+    private static GraylogApis apis;
+    private static WebhookServerContainer webhookServerInstance;
 
-    public EventNotificationsResourceIT(GraylogApis graylogApis) {
-        this.graylogApis = graylogApis;
-        webhookTester = graylogApis.backend().getWebhookServerInstance().orElseThrow(() -> new IllegalStateException("Webhook tester instance not found!"));
+
+    @BeforeAll
+    static void setUp(GraylogApis graylogApis) {
+        apis = graylogApis;
+        webhookServerInstance = apis.backend().getWebhookServerInstance().orElseThrow();
+        graylogApis.system().urlAllowlist(webhookServerInstance.getContainerizedCollectorURI());
     }
 
-    @BeforeEach
-    void setUp() {
-        graylogApis.system().urlAllowlist(webhookTester.getContainerizedCollectorURI());
-    }
-
-    @ContainerMatrixTest
+    @FullBackendTest
     void testNotificationTestTrigger() throws ExecutionException, RetryException {
 
-        final String httpNotificationID = graylogApis.eventsNotifications().createHttpNotification(webhookTester.getContainerizedCollectorURI());
+        final String httpNotificationID = apis.eventsNotifications().createHttpNotification(webhookServerInstance.getContainerizedCollectorURI());
 
         // now trigger the test of the notification, we should immediately see one recorded webhook afterward
-        graylogApis.post("/events/notifications/" + httpNotificationID + "/test", "", 200);
+        apis.post("/events/notifications/" + httpNotificationID + "/test", "", 200);
 
         // wait for the just triggered notification
-        webhookTester.waitForRequests(webhookRequest -> webhookRequest.body().contains("TEST_NOTIFICATION_ID"));
+        webhookServerInstance.waitForRequests(webhookRequest -> webhookRequest.body().contains("TEST_NOTIFICATION_ID"));
 
         // the wait succeeded, cleanup
-        graylogApis.eventsNotifications().deleteNotification(httpNotificationID);
+        apis.eventsNotifications().deleteNotification(httpNotificationID);
 
     }
 }

@@ -23,7 +23,7 @@ import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import { convertValueToBaseUnit, getPrettifiedValue } from 'views/components/visualizations/utils/unitConverters';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import type { MappersForYAxis } from 'views/components/visualizations/utils/chartLayoutGenerators';
-import { getYAxisPosition } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { getYAxisSide } from 'views/components/visualizations/utils/chartLayoutGenerators';
 import { NO_FIELD_NAME_SERIES } from 'views/components/visualizations/Constants';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
@@ -63,11 +63,12 @@ const getThresholdShapes = ({
         ? formatValueWithUnitLabel(prettified?.value, prettified.unit.abbrev, 0)
         : value;
 
-      const axisStartPosition = getYAxisPosition(mapperAxisNumber[curSeries.function] ?? 0);
+      const seriesName = curSeries.config.name || curSeries.function;
+      const axisCount = mapperAxisNumber[seriesName] ?? 1;
 
       const shape: Partial<Shape> = {
         type: 'line',
-        x0: axisStartPosition,
+        x0: 0,
         x1: 1,
         y0: baseUnitValue,
         y1: baseUnitValue,
@@ -81,18 +82,18 @@ const getThresholdShapes = ({
 
       const bgColor = theme.utils.opacify(color, 0.6);
       const contrastColor = theme.utils.readableColor(bgColor);
-      const isLeft = axisStartPosition < 0.5;
+      const side = getYAxisSide(axisCount);
 
       const annotation: Partial<Annotations> = {
-        x: axisStartPosition,
+        x: side === 'left' ? 0 : 1,
         y: baseUnitValue,
         xref: 'paper',
         yref,
         text: `${name} (${formattedValueWithUnitLabel})`,
         showarrow: false,
-        xanchor: isLeft ? 'left' : 'right',
+        xanchor: side,
         yanchor: 'bottom',
-        align: isLeft ? 'left' : 'right',
+        align: side,
         font: { color: contrastColor, size: 12 },
         xshift: 0,
         yshift: 0,

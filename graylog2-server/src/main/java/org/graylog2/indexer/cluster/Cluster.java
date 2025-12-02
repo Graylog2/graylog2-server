@@ -17,7 +17,10 @@
 package org.graylog2.indexer.cluster;
 
 import com.github.joschi.jadconfig.util.Duration;
-import org.graylog2.indexer.IndexSetRegistry;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import jakarta.inject.Singleton;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.cluster.health.ClusterAllocationDiskSettings;
 import org.graylog2.indexer.cluster.health.ClusterShardAllocation;
 import org.graylog2.indexer.cluster.health.NodeDiskUsageStats;
@@ -29,12 +32,7 @@ import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.inject.Singleton;
-
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -70,10 +68,6 @@ public class Cluster {
      */
     public Optional<HealthStatus> health() {
         return clusterAdapter.health();
-    }
-
-    private List<String> allIndexWildcards() {
-        return Arrays.asList(indexSetRegistry.getIndexWildcards());
     }
 
     /**

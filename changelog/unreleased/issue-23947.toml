@@ -1,0 +1,5 @@
+type = "a"
+message = "Dynamic shard sizing based on search nodes operating system memory."
+
+issues = ["23947"]
+pulls = ["24372"]

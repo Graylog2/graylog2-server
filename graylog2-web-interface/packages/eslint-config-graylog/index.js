@@ -45,7 +45,7 @@ export default [
   jest.configs['flat/recommended'],
   testingLibrary.configs['flat/react'],
   importPlugin.flatConfigs.recommended,
-  reactHooks.configs['recommended-latest'],
+  reactHooks.configs.flat['recommended-latest'],
   jsxA11y.flatConfigs.recommended,
   reactQuery.configs['flat/recommended'],
   compat.configs['flat/recommended'],
@@ -153,6 +153,7 @@ export default [
       ],
       'sort-imports': 'off', // disabled in favor of 'import/order'
       'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
+      'jsx-a11y/no-autofocus': 'off',
       'max-classes-per-file': 'off',
       'max-len': 'off',
       'new-cap': 'off',

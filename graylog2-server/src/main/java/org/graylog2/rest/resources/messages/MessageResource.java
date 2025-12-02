@@ -41,7 +41,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
@@ -57,8 +57,6 @@ import org.graylog2.rest.models.messages.requests.MessageParseRequest;
 import org.graylog2.rest.models.messages.responses.MessageTokens;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.IOException;
@@ -75,8 +73,6 @@ import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_V
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/messages")
 public class MessageResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
-
     private final Messages messages;
     private final CodecFactory codecFactory;
     private final IndexSetRegistry indexSetRegistry;

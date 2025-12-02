@@ -68,8 +68,11 @@ import {
   KeyboardShortcutsPage,
   LoggersPage,
   LUTCachesPage,
+  LUTCachesFormPage,
   LUTDataAdaptersPage,
+  LUTDataAdaptersFormPage,
   LUTTablesPage,
+  LUTFormPage,
   NodeInputsPage,
   NotFoundPage,
   PipelineDetailsPage,
@@ -192,6 +195,7 @@ const AppRouter = () => {
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
             { path: RoutePaths.WELCOME, element: <WelcomePage /> },
             { path: RoutePaths.STREAMS, element: <StreamsPage /> },
+            { path: RoutePaths.STREAM_NEW, element: <StreamsPage /> },
             { path: RoutePaths.stream_view(':streamId'), element: <StreamDetailsPage /> },
             { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
             !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },
@@ -258,12 +262,19 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: withLUTModalProvider(LUTTablesPage) },
-
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':lutIdOrName'), element: <LUTFormPage /> },
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: withLUTModalProvider(LUTCachesPage) },
-
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheIdOrName'), element: <LUTCachesFormPage /> },
             {
               path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW,
               element: withLUTModalProvider(LUTDataAdaptersPage),
+            },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE, element: <LUTDataAdaptersFormPage /> },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterIdOrName'),
+              element: <LUTDataAdaptersFormPage />,
             },
 
             { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },

@@ -16,10 +16,22 @@
  */
 package org.graylog.testing.completebackend;
 
-import org.graylog.testing.mongodb.MongoDBInstance;
+import com.mongodb.client.MongoDatabase;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TestLicenseImporter {
-    default void importLicenses(final MongoDBInstance mongoDBInstance, final List<String> licenses) {}
+
+    /**
+     * import the given licenses and return the cluster id used in the licenses.
+     * this will warn if the licenses are for different clusters and return the first one found.
+     *
+     * @param mongoDatabase
+     * @param licenses
+     * @return the first cluster id of the license list
+     */
+    default Optional<String> importLicenses(final MongoDatabase mongoDatabase, final List<String> licenses) {
+        return Optional.empty();
+    }
 }

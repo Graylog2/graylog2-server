@@ -44,11 +44,11 @@ import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.creat
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toCreationRequest;
 import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.toUpdateRequest;
 import static org.graylog2.shared.utilities.StringUtils.f;
-import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class IndexSetRestrictionsServiceTest {
+public class IndexSetRestrictionsServiceTest {
 
     private static final Map<String, Set<IndexSetFieldRestriction>> FIELD_RESTRICTION = Map.of(
             "shards", Set.of(ImmutableIndexSetField.builder().build()),
@@ -68,7 +68,8 @@ class IndexSetRestrictionsServiceTest {
         underTest = new IndexSetRestrictionsService(
                 templateService,
                 indexSetDefaultTemplateService,
-                new ObjectMapperProvider().get());
+                new DefaultIndexSetConfigTransformer(),
+                new FieldRestrictionService(new ObjectMapperProvider().get()));
     }
 
     @Test
@@ -191,7 +192,7 @@ class IndexSetRestrictionsServiceTest {
                 .build());
     }
 
-    private static IndexSetTemplate createIndexSetTemplate(IndexSetConfig indexSetConfig) {
+    public static IndexSetTemplate createIndexSetTemplate(IndexSetConfig indexSetConfig) {
         return new IndexSetTemplate("1", "", "", false, IndexSetTemplateConfig.builder()
                 .shards(indexSetConfig.shards())
                 .replicas(indexSetConfig.replicas())
@@ -205,6 +206,7 @@ class IndexSetRestrictionsServiceTest {
                 .fieldTypeRefreshInterval(indexSetConfig.fieldTypeRefreshInterval())
                 .useLegacyRotation(indexSetConfig.dataTieringConfig() == null)
                 .fieldRestrictions(indexSetConfig.fieldRestrictions())
+                .dataTieringConfig(indexSetConfig.dataTieringConfig())
                 .build());
     }
 

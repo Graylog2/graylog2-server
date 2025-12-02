@@ -39,10 +39,12 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
 import org.graylog2.indexer.searches.SearchesAdapter;
+import org.graylog2.indexer.security.SecurityAdapter;
 import org.graylog2.migrations.V20170607164210_MigrateReopenedIndicesToAliases;
 import org.graylog2.plugin.VersionAwareModule;
 import org.graylog2.storage.SearchVersion;
@@ -64,9 +66,9 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterES7.class);
         bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterES7.class);
         if (useComposableIndexTemplates) {
-            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {
-            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
 
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterES7.class);
@@ -93,6 +95,7 @@ public class Elasticsearch7Module extends VersionAwareModule {
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterES7.class);
 
         bindForSupportedVersion(IndexerHostsAdapter.class).to(IndexerHostsAdapterES7.class);
+        bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterES7.class);
     }
 
     private <T> LinkedBindingBuilder<T> bindForSupportedVersion(Class<T> interfaceClass) {

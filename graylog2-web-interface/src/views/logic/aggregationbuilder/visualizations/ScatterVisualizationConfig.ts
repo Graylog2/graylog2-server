@@ -16,29 +16,42 @@
  */
 import * as Immutable from 'immutable';
 
-import type { AxisType, XYVisualization } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import type {
+  AxisType,
+  XYVisualization,
+  ChartAxisConfig,
+} from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
+import { DEFAULT_AXIS_CONFIG, DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
-import { DEFAULT_AXIS_TYPE } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 import LineVisualizationConfig from 'views/logic/aggregationbuilder/visualizations/LineVisualizationConfig';
 
 type InternalState = {
   axisType: AxisType;
+  axisConfig: ChartAxisConfig;
 };
 
 export type ScatterVisualizationConfigJson = {
   axis_type?: AxisType;
+  axis_config: ChartAxisConfig;
 };
 
 export default class ScatterVisualizationConfig extends VisualizationConfig implements XYVisualization {
   private readonly _value: InternalState;
 
-  constructor(axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE) {
+  constructor(
+    axisType: InternalState['axisType'] = DEFAULT_AXIS_TYPE,
+    axisConfig: ChartAxisConfig = DEFAULT_AXIS_CONFIG,
+  ) {
     super();
-    this._value = { axisType };
+    this._value = { axisType, axisConfig };
   }
 
   get axisType() {
     return this._value.axisType;
+  }
+
+  get axisConfig() {
+    return this._value.axisConfig;
   }
 
   toBuilder() {
@@ -46,24 +59,28 @@ export default class ScatterVisualizationConfig extends VisualizationConfig impl
     return new Builder(Immutable.Map(this._value));
   }
 
-  static create(axisType: InternalState['axisType']) {
-    return new ScatterVisualizationConfig(axisType);
+  static create(axisType: InternalState['axisType'], axisConfig: ChartAxisConfig = DEFAULT_AXIS_CONFIG) {
+    return new ScatterVisualizationConfig(axisType, axisConfig);
   }
 
   static empty() {
-    return new ScatterVisualizationConfig(DEFAULT_AXIS_TYPE);
+    return new ScatterVisualizationConfig(DEFAULT_AXIS_TYPE, DEFAULT_AXIS_CONFIG);
   }
 
   toJSON() {
-    const { axisType } = this._value;
+    const { axisType, axisConfig } = this._value;
 
     return {
       axis_type: axisType,
+      axis_config: axisConfig,
     };
   }
 
   static fromJSON(_type: string, value: ScatterVisualizationConfigJson) {
-    return ScatterVisualizationConfig.create(value?.axis_type ?? DEFAULT_AXIS_TYPE);
+    return ScatterVisualizationConfig.create(
+      value?.axis_type ?? DEFAULT_AXIS_TYPE,
+      value?.axis_config ?? DEFAULT_AXIS_CONFIG,
+    );
   }
 }
 

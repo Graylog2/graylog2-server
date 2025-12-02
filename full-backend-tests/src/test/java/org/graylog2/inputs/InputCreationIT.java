@@ -18,23 +18,18 @@ package org.graylog2.inputs;
 
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
 
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class InputCreationIT {
-    private final GraylogApis apis;
 
-    public InputCreationIT(GraylogApis apis) {
-        this.apis = apis;
-    }
-
-    @ContainerMatrixTest
-    void testHttpRandomInputCreation() {
+    @FullBackendTest
+    void testHttpRandomInputCreation(GraylogApis apis) {
         String inputId = apis.inputs().createGlobalInput("testInput",
                 "org.graylog2.inputs.random.FakeHttpMessageInput",
                 Map.of("sleep", 30,
@@ -53,15 +48,17 @@ public class InputCreationIT {
     /**
      * Test to make sure configuration encryption serialization/deserialization works
      */
-    @ContainerMatrixTest
-    void testFailingAwsCloudTrailInputCreation() {
+    @FullBackendTest
+    void testFailingAwsCloudTrailInputCreation(GraylogApis apis) {
         String inputId = apis.inputs().createGlobalInput("testInput",
                 "org.graylog.aws.inputs.cloudtrail.CloudTrailInput",
                 Map.of("aws_sqs_region", "us-east-1",
                         "aws_s3_region", "us-east-1",
                         "aws_sqs_queue_name", "invalid-queue-no-messages-read",
                         "aws_access_key", "invalid-access-key",
-                        "aws_secret_key", "invalid-secret-key"));
+                        "aws_secret_key", "invalid-secret-key",
+                        "polling_interval", 1,
+                        "sqs_message_batch_size", 10));
         apis.inputs().getInput(inputId)
                 .assertThat().body("attributes.aws_access_key", equalTo("invalid-access-key"));
         apis.waitFor(() ->

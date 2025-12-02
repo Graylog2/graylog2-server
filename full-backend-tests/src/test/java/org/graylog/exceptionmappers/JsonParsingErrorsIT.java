@@ -19,44 +19,45 @@ package org.graylog.exceptionmappers;
 import io.restassured.response.ValidatableResponse;
 import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.completebackend.apis.GraylogApis;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = Lifecycle.CLASS, searchVersions = SearchServer.OS2_LATEST)
+@GraylogBackendConfiguration(serverLifecycle = Lifecycle.CLASS)
 public class JsonParsingErrorsIT {
     private static final String SYNC_SEARCH = "/views/search/sync";
     private static final String STREAMS = "/streams";
 
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    public JsonParsingErrorsIT(GraylogApis api) {
-        this.api = api;
+    @BeforeAll
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void returnsSpecificErrorWhenTypeMismatches() {
         assertErrorResponse(SYNC_SEARCH, """
-                        {
-                         	"queries": [
-                         		{
-                         			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
-                         			"query": {
-                         				"type": "elasticsearch",
-                         				"query_string": ""
-                         			},
-                         			"timerange": {
-                         				"type": "relative",
-                         				"from": "foo"
-                         			}
-                         		}
-                         	]
-                         }
-                                                """)
+                {
+                 	"queries": [
+                 		{
+                 			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
+                 			"query": {
+                 				"type": "elasticsearch",
+                 				"query_string": ""
+                 			},
+                 			"timerange": {
+                 				"type": "relative",
+                 				"from": "foo"
+                 			}
+                 		}
+                 	]
+                 }
+                """)
                 .body("path", equalTo("queries.[0].timerange.from"))
                 .body("line", equalTo(11))
                 .body("column", equalTo(14))
@@ -68,25 +69,25 @@ public class JsonParsingErrorsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void returnsSpecificErrorForJsonParsingError() {
         assertErrorResponse(SYNC_SEARCH, """
-                        {
-                         	"queries": [
-                         		{
-                         			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
-                         			"query": {
-                         				"type": "elasticsearch",
-                         				"query_string": ""
-                         			},
-                         			"timerange": {
-                         				"type": "relative",
-                         				"from": 23,
-                         			}
-                         		}
-                         	]
-                         }
-                                                """)
+                {
+                 	"queries": [
+                 		{
+                 			"id": "75988e96-71e2-4f3f-9d14-d8e918571b16",
+                 			"query": {
+                 				"type": "elasticsearch",
+                 				"query_string": ""
+                 			},
+                 			"timerange": {
+                 				"type": "relative",
+                 				"from": 23,
+                 			}
+                 		}
+                 	]
+                 }
+                """)
                 .body("path", equalTo("queries.[0].timerange"))
                 .body("line", equalTo(12))
                 .body("column", equalTo(5))
@@ -98,7 +99,7 @@ public class JsonParsingErrorsIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void extractsReferencePathFromMissingProperty() {
         assertErrorResponse(STREAMS, "{}")
                 .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
@@ -112,7 +113,7 @@ public class JsonParsingErrorsIT {
                 .body("reference_path", equalTo("org.graylog.security.shares.CreateEntityRequest"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void handlesGenericJSONErrorsOnRootLevel() {
         assertErrorResponse(STREAMS, """
                 {
@@ -133,7 +134,7 @@ public class JsonParsingErrorsIT {
                 .body("column", equalTo(13));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void handleInvalidPropertiesOnRootLevel() {
         assertErrorResponse(SYNC_SEARCH, """
                 {

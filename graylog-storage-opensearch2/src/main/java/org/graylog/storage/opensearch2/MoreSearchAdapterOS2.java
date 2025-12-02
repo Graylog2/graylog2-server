@@ -53,6 +53,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.search.QueryStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,19 +86,16 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
 
     private final OpenSearchClient client;
     private final Boolean allowLeadingWildcard;
-    private final SortOrderMapper sortOrderMapper;
     private final MultiChunkResultRetriever multiChunkResultRetriever;
     private final OS2ResultMessageFactory resultMessageFactory;
 
     @Inject
     public MoreSearchAdapterOS2(OpenSearchClient client,
                                 @Named("allow_leading_wildcard_searches") Boolean allowLeadingWildcard,
-                                SortOrderMapper sortOrderMapper,
                                 MultiChunkResultRetriever multiChunkResultRetriever,
                                 OS2ResultMessageFactory resultMessageFactory) {
         this.client = client;
         this.allowLeadingWildcard = allowLeadingWildcard;
-        this.sortOrderMapper = sortOrderMapper;
         this.multiChunkResultRetriever = multiChunkResultRetriever;
         this.resultMessageFactory = resultMessageFactory;
     }
@@ -208,7 +206,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     }
 
     private QueryBuilder createQuery(String queryString, TimeRange timerange, Set<String> eventStreams, String filterString, Set<String> forbiddenSourceStreams, Map<String, Set<String>> extraFilters) {
-        final QueryBuilder query = (queryString.isEmpty() || queryString.equals("*"))
+        final QueryBuilder query = QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
                 ? matchAllQuery()
                 : queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
 
@@ -251,7 +249,7 @@ public class MoreSearchAdapterOS2 implements MoreSearchAdapter {
     }
 
     private List<FieldSortBuilder> createSorting(Sorting sorting) {
-        final SortOrder order = sortOrderMapper.fromSorting(sorting);
+        final SortOrder order = SortOrder.valueOf(sorting.getUppercasedDirection());
         final List<FieldSortBuilder> sortBuilders;
         if (EventDto.FIELD_TIMERANGE_START.equals(sorting.getField())) {
             sortBuilders = List.of(

@@ -88,7 +88,7 @@ describe('Lookup Table List', () => {
   it('should render a list of lookup tables', async () => {
     render(<LookupTableList />);
 
-    await screen.findAllByRole('button', { name: /help/i });
+    await screen.findAllByRole('button', { name: /Show search syntax help/i });
 
     screen.getByText(/0 table title/i);
     screen.getByText(/0 table description/i);

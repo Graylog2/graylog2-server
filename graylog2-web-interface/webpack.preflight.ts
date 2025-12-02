@@ -41,6 +41,7 @@ const baseConfig = {
   mode,
   name: 'preflight',
   entry: {
+    preload: path.resolve(PREFLIGHT_PATH, '..', 'preload.ts'),
     preflight: PREFLIGHT_PATH,
   },
   output: {
