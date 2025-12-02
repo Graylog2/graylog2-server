@@ -766,7 +766,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <mainClass>org.graylog.datanode.docs.ConfigurationDocsGenerator</mainClass>
                             <arguments>
                                 <argument>csv</argument>
                                 <argument>${project.build.directory}/datanode-conf-docs.csv</argument>
@@ -780,7 +780,7 @@
                             <goal>java</goal>
                         </goals>
                         <configuration>
-                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <mainClass>org.graylog.datanode.docs.ConfigurationDocsGenerator</mainClass>
                             <arguments>
                                 <argument>conf</argument>
                                 <argument>${project.build.directory}/datanode.conf.generated</argument>

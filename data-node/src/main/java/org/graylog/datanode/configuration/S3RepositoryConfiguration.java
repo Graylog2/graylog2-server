@@ -18,8 +18,8 @@ package org.graylog.datanode.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.BooleanConverter;
-import com.github.joschi.jadconfig.documentation.Documentation;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog2.configuration.Documentation;
 
 import java.util.Arrays;
 import java.util.Map;
