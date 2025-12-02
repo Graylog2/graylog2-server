@@ -16,7 +16,6 @@
  */
 package org.graylog.datanode.commands;
 
-import com.github.joschi.jadconfig.documentation.DocumentedBeansService;
 import com.github.rvesse.airline.annotations.Command;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
@@ -37,6 +36,7 @@ import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
+import org.graylog.datanode.docs.DocumentedBeansService;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.cluster.nodes.DataNodeDto;

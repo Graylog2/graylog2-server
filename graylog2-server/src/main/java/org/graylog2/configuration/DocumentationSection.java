@@ -16,22 +16,16 @@
  */
 package org.graylog2.configuration;
 
-import com.github.joschi.jadconfig.Parameter;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import java.net.URI;
-
-public class VersionCheckConfiguration {
-    @Parameter(value = "versionchecks")
-    private boolean enabled = true;
-
-    @Parameter(value = "versionchecks_uri")
-    private URI uri = URI.create("https://versioncheck.graylog.com/check");
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public URI getUri() {
-        return uri;
-    }
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE, ElementType.FIELD})
+public @interface DocumentationSection {
+    String heading();
+    String description();
 }
