@@ -52,7 +52,7 @@ const Td = styled.td<{ $colId: string }>(
   ({ $colId }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
-    transform: var(${columnTransformVar($colId)}, translate3d(0px, 0px, 0));
+    transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
     transition: var(${columnTransition()}, none);
   `,
 );

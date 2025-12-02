@@ -19,37 +19,39 @@ import styled, { css } from 'styled-components';
 
 import { Section } from 'components/common';
 
-const Container = styled.div(({ theme }) => css`
-  table thead,
-  table thead tr,
-  table thead th {
-    background-color: ${theme.colors.section.filled} !important;
-  }
+const Container = styled.div(
+  ({ theme }) => css`
+    table thead,
+    table thead tr,
+    table thead th {
+      background-color: ${theme.colors.section.filled} !important;
+    }
 
-  table tbody {
-    background-color: transparent;
-  }
+    table tbody {
+      background-color: transparent;
+    }
 
-  table tbody tr {
-    background-color: transparent;
-  }
+    table tbody tr {
+      background-color: transparent;
+    }
 
-  table tbody tr:first-of-type {
-    background-color: transparent;
-  }
+    table tbody tr:first-of-type {
+      background-color: transparent;
+    }
 
-  table tbody:nth-of-type(odd) tr:first-of-type {
-    background-color: ${theme.colors.table.row.background} !important;
-  }
+    table tbody:nth-of-type(odd) tr:first-of-type {
+      background-color: ${theme.colors.table.row.background} !important;
+    }
 
-  table tbody:nth-of-type(even) tr:first-of-type {
-    background-color: ${theme.colors.table.row.backgroundStriped} !important;
-  }
+    table tbody:nth-of-type(even) tr:first-of-type {
+      background-color: ${theme.colors.table.row.backgroundStriped} !important;
+    }
 
-  table tbody tr:hover:first-of-type {
-    background-color: ${theme.colors.table.row.backgroundHover} !important;
-  }
-`);
+    table tbody tr:hover:first-of-type {
+      background-color: ${theme.colors.table.row.backgroundHover} !important;
+    }
+  `,
+);
 
 const TitleWrapper = styled.div`
   display: inline-flex;
@@ -166,9 +168,7 @@ const ClusterNodesSectionWrapper = ({
         collapsible={collapsible}
         headerLeftSection={headerLeftSection}
         collapseButtonPosition="left">
-        <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>
-          {children}
-        </TableWrapper>
+        <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
       </Section>
     </Container>
   );
