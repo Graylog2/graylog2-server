@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Locale;
 
-@DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = "tbd")
+@DocumentationSection(heading = "Netty transport configuration", description = "")
 public class NettyTransportConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(NettyTransportConfiguration.class);
     private static final String PREFIX = "transport_netty_";

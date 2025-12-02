@@ -21,7 +21,7 @@ import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.plugin.PluginConfigBean;
 
-@DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = "tbd")
+@DocumentationSection(heading = "Pipeline configuration", description = "")
 public class PipelineConfig implements PluginConfigBean {
 
     @Documentation(value = "tbd")

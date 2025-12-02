@@ -22,7 +22,7 @@ import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.plugin.PluginConfigBean;
 import org.joda.time.Duration;
 
-@DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = "tbd")
+@DocumentationSection(heading = "Views configuration", description = "")
 public class ViewsConfig implements PluginConfigBean {
     private static final Duration DEFAULT_MAXIMUM_AGE_FOR_SEARCHES = Duration.standardDays(4);
     private static final String PREFIX = "views_";

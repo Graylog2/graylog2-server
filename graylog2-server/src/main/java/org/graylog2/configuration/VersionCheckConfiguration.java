@@ -23,7 +23,7 @@ import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import java.net.URI;
 
 
-@DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = "tbd")
+@DocumentationSection(heading = "Version check configuration", description = "")
 public class VersionCheckConfiguration {
     @Documentation(value = "tbd", visible = false)
     @Parameter(value = "versionchecks")

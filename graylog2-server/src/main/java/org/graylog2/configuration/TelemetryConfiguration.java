@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Map;
 
-@DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = "tbd")
+@DocumentationSection(heading = "Telemetry configuration", description = "")
 public class TelemetryConfiguration {
 
     public static final String TELEMETRY_ENABLED = "telemetry_enabled";

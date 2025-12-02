@@ -28,7 +28,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 @SuppressWarnings({"unused", "FieldMayBeFinal"})
-@DocumentationSection(heading = "GRAYLOG CONFIGURATION FILE", description = "tbd")
+@DocumentationSection(heading = "GeoIP processor configuration", description = "")
 @Singleton
 public class GeoIpProcessorConfig extends PathConfiguration {
     private static final String PREFIX = "geo_ip_processor";
