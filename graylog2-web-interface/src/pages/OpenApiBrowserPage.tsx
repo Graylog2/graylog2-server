@@ -22,7 +22,7 @@ import { DocumentTitle } from 'components/common';
 
 const OpenApiBrowserPage = () => (
   <DocumentTitle title="OpenAPI Browser">
-    <SwaggerUI url="/api/openapi/yaml" />
+    <SwaggerUI url="/api/openapi.yaml" />
   </DocumentTitle>
 );
 

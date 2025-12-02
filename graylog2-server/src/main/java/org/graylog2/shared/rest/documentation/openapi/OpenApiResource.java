@@ -33,8 +33,18 @@ import jakarta.ws.rs.core.UriInfo;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.rest.MoreMediaTypes;
 
-@Path("/openapi/{type:json|yaml}")
+/**
+ * Serves the OpenAPI specification in JSON or YAML format.
+ * <p>
+ * Supported URLs:
+ * <ul>
+ *   <li>{@code /api/openapi} - JSON format (default)</li>
+ *   <li>{@code /api/openapi.json} - JSON format (via Jersey's media type mapping)</li>
+ *   <li>{@code /api/openapi.yaml} - YAML format</li>
+ * </ul>
+ */
 @RequiresAuthentication
+@Path("/openapi{ext: (\\.yaml)?}")
 public class OpenApiResource extends BaseOpenApiResource {
     @Context
     Application app;
@@ -51,8 +61,8 @@ public class OpenApiResource extends BaseOpenApiResource {
     @Operation(hidden = true)
     public Response getOpenApi(@Context HttpHeaders headers,
                                @Context UriInfo uriInfo,
-                               @PathParam("type") String type) throws Exception {
-
+                               @PathParam("ext") String ext) throws Exception {
+        final String type = ".yaml".equals(ext) ? "yaml" : "json";
         return super.getOpenApi(headers, null, app, uriInfo, type);
     }
 }
