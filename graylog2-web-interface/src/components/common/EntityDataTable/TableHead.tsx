@@ -29,6 +29,7 @@ import {
   columnWidthVar,
   columnTransition,
 } from 'components/common/EntityDataTable/CSSVariables';
+import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
 import SortIcon from './SortIcon';
 import DndStylesContext from './contexts/DndStylesContext';
@@ -41,13 +42,20 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $colId: string }>(
-  ({ $colId, theme }) => css`
+export const Th = styled.th<{ $colId: string; $hidePadding }>(
+  ({ $colId, $hidePadding, theme }) => css`
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
     background-color: ${theme.colors.table.head.background};
     transition: var(${columnTransition()}, none);
+
+    ${$hidePadding &&
+    css`
+      && {
+        padding: 0;
+      }
+    `}
   `,
 );
 
@@ -88,7 +96,13 @@ const useSortableCol = (colId: string, disabled: boolean) => {
   };
 };
 
-const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+const TableHeaderCell = <Entity extends EntityBase>({
+  header,
+  hasRowActions,
+}: {
+  header: Header<Entity, unknown>;
+  hasRowActions;
+}) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
     header.column.id,
@@ -96,7 +110,12 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
   );
 
   return (
-    <Th key={header.id} ref={setNodeRef} colSpan={header.colSpan} $colId={header.column.id}>
+    <Th
+      key={header.id}
+      ref={setNodeRef}
+      colSpan={header.colSpan}
+      $colId={header.column.id}
+      $hidePadding={!hasRowActions && header.column.id === ACTIONS_COL_ID}>
       <ThInner>
         <LeftCol>
           {columnMeta?.enableColumnOrdering && (
@@ -124,15 +143,16 @@ const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header
 };
 
 type Props<Entity extends EntityBase> = {
+  hasRowActions: boolean;
   headerGroups: Array<HeaderGroup<Entity>>;
 };
 
-const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
+const TableHead = <Entity extends EntityBase>({ headerGroups, hasRowActions }: Props<Entity>) => (
   <Thead>
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeaderCell key={header.id} header={header} />
+          <TableHeaderCell key={header.id} header={header} hasRowActions={hasRowActions} />
         ))}
       </tr>
     ))}

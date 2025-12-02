@@ -135,7 +135,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnRenderersByAttribute,
   columnSchemas,
   columnWidths,
-  displayActionsCol,
+  hasRowActions,
   displayBulkSelectCol,
   entityActions,
   entityAttributesAreCamelCase,
@@ -145,7 +145,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
   columnWidths: { [_attributeId: string]: number };
-  displayActionsCol: boolean;
+  hasRowActions: boolean;
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
   entityAttributesAreCamelCase: boolean;
@@ -153,7 +153,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol);
-  const actionsCol = useActionsColumnDefinition(displayActionsCol, columnWidths.actions, entityActions, actionsRef);
+  const actionsCol = useActionsColumnDefinition(hasRowActions, columnWidths.actions, entityActions, actionsRef);
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
     columnSchemas,
     columnRenderersByAttribute,
@@ -252,7 +252,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   pageSize = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
-  const displayActionsCol = typeof entityActions === 'function';
+  const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
   const displayBulkSelectCol = typeof onChangeSelection === 'function' || displayBulkAction;
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
@@ -292,7 +292,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
-    displayActionsCol,
+    hasRowActions,
     displayBulkSelectCol,
     entityActions,
     entityAttributesAreCamelCase,
@@ -359,6 +359,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                     expandedSectionRenderers={expandedSectionRenderers}
                     headerGroups={headerGroups}
                     rows={table.getRowModel().rows}
+                    hasRowActions={hasRowActions}
                   />
                 </ScrollContainer>
               )}
