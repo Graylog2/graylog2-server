@@ -80,6 +80,7 @@ const ActionsRow = styled.div`
   justify-content: space-between;
   margin-bottom: 10px;
   min-height: 22px;
+  width: 100%;
 `;
 
 const LayoutConfigRow = styled.div`
