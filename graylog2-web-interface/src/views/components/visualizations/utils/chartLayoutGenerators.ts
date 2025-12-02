@@ -20,7 +20,7 @@ import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
 import type { DefaultTheme } from 'styled-components';
 
-import type {DefaultAxisKey, FieldUnitType} from 'views/types';
+import type { DefaultAxisKey, FieldUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';

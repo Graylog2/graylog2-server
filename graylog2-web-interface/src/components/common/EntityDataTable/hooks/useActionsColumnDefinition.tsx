@@ -37,7 +37,7 @@ const Actions = styled(ButtonToolbar)`
 const ActionsHeader = () => <ActionsHead>Actions</ActionsHead>;
 
 const useActionsColumnDefinition = <Entity extends EntityBase>(
-  displayActionsCol: boolean,
+  hasRowActions: boolean,
   actionsColWidth: number,
   entityActions: (entity: Entity) => React.ReactNode | undefined,
   colRef: React.MutableRefObject<HTMLDivElement>,
@@ -58,12 +58,12 @@ const useActionsColumnDefinition = <Entity extends EntityBase>(
       columnHelper.display({
         id: ACTIONS_COL_ID,
         size: actionsColWidth,
-        header: displayActionsCol ? ActionsHeader : undefined,
+        header: hasRowActions ? ActionsHeader : undefined,
         enableHiding: false,
         enableResizing: false,
-        cell: displayActionsCol ? cell : undefined,
+        cell: hasRowActions ? cell : undefined,
       }),
-    [actionsColWidth, cell, columnHelper, displayActionsCol],
+    [actionsColWidth, cell, columnHelper, hasRowActions],
   );
 };
 export default useActionsColumnDefinition;
