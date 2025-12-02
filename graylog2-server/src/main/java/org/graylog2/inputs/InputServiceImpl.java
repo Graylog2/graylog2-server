@@ -275,15 +275,6 @@ public class InputServiceImpl implements InputService {
                 .setConfiguration((Map<String, Object>) fields.get(MessageInput.FIELD_CONFIGURATION))
                 .setCreatedAt(createdAt);
 
-        final Object idField = fields.get(InputImpl.FIELD_ID);
-        if (idField instanceof ObjectId objectId) {
-            builder.setId(objectId.toHexString());
-        } else if (idField instanceof String idStr && !idStr.isBlank()) {
-            builder.setId(idStr);
-        } else {
-            builder.setId(new ObjectId().toHexString());
-        }
-
         final String desiredStateStr = (String) fields.get(MessageInput.FIELD_DESIRED_STATE);
         if (desiredStateStr != null && !desiredStateStr.isBlank()) {
             builder.setPersistedDesiredState(IOState.Type.valueOf(desiredStateStr));
