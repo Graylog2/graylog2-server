@@ -18,8 +18,8 @@ package org.graylog2.migrations;
 
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachine;
 import org.graylog.plugins.views.storage.migration.state.machine.MigrationStateMachineContext;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.datanode.CurrentWriteIndices;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
@@ -33,6 +33,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -98,7 +100,7 @@ public class V20240927120300_DataNodeMigrationIndexSetTest {
         when(indexSet.getNewestIndex()).thenThrow(new NoTargetIndexException(""));
         when(indexSetRegistry.get("id1")).thenReturn(Optional.of(indexSet));
         migration.upgrade();
-        verify(indices, times(1)).create("graylog_11", indexSet);
+        verify(indices, times(1)).create(eq("graylog_11"), any());
         verify(indexSet, times(1)).setUp();
     }
 

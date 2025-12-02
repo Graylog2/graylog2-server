@@ -19,11 +19,12 @@ package org.graylog2.indexer.fieldtypes.mapping;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
-import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
@@ -215,7 +216,7 @@ public class FieldTypeMappingsService {
     }
 
     private void cycleIndexSet(final IndexSetConfig indexSetConfig) {
-        final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(indexSetConfig);
+        final IndexSet mongoIndexSet = mongoIndexSetFactory.create(indexSetConfig);
         mongoIndexSet.cycle();
     }
 

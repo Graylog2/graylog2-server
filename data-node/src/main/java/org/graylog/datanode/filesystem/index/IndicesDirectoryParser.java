@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.filesystem.index;
 
+import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog.datanode.filesystem.index.dto.IndexInformation;
@@ -26,17 +27,22 @@ import org.graylog.datanode.filesystem.index.indexreader.ShardStats;
 import org.graylog.datanode.filesystem.index.indexreader.ShardStatsParser;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 import org.graylog.datanode.filesystem.index.statefile.StateFileParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Singleton
 public class IndicesDirectoryParser {
+
+    private static final Logger LOG = LoggerFactory.getLogger(IndicesDirectoryParser.class);
 
     public static final String STATE_DIR_NAME = "_state";
     public static final String STATE_FILE_EXTENSION = ".st";
@@ -83,7 +89,7 @@ public class IndicesDirectoryParser {
 
     private NodeInformation parseNode(Path nodePath) {
         final Path indicesDir = nodePath.resolve("indices");
-        if(!Files.exists(indicesDir)) {
+        if (!Files.exists(indicesDir)) {
             return NodeInformation.empty(nodePath);
         }
         try (Stream<Path> indicesDirs = Files.list(indicesDir)) {
@@ -98,9 +104,17 @@ public class IndicesDirectoryParser {
         }
     }
 
+    @Nullable
     private StateFile getState(Path path, String stateFilePrefix) {
-        final Path stateFile = findStateFile(path, stateFilePrefix);
-        return stateFileParser.parse(stateFile);
+        final Optional<StateFile> stateFile = findStateFile(path, stateFilePrefix)
+                .map(stateFileParser::parse);
+        if (stateFile.isPresent()) {
+            return stateFile.get();
+        } else {
+            LOG.warn("Couldn't find state file in directory " + path + ". This is unexpected but indexers can usually recover from this.");
+            return null;
+        }
+
     }
 
     private IndexInformation parseIndex(Path path) {
@@ -126,14 +140,13 @@ public class IndicesDirectoryParser {
         return new ShardInformation(path, shardStats.documentsCount(), state, shardStats.minSegmentLuceneVersion());
     }
 
-    private Path findStateFile(Path stateDir, String stateFilePrefix) {
+    private Optional<Path> findStateFile(Path stateDir, String stateFilePrefix) {
         try (Stream<Path> stateFiles = Files.list(stateDir.resolve(STATE_DIR_NAME))) {
             return stateFiles
                     .filter(Files::isRegularFile)
                     .filter(file -> file.getFileName().toString().startsWith(stateFilePrefix))
                     .filter(file -> file.getFileName().toString().endsWith(STATE_FILE_EXTENSION))
-                    .findFirst()
-                    .orElseThrow(() -> new IndexerInformationParserException("No state file available in dir  " + stateDir));
+                    .findFirst();
         } catch (IOException e) {
             throw new IndexerInformationParserException("Failed to list state file of index" + stateDir, e);
         }

@@ -17,7 +17,7 @@
 package org.graylog2.indexer.datanode;
 
 import org.graylog2.cluster.lock.Lock;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 
 public interface DatanodeMigrationLockService {
     /**

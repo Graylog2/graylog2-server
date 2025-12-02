@@ -23,10 +23,10 @@ import type { IndexInfo } from 'stores/indices/IndicesStore';
 type Props = {
   indexDetails: Array<IndexInfo>;
   indices: Array<IndexSummary>;
-  indexSetId: string;
+  indexSetId?: string;
 };
 
-const IndicesOverview = ({ indexDetails, indices, indexSetId }: Props) => {
+const IndicesOverview = ({ indexDetails, indices, indexSetId = undefined }: Props) => {
   const indicesFilteredByTier = (
     indicesList: Array<IndexSummary>,
     tier: 'WARM' | 'HOT' | undefined,

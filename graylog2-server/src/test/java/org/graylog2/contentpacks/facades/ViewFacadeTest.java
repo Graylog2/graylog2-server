@@ -316,7 +316,7 @@ public class ViewFacadeTest {
                 .widgets(Set.of())
                 .widgetMapping(Map.of())
                 .widgetPositions(Map.of())
-                .formatting(FormattingSettings.builder().highlighting(Set.of()).build())
+                .formatting(FormattingSettings.builder().highlighting(List.of()).build())
                 .displayModeSettings(DisplayModeSettings.empty())
                 .build();
         String newViewId = "5def958063303ae5f68edead";

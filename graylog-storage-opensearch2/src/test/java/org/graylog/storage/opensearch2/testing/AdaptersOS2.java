@@ -41,6 +41,7 @@ import org.graylog2.indexer.IndexToolsAdapter;
 import org.graylog2.indexer.cluster.NodeAdapter;
 import org.graylog2.indexer.counts.CountsAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.ChunkedBulkIndexer;
 import org.graylog2.indexer.messages.MessagesAdapter;
@@ -59,16 +60,18 @@ public class AdaptersOS2 implements Adapters {
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
     private final ResultMessageFactory resultMessageFactory = new TestResultMessageFactory();
+    private final SearchRequestFactory searchRequestFactory;
 
     public AdaptersOS2(OpenSearchClient client, List<String> featureFlags) {
         this.client = client;
         this.featureFlags = featureFlags;
         this.objectMapper = new ObjectMapperProvider().get();
+        this.searchRequestFactory = new SearchRequestFactory(true, true, new IgnoreSearchFilters());
     }
 
     @Override
     public CountsAdapter countsAdapter() {
-        return new CountsAdapterOS2(client);
+        return new CountsAdapterOS2(client, searchRequestFactory);
     }
 
     @Override
@@ -78,7 +81,7 @@ public class AdaptersOS2 implements Adapters {
                 new org.graylog.storage.opensearch2.stats.ClusterStatsApi(objectMapper, new PlainJsonApi(objectMapper, client)),
                 new org.graylog.storage.opensearch2.cat.CatApi(objectMapper, client),
                 new org.graylog.storage.opensearch2.cluster.ClusterStateApi(objectMapper, client),
-                featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE) ? new ComposableIndexTemplateAdapter(client, objectMapper) : new LegacyIndexTemplateAdapter(client)
+                indexTemplateAdapter()
         );
     }
 
@@ -97,10 +100,6 @@ public class AdaptersOS2 implements Adapters {
         final ScrollResultOS2.Factory scrollResultFactory = (initialResult, query, scroll, fields, limit) -> new ScrollResultOS2(
                 resultMessageFactory, client, initialResult, query, scroll, fields, limit
         );
-        final boolean allowHighlighting = true;
-        final boolean allowLeadingWildcardSearches = true;
-
-        final SearchRequestFactory searchRequestFactory = new SearchRequestFactory(allowHighlighting, allowLeadingWildcardSearches, new IgnoreSearchFilters());
         return new SearchesAdapterOS2(client,
                 new Scroll(client,
                         scrollResultFactory,
@@ -121,6 +120,15 @@ public class AdaptersOS2 implements Adapters {
     @Override
     public IndexFieldTypePollerAdapter indexFieldTypePollerAdapter(final Configuration configuration) {
         return new IndexFieldTypePollerAdapterOS2(new FieldMappingApi(client), configuration, new StreamsForFieldRetrieverOS2(client));
+    }
+
+    @Override
+    public IndexTemplateAdapter indexTemplateAdapter() {
+        if(featureFlags.contains(COMPOSABLE_INDEX_TEMPLATES_FEATURE)) {
+            return new ComposableIndexTemplateAdapter(client, objectMapper);
+        } else {
+            return new LegacyIndexTemplateAdapter(client);
+        }
     }
 
 }

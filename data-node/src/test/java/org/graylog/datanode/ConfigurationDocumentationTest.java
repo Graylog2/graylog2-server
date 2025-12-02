@@ -18,13 +18,13 @@ package org.graylog.datanode;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ReflectionUtils;
+import com.github.joschi.jadconfig.documentation.ConfigurationBeansSPI;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.lang3.ClassUtils;
 import org.bson.assertions.Assertions;
 import org.graylog.datanode.commands.Datanode;
-import org.graylog.datanode.docs.ConfigurationBeansSPI;
-import org.graylog2.configuration.Documentation;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
