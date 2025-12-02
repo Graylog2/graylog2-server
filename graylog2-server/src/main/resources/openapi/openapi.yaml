@@ -15,6 +15,8 @@ info:
 tags:
 - description: Manage AWS Config settings
   name: AWS/Config
+- description: AWS CloudTrail
+  name: AWSCloudTrail
 - description: Render system notification messages
   name: System/Notification/Message
 - description: Event entity types
@@ -145,6 +147,8 @@ tags:
   name: Stream/Destinations/Filters/Builder
 - description: Manage stream destination filter rules
   name: Stream/Destinations/Filters
+- description: Retrieve/set favorite fields per stream
+  name: FavoriteFields
 - description: Manage stream outputs for a given stream
   name: StreamOutputs
 - description: Provide stream rule inputs
@@ -2204,7 +2208,7 @@ paths:
       tags:
       - EntityLists
     post:
-      operationId: create_6
+      operationId: create_7
       parameters:
       - in: path
         name: entity_list_id
@@ -2280,7 +2284,7 @@ paths:
       tags:
       - Events/Definitions
     post:
-      operationId: create
+      operationId: create_1
       parameters:
       - in: query
         name: schedule
@@ -2732,7 +2736,7 @@ paths:
       tags:
       - Events/Notifications
     post:
-      operationId: create_1
+      operationId: create_2
       requestBody:
         content:
           application/json:
@@ -2941,6 +2945,57 @@ paths:
       summary: Get event by ID
       tags:
       - Events
+  /favorite_fields:
+    post:
+      operationId: set
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.resources.streams.favoritefields.FavoriteFieldsResource.SetFavoriteFieldsRequest"
+        required: true
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+      summary: Set favorite fields for a list of streams
+      tags:
+      - FavoriteFields
+  /favorite_fields/add:
+    patch:
+      operationId: add
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.resources.streams.favoritefields.FavoriteFieldsResource.FavoriteFieldRequest"
+        required: true
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+      summary: Add favorite field for a list of streams
+      tags:
+      - FavoriteFields
+  /favorite_fields/remove:
+    patch:
+      operationId: remove
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.resources.streams.favoritefields.FavoriteFieldsResource.FavoriteFieldRequest"
+        required: true
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+      summary: Remove favorite field from a list of streams
+      tags:
+      - FavoriteFields
   /favorites:
     get:
       operationId: getFavoriteItems
@@ -3225,7 +3280,7 @@ paths:
       - AWS
   /plugins/org.graylog.integrations/aws/inputs:
     post:
-      operationId: create_2
+      operationId: create_3
       parameters:
       - in: query
         name: setup_wizard
@@ -3374,6 +3429,63 @@ paths:
       summary: Get all available AWS regions
       tags:
       - AWS
+  /plugins/org.graylog.integrations/cloudtrail/check_credentials:
+    post:
+      operationId: checkCredentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailRequestImpl"
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                type: string
+          description: default response
+      summary: Validate input credentials
+      tags:
+      - AWSCloudTrail
+  /plugins/org.graylog.integrations/cloudtrail/getawsregions:
+    get:
+      operationId: getAWSRegions
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: string
+          description: default response
+      summary: Get all available AWS regions
+      tags:
+      - AWSCloudTrail
+  /plugins/org.graylog.integrations/cloudtrail/inputs:
+    post:
+      operationId: create
+      parameters:
+      - in: query
+        name: setup_wizard
+        schema:
+          type: boolean
+          default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest"
+        required: true
+      responses:
+        default:
+          content:
+            application/json: {}
+          description: default response
+      summary: Create a new CloudTrail input
+      tags:
+      - AWSCloudTrail
   /plugins/org.graylog2.shared.security/certrenewal/{nodeID}:
     post:
       operationId: initiateCertRenewalForNode
@@ -3445,7 +3557,7 @@ paths:
       tags:
       - Roles
     post:
-      operationId: create_7
+      operationId: create_8
       requestBody:
         content:
           application/json:
@@ -3684,7 +3796,7 @@ paths:
       tags:
       - Search/Decorators
     post:
-      operationId: create_8
+      operationId: create_9
       requestBody:
         content:
           application/json:
@@ -5191,7 +5303,7 @@ paths:
       tags:
       - Streams
     post:
-      operationId: create_9
+      operationId: create_10
       requestBody:
         content:
           application/json:
@@ -5850,7 +5962,7 @@ paths:
       tags:
       - StreamOutputs
     post:
-      operationId: add
+      operationId: add_1
       parameters:
       - description: The id of the stream whose outputs we want.
         in: path
@@ -5872,7 +5984,7 @@ paths:
       - StreamOutputs
   /streams/{streamid}/outputs/{outputId}:
     delete:
-      operationId: remove
+      operationId: remove_1
       parameters:
       - description: The id of the stream whose outputs we want.
         in: path
@@ -5934,7 +6046,7 @@ paths:
       tags:
       - StreamRules
     post:
-      operationId: create_10
+      operationId: create_11
       parameters:
       - description: The stream id this new rule belongs to.
         in: path
@@ -6182,7 +6294,7 @@ paths:
       tags:
       - System/Authentication/Services/Backends
     post:
-      operationId: create_5
+      operationId: create_6
       requestBody:
         content:
           application/json:
@@ -6464,7 +6576,7 @@ paths:
         required: true
         schema:
           type: string
-          default: title
+          default: hostname
           enum:
           - hostname
           - data_node_status
@@ -6518,6 +6630,60 @@ paths:
                 $ref: "#/components/schemas/org.graylog2.rest.models.system.cluster.responses.NodeSummaryList"
           description: default response
       summary: List all active nodes in this cluster.
+      tags:
+      - System/Cluster
+  /system/cluster/nodes/paginated:
+    get:
+      operationId: nodes_1
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - in: query
+        name: per_page
+        schema:
+          type: integer
+          format: int32
+          default: 50
+      - in: query
+        name: query
+        schema:
+          type: string
+          default: ""
+      - description: The field to sort the result on
+        in: query
+        name: sort
+        required: true
+        schema:
+          type: string
+          default: hostname
+          enum:
+          - hostname
+          - node_id
+          - short_node_id
+          - transport_address
+      - description: The sort direction
+        in: query
+        name: order
+        schema:
+          type: string
+          default: asc
+          enum:
+          - asc
+          - desc
+          - asc
+          - desc
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.tools.responses.PageListResponseOrg.graylog2.cluster.nodes.ServerNodeDto"
+          description: default response
+      summary: Get a paginated list of all server nodes in this cluster
       tags:
       - System/Cluster
   /system/cluster/nodes/{nodeId}:
@@ -7177,8 +7343,8 @@ paths:
       - System/Deflector
   /system/fields:
     get:
-      description: This operation is comparably fast because it reads directly from
-        the indexer mapping.
+      description: This operation is comparatively fast because it reads directly
+        from the indexer mapping.
       operationId: fields
       parameters:
       - description: Maximum number of fields to return. Set to 0 for all fields.
@@ -7192,12 +7358,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                additionalProperties:
-                  type: array
-                  items:
-                    type: string
-                  uniqueItems: true
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.SystemFieldsResource.MessageFieldsDTO"
           description: default response
       summary: Get list of message fields that exist
       tags:
@@ -7901,7 +8062,7 @@ paths:
       - System/IndexSets
   /system/indices/index_sets/profiles:
     post:
-      operationId: create_11
+      operationId: create_12
       requestBody:
         content:
           application/json:
@@ -8087,7 +8248,7 @@ paths:
       - System/IndexSets
   /system/indices/index_sets/templates:
     post:
-      operationId: create_12
+      operationId: create_13
       requestBody:
         content:
           application/json:
@@ -8775,7 +8936,7 @@ paths:
       tags:
       - System/Inputs
     post:
-      operationId: create_14
+      operationId: create_15
       parameters:
       - in: query
         name: setup_wizard
@@ -8815,6 +8976,103 @@ paths:
         "404":
           description: No such input.
       summary: Get diagnostic information of a single input
+      tags:
+      - System/Inputs
+  /system/inputs/meta/retrieve:
+    post:
+      operationId: pipelineMetadataBulk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao"
+          description: default response
+      summary: Bulk retrieval of input metadata
+      tags:
+      - System/Inputs
+  /system/inputs/meta/{inputId}:
+    get:
+      operationId: pipelineMetadata
+      parameters:
+      - in: path
+        name: inputId
+        required: true
+        schema:
+          type: string
+      responses:
+        "404":
+          description: No such input.
+      summary: Get information about usage of input in pipeline rules
+      tags:
+      - System/Inputs
+  /system/inputs/paginated:
+    get:
+      operationId: getPage_9
+      parameters:
+      - in: query
+        name: page
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - in: query
+        name: per_page
+        schema:
+          type: integer
+          format: int32
+          default: 50
+      - in: query
+        name: query
+        schema:
+          type: string
+          default: ""
+      - in: query
+        name: filters
+        schema:
+          type: array
+          items:
+            type: string
+      - description: The field to sort the result on
+        in: query
+        name: sort
+        required: true
+        schema:
+          type: string
+          default: title
+          enum:
+          - title
+          - created_at
+          - status
+      - description: The sort direction
+        in: query
+        name: order
+        schema:
+          type: string
+          default: asc
+          enum:
+          - asc
+          - desc
+          - asc
+          - desc
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.tools.responses.PageListResponseOrg.graylog2.rest.models.system.inputs.responses.InputSummary"
+          description: default response
+      summary: Get a paginated list of inputs
       tags:
       - System/Inputs
   /system/inputs/references/{inputId}:
@@ -8948,7 +9206,7 @@ paths:
       tags:
       - Extractors
     post:
-      operationId: create_13
+      operationId: create_14
       parameters:
       - in: path
         name: inputId
@@ -9067,7 +9325,7 @@ paths:
       - Extractors
   /system/inputs/{inputId}/staticfields:
     post:
-      operationId: create_15
+      operationId: create_16
       parameters:
       - in: path
         name: inputId
@@ -10445,7 +10703,7 @@ paths:
       tags:
       - System/Outputs
     post:
-      operationId: create_16
+      operationId: create_17
       requestBody:
         content:
           application/json:
@@ -10790,7 +11048,6 @@ paths:
       tags:
       - Pipelines/Pipelines
     get:
-      description: It can take up to a second until the change is applied
       operationId: get_3
       parameters:
       - in: path
@@ -10831,6 +11088,25 @@ paths:
                 $ref: "#/components/schemas/org.graylog.plugins.pipelineprocessor.rest.PipelineSource"
           description: default response
       summary: Modify a processing pipeline
+      tags:
+      - Pipelines/Pipelines
+  /system/pipelines/pipeline/{id}/meta/rules:
+    get:
+      operationId: getRulesMetadata
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: string
+      responses:
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao"
+          description: default response
+      summary: Get rules metadata of a processing pipeline
       tags:
       - Pipelines/Pipelines
   /system/pipelines/rule:
@@ -11668,7 +11944,7 @@ paths:
       - Telemetry
   /token_usage/paginated:
     get:
-      operationId: getPage_9
+      operationId: getPage_10
       parameters:
       - in: query
         name: page
@@ -12143,7 +12419,7 @@ paths:
       tags:
       - Users
     post:
-      operationId: create_17
+      operationId: create_18
       requestBody:
         content:
           application/json:
@@ -12210,7 +12486,7 @@ paths:
       - Users
   /users/paginated:
     get:
-      operationId: getPage_10
+      operationId: getPage_11
       parameters:
       - in: query
         name: page
@@ -12589,7 +12865,7 @@ paths:
       tags:
       - Views
     post:
-      operationId: create_4
+      operationId: create_5
       responses:
         default:
           content:
@@ -12621,7 +12897,7 @@ paths:
       - Views
   /views/export:
     post:
-      operationId: create_3
+      operationId: create_4
       responses:
         default:
           content:
@@ -13929,6 +14205,48 @@ components:
         secret_key:
           type: string
           writeOnly: true
+    org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailCreateInputRequest:
+      type: object
+      properties:
+        assume_role_arn:
+          type: string
+        aws_access_key:
+          type: string
+        aws_s3_region:
+          type: string
+        aws_secret_key:
+          $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
+        aws_sqs_queue_name:
+          type: string
+        aws_sqs_region:
+          type: string
+        enable_throttling:
+          type: boolean
+        name:
+          type: string
+        override_source:
+          type: string
+        polling_interval:
+          type: integer
+          format: int64
+        sqs_message_batch_size:
+          type: integer
+          format: int32
+    org.graylog.aws.inputs.cloudtrail.api.requests.CloudTrailRequestImpl:
+      type: object
+      properties:
+        assume_role_arn:
+          type: string
+        aws_access_key:
+          type: string
+        aws_s3_region:
+          type: string
+        aws_secret_key:
+          $ref: "#/components/schemas/org.graylog2.security.encryption.EncryptedValue"
+        aws_sqs_queue_name:
+          type: string
+        aws_sqs_region:
+          type: string
     org.graylog.events.conditions.BooleanExpression:
       type: object
       discriminator:
@@ -15347,6 +15665,58 @@ components:
       required:
       - database_type
       - path
+    org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao:
+      type: object
+      properties:
+        id:
+          type: string
+        input_id:
+          type: string
+        mentioned_in:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao.MentionedInEntry"
+    org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao.MentionedInEntry:
+      type: object
+      properties:
+        connected_streams:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        pipeline_id:
+          type: string
+        rule_id:
+          type: string
+    org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao:
+      type: object
+      properties:
+        deprecated_functions:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        functions:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        has_input_references:
+          type: boolean
+        id:
+          type: string
+        pipeline_id:
+          type: string
+        rules:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+        streams:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
     org.graylog.plugins.pipelineprocessor.db.RuleMetricsConfigDto:
       type: object
       properties:
@@ -15619,7 +15989,7 @@ components:
         index_sets:
           type: array
           items:
-            $ref: "#/components/schemas/org.graylog2.indexer.IndexSet"
+            $ref: "#/components/schemas/org.graylog2.indexer.indexset.IndexSet"
           uniqueItems: true
         inet_address:
           type: object
@@ -17617,7 +17987,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/org.graylog.plugins.views.search.views.formatting.highlighting.HighlightingRule"
-          uniqueItems: true
     org.graylog.plugins.views.search.views.PluginMetadataSummary:
       type: object
       properties:
@@ -18490,7 +18859,7 @@ components:
           type: array
           items:
             type: string
-        data_node_status:
+        datanode_status:
           type: string
           enum:
           - UNCONFIGURED
@@ -18539,6 +18908,49 @@ components:
           type: string
         version_compatible:
           type: boolean
+    org.graylog2.cluster.nodes.ServerNodeDto:
+      type: object
+      properties:
+        hostname:
+          type: string
+        id:
+          type: string
+        is_leader:
+          type: boolean
+        is_master:
+          type: boolean
+        is_processing:
+          type: boolean
+        last_seen:
+          type: string
+          format: date-time
+        lb_status:
+          type: string
+          enum:
+          - DEAD
+          - ALIVE
+          - THROTTLED
+        lifecycle:
+          type: string
+          enum:
+          - UNINITIALIZED
+          - STARTING
+          - RUNNING
+          - PAUSED
+          - HALTING
+          - FAILED
+          - THROTTLED
+          - OVERRIDE_LB_DEAD
+          - OVERRIDE_LB_ALIVE
+          - OVERRIDE_LB_THROTTLED
+        node_id:
+          type: string
+        object_id:
+          type: string
+        short_node_id:
+          type: string
+        transport_address:
+          type: string
     org.graylog2.configuration.ExposedConfiguration:
       type: object
       properties:
@@ -19327,34 +19739,6 @@ components:
           type: string
         pattern:
           type: string
-    org.graylog2.indexer.IndexSet:
-      type: object
-      properties:
-        active_write_index:
-          type: string
-        all_index_aliases:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: string
-            uniqueItems: true
-        config:
-          $ref: "#/components/schemas/org.graylog2.indexer.indexset.IndexSetConfig"
-        index_prefix:
-          type: string
-        index_wildcard:
-          type: string
-        managed_indices:
-          type: array
-          items:
-            type: string
-        newest_index:
-          type: string
-        up:
-          type: boolean
-        write_index_alias:
-          type: string
     org.graylog2.indexer.fieldtypes.FieldTypes.Type:
       type: object
       properties:
@@ -19390,6 +19774,34 @@ components:
       properties:
         empty:
           type: boolean
+    org.graylog2.indexer.indexset.IndexSet:
+      type: object
+      properties:
+        active_write_index:
+          type: string
+        all_index_aliases:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+            uniqueItems: true
+        config:
+          $ref: "#/components/schemas/org.graylog2.indexer.indexset.IndexSetConfig"
+        index_prefix:
+          type: string
+        index_wildcard:
+          type: string
+        managed_indices:
+          type: array
+          items:
+            type: string
+        newest_index:
+          type: string
+        up:
+          type: boolean
+        write_index_alias:
+          type: string
     org.graylog2.indexer.indexset.IndexSetConfig:
       type: object
       properties:
@@ -20092,7 +20504,7 @@ components:
         index_sets:
           type: array
           items:
-            $ref: "#/components/schemas/org.graylog2.indexer.IndexSet"
+            $ref: "#/components/schemas/org.graylog2.indexer.indexset.IndexSet"
           uniqueItems: true
         inet_address:
           type: object
@@ -20378,13 +20790,17 @@ components:
           type: boolean
         editable:
           type: boolean
+        favorite_fields:
+          type: array
+          items:
+            type: string
         fingerprint:
           type: integer
           format: int32
         id:
           type: string
         index_set:
-          $ref: "#/components/schemas/org.graylog2.indexer.IndexSet"
+          $ref: "#/components/schemas/org.graylog2.indexer.indexset.IndexSet"
         index_set_id:
           type: string
         matching_type:
@@ -21883,7 +22299,18 @@ components:
         throughput:
           type: integer
           format: int64
-    org.graylog2.rest.models.system.sessions.responses.SessionResponse: {}
+    org.graylog2.rest.models.system.sessions.responses.SessionResponse:
+      type: object
+      properties:
+        session_id:
+          type: string
+        user_id:
+          type: string
+        username:
+          type: string
+        valid_until:
+          type: string
+          format: date-time
     org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse:
       type: object
       properties:
@@ -22202,6 +22629,33 @@ components:
         total:
           type: integer
           format: int64
+    org.graylog2.rest.models.tools.responses.PageListResponseOrg.graylog2.cluster.nodes.ServerNodeDto:
+      type: object
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.rest.resources.entities.EntityAttribute"
+        defaults:
+          $ref: "#/components/schemas/org.graylog2.rest.resources.entities.EntityDefaults"
+        elements:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.cluster.nodes.ServerNodeDto"
+        order:
+          type: string
+          enum:
+          - asc
+          - desc
+        pagination:
+          $ref: "#/components/schemas/org.graylog2.database.PaginatedList.PaginationInfo"
+        query:
+          type: string
+        sort:
+          type: string
+        total:
+          type: integer
+          format: int64
     org.graylog2.rest.models.tools.responses.PageListResponseOrg.graylog2.indexer.indexset.profile.IndexFieldTypeProfileWithUsages:
       type: object
       properties:
@@ -22242,6 +22696,33 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/org.graylog2.indexer.indexset.template.rest.IndexSetTemplateResponse"
+        order:
+          type: string
+          enum:
+          - asc
+          - desc
+        pagination:
+          $ref: "#/components/schemas/org.graylog2.database.PaginatedList.PaginationInfo"
+        query:
+          type: string
+        sort:
+          type: string
+        total:
+          type: integer
+          format: int64
+    org.graylog2.rest.models.tools.responses.PageListResponseOrg.graylog2.rest.models.system.inputs.responses.InputSummary:
+      type: object
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.rest.resources.entities.EntityAttribute"
+        defaults:
+          $ref: "#/components/schemas/org.graylog2.rest.resources.entities.EntityDefaults"
+        elements:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputSummary"
         order:
           type: string
           enum:
@@ -22726,10 +23207,14 @@ components:
     org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences:
       type: object
       properties:
+        attributes:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences.Attribute"
         custom_preferences:
           type: object
           additionalProperties: {}
-        displayed_attributes:
+        order:
           type: array
           items:
             type: string
@@ -22738,19 +23223,27 @@ components:
           format: int32
         sort:
           $ref: "#/components/schemas/org.graylog2.rest.resources.entities.preferences.model.SortPreferences"
-    org.graylog2.rest.resources.entities.preferences.model.SingleFieldSortPreferences:
-      allOf:
-      - $ref: "#/components/schemas/org.graylog2.rest.resources.entities.preferences.model.SortPreferences"
-      - type: object
-        properties:
-          field:
-            type: string
-          order:
-            type: string
-            enum:
-            - asc
-            - desc
-    org.graylog2.rest.resources.entities.preferences.model.SortPreferences: {}
+    org.graylog2.rest.resources.entities.preferences.model.EntityListPreferences.Attribute:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - show
+          - hide
+        width:
+          type: integer
+          format: int32
+    org.graylog2.rest.resources.entities.preferences.model.SortPreferences:
+      type: object
+      properties:
+        field:
+          type: string
+        order:
+          type: string
+          enum:
+          - asc
+          - desc
     org.graylog2.rest.resources.search.responses.SearchDecorationStats:
       type: object
       properties:
@@ -22811,6 +23304,29 @@ components:
           type: array
           items:
             type: string
+    org.graylog2.rest.resources.streams.favoritefields.FavoriteFieldsResource.FavoriteFieldRequest:
+      type: object
+      properties:
+        field:
+          type: string
+          minLength: 1
+        stream_ids:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+      required:
+      - field
+      - stream_ids
+    org.graylog2.rest.resources.streams.favoritefields.FavoriteFieldsResource.SetFavoriteFieldsRequest:
+      type: object
+      properties:
+        fields:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
     org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary:
       type: object
       properties:
@@ -22943,6 +23459,10 @@ components:
           type: string
         disabled:
           type: boolean
+        favorite_fields:
+          type: array
+          items:
+            type: string
         id:
           type: string
         index_set_id:
@@ -23035,6 +23555,14 @@ components:
           type: string
         satisfied:
           type: boolean
+    org.graylog2.rest.resources.system.SystemFieldsResource.MessageFieldsDTO:
+      type: object
+      properties:
+        fields:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
     org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse:
       type: object
       properties:
