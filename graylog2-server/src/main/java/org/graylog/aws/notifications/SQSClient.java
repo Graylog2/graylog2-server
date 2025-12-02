@@ -25,6 +25,7 @@ import org.graylog2.plugin.InputFailureRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
+import software.amazon.awssdk.http.apache.ProxyConfiguration;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
@@ -33,7 +34,6 @@ import software.amazon.awssdk.services.sqs.model.Message;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageRequest;
 import software.amazon.awssdk.services.sqs.model.ReceiveMessageResponse;
 
-import java.net.URI;
 import java.util.List;
 
 public class SQSClient {
@@ -45,9 +45,9 @@ public class SQSClient {
     private final InputFailureRecorder inputFailureRecorder;
 
     public SQSClient(String queueName, String region, AwsCredentialsProvider authProvider, ObjectMapper objectMapper,
-            InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
+            InputFailureRecorder inputFailureRecorder, @Nullable ProxyConfiguration proxyConfiguration) {
         SqsClientBuilder clientBuilder = SqsClient.builder()
-                .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyUri))
+                .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyConfiguration))
                 .region(Region.of(region))
                 .credentialsProvider(authProvider);
 

@@ -26,6 +26,7 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.http.apache.ProxyConfiguration;
 
 import java.io.IOException;
 import java.net.URI;
@@ -39,11 +40,11 @@ public class CloudTrailS3Client {
 
     public CloudTrailS3Client(@Nullable URI endpointOverride, String awsRegion,
                               AwsCredentialsProvider credentialsProvider,
-                              InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
+                              InputFailureRecorder inputFailureRecorder, @Nullable ProxyConfiguration proxyConfiguration) {
         this.inputFailureRecorder = inputFailureRecorder;
 
         final S3ClientBuilder clientBuilder = S3Client.builder()
-                .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyUri))
+                .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyConfiguration))
                 .region(Region.of(awsRegion))
                 .credentialsProvider(credentialsProvider);
 

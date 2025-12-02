@@ -16,9 +16,7 @@
  */
 package org.graylog.aws.inputs.cloudtrail.api;
 
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
-import jakarta.inject.Named;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.aws.config.AWSPluginConfiguration;
 import org.graylog.aws.inputs.cloudtrail.CloudTrailInput;
@@ -48,7 +46,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
-import java.net.URI;
 import java.util.HashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -63,28 +60,25 @@ public class CloudTrailDriver {
     private final NodeId nodeId;
     private final CloudTrailClientFactory cloudTrailClientFactory;
     private final AWSClientBuilderUtil awsUtils;
-    private final URI httpProxyUri;
     private final ClusterConfigService clusterConfigService;
     private final EncryptedValueService encryptedValueService;
     private final Configuration systemConfiguration;
 
     @Inject
     public CloudTrailDriver(InputService inputService,
-            MessageInputFactory messageInputFactory,
-            NodeId nodeId,
-            CloudTrailClientFactory cloudTrailClientFactory,
-            AWSClientBuilderUtil awsUtils,
-            @Named("http_proxy_uri") @Nullable URI httpProxyUri,
-            ClusterConfigService clusterConfigService,
-            EncryptedValueService encryptedValueService,
-            Configuration systemConfiguration) {
+                            MessageInputFactory messageInputFactory,
+                            NodeId nodeId,
+                            CloudTrailClientFactory cloudTrailClientFactory,
+                            AWSClientBuilderUtil awsUtils,
+                            ClusterConfigService clusterConfigService,
+                            EncryptedValueService encryptedValueService,
+                            Configuration systemConfiguration) {
 
         this.inputService = inputService;
         this.messageInputFactory = messageInputFactory;
         this.nodeId = nodeId;
         this.cloudTrailClientFactory = cloudTrailClientFactory;
         this.awsUtils = awsUtils;
-        this.httpProxyUri = httpProxyUri;
         this.clusterConfigService = clusterConfigService;
         this.encryptedValueService = encryptedValueService;
         this.systemConfiguration = systemConfiguration;
@@ -123,7 +117,7 @@ public class CloudTrailDriver {
                 .assumeRoleArn(request.assumeRoleArn()).build();
         final AwsCredentialsProvider credentialsProvider = awsUtils.createCredentialsProvider(awsRequest);
         return cloudTrailClientFactory.checkCredentials(request.sqsQueueName(), credentialsProvider,
-                request.sqsRegion(), httpProxyUri);
+                request.sqsRegion());
     }
 
     public Input saveInput(CloudTrailCreateInputRequest request, User user) throws Exception {

@@ -18,8 +18,10 @@ package org.graylog.aws.inputs.cloudtrail.external;
 
 import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Nullable;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
 import org.graylog.aws.AWSProxyUtils;
+import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
@@ -36,6 +38,12 @@ import java.net.URI;
  */
 public class CloudTrailClientFactory {
     private static final Logger LOG = LoggerFactory.getLogger(CloudTrailClientFactory.class);
+    private final AWSProxyConfigurationProvider proxyConfigurationProvider;
+
+    @Inject
+    public CloudTrailClientFactory(AWSProxyConfigurationProvider proxyConfigurationProvider) {
+        this.proxyConfigurationProvider = proxyConfigurationProvider;
+    }
 
     /**
      * Check if the provided AWS credentials are valid by attempting to receive
@@ -47,10 +55,10 @@ public class CloudTrailClientFactory {
      * @return JSON string indicating whether the credentials are valid
      * @throws Exception if the credentials are invalid or an error occurs
      */
-    public String checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion, @Nullable URI proxyUri) throws Exception {
+    public String checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion) throws Exception {
         try {
             try (SqsClient client = SqsClient.builder()
-                    .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyUri))
+                    .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyConfigurationProvider.get()))
                     .credentialsProvider(credentialsProvider)
                     .region(Region.of(awsRegion))
                     .build()) {
@@ -68,13 +76,13 @@ public class CloudTrailClientFactory {
     }
 
     public CloudTrailS3Client getS3Client(String awsRegion, AwsCredentialsProvider credentialsProvider,
-                                          InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
-        return getS3Client(null, awsRegion, credentialsProvider, inputFailureRecorder, proxyUri);
+                                          InputFailureRecorder inputFailureRecorder) {
+        return getS3Client(null, awsRegion, credentialsProvider, inputFailureRecorder);
     }
 
     @VisibleForTesting
     CloudTrailS3Client getS3Client(@Nullable URI endpoint, String awsRegion, AwsCredentialsProvider credentialsProvider,
-                                   InputFailureRecorder inputFailureRecorder, @Nullable URI proxyUri) {
-        return new CloudTrailS3Client(endpoint, awsRegion, credentialsProvider, inputFailureRecorder, proxyUri);
+                                   InputFailureRecorder inputFailureRecorder) {
+        return new CloudTrailS3Client(endpoint, awsRegion, credentialsProvider, inputFailureRecorder, proxyConfigurationProvider.get());
     }
 }

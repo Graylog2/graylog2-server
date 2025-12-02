@@ -96,4 +96,12 @@ public class AWSProxyUtils {
         }
         return httpClientBuilder;
     }
+
+    public static ApacheHttpClient.Builder createHttpClientBuilder(@Nullable ProxyConfiguration proxyConfiguration) {
+        ApacheHttpClient.Builder httpClientBuilder = ApacheHttpClient.builder();
+        if (proxyConfiguration != null) {
+            httpClientBuilder.proxyConfiguration(proxyConfiguration);
+        }
+        return httpClientBuilder;
+    }
 }
