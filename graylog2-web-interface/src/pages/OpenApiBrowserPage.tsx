@@ -15,55 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useRef } from 'react';
+import SwaggerUI from 'swagger-ui-react';
+import 'swagger-ui-react/swagger-ui.css';
 
 import { DocumentTitle } from 'components/common';
 
-// Using Redoc via CDN to avoid webpack bundling issues (POC approach)
-// See: https://redocly.com/docs/redoc/deployment/html
-const OpenApiBrowserPage = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Load Redoc script from CDN
-    const script = document.createElement('script');
-    script.src = 'https://cdn.redoc.ly/redoc/latest/bundles/redoc.standalone.js';
-    script.async = true;
-    document.body.appendChild(script);
-
-    script.onload = () => {
-      // Initialize Redoc once script is loaded
-      // @ts-ignore - Redoc loaded from CDN
-      if (containerRef.current && window.Redoc) {
-        // @ts-ignore
-        window.Redoc.init(
-          '/api/openapi/yaml',
-          {
-            nativeScrollbars: true,
-            theme: {
-              colors: {
-                primary: {
-                  main: '#dd4400',
-                },
-              },
-            },
-          },
-          containerRef.current,
-        );
-      }
-    };
-
-    return () => {
-      // Cleanup script on unmount
-      document.body.removeChild(script);
-    };
-  }, []);
-
-  return (
-    <DocumentTitle title="OpenAPI Browser">
-      <div ref={containerRef} />
-    </DocumentTitle>
-  );
-};
+const OpenApiBrowserPage = () => (
+  <DocumentTitle title="OpenAPI Browser">
+    <SwaggerUI url="/api/openapi/yaml" />
+  </DocumentTitle>
+);
 
 export default OpenApiBrowserPage;

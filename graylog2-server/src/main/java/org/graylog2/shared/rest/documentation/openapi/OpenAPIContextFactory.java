@@ -28,6 +28,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.Version;
@@ -108,7 +109,11 @@ public class OpenAPIContextFactory {
                 .license(new License().name("SSPLv1").url("https://www.mongodb.com/licensing/server-side-public-license"));
 
         final var openAPI = new OpenAPI()
-                .info(info);
+                .info(info)
+                .addServersItem(
+                        new Server()
+                                .description("REST API endpoint that is also used by the web interface.")
+                                .url("/api/"));
         // TODO: add server and security
 
         return new SwaggerConfiguration()
