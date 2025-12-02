@@ -81,7 +81,7 @@ type LookupTableActionsType = {
     resolve?: boolean,
   ) => Promise<{ lookup_tables: Array<LookupTable> }>;
   reloadPage: () => Promise<unknown>;
-  get: (idOrName: string) => Promise<unknown>;
+  get: (idOrName: string) => Promise<{ lookup_tables: Array<LookupTable> }>;
   create: (table: LookupTable) => Promise<unknown>;
   delete: (idOrName: string) => Promise<unknown>;
   update: (table: LookupTable) => Promise<unknown>;

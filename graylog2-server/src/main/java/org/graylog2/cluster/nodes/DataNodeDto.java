@@ -44,24 +44,28 @@ import java.util.Optional;
 @JsonDeserialize(builder = DataNodeDto.Builder.class)
 public abstract class DataNodeDto extends NodeDto {
 
+    public static final String FIELD_ACTION_QUEUE = "action_queue";
+    public static final String FIELD_CLUSTER_ADDRESS = "cluster_address";
+    public static final String FIELD_REST_API_ADDRESS = "rest_api_address";
+    public static final String FIELD_DATANODE_STATUS = "datanode_status";
     public static final String FIELD_CERT_VALID_UNTIL = "cert_valid_until";
     public static final String FIELD_DATANODE_VERSION = "datanode_version";
     public static final String FIELD_CONFIGURATION_WARNINGS = "configuration_warnings";
     public static final String FIELD_OPENSEARCH_ROLES = "opensearch_roles";
 
     @Nullable
-    @JsonProperty("cluster_address")
+    @JsonProperty(FIELD_CLUSTER_ADDRESS)
     public abstract String getClusterAddress();
 
     @Nullable
-    @JsonProperty("rest_api_address")
+    @JsonProperty(FIELD_REST_API_ADDRESS)
     public abstract String getRestApiAddress();
 
-    @JsonProperty("data_node_status")
+    @JsonProperty(FIELD_DATANODE_STATUS)
     public abstract DataNodeStatus getDataNodeStatus();
 
     @Nullable
-    @JsonProperty("action_queue")
+    @JsonProperty(FIELD_ACTION_QUEUE)
     public abstract DataNodeLifecycleTrigger getActionQueue();
 
     @Nullable
@@ -115,19 +119,19 @@ public abstract class DataNodeDto extends NodeDto {
     public Map<String, Object> toEntityParameters() {
         final Map<String, Object> params = super.toEntityParameters();
         if (Objects.nonNull(getClusterAddress())) {
-            params.put("cluster_address", getClusterAddress());
+            params.put(FIELD_CLUSTER_ADDRESS, getClusterAddress());
         }
         if (Objects.nonNull(getRestApiAddress())) {
-            params.put("rest_api_address", getRestApiAddress());
+            params.put(FIELD_REST_API_ADDRESS, getRestApiAddress());
         }
         if (Objects.nonNull(getDataNodeStatus())) {
-            params.put("datanode_status", getDataNodeStatus());
+            params.put(FIELD_DATANODE_STATUS, getDataNodeStatus());
         }
         if (Objects.nonNull(getActionQueue())) {
             if (getActionQueue() == DataNodeLifecycleTrigger.CLEAR) {
-                params.put("action_queue", null);
+                params.put(FIELD_ACTION_QUEUE, null);
             } else {
-                params.put("action_queue", getActionQueue());
+                params.put(FIELD_ACTION_QUEUE, getActionQueue());
             }
         }
 
@@ -166,16 +170,16 @@ public abstract class DataNodeDto extends NodeDto {
                     .setLeader(false); // TODO: completely remove the leader property from this DTO
         }
 
-        @JsonProperty("cluster_address")
+        @JsonProperty(FIELD_CLUSTER_ADDRESS)
         public abstract Builder setClusterAddress(String clusterAddress);
 
-        @JsonProperty("rest_api_address")
+        @JsonProperty(FIELD_REST_API_ADDRESS)
         public abstract Builder setRestApiAddress(String restApiAddress);
 
-        @JsonProperty("datanode_status")
+        @JsonProperty(FIELD_DATANODE_STATUS)
         public abstract Builder setDataNodeStatus(DataNodeStatus dataNodeStatus);
 
-        @JsonProperty("action_queue")
+        @JsonProperty(FIELD_ACTION_QUEUE)
         public abstract Builder setActionQueue(DataNodeLifecycleTrigger trigger);
 
         @JsonProperty(FIELD_CERT_VALID_UNTIL)

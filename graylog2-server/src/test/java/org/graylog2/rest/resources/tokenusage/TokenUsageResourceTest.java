@@ -23,14 +23,15 @@ import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.security.AccessTokenEntity;
 import org.graylog2.shared.tokenusage.TokenUsageService;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -39,20 +40,18 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class TokenUsageResourceTest {
     public static final int PAGE = 1;
     public static final int PER_PAGE = 10;
-
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private TokenUsageService tokenUsageService;
 
     private TokenUsageResource testee;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         testee = new TokenUsageResource(tokenUsageService);
     }

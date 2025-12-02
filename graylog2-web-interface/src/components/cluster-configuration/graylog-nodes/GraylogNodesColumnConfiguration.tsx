@@ -1,0 +1,111 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+import React from 'react';
+
+import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
+
+import type { GraylogNode } from './useClusterGraylogNodes';
+import BuffersMetricsCell from './cells/BuffersMetricsCell';
+import HostnameCell from './cells/HostnameCell';
+import LifecycleCell from './cells/LifecycleCell';
+import LoadBalancerStatusCell from './cells/LoadBalancerStatusCell';
+import ProcessingStateCell from './cells/ProcessingStateCell';
+import ThroughputMetricsCell from './cells/ThroughputMetricsCell';
+
+import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
+
+const JOURNAL_WARNING_THRESHOLD = 0.1;
+const JOURNAL_DANGER_THRESHOLD = 0.4;
+const BUFFER_WARNING_THRESHOLD = 0.95;
+const JVM_WARNING_THRESHOLD = 0.95;
+
+export const DEFAULT_VISIBLE_COLUMNS = [
+  'hostname',
+  'lifecycle',
+  'jvm',
+  'buffers',
+  'journal',
+  'dataLakeJournal',
+  'throughput',
+  'is_processing',
+  'lb_status',
+] as const;
+
+export const createColumnDefinitions = (): Array<ColumnSchema> => [
+  { id: 'hostname', title: 'Node', sortable: true },
+  { id: 'lifecycle', title: 'State', sortable: true },
+  { id: 'jvm', title: 'JVM', isDerived: true, sortable: false },
+  { id: 'buffers', title: 'Buffers', isDerived: true, sortable: false },
+  { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
+  { id: 'dataLakeJournal', title: 'Data Lake Journal', isDerived: true, sortable: false },
+  { id: 'throughput', title: 'Throughput', isDerived: true, sortable: false },
+  { id: 'is_processing', title: 'Message Processing', sortable: true },
+  { id: 'lb_status', title: 'Load Balancer', sortable: true },
+];
+
+export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
+  attributes: {
+    hostname: {
+      renderCell: (_value, entity) => <HostnameCell node={entity} />,
+    },
+    lifecycle: {
+      renderCell: (_value, entity) => <LifecycleCell node={entity} />,
+    },
+    is_processing: {
+      renderCell: (_value, entity) => <ProcessingStateCell node={entity} />,
+    },
+    lb_status: {
+      renderCell: (_value, entity) => <LoadBalancerStatusCell node={entity} />,
+    },
+    journal: {
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.journalSize}
+          max={entity.metrics?.journalMaxSize}
+          ratio={entity.metrics?.journalSizeRatio}
+          warningThreshold={JOURNAL_WARNING_THRESHOLD}
+          dangerThreshold={JOURNAL_DANGER_THRESHOLD}
+        />
+      ),
+    },
+    dataLakeJournal: {
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.dataLakeJournalSize}
+          max={entity.metrics?.journalMaxSize}
+          warningThreshold={JOURNAL_WARNING_THRESHOLD}
+          dangerThreshold={JOURNAL_DANGER_THRESHOLD}
+        />
+      ),
+    },
+    jvm: {
+      renderCell: (_value, entity) => (
+        <SizeAndRatioMetric
+          used={entity.metrics?.jvmMemoryHeapUsed}
+          max={entity.metrics?.jvmMemoryHeapMax}
+          warningThreshold={JVM_WARNING_THRESHOLD}
+        />
+      ),
+    },
+    buffers: {
+      renderCell: (_value, entity) => <BuffersMetricsCell node={entity} warningThreshold={BUFFER_WARNING_THRESHOLD} />,
+    },
+    throughput: {
+      renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
+    },
+  },
+});

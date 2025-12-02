@@ -58,6 +58,7 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleR
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -122,17 +123,17 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
         final Set<String> streams = adaptStreams(suggestionsRequest.streams(), searchUser);
         final TimeRange timerange = Optional.ofNullable(suggestionsRequest.timerange()).orElse(defaultTimeRange());
         final String fieldName = suggestionsRequest.field();
-        final SuggestionFieldType suggestionFieldType = getFieldType(streams, timerange, fieldName);
+        final var fieldType = mappedFieldTypesService.singleFieldTypeByStreamIds(streams, timerange, suggestionsRequest.field())
+                .stream()
+                .findFirst()
+                .map(MappedFieldTypeDTO::type)
+                .orElse(FieldTypes.Type.createType("unknown", Collections.emptySet()));
+
+        final var suggestionFieldType = SuggestionFieldType.fromFieldType(fieldType);
 
         if (fieldValueSuggestionMode == TEXTUAL_ONLY && suggestionFieldType != SuggestionFieldType.TEXTUAL) {
             return getNoSuggestionResponse(suggestionsRequest.field(), suggestionsRequest.input());
         }
-
-        final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
-        var fieldType = fieldTypes.stream().filter(f -> f.name().equals(fieldName))
-                .findFirst()
-                .map(MappedFieldTypeDTO::type)
-                .orElse(FieldTypes.Type.createType("unknown", Collections.emptySet()));
 
         final SuggestionRequest req = SuggestionRequest.builder()
                 .field(fieldName)
@@ -143,7 +144,7 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
                 .timerange(timerange)
                 .build();
 
-        SuggestionResponse res = querySuggestionsService.suggest(req);
+        SuggestionResponse res = querySuggestionsService.suggest(req, Duration.ofSeconds(10));
         final List<SuggestionEntryDTO> suggestions = augmentSuggestions(res.suggestions().stream()
                 .map(s -> SuggestionEntryDTO.create(s.getValue(), s.getOccurrence()))
                 .toList(), fieldType, searchUser);
@@ -216,15 +217,6 @@ public class SuggestionsResource extends RestResource implements PluginRestResou
 
     private ImmutableSet<String> loadAllAllowedStreamsForUser(SearchUser searchUser) {
         return permittedStreams.loadAllMessageStreams(searchUser);
-    }
-
-    private SuggestionFieldType getFieldType(Set<String> streams, TimeRange timerange, final String fieldName) {
-        final Set<MappedFieldTypeDTO> fieldTypes = mappedFieldTypesService.fieldTypesByStreamIds(streams, timerange);
-        return fieldTypes.stream().filter(f -> f.name().equals(fieldName))
-                .findFirst()
-                .map(MappedFieldTypeDTO::type)
-                .map(SuggestionFieldType::fromFieldType)
-                .orElse(SuggestionFieldType.OTHER);
     }
 
     private SuggestionsDTO getNoSuggestionResponse(final String fieldName,

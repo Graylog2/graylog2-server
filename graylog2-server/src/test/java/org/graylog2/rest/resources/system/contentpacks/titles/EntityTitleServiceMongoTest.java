@@ -18,7 +18,9 @@ package org.graylog2.rest.resources.system.contentpacks.titles;
 
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
-import org.graylog.testing.mongodb.MongoDBInstance;
+import org.graylog.testing.mongodb.MongoDBExtension;
+import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.dbcatalog.DbEntitiesCatalog;
 import org.graylog2.database.dbcatalog.DbEntityCatalogEntry;
@@ -27,9 +29,9 @@ import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityIdenti
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleRequest;
 import org.graylog2.rest.resources.system.contentpacks.titles.model.EntityTitleResponse;
 import org.graylog2.streams.StreamImpl;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 
@@ -37,25 +39,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.rest.resources.system.contentpacks.titles.EntityTitleServiceImpl.TITLE_IF_NOT_PERMITTED;
 
 
+@ExtendWith(MongoDBExtension.class)
 public class EntityTitleServiceMongoTest {
 
     private EntityTitleService toTest;
 
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Before
-    public void setUp() {
+    @BeforeEach
+    public void setUp(MongoDBTestService mongoDBTestService) {
         DbEntitiesCatalog entitiesCatalog = new DbEntitiesCatalog(
                 List.of(
                         new DbEntityCatalogEntry("streams", "title", StreamImpl.class, "streams:read"),
                         new DbEntityCatalogEntry("nodes", "node_id", StreamImpl.class, "nodes:read")
                 )
         );
-        mongodb.start();
-        mongodb.importFixture("fixture_for_title_retrieval_testing.json", EntityTitleServiceImpl.class);
+        mongoDBTestService.importFixture("fixture_for_title_retrieval_testing.json", EntityTitleServiceImpl.class);
 
-        final MongoConnection connection = mongodb.mongoConnection();
+        final MongoConnection connection = mongoDBTestService.mongoConnection();
 
         toTest = new EntityTitleServiceImpl(connection, entitiesCatalog);
     }

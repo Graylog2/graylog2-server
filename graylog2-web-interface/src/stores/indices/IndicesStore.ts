@@ -82,7 +82,7 @@ export type IndexInfo = {
     };
   };
   routing: Array<IndexShardRouting>;
-  reopened: boolean;
+  is_reopened: boolean;
 };
 
 export type Indices = Array<IndexInfo>;

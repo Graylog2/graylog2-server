@@ -19,22 +19,8 @@ import * as React from 'react';
 import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 
 import LUTdrawer from './LUTDrawer';
-import CacheCreateModal from './CacheCreateModal';
-import DataAdapterCreateModal from './DataAdapterCreateModal';
-import CacheEditModal from './CacheEditModal';
-import DataAdapterEditModal from './DataAdapterEditModal';
-import LUTCreateModal from './LUTCreateModal';
 
-export type ModalTypes =
-  | 'LUT'
-  | 'CACHE'
-  | 'DATA-ADAPTER'
-  | 'LUT-CREATE'
-  | 'LUT-EDIT'
-  | 'CACHE-CREATE'
-  | 'DATA-ADAPTER-CREATE'
-  | 'CACHE-EDIT'
-  | 'DATA-ADAPTER-EDIT';
+export type ModalTypes = 'LUT' | 'CACHE' | 'DATA-ADAPTER';
 
 function LUTModals() {
   const { modal, setModal, entity, setEntity, title, setTitle, double } = useModalContext();
@@ -54,18 +40,6 @@ function LUTModals() {
           {entity}
         </LUTdrawer>
       );
-    case 'LUT-CREATE':
-      return <LUTCreateModal onClose={onClose} />;
-    case 'LUT-EDIT':
-      return <LUTCreateModal onClose={onClose} title={title} lut={entity} />;
-    case 'CACHE-CREATE':
-      return <CacheCreateModal onClose={onClose} />;
-    case 'DATA-ADAPTER-CREATE':
-      return <DataAdapterCreateModal onClose={onClose} />;
-    case 'CACHE-EDIT':
-      return <CacheEditModal onClose={onClose} title={title} cache={entity} />;
-    case 'DATA-ADAPTER-EDIT':
-      return <DataAdapterEditModal onClose={onClose} title={title} dataAdapter={entity} />;
     default:
       return null;
   }

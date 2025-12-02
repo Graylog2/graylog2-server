@@ -31,31 +31,32 @@ import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.system.inputs.requests.InputCreateRequest;
 import org.graylog2.security.encryption.EncryptedValue;
 import org.graylog2.shared.inputs.MessageInputFactory;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import software.amazon.awssdk.regions.Region;
 
 import java.util.HashMap;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AWSServiceTest {
-
-    @Rule
-    public MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
 
@@ -72,7 +73,7 @@ public class AWSServiceTest {
     @Mock
     EncryptedValue encryptedValue;
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         awsService = new AWSService(inputService, messageInputFactory, nodeId);
@@ -84,7 +85,8 @@ public class AWSServiceTest {
         when(inputService.save(isA(Input.class))).thenReturn("input-id");
         when(user.getName()).thenReturn("a-user-name");
         when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class), anyBoolean())).thenReturn(messageInput);
-
+        when(inputService.create(isA(HashMap.class))).thenReturn(mock(Input.class));
+        
         AWSInputCreateRequest request =
                 AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
                         .awsAccessKeyId("a-key")
@@ -139,6 +141,6 @@ public class AWSServiceTest {
         assertTrue(foundEuWestRegion);
         assertTrue(regions.stream().anyMatch(r -> r.displayValue().equals("Europe (Stockholm): eu-north-1")));
         // AWS periodically adds regions. The number should generally only increase. No need to check exact number.
-        assertTrue("There should be at least 34 total regions.", regions.size() >= 34);
+        assertTrue(regions.size() >= 34, "There should be at least 34 total regions.");
     }
 }

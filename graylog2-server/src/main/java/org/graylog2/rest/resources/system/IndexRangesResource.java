@@ -35,13 +35,26 @@ import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -154,7 +167,7 @@ public class IndexRangesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
         submitIndexRangesCleanupJob();
-        submitIndexRangesJob(indexSetRegistry.getAll());
+        submitIndexRangesJob(indexSetRegistry.getAllBasicIndexSets());
 
         return Response.accepted().build();
     }
@@ -201,7 +214,7 @@ public class IndexRangesResource extends RestResource {
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);
 
-        final SystemJob rebuildJob = singleIndexRangeJobFactory.create(indexSetRegistry.getAll(), index);
+        final SystemJob rebuildJob = singleIndexRangeJobFactory.create(index);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
@@ -213,13 +226,13 @@ public class IndexRangesResource extends RestResource {
         return Response.accepted().build();
     }
 
-    private void submitIndexRangesJob(final Set<IndexSet> indexSets) {
+    public void submitIndexRangesJob(final Set<BasicIndexSet> indexSets) {
         final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSets);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
             final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(errorMsg, e);
+            LOG.info(errorMsg, e);
             throw new ForbiddenException(errorMsg);
         }
     }

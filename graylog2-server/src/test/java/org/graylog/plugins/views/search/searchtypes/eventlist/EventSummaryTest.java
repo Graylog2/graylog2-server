@@ -22,7 +22,7 @@ import org.graylog.plugins.views.search.searchtypes.events.EventSummary;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
