@@ -64,7 +64,7 @@ public class RenameFields extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(fieldsParam, messageParam)
-                .description("Rename a message fields. If no specific message is provided, it performs the renaming operation on the currently processed message.")
+                .description("Rename message fields. If no specific message is provided, it performs the renaming operation on the currently processed message.")
                 .ruleBuilderEnabled()
                 .ruleBuilderName("Rename fields")
                 .ruleBuilderTitle("Rename field '${old_field}' to '${new_field}' in the message")
