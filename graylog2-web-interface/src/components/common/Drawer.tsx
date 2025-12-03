@@ -117,7 +117,8 @@ const Drawer = ({
   const [opened, { open, close }] = useDisclosure(false);
 
   React.useLayoutEffect(() => {
-    setTimeout(() => open(), 80);
+    const timeoutId = setTimeout(() => open(), 80);
+    return () => clearTimeout(timeoutId);
   }, [open, close, props.onClose]);
 
   const handleClose = () => {
