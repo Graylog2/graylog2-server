@@ -267,6 +267,14 @@ export default [
       'testing-library/no-debugging-utils': 'warn',
       'testing-library/prefer-screen-queries': 'off',
       'testing-library/prefer-user-event': 'error',
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'fireEvent',
+          property: 'submit',
+          message: 'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
+        },
+      ],
       'testing-library/render-result-naming-convention': 'off',
     },
   },
