@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import ReactDom from 'react-dom';
+import ReactDOM from 'react-dom';
 import { Drawer as MantineDrawer } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import styled, { css } from 'styled-components';
@@ -65,6 +65,9 @@ const Title = styled.div(
   `,
 );
 
+const DRAWER_OPEN_DELAY_MS = 80;
+const DRAWER_CLOSE_DELAY_MS = 200;
+
 export const getDrawerPropsByLevel = ({
   parentSize,
   level = 0,
@@ -79,7 +82,7 @@ export const getDrawerPropsByLevel = ({
   styles: parentPosition
     ? { inner: { [parentPosition]: `calc((var(--drawer-size-${parentSize}) + 0.8rem) * ${level})` } }
     : undefined,
-  overlayProps: { zIndex: `103${level}` },
+  overlayProps: { zIndex: 1030 + level },
 });
 
 type Props = Pick<
@@ -94,7 +97,6 @@ type Props = Pick<
   | 'zIndex'
   | 'withOverlay'
   | 'overlayProps'
-  | 'styles'
   | 'transitionProps'
   | 'styles'
   | 'lockScroll'
@@ -116,18 +118,26 @@ const Drawer = ({
 }: Props) => {
   const [opened, { open, close }] = useDisclosure(false);
 
+  const closeTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
   React.useLayoutEffect(() => {
-    setTimeout(() => open(), 80);
-  }, [open, close, props.onClose]);
+    setTimeout(() => open(), DRAWER_OPEN_DELAY_MS);
+
+    return () => {
+      if (closeTimeoutRef.current !== null) {
+        clearTimeout(closeTimeoutRef.current);
+        closeTimeoutRef.current = null;
+      }
+    };
+  }, [open]);
 
   const handleClose = () => {
     close();
-    setTimeout(() => props.onClose?.(), 200);
+    closeTimeoutRef.current = setTimeout(() => props.onClose?.(), DRAWER_CLOSE_DELAY_MS);
   };
 
-  return ReactDom.createPortal(
+  return ReactDOM.createPortal(
     <StyledDrawer
-      opened={opened}
       offset={15}
       padding="lg"
       radius={5}
@@ -140,6 +150,7 @@ const Drawer = ({
       }
       {...getDrawerPropsByLevel({ parentSize, level, parentPosition })}
       {...props}
+      opened={opened}
       onClose={handleClose}
     />,
     document.body,
