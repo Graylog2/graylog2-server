@@ -24,19 +24,16 @@ import java.net.URI;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Unit tests for {@link AWSProxyUtils}.
+ * Unit tests for {@link AWSProxyConfigurationProvider} proxy configuration creation.
  */
-public class AWSProxyUtilsTest {
+public class AWSProxyConfigurationProviderTest {
 
     @Test
     public void buildProxyConfigurationWithoutCredentials() {
-        // Given: A proxy URI without user credentials
         URI proxyUri = URI.create("http://proxy.example.com:8080");
 
-        // When: Building proxy configuration
-        ProxyConfiguration proxyConfig = AWSProxyUtils.buildProxyConfiguration(proxyUri);
+        ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
-        // Then: The proxy should be configured without credentials
         assertThat(proxyConfig.host()).isEqualTo("proxy.example.com");
         assertThat(proxyConfig.port()).isEqualTo(8080);
         assertThat(proxyConfig.username()).isNull();
@@ -45,13 +42,10 @@ public class AWSProxyUtilsTest {
 
     @Test
     public void buildProxyConfigurationWithCredentials() {
-        // Given: A proxy URI with username and password
         URI proxyUri = URI.create("http://user:pass@proxy.example.com:8080");
 
-        // When: Building proxy configuration
-        ProxyConfiguration proxyConfig = AWSProxyUtils.buildProxyConfiguration(proxyUri);
+        ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
-        // Then: Credentials should be extracted and proxy configured properly
         assertThat(proxyConfig.username()).contains("user");
         assertThat(proxyConfig.password()).contains("pass");
         assertThat(proxyConfig.host()).isEqualTo("proxy.example.com");
@@ -60,15 +54,10 @@ public class AWSProxyUtilsTest {
 
     @Test
     public void buildProxyConfigurationWithUsernameOnly() {
-        // Given: A proxy URI with only username (edge case)
         URI proxyUri = URI.create("http://user@proxy.example.com:8080");
 
-        // When: Building proxy configuration
-        ProxyConfiguration proxyConfig = AWSProxyUtils.buildProxyConfiguration(proxyUri);
+        ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
-        // Then: Only username should be set (no password)
-        // Note: Since there's no colon, the split won't produce 2 elements,
-        // so credentials won't be set
         assertThat(proxyConfig.host()).isEqualTo("proxy.example.com");
         assertThat(proxyConfig.port()).isEqualTo(8080);
         assertThat(proxyConfig.username()).isNull();
@@ -77,13 +66,10 @@ public class AWSProxyUtilsTest {
 
     @Test
     public void buildProxyConfigurationWithHttpsScheme() {
-        // Given: A proxy URI with HTTPS scheme and credentials
         URI proxyUri = URI.create("https://admin:secret@secure-proxy.example.com:443");
 
-        // When: Building proxy configuration
-        ProxyConfiguration proxyConfig = AWSProxyUtils.buildProxyConfiguration(proxyUri);
+        ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
-        // Then: Credentials should be extracted
         assertThat(proxyConfig.username()).contains("admin");
         assertThat(proxyConfig.password()).contains("secret");
         assertThat(proxyConfig.host()).isEqualTo("secure-proxy.example.com");
@@ -92,13 +78,10 @@ public class AWSProxyUtilsTest {
 
     @Test
     public void buildProxyConfigurationWithEmptyCredentials() {
-        // Given: A proxy URI with empty user info (colon but no username/password)
         URI proxyUri = URI.create("http://:@proxy.example.com:8080");
 
-        // When: Building proxy configuration
-        ProxyConfiguration proxyConfig = AWSProxyUtils.buildProxyConfiguration(proxyUri);
+        ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
-        // Then: Empty credentials should be set
         assertThat(proxyConfig.username()).contains("");
         assertThat(proxyConfig.password()).contains("");
         assertThat(proxyConfig.host()).isEqualTo("proxy.example.com");
@@ -107,17 +90,13 @@ public class AWSProxyUtilsTest {
 
     @Test
     public void buildProxyConfigurationWithDefaultPort() {
-        // Given: A proxy URI with credentials but no explicit port
         URI proxyUri = URI.create("http://user:pass@proxy.example.com");
 
-        // When: Building proxy configuration
-        ProxyConfiguration proxyConfig = AWSProxyUtils.buildProxyConfiguration(proxyUri);
+        ProxyConfiguration proxyConfig = AWSProxyConfigurationProvider.buildProxyConfiguration(proxyUri);
 
-        // Then: Credentials should be extracted and port should be default
         assertThat(proxyConfig.username()).contains("user");
         assertThat(proxyConfig.password()).contains("pass");
         assertThat(proxyConfig.host()).isEqualTo("proxy.example.com");
-        // Default port is -1 when not specified
         assertThat(proxyConfig.port()).isEqualTo(-1);
     }
 }

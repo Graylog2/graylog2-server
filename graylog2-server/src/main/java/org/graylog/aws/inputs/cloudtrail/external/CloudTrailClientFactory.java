@@ -20,7 +20,6 @@ import com.google.common.annotations.VisibleForTesting;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.BadRequestException;
-import org.graylog.aws.AWSProxyUtils;
 import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.shared.utilities.ExceptionUtils;
@@ -58,7 +57,7 @@ public class CloudTrailClientFactory {
     public String checkCredentials(String sqsQueueName, AwsCredentialsProvider credentialsProvider, String awsRegion) throws Exception {
         try {
             try (SqsClient client = SqsClient.builder()
-                    .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyConfigurationProvider.get()))
+                    .httpClientBuilder(proxyConfigurationProvider.get())
                     .credentialsProvider(credentialsProvider)
                     .region(Region.of(awsRegion))
                     .build()) {

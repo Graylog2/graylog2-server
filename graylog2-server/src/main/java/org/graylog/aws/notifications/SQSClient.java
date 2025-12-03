@@ -18,14 +18,12 @@ package org.graylog.aws.notifications;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import jakarta.annotation.Nullable;
-import org.graylog.aws.AWSProxyUtils;
 import org.graylog.aws.sqs.ObjectCreatedPutParseException;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
-import software.amazon.awssdk.http.apache.ProxyConfiguration;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.SqsClientBuilder;
@@ -45,9 +43,9 @@ public class SQSClient {
     private final InputFailureRecorder inputFailureRecorder;
 
     public SQSClient(String queueName, String region, AwsCredentialsProvider authProvider, ObjectMapper objectMapper,
-            InputFailureRecorder inputFailureRecorder, @Nullable ProxyConfiguration proxyConfiguration) {
+                     InputFailureRecorder inputFailureRecorder, ApacheHttpClient.Builder httpClientBuilder) {
         SqsClientBuilder clientBuilder = SqsClient.builder()
-                .httpClientBuilder(AWSProxyUtils.createHttpClientBuilder(proxyConfiguration))
+                .httpClientBuilder(httpClientBuilder)
                 .region(Region.of(region))
                 .credentialsProvider(authProvider);
 
