@@ -16,13 +16,13 @@
  */
 import { create } from 'storybook/theming';
 
-import graylogLog from '../graylog-logo.png';
+import graylogLogo from '../graylog-logo.png';
 
 const baseTheme = {
   brandTitle: 'Graylog Design System',
   brandUrl: 'https://graylog.org/',
   brandTarget: '_block',
-  brandImage: graylogLog,
+  brandImage: graylogLogo,
 
   fontBase: '"Poppins", sans-serif',
   fontCode: '"Roboto Mono", monospace',
