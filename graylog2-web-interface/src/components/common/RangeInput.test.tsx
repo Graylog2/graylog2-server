@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import RangeInput from './RangeInput';
 
@@ -54,11 +54,12 @@ describe('<RangeInput />', () => {
     const updateConfig = jest.fn();
 
     render(SUT(updateConfig));
-    const thumb2 = screen.getByText(/4/i);
+    const [, thumb2] = screen.getAllByRole('slider');
 
     await userEvent.click(thumb2);
-    await userEvent.keyboard('{ArrowRight}');
+    expect(thumb2).toHaveFocus();
+    await userEvent.keyboard('{arrowright>}');
 
-    expect(screen.getByText(/5/i)).toBeVisible();
+    await waitFor(() => expect(thumb2).toHaveAttribute('aria-valuenow', '5'));
   });
 });

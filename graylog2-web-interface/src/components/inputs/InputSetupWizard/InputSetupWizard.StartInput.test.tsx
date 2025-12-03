@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { PipelinesPipelines, Streams, PipelinesConnections } from '@graylog/server-api';
 
@@ -30,10 +30,9 @@ import { InputStatesStore } from 'stores/inputs/InputStatesStore';
 
 import InputSetupWizardProvider from './contexts/InputSetupWizardProvider';
 import InputSetupWizard from './Wizard';
-
 jest.mock('@graylog/server-api', () => ({
   PipelinesPipelines: {
-    createFromParser: jest.fn(),
+    createFromParser: jest.fn(() => Promise.resolve({})),
     routing: jest.fn(),
     remove: jest.fn(),
   },
@@ -218,8 +217,8 @@ const createStream = async (newPipeline = false, removeFromDefault = true) => {
     name: 'Next',
   });
 
-  await userEvent.type(titleInput, 'Wingardium');
-  await userEvent.type(descriptionInput, 'Wingardium new stream');
+  fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+  fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
 
   if (!removeFromDefault) {
     await userEvent.click(removeFromDefaultCheckbox);

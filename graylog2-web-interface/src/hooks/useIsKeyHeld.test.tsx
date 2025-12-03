@@ -14,8 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 import { render } from 'wrappedTestingLibrary';
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 
@@ -23,31 +23,27 @@ import useIsKeyHeld from 'hooks/useIsKeyHeld';
 
 describe('useIsKeyHeld custom hook', () => {
   it('Test is Enter key held after keyDown and upheld after keyUp', async () => {
-    const { container } = render(<input />);
+    render(<input />);
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
-    const input = container.querySelector('input');
 
-    await userEvent.click(input);
-    await userEvent.keyboard('{Enter>}');
+    const keyboardState = await userEvent.keyboard('{Enter>}');
 
     expect(result.current).toEqual(true);
 
-    await userEvent.keyboard('{/Enter}');
+    await userEvent.keyboard('{/Enter}', { keyboardState });
 
     expect(result.current).toEqual(false);
   });
 
   it('Test is Enter key held when user click other key', async () => {
     const { result } = renderHook(() => useIsKeyHeld('Enter'));
-    const { container } = render(<input />);
-    const input = container.querySelector('input');
+    render(<input />);
 
-    await userEvent.click(input);
-    await userEvent.keyboard('{Enter>}');
+    const keyboardState = await userEvent.keyboard('{Enter>}');
 
     expect(result.current).toEqual(true);
 
-    await userEvent.keyboard('{Shift>}');
+    await userEvent.keyboard('{Shift>}', { keyboardState });
 
     expect(result.current).toEqual(true);
   });

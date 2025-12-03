@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import AbsoluteTimeInput from './AbsoluteTimeInput';
 
@@ -55,10 +55,10 @@ describe('AbsoluteTimeInput', () => {
   it('reset non-numeric inputs to 0', async () => {
     render(<AbsoluteTimeInput {...defaultProps} />);
 
-    const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
+    const inputHour = screen.getByRole<HTMLInputElement>('spinbutton', { name: /from hour/i });
 
     await userEvent.clear(inputHour);
-    await userEvent.type(inputHour, '!');
+    await userEvent.type(inputHour, '!', { initialSelectionStart: 0, initialSelectionEnd: 1 });
 
     expect(defaultProps.onChange).toHaveBeenCalled();
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00');
@@ -69,8 +69,7 @@ describe('AbsoluteTimeInput', () => {
 
     const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
 
-    await userEvent.clear(inputHour);
-    await userEvent.type(inputHour, '10');
+    await userEvent.type(inputHour, '10', { initialSelectionStart: 0, initialSelectionEnd: 2 });
 
     expect(defaultProps.onChange).toHaveBeenCalled();
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 10:15:00');
@@ -79,22 +78,25 @@ describe('AbsoluteTimeInput', () => {
   it('does not allow numbers over their maximum', async () => {
     render(<AbsoluteTimeInput {...defaultProps} />);
 
-    const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
-    const inputMinute = screen.getByRole('spinbutton', { name: /from minutes/i });
-    const inputSeconds = screen.getByRole('spinbutton', { name: /from seconds/i });
+    const inputHour = screen.getByRole<HTMLInputElement>('spinbutton', { name: /from hour/i });
+    const inputMinute = screen.getByRole<HTMLInputElement>('spinbutton', { name: /from minutes/i });
+    const inputSeconds = screen.getByRole<HTMLInputElement>('spinbutton', { name: /from seconds/i });
 
-    await userEvent.clear(inputHour);
-    await userEvent.type(inputHour, '99');
+    await userEvent.type(inputHour, '99', { initialSelectionStart: 0, initialSelectionEnd: 1 });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 23:15:00');
 
-    await userEvent.clear(inputMinute);
-    await userEvent.type(inputMinute, '999');
+    await userEvent.type(inputMinute, '999', {
+      initialSelectionStart: 0,
+      initialSelectionEnd: inputMinute.value.length,
+    });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 06:59:00');
 
-    await userEvent.clear(inputSeconds);
-    await userEvent.type(inputSeconds, '999');
+    await userEvent.type(inputSeconds, '999', {
+      initialSelectionStart: 0,
+      initialSelectionEnd: inputSeconds.value.length,
+    });
 
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 06:15:59');
   });
@@ -104,7 +106,7 @@ describe('AbsoluteTimeInput', () => {
 
     const inputHour = screen.getByRole('spinbutton', { name: /from hour/i });
 
-    await userEvent.clear(inputHour);
+    userEvent.clear(inputHour);
 
     expect(defaultProps.onChange).toHaveBeenCalled();
     expect(defaultProps.onChange).toHaveBeenCalledWith('1955-05-11 00:15:00');
