@@ -56,6 +56,10 @@ public abstract class EntityAttribute {
     @Nullable
     public abstract String relatedCollection();
 
+    @JsonProperty("related_identifier")
+    @Nullable
+    public abstract String relatedIdentifier();
+
     @JsonProperty("related_property")
     @Nullable
     public abstract String relatedProperty();
@@ -85,6 +89,8 @@ public abstract class EntityAttribute {
         public abstract Builder hidden(Boolean hidden);
 
         public abstract Builder relatedCollection(String relatedCollection);
+
+        public abstract Builder relatedIdentifier(String relatedIdentifier);
 
         public abstract Builder relatedProperty(String relatedProperty);
 

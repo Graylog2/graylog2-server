@@ -21,6 +21,7 @@ import org.apache.shiro.subject.Subject;
 public interface EntitySuggestionService {
 
     EntitySuggestionResponse suggest(final String collection,
+                                     final String identifier,
                                      final String valueColumn,
                                      final String query,
                                      final int page,
