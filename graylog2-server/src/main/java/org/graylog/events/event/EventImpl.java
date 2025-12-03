@@ -61,7 +61,7 @@ public class EventImpl implements Event {
     private boolean alert;
     private Map<String, FieldValue> fields = new HashMap<>();
     private Map<String, FieldValue> groupByFields = new HashMap<>();
-    private Map<String, FieldValue> aggregationConditions = new HashMap<>();
+    private Map<String, Double> aggregationConditions = new HashMap<>();
     private final Map<String, Double> scores = new HashMap<>();
     private final Set<String> associatedAssets = new HashSet<>();
     private EventReplayInfo replayInfo;
@@ -305,13 +305,13 @@ public class EventImpl implements Event {
     }
 
     @Override
-    public Map<String, String> getAggregationConditions() {
-        return this.aggregationConditions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().value()));
+    public Map<String, Double> getAggregationConditions() {
+        return this.aggregationConditions;
     }
 
     @Override
-    public void setAggregationConditions(Map<String, String> aggregationConditions) {
-        this.aggregationConditions = aggregationConditions.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> FieldValue.string(entry.getValue())));
+    public void setAggregationConditions(Map<String, Double> aggregationConditions) {
+        this.aggregationConditions = ImmutableMap.copyOf(aggregationConditions));
     }
 
     @Override
@@ -332,11 +332,6 @@ public class EventImpl implements Event {
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
 
         final Map<String, String> groupByFields = this.groupByFields.entrySet()
-                .stream()
-                .filter(entry -> !entry.getValue().isError())
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
-
-        final Map<String, String> aggregationConditions = this.aggregationConditions.entrySet()
                 .stream()
                 .filter(entry -> !entry.getValue().isError())
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().value()));
@@ -416,6 +411,7 @@ public class EventImpl implements Event {
                 Objects.equals(keyTuple, event.keyTuple) &&
                 Objects.equals(fields, event.fields) &&
                 Objects.equals(groupByFields, event.groupByFields) &&
+                Objects.equals(aggregationConditions, event.aggregationConditions) &&
                 Objects.equals(scores, event.scores) &&
                 Objects.equals(associatedAssets, event.associatedAssets) &&
                 Objects.equals(replayInfo, event.replayInfo);
@@ -425,7 +421,7 @@ public class EventImpl implements Event {
     public int hashCode() {
         return Objects.hash(eventId, eventDefinitionType, eventDefinitionId, originContext, eventTimestamp,
                 processingTimestamp, timerangeStart, timerangeEnd, streams, sourceStreams, message, source,
-                keyTuple, priority, alert, fields, groupByFields, scores, replayInfo);
+                keyTuple, priority, alert, fields, groupByFields, aggregationConditions, scores, replayInfo);
     }
 
     @Override
@@ -448,6 +444,7 @@ public class EventImpl implements Event {
                 .add("alert", alert)
                 .add("fields", fields)
                 .add("groupByFields", groupByFields)
+                .add("aggregationConditions", aggregationConditions)
                 .add("replayInfo", replayInfo)
                 .add("scores", scores)
                 .add("associatedAssets", associatedAssets)
