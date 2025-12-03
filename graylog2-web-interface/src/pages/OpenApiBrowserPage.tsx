@@ -25,10 +25,16 @@ const OpenApiBrowserPage = () => (
   <DocumentTitle title="OpenAPI Browser">
     <SwaggerUI
       url="/api/openapi.yaml"
-      // Hide authorization UI since the browser already has a valid session cookie which takes precedence over
-      // any other auth mechanism even if users try to enable that through the Swagger UI.
+      filter
+      deepLinking
+      requestInterceptor={(req) => {
+        req.headers['X-Requested-By'] = 'OpenAPI Browser';
+        return req;
+      }}
       plugins={[
         () => ({
+          // Hide authorization UI since the browser already has a valid session cookie which takes precedence over
+          // any other auth mechanism even if users try to enable that through the Swagger UI.
           wrapComponents: {
             authorizeBtn: () => () => null,
             authorizeOperationBtn: () => () => null,
