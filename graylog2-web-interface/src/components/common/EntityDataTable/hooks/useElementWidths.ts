@@ -52,6 +52,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
     columnRenderersByAttribute,
     columnIds,
+    columnSchemas,
     tableWidth,
     columnWidthPreferences,
   });

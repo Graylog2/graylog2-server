@@ -24,6 +24,10 @@ describe('useColumnWidths hook test', () => {
     bulkSelectColWidth: 0,
     columnWidthPreferences: undefined,
     tableWidth: 600,
+    columnSchemas: [
+      { id: 'title', title: 'Title' },
+      { id: 'description', title: 'Description' },
+    ],
   };
 
   it('should calculate width for columns with flexible width', async () => {

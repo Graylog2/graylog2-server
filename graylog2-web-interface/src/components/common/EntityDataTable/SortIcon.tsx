@@ -16,18 +16,23 @@
  */
 
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import type { Column } from '@tanstack/react-table';
 
 import CommonSortIcon from 'components/common/SortIcon';
 import type { ColumnMetaContext, EntityBase } from 'components/common/EntityDataTable/types';
 
-const StyledCommonSortIcon = styled(CommonSortIcon)`
-  display: inline-block;
-  margin-left: 6px;
-  padding: 0;
-  cursor: pointer;
-`;
+export const SORT_ICON_WIDTH = 20;
+
+const StyledCommonSortIcon = styled(CommonSortIcon)(
+  ({ theme }) => css`
+    width: ${SORT_ICON_WIDTH}px;
+    display: inline-block;
+    margin-left: ${theme.spacings.xs}; // needs to be updated in column width calculations if changed
+    padding: 0;
+    cursor: pointer;
+  `,
+);
 
 const SORT_DIRECTIONS = {
   ASC: 'asc',

@@ -50,9 +50,10 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
 );
 
 const DragHandle = styled.div<{ $isDragging: boolean }>(
-  ({ $isDragging }) => css`
+  ({ $isDragging, theme }) => css`
     display: inline-block;
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
+    margin-right: ${theme.spacings.xxs};
   `,
 );
 
