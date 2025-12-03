@@ -12,6 +12,13 @@ info:
     url: https://www.mongodb.com/licensing/server-side-public-license
   title: Graylog REST API
   version: 0.0.0
+servers:
+- description: REST API endpoint that is also used by the web interface.
+  url: /api/
+security:
+- tokenAuth: []
+- basicAuth: []
+- sessionAuth: []
 tags:
 - description: Manage AWS Config settings
   name: AWS/Config
@@ -25401,3 +25408,19 @@ components:
                 type: boolean
         zero:
           type: boolean
+  securitySchemes:
+    basicAuth:
+      description: HTTP Basic Authentication with username and password
+      scheme: basic
+      type: http
+    sessionAuth:
+      description: Session Cookie Authentication - used by the web interface after
+        logging in
+      in: cookie
+      name: authentication
+      type: apiKey
+    tokenAuth:
+      description: API Token Authentication - use your API token as username and literal
+        'token' as password
+      scheme: basic
+      type: http
