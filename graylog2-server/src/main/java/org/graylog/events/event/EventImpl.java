@@ -311,7 +311,7 @@ public class EventImpl implements Event {
 
     @Override
     public void setAggregationConditions(Map<String, Double> aggregationConditions) {
-        this.aggregationConditions = ImmutableMap.copyOf(aggregationConditions));
+        this.aggregationConditions = ImmutableMap.copyOf(aggregationConditions);
     }
 
     @Override
