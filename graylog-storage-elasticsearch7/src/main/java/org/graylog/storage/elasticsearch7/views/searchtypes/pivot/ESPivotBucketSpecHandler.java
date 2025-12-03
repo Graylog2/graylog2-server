@@ -46,7 +46,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
     }
 
     protected void record(ESGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
-        aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
+        aggTypes(queryContext, pivot).record(spec, name);
     }
 
     public record SortOrders(List<BucketOrder> orders, List<AggregationBuilder> sortingAggregations) {}
