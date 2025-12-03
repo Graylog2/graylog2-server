@@ -120,7 +120,7 @@ public abstract class EventDto {
 
     @JsonProperty(FIELD_AGGREGATION_CONDITIONS)
     @Nullable
-    public abstract Map<String, String> aggregationConditions();
+    public abstract Map<String, Double> aggregationConditions();
 
     @JsonProperty(FIELD_REPLAY_INFO)
     public abstract Optional<EventReplayInfo> replayInfo();
@@ -210,7 +210,7 @@ public abstract class EventDto {
         public abstract Builder groupByFields(Map<String, String> fields);
 
         @JsonProperty(FIELD_AGGREGATION_CONDITIONS)
-        public abstract Builder aggregationConditions(@Nullable Map<String, String> conditions);
+        public abstract Builder aggregationConditions(@Nullable Map<String, Double> conditions);
 
         @JsonProperty(FIELD_REPLAY_INFO)
         public abstract Builder replayInfo(@Nullable EventReplayInfo replayInfo);
