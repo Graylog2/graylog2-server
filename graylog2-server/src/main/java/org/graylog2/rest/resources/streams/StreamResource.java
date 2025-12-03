@@ -676,7 +676,7 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
     public Response assignToIndexSet(@ApiParam(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
-                                     @ApiParam(name = "JSON body", required = true) @NotNull @NotEmpty List<@NotBlank String> streamIds) {
+                                     @ApiParam(name = "JSON body", required = true) @NotEmpty List<@NotBlank String> streamIds) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         streamIds.forEach(streamId -> {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);
