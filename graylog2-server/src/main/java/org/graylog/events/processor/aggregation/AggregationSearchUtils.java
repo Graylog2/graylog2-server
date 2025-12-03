@@ -191,7 +191,7 @@ public class AggregationSearchUtils {
 
             // adding the aggregation conditions to the event, TODO: is it possible to have identical keys for multiple seriesValues?
             final var aggregationConditions = keyResult.seriesValues().stream()
-                    .collect(Collectors.toMap(s -> s.series().literal(), s -> String.valueOf(s.value())));
+                    .collect(Collectors.toMap(s -> s.series().literal(), s -> s.value()));
             event.setAggregationConditions(aggregationConditions);
 
             // Ask any event query modifier for its state and collect it into the event modifier state
