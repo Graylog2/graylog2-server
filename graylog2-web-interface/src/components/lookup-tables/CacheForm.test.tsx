@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
 import { createLookupTableCache } from 'fixtures/lookupTables';
@@ -128,7 +128,8 @@ describe('CacheForm', () => {
     renderedCache({ scope: 'DEFAULT', inCache: cache, withConfig: false });
 
     const titleInput = screen.queryByLabelText('* Title');
-    fireEvent.blur(titleInput);
+    await userEvent.click(titleInput);
+    await userEvent.tab();
     const requiredErrorMessages = await screen.findAllByText('Required');
 
     expect(requiredErrorMessages.length).toBeGreaterThanOrEqual(1);
@@ -150,7 +151,8 @@ describe('CacheForm', () => {
     });
 
     const titleInput = screen.queryByLabelText('* Title');
-    fireEvent.blur(titleInput);
+    await userEvent.click(titleInput);
+    await userEvent.tab();
 
     const dupNameError = await screen.findByText('The cache name is already in use.');
 
@@ -177,9 +179,9 @@ describe('CacheForm', () => {
     const nameEle = await screen.findByLabelText('* Name');
     const submitButton = await findSubmitButton();
 
-    fireEvent.change(titleEle, { target: { value: '' } });
-    fireEvent.change(nameEle, { target: { value: '' } });
-    userEvent.click(submitButton);
+    await userEvent.clear(titleEle);
+    await userEvent.clear(nameEle);
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockSaved).not.toHaveBeenCalled();
@@ -206,9 +208,9 @@ describe('CacheForm', () => {
     const nameEle = await screen.findByLabelText('* Name');
     const submitButton = await findSubmitButton();
 
-    fireEvent.change(titleEle, { target: { value: 'Test title' } });
-    fireEvent.change(nameEle, { target: { value: 'test-title' } });
-    userEvent.click(submitButton);
+    await userEvent.type(titleEle, 'Test title');
+    await userEvent.type(nameEle, 'test-title');
+    await userEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockSaved).toHaveBeenCalled();
