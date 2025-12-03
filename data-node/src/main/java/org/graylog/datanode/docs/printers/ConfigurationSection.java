@@ -14,24 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.configuration;
+package org.graylog.datanode.docs.printers;
 
-import com.github.joschi.jadconfig.Parameter;
+import org.graylog.datanode.docs.ConfigurationEntry;
 
-import java.net.URI;
+import java.util.List;
 
-public class VersionCheckConfiguration {
-    @Parameter(value = "versionchecks")
-    private boolean enabled = true;
-
-    @Parameter(value = "versionchecks_uri")
-    private URI uri = URI.create("https://versioncheck.graylog.com/check");
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public URI getUri() {
-        return uri;
+public record ConfigurationSection(String heading, String description, List<ConfigurationSection> sections, List<ConfigurationEntry> entries) {
+    public boolean hasPriority() {
+        return entries.stream().anyMatch(ConfigurationEntry::hasPriority);
     }
 }

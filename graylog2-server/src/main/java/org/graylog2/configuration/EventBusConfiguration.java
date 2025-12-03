@@ -17,7 +17,6 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.documentation.Documentation;
 
 public class EventBusConfiguration {
 
