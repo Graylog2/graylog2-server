@@ -47,8 +47,9 @@ type UseClusterDataNodesTableLayoutReturn = {
   handleLayoutPreferencesChange: (newLayoutPreferences: {
     attributes?: ColumnPreferences;
     order?: Array<string>;
-  }) => void;
+  }) => Promise<void>;
   handleSortChange: (newSort: Sort) => void;
+  resetLayoutPreferences: () => Promise<void>;
 };
 
 const useClusterDataNodesTableLayout = (
@@ -56,12 +57,27 @@ const useClusterDataNodesTableLayout = (
   pageSizeLimit?: number,
 ): UseClusterDataNodesTableLayoutReturn => {
   const { layoutConfig, isInitialLoading: isLoadingLayout } = useTableLayout(TABLE_LAYOUT);
-  const { mutate: updateTableLayout } = useUpdateUserLayoutPreferences(TABLE_LAYOUT.entityTableId);
+  const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(TABLE_LAYOUT.entityTableId);
 
   const handleLayoutPreferencesChange = useCallback(
-    ({ attributes, order }: { attributes?: ColumnPreferences; order?: Array<string> }) => {
-      updateTableLayout({ attributes, order });
+    (layoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> }) => {
+      const newLayoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> } = {};
+
+      if ('order' in layoutPreferences) {
+        newLayoutPreferences.order = layoutPreferences.order;
+      }
+
+      if ('attributes' in layoutPreferences) {
+        newLayoutPreferences.attributes = layoutPreferences.attributes;
+      }
+
+      return updateTableLayout(newLayoutPreferences);
     },
+    [updateTableLayout],
+  );
+
+  const resetLayoutPreferences = useCallback(
+    () => updateTableLayout({ attributes: null, order: null, sort: undefined, perPage: undefined }),
     [updateTableLayout],
   );
 
@@ -89,6 +105,7 @@ const useClusterDataNodesTableLayout = (
     searchParams,
     isLoadingLayout,
     handleLayoutPreferencesChange,
+    resetLayoutPreferences,
     handleSortChange,
   };
 };

@@ -20,9 +20,12 @@ import type { ColumnDef, SortingState, Updater, VisibilityState, RowSelectionSta
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 
 import type { Sort } from 'stores/PaginationTypes';
+import debounceWithPromise from 'views/logic/debounceWithPromise';
 
-import type { ColumnPreferences, EntityBase } from '../types';
-import { UTILITY_COLUMNS } from '../Constants';
+import type { ColumnPreferences, EntityBase, ColumnRenderersByAttribute } from '../types';
+import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, DEFAULT_COL_MIN_WIDTH } from '../Constants';
+
+const COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS = 500;
 
 const columnVisibilityChanges = (prevVisibleColumns: VisibilityState, currVisibleColumns: VisibilityState) => {
   const addedColumns = new Set<string>();
@@ -48,11 +51,11 @@ const updateColumnPreferences = (
 
   // only update the preferences for columns which have been shown/hidden by the user
   addedColumns.forEach((col) => {
-    updatedPreferences[col] = { status: 'show' };
+    updatedPreferences[col] = { status: ATTRIBUTE_STATUS.show };
   });
 
   removedColumns.forEach((col) => {
-    updatedPreferences[col] = { status: 'hide' };
+    updatedPreferences[col] = { status: ATTRIBUTE_STATUS.hide };
   });
 
   return updatedPreferences;
@@ -60,7 +63,9 @@ const updateColumnPreferences = (
 
 type Props<Entity extends EntityBase> = {
   columnOrder: Array<string>;
-  columnsDefinitions: Array<ColumnDef<Entity>>;
+  columnDefinitions: Array<ColumnDef<Entity>>;
+  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
+  columnWidths: { [colId: string]: number };
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
@@ -75,27 +80,37 @@ type Props<Entity extends EntityBase> = {
   selectedEntities: Array<Entity['id']>;
   setInternalAttributeColumnOrder: (columnOrder: Array<string>) => void;
   setSelectedEntities: (rows: Array<string>) => void;
+  setInternalColumnWidthPreferences: React.Dispatch<React.SetStateAction<{ [key: string]: number }>>;
+  internalColumnWidthPreferences: { [colId: string]: number };
   sort: Sort | undefined;
 };
 
 const useTable = <Entity extends EntityBase>({
-  layoutPreferences,
+  columnOrder,
+  columnDefinitions,
+  columnRenderersByAttribute,
+  columnWidths,
   defaultColumnOrder,
-  columnsDefinitions,
   displayBulkSelectCol,
   entities,
   isEntitySelectable = () => true,
+  layoutPreferences,
   onChangeSelection,
   onLayoutPreferencesChange,
-  setInternalAttributeColumnOrder,
   onSortChange,
   selectedEntities,
+  internalColumnWidthPreferences,
+  setInternalColumnWidthPreferences,
+  setInternalAttributeColumnOrder,
   setSelectedEntities,
   sort,
-  columnOrder,
 }: Props<Entity>) => {
   const data = useMemo(() => [...entities], [entities]);
   const sorting = useMemo(() => (sort ? [{ id: sort.attributeId, desc: sort.direction === 'desc' }] : []), [sort]);
+  const debouncedOnLayoutPreferencesChange = useMemo(
+    () => debounceWithPromise(onLayoutPreferencesChange, COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS),
+    [onLayoutPreferencesChange],
+  );
 
   const onSortingChange = useCallback(
     (updater: Updater<SortingState>) => {
@@ -106,8 +121,8 @@ const useTable = <Entity extends EntityBase>({
   );
 
   const columnVisibility = useMemo(
-    () => Object.fromEntries(columnsDefinitions.map(({ id }) => [id, columnOrder.includes(id)])),
-    [columnsDefinitions, columnOrder],
+    () => Object.fromEntries(columnDefinitions.map(({ id }) => [id, columnOrder.includes(id)])),
+    [columnDefinitions, columnOrder],
   );
 
   const onColumnVisibilityChange = useCallback(
@@ -168,7 +183,7 @@ const useTable = <Entity extends EntityBase>({
     [entities, onChangeSelection, rowSelection, setSelectedEntities],
   );
 
-  const _onColumnOrderChange = useCallback(
+  const onColumnOrderChange = useCallback(
     (updater: Updater<Array<string>>) => {
       const newColumnOrder = (updater instanceof Function ? updater(columnOrder) : updater).filter(
         (colId) => !UTILITY_COLUMNS.has(colId),
@@ -179,24 +194,61 @@ const useTable = <Entity extends EntityBase>({
     [columnOrder, onLayoutPreferencesChange, setInternalAttributeColumnOrder],
   );
 
+  const onColumnSizingChange = useCallback(
+    (updater: Updater<{ [colId: string]: number }>) => {
+      const newAttributeWidthPreferences =
+        updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
+
+      const clampedAttributeWidths = Object.fromEntries(
+        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
+          colId,
+          Math.max(width, columnRenderersByAttribute[colId]?.minWidth ?? DEFAULT_COL_MIN_WIDTH),
+        ]),
+      );
+
+      setInternalColumnWidthPreferences(clampedAttributeWidths);
+
+      const newAttributePreferences = { ...(layoutPreferences?.attributes || {}) };
+
+      Object.entries(clampedAttributeWidths).forEach(([colId, width]) => {
+        newAttributePreferences[colId] = {
+          ...newAttributePreferences[colId],
+          width,
+        };
+      });
+
+      return debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
+    },
+    [
+      columnRenderersByAttribute,
+      debouncedOnLayoutPreferencesChange,
+      internalColumnWidthPreferences,
+      layoutPreferences?.attributes,
+      setInternalColumnWidthPreferences,
+    ],
+  );
+
   // eslint-disable-next-line react-hooks/incompatible-library
   return useReactTable({
-    columns: columnsDefinitions,
+    columns: columnDefinitions,
+    columnResizeMode: 'onChange',
     data,
     enableRowSelection: (row) => displayBulkSelectCol && isEntitySelectable(row.original),
     enableSortingRemoval: false,
     getCoreRowModel: getCoreRowModel(),
     getRowId: (row) => row.id,
     manualSorting: true,
-    onColumnOrderChange: _onColumnOrderChange,
+    onColumnOrderChange,
     onColumnVisibilityChange,
     onRowSelectionChange,
     onSortingChange,
+    onColumnSizingChange,
     state: {
       columnOrder,
       columnVisibility,
       sorting,
       rowSelection,
+      columnSizing: columnWidths,
     },
   });
 };

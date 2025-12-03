@@ -16,7 +16,7 @@
  */
 package org.graylog.testing.elasticsearch;
 
-import org.graylog2.indexer.MessageIndexTemplateProvider;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.indexer.indices.Template;
 import org.graylog2.storage.SearchVersion;
 import org.junit.jupiter.api.BeforeEach;
