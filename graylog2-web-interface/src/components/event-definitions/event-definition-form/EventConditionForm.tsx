@@ -110,8 +110,7 @@ const EventConditionForm = ({
   );
 
   const formattedEventDefinitionTypes = useMemo(
-    () =>
-      sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type })),
+    () => sortedEventDefinitionTypes.map((type) => ({ label: type.displayName, value: type.type })),
     [sortedEventDefinitionTypes],
   );
 
