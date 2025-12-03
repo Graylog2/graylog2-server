@@ -15,10 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useState } from 'react';
-import URI from 'urijs';
 
 import { LinkContainer } from 'components/common/router';
-import { ConfirmDialog, ExternalLink, IfPermitted } from 'components/common';
+import { ConfirmDialog, IfPermitted } from 'components/common';
 import { DropdownButton, MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
@@ -37,7 +36,6 @@ const GraylogNodeActions = ({ node }: Props) => {
     undefined,
   );
 
-  const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
   const nodeName = `${node.short_node_id} / ${node.hostname}`;
 
   const toggleMessageProcessing = () => {
@@ -102,11 +100,6 @@ const GraylogNodeActions = ({ node }: Props) => {
           <LinkContainer to={Routes.SYSTEM.SYSTEMLOGS(node.node_id)}>
             <MenuItem>Get recent system log messages</MenuItem>
           </LinkContainer>
-        </IfPermitted>
-        <IfPermitted permissions="api_browser:read">
-          <MenuItem href={apiBrowserURI} target="_blank">
-            <ExternalLink>API Browser</ExternalLink>
-          </MenuItem>
         </IfPermitted>
       </DropdownButton>
       {showMessageProcessingModal && (

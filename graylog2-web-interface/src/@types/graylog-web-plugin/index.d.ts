@@ -282,7 +282,7 @@ interface EntityCreator {
 type HelpMenuItem = {
   description: string;
   permissions?: string | Array<string>;
-} & ({ externalLink?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
+} & ({ externalLink?: string } | { path?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
 
 type RouteGenerator = (id: string, type: string) => QualifiedUrl<string>;
 

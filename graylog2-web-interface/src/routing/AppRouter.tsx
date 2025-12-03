@@ -75,7 +75,7 @@ import {
   LUTFormPage,
   NodeInputsPage,
   NotFoundPage,
-  OpenApiBrowserPage,
+  ApiBrowserPage,
   PipelineDetailsPage,
   PipelinesOverviewPage,
   ProcessBufferDumpPage,
@@ -195,7 +195,7 @@ const AppRouter = () => {
           children: [
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
             { path: RoutePaths.WELCOME, element: <WelcomePage /> },
-            { path: RoutePaths.OPENAPI_BROWSER, element: <OpenApiBrowserPage /> },
+            { path: RoutePaths.API_BROWSER, element: <ApiBrowserPage /> },
             { path: RoutePaths.STREAMS, element: <StreamsPage /> },
             { path: RoutePaths.STREAM_NEW, element: <StreamsPage /> },
             { path: RoutePaths.stream_view(':streamId'), element: <StreamDetailsPage /> },

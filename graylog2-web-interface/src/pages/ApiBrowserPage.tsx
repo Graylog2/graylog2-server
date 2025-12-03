@@ -22,14 +22,14 @@ import { DocumentTitle } from 'components/common';
 import { qualifyUrl } from 'util/URLUtils';
 
 // noinspection JSUnusedGlobalSymbols
-const OpenApiBrowserPage = () => (
-  <DocumentTitle title="OpenAPI Browser">
+const ApiBrowserPage = () => (
+  <DocumentTitle title="API Browser">
     <SwaggerUI
       url={qualifyUrl('/openapi.yaml')}
       filter
       deepLinking
       requestInterceptor={(req) => {
-        req.headers['X-Requested-By'] = 'OpenAPI Browser';
+        req.headers['X-Requested-By'] = 'API Browser';
         return req;
       }}
       plugins={[
@@ -46,4 +46,4 @@ const OpenApiBrowserPage = () => (
   </DocumentTitle>
 );
 
-export default OpenApiBrowserPage;
+export default ApiBrowserPage;

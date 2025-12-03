@@ -15,11 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import URI from 'urijs';
 
 import { LinkContainer } from 'components/common/router';
 import { ButtonGroup, DropdownButton, MenuItem } from 'components/bootstrap';
-import { ExternalLink, IfPermitted } from 'components/common';
+import { IfPermitted } from 'components/common';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 
@@ -27,10 +26,7 @@ type Props = {
   node: any;
 };
 
-const NodeMaintenanceDropdown = ({ node }: Props) => {
-  const apiBrowserURI = new URI(`${node.transport_address}/api-browser/`).normalizePathname().toString();
-
-  return (
+const NodeMaintenanceDropdown = ({ node }: Props) => (
     <ButtonGroup>
       <DropdownButton bsStyle="info" bsSize="lg" title="Actions" id="node-maintenance-actions" pullRight>
         <IfPermitted permissions="threads:dump">
@@ -56,13 +52,8 @@ const NodeMaintenanceDropdown = ({ node }: Props) => {
             </LinkContainer>
           </IfPermitted>
         </HideOnCloud>
-
-        <MenuItem href={apiBrowserURI} target="_blank">
-          <ExternalLink>API Browser</ExternalLink>
-        </MenuItem>
       </DropdownButton>
     </ButtonGroup>
-  );
-};
+);
 
 export default NodeMaintenanceDropdown;

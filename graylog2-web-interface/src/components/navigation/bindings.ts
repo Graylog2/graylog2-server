@@ -108,13 +108,8 @@ const navigationBindings: PluginExports = {
     { description: 'Documentation', externalLink: DocsHelper.versionedDocsHomePage() },
     { description: 'Keyboard Shortcuts', action: ({ showHotkeysModal }) => showHotkeysModal() },
     {
-      description: 'Cluster Global API browser',
-      externalLink: Routes.global_api_browser(),
-      permissions: 'api_browser:read',
-    },
-    {
-      description: 'OpenAPI browser',
-      externalLink: Routes.openapi_browser(),
+      description: 'API browser',
+      path: Routes.API_BROWSER,
       permissions: 'api_browser:read',
     },
   ],

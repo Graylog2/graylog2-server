@@ -92,8 +92,7 @@ const Routes = {
     FULL_SCREEN: dashboardsTvPath,
   },
   WELCOME: '/welcome',
-  GLOBAL_API_BROWSER_URL: '/api/api-browser/global/index.html',
-  OPENAPI_BROWSER: '/openapi-browser',
+  API_BROWSER: '/api-browser',
   SYSTEM: {
     CLUSTER: {
       NODES: '/system/cluster',
@@ -346,8 +345,6 @@ const Routes = {
   edit_input_extractor: (nodeId: string, inputId: string, extractorId: string) =>
     `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
   filtered_metrics: (nodeId: string, filter: string) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
-  global_api_browser: () => Routes.GLOBAL_API_BROWSER_URL,
-  openapi_browser: () => Routes.OPENAPI_BROWSER,
 } as const;
 
 const prefixUrlWithoutHostname = (url: string, prefix: string) => {
