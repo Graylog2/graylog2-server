@@ -19,12 +19,13 @@ import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 
 import { DocumentTitle } from 'components/common';
+import { qualifyUrl } from 'util/URLUtils';
 
 // noinspection JSUnusedGlobalSymbols
 const OpenApiBrowserPage = () => (
   <DocumentTitle title="OpenAPI Browser">
     <SwaggerUI
-      url="/api/openapi.yaml"
+      url={qualifyUrl('/openapi.yaml')}
       filter
       deepLinking
       requestInterceptor={(req) => {
