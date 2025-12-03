@@ -24,10 +24,13 @@ import io.swagger.v3.oas.integration.OpenApiConfigurationException;
 import io.swagger.v3.oas.integration.OpenApiContextLocator;
 import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.integration.api.OpenApiContext;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -108,13 +111,31 @@ public class OpenAPIContextFactory {
                 .contact(new Contact().name("Graylog").url("https://www.graylog.com"))
                 .license(new License().name("SSPLv1").url("https://www.mongodb.com/licensing/server-side-public-license"));
 
+        final var securitySchemes = new Components()
+                .addSecuritySchemes("tokenAuth", new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("basic")
+                        .description("API Token Authentication - use your API token as username and literal 'token' as password"))
+                .addSecuritySchemes("basicAuth", new SecurityScheme()
+                        .type(SecurityScheme.Type.HTTP)
+                        .scheme("basic")
+                        .description("HTTP Basic Authentication with username and password"))
+                .addSecuritySchemes("sessionAuth", new SecurityScheme()
+                        .type(SecurityScheme.Type.APIKEY)
+                        .in(SecurityScheme.In.COOKIE)
+                        .name("authentication")
+                        .description("Session Cookie Authentication - used by the web interface after logging in"));
+
         final var openAPI = new OpenAPI()
                 .info(info)
+                .components(securitySchemes)
                 .addServersItem(
                         new Server()
                                 .description("REST API endpoint that is also used by the web interface.")
-                                .url("/api/"));
-        // TODO: add server and security
+                                .url("/api/"))
+                .addSecurityItem(new SecurityRequirement().addList("tokenAuth"))
+                .addSecurityItem(new SecurityRequirement().addList("basicAuth"))
+                .addSecurityItem(new SecurityRequirement().addList("sessionAuth"));
 
         return new SwaggerConfiguration()
                 .openAPI31(true)

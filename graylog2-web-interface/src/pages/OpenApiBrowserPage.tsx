@@ -20,9 +20,22 @@ import 'swagger-ui-react/swagger-ui.css';
 
 import { DocumentTitle } from 'components/common';
 
+// noinspection JSUnusedGlobalSymbols
 const OpenApiBrowserPage = () => (
   <DocumentTitle title="OpenAPI Browser">
-    <SwaggerUI url="/api/openapi.yaml" />
+    <SwaggerUI
+      url="/api/openapi.yaml"
+      // Hide authorization UI since the browser already has a valid session cookie which takes precedence over
+      // any other auth mechanism even if users try to enable that through the Swagger UI.
+      plugins={[
+        () => ({
+          wrapComponents: {
+            authorizeBtn: () => () => null,
+            authorizeOperationBtn: () => () => null,
+          },
+        }),
+      ]}
+    />
   </DocumentTitle>
 );
 
