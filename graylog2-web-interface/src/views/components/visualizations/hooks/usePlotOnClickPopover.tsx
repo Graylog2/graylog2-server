@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import type { PlotMouseEvent, PlotlyHTMLElement, PlotData } from 'plotly.js';
 import minBy from 'lodash/minBy';
 import { useFloating } from '@floating-ui/react';
@@ -356,6 +356,7 @@ const alignByRelativeCoords = (rel: Rel = { x: 0, y: 0 }) => ({
 const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetConfig) => {
   const gdRef = useRef<PlotlyHTMLElement | null>(null);
   const [anchor, setAnchor] = useState<Anchor | null>(null);
+  const lastOutsideCloseTsRef = useRef<null | number>(null);
   const { refs, floatingStyles } = useFloating({
     placement: 'top-start',
     elements: {
@@ -371,22 +372,59 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
 
   const onPopoverClose = () => setAnchor(null);
 
-  const onChartClick = (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
-    const gd =
-      gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
-    if (!gd) return;
-    const a = chartType === 'scatter' ? makeScatterAnchor(e, gd) : makeElementAnchor(e, gd, chartType);
-    if (!a) return;
-    setAnchor(a);
-  };
+  const onChartClick = useCallback(
+    (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
+      const gd =
+        gdRef.current ?? ((e.event?.target as HTMLElement)?.closest('.js-plotly-plot') as PlotlyHTMLElement | null);
+      console.log({ e, gd });
+      if (!gd) return;
+      const newAnchor = chartType === 'scatter' ? makeScatterAnchor(e, gd) : makeElementAnchor(e, gd, chartType);
+      if (!newAnchor) return;
+      setAnchor((prevAnchor) => {
+        console.log({ prevAnchor });
+
+        if (prevAnchor) {
+          return null;
+        }
+
+        return newAnchor;
+      });
+    },
+    [chartType],
+  );
 
   const onPopoverChange = (isOpen: boolean) => {
-    if (!isOpen) onPopoverClose();
+    console.log({ isOpen });
+    if (!isOpen) {
+      setTimeout(onPopoverClose, 200);
+      // onPopoverClose();
+      // lastOutsideCloseTsRef.current = Date.now();
+    }
   };
 
   const isPopoverOpen = !!anchor;
 
   const PopoverComponent = popoverComponent(chartType);
+
+  const onPopoverClickHandler = useCallback(
+    (_: OnClickMarkerEvent, e: PlotMouseEvent) => {
+      const now = Date.now();
+      const lastClose = lastOutsideCloseTsRef.current;
+
+      // If we *just* closed the popover (within 50ms),
+      // this chart click is almost certainly the same native event,
+      // so we skip reopening.
+      if (isPopoverOpen) {
+        e.event.stopPropagation();
+        e.event.preventDefault();
+
+        return;
+      }
+
+      onChartClick(_, e);
+    },
+    [isPopoverOpen, onChartClick],
+  );
 
   const popover = (
     <OnClickPopoverWrapper
@@ -404,7 +442,7 @@ const usePlotOnClickPopover = (chartType: ChartType, config: AggregationWidgetCo
     </OnClickPopoverWrapper>
   );
 
-  return { initializeGraphDivRef, onChartClick, popover };
+  return { initializeGraphDivRef, onChartClick: !isPopoverOpen ? onPopoverClickHandler : undefined, popover };
 };
 
 export default usePlotOnClickPopover;

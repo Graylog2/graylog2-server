@@ -109,6 +109,8 @@ const PieVisualization = makeVisualization(({ config, data, height, width }: Vis
 
   const { popover, initializeGraphDivRef, onChartClick } = usePlotOnClickPopover('pie', config);
 
+  console.log({ onChartClick });
+
   return (
     <>
       <PlotLegend

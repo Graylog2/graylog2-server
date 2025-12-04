@@ -237,9 +237,12 @@ const GenericPlot = ({
   );
 
   const _onHoverMarker = useCallback(
-    (event: unknown) => {
+    (event: unknown, elseGG) => {
       const { points } = event as { points: Array<{ bbox: { x0: number; y0: number }; y: string; x: string }> };
-
+      console.log({
+        event,
+        elseGG,
+      });
       onHoverMarker?.({
         positionX: points[0].bbox.x0,
         positionY: points[0].bbox.y0,
