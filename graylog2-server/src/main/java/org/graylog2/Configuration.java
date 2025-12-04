@@ -301,6 +301,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
+    @Parameter(value = "max_event_age", validators = PositiveDurationValidator.class)
+    private Duration maxEventAge = Duration.days(1L);
+
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
     }
