@@ -39,10 +39,10 @@ public class OSSumHandler extends OSPivotSeriesSpecHandler<Sum, org.graylog.shad
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, Sum pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        Sum pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum sumAggregation,
-
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(Value.create(pivotSpec.id(), Sum.NAME, sumAggregation.getValue()));
     }

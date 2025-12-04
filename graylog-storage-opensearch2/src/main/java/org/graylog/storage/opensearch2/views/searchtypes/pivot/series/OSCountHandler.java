@@ -64,7 +64,6 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
                                         Count count,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
-
                                         OSGeneratedQueryContext esGeneratedQueryContext) {
         final Object value;
         if (valueCount == null) {

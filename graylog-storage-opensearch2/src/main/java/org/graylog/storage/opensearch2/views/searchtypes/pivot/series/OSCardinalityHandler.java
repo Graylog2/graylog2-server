@@ -43,7 +43,6 @@ public class OSCardinalityHandler extends OSPivotSeriesSpecHandler<Cardinality, 
     public Stream<Value> doHandleResult(Pivot pivot, Cardinality pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Cardinality cardinalityAggregation,
-
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Cardinality.NAME, cardinalityAggregation.getValue()));
     }

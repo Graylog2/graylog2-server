@@ -84,7 +84,6 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
                                                     Percentage percentage,
                                                     SearchResponse searchResult,
                                                     Object seriesResult,
-
                                                     OSGeneratedQueryContext esGeneratedQueryContext) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {

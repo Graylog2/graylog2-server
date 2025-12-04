@@ -44,7 +44,6 @@ public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.graylog.shad
                                         Min pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min minAggregation,
-
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Min.NAME, minAggregation.getValue()));
     }

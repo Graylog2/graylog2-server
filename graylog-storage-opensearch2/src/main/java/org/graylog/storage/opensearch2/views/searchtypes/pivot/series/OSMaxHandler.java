@@ -44,7 +44,6 @@ public class OSMaxHandler extends OSPivotSeriesSpecHandler<Max, org.graylog.shad
                                         Max pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max maxAggregation,
-
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
     }

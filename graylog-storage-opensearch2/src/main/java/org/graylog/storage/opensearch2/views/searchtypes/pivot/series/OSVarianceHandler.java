@@ -41,10 +41,10 @@ public class OSVarianceHandler extends OSPivotSeriesSpecHandler<Variance, Extend
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, Variance pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        Variance pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats varianceAggregation,
-
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
     }
