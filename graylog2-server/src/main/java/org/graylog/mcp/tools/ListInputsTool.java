@@ -17,10 +17,8 @@
 package org.graylog.mcp.tools;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import jakarta.inject.Inject;
-import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -30,7 +28,6 @@ import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.web.customization.CustomizationConfig;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -45,35 +42,31 @@ public class ListInputsTool extends Tool<ListInputsTool.Parameters, String> {
 
     private final InputService inputService;
     private final Map<String, InputDescription> availableInputs;
-    private final String productName;
 
     @Inject
-    public ListInputsTool(ObjectMapper objectMapper,
-                          SchemaGeneratorProvider schemaGeneratorProvider,
+    public ListInputsTool(final ToolContext toolContext,
                           InputService inputService,
-                          MessageInputFactory messageInputFactory,
-                          CustomizationConfig customizationConfig) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+                          MessageInputFactory messageInputFactory) {
+        super(
+                toolContext,
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
-                f("List %s Inputs", customizationConfig.productName()),
+                f("List %s Inputs", toolContext.customizationConfig().productName()),
                 f("""
                         List all configured %s inputs. Returns detailed information about each input including type (syslog, GELF, etc.), current state (running/stopped),
                         configuration parameters, and throughput statistics. Use this to monitor input health, troubleshoot data ingestion issues, or understand what types of
                         logs are being collected. No parameters required.
-                        """, customizationConfig.productName()));
+                        """, toolContext.customizationConfig().productName()));
         this.inputService = inputService;
         this.availableInputs = messageInputFactory.getAvailableInputs();
-        this.productName = customizationConfig.productName();
     }
 
     @Override
     public String apply(PermissionHelper permissionHelper, ListInputsTool.Parameters unused) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
-        pw.append(productName).append("Inputs:");
+        pw.append(getProductName()).append("Inputs:");
         try (var inputs = inputService.all().stream()) {
             inputs.filter(input -> permissionHelper.isPermitted(RestPermissions.INPUTS_READ, input.getId()))
                     .map(input -> {

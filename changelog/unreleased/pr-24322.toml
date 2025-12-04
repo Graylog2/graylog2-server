@@ -1,0 +1,5 @@
+type = "added" # One of: a(dded), c(hanged), d(eprecated), r(emoved), f(ixed), s(ecurity)
+message = "Add MCP tool output schema toggle config"
+
+issues = ["23980"]
+pulls = ["24322"]
