@@ -47,32 +47,10 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
     @Override
     public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregationResult, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext);
 
-    public static class Value {
-
-        private final String id;
-        private final String key;
-        private final Object value;
-
-        public Value(String id, String key, Object value) {
-            this.id = id;
-            this.key = key;
-            this.value = value;
-        }
+    public record Value(String id, String key, Object value) {
 
         public static Value create(String id, String key, Object value) {
             return new Value(id, key, value);
-        }
-
-        public String id() {
-            return id;
-        }
-
-        public String key() {
-            return key;
-        }
-
-        public Object value() {
-            return value;
         }
     }
 }
