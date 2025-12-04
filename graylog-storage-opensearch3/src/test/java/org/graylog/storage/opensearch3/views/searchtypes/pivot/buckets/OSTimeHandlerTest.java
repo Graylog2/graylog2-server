@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.engine.AggTypes;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
@@ -27,7 +28,6 @@ import org.graylog.plugins.views.search.timeranges.DerivedTimeRange;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.histogram.AutoDateHistogramAggregationBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.AggTypes;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;

@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.engine.AggTypes;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;

@@ -20,6 +20,7 @@ import com.google.common.base.MoreObjects;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.joda.time.DateTimeZone;
 
@@ -81,6 +82,12 @@ public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryC
 
     public Map<Object, Object> contextMap() {
         return contextMap;
+    }
+
+    public void record(Pivot pivot,
+                       PivotSpec spec,
+                       String name) {
+
     }
 
     public String seriesName(final SeriesSpec seriesSpec, final Pivot pivot) {
