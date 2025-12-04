@@ -38,6 +38,7 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
     () =>
       pluggableAssetListComponent.map(({ component: PluggableAssetListItem }) => (
         <PluggableAssetListItem
+          key={associated_assets[0]}
           assetIds={associated_assets}
           direction="col"
           addToQuery={(id) => handleAddToQuery(dispatch, queryId, id, fieldType)}
