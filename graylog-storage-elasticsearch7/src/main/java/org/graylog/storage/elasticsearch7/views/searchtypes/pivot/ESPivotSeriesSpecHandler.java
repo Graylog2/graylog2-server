@@ -38,7 +38,7 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
     }
 
     protected void record(ESGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
-        aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
+        aggTypes(queryContext, pivot).record(spec, name);
     }
 
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
