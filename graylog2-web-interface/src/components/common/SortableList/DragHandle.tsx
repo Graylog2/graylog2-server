@@ -24,8 +24,8 @@ import type { DragHandleProps } from 'components/common/SortableList/types';
 export const DRAG_HANDLE_DEFAULT_TITLE = 'Drag or press space to reorder';
 
 const Container = styled.button<{ $isDragging: boolean }>(
-  ({ $isDragging }) => css`
-    margin-right: 5px;
+  ({ $isDragging, theme }) => css`
+    margin-right: ${theme.spacings.xxs};
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
     background: transparent;
     border: 0;
@@ -40,7 +40,10 @@ type Props = {
   index: number;
 };
 
-const DragHandle = ({ itemTitle = undefined, dragHandleProps, isDragging, index }: Props, ref: React.Ref<HTMLButtonElement>) => {
+const DragHandle = (
+  { itemTitle = undefined, dragHandleProps, isDragging, index }: Props,
+  ref: React.Ref<HTMLButtonElement>,
+) => {
   const dragHandleTitle =
     typeof itemTitle === 'string'
       ? `${DRAG_HANDLE_DEFAULT_TITLE} ${itemTitle.toLocaleLowerCase()}`

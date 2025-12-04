@@ -19,9 +19,10 @@ import * as React from 'react';
 import type { Column, Table } from '@tanstack/react-table';
 
 import { defaultCompare } from 'logic/DefaultCompare';
-import { Checkbox, DropdownButton, MenuItem } from 'components/bootstrap';
+import { Checkbox, DropdownButton, MenuItem, DeleteMenuItem } from 'components/bootstrap';
 import TextOverflowEllipsis from 'components/common/TextOverflowEllipsis';
 import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
+import { Icon } from 'components/common';
 
 const StyledDropdownButton = styled(DropdownButton)`
   ~ .dropdown-menu {
@@ -74,10 +75,11 @@ const ColumnListItem = <Entity extends EntityBase>({ column }: { column: Column<
 };
 
 type Props<Entity> = {
+  onResetLayoutPreferences: () => void;
   table: Table<Entity>;
 };
 
-const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table }: Props<Entity>) => (
+const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table, onResetLayoutPreferences }: Props<Entity>) => (
   <StyledDropdownButton
     title="Columns"
     bsSize="small"
@@ -93,6 +95,11 @@ const ColumnsVisibilitySelect = <Entity extends EntityBase>({ table }: Props<Ent
       .map((column) => (
         <ColumnListItem<Entity> column={column} key={column.id} />
       ))}
+    <MenuItem divider />
+    <DeleteMenuItem onSelect={onResetLayoutPreferences}>
+      <Icon name="reopen_window" /> Reset all columns
+    </DeleteMenuItem>
   </StyledDropdownButton>
 );
+
 export default ColumnsVisibilitySelect;

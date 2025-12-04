@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 import IconButton from 'components/common/IconButton';
 import { ButtonToolbar } from 'components/bootstrap';
 
-import type { EntityBase, ExpandedSectionRenderer } from './types';
+import type { EntityBase, ExpandedSectionRenderers } from './types';
 import ExpandedEntitiesSectionsContext from './contexts/ExpandedSectionsContext';
 
 const Container = styled.tr(
@@ -48,14 +48,10 @@ const HideSectionButton = styled(IconButton)`
 `;
 
 const ExpandedSections = <Entity extends EntityBase>({
-  expandedSectionsRenderer,
+  expandedSectionRenderers,
   entity,
 }: {
-  expandedSectionsRenderer:
-    | {
-        [sectionName: string]: ExpandedSectionRenderer<Entity>;
-      }
-    | undefined;
+  expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
   entity: Entity;
 }) => {
   const { expandedSections, toggleSection } = useContext(ExpandedEntitiesSectionsContext);
@@ -68,7 +64,7 @@ const ExpandedSections = <Entity extends EntityBase>({
   return (
     <Container>
       <td colSpan={1000}>
-        {Object.entries(expandedSectionsRenderer ?? {})
+        {Object.entries(expandedSectionRenderers ?? {})
           .filter(([sectionName]) => expandedEntitySections.includes(sectionName))
           .map(([sectionName, section]) => {
             const hideSection = () => toggleSection(entity.id, sectionName);

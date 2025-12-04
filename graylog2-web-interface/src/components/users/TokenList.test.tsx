@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render, screen, waitFor, fireEvent } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Optional } from 'utility-types';
 
 import OriginalTokenList from 'components/users/TokenList';
@@ -99,7 +99,7 @@ describe('<TokenList />', () => {
     await userEvent.type(nameInput, 'hans');
 
     const ttlInput = await screen.findByLabelText('Token TTL');
-    fireEvent.change(ttlInput, { target: { value: 'PT72H' } });
+    await userEvent.type(ttlInput, '{selectall}PT72H');
 
     const createToken = await screen.findByRole('button', { name: 'Create Token' });
     await userEvent.click(createToken);

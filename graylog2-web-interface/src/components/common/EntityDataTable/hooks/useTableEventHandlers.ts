@@ -28,7 +28,7 @@ const useTableEventHandlers = ({
   setQuery,
   appSection,
 }: {
-  updateTableLayout: (preferences: TableLayoutPreferences) => void;
+  updateTableLayout: (preferences: TableLayoutPreferences) => Promise<void>;
   paginationQueryParameter: PaginationQueryParameterResult;
   setQuery: (query: string) => void;
   appSection: string;
@@ -71,26 +71,35 @@ const useTableEventHandlers = ({
         sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_CHANGED, {
           app_section: appSection,
           app_action_value: 'columns-select',
-          columns: Object.keys(layoutPreferences.attributes).filter(
-            (key) => layoutPreferences.attributes[key].status === 'show',
-          ),
+          columns: layoutPreferences.attributes,
         });
       }
 
       const newLayoutPreferences: { attributes?: ColumnPreferences; order?: Array<string> } = {};
 
-      if (layoutPreferences.order) {
+      if ('order' in layoutPreferences) {
         newLayoutPreferences.order = layoutPreferences.order;
       }
 
-      if (layoutPreferences.attributes) {
+      if ('attributes' in layoutPreferences) {
         newLayoutPreferences.attributes = layoutPreferences.attributes;
       }
 
-      updateTableLayout(newLayoutPreferences);
+      return updateTableLayout(newLayoutPreferences);
     },
     [appSection, sendTelemetry, updateTableLayout],
   );
+
+  const onResetLayoutPreferences = useCallback(() => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.COLUMNS_RESET, {
+      app_section: appSection,
+      app_action_value: 'columns-select',
+    });
+
+    paginationQueryParameter.resetPage();
+
+    return updateTableLayout({ attributes: null, order: null, sort: undefined, perPage: undefined });
+  }, [appSection, paginationQueryParameter, sendTelemetry, updateTableLayout]);
 
   const onSearchReset = useCallback(() => {
     onSearch('');
@@ -113,6 +122,7 @@ const useTableEventHandlers = ({
   return {
     onLayoutPreferencesChange,
     onPageSizeChange,
+    onResetLayoutPreferences,
     onSearch,
     onSearchReset,
     onSortChange,

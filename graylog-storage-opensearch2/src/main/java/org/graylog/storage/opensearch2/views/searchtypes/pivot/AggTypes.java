@@ -19,8 +19,6 @@ package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,18 +28,19 @@ import java.util.Map;
  * It's just ugly and in the way.
  */
 public class AggTypes {
-    final Map<PivotSpec, Tuple2<String, Class<? extends Aggregation>>> aggTypeMap = new HashMap<>();
+    final Map<PivotSpec, String> aggMap = new HashMap<>();
 
-    public void record(PivotSpec pivotSpec, String name, Class<? extends Aggregation> aggClass) {
-        aggTypeMap.put(pivotSpec, Tuple.tuple(name, aggClass));
+    public void record(PivotSpec pivotSpec, String name) {
+        aggMap.put(pivotSpec, name);
     }
 
-    public Aggregation getSubAggregation(PivotSpec pivotSpec, HasAggregations currentAggregationOrBucket) {
-        final Tuple2<String, Class<? extends Aggregation>> tuple2 = getTypes(pivotSpec);
-        return currentAggregationOrBucket.getAggregations().get(tuple2.v1);
+    public Aggregation getSubAggregation(PivotSpec pivotSpec,
+                                         HasAggregations currentAggregationOrBucket) {
+        final String aggName = getTypes(pivotSpec);
+        return currentAggregationOrBucket.getAggregations().get(aggName);
     }
 
-    public Tuple2<String, Class<? extends Aggregation>> getTypes(PivotSpec pivotSpec) {
-        return aggTypeMap.get(pivotSpec);
+    public String getTypes(PivotSpec pivotSpec) {
+        return aggMap.get(pivotSpec);
     }
 }

@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { act, fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { SEARCH_DEBOUNCE_THRESHOLD } from 'components/common/SearchForm';
 
@@ -103,23 +104,22 @@ describe('<ClusterConfigurationNodes />', () => {
   it('switches to a specific node type when segmented control is used', async () => {
     render(<ClusterConfigurationNodes />);
 
-    fireEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
 
     await waitFor(() => {
       expect(useClusterDataNodesTableLayout).toHaveBeenLastCalledWith(expect.anything(), 100);
     });
 
     expect(useClusterGraylogNodesTableLayout).toHaveBeenCalledTimes(1);
-    expect(useClusterDataNodes).toHaveBeenLastCalledWith(
-      expect.objectContaining({ query: '' }),
-      { refetchInterval: 10000 },
-    );
+    expect(useClusterDataNodes).toHaveBeenLastCalledWith(expect.objectContaining({ query: '' }), {
+      refetchInterval: 10000,
+    });
   });
 
   it('uses child "select node type" handler to switch view', async () => {
     render(<ClusterConfigurationNodes />);
 
-    fireEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
+    await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
 
     await waitFor(() => {
       expect(useClusterDataNodesTableLayout).toHaveBeenLastCalledWith('', 100);
@@ -131,7 +131,7 @@ describe('<ClusterConfigurationNodes />', () => {
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');
 
-    fireEvent.change(searchInput, { target: { value: '  nodes  ' } });
+    await userEvent.type(searchInput, '  nodes  ');
     act(() => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD + 10);
     });

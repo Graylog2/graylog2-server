@@ -66,6 +66,7 @@ const useBulkSelectColumnDefinition = <Entity extends EntityBase>(displayBulkSel
             header: BulkSelectHeader<Entity>,
             enableHiding: false,
             cell: BulkSelectCell<Entity>,
+            enableResizing: false,
           })
         : null,
     [displayBulkSelectCol, columnHelper],

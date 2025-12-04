@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, act } from 'wrappedTestingLibrary';
+import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import type { InputTypeDescriptionsResponse } from 'src/hooks/useInputTypesDescriptions';
 
@@ -112,7 +112,8 @@ const inputTypeDescriptions = {
   },
 } as unknown as InputTypeDescriptionsResponse;
 
-const renderSUT = (input = baseInput, extraProps = {}) => render(
+const renderSUT = (input = baseInput, extraProps = {}) =>
+  render(
     <InputsActions
       input={input as any}
       inputTypes={{} as any}
@@ -248,7 +249,7 @@ describe('InputsActions', () => {
 
     expect(screen.getByText(/Editing Input Input 3/)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Update input'));
+    await userEvent.click(screen.getByText('Update input'));
     expect(updateInputMock).toHaveBeenCalledWith({
       input: expect.objectContaining({ title: 'Input 3' }),
       inputId: 'input3',
@@ -316,7 +317,7 @@ describe('InputsActions', () => {
 
     expect(screen.getByText('Do you really want to delete input Input 3?')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    await userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
     expect(deleteInputMock).toHaveBeenCalledWith({ inputId: 'input3' });
   });

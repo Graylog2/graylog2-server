@@ -78,7 +78,7 @@ describe('SavedSearchesModal', () => {
 
   beforeEach(() => {
     asMock(fetchSavedSearches).mockResolvedValue(defaultPaginatedSearches);
-    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
+    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutateAsync: () => Promise.resolve() });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
@@ -188,7 +188,7 @@ describe('SavedSearchesModal', () => {
       const updateTableLayout = jest.fn();
 
       asMock(useUpdateUserLayoutPreferences).mockReturnValue({
-        mutate: updateTableLayout,
+        mutateAsync: updateTableLayout,
       });
 
       render(

@@ -66,7 +66,7 @@ import type { ValueRendererProps } from 'views/components/messagelist/decoration
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
-import type {DEFAULT_AXIS_KEY} from "views/components/visualizations/Constants";
+import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
