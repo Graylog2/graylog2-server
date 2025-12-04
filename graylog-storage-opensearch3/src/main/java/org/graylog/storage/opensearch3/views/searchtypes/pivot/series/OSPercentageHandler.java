@@ -83,7 +83,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
     private Stream<Value> handleNestedSeriesResults(Pivot pivot,
                                                     Percentage percentage,
                                                     SearchResponse searchResult,
-                                                    Object seriesResult,
+                                                    Aggregation seriesResult,
                                                     OSGeneratedQueryContext esGeneratedQueryContext) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {

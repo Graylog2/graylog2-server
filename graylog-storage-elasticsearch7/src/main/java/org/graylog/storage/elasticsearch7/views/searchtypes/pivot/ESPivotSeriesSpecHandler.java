@@ -37,8 +37,8 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
 
     @SuppressWarnings("unchecked")
     @Override
-    public Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, ESGeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (SearchResponse) queryResult, (AGGREGATION_RESULT) aggregationResult, queryContext);
+    public Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, SearchResponse queryResult, Aggregation aggregationResult, ESGeneratedQueryContext queryContext) {
+        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, queryResult, (AGGREGATION_RESULT) aggregationResult, queryContext);
     }
 
     @Override

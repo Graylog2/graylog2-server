@@ -83,7 +83,7 @@ public class ESPercentageHandler extends ESPivotSeriesSpecHandler<Percentage, Va
     private Stream<Value> handleNestedSeriesResults(Pivot pivot,
                                                     Percentage percentage,
                                                     SearchResponse searchResult,
-                                                    Object seriesResult,
+                                                    Aggregation seriesResult,
                                                     ESGeneratedQueryContext esGeneratedQueryContext) {
         return switch (percentage.strategy().orElse(Percentage.Strategy.COUNT)) {
             case SUM -> {

@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
-import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.stream.Stream;
@@ -34,16 +32,15 @@ public interface SeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_BUI
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default List<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, SeriesSpec seriesSpec, GeneratedQueryContext queryContext) {
-        return doCreateAggregation(name, pivot, (SPEC_TYPE) seriesSpec, (QUERY_CONTEXT) queryContext);
+    default List<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, SeriesSpec seriesSpec, QUERY_CONTEXT queryContext) {
+        return doCreateAggregation(name, pivot, (SPEC_TYPE) seriesSpec, queryContext);
     }
 
     @Nonnull
     List<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE seriesSpec, QUERY_CONTEXT queryContext);
 
-    @SuppressWarnings("unchecked")
-    default Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, QUERY_CONTEXT queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (QUERY_RESULT) queryResult, (AGGREGATION_RESULT) aggregationResult, queryContext);
+    default Stream<Value> handleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT aggregationResult, QUERY_CONTEXT queryContext) {
+        return doHandleResult(pivot, seriesSpec, queryResult, aggregationResult, queryContext);
     }
 
     Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT result, QUERY_CONTEXT queryContext);

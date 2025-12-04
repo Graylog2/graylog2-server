@@ -41,7 +41,8 @@ public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
     }
 
     @Override
-    public Stream<OSPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot, Average pivotSpec,
+    public Stream<OSPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot,
+                                                                 Average pivotSpec,
                                                                  SearchResponse searchResult,
                                                                  Avg avgAggregation,
                                                                  OSGeneratedQueryContext OSGeneratedQueryContext) {
