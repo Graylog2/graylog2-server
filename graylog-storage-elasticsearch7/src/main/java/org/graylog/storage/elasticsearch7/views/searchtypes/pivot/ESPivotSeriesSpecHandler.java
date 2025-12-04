@@ -34,16 +34,12 @@ import java.util.stream.Stream;
 public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
         implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESSearchTypeHandler<Pivot>, ESGeneratedQueryContext> {
 
-    protected PivotAggsContext aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
-        return (PivotAggsContext) queryContext.contextMap().get(pivot.id());
-    }
-
     protected void record(ESGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
-        aggTypes(queryContext, pivot).record(spec, name);
+        queryContext.getPivotAggsContext(pivot).record(spec, name);
     }
 
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, ESGeneratedQueryContext queryContext) {
-        final PivotAggsContext pivotAggsContext = aggTypes(queryContext, pivot);
+        final PivotAggsContext pivotAggsContext = queryContext.getPivotAggsContext(pivot);
         final String aggName = pivotAggsContext.getTypes(spec);
         return currentAggregationOrBucket.getAggregations().get(aggName);
     }
