@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -46,7 +47,7 @@ public class ESVarianceHandler extends ESPivotSeriesSpecHandler<Variance, Extend
                                         ExtendedStats varianceAggregation,
                                         ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
-        return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
+        return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
     }
 }
 

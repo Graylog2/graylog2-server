@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Variance;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
@@ -46,7 +47,7 @@ public class OSVarianceHandler extends OSPivotSeriesSpecHandler<Variance, Extend
                                         ExtendedStats varianceAggregation,
                                         OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
-        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
+        return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
     }
 }
 

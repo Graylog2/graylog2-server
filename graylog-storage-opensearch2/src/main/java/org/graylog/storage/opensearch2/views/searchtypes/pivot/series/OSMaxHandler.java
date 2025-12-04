@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Max;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
@@ -46,6 +47,6 @@ public class OSMaxHandler extends OSPivotSeriesSpecHandler<Max, org.graylog.shad
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max maxAggregation,
                                         OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
-        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
+        return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
     }
 }

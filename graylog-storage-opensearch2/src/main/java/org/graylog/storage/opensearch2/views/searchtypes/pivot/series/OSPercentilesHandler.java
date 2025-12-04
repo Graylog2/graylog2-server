@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
@@ -48,6 +49,6 @@ public class OSPercentilesHandler extends OSPivotSeriesSpecHandler<Percentile, P
                                         OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext queryContext) {
         Double percentile = percentilesAggregation.percentile(pivotSpec.percentile());
-        return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));
+        return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));
     }
 }

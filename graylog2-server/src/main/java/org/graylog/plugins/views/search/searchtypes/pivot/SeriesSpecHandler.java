@@ -49,4 +49,11 @@ public interface SeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_BUI
 
     Object doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT result, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
 
+
+    record Value(String id, String key, Object value) {
+
+        public static Value create(String id, String key, Object value) {
+            return new Value(id, key, value);
+        }
+    }
 }
