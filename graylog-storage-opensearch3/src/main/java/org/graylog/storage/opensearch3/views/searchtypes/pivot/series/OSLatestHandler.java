@@ -49,7 +49,7 @@ public class OSLatestHandler extends OSPivotSeriesSpecHandler<Latest, ParsedFilt
                         .size(1)
                         .fetchSource(latestSpec.field(), null)
                         .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
-        record(queryContext, pivot, latestSpec, name, ParsedFilter.class);
+        queryContext.recordNameForPivotSpec(pivot, latestSpec, name);
         return List.of(SeriesAggregationBuilder.metric(latest));
     }
 
