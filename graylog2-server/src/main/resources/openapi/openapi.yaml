@@ -284,49 +284,6 @@ paths:
       summary: A few details about the Graylog node.
       tags:
       - Hello World
-  /api-browser:
-    get:
-      operationId: root
-      responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
-  /api-browser/global/index.html:
-    get:
-      operationId: allIndex
-      responses:
-        default:
-          content:
-            text/html:
-              schema:
-                type: string
-          description: default response
-  /api-browser/index.html:
-    get:
-      operationId: index_2
-      responses:
-        default:
-          content:
-            text/html:
-              schema:
-                type: string
-          description: default response
-  /api-browser/{route}:
-    get:
-      operationId: asset
-      parameters:
-      - in: path
-        name: route
-        required: true
-        schema:
-          type: string
-          pattern: .*
-      responses:
-        default:
-          content:
-            '*/*': {}
-          description: default response
   /api-docs:
     get:
       operationId: overview
