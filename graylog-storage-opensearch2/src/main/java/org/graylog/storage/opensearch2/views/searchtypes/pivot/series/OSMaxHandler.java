@@ -23,7 +23,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -34,7 +33,7 @@ import java.util.stream.Stream;
 public class OSMaxHandler extends OSPivotSeriesSpecHandler<Max, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, OSGeneratedQueryContext queryContext) {
         final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
         queryContext.recordNameForPivotSpec(pivot, maxSpec, name);
         return List.of(SeriesAggregationBuilder.metric(max));
@@ -45,7 +44,7 @@ public class OSMaxHandler extends OSPivotSeriesSpecHandler<Max, org.graylog.shad
                                         Max pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Max maxAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
+
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
     }

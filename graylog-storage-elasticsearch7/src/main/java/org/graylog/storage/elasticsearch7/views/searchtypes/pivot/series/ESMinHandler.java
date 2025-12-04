@@ -23,7 +23,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MinAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -34,7 +33,7 @@ import java.util.stream.Stream;
 public class ESMinHandler extends ESPivotSeriesSpecHandler<Min, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, ESGeneratedQueryContext queryContext) {
         final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
         queryContext.recordNameForPivotSpec(pivot, minSpec, name);
         return List.of(SeriesAggregationBuilder.metric(min));
@@ -45,7 +44,6 @@ public class ESMinHandler extends ESPivotSeriesSpecHandler<Min, org.graylog.shad
                                         Min pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min minAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Min.NAME, minAggregation.getValue()));
     }

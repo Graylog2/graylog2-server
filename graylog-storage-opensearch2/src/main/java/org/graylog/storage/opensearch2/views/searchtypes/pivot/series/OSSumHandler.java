@@ -22,7 +22,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.SumAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -33,7 +32,7 @@ import java.util.stream.Stream;
 public class OSSumHandler extends OSPivotSeriesSpecHandler<Sum, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Sum sumSpec, OSGeneratedQueryContext queryContext) {
         final SumAggregationBuilder sum = AggregationBuilders.sum(name).field(sumSpec.field());
         queryContext.recordNameForPivotSpec(pivot, sumSpec, name);
         return List.of(SeriesAggregationBuilder.metric(sum));
@@ -43,7 +42,7 @@ public class OSSumHandler extends OSPivotSeriesSpecHandler<Sum, org.graylog.shad
     public Stream<Value> doHandleResult(Pivot pivot, Sum pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Sum sumAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
+
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(Value.create(pivotSpec.id(), Sum.NAME, sumAggregation.getValue()));
     }

@@ -23,7 +23,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -34,7 +33,7 @@ import java.util.stream.Stream;
 public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, OSGeneratedQueryContext queryContext) {
         final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
         queryContext.recordNameForPivotSpec(pivot, minSpec, name);
         return List.of(SeriesAggregationBuilder.metric(min));
@@ -45,7 +44,7 @@ public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.graylog.shad
                                         Min pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min minAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
+
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Min.NAME, minAggregation.getValue()));
     }

@@ -23,7 +23,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -34,7 +33,7 @@ import java.util.stream.Stream;
 public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESGeneratedQueryContext queryContext) {
         final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
         queryContext.recordNameForPivotSpec(pivot, maxSpec, name);
         return List.of(SeriesAggregationBuilder.metric(max));
@@ -45,7 +44,6 @@ public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shad
                                         Max pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max maxAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
     }

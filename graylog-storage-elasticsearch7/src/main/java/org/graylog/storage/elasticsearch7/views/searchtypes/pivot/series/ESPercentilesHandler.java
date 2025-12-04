@@ -24,7 +24,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Percentiles;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.PercentilesAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -35,7 +34,7 @@ import java.util.stream.Stream;
 public class ESPercentilesHandler extends ESPivotSeriesSpecHandler<Percentile, Percentiles> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, ESGeneratedQueryContext queryContext) {
         final PercentilesAggregationBuilder percentiles = AggregationBuilders.percentiles(name).field(percentileSpec.field()).percentiles(percentileSpec.percentile());
         queryContext.recordNameForPivotSpec(pivot, percentileSpec, name);
         return List.of(SeriesAggregationBuilder.metric(percentiles));
@@ -46,7 +45,6 @@ public class ESPercentilesHandler extends ESPivotSeriesSpecHandler<Percentile, P
                                         Percentile pivotSpec,
                                         SearchResponse searchResult,
                                         Percentiles percentilesAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext queryContext) {
         Double percentile = percentilesAggregation.percentile(pivotSpec.percentile());
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));

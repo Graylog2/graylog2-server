@@ -24,7 +24,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -35,7 +34,7 @@ import java.util.stream.Stream;
 public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedStats> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, StdDev stddevSpec, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder stddev = AggregationBuilders.extendedStats(name).field(stddevSpec.field());
         queryContext.recordNameForPivotSpec(pivot, stddevSpec, name);
         return List.of(SeriesAggregationBuilder.metric(stddev));
@@ -45,7 +44,7 @@ public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedSt
     public Stream<Value> doHandleResult(Pivot pivot, StdDev pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats stddevAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
+
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
     }

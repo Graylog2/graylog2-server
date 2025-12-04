@@ -24,7 +24,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ExtendedStats;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -35,7 +34,7 @@ import java.util.stream.Stream;
 public class ESVarianceHandler extends ESPivotSeriesSpecHandler<Variance, ExtendedStats> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, ESGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder variance = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
         queryContext.recordNameForPivotSpec(pivot, varianceSpec, name);
         return List.of(SeriesAggregationBuilder.metric(variance));
@@ -45,7 +44,6 @@ public class ESVarianceHandler extends ESPivotSeriesSpecHandler<Variance, Extend
     public Stream<Value> doHandleResult(Pivot pivot, Variance pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats varianceAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
     }

@@ -17,7 +17,6 @@
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -26,12 +25,11 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 
 import java.util.stream.Stream;
 
 public abstract class OSPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
-        implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSSearchTypeHandler<Pivot>, OSGeneratedQueryContext> {
+        implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSGeneratedQueryContext> {
 
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, OSGeneratedQueryContext queryContext) {
         final String aggName = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
@@ -40,11 +38,11 @@ public abstract class OSPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
 
     @SuppressWarnings("unchecked")
     @Override
-    public Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (SearchResponse) queryResult, (AGGREGATION_RESULT) aggregationResult, (OSSearchTypeHandler<Pivot>) searchTypeHandler, (OSGeneratedQueryContext) queryContext);
+    public Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, GeneratedQueryContext queryContext) {
+        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (SearchResponse) queryResult, (AGGREGATION_RESULT) aggregationResult, (OSGeneratedQueryContext) queryContext);
     }
 
     @Override
-    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregation_result, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext);
+    public abstract Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, SearchResponse searchResult, AGGREGATION_RESULT aggregation_result, OSGeneratedQueryContext queryContext);
 
 }

@@ -24,7 +24,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStats;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ExtendedStatsAggregationBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -35,7 +34,7 @@ import java.util.stream.Stream;
 public class OSVarianceHandler extends OSPivotSeriesSpecHandler<Variance, ExtendedStats> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder variance = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
         queryContext.recordNameForPivotSpec(pivot, varianceSpec, name);
         return List.of(SeriesAggregationBuilder.metric(variance));
@@ -45,7 +44,7 @@ public class OSVarianceHandler extends OSPivotSeriesSpecHandler<Variance, Extend
     public Stream<Value> doHandleResult(Pivot pivot, Variance pivotSpec,
                                         SearchResponse searchResult,
                                         ExtendedStats varianceAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
+
                                         OSGeneratedQueryContext OSGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Variance.NAME, varianceAggregation.getVariance()));
     }

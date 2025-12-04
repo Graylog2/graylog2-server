@@ -17,7 +17,6 @@
 package org.graylog.plugins.views.search.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
-import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -29,26 +28,25 @@ import java.util.stream.Stream;
  * @param <AGGREGATION_BUILDER> implementation specific type for building up the aggregation when generating a backend query
  * @param <QUERY_RESULT> the backend specific type holding the overall result from the backend
  * @param <AGGREGATION_RESULT> the backend specific type holding the partial result for the generated aggregation
- * @param <SEARCHTYPE_HANDLER> the backend specific type of the surrounding pivot search type handler
  * @param <QUERY_CONTEXT> an opaque context object to pass around information between query generation and result handling
  */
-public interface SeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_BUILDER, QUERY_RESULT, AGGREGATION_RESULT, SEARCHTYPE_HANDLER, QUERY_CONTEXT> {
+public interface SeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_BUILDER, QUERY_RESULT, AGGREGATION_RESULT, QUERY_CONTEXT> {
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    default List<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, SeriesSpec seriesSpec, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doCreateAggregation(name, pivot, (SPEC_TYPE) seriesSpec, (SEARCHTYPE_HANDLER) searchTypeHandler, (QUERY_CONTEXT) queryContext);
+    default List<AGGREGATION_BUILDER> createAggregation(String name, Pivot pivot, SeriesSpec seriesSpec, GeneratedQueryContext queryContext) {
+        return doCreateAggregation(name, pivot, (SPEC_TYPE) seriesSpec, (QUERY_CONTEXT) queryContext);
     }
 
     @Nonnull
-    List<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE seriesSpec, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
+    List<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE seriesSpec, QUERY_CONTEXT queryContext);
 
     @SuppressWarnings("unchecked")
-    default Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, SearchTypeHandler searchTypeHandler, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (QUERY_RESULT) queryResult, (AGGREGATION_RESULT) aggregationResult, (SEARCHTYPE_HANDLER) searchTypeHandler, (QUERY_CONTEXT) queryContext);
+    default Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, GeneratedQueryContext queryContext) {
+        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (QUERY_RESULT) queryResult, (AGGREGATION_RESULT) aggregationResult, (QUERY_CONTEXT) queryContext);
     }
 
-    Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT result, SEARCHTYPE_HANDLER searchTypeHandler, QUERY_CONTEXT queryContext);
+    Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT result, QUERY_CONTEXT queryContext);
 
 
     record Value(String id, String key, Object value) {

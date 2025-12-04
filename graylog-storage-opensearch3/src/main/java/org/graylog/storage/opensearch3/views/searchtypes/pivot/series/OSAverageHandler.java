@@ -24,7 +24,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Avg;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.AvgAggregationBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -35,7 +34,7 @@ import java.util.stream.Stream;
 public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Average avgSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Average avgSpec, OSGeneratedQueryContext queryContext) {
         final AvgAggregationBuilder avg = AggregationBuilders.avg(name).field(avgSpec.field());
         queryContext.recordNameForPivotSpec(pivot, avgSpec, name);
         return List.of(SeriesAggregationBuilder.metric(avg));
@@ -45,7 +44,7 @@ public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
     public Stream<OSPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot, Average pivotSpec,
                                                                  SearchResponse searchResult,
                                                                  Avg avgAggregation,
-                                                                 OSSearchTypeHandler<Pivot> searchTypeHandler,
+
                                                                  OSGeneratedQueryContext OSGeneratedQueryContext) {
         double value = avgAggregation.getValue();
         if (pivotSpec.wholeNumber()) {

@@ -23,7 +23,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.CardinalityAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -34,17 +33,17 @@ import java.util.stream.Stream;
 public class ESCardinalityHandler extends ESPivotSeriesSpecHandler<Cardinality, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Cardinality> {
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Cardinality cardinalitySpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Cardinality cardinalitySpec, ESGeneratedQueryContext queryContext) {
         final CardinalityAggregationBuilder card = AggregationBuilders.cardinality(name).field(cardinalitySpec.field());
         queryContext.recordNameForPivotSpec(pivot, cardinalitySpec, name);
         return List.of(SeriesAggregationBuilder.metric(card));
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, Cardinality pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        Cardinality pivotSpec,
                                         SearchResponse searchResult,
                                         org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Cardinality cardinalityAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         return Stream.of(SeriesSpecHandler.Value.create(pivotSpec.id(), Cardinality.NAME, cardinalityAggregation.getValue()));
     }
