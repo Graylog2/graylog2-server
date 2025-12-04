@@ -58,7 +58,7 @@ const PieOnClickPopoverDropdown = ({ clickPoint, config, setFieldData }: OnClick
       metricValue: {
         value: clickPoint.value,
         field: metric,
-        text: `${String(clickPoint.text ?? clickPoint?.value)}`,
+        text: `${String(clickPoint?.value)}`,
         traceColor,
       },
     };
