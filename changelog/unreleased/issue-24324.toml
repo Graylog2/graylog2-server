@@ -1,5 +1,0 @@
-type = "f"
-message = "Fix deprecation warning in StreamResource."
-
-issues = ["24324", "24363"]
-pulls = ["24426"]
