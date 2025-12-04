@@ -80,21 +80,27 @@ class OpenAPIContextFactoryTest {
 
     @Test
     void createsValidOpenAPIObject() {
-        assertThat(generatedDescription).isNotNull();
-        assertThat(generatedDescription.getInfo()).isNotNull();
-        assertThat(generatedDescription.getInfo().getTitle()).isEqualTo("Graylog REST API");
-        assertThat(generatedDescription.getInfo().getVersion()).isEqualTo("1.0.0");
-        assertThat(generatedDescription.getInfo().getDescription()).contains("REST API");
-        assertThat(generatedDescription.getInfo().getContact()).isNotNull();
-        assertThat(generatedDescription.getInfo().getContact().getName()).isEqualTo("Graylog");
-        assertThat(generatedDescription.getInfo().getLicense()).isNotNull();
-        assertThat(generatedDescription.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
+        try {
+            assertThat(generatedDescription).isNotNull();
+            assertThat(generatedDescription.getInfo()).isNotNull();
+            assertThat(generatedDescription.getInfo().getTitle()).isEqualTo("Graylog REST API");
+            assertThat(generatedDescription.getInfo().getVersion()).isEqualTo("1.0.0");
+            assertThat(generatedDescription.getInfo().getDescription()).contains("REST API");
+            assertThat(generatedDescription.getInfo().getContact()).isNotNull();
+            assertThat(generatedDescription.getInfo().getContact().getName()).isEqualTo("Graylog");
+            assertThat(generatedDescription.getInfo().getLicense()).isNotNull();
+            assertThat(generatedDescription.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
 
-        // Verify that paths and schemas are generated
-        assertThat(generatedDescription.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test",
-                "/plugins/my.plugin.id/subtypes", "/plugins/my.plugin.id/response-schema-name-conflict/pkg1",
-                "/plugins/my.plugin.id/response-schema-name-conflict/pkg2", "/plugins/my.plugin.id/immutable-maps");
-        assertThat(generatedDescription.getComponents().getSchemas()).isNotEmpty();
+            // Verify that paths and schemas are generated
+            assertThat(generatedDescription.getPaths()).containsOnlyKeys("/test", "/plugins/my.plugin.id/test",
+                    "/plugins/my.plugin.id/subtypes", "/plugins/my.plugin.id/response-schema-name-conflict/pkg1",
+                    "/plugins/my.plugin.id/response-schema-name-conflict/pkg2", "/plugins/my.plugin.id/immutable-maps");
+            assertThat(generatedDescription.getComponents().getSchemas()).isNotEmpty();
+        } catch (AssertionError | NullPointerException e) {
+            System.err.println("Test failed. Full OpenAPI description:");
+            System.err.println(Json31.pretty(generatedDescription));
+            throw e;
+        }
     }
 
     @Test

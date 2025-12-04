@@ -16,29 +16,30 @@
  */
 package org.graylog2.shared.rest.documentation.openapi;
 
-import com.google.common.collect.MapDifference;
-import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import io.swagger.v3.jaxrs2.Reader;
 import io.swagger.v3.oas.integration.api.OpenAPIConfiguration;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.Paths;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.parameters.RequestBody;
 import io.swagger.v3.oas.models.responses.ApiResponses;
 import jakarta.inject.Inject;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.initializers.JerseyService;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class CustomReader extends Reader {
+
+    public static final String PATH_MARKER = "__HANDLED__";
+
     public interface Factory {
         CustomReader create(OpenAPIConfiguration openAPIConfig);
     }
@@ -60,40 +61,50 @@ public class CustomReader extends Reader {
     // We are synchronizing this method because the read process modifies the internal state of the Reader instance.
     @Override
     public synchronized OpenAPI read(Set<Class<?>> classes, Map<String, Object> resources) {
-        return super.read(classes, resources);
+        final var openAPI = super.read(classes, resources);
+
+        // Remove all markers from paths that we've added in the read method below
+        final var newPaths = openAPI.getPaths().entrySet()
+                .stream()
+                .collect(Collectors.toMap(e ->
+                        StringUtils.defaultString(Strings.CS.removeStart(e.getKey(), PATH_MARKER)), Map.Entry::getValue));
+
+        openAPI.getPaths().clear();
+        openAPI.getPaths().putAll(newPaths);
+
+        return openAPI;
     }
 
     /**
      * We are overriding the read method to add a prefix to the paths of plugin REST resources.
-     * We are tracking which paths are added with each invocation and correct them accordingly, if needed.
+     * To make sure that we correctly preserve all paths even if a system resource and a plugin resource share the same
+     * path we are adding a marker to the beginning of <em>all</em> paths. Otherwise, a plugin resource would override
+     * the system resource path because we can only add the plugin prefix after the upstream reader has processed the
+     * resource.
      */
     @Override
     public synchronized OpenAPI read(Class<?> cls, String parentPath, String parentMethod, boolean isSubresource, RequestBody parentRequestBody, ApiResponses parentResponses, Set<String> parentTags, List<Parameter> parentParameters, Set<Class<?>> scannedResources) {
-        final var pathPrefix = prefixes.get(cls);
+        final var pathPrefix = PATH_MARKER + prefixes.getOrDefault(cls, "");
 
-        if (pathPrefix == null) {
-            return super.read(cls, parentPath, parentMethod, isSubresource, parentRequestBody, parentResponses,
-                    parentTags, parentParameters, scannedResources);
-        } else {
-            final Map<String, PathItem> oldPaths = getPaths() != null ? Map.copyOf(getPaths()) : Map.of();
+        final OpenAPI openAPI = super.read(cls, parentPath, parentMethod, isSubresource, parentRequestBody, parentResponses, parentTags, parentParameters, scannedResources);
 
-            final OpenAPI openAPI = super.read(cls, parentPath, parentMethod, isSubresource, parentRequestBody, parentResponses, parentTags, parentParameters, scannedResources);
+        final Paths newPaths = new Paths();
 
-            final Map<String, PathItem> newPaths = Optional.ofNullable(getPaths()).orElse(new Paths());
-            final MapDifference<String, PathItem> difference = Maps.difference(oldPaths, newPaths);
-
-            getPaths().clear();
-
-            getPaths().putAll(difference.entriesInCommon());
-
-            difference.entriesOnlyOnRight().forEach((path, pathItem) -> {
+        // Remove previously added paths that have not been handled and collect them to re-add with the correct prefix
+        final var it = openAPI.getPaths().entrySet().iterator();
+        while (it.hasNext()) {
+            final var entry = it.next();
+            final var path = entry.getKey();
+            if (!path.startsWith(PATH_MARKER)) {
                 final var newKey = Objects.requireNonNull(path).startsWith("/")
                         ? pathPrefix + path
                         : pathPrefix + "/" + path;
-                getPaths().put(newKey, pathItem);
-            });
-
-            return openAPI;
+                newPaths.put(newKey, entry.getValue());
+                it.remove();
+            }
         }
+
+        openAPI.getPaths().putAll(newPaths);
+        return openAPI;
     }
 }
