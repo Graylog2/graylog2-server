@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, within } from 'wrappedTestingLibrary';
+import { render, screen, within } from 'wrappedTestingLibrary';
 import type { PluginExports } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
 import type { Notifications } from 'theme/types';
 import { asMock } from 'helpers/mocking';
@@ -114,7 +115,7 @@ describe('PublicNotifications', () => {
     expect(alerts).toHaveLength(1);
   });
 
-  it('should dismiss notification', () => {
+  it('should dismiss notification', async () => {
     render(<PublicNotifications />);
     const dismissedId = Object.keys(mockedNotifications)[1];
 
@@ -124,7 +125,7 @@ describe('PublicNotifications', () => {
       name: /close alert/i,
     });
 
-    fireEvent.click(dismissBtn);
+    await userEvent.click(dismissBtn);
 
     expect(onDismissPublicNotification).toHaveBeenCalledWith(dismissedId);
   });

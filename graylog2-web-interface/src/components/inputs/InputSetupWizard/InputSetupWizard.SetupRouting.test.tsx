@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 import { asMock } from 'helpers/mocking';
@@ -225,7 +226,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await screen.findByLabelText(/Default Stream/i);
       });
@@ -243,7 +244,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.assertOptionExists('Default Stream', 'Aloho');
 
@@ -266,7 +267,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.assertOptionExists('Default Stream', 'Mora');
 
@@ -289,7 +290,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.chooseOption('Default Stream', 'Aloho');
       });
@@ -315,7 +316,7 @@ describe('InputSetupWizard Setup Routing', () => {
           name: /Select Stream/i,
         });
 
-        fireEvent.click(selectStreamButton);
+        await userEvent.click(selectStreamButton);
 
         await selectEvent.chooseOption('Default Stream', 'Aloho');
 
@@ -350,23 +351,23 @@ describe('InputSetupWizard Setup Routing', () => {
         name: /Create Stream/i,
       });
 
-      fireEvent.click(createStreamButton);
+      await userEvent.click(createStreamButton);
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
       const { titleInput, descriptionInput, removeMatchesCheckbox, newPipelineCheckbox, submitButton } =
         await getStreamCreateFormFields();
 
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await userEvent.type(descriptionInput, 'Wingardium new stream');
 
       await selectEvent.chooseOption('Select an index set', 'Nox');
 
-      fireEvent.click(removeMatchesCheckbox);
-      fireEvent.click(newPipelineCheckbox);
+      await userEvent.click(removeMatchesCheckbox);
+      await userEvent.click(newPipelineCheckbox);
 
       expect(submitButton).toBeDisabled();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
+      await userEvent.type(titleInput, 'Wingardium');
 
       await waitFor(() => expect(submitButton).toBeEnabled());
     });
@@ -378,14 +379,14 @@ describe('InputSetupWizard Setup Routing', () => {
         name: /Create Stream/i,
       });
 
-      fireEvent.click(createStreamButton);
+      await userEvent.click(createStreamButton);
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
       const { titleInput, descriptionInput } = await getStreamCreateFormFields();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await userEvent.type(titleInput, 'Wingardium');
+      await userEvent.type(descriptionInput, 'Wingardium new stream');
 
       await selectEvent.chooseOption('Select an index set', 'Default');
 
@@ -399,14 +400,14 @@ describe('InputSetupWizard Setup Routing', () => {
         name: /Create Stream/i,
       });
 
-      fireEvent.click(createStreamButton);
+      await userEvent.click(createStreamButton);
 
       await screen.findByRole('heading', { name: /Create new stream/i });
 
       const { titleInput, descriptionInput } = await getStreamCreateFormFields();
 
-      fireEvent.change(titleInput, { target: { value: 'Wingardium' } });
-      fireEvent.change(descriptionInput, { target: { value: 'Wingardium new stream' } });
+      await userEvent.type(titleInput, 'Wingardium');
+      await userEvent.type(descriptionInput, 'Wingardium new stream');
 
       await selectEvent.chooseOption('Select an index set', 'Nox');
 

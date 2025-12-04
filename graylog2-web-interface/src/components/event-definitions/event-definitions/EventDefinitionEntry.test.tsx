@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
 import userEvent from '@testing-library/user-event';
 
@@ -83,7 +83,7 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT());
 
     const button = screen.getAllByRole('button', { name: /Share/ })[0];
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('EntityShareModal content');
   });
@@ -94,7 +94,7 @@ describe('EventDefinitionEntry', () => {
     render(renderSUT());
 
     const button = screen.getAllByRole('button', { name: /Share/ })[0];
-    fireEvent.click(button);
+    await userEvent.click(button);
 
     await screen.findByText('EntityShareModal content');
   });

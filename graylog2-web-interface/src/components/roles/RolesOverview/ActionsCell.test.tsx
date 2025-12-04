@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { paginatedUsers } from 'fixtures/userOverviews';
 import { asMock } from 'helpers/mocking';
@@ -79,7 +80,7 @@ describe('ActionsCell', () => {
       render(<SUT readOnly={false} roleId={customRoleId} roleName={customRoleName} />);
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
-      fireEvent.click(deleteButton);
+      await userEvent.click(deleteButton);
 
       await waitFor(() =>
         expect(window.confirm).toHaveBeenCalledWith(`Do you really want to delete role "${customRoleName}"?`),
@@ -103,7 +104,7 @@ describe('ActionsCell', () => {
       render(<SUT readOnly={false} roleId={customRoleId} roleName={customRoleName} />);
 
       const deleteButton = screen.getByRole('button', { name: `Delete role ${customRoleName}` });
-      fireEvent.click(deleteButton);
+      await userEvent.click(deleteButton);
 
       await waitFor(() => expect(window.confirm).toHaveBeenCalledWith(confirmMessage));
 

@@ -22,6 +22,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+import java.util.Optional;
+
 @AutoValue
 @JsonTypeName(BarVisualizationConfigDTO.NAME)
 @JsonDeserialize(builder = BarVisualizationConfigDTO.Builder.class)
@@ -42,6 +45,9 @@ public abstract class BarVisualizationConfigDTO implements VisualizationConfigDT
     @JsonProperty(FIELD_AXIS_TYPE)
     public abstract AxisType axisType();
 
+    @JsonProperty(FIELD_AXIS_CONFIG)
+    public abstract Optional<AxisConfig> axisConfig();
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -50,6 +56,9 @@ public abstract class BarVisualizationConfigDTO implements VisualizationConfigDT
 
         @JsonProperty(FIELD_AXIS_TYPE)
         public abstract Builder axisType(AxisType axisType);
+
+        @JsonProperty(FIELD_AXIS_CONFIG)
+        public abstract Builder axisConfig(@Nullable AxisConfig axisConfig);
 
         public abstract BarVisualizationConfigDTO build();
 

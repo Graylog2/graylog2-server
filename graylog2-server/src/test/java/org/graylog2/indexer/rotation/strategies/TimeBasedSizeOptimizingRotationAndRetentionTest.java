@@ -16,11 +16,13 @@
  */
 package org.graylog2.indexer.rotation.strategies;
 
+import com.github.joschi.jadconfig.util.Size;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.RetentionTestIndexSet;
+import org.graylog2.indexer.cluster.ClusterAdapter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.RetentionTestIndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.retention.executors.RetentionExecutor;
@@ -28,6 +30,7 @@ import org.graylog2.indexer.retention.executors.TimeBasedRetentionExecutor;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.common.IndexRotator;
+import org.graylog2.indexer.rotation.tso.TimeSizeOptimizingCalculator;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -46,7 +49,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.graylog2.shared.utilities.StringUtils.f;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -55,37 +58,39 @@ import static org.mockito.Mockito.lenient;
 @ExtendWith(MockitoExtension.class)
 class TimeBasedSizeOptimizingRotationAndRetentionTest {
     private static final Logger LOG = LoggerFactory.getLogger(TimeBasedSizeOptimizingRotationAndRetentionTest.class);
-
+    private static final Size SHARD_SIZE_MIN_MAX = Size.gigabytes(20);
     private TimeBasedSizeOptimizingStrategy timeBasedSizeOptimizingStrategy;
 
     @Mock
     private Indices indices;
-
     @Mock
     private NodeId nodeId;
-
     @Mock
     private AuditEventSender auditEventSender;
-
     @Mock
     private ActivityWriter activityWriter;
+    @Mock
+    ClusterAdapter clusterAdapter;
 
     private JobSchedulerTestClock clock;
 
     private RetentionTestIndexSet indexSet;
     private ElasticsearchConfiguration elasticsearchConfiguration;
-    private TimeBasedSizeOptimizingStrategyConfig rotationStrategyConfig;
 
     private DeletionRetentionStrategy deletionRetentionStrategy;
 
     @BeforeEach
     void setUp() {
         clock = new JobSchedulerTestClock(Tools.nowUTC());
-
         elasticsearchConfiguration = new ElasticsearchConfiguration();
+        elasticsearchConfiguration.setTimeSizeOptimizingRotationMaxShardSize(SHARD_SIZE_MIN_MAX);
+        elasticsearchConfiguration.setTimeSizeOptimizingRotationMinShardSize(SHARD_SIZE_MIN_MAX);
         IndexRotator indexRotator = new IndexRotator(indices, auditEventSender, nodeId);
-        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(indices, elasticsearchConfiguration, clock, indexRotator);
-        rotationStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder()
+        timeBasedSizeOptimizingStrategy = new TimeBasedSizeOptimizingStrategy(
+                elasticsearchConfiguration,
+                indexRotator,
+                new TimeSizeOptimizingCalculator(indices, clock, elasticsearchConfiguration, clusterAdapter));
+        final TimeBasedSizeOptimizingStrategyConfig rotationStrategyConfig = TimeBasedSizeOptimizingStrategyConfig.builder()
                 .indexLifetimeMin(Period.days(4))
                 .indexLifetimeMax(Period.days(6))
                 .build();
@@ -233,7 +238,7 @@ class TimeBasedSizeOptimizingRotationAndRetentionTest {
     }
 
     @Test
-    public void testRetentionWithoutClosingDate() {
+    void testRetentionWithoutClosingDate() {
         // Report all but the newest index as read-only
         lenient().when(indices.getIndicesBlocksStatus(anyList())).then(a -> {
             final List<String> indices = a.getArgument(0);
