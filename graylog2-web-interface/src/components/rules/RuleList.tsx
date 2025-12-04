@@ -21,7 +21,17 @@ import type { RuleType, RulesContext } from 'stores/rules/RulesStore';
 
 import RuleListEntry from './RuleListEntry';
 
-const headers = ['Title', 'Description', 'Created', 'Last modified', 'Throughput', 'Errors', 'Pipelines', 'Actions'];
+const headers = [
+  'Title',
+  '',
+  'Description',
+  'Created',
+  'Last modified',
+  'Throughput',
+  'Errors',
+  'Pipelines',
+  'Actions',
+];
 
 const headerCellFormatter = (header: React.ReactNode) => <th>{header}</th>;
 
