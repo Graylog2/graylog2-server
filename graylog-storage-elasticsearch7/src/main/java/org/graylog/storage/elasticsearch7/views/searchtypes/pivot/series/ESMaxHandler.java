@@ -35,7 +35,7 @@ public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shad
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Max maxSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final MaxAggregationBuilder max = AggregationBuilders.max(name).field(maxSpec.field());
-        record(queryContext, pivot, maxSpec, name, org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max.class);
+        queryContext.recordNameForPivotSpec(pivot, maxSpec, name);
         return List.of(SeriesAggregationBuilder.metric(max));
     }
 

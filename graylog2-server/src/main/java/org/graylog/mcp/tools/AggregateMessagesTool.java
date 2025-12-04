@@ -35,6 +35,7 @@ import org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationReq
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Grouping;
 import org.graylog.plugins.views.search.rest.scriptingapi.request.Metric;
 import org.graylog.plugins.views.search.rest.scriptingapi.response.TabularResponse;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.slf4j.Logger;
@@ -52,12 +53,12 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
     private final ScriptingApiService scriptingApiService;
 
     @Inject
-    public AggregateMessagesTool(ObjectMapper objectMapper,
-                                 CustomizationConfig customizationConfig,
-                                 SchemaGeneratorProvider schemaGeneratorProvider,
-                                 ScriptingApiService scriptingApiService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public AggregateMessagesTool(ScriptingApiService scriptingApiService,
+                                 final CustomizationConfig customizationConfig,
+                                 final ObjectMapper objectMapper,
+                                 final ClusterConfigService clusterConfigService,
+                                 final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -70,7 +71,11 @@ public class AggregateMessagesTool extends Tool<AggregateMessagesTool.Parameters
                         You need to provide at least one grouping, a field name and limit, as well as one metric to calculate for the group by buckets.
                         For example, to count the top 10 number of messages per source, you can send {"groupings": [{"field":"source", "limit": 10}], "metrics": {"function":"count"}}
                         The query string supports Lucene query language, but be careful about leading wildcards, %1$s might not have them enabled.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+                );
         this.scriptingApiService = scriptingApiService;
     }
 
