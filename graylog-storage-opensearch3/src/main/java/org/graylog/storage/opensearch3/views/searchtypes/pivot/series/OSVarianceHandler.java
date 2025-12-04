@@ -36,7 +36,7 @@ public class OSVarianceHandler extends OSPivotSeriesSpecHandler<Variance, Extend
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Variance varianceSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder variance = AggregationBuilders.extendedStats(name).field(varianceSpec.field());
-        record(queryContext, pivot, varianceSpec, name, ExtendedStats.class);
+        queryContext.recordNameForPivotSpec(pivot, varianceSpec, name);
         return List.of(SeriesAggregationBuilder.metric(variance));
     }
 

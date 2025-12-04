@@ -68,7 +68,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
       CustomColumnRenderers(indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers),
     [indexSets, isPipelineColumnPermitted, currentUser.permissions, pluggableColumnRenderers],
   );
-  const { columnOrder, additionalAttributes, defaultLayout } = useMemo(
+  const { additionalAttributes, defaultLayout } = useMemo(
     () => getStreamTableElements(currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes),
     [currentUser.permissions, isPipelineColumnPermitted, pluggableAttributes],
   );
@@ -82,7 +82,6 @@ const StreamsOverview = ({ indexSets }: Props) => {
   return (
     <PaginatedEntityTable<Stream>
       humanName="streams"
-      columnsOrder={columnOrder}
       additionalAttributes={additionalAttributes}
       queryHelpComponent={<QueryHelper entityName="stream" />}
       entityActions={entityActions}
@@ -90,7 +89,7 @@ const StreamsOverview = ({ indexSets }: Props) => {
       fetchEntities={fetchEntities}
       keyFn={keyFn}
       actionsCellWidth={220}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       bulkSelection={{ actions: bulkActions }}
       entityAttributesAreCamelCase={false}
       filterValueRenderers={FilterValueRenderers}

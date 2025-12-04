@@ -24,8 +24,8 @@ import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.logging.LoggingHandler;
 import org.graylog2.jackson.TypeReferences;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -38,7 +38,7 @@ public class BeatsFrameDecoderTest {
     private EmbeddedChannel channel;
     private BeatsFrameDecoder decoder;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         decoder = new BeatsFrameDecoder();
         channel = new EmbeddedChannel(new LoggingHandler(), decoder);

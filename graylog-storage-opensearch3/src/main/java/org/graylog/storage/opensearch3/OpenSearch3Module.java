@@ -29,6 +29,8 @@ import org.graylog.storage.opensearch3.client.IndexerHostsAdapterOS2;
 import org.graylog.storage.opensearch3.client.OSCredentialsProvider;
 import org.graylog.storage.opensearch3.client.OpensearchCredentialsProvider;
 import org.graylog.storage.opensearch3.fieldtypes.streams.StreamsForFieldRetrieverOS;
+import org.graylog.storage.opensearch3.indextemplates.ComposableIndexTemplateAdapter;
+import org.graylog.storage.opensearch3.indextemplates.LegacyIndexTemplateAdapter;
 import org.graylog.storage.opensearch3.migrations.V20170607164210_MigrateReopenedIndicesToAliasesClusterStateOS2;
 import org.graylog.storage.opensearch3.sniffer.SnifferBuilder;
 import org.graylog.storage.opensearch3.sniffer.SnifferFilter;
@@ -47,6 +49,7 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.datastream.DataStreamAdapter;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerAdapter;
 import org.graylog2.indexer.fieldtypes.streamfiltered.esadapters.StreamsForFieldRetriever;
+import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.IndicesAdapter;
 import org.graylog2.indexer.messages.MessagesAdapter;
 import org.graylog2.indexer.results.MultiChunkResultRetriever;
@@ -71,12 +74,12 @@ public class OpenSearch3Module extends VersionAwareModule {
         bindForSupportedVersion(CountsAdapter.class).to(CountsAdapterOS.class);
         bindForSupportedVersion(ClusterAdapter.class).to(ClusterAdapterOS.class);
         bindForSupportedVersion(IndicesAdapter.class).to(IndicesAdapterOS.class);
-        bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS2.class);
+        bindForSupportedVersion(DataStreamAdapter.class).to(DataStreamAdapterOS.class);
         bindForSupportedVersion(SecurityAdapter.class).to(SecurityAdapterOS.class);
         if (useComposableIndexTemplates) {
-            bind(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(ComposableIndexTemplateAdapter.class);
         } else {
-            bind(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
+            bindForSupportedVersion(IndexTemplateAdapter.class).to(LegacyIndexTemplateAdapter.class);
         }
         bindForSupportedVersion(IndexFieldTypePollerAdapter.class).to(IndexFieldTypePollerAdapterOS.class);
         bindForSupportedVersion(IndexToolsAdapter.class).to(IndexToolsAdapterOS2.class);
@@ -98,7 +101,7 @@ public class OpenSearch3Module extends VersionAwareModule {
         install(new FactoryModuleBuilder().build(ScrollResultOS2.Factory.class));
 
         bind(RestHighLevelClient.class).toProvider(RestClientProvider.class);
-        bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class);
+        bind(OfficialOpensearchClient.class).toProvider(OfficialOpensearchClientProvider.class).asEagerSingleton();
         bind(CredentialsProvider.class).toProvider(OSCredentialsProvider.class);
         bind(org.apache.hc.client5.http.auth.CredentialsProvider.class).toProvider(OpensearchCredentialsProvider.class);
         bindForSupportedVersion(DatanodeUpgradeServiceAdapter.class).to(DatanodeUpgradeServiceAdapterOS2.class);

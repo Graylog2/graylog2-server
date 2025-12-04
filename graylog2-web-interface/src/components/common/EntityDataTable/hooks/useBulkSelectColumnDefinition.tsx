@@ -23,6 +23,7 @@ import { useMemo } from 'react';
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { BULK_SELECT_COL_ID, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => {
   const checked = table.getIsAllRowsSelected();
@@ -40,14 +41,18 @@ const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<E
   );
 };
 
-const BulkSelectCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> }) => (
-  <RowCheckbox
-    onChange={row.getToggleSelectedHandler()}
-    title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
-    checked={row.getIsSelected()}
-    disabled={!row.getCanSelect()}
-  />
-);
+const BulkSelectCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> }) => {
+  const { selectedEntities } = useSelectedEntities();
+
+  return (
+    <RowCheckbox
+      onChange={row.getToggleSelectedHandler()}
+      title={`${row.getIsSelected() ? 'Deselect' : 'Select'} entity`}
+      checked={selectedEntities.includes(row.id)}
+      disabled={!row.getCanSelect()}
+    />
+  );
+};
 
 const useBulkSelectColumnDefinition = <Entity extends EntityBase>(displayBulkSelectCol: boolean) => {
   const columnHelper = createColumnHelper<Entity>();
@@ -61,6 +66,7 @@ const useBulkSelectColumnDefinition = <Entity extends EntityBase>(displayBulkSel
             header: BulkSelectHeader<Entity>,
             enableHiding: false,
             cell: BulkSelectCell<Entity>,
+            enableResizing: false,
           })
         : null,
     [displayBulkSelectCol, columnHelper],

@@ -18,6 +18,7 @@ package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
@@ -41,8 +42,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -71,10 +70,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
     public void doGenerateQueryPart(Query query, Pivot pivot, ESGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
-
-        final Map<Object, Object> contextMap = queryContext.contextMap();
-        final AggTypes aggTypes = new AggTypes();
-        contextMap.put(pivot.id(), aggTypes);
 
         var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
 

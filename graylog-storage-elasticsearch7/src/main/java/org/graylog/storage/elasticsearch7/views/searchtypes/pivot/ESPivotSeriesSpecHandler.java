@@ -33,16 +33,9 @@ import java.util.stream.Stream;
 public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
         implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESSearchTypeHandler<Pivot>, ESGeneratedQueryContext> {
 
-    protected AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
-        return (AggTypes) queryContext.contextMap().get(pivot.id());
-    }
-
-    protected void record(ESGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
-        aggTypes(queryContext, pivot).record(spec, name, aggregationClass);
-    }
-
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
-        return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, ESGeneratedQueryContext queryContext) {
+        final String aggName = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
+        return currentAggregationOrBucket.getAggregations().get(aggName);
     }
 
     @SuppressWarnings("unchecked")

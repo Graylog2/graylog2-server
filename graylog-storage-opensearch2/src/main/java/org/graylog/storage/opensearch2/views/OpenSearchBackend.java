@@ -61,6 +61,7 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.search.QueryStringUtils;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -111,8 +112,8 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
         this.allowLeadingWildcard = allowLeadingWildcard;
     }
 
-    private QueryBuilder translateQueryString(String queryString) {
-        return (queryString.isEmpty() || queryString.trim().equals("*"))
+    private QueryBuilder translateQueryString(final String queryString) {
+        return QueryStringUtils.isEmptyOrMatchAllQueryString(queryString)
                 ? QueryBuilders.matchAllQuery()
                 : QueryBuilders.queryStringQuery(queryString).allowLeadingWildcard(allowLeadingWildcard);
     }

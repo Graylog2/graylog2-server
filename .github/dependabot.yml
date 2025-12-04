@@ -17,6 +17,14 @@ updates:
       - dependency-name: "org.apache.lucene:lucene-*"
         versions:
           - ">= 10"
+      # we want to manually update the opensearch-java client as long as it requires intensive testing
+      - dependency-name: "org.opensearch.client:opensearch-java"
+    groups:
+      openrewrite:
+        patterns:
+          - "org.openrewrite:*"
+          - "org.openrewrite.maven:*"
+          - "org.openrewrite.recipe:*"
     open-pull-requests-limit: 25
     labels:
       - dependencies
@@ -29,6 +37,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -45,6 +55,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -55,6 +67,9 @@ updates:
           - "< 5"
     rebase-strategy: "disabled"
     groups:
+      dnd-kit:
+        patterns:
+          - "@dnd-kit/*"
       mantine:
         patterns:
           - "@mantine/*"
@@ -71,6 +86,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -86,6 +103,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -101,6 +120,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -119,6 +140,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -130,6 +153,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
