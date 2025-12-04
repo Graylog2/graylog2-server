@@ -41,8 +41,10 @@ public abstract class OSPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
         aggTypes(queryContext, pivot).record(spec, name);
     }
 
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
-        return aggTypes(queryContext, pivot).getSubAggregation(spec, aggregations);
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, OSGeneratedQueryContext queryContext) {
+        final AggTypes aggTypes = aggTypes(queryContext, pivot);
+        final String aggName = aggTypes.getTypes(spec);
+        return currentAggregationOrBucket.getAggregations().get(aggName);
     }
 
     @SuppressWarnings("unchecked")

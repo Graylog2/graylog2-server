@@ -17,8 +17,6 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,12 +30,6 @@ public class AggTypes {
 
     public void record(PivotSpec pivotSpec, String name) {
         aggMap.put(pivotSpec, name);
-    }
-
-    public Aggregation getSubAggregation(PivotSpec pivotSpec,
-                                         HasAggregations currentAggregationOrBucket) {
-        final String aggName = getTypes(pivotSpec);
-        return currentAggregationOrBucket.getAggregations().get(aggName);
     }
 
     public String getTypes(PivotSpec pivotSpec) {
