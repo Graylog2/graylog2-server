@@ -14,9 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
+import * as React from 'react';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
@@ -82,8 +82,8 @@ describe('CreateProfile', () => {
 
     const submitButton = await screen.findByTitle(/create profile/i);
 
-    fireEvent.change(name, { target: { value: 'Profile new' } });
-    fireEvent.change(description, { target: { value: 'Profile description' } });
+    await userEvent.type(name, 'Profile new');
+    await userEvent.type(description, 'Profile description');
 
     await selectEvent.chooseOption('select customFieldMappings.0.field', 'date');
     await selectEvent.chooseOption('select customFieldMappings.0.type', 'String type');

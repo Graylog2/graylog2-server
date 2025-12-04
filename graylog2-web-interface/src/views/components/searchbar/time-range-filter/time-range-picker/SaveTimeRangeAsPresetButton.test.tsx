@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
@@ -87,7 +88,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     await screen.findByRole('heading', {
       name: /save as preset/i,
@@ -106,7 +107,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     await waitFor(() => {
       expect(screen.queryByText('You already have similar time range in')).not.toBeInTheDocument();
@@ -125,7 +126,7 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     await screen.findByText('You already have similar time range in');
   });
@@ -142,18 +143,19 @@ describe('SaveTimeRangeAsPresetButton', () => {
 
     const buttonIcon = await findOpenButton();
 
-    fireEvent.click(buttonIcon);
+    await userEvent.click(buttonIcon);
 
     const descriptionInput = await screen.findByLabelText('Time range description');
     descriptionInput.focus();
 
-    fireEvent.change(descriptionInput, { target: { value: 'My new time range' } });
+    await userEvent.clear(descriptionInput);
+    await userEvent.type(descriptionInput, 'My new time range');
 
     const submitButton = await screen.findByRole('button', {
       name: /save preset/i,
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(mockUpdate).toHaveBeenCalledWith('org.graylog2.indexer.searches.SearchesClusterConfig', {
@@ -185,20 +187,20 @@ describe('SaveTimeRangeAsPresetButton', () => {
       />,
     );
 
-    fireEvent.click(await findOpenButton());
+    await userEvent.click(await findOpenButton());
 
     const descriptionInput = await screen.findByRole('textbox', {
       name: /time range description/i,
     });
     descriptionInput.focus();
 
-    fireEvent.change(descriptionInput, { target: { value: '' } });
+    await userEvent.clear(descriptionInput);
 
     const submitButton = await screen.findByRole('button', {
       name: /save preset/i,
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() => expect(submitButton).toHaveAttribute('disabled'));
   });
