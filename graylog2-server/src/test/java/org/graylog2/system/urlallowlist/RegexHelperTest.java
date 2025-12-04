@@ -16,7 +16,7 @@
  */
 package org.graylog2.system.urlallowlist;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.regex.Pattern;
 

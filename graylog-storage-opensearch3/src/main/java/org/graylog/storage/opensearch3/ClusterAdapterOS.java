@@ -36,6 +36,7 @@ import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.system.stats.elasticsearch.ClusterStats;
 import org.graylog2.system.stats.elasticsearch.IndicesStats;
+import org.graylog2.system.stats.elasticsearch.NodeOSInfo;
 import org.graylog2.system.stats.elasticsearch.NodesStats;
 import org.graylog2.system.stats.elasticsearch.ShardStats;
 import org.opensearch.client.json.JsonData;
@@ -327,6 +328,25 @@ public class ClusterAdapterOS implements ClusterAdapter {
                 .build();
     }
 
+    @Override
+    public Map<String, NodeOSInfo> nodesHostInfo() {
+        Request request = Requests.builder()
+                .endpoint("/_nodes/stats/os")
+                .method("GET")
+                .build();
+        JsonNode json = jsonApi.performRequest(request, "Couldn't read Opensearch nodes os data!");
+        JsonNode nodes = json.at("/nodes");
+        return toStream(nodes.fieldNames())
+                .collect(Collectors.toMap(name -> name, name -> createNodeHostInfo(nodes.get(name))));
+    }
+
+    private NodeOSInfo createNodeHostInfo(JsonNode nodesOsJson) {
+        return new NodeOSInfo(
+                nodesOsJson.at("/os/mem/total_in_bytes").asLong(),
+                toStream(nodesOsJson.at("/roles").elements()).map(JsonNode::asText).toList()
+        );
+    }
+
     public <T> Stream<T> toStream(Iterator<T> iterator) {
         return StreamSupport.stream(((Iterable<T>) () -> iterator).spliterator(), false);
     }
@@ -386,8 +406,8 @@ public class ClusterAdapterOS implements ClusterAdapter {
 
         final Set<IndicesRecord> indexSummaries = opensearchClient.execute(() ->
                         catClient.indices().valueBody()
-                .stream()
-                .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
+                                .stream()
+                                .filter(indexSummary -> mappedIndices.contains(indexSummary.index()))
                                 .collect(Collectors.toSet()),
                 "Unable to retrieve indices");
 

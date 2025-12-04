@@ -36,7 +36,7 @@ public class OSAverageHandler extends OSPivotSeriesSpecHandler<Average, Avg> {
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Average avgSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final AvgAggregationBuilder avg = AggregationBuilders.avg(name).field(avgSpec.field());
-        record(queryContext, pivot, avgSpec, name, Avg.class);
+        queryContext.recordNameForPivotSpec(pivot, avgSpec, name);
         return List.of(SeriesAggregationBuilder.metric(avg));
     }
 

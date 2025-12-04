@@ -1,0 +1,6 @@
+rule "char_literal"
+when
+    true
+then
+    set_field(field: "x", value: 'x');
+end

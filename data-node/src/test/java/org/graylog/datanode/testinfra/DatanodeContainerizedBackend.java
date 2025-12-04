@@ -70,8 +70,7 @@ public class DatanodeContainerizedBackend {
     public DatanodeContainerizedBackend(final String nodeName, DatanodeDockerHooks hooks) {
 
         this.network = Network.newNetwork();
-        this.mongoDBTestService = MongoDBTestService.create(this.network);
-        this.mongoDBTestService.start();
+        this.mongoDBTestService = MongoDBTestService.createStarted(this.network);
 
         // we have created these resources, we have to close them.
         this.shouldCloseNetwork = true;

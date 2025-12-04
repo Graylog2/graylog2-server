@@ -19,28 +19,27 @@ package org.graylog2.streams;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.events.StreamsChangedEvent;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Map;
@@ -53,13 +52,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class StreamServiceImplTest {
     protected static final String STREAM_ID = "5628f4503b0c5756a8eebc4d";
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private StreamRuleService streamRuleService;
@@ -76,10 +73,9 @@ public class StreamServiceImplTest {
 
     private StreamService streamService;
 
-    @Before
-    public void setUp() throws Exception {
-        final MongoCollections mc = new MongoCollections(new MongoJackObjectMapperProvider(new ObjectMapperProvider().get()), mongodb.mongoConnection());
-        this.streamService = new StreamServiceImpl(mc, streamRuleService,
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) throws Exception {
+        this.streamService = new StreamServiceImpl(mongoCollections, streamRuleService,
                 outputService, indexSetService, factory, entityRegistrar, eventBus, Set.of(), new EntityScopeService(Set.of(new DefaultEntityScope(), new ImmutableSystemScope())));
     }
 

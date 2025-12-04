@@ -267,6 +267,16 @@ class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
+    void charLiteral() {
+        final Rule rule = parseRuleWithOptionalCodegen();
+        Message message = messageFactory.createMessage("hello test", "source", DateTime.now(DateTimeZone.UTC));
+        final Message processedMsg = evaluateRule(rule, message);
+
+        assertNotNull(processedMsg);
+        assertEquals("x", processedMsg.getField("x"));
+    }
+
+    @Test
     void typedFieldAccess() throws Exception {
         final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule, messageFactory.createMessage("hallo", "test", DateTime.now(DateTimeZone.UTC)));

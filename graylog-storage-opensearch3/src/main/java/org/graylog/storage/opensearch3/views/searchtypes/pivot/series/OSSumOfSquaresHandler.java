@@ -36,7 +36,7 @@ public class OSSumOfSquaresHandler extends OSPivotSeriesSpecHandler<SumOfSquares
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, SumOfSquares sumOfSquaresSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final ExtendedStatsAggregationBuilder sumOfSquares = AggregationBuilders.extendedStats(name).field(sumOfSquaresSpec.field());
-        record(queryContext, pivot, sumOfSquaresSpec, name, ExtendedStats.class);
+        queryContext.recordNameForPivotSpec(pivot, sumOfSquaresSpec, name);
         return List.of(SeriesAggregationBuilder.metric(sumOfSquares));
     }
 

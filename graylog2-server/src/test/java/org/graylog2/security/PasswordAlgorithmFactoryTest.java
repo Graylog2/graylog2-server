@@ -18,12 +18,13 @@ package org.graylog2.security;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.security.PasswordAlgorithm;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.Map;
@@ -33,9 +34,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class PasswordAlgorithmFactoryTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private PasswordAlgorithm passwordAlgorithm1;
@@ -44,7 +45,7 @@ public class PasswordAlgorithmFactoryTest {
 
     private Map<String, PasswordAlgorithm> passwordAlgorithms;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.passwordAlgorithms = ImmutableMap.<String, PasswordAlgorithm>builder()
                 .put("algorithm1", passwordAlgorithm1)
