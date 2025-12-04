@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import StreamsContext from 'contexts/StreamsContext';
@@ -143,7 +144,7 @@ describe('StreamSearchPage', () => {
 
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewLoadButton = await findByText('Load view');
-      fireEvent.click(viewLoadButton);
+      await userEvent.click(viewLoadButton);
 
       await waitFor(() => expect(loadView).toHaveBeenCalled());
 
@@ -168,7 +169,7 @@ describe('StreamSearchPage', () => {
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(loadNewViewForStream).toHaveBeenCalled());
 
@@ -180,7 +181,7 @@ describe('StreamSearchPage', () => {
       const { findByText } = render(<SimpleStreamSearchPage />);
       const viewCreateButton = await findByText('Load new view');
 
-      fireEvent.click(viewCreateButton);
+      await userEvent.click(viewCreateButton);
 
       await waitFor(() => expect(useProcessHooksForView).toHaveBeenCalled());
 

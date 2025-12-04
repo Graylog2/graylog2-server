@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 // eslint-disable-next-line no-restricted-imports
 import type { DebouncedFunc } from 'lodash';
-import { fireEvent, render, screen, within, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, within, waitFor } from 'wrappedTestingLibrary';
 import debounce from 'lodash/debounce';
 import Immutable from 'immutable';
 import { Formik } from 'formik';
@@ -71,7 +72,7 @@ describe('TimeRangePresetForm', () => {
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const removeButton = await within(timerangeItem).findByTitle('Remove preset');
 
-    fireEvent.click(removeButton);
+    await userEvent.click(removeButton);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       Immutable.List([{ description: 'TimeRange2', id: 'tr-id-2', timerange: { from: 600, type: 'relative' } }]),
@@ -82,7 +83,7 @@ describe('TimeRangePresetForm', () => {
     renderForm();
     const addItemButton = await screen.findByLabelText('Add new search time range preset');
 
-    fireEvent.click(addItemButton);
+    await userEvent.click(addItemButton);
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       Immutable.List([
@@ -98,7 +99,8 @@ describe('TimeRangePresetForm', () => {
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const descriptionInput = await within(timerangeItem).findByTitle('Time range preset description');
 
-    fireEvent.change(descriptionInput, { target: { value: 'TimeRange1 changed' } });
+    await userEvent.clear(descriptionInput);
+    await userEvent.type(descriptionInput, 'TimeRange1 changed');
 
     expect(mockOnUpdate).toHaveBeenCalledWith(
       Immutable.List([
@@ -112,13 +114,14 @@ describe('TimeRangePresetForm', () => {
     renderForm();
     const timerangeItem = await screen.findByTestId('time-range-preset-tr-id-1');
     const timerangeFilter = await within(timerangeItem).findByText('5 minutes ago');
-    fireEvent.click(timerangeFilter);
+    await userEvent.click(timerangeFilter);
     const fromInput = await screen.findByTitle('Set the from value');
-    fireEvent.change(fromInput, { target: { value: 15 } });
+    await userEvent.clear(fromInput);
+    await userEvent.type(fromInput, '15');
     const submitButton = await screen.findByRole('button', { name: /update time range/i });
 
     await waitFor(() => expect(submitButton).toBeEnabled());
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(mockOnUpdate).toHaveBeenCalledWith(

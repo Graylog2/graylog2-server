@@ -33,7 +33,6 @@ import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
-import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -83,8 +82,8 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Override
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
-        final Tuple2<String, Class<? extends Aggregation>> objects = aggTypes(queryContext, pivot).getTypes(spec);
-        if (objects == null) {
+        final String agg = aggTypes(queryContext, pivot).getTypes(spec);
+        if (agg == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
                 return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
             } else if (aggregations instanceof Missing) {
@@ -93,7 +92,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
         } else {
             // try to saved sub aggregation type. this might fail if we refer to the total result of the entire result instead of a specific
             // value_count aggregation. we'll handle that special case in doHandleResult above
-            return aggregations.getAggregations().get(objects.v1);
+            return aggregations.getAggregations().get(agg);
         }
 
         return null;

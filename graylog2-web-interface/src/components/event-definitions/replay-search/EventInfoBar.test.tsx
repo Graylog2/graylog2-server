@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent } from 'wrappedTestingLibrary';
+import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import MockStore from 'helpers/mocking/StoreMock';
 import asMock from 'helpers/mocking/AsMock';
@@ -185,13 +186,13 @@ describe('<EventInfoBar />', () => {
     const hideButton = await screen.findByText('Hide event definition details');
     const detailsContainer = await screen.findByTestId('info-container');
 
-    fireEvent.click(hideButton);
+    await userEvent.click(hideButton);
 
     expect(detailsContainer).not.toBeInTheDocument();
 
     const showButton = await screen.findByText('Show event definition details');
 
-    fireEvent.click(showButton);
+    await userEvent.click(showButton);
 
     await screen.findByTestId('info-container');
   });

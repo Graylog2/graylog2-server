@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { screen, render, waitFor, fireEvent } from 'wrappedTestingLibrary';
+import { screen, render, waitFor } from 'wrappedTestingLibrary';
 
 import TitleField from './TitleField';
 
@@ -48,7 +49,8 @@ describe('<TitleField>', () => {
     render(<TitleField typeName="org.graylog.plugins.example" onChange={changeFunction} />);
 
     const titleField = screen.getByLabelText(/title/i);
-    fireEvent.change(titleField, { target: { value: 'New title' } });
+    await userEvent.clear(titleField);
+    await userEvent.paste(titleField, 'New title');
 
     await waitFor(() => expect(changeFunction).toHaveBeenCalledWith('title', 'New title'));
   });
