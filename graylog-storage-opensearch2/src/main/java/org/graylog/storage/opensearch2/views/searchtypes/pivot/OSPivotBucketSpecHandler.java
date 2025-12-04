@@ -17,16 +17,13 @@
 package org.graylog.storage.opensearch2.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.engine.AggTypes;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
-import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
@@ -41,11 +38,6 @@ import java.util.stream.Stream;
 
 public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
         implements BucketSpecHandler<SPEC_TYPE, AggregationBuilder, OSGeneratedQueryContext> {
-
-    protected void record(OSGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
-        final AggTypes aggTypes = (AggTypes) queryContext.contextMap().get(pivot.id());
-        aggTypes.record(spec, name);
-    }
 
     public record SortOrders(List<BucketOrder> orders, List<AggregationBuilder> sortingAggregations) {}
 

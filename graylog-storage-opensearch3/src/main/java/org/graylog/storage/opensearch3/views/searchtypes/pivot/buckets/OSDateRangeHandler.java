@@ -57,7 +57,7 @@ public class OSDateRangeHandler extends OSPivotBucketSpecHandler<DateRangeBucket
             builder.format("date_time");
             builder.keyed(false);
 
-            record(queryContext, pivot, dateRangeBucket, name, ParsedDateRange.class);
+            queryContext.record(pivot, dateRangeBucket, name);
 
             if (root == null && leaf == null) {
                 root = builder;

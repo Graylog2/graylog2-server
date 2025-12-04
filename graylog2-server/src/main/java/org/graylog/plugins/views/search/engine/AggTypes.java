@@ -8,11 +8,11 @@ import java.util.Map;
 public class AggTypes {
     final Map<PivotSpec, String> aggMap = new HashMap<>();
 
-    public void record(PivotSpec pivotSpec, String name) {
+    public void record(final PivotSpec pivotSpec, final String name) {
         aggMap.put(pivotSpec, name);
     }
 
-    public String getTypes(PivotSpec pivotSpec) {
+    public String getTypes(final PivotSpec pivotSpec) {
         return aggMap.get(pivotSpec);
     }
 }
