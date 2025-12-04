@@ -5,7 +5,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AggTypes {
+public class PivotAggsContext {
     final Map<PivotSpec, String> aggMap = new HashMap<>();
 
     public void record(final PivotSpec pivotSpec, final String name) {

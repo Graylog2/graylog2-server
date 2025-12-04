@@ -16,8 +16,8 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
-import org.graylog.plugins.views.search.engine.AggTypes;
 import org.graylog.plugins.views.search.engine.GeneratedQueryContext;
+import org.graylog.plugins.views.search.engine.PivotAggsContext;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
@@ -34,8 +34,8 @@ import java.util.stream.Stream;
 public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
         implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESSearchTypeHandler<Pivot>, ESGeneratedQueryContext> {
 
-    protected AggTypes aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
-        return (AggTypes) queryContext.contextMap().get(pivot.id());
+    protected PivotAggsContext aggTypes(ESGeneratedQueryContext queryContext, Pivot pivot) {
+        return (PivotAggsContext) queryContext.contextMap().get(pivot.id());
     }
 
     protected void record(ESGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
@@ -43,8 +43,8 @@ public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
     }
 
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, ESGeneratedQueryContext queryContext) {
-        final AggTypes aggTypes = aggTypes(queryContext, pivot);
-        final String aggName = aggTypes.getTypes(spec);
+        final PivotAggsContext pivotAggsContext = aggTypes(queryContext, pivot);
+        final String aggName = pivotAggsContext.getTypes(spec);
         return currentAggregationOrBucket.getAggregations().get(aggName);
     }
 

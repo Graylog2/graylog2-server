@@ -17,7 +17,7 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.buckets;
 
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.engine.AggTypes;
+import org.graylog.plugins.views.search.engine.PivotAggsContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.buckets.AutoInterval;
@@ -67,8 +67,8 @@ class OSTimeHandlerTest {
         this.osTimeHandler = new OSTimeHandler();
         when(time.interval()).thenReturn(interval);
         when(time.fields()).thenReturn(Collections.singletonList("foobar"));
-        final AggTypes aggTypes = mock(AggTypes.class);
-        when(queryContext.contextMap().get(any())).thenReturn(aggTypes);
+        final PivotAggsContext pivotAggsContext = mock(PivotAggsContext.class);
+        when(queryContext.contextMap().get(any())).thenReturn(pivotAggsContext);
         when(queryContext.timezone()).thenReturn(DateTimeZone.UTC);
         when(query.effectiveTimeRange(any())).thenCallRealMethod();
     }

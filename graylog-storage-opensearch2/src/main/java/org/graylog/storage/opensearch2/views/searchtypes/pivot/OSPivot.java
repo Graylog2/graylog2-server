@@ -22,7 +22,7 @@ import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
-import org.graylog.plugins.views.search.engine.AggTypes;
+import org.graylog.plugins.views.search.engine.PivotAggsContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -73,8 +73,8 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
         final Map<Object, Object> contextMap = queryContext.contextMap();
-        final AggTypes aggTypes = new AggTypes();
-        contextMap.put(pivot.id(), aggTypes);
+        final PivotAggsContext pivotAggsContext = new PivotAggsContext();
+        contextMap.put(pivot.id(), pivotAggsContext);
 
         var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
 
