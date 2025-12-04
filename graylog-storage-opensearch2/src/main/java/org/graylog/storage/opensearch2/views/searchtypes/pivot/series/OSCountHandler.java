@@ -83,7 +83,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Override
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
-        final String agg = queryContext.getPivotAggsContext(pivot).getName(spec);
+        final String agg = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
         if (agg == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
                 return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());

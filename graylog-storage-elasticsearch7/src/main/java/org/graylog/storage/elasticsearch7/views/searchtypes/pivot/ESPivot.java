@@ -71,8 +71,6 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
 
-        queryContext.initContextForPivot(pivot.id());
-
         var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
 
         // add global rollup series if those were requested

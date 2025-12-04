@@ -84,19 +84,17 @@ public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryC
         return contextMap;
     }
 
-    public void initContextForPivot(final String pivotId) {
-        contextMap.put(pivotId, new PivotAggsContext());
-    }
-
     public void recordNameForPivotSpec(final Pivot pivot,
                                        final PivotSpec spec,
                                        final String name) {
-        final PivotAggsContext pivotAggsContext = (PivotAggsContext) contextMap().get(pivot.id());
+        contextMap.putIfAbsent(pivot.id(), new PivotAggsContext());
+        final PivotAggsContext pivotAggsContext = (PivotAggsContext) contextMap.get(pivot.id());
         pivotAggsContext.recordNameForPivotSpec(spec, name);
     }
 
-    public PivotAggsContext getPivotAggsContext(final Pivot pivot) {
-        return (PivotAggsContext) contextMap().get(pivot.id());
+    public String getAggNameForPivotSpecFromContext(final Pivot pivot, final PivotSpec pivotSpec) {
+        contextMap.putIfAbsent(pivot.id(), new PivotAggsContext());
+        return ((PivotAggsContext) contextMap.get(pivot.id())).getName(pivotSpec);
     }
 
     public String seriesName(final SeriesSpec seriesSpec, final Pivot pivot) {
