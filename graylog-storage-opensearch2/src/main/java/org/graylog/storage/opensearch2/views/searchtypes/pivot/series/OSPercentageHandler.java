@@ -106,7 +106,6 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
                                         Percentage percentage,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
-
                                         OSGeneratedQueryContext osGeneratedQueryContext) {
         final long value;
         if (valueCount == null) {

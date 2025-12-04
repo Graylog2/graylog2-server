@@ -42,8 +42,8 @@ public interface SeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_BUI
     List<AGGREGATION_BUILDER> doCreateAggregation(String name, Pivot pivot, SPEC_TYPE seriesSpec, QUERY_CONTEXT queryContext);
 
     @SuppressWarnings("unchecked")
-    default Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, GeneratedQueryContext queryContext) {
-        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (QUERY_RESULT) queryResult, (AGGREGATION_RESULT) aggregationResult, (QUERY_CONTEXT) queryContext);
+    default Stream<Value> handleResult(Pivot pivot, SeriesSpec seriesSpec, Object queryResult, Object aggregationResult, QUERY_CONTEXT queryContext) {
+        return doHandleResult(pivot, (SPEC_TYPE) seriesSpec, (QUERY_RESULT) queryResult, (AGGREGATION_RESULT) aggregationResult, queryContext);
     }
 
     Stream<Value> doHandleResult(Pivot pivot, SPEC_TYPE seriesSpec, QUERY_RESULT queryResult, AGGREGATION_RESULT result, QUERY_CONTEXT queryContext);
