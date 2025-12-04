@@ -22,6 +22,7 @@ import jakarta.inject.Inject;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -40,16 +41,23 @@ public class CurrentTimeTool extends Tool<CurrentTimeTool.Parameters, String> {
     public static String NAME = "get_current_time";
 
     @Inject
-    public CurrentTimeTool(ObjectMapper objectMapper,
-                           CustomizationConfig customizationConfig,
-                           SchemaGeneratorProvider schemaGeneratorProvider) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public CurrentTimeTool(final CustomizationConfig customizationConfig,
+                           final ObjectMapper objectMapper,
+                           final ClusterConfigService clusterConfigService,
+                           final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
                 "Get current time",
-                f("Return the current time from the %s server in ISO‑8601 UTC format.", customizationConfig.productName()));
+                f(
+                        "Return the current time from the %s server in ISO‑8601 UTC format.",
+                        customizationConfig.productName()
+                ),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
     }
 
     @Override
