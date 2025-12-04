@@ -52,7 +52,6 @@ const FormatAssetList = ({ associated_assets, fieldType }: { associated_assets: 
 
   return (
     <div>
-      <dt>Associated Assets</dt>
       {assetsList.map((assetElement) => (
         <div key={assetElement.props.assetIds[0]}>{assetElement}</div>
       ))}
