@@ -44,9 +44,7 @@ public class OSPercentilesHandler extends OSPivotSeriesSpecHandler<Percentile, P
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Percentile pivotSpec,
                                         SearchResponse searchResult,
-                                        Percentiles percentilesAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext queryContext) {
+                                        Percentiles percentilesAggregation) {
         Double percentile = percentilesAggregation.percentile(pivotSpec.percentile());
         return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Percentile.NAME, percentile));
     }

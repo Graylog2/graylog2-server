@@ -43,9 +43,7 @@ public class ESMinHandler extends ESPivotSeriesSpecHandler<Min, org.graylog.shad
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Min pivotSpec,
                                         SearchResponse searchResult,
-                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min minAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Min minAggregation) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Min.NAME, minAggregation.getValue()));
     }
 }

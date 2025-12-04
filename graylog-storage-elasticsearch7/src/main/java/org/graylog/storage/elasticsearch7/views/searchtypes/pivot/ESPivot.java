@@ -27,6 +27,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentage;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
@@ -36,9 +37,11 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.H
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.MinAggregationBuilder;
+import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
+import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series.ESPercentageHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,10 +201,9 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                             .key(rowKeys)
                             .source("leaf");
                     if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
-                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf", initialBucket);
                     }
                     if (!pivot.columnGroups().isEmpty()) {
-                        var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
                         retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
@@ -209,7 +211,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
-                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf", rowBucket);
                                 });
                     }
                     resultBuilder.addRow(rowBuilder.build());
@@ -217,7 +219,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner");
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner", initialBucket);
             resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
@@ -248,11 +250,19 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
                                ArrayDeque<String> columnKeys,
                                HasAggregations aggregation,
                                boolean rollup,
-                               String source) {
+                               String source,
+                               MultiBucketsAggregation.Bucket initialBucket) {
         pivot.series().forEach(seriesSpec -> {
             final ESPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = this.seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
+            Stream<ESPivotSeriesSpecHandler.Value> valueStream;
+            if (seriesHandler instanceof ESPercentageHandler percentageHandler) {
+                valueStream = percentageHandler.doHandleResult(pivot, (Percentage) seriesSpec, searchResult, (ValueCount) series, this, queryContext, initialBucket);
+
+            } else {
+                valueStream = seriesHandler.handleResult(pivot, seriesSpec, searchResult, series);
+            }
+            valueStream
                     .map(value -> {
                         columnKeys.addLast(value.id());
                         final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);

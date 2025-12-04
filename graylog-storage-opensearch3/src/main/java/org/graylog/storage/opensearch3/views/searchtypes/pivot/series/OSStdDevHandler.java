@@ -41,11 +41,10 @@ public class OSStdDevHandler extends OSPivotSeriesSpecHandler<StdDev, ExtendedSt
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, StdDev pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        StdDev pivotSpec,
                                         SearchResponse searchResult,
-                                        ExtendedStats stddevAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+                                        ExtendedStats stddevAggregation) {
         return Stream.of(OSPivotSeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
     }
 }

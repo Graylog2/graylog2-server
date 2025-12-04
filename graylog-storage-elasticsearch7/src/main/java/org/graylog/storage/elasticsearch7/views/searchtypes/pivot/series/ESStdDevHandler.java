@@ -41,11 +41,10 @@ public class ESStdDevHandler extends ESPivotSeriesSpecHandler<StdDev, ExtendedSt
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, StdDev pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        StdDev pivotSpec,
                                         SearchResponse searchResult,
-                                        ExtendedStats stddevAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        ExtendedStats stddevAggregation) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), StdDev.NAME, stddevAggregation.getStdDeviation()));
     }
 }

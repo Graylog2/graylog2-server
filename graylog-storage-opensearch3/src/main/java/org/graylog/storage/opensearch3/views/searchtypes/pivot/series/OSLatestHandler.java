@@ -57,9 +57,7 @@ public class OSLatestHandler extends OSPivotSeriesSpecHandler<Latest, ParsedFilt
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Latest pivotSpec,
                                         SearchResponse searchResult,
-                                        ParsedFilter filterAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+                                        ParsedFilter filterAggregation) {
         final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
         final Optional<Value> latestValue = Optional.ofNullable(latestAggregation)
                 .map(TopHits::getHits)

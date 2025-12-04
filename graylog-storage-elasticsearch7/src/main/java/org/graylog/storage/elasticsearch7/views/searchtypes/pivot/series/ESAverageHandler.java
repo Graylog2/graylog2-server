@@ -41,11 +41,10 @@ public class ESAverageHandler extends ESPivotSeriesSpecHandler<Average, Avg> {
     }
 
     @Override
-    public Stream<ESPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot, Average pivotSpec,
+    public Stream<ESPivotSeriesSpecHandler.Value> doHandleResult(Pivot pivot,
+                                                                 Average pivotSpec,
                                                                  SearchResponse searchResult,
-                                                                 Avg avgAggregation,
-                                                                 ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                                                 ESGeneratedQueryContext esGeneratedQueryContext) {
+                                                                 Avg avgAggregation) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Average.NAME, avgAggregation.getValue()));
     }
 }

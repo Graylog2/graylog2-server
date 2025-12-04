@@ -43,9 +43,7 @@ public class ESMaxHandler extends ESPivotSeriesSpecHandler<Max, org.graylog.shad
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Max pivotSpec,
                                         SearchResponse searchResult,
-                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max maxAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Max maxAggregation) {
         return Stream.of(ESPivotSeriesSpecHandler.Value.create(pivotSpec.id(), Max.NAME, maxAggregation.getValue()));
     }
 }

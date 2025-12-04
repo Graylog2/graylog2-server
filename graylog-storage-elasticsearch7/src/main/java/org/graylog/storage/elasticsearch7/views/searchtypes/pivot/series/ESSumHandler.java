@@ -40,11 +40,10 @@ public class ESSumHandler extends ESPivotSeriesSpecHandler<Sum, org.graylog.shad
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot, Sum pivotSpec,
+    public Stream<Value> doHandleResult(Pivot pivot,
+                                        Sum pivotSpec,
                                         SearchResponse searchResult,
-                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Sum sumAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
+                                        org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.Sum sumAggregation) {
         return Stream.of(Value.create(pivotSpec.id(), Sum.NAME, sumAggregation.getValue()));
     }
 }

@@ -24,20 +24,16 @@ import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilder;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.joda.time.DateTimeZone;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
 
 public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<SearchSourceBuilder> {
 
     private final ElasticsearchBackend elasticsearchBackend;
-    private final MultiBucketsAggregation.Bucket rowBucket;
 
     @AssistedInject
     public ESGeneratedQueryContext(
@@ -48,21 +44,6 @@ public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
             FieldTypesLookup fieldTypes) {
         super(new HashMap<>(), new HashSet<>(validationErrors), fieldTypes, timezone, ssb, new HashMap<>());
         this.elasticsearchBackend = elasticsearchBackend;
-        this.rowBucket = null;
-    }
-
-    private ESGeneratedQueryContext(
-            ElasticsearchBackend elasticsearchBackend,
-            SearchSourceBuilder ssb,
-            Collection<SearchError> validationErrors,
-            FieldTypesLookup fieldTypes,
-            MultiBucketsAggregation.Bucket rowBucket,
-            Map<String, SearchSourceBuilder> searchTypeQueries,
-            Map<Object, Object> contextMap,
-            DateTimeZone timezone) {
-        super(contextMap, new HashSet<>(validationErrors), fieldTypes, timezone, ssb, searchTypeQueries);
-        this.elasticsearchBackend = elasticsearchBackend;
-        this.rowBucket = rowBucket;
     }
 
     public interface Factory {
@@ -82,11 +63,4 @@ public class ESGeneratedQueryContext extends IndexerGeneratedQueryContext<Search
                         .orElse(ssb.query())));
     }
 
-    public ESGeneratedQueryContext withRowBucket(MultiBucketsAggregation.Bucket rowBucket) {
-        return new ESGeneratedQueryContext(elasticsearchBackend, ssb, errors, fieldTypes, rowBucket, searchTypeQueries, contextMap, timezone);
-    }
-
-    public Optional<MultiBucketsAggregation.Bucket> rowBucket() {
-        return Optional.ofNullable(this.rowBucket);
-    }
 }
