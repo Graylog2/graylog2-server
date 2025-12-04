@@ -17,6 +17,7 @@
 import type * as React from 'react';
 
 import type { Attribute, Sort } from 'stores/PaginationTypes';
+import type { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 
 export type EntityBase = {
   id: string;
@@ -49,7 +50,8 @@ export type ColumnRenderers<Entity extends EntityBase, Meta = unknown> = {
 
 export type ColumnPreferences = {
   [attributeId: string]: {
-    status: 'show' | 'hide';
+    status: (typeof ATTRIBUTE_STATUS)[keyof typeof ATTRIBUTE_STATUS];
+    width?: number; // px
   };
 };
 
@@ -77,6 +79,10 @@ export type ExpandedSectionRenderer<Entity> = {
   content: (entity: Entity) => React.ReactNode;
   actions?: (entity: Entity) => React.ReactNode;
   disableHeader?: boolean;
+};
+
+export type ExpandedSectionRenderers<Entity> = {
+  [sectionName: string]: ExpandedSectionRenderer<Entity>;
 };
 
 export type DefaultLayout = {
