@@ -21,10 +21,7 @@ import { EntityDataTable, NoSearchResult, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
-import {
-  createColumnDefinitions,
-  createColumnRenderers,
-} from './DataNodesColumnConfiguration';
+import { createColumnDefinitions, createColumnRenderers } from './DataNodesColumnConfiguration';
 import useClusterDataNodesTableLayout from './useClusterDataNodesTableLayout';
 import useClusterDataNodes, { type ClusterDataNode } from './useClusterDataNodes';
 
@@ -57,6 +54,7 @@ const DataNodesExpandable = ({
     isLoadingLayout,
     handleLayoutPreferencesChange,
     handleSortChange,
+    resetLayoutPreferences,
   } = useClusterDataNodesTableLayout(searchQuery, pageSizeLimit);
   const {
     nodes: dataNodes,
@@ -105,6 +103,7 @@ const DataNodesExpandable = ({
             defaultDisplayedColumns={defaultDisplayedColumns}
             defaultColumnOrder={defaultColumnOrder}
             layoutPreferences={layoutPreferences}
+            onResetLayoutPreferences={resetLayoutPreferences}
             onLayoutPreferencesChange={handleLayoutPreferencesChange}
             onSortChange={handleSortChange}
             activeSort={searchParams.sort}

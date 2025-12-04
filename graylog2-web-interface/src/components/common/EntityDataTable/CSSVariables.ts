@@ -15,30 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import generateDomain from 'views/components/visualizations/utils/generateDomain';
-
-describe('generateDomain', () => {
-  it('generate domain for 1 axis', () => {
-    const result = generateDomain(1);
-
-    expect(result).toEqual([0, 1]);
-  });
-
-  it('generate domain for 2 axis', () => {
-    const result = generateDomain(2);
-
-    expect(result).toEqual([0, 1]);
-  });
-
-  it('generate domain for 3 axis', () => {
-    const result = generateDomain(3);
-
-    expect(result).toEqual([0.1, 1]);
-  });
-
-  it('generate domain for 4 axis', () => {
-    const result = generateDomain(4);
-
-    expect(result).toEqual([0.1, 0.9]);
-  });
-});
+export const columnTransformVar = (colId: string) => `--col-${colId}-transform`;
+export const columnWidthVar = (colId: string) => `--col-${colId}-width`;
+export const columnOpacityVar = (colId: string) => `--col-${colId}-opacity`;
+export const columnTransition = () => `--col-transition`;

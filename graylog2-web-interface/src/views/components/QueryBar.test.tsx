@@ -16,7 +16,8 @@
  */
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { fireEvent, render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import { render, screen, waitFor, within } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import { asMock } from 'helpers/mocking';
 import OriginalQueryBar from 'views/components/QueryBar';
@@ -91,7 +92,7 @@ describe('QueryBar', () => {
 
     const nextTab = await screen.findByRole('button', { name: /third query/i });
 
-    fireEvent.click(nextTab);
+    await userEvent.click(nextTab);
 
     await waitFor(() => expect(selectQuery).toHaveBeenCalledWith('baz'));
   });
@@ -116,11 +117,11 @@ describe('QueryBar', () => {
 
     const dropdown = await within(currentTab).findByTestId('query-action-dropdown');
 
-    fireEvent.click(dropdown);
+    await userEvent.click(dropdown);
 
     const closeButton = await screen.findByRole('menuitem', { name: /delete/i });
 
-    fireEvent.click(closeButton);
+    await userEvent.click(closeButton);
 
     await waitFor(() => expect(removeQuery).toHaveBeenCalledWith('bar'));
 

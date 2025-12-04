@@ -14,15 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+package org.graylog2.system.stats.elasticsearch;
 
-import { Y_POSITION_AXIS_STEP } from 'views/components/visualizations/Constants';
+import java.util.List;
 
-export const generateDomain = (yAxisCount: number) => {
-  if (!yAxisCount || yAxisCount === 1) return [0, 1];
-  const leftAxisCount = Math.ceil(yAxisCount / 2);
-  const rightAxisCount = Math.floor(yAxisCount / 2);
-
-  return [(leftAxisCount - 1) * Y_POSITION_AXIS_STEP, 1 - (rightAxisCount - 1) * Y_POSITION_AXIS_STEP];
-};
-
-export default generateDomain;
+public record NodeOSInfo(long memoryTotalInBytes, List<String> roles) {
+}
