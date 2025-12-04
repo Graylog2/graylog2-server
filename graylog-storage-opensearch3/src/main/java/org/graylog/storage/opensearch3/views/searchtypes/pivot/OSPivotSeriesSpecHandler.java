@@ -35,12 +35,12 @@ public abstract class OSPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
         implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, OSSearchTypeHandler<Pivot>, OSGeneratedQueryContext> {
 
     protected void record(OSGeneratedQueryContext queryContext, Pivot pivot, PivotSpec spec, String name, Class<? extends Aggregation> aggregationClass) {
-        queryContext.getPivotAggsContext(pivot).record(spec, name);
+        queryContext.getPivotAggsContext(pivot).recordNameForPivotSpec(spec, name);
     }
 
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, OSGeneratedQueryContext queryContext) {
         final PivotAggsContext pivotAggsContext = queryContext.getPivotAggsContext(pivot);
-        final String aggName = pivotAggsContext.getTypes(spec);
+        final String aggName = pivotAggsContext.getName(spec);
         return currentAggregationOrBucket.getAggregations().get(aggName);
     }
 

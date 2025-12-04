@@ -57,7 +57,7 @@ public class ESDateRangeHandler extends ESPivotBucketSpecHandler<DateRangeBucket
             builder.format("date_time");
             builder.keyed(false);
 
-            queryContext.record(pivot, dateRangeBucket, name);
+            queryContext.recordNameForPivotSpec(pivot, dateRangeBucket, name);
 
             if (root == null && leaf == null) {
                 root = builder;

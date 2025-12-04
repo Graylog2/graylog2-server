@@ -82,7 +82,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Override
     public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, ESGeneratedQueryContext queryContext) {
-        final String agg = queryContext.getPivotAggsContext(pivot).getTypes(spec);
+        final String agg = queryContext.getPivotAggsContext(pivot).getName(spec);
         if (agg == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
                 return createValueCount(((MultiBucketsAggregation.Bucket) aggregations).getDocCount());
