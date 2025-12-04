@@ -36,7 +36,7 @@ public class ESPercentilesHandler extends ESPivotSeriesSpecHandler<Percentile, P
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Percentile percentileSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
         final PercentilesAggregationBuilder percentiles = AggregationBuilders.percentiles(name).field(percentileSpec.field()).percentiles(percentileSpec.percentile());
-        record(queryContext, pivot, percentileSpec, name, Percentiles.class);
+        queryContext.recordNameForPivotSpec(pivot, percentileSpec, name);
         return List.of(SeriesAggregationBuilder.metric(percentiles));
     }
 

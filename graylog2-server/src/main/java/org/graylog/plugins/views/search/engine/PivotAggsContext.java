@@ -14,33 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
+package org.graylog.plugins.views.search.engine;
 
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregation;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.HasAggregations;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * This solely exists to hide the nasty type signature of the aggregation type map from the rest of the code.
- * It's just ugly and in the way.
- */
-public class AggTypes {
+public class PivotAggsContext {
     final Map<PivotSpec, String> aggMap = new HashMap<>();
 
-    public void record(PivotSpec pivotSpec, String name) {
+    public void recordNameForPivotSpec(final PivotSpec pivotSpec, final String name) {
         aggMap.put(pivotSpec, name);
     }
 
-    public Aggregation getSubAggregation(PivotSpec pivotSpec,
-                                         HasAggregations currentAggregationOrBucket) {
-        final String aggName = getTypes(pivotSpec);
-        return currentAggregationOrBucket.getAggregations().get(aggName);
-    }
-
-    public String getTypes(PivotSpec pivotSpec) {
+    public String getName(final PivotSpec pivotSpec) {
         return aggMap.get(pivotSpec);
     }
 }
