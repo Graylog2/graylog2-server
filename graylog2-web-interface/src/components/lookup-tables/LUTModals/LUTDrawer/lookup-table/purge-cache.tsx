@@ -70,6 +70,7 @@ function PurgeCache({ table }: Props) {
             type="text"
             id="purge-key"
             name="purgekey"
+            aria-label="Purge key"
             placeholder="Insert key which should be purged"
             label="Key"
             onChange={onChange}
