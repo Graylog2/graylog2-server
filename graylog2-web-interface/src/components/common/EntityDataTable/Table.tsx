@@ -68,6 +68,7 @@ type Props<Entity extends EntityBase> = {
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
   rows: Array<Row<Entity>>;
   headerGroups: Array<HeaderGroup<Entity>>;
+  registerHeaderSection: (colId: string, part: 'left' | 'right') => (tableHeader: HTMLDivElement | null) => void;
 };
 
 const Table = <Entity extends EntityBase>({
@@ -75,9 +76,14 @@ const Table = <Entity extends EntityBase>({
   rows,
   headerGroups,
   hasRowActions,
+  registerHeaderSection,
 }: Props<Entity>) => (
   <StyledTable striped condensed hover>
-    <TableHead headerGroups={headerGroups} hasRowActions={hasRowActions} />
+    <TableHead
+      headerGroups={headerGroups}
+      hasRowActions={hasRowActions}
+      registerHeaderSection={registerHeaderSection}
+    />
     {rows.map((row) => (
       <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
         <tr>

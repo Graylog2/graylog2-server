@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useLayoutEffect } from 'react';
+import { useState, useLayoutEffect, useMemo } from 'react';
 
 import {
   DEFAULT_COL_MIN_WIDTH,
@@ -22,9 +22,10 @@ import {
   ACTIONS_COL_ID,
   BULK_SELECT_COL_ID,
 } from 'components/common/EntityDataTable/Constants';
-import useCalculateStaticColumnWidths from 'components/common/EntityDataTable/hooks/useCalculateStaticColumnWidths';
 
 import type { EntityBase, ColumnRenderersByAttribute, ColumnSchema } from '../types';
+
+const HEADER_PADDING = 10; // px
 
 const assignableTableWidth = ({
   tableWidth,
@@ -93,6 +94,27 @@ const calculateColumnWidths = ({
   };
 };
 
+const calculateStaticColumnWidth = ({
+  attributeColumnIds,
+  attributeColumnRenderers,
+  headerMinWidths,
+}: {
+  attributeColumnIds: Array<string>;
+  attributeColumnRenderers: ColumnRenderersByAttribute<EntityBase>;
+  headerMinWidths: { [colId: string]: number };
+}) =>
+  attributeColumnIds.reduce<Record<string, number>>((staticWidths, id) => {
+    const staticWidth = attributeColumnRenderers[id]?.staticWidth;
+
+    if (!staticWidth) {
+      return staticWidths;
+    }
+
+    const resolvedStaticWidth = staticWidth === 'matchHeader' ? headerMinWidths[id] + HEADER_PADDING : staticWidth;
+
+    return resolvedStaticWidth ? { ...staticWidths, [id]: resolvedStaticWidth } : staticWidths;
+  }, {});
+
 const useColumnWidths = <Entity extends EntityBase>({
   actionsColWidth,
   bulkSelectColWidth,
@@ -100,7 +122,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   columnIds,
   tableWidth,
   columnWidthPreferences,
-  columnSchemas,
+  headerMinWidths,
 }: {
   actionsColWidth: number;
   bulkSelectColWidth: number;
@@ -109,13 +131,18 @@ const useColumnWidths = <Entity extends EntityBase>({
   tableWidth: number;
   columnWidthPreferences: { [key: string]: number } | undefined;
   columnSchemas: Array<ColumnSchema>;
+  headerMinWidths: { [colId: string]: number };
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
-  const staticColumnWidths = useCalculateStaticColumnWidths({
-    attributeColumnIds: columnIds,
-    attributeColumnRenderers: columnRenderersByAttribute,
-    columnSchemas,
-  });
+  const staticColumnWidths = useMemo(
+    () =>
+      calculateStaticColumnWidth({
+        attributeColumnIds: columnIds,
+        attributeColumnRenderers: columnRenderersByAttribute,
+        headerMinWidths,
+      }),
+    [columnIds, columnRenderersByAttribute, headerMinWidths],
+  );
 
   useLayoutEffect(() => {
     if (!tableWidth) {
@@ -151,7 +178,6 @@ const useColumnWidths = <Entity extends EntityBase>({
     columnIds,
     tableWidth,
     columnWidthPreferences,
-    columnSchemas,
     staticColumnWidths,
   ]);
 
