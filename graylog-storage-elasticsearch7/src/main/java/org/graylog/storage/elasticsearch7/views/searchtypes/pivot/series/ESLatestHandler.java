@@ -16,9 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot.series;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHits;
@@ -28,32 +26,12 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.TopHits;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
-import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
 import java.util.Optional;
-import java.util.stream.Stream;
 
 public class ESLatestHandler extends ESBasicSeriesSpecHandler<Latest, ParsedFilter> {
     private static final String AGG_NAME = "latest_aggregation";
-
-    @Override
-    public Stream<Value> doHandleResult(Pivot pivot,
-                                        Latest pivotSpec,
-                                        SearchResponse searchResult,
-                                        ParsedFilter filterAggregation,
-                                        ESGeneratedQueryContext esGeneratedQueryContext) {
-        final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
-        final Optional<Value> latestValue = Optional.ofNullable(latestAggregation)
-                .map(TopHits::getHits)
-                .map(SearchHits::getHits)
-                .filter(hits -> hits.length > 0)
-                .map(hits -> hits[0])
-                .map(SearchHit::getSourceAsMap)
-                .map(source -> source.get(pivotSpec.field()))
-                .map(value -> Value.create(pivotSpec.id(), Latest.NAME, value));
-        return latestValue.stream();
-    }
 
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Latest latestSpec) {

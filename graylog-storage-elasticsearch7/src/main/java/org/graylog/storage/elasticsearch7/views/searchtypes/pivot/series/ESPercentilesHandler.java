@@ -24,7 +24,6 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregat
 
 public class ESPercentilesHandler extends ESBasicSeriesSpecHandler<Percentile, Percentiles> {
 
-
     @Override
     protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Percentile percentileSpec) {
         final PercentilesAggregationBuilder percentiles = AggregationBuilders.percentiles(name).field(percentileSpec.field()).percentiles(percentileSpec.percentile());
