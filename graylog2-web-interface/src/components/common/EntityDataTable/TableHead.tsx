@@ -67,7 +67,11 @@ export const ThInner = styled.div`
 `;
 
 export const LeftCol = styled.div`
-  flex: 1;
+  display: flex;
+  align-items: center;
+`;
+
+const RightCol = styled.div`
   display: flex;
   align-items: center;
 `;
@@ -99,9 +103,11 @@ const useSortableCol = (colId: string, disabled: boolean) => {
 const TableHeaderCell = <Entity extends EntityBase>({
   header,
   hasRowActions,
+  registerHeaderSection,
 }: {
   header: Header<Entity, unknown>;
-  hasRowActions;
+  hasRowActions: boolean;
+  registerHeaderSection: (colId: string, part: 'left' | 'right') => (tableHeader: HTMLDivElement | null) => void;
 }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
@@ -117,7 +123,7 @@ const TableHeaderCell = <Entity extends EntityBase>({
       $colId={header.column.id}
       $hidePadding={!hasRowActions && header.column.id === ACTIONS_COL_ID}>
       <ThInner>
-        <LeftCol>
+        <LeftCol ref={registerHeaderSection(header.column.id, 'left')}>
           {columnMeta?.enableColumnOrdering && (
             <DragHandle
               ref={setActivatorNodeRef}
@@ -130,13 +136,15 @@ const TableHeaderCell = <Entity extends EntityBase>({
           {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
           {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
         </LeftCol>
-        {header.column.getCanResize() && (
-          <ResizeHandle
-            onMouseDown={header.getResizeHandler()}
-            onTouchStart={header.getResizeHandler()}
-            colTitle={columnMeta.label}
-          />
-        )}
+        <RightCol ref={registerHeaderSection(header.column.id, 'right')}>
+          {header.column.getCanResize() && (
+            <ResizeHandle
+              onMouseDown={header.getResizeHandler()}
+              onTouchStart={header.getResizeHandler()}
+              colTitle={columnMeta.label}
+            />
+          )}
+        </RightCol>
       </ThInner>
     </Th>
   );
@@ -145,14 +153,24 @@ const TableHeaderCell = <Entity extends EntityBase>({
 type Props<Entity extends EntityBase> = {
   hasRowActions: boolean;
   headerGroups: Array<HeaderGroup<Entity>>;
+  registerHeaderSection: (colId: string, part: 'left' | 'right') => (tableHeader: HTMLDivElement | null) => void;
 };
 
-const TableHead = <Entity extends EntityBase>({ headerGroups, hasRowActions }: Props<Entity>) => (
+const TableHead = <Entity extends EntityBase>({
+  headerGroups,
+  hasRowActions,
+  registerHeaderSection,
+}: Props<Entity>) => (
   <Thead>
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeaderCell key={header.id} header={header} hasRowActions={hasRowActions} />
+          <TableHeaderCell
+            key={header.id}
+            header={header}
+            hasRowActions={hasRowActions}
+            registerHeaderSection={registerHeaderSection}
+          />
         ))}
       </tr>
     ))}

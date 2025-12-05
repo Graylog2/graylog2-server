@@ -36,6 +36,7 @@ import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVi
 import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
 import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
+import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
@@ -251,6 +252,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
 }: Props<Entity, Meta>) => {
+  const { headerMinWidths, registerHeaderSection } = useHeaderMinWidths();
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
@@ -285,6 +287,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     fixedActionsCellWidth,
     visibleColumns: columnOrder,
     columnWidthPreferences: internalColumnWidthPreferences,
+    headerMinWidths,
   });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
@@ -356,6 +359,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                   $activeColId={activeColId}
                   $columnTransform={columnTransform}>
                   <Table<Entity>
+                    registerHeaderSection={registerHeaderSection}
                     expandedSectionRenderers={expandedSectionRenderers}
                     headerGroups={headerGroups}
                     rows={table.getRowModel().rows}
