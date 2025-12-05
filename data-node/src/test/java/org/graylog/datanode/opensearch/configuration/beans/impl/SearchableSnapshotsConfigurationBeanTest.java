@@ -22,6 +22,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
@@ -53,9 +54,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
-                )),
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -92,9 +93,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
-                )),
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 gcsRepositoryConfiguration,
@@ -122,9 +123,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
-                )),
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 new S3RepositoryConfiguration(),
                 new GCSRepositoryConfiguration(),
@@ -153,10 +154,10 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
-                )),
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -183,9 +184,9 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
-                )),
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -214,9 +215,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_search_cache_size", "10gb"
-                )),
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -237,11 +238,11 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_roles", "cluster_manager,data,ingest,remote_cluster_client",
                         "path_repo", snapshotsPath,
                         "node_search_cache_size", "10gb"
-                )),
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -273,15 +274,6 @@ class SearchableSnapshotsConfigurationBeanTest {
     private HdfsRepositoryConfiguration hdfsConfiguration(Map<String, String> properties) throws RepositoryException, ValidationException {
         final HdfsRepositoryConfiguration configuration = new HdfsRepositoryConfiguration();
         new JadConfig(new InMemoryRepository(properties), configuration).process();
-        return configuration;
-    }
-
-    private Configuration datanodeConfiguration(Map<String, String> properties) throws RepositoryException, ValidationException {
-        final Configuration configuration = new Configuration();
-        final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
-                "password_secret", "thisisverysecretpassword"
-        ));
-        new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
         return configuration;
     }
 }
