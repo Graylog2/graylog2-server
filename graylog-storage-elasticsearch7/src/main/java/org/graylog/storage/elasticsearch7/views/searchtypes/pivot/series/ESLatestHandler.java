@@ -29,28 +29,13 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
-import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, ParsedFilter> {
+public class ESLatestHandler extends ESBasicSeriesSpecHandler<Latest, ParsedFilter> {
     private static final String AGG_NAME = "latest_aggregation";
-
-    @Nonnull
-    @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, ESGeneratedQueryContext queryContext) {
-        final FilterAggregationBuilder latest = AggregationBuilders.filter(name, QueryBuilders.existsQuery(latestSpec.field()))
-                .subAggregation(AggregationBuilders.topHits(AGG_NAME)
-                        .size(1)
-                        .fetchSource(latestSpec.field(), null)
-                        .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
-        queryContext.recordNameForPivotSpec(pivot, latestSpec, name);
-        return List.of(SeriesAggregationBuilder.metric(latest));
-    }
 
     @Override
     public Stream<Value> doHandleResult(Pivot pivot,
@@ -67,6 +52,29 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, ParsedFilt
                 .map(SearchHit::getSourceAsMap)
                 .map(source -> source.get(pivotSpec.field()))
                 .map(value -> Value.create(pivotSpec.id(), Latest.NAME, value));
+        return latestValue.stream();
+    }
+
+    @Override
+    protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Latest latestSpec) {
+        final FilterAggregationBuilder latest = AggregationBuilders.filter(name, QueryBuilders.existsQuery(latestSpec.field()))
+                .subAggregation(AggregationBuilders.topHits(AGG_NAME)
+                        .size(1)
+                        .fetchSource(latestSpec.field(), null)
+                        .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
+        return SeriesAggregationBuilder.metric(latest);
+    }
+
+    @Override
+    protected Object getValueFromAggregationResult(final ParsedFilter filterAggregation, final Latest seriesSpec) {
+        final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
+        final Optional<Object> latestValue = Optional.ofNullable(latestAggregation)
+                .map(TopHits::getHits)
+                .map(SearchHits::getHits)
+                .filter(hits -> hits.length > 0)
+                .map(hits -> hits[0])
+                .map(SearchHit::getSourceAsMap)
+                .map(source -> source.get(seriesSpec.field()));
         return latestValue.stream();
     }
 }
