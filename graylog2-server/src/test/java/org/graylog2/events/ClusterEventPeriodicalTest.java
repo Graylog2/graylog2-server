@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -51,6 +50,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,7 +94,8 @@ public class ClusterEventPeriodicalTest {
                         new SafeClasses(Set.of(
                                 SimpleEvent.class.getName(), DebugEvent.class.getName(), Safe.class.getName()))),
                 serverEventBus,
-                clusterEventBus
+                clusterEventBus,
+                new Offset(TIME.minusSeconds(1).toDate(), null)
         );
     }
 
@@ -111,13 +112,7 @@ public class ClusterEventPeriodicalTest {
 
     @Test
     public void runHandlesInvalidPayloadsGracefully() throws Exception {
-        DBObject event = new BasicDBObjectBuilder()
-                .add("timestamp", TIME.getMillis())
-                .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.emptyList())
-                .add("event_class", SimpleEvent.class.getCanonicalName())
-                .add("payload", ImmutableMap.of("HAHA", "test"))
-                .get();
+        DBObject event = createEvent(TIME.toDate(), Collections.emptyList(), SimpleEvent.class.getCanonicalName(), ImmutableMap.of("HAHA", "test"));
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         collection.save(event);
@@ -128,10 +123,6 @@ public class ClusterEventPeriodicalTest {
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        @SuppressWarnings("unchecked")
-        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.getNodeId());
-
         verify(serverEventBus, never()).post(any());
         verify(clusterEventBus, never()).post(any());
     }
@@ -141,13 +132,7 @@ public class ClusterEventPeriodicalTest {
         final SimpleEventHandler handler = new SimpleEventHandler();
         serverEventBus.register(handler);
 
-        DBObject event = new BasicDBObjectBuilder()
-                .add("timestamp", TIME.getMillis())
-                .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.emptyList())
-                .add("event_class", SimpleEvent.class.getCanonicalName())
-                .add("payload", ImmutableMap.of("payload", "test"))
-                .get();
+        DBObject event = createEvent(TIME.toDate(), Collections.emptyList(), SimpleEvent.class.getCanonicalName(), ImmutableMap.of("payload", "test"));
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.count()).isEqualTo(0L);
@@ -160,10 +145,6 @@ public class ClusterEventPeriodicalTest {
         assertThat(handler.invocations).hasValue(1);
         assertThat(collection.count()).isEqualTo(1L);
 
-        @SuppressWarnings("unchecked")
-        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.getNodeId());
-
         verify(serverEventBus, times(1)).post(any(SimpleEvent.class));
         verify(clusterEventBus, never()).post(any());
     }
@@ -171,13 +152,7 @@ public class ClusterEventPeriodicalTest {
     @Test
     public void runHandlesAutoValueCorrectly() throws Exception {
         final DebugEvent event = DebugEvent.create("Node ID", TIME, "test");
-        DBObject dbObject = new BasicDBObjectBuilder()
-                .add("timestamp", TIME.getMillis())
-                .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.emptyList())
-                .add("event_class", DebugEvent.class.getCanonicalName())
-                .add("payload", objectMapper.convertValue(event, Map.class))
-                .get();
+        DBObject dbObject = createEvent(TIME.toDate(), Collections.emptyList(), DebugEvent.class.getCanonicalName(), objectMapper.convertValue(event, Map.class));
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         collection.save(dbObject);
@@ -188,23 +163,13 @@ public class ClusterEventPeriodicalTest {
 
         assertThat(collection.count()).isEqualTo(1L);
 
-        @SuppressWarnings("unchecked")
-        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.getNodeId());
-
         verify(serverEventBus, times(1)).post(event);
         verify(clusterEventBus, never()).post(event);
     }
 
     @Test
     public void testRun() throws Exception {
-        DBObject event = new BasicDBObjectBuilder()
-                .add("timestamp", TIME.getMillis())
-                .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.emptyList())
-                .add("event_class", SimpleEvent.class.getCanonicalName())
-                .add("payload", ImmutableMap.of("payload", "test"))
-                .get();
+        DBObject event = createEvent(TIME.toDate(), Collections.emptyList(), SimpleEvent.class.getCanonicalName(), ImmutableMap.of("payload", "test"));
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         collection.save(event);
@@ -214,10 +179,6 @@ public class ClusterEventPeriodicalTest {
         clusterEventPeriodical.run();
 
         assertThat(collection.count()).isEqualTo(1L);
-
-        @SuppressWarnings("unchecked")
-        final List<String> consumers = (List<String>) collection.findOne().get("consumers");
-        assertThat(consumers).containsExactly(nodeId.getNodeId());
 
         verify(serverEventBus, times(1)).post(new SimpleEvent("test"));
         verify(clusterEventBus, never()).post(event);
@@ -307,19 +268,6 @@ public class ClusterEventPeriodicalTest {
     }
 
     @Test
-    public void localNodeIsMarkedAsHavingConsumedEvent() {
-        @SuppressWarnings("deprecation")
-        DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
-        SimpleEvent event = new SimpleEvent("test");
-
-        clusterEventPeriodical.publishClusterEvent(event);
-
-        DBObject dbObject = collection.findOne();
-
-        assertThat(((BasicDBList) dbObject.get("consumers")).toArray()).isEqualTo(new String[]{nodeId.getNodeId()});
-    }
-
-    @Test
     public void localEventIsPostedToServerBusImmediately() {
         SimpleEvent event = new SimpleEvent("test");
 
@@ -330,13 +278,7 @@ public class ClusterEventPeriodicalTest {
 
     @Test
     public void localEventIsNotProcessedFromDB() {
-        DBObject event = new BasicDBObjectBuilder()
-                .add("timestamp", TIME.getMillis())
-                .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.singletonList(nodeId.getNodeId()))
-                .add("event_class", SimpleEvent.class.getCanonicalName())
-                .add("payload", ImmutableMap.of("payload", "test"))
-                .get();
+        DBObject event = createEvent(TIME.toDate(), Collections.singletonList(nodeId.getNodeId()), SimpleEvent.class.getCanonicalName(), ImmutableMap.of("payload", "test"), true);
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         collection.save(event);
@@ -363,15 +305,23 @@ public class ClusterEventPeriodicalTest {
         }
     }
 
+    private DBObject createEvent(Date timestamp, List<String> consumers, String eventClass, Object payload) {
+        return createEvent(timestamp, consumers, eventClass, payload, false);
+    }
+
+    private DBObject createEvent(Date timestamp, List<String> consumers, String eventClass, Object payload, boolean selfProduced) {
+        return new BasicDBObjectBuilder()
+                .add("timestamp", timestamp)
+                .add("producer", selfProduced ? nodeId.toString() : "TEST-PRODUCER")
+                .add("consumers", consumers)
+                .add("event_class", eventClass)
+                .add("payload", payload)
+                .get();
+    }
+
     @Test
     public void testInstantiatesSafeEventClass() {
-        DBObject event = new BasicDBObjectBuilder()
-                .add("timestamp", TIME.getMillis())
-                .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.emptyList())
-                .add("event_class", "org.graylog2.events.ClusterEventPeriodicalTest$Safe")
-                .add("payload", "this-is-safe")
-                .get();
+        DBObject event = createEvent(TIME.toDate(), Collections.emptyList(), "org.graylog2.events.ClusterEventPeriodicalTest$Safe", "this-is-safe");
 
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
@@ -384,13 +334,7 @@ public class ClusterEventPeriodicalTest {
 
     @Test
     public void testIgnoresUnsafeEventClass() {
-        DBObject event = new BasicDBObjectBuilder()
-                .add("timestamp", TIME.getMillis())
-                .add("producer", "TEST-PRODUCER")
-                .add("consumers", Collections.emptyList())
-                .add("event_class", "org.graylog2.events.ClusterEventPeriodicalTest$Unsafe")
-                .add("payload", "this-is-unsafe")
-                .get();
+        DBObject event = createEvent(TIME.toDate(), Collections.emptyList(), "org.graylog2.events.ClusterEventPeriodicalTest$Unsafe", "this-is-unsafe");
 
         @SuppressWarnings("deprecation")
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);

@@ -24,13 +24,14 @@ import com.google.common.eventbus.Subscribe;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.FindIterable;
-import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
-import com.mongodb.client.model.Updates;
+import com.mongodb.client.model.UpdateOptions;
 import jakarta.inject.Inject;
+import org.bson.Document;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.utils.MongoUtils;
@@ -42,7 +43,8 @@ import org.graylog2.shared.utilities.AutoValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
+import java.util.Map;
+import java.util.UUID;
 
 public class ClusterEventPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventPeriodical.class);
@@ -55,6 +57,7 @@ public class ClusterEventPeriodical extends Periodical {
     private final ObjectMapper objectMapper;
     private final EventBus serverEventBus;
     private final RestrictedChainingClassLoader chainingClassLoader;
+    private Offset offset;
 
     @Inject
     public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
@@ -62,12 +65,14 @@ public class ClusterEventPeriodical extends Periodical {
                                   final NodeId nodeId,
                                   final RestrictedChainingClassLoader chainingClassLoader,
                                   final EventBus serverEventBus,
-                                  final ClusterEventBus clusterEventBus) {
+                                  final ClusterEventBus clusterEventBus,
+                                  final Offset offset) {
         this.nodeId = nodeId;
         this.objectMapper = mapperProvider.get();
         this.chainingClassLoader = chainingClassLoader;
         this.serverEventBus = serverEventBus;
         this.collection = prepareCollection(mongoConnection, mapperProvider);
+        this.offset = offset;
 
         clusterEventBus.registerClusterEventSubscriber(this);
     }
@@ -80,9 +85,8 @@ public class ClusterEventPeriodical extends Periodical {
                 .withWriteConcern(WriteConcern.JOURNALED);
 
         collection.createIndex(Indexes.ascending(
-                "timestamp",
-                "producer",
-                "consumers"));
+                ClusterEvent.FIELD_TIMESTAMP,
+                ClusterEvent.FIELD_PRODUCER));
 
         return collection;
     }
@@ -131,7 +135,7 @@ public class ClusterEventPeriodical extends Periodical {
     public void doRun() {
         LOG.debug("Opening MongoDB cursor on \"{}\"", COLLECTION_NAME);
         try {
-            final FindIterable<ClusterEvent> eventsIterable = eventsIterable(nodeId);
+            final FindIterable<ClusterEvent> eventsIterable = eventsIterable(this.offset);
             if (LOG.isTraceEnabled()) {
                 LOG.trace("MongoDB query plan: {}", eventsIterable.explain());
             }
@@ -148,7 +152,7 @@ public class ClusterEventPeriodical extends Periodical {
                         LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
                     }
 
-                    updateConsumers(clusterEvent.id(), nodeId);
+                    this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
                 });
             }
         } catch (Exception e) {
@@ -164,12 +168,12 @@ public class ClusterEventPeriodical extends Periodical {
         }
 
         final String className = AutoValueUtils.getCanonicalName(event.getClass());
-        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, Collections.singleton(nodeId.getNodeId()), event);
+        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, event);
 
         try {
-            final String id = MongoUtils.insertedIdAsString(collection.insertOne(clusterEvent));
+            final String id = save(clusterEvent);
             // We are handling a locally generated event, so we can speed up processing by posting it to the local event
-            // bus immediately. Due to having added the local node id to its list of consumers, it will not be picked up
+            // bus immediately. Due to filtering on the `producer` field not being equal to the local node id, it will not be picked up
             // by the db cursor again, avoiding double processing of the event. See #11263 for details.
             serverEventBus.post(event);
             LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);
@@ -178,13 +182,27 @@ public class ClusterEventPeriodical extends Periodical {
         }
     }
 
-    private FindIterable<ClusterEvent> eventsIterable(NodeId nodeId) {
-        return collection.find(Filters.nin("consumers", nodeId.getNodeId()))
-                .sort(Sorts.ascending("timestamp"));
+    private String save(ClusterEvent clusterEvent) {
+        final var result = collection.updateOne(new Document(Map.of(
+                        // This is just used to make sure there is no matching document present.
+                        "event_key", UUID.randomUUID().toString()
+                )), new Document(Map.of(
+                        "$set", clusterEvent,
+                        "$currentDate", new Document(ClusterEvent.FIELD_TIMESTAMP, true),
+                        "$unset", new Document("event_key", 1)
+                )),
+                new UpdateOptions().upsert(true));
+        return result.getUpsertedId().asObjectId().getValue().toHexString();
     }
 
-    private void updateConsumers(final String eventId, final NodeId nodeId) {
-        collection.updateOne(MongoUtils.idEq(eventId), Updates.addToSet("consumers", nodeId.getNodeId()));
+    private FindIterable<ClusterEvent> eventsIterable(Offset offset) {
+        final var timestampQuery = offset.lastId() == null
+                ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen())
+                : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()),
+                Filters.and(Filters.eq(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()), Filters.ne(ClusterEvent.FIELD_ID, offset.lastId())));
+        final var query = Filters.and(Filters.ne(ClusterEvent.FIELD_PRODUCER, nodeId.toString()), timestampQuery);
+        return collection.find(query)
+                .sort(Sorts.ascending(ClusterEvent.FIELD_TIMESTAMP));
     }
 
     private Object extractPayload(Object payload, String eventClass) {
