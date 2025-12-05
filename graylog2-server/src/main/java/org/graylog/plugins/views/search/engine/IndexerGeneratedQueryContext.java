@@ -20,6 +20,7 @@ import com.google.common.base.MoreObjects;
 import org.graylog.plugins.views.search.elasticsearch.FieldTypesLookup;
 import org.graylog.plugins.views.search.errors.SearchError;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
+import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.joda.time.DateTimeZone;
 
@@ -81,6 +82,19 @@ public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryC
 
     public Map<Object, Object> contextMap() {
         return contextMap;
+    }
+
+    public void recordNameForPivotSpec(final Pivot pivot,
+                                       final PivotSpec spec,
+                                       final String name) {
+        contextMap.putIfAbsent(pivot.id(), new PivotAggsContext());
+        final PivotAggsContext pivotAggsContext = (PivotAggsContext) contextMap.get(pivot.id());
+        pivotAggsContext.recordNameForPivotSpec(spec, name);
+    }
+
+    public String getAggNameForPivotSpecFromContext(final Pivot pivot, final PivotSpec pivotSpec) {
+        contextMap.putIfAbsent(pivot.id(), new PivotAggsContext());
+        return ((PivotAggsContext) contextMap.get(pivot.id())).getName(pivotSpec);
     }
 
     public String seriesName(final SeriesSpec seriesSpec, final Pivot pivot) {
