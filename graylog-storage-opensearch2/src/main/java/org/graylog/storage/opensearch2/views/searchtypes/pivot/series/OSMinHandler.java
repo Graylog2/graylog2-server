@@ -35,7 +35,7 @@ public class OSMinHandler extends OSPivotSeriesSpecHandler<Min, org.graylog.shad
     @Override
     public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Min minSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
         final MinAggregationBuilder min = AggregationBuilders.min(name).field(minSpec.field());
-        record(queryContext, pivot, minSpec, name, org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.Min.class);
+        queryContext.recordNameForPivotSpec(pivot, minSpec, name);
         return List.of(SeriesAggregationBuilder.metric(min));
     }
 
