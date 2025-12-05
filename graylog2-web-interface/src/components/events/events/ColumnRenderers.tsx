@@ -141,6 +141,9 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
     renderCell: (key: string) => <span>{key || <em>No Key set for this Event.</em>}</span>,
     staticWidth: 200,
   },
+  event_id: {
+    staticWidth: 260,
+  },
   id: {
     staticWidth: 300,
   },
@@ -150,11 +153,11 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   },
   priority: {
     renderCell: (priority: number) => <PriorityName priority={priority} />,
-    staticWidth: 100,
+    staticWidth: 'matchHeader',
   },
   event_definition_type: {
     renderCell: (type: string) => <EventDefinitionTypeRenderer type={type} />,
-    staticWidth: 200,
+    staticWidth: 'matchHeader',
   },
   group_by_fields: {
     renderCell: (groupByFields: Record<string, string>) => <GroupByFieldsRenderer groupByFields={groupByFields} />,
@@ -165,7 +168,6 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
   attributes: {
     ...getGeneralEventAttributeRenderers<Event>(),
     event_definition_id: {
-      minWidth: 300,
       width: 0.3,
       renderCell: (eventDefinitionId: string, _, meta: EventsAdditionalData) => (
         <EventDefinitionRenderer meta={meta} eventDefinitionId={eventDefinitionId} />
