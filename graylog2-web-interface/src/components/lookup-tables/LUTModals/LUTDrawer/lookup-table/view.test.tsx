@@ -136,7 +136,7 @@ describe('Lookup Table Details', () => {
     const testKeyValue = 'test_key';
     renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
 
-    userEvent.type(await screen.findByRole('textbox', { name: /key/i }), testKeyValue);
+    userEvent.type(await screen.findByRole('textbox', { name: /Purge key/i }), testKeyValue);
     userEvent.click(await screen.findByRole('button', { name: /Purge key/i }));
 
     expect(mockPurgeLookupTableKey).toHaveBeenCalledWith({ table: LOOKUP_TABLES[0], key: testKeyValue });
