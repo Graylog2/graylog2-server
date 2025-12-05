@@ -66,7 +66,7 @@ const UserSyncSection = ({ authenticationBackend, roles, excludedFields = {} }: 
         <ReadOnlyFormGroup label="ID Attribute" value={userUniqueIdAttribute} />
       )}
       <ReadOnlyFormGroup label="Default Roles" value={rolesList(defaultRoles, roles)} />
-      <ReadOnlyFormGroup label="Default User Time Zone" value={defaultUserTimezone} />
+      <ReadOnlyFormGroup label="Default User Time Zone" value={defaultUserTimezone || "Browser's time zone"} />
     </SectionComponent>
   );
 };
