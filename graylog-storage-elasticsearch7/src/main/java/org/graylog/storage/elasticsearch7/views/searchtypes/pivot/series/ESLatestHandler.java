@@ -29,7 +29,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.m
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 
@@ -43,13 +42,13 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, ParsedFilt
 
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, ESGeneratedQueryContext queryContext) {
         final FilterAggregationBuilder latest = AggregationBuilders.filter(name, QueryBuilders.existsQuery(latestSpec.field()))
                 .subAggregation(AggregationBuilders.topHits(AGG_NAME)
                         .size(1)
                         .fetchSource(latestSpec.field(), null)
                         .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
-        record(queryContext, pivot, latestSpec, name, ParsedFilter.class);
+        queryContext.recordNameForPivotSpec(pivot, latestSpec, name);
         return List.of(SeriesAggregationBuilder.metric(latest));
     }
 
@@ -58,7 +57,6 @@ public class ESLatestHandler extends ESPivotSeriesSpecHandler<Latest, ParsedFilt
                                         Latest pivotSpec,
                                         SearchResponse searchResult,
                                         ParsedFilter filterAggregation,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
         final Optional<Value> latestValue = Optional.ofNullable(latestAggregation)
