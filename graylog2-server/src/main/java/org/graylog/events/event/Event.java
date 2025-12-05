@@ -99,6 +99,10 @@ public interface Event extends Indexable {
 
     void setGroupByFields(Map<String, String> fields);
 
+    Map<String, Double> getAggregationConditions();
+
+    void setAggregationConditions(Map<String, Double> fields);
+
     void setReplayInfo(EventReplayInfo replayInfo);
 
     EventReplayInfo getReplayInfo();
