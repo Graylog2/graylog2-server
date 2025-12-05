@@ -48,6 +48,10 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
   const columnOrder = table.getState().columnOrder;
   const draggableColumns = useMemo(() => columnOrder.filter((id) => !UTILITY_COLUMNS.has(id)), [columnOrder]);
   const { collisionDetection, setLastOverId } = useDndCollisionDetection(draggableColumns);
+  const activeColumn = useMemo(
+    () => (activeId ? table.getAllColumns().find((col) => col.id === activeId) : undefined),
+    [activeId, table],
+  );
 
   const sensors = useSensors(
     useSensor(MouseSensor, {}),
@@ -90,9 +94,7 @@ const TableDndProvider = <Entity extends EntityBase>({ children = undefined, tab
       </SortableContext>
       {createPortal(
         <DragOverlay dropAnimation={null} zIndex={zIndices.modalBody}>
-          {activeId ? (
-            <ThDragOverlay<Entity> column={table.getAllColumns().find((col) => col.id === activeId)} />
-          ) : null}
+          {activeColumn ? <ThDragOverlay<Entity> column={activeColumn} /> : null}
         </DragOverlay>,
         document.body,
       )}

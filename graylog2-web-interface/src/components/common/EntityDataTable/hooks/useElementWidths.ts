@@ -29,7 +29,8 @@ type Props<Entity extends EntityBase, Meta> = {
   displayBulkSelectCol: boolean;
   fixedActionsCellWidth: number | undefined;
   visibleColumns: Array<string>;
-  columnWidthPreferences: { [key: string]: number };
+  columnWidthPreferences: { [colId: string]: number };
+  headerMinWidths: { [colId: string]: number };
 };
 
 const useElementWidths = <Entity extends EntityBase, Meta>({
@@ -39,6 +40,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
   fixedActionsCellWidth,
   visibleColumns,
   columnWidthPreferences,
+  headerMinWidths,
 }: Props<Entity, Meta>) => {
   const tableRef = useRef<HTMLTableElement>(null);
   const actionsRef = useRef<HTMLDivElement>();
@@ -54,6 +56,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     columnIds,
     tableWidth,
     columnWidthPreferences,
+    headerMinWidths,
   });
 
   return { tableRef, actionsRef, columnWidths };

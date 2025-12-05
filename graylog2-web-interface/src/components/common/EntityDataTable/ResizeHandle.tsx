@@ -24,6 +24,7 @@ const Container = styled.div(
   ({ theme }) => css`
     cursor: col-resize;
     color: ${theme.colors.gray[70]};
+    margin-left: ${theme.spacings.xxs};
     user-select: none;
   `,
 );
