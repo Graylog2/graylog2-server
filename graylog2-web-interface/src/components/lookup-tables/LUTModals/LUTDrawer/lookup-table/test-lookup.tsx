@@ -64,12 +64,11 @@ function TestLookup({ table }: Props) {
     lookupPreview: { results, total, supported },
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
 
-  const previewValue = React.useMemo(() => {
-    if (!supported) return "This lookup table doesn't support keys preview";
+  const dataPreview = React.useMemo(() => {
     if (total < 1) return 'No result to show';
 
     return JSON.stringify(results, null, 2);
-  }, [results, total, supported]);
+  }, [results, total]);
 
   const onChange = (event: React.BaseSyntheticEvent) => {
     const newValue = { ...lookupKey };
@@ -111,6 +110,11 @@ function TestLookup({ table }: Props) {
     }
   };
 
+  const showResults = React.useMemo(
+    () => !lutError && (lookupResult || supported),
+    [lutError, lookupResult, supported],
+  );
+
   return (
     <Col $gap="sm">
       <Col $gap="xs">
@@ -147,11 +151,11 @@ function TestLookup({ table }: Props) {
         </form>
       </Col>
       {lutError && <StyledAlert bsStyle="danger">{lutError}</StyledAlert>}
-      {!lutError && (
+      {showResults && (
         <Col $gap="xs" style={{ marginTop: 20 }}>
           <h4 style={{ width: '100%' }}>
             <Row $align="center" $justify="space-between">
-              <span>Lookup result</span>
+              <span>{lookupResult ? 'Lookup result' : 'Data Preview'}</span>
               {supported && total > 0 && (
                 <Row $width="auto" $align="center">
                   <NoMarginInput>
@@ -171,7 +175,7 @@ function TestLookup({ table }: Props) {
               )}
             </Row>
           </h4>
-          <StyledDataWell>{lookupResult ?? previewValue}</StyledDataWell>
+          <StyledDataWell>{lookupResult ?? dataPreview}</StyledDataWell>
         </Col>
       )}
     </Col>
