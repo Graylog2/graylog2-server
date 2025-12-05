@@ -28,7 +28,7 @@ const StyledCommonSortIcon = styled(CommonSortIcon)(
   ({ theme }) => css`
     width: ${SORT_ICON_WIDTH}px;
     display: inline-block;
-    margin-left: ${theme.spacings.xs}; // needs to be updated in column width calculations if changed
+    margin-left: ${theme.spacings.xs};
     padding: 0;
     cursor: pointer;
   `,

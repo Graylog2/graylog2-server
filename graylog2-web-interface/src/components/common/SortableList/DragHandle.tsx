@@ -27,7 +27,7 @@ export const DRAG_HANDLE_WIDTH = 20;
 const Container = styled.button<{ $isDragging: boolean }>(
   ({ $isDragging, theme }) => css`
     width: ${DRAG_HANDLE_WIDTH}px;
-    margin-right: ${theme.spacings.xxs}; // needs to be updated in column width calculations if changed
+    margin-right: ${theme.spacings.xxs};
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
     background: transparent;
     border: 0;

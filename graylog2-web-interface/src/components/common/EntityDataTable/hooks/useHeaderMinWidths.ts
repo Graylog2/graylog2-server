@@ -24,7 +24,7 @@ const useHeaderMinWidths = () => {
   const resizeObserversRef = useRef<Map<HTMLDivElement, ResizeObserver>>(new Map());
   // This refs ensures we keep the ref callbacks stable per (colId, section).
   const refCallbacksRef = useRef<Map<string, (targetHeaderSection: HTMLDivElement | null) => void>>(new Map());
-  const [headerMinWidths, setHeaderMinWidths] = useState<Record<string, number>>({});
+  const [headerMinWidths, setHeaderMinWidths] = useState<{ [colId: string]: number }>({});
 
   const updateWidth = useCallback((colId: string) => {
     const parts = headerSectionsRef.current.get(colId);
