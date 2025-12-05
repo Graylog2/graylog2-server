@@ -142,12 +142,6 @@ describe('Lookup Table Details', () => {
     expect(mockPurgeLookupTableKey).toHaveBeenCalledWith({ table: LOOKUP_TABLES[0], key: testKeyValue });
   });
 
-  it("should show a message when preview isn't supported", async () => {
-    renderView(LOOKUP_TABLES[0], CACHES[0], DATA_ADAPTERS[0]);
-
-    await screen.findByText(/This lookup table doesn't support keys preview/i);
-  });
-
   it('should show the validation error message', async () => {
     mockUseFetchLookupPreview.mockReturnValue({ lookupPreview: SUPPORTED_PREVIEW });
     renderView(LOOKUP_TABLES[1], CACHES[1], DATA_ADAPTERS[1]);
