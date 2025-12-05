@@ -88,6 +88,7 @@ import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.featureflag.FeatureFlags;
 import org.graylog2.indexer.FieldTypeManagementModule;
 import org.graylog2.indexer.IndexerBindings;
+import org.graylog2.indexer.indices.jobs.IndexJobsModule;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
@@ -192,6 +193,7 @@ public class Server extends ServerBootstrap {
                 new DecoratorBindings(),
                 new AlertConditionBindings(),
                 new IndexerBindings(),
+                new IndexJobsModule(),
                 new MigrationsModule(),
                 new NetFlowPluginModule(),
                 new CEFInputModule(),
