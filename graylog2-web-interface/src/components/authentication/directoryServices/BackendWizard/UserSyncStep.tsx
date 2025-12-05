@@ -218,7 +218,6 @@ const UserSyncStep = ({
                 labelClassName="col-sm-3"
                 wrapperClassName="col-sm-9">
                 <TimezoneSelect
-                  className="default-user-timezone-select"
                   value={value || "Browser's time zone"}
                   name="timezone"
                   onChange={(newValue) => onChange({ target: { name, value: newValue } })}
