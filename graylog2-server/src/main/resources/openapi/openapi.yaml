@@ -286,28 +286,33 @@ paths:
       - Hello World
   /api-docs:
     get:
+      deprecated: true
       operationId: overview
       responses:
         default:
           content:
             application/json: {}
           description: default response
-      summary: Get API documentation
+      summary: "Get API documentation - Deprecated: Consider the OpenAPI description\
+        \ at '/api/openapi.yaml' instead."
       tags:
       - Documentation
   /api-docs/global:
     get:
+      deprecated: true
       operationId: globalOverview
       responses:
         default:
           content:
             application/json: {}
           description: default response
-      summary: Get API documentation with cluster global URI path
+      summary: "Get API documentation with cluster global URI path - Deprecated: Consider\
+        \ the OpenAPI description at '/api/openapi.yaml' instead."
       tags:
       - Documentation
   /api-docs/{route}:
     get:
+      deprecated: true
       operationId: route
       parameters:
       - description: Route to fetch. For example /system
@@ -322,7 +327,8 @@ paths:
           content:
             application/json: {}
           description: default response
-      summary: Get detailed API documentation of a single resource
+      summary: "Get detailed API documentation of a single resource - Deprecated:\
+        \ Consider the OpenAPI description at '/api/openapi.yaml' instead."
       tags:
       - Documentation
   /authz/capabilities:

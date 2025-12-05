@@ -38,8 +38,8 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.plugins.DocumentationRestResourceClasses;
 import org.graylog2.shared.rest.documentation.generator.Generator;
+import org.graylog2.shared.rest.documentation.openapi.OpenApiResource;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.rest.resources.csp.CSP;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -50,9 +50,12 @@ import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 
+/**
+ * @deprecated Replaced by OpenAPI description generated with {@link OpenApiResource}.
+ */
+@Deprecated(forRemoval = true)
 @Tag(name = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")
-@CSP(group = CSP.SWAGGER)
 @RequiresAuthentication
 public class DocumentationResource extends RestResource {
 
@@ -86,7 +89,8 @@ public class DocumentationResource extends RestResource {
 
     @GET
     @Timed
-    @Operation(summary = "Get API documentation")
+    @Operation(summary = "Get API documentation " +
+            "- Deprecated: Consider the OpenAPI description at '/api/openapi.yaml' instead.", deprecated = true)
     @Produces(MediaType.APPLICATION_JSON)
     public Response overview() {
         return buildSuccessfulCORSResponse(generator.generateOverview());
@@ -94,7 +98,8 @@ public class DocumentationResource extends RestResource {
 
     @GET
     @Timed
-    @Operation(summary = "Get API documentation with cluster global URI path")
+    @Operation(summary = "Get API documentation with cluster global URI path " +
+            "- Deprecated: Consider the OpenAPI description at '/api/openapi.yaml' instead.", deprecated = true)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/global")
     public Response globalOverview() {
@@ -103,7 +108,8 @@ public class DocumentationResource extends RestResource {
 
     @GET
     @Timed
-    @Operation(summary = "Get detailed API documentation of a single resource")
+    @Operation(summary = "Get detailed API documentation of a single resource " +
+            "- Deprecated: Consider the OpenAPI description at '/api/openapi.yaml' instead.", deprecated = true)
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{route: .+}")
     public Response route(@Parameter(name = "route", description = "Route to fetch. For example /system", required = true)
@@ -126,6 +132,9 @@ public class DocumentationResource extends RestResource {
                 .header("Access-Control-Allow-Origin", "*") // Headers for Swagger UI.
                 .header("Access-Control-Allow-Methods", "GET")
                 .header("Access-Control-Allow-Headers", "Content-Type, api_key, Authorization")
+                // Indicate deprecation in accordance with https://datatracker.ietf.org/doc/rfc9745/.
+                // RFC 9745 date format: @<unix-timestamp> for May 4, 2026 00:00:00 UTC (Graylog 7.1.0 release date)
+                .header("Deprecation", "@1777852800")
                 .build();
     }
 }
