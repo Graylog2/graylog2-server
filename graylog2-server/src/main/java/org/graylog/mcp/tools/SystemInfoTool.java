@@ -24,6 +24,7 @@ import org.graylog.mcp.server.Tool;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.security.RestPermissions;
@@ -37,17 +38,17 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
     public static String NAME = "get_system_status";
 
     private final ServerStatus serverStatus;
-    private final CustomizationConfig customizationConfig;
     private final LeaderElectionService leaderElectionService;
+    private final CustomizationConfig customizationConfig;
 
     @Inject
-    public SystemInfoTool(ObjectMapper objectMapper,
-                          SchemaGeneratorProvider schemaGeneratorProvider,
-                          ServerStatus serverStatus,
-                          CustomizationConfig customizationConfig,
-                          LeaderElectionService leaderElectionService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public SystemInfoTool(ServerStatus serverStatus,
+                          LeaderElectionService leaderElectionService,
+                          final CustomizationConfig customizationConfig,
+                          final ObjectMapper objectMapper,
+                          final ClusterConfigService clusterConfigService,
+                          final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
@@ -55,10 +56,14 @@ public class SystemInfoTool extends Tool<SystemInfoTool.Parameters, SystemOvervi
                 """
                         Returns system information about the %s installation, including
                         cluster ID, installed version, hostname, timezone, and operating system.
-                        """.formatted(customizationConfig.productName()));
+                        """.formatted(customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.serverStatus = serverStatus;
-        this.customizationConfig = customizationConfig;
         this.leaderElectionService = leaderElectionService;
+        this.customizationConfig = customizationConfig;
     }
 
     @Override

@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.inject.Inject;
 import org.graylog.mcp.server.SchemaGeneratorProvider;
 import org.graylog.mcp.server.Tool;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.graylog2.web.customization.CustomizationConfig;
@@ -37,17 +38,21 @@ public class ListStreamsTool extends Tool<ListStreamsTool.Parameters, String> {
     private final StreamService streamService;
 
     @Inject
-    public ListStreamsTool(ObjectMapper objectMapper,
-                           CustomizationConfig customizationConfig,
-                           SchemaGeneratorProvider schemaGeneratorProvider,
-                           StreamService streamService) {
-        super(objectMapper,
-                schemaGeneratorProvider,
+    public ListStreamsTool(StreamService streamService,
+                           final CustomizationConfig customizationConfig,
+                           final ObjectMapper objectMapper,
+                           final ClusterConfigService clusterConfigService,
+                           final SchemaGeneratorProvider schemaGeneratorProvider) {
+        super(
                 new TypeReference<>() {},
                 new TypeReference<>() {},
                 NAME,
                 f("List all %s Streams", customizationConfig.productName()),
-                f("List all available streams in the %s instance.", customizationConfig.productName()));
+                f("List all available streams in the %s instance.", customizationConfig.productName()),
+                objectMapper,
+                clusterConfigService,
+                schemaGeneratorProvider
+        );
         this.streamService = streamService;
     }
 
