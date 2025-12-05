@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -254,9 +254,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 }: Props<Entity, Meta>) => {
   const { headerMinWidths, registerHeaderSection } = useHeaderMinWidths();
 
-  useEffect(() => {
-    console.log('Header min widths updated:', headerMinWidths);
-  }, [headerMinWidths]);
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
@@ -305,7 +302,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     entityAttributesAreCamelCase,
     meta,
   });
-
   const table = useTable<Entity>({
     columnOrder,
     columnRenderersByAttribute,
