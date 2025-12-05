@@ -24,8 +24,8 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggrega
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -33,7 +33,7 @@ public abstract class OSBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
         extends OSPivotSeriesSpecHandler<SPEC_TYPE, AGGREGATION_RESULT> {
 
     @Override
-    public @NotNull List<SeriesAggregationBuilder> doCreateAggregation(String name,
+    public @Nonnull List<SeriesAggregationBuilder> doCreateAggregation(String name,
                                                                        Pivot pivot,
                                                                        SPEC_TYPE seriesSpec,
                                                                        OSGeneratedQueryContext queryContext) {

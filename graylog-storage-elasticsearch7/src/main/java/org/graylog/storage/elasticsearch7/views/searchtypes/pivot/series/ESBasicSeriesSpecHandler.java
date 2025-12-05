@@ -23,8 +23,8 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.A
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,7 +32,7 @@ public abstract class ESBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
         extends ESPivotSeriesSpecHandler<SPEC_TYPE, AGGREGATION_RESULT> {
 
     @Override
-    public @NotNull List<SeriesAggregationBuilder> doCreateAggregation(String name,
+    public @Nonnull List<SeriesAggregationBuilder> doCreateAggregation(String name,
                                                                        Pivot pivot,
                                                                        SPEC_TYPE seriesSpec,
                                                                        ESGeneratedQueryContext queryContext) {
