@@ -110,7 +110,7 @@ public class InputsResource extends AbstractInputsResource {
             EntityAttribute.builder().id(MessageInput.FIELD_ID).title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_TITLE).title("Title").type(SearchQueryField.Type.STRING).searchable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_TYPE).title("Type").type(SearchQueryField.Type.STRING).searchable(true).build(),
-            EntityAttribute.builder().id(MessageInput.FIELD_NODE_ID).title("Node").type(SearchQueryField.Type.STRING).filterable(true).build(),
+            EntityAttribute.builder().id(MessageInput.FIELD_NODE_ID).title("Node").relatedCollection("nodes").relatedIdentifier("node_id").relatedProperty("hostname").type(SearchQueryField.Type.STRING).filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_GLOBAL).title("Global").type(SearchQueryField.Type.BOOLEAN).filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_CREATED_AT).title("Created").type(SearchQueryField.Type.DATE).filterable(true).build(),
             EntityAttribute.builder().id(MessageInput.FIELD_DESIRED_STATE).title("State").type(SearchQueryField.Type.STRING).filterable(true).build()

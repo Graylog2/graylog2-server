@@ -60,6 +60,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
     @Override
     public EntitySuggestionResponse suggest(final String collection,
+                                            final String targetColumn,
                                             final String valueColumn,
                                             final String query,
                                             final int page,
@@ -77,7 +78,7 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
 
         final var resultWithoutPagination = mongoCollection
                 .find(bsonFilter)
-                .projection(Projections.include(valueColumn))
+                .projection(Projections.include(targetColumn, valueColumn))
                 .sort(Sorts.ascending(valueColumn));
 
         final var userCanReadAllEntities = permissionsUtils.hasAllPermission(subject) || permissionsUtils.hasReadPermissionForWholeCollection(subject, collection);
@@ -89,12 +90,13 @@ public class MongoEntitySuggestionService implements EntitySuggestionService {
                 ? mongoPaginate(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip)
                 : paginateWithPermissionCheck(resultWithoutPagination, perPage - fixNumberOfItemsToReadFromDB, skip, checkPermission)) {
 
-            final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, "admin")) : List.of();
+            final List<EntitySuggestion> staticEntry = isFirstPageAndSpecialCollection ? List.of(new EntitySuggestion(LOCAL_ADMIN_ID, null, "admin")) : List.of();
 
             final Stream<EntitySuggestion> suggestionsFromDB = documents
                     .map(doc ->
                             new EntitySuggestion(
-                                    doc.getObjectId(ID_FIELD).toString(),
+                                    doc.getObjectId("_id").toHexString(),
+                                    doc.getString(targetColumn),
                                     doc.getString(valueColumn)
                             )
                     );
