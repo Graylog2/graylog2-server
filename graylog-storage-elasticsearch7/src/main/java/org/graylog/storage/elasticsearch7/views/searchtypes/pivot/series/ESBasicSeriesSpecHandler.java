@@ -26,6 +26,7 @@ import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregat
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public abstract class ESBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
@@ -49,11 +50,12 @@ public abstract class ESBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
                                         AGGREGATION_RESULT aggregationResult,
                                         ESGeneratedQueryContext queryContext) {
 
-        return Stream.of(Value.create(
-                seriesSpec.id(),
-                seriesSpec.type(),
-                getValueFromAggregationResult(aggregationResult, seriesSpec))
-        );
+        return Optional.ofNullable(getValueFromAggregationResult(aggregationResult, seriesSpec))
+                .map(res -> Value.create(
+                        seriesSpec.id(),
+                        seriesSpec.type(),
+                        res))
+                .stream();
     }
 
     protected abstract Object getValueFromAggregationResult(final AGGREGATION_RESULT aggregationResult, final SPEC_TYPE seriesSpec);

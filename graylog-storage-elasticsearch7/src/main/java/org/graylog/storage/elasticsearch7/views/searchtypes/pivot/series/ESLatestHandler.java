@@ -46,13 +46,13 @@ public class ESLatestHandler extends ESBasicSeriesSpecHandler<Latest, ParsedFilt
     @Override
     protected Object getValueFromAggregationResult(final ParsedFilter filterAggregation, final Latest seriesSpec) {
         final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
-        final Optional<Object> latestValue = Optional.ofNullable(latestAggregation)
+        return Optional.ofNullable(latestAggregation)
                 .map(TopHits::getHits)
                 .map(SearchHits::getHits)
                 .filter(hits -> hits.length > 0)
                 .map(hits -> hits[0])
                 .map(SearchHit::getSourceAsMap)
-                .map(source -> source.get(seriesSpec.field()));
-        return latestValue.stream();
+                .map(source -> source.get(seriesSpec.field()))
+                .orElse(null);
     }
 }

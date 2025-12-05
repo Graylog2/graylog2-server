@@ -27,6 +27,7 @@ import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregation
 
 import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public abstract class OSBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
@@ -50,11 +51,12 @@ public abstract class OSBasicSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGG
                                                           AGGREGATION_RESULT aggregationResult,
                                                           OSGeneratedQueryContext queryContext) {
 
-        return Stream.of(SeriesSpecHandler.Value.create(
-                seriesSpec.id(),
-                seriesSpec.type(),
-                getValueFromAggregationResult(aggregationResult, seriesSpec))
-        );
+        return Optional.ofNullable(getValueFromAggregationResult(aggregationResult, seriesSpec))
+                .map(res -> Value.create(
+                        seriesSpec.id(),
+                        seriesSpec.type(),
+                        res))
+                .stream();
     }
 
     protected abstract Object getValueFromAggregationResult(final AGGREGATION_RESULT aggregationResult, final SPEC_TYPE seriesSpec);
