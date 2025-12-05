@@ -152,21 +152,23 @@ function TestLookup({ table }: Props) {
           <h4 style={{ width: '100%' }}>
             <Row $align="center" $justify="space-between">
               <span>Lookup result</span>
-              <Row $width="auto" $align="center">
-                <NoMarginInput>
-                  <Input
-                    type="number"
-                    bsSize="sm"
-                    onChange={onPreviewSizeChange}
-                    value={previewSize > total ? total : previewSize}
-                    style={{ marginLeft: 'auto' }}
-                    min={1}
-                    max={total}
-                  />
-                </NoMarginInput>
-                <Description>of</Description>
-                <Description>{total}</Description>
-              </Row>
+              {supported && total > 0 && (
+                <Row $width="auto" $align="center">
+                  <NoMarginInput>
+                    <Input
+                      type="number"
+                      bsSize="sm"
+                      onChange={onPreviewSizeChange}
+                      value={previewSize > total ? total : previewSize}
+                      style={{ marginLeft: 'auto' }}
+                      min={1}
+                      max={total}
+                    />
+                  </NoMarginInput>
+                  <Description>of</Description>
+                  <Description>{total}</Description>
+                </Row>
+              )}
             </Row>
           </h4>
           <StyledDataWell>{lookupResult ?? previewValue}</StyledDataWell>
