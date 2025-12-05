@@ -284,11 +284,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const { tableRef, actionsRef, columnWidths } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
+    columnWidthPreferences: internalColumnWidthPreferences,
     displayBulkSelectCol,
     fixedActionsCellWidth,
-    visibleColumns: columnOrder,
-    columnWidthPreferences: internalColumnWidthPreferences,
     headerMinWidths,
+    visibleColumns: columnOrder,
   });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
@@ -310,6 +310,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     defaultColumnOrder,
     displayBulkSelectCol,
     entities,
+    headerMinWidths,
     internalColumnWidthPreferences,
     isEntitySelectable,
     layoutPreferences,

@@ -58,6 +58,7 @@ const calculateColumnWidths = ({
   columnWidthPreferences,
   bulkSelectColWidth,
   staticColumnWidths,
+  headerMinWidths,
 }: {
   actionColMinWidth: number;
   assignableWidth: number;
@@ -66,6 +67,7 @@ const calculateColumnWidths = ({
   columnWidthPreferences: { [key: string]: number } | undefined;
   bulkSelectColWidth?: number;
   staticColumnWidths: { [colId: string]: number };
+  headerMinWidths: { [colId: string]: number };
 }) => {
   const totalFlexColumns = attributeColumnIds.reduce((total, id) => {
     const { width = DEFAULT_COL_WIDTH } = attributeColumnRenderers[id] ?? {};
@@ -82,10 +84,12 @@ const calculateColumnWidths = ({
   return {
     ...Object.fromEntries(
       attributeColumnIds.map((id) => {
-        const { width = DEFAULT_COL_WIDTH, minWidth = DEFAULT_COL_MIN_WIDTH } = attributeColumnRenderers[id] ?? {};
+        const { width = DEFAULT_COL_WIDTH, minWidth } = attributeColumnRenderers[id] ?? {};
         const targetWidth = columnWidthPreferences?.[id] ?? staticColumnWidths[id] ?? Math.floor(flexColWidth * width);
+        const resolvedMinWidth =
+          (minWidth ?? headerMinWidths[id] > DEFAULT_COL_MIN_WIDTH) ? headerMinWidths[id] : DEFAULT_COL_MIN_WIDTH;
 
-        return [id, !staticColumnWidths[id] && targetWidth < minWidth ? minWidth : targetWidth];
+        return [id, !staticColumnWidths[id] && targetWidth < resolvedMinWidth ? resolvedMinWidth : targetWidth];
       }),
     ),
     [ACTIONS_COL_ID]:
@@ -94,7 +98,7 @@ const calculateColumnWidths = ({
   };
 };
 
-const calculateStaticColumnWidth = ({
+const calculateStaticColumnWidths = ({
   attributeColumnIds,
   attributeColumnRenderers,
   headerMinWidths,
@@ -135,7 +139,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   const [columnWidths, setColumnWidths] = useState({});
   const staticColumnWidths = useMemo(
     () =>
-      calculateStaticColumnWidth({
+      calculateStaticColumnWidths({
         attributeColumnIds: columnIds,
         attributeColumnRenderers: columnRenderersByAttribute,
         headerMinWidths,
@@ -168,6 +172,7 @@ const useColumnWidths = <Entity extends EntityBase>({
         columnWidthPreferences,
         bulkSelectColWidth,
         staticColumnWidths,
+        headerMinWidths,
       }),
     );
   }, [
@@ -178,6 +183,7 @@ const useColumnWidths = <Entity extends EntityBase>({
     tableWidth,
     columnWidthPreferences,
     staticColumnWidths,
+    headerMinWidths,
   ]);
 
   return columnWidths;

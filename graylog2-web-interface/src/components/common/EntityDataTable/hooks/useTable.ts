@@ -69,6 +69,7 @@ type Props<Entity extends EntityBase> = {
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
+  headerMinWidths: { [colId: string]: number };
   isEntitySelectable: (entity: Entity) => boolean | undefined;
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -93,6 +94,7 @@ const useTable = <Entity extends EntityBase>({
   defaultColumnOrder,
   displayBulkSelectCol,
   entities,
+  headerMinWidths,
   isEntitySelectable = () => true,
   layoutPreferences,
   onChangeSelection,
@@ -202,7 +204,11 @@ const useTable = <Entity extends EntityBase>({
       const clampedAttributeWidths = Object.fromEntries(
         Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
           colId,
-          Math.max(width, columnRenderersByAttribute[colId]?.minWidth ?? DEFAULT_COL_MIN_WIDTH),
+          Math.max(
+            width,
+            columnRenderersByAttribute[colId]?.minWidth ??
+              (headerMinWidths[colId] > DEFAULT_COL_MIN_WIDTH ? headerMinWidths[colId] : DEFAULT_COL_MIN_WIDTH),
+          ),
         ]),
       );
 
