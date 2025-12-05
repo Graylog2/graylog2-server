@@ -23,7 +23,7 @@ import {
   BULK_SELECT_COL_ID,
 } from 'components/common/EntityDataTable/Constants';
 
-import type { EntityBase, ColumnRenderersByAttribute, ColumnSchema } from '../types';
+import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
 const HEADER_PADDING = 10; // px
 
@@ -39,8 +39,8 @@ const assignableTableWidth = ({
   bulkSelectColWidth: number;
   columnIds: Array<string>;
   tableWidth: number;
-  columnWidthPreferences: { [key: string]: number } | undefined;
-  staticColumnWidths: Record<string, number>;
+  columnWidthPreferences: { [colId: string]: number } | undefined;
+  staticColumnWidths: { [colId: string]: number };
 }) => {
   const staticColWidths = columnIds.reduce(
     (total, id) => total + (columnWidthPreferences?.[id] ?? staticColumnWidths[id] ?? 0),
@@ -65,7 +65,7 @@ const calculateColumnWidths = ({
   attributeColumnIds: Array<string>;
   columnWidthPreferences: { [key: string]: number } | undefined;
   bulkSelectColWidth?: number;
-  staticColumnWidths: Record<string, number>;
+  staticColumnWidths: { [colId: string]: number };
 }) => {
   const totalFlexColumns = attributeColumnIds.reduce((total, id) => {
     const { width = DEFAULT_COL_WIDTH } = attributeColumnRenderers[id] ?? {};
@@ -103,7 +103,7 @@ const calculateStaticColumnWidth = ({
   attributeColumnRenderers: ColumnRenderersByAttribute<EntityBase>;
   headerMinWidths: { [colId: string]: number };
 }) =>
-  attributeColumnIds.reduce<Record<string, number>>((staticWidths, id) => {
+  attributeColumnIds.reduce((staticWidths, id) => {
     const staticWidth = attributeColumnRenderers[id]?.staticWidth;
 
     if (!staticWidth) {
@@ -130,7 +130,6 @@ const useColumnWidths = <Entity extends EntityBase>({
   columnIds: Array<string>;
   tableWidth: number;
   columnWidthPreferences: { [key: string]: number } | undefined;
-  columnSchemas: Array<ColumnSchema>;
   headerMinWidths: { [colId: string]: number };
 }) => {
   const [columnWidths, setColumnWidths] = useState({});
