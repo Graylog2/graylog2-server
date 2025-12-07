@@ -15,79 +15,56 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-type HeaderParts = Map<string, { left?: HTMLDivElement; right?: HTMLDivElement }>;
+import useObservedElementDimensions from 'hooks/useObservedElementDimensions';
 
 const useHeaderMinWidths = () => {
-  const headerSectionsRef = useRef<HeaderParts>(new Map());
-  const resizeObserversRef = useRef<Map<HTMLDivElement, ResizeObserver>>(new Map());
-  // This refs ensures we keep the ref callbacks stable per (colId, section).
   const refCallbacksRef = useRef<Map<string, (targetHeaderSection: HTMLDivElement | null) => void>>(new Map());
+  const { register, dimensions } = useObservedElementDimensions<HTMLDivElement>();
   const [headerMinWidths, setHeaderMinWidths] = useState<{ [colId: string]: number }>({});
-
-  const updateWidth = useCallback((colId: string) => {
-    const parts = headerSectionsRef.current.get(colId);
-    const nextWidth = Math.round(
-      (parts?.left?.getBoundingClientRect().width ?? 0) + (parts?.right?.getBoundingClientRect().width ?? 0),
-    );
-
-    setHeaderMinWidths((cur) => (cur[colId] === nextWidth ? cur : { ...cur, [colId]: nextWidth }));
-  }, []);
-
-  useEffect(
-    () => () => {
-      resizeObserversRef.current.forEach((observer) => observer.disconnect());
-    },
-    [],
-  );
+  const separator = useMemo(() => '__header-section__', []);
 
   const registerHeaderSection = useCallback(
     (colId: string, part: 'left' | 'right') => {
-      const callbackKey = `${colId}-${part}`;
+      const callbackKey = `${colId}${separator}${part}`;
       const existing = refCallbacksRef.current.get(callbackKey);
 
       if (existing) {
         return existing;
       }
 
-      let currentNode: HTMLDivElement | null = null;
+      const observedRefCallback = register(callbackKey);
 
       const refCallback = (targetHeaderSection: HTMLDivElement | null) => {
-        const currentHeaderSections = headerSectionsRef.current.get(colId) ?? {};
-
-        // If React swaps the DOM node (e.g. reorder/unmount/remount), drop the old observer before wiring the new one.
-        if (currentNode && targetHeaderSection !== currentNode) {
-          resizeObserversRef.current.get(currentNode)?.disconnect();
-          resizeObserversRef.current.delete(currentNode);
-          if (currentHeaderSections[part] === currentNode) {
-            currentHeaderSections[part] = undefined;
-          }
-        }
-
-        if (targetHeaderSection) {
-          currentHeaderSections[part] = targetHeaderSection;
-          currentNode = targetHeaderSection;
-          if (!resizeObserversRef.current.has(targetHeaderSection)) {
-            const observer = new ResizeObserver(() => updateWidth(colId));
-            observer.observe(targetHeaderSection);
-            resizeObserversRef.current.set(targetHeaderSection, observer);
-          }
-        } else {
-          currentNode = null;
-          currentHeaderSections[part] = undefined;
-        }
-
-        headerSectionsRef.current.set(colId, currentHeaderSections);
-        updateWidth(colId);
+        console.log('registerHeaderPart called for colId:', colId, 'part:', part, 'tableHeader:', targetHeaderSection);
+        observedRefCallback(targetHeaderSection);
       };
 
       refCallbacksRef.current.set(callbackKey, refCallback);
 
       return refCallback;
     },
-    [updateWidth],
+    [register, separator],
   );
+
+  useEffect(() => {
+    const aggregated: { [colId: string]: number } = {};
+
+    Object.entries(dimensions).forEach(([key, { width }]) => {
+      const [colId, part] = key.split(separator);
+      if (!colId || !part) return;
+      aggregated[colId] = (aggregated[colId] ?? 0) + Math.round(width);
+    });
+
+    setHeaderMinWidths((cur) => {
+      const keysMatch =
+        Object.keys(cur).length === Object.keys(aggregated).length &&
+        Object.entries(aggregated).every(([k, v]) => cur[k] === v);
+
+      return keysMatch ? cur : aggregated;
+    });
+  }, [dimensions, separator]);
 
   return { registerHeaderSection, headerMinWidths };
 };

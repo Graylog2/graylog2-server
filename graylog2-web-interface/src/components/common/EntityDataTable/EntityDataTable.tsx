@@ -253,7 +253,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   pageSize = undefined,
 }: Props<Entity, Meta>) => {
   const { headerMinWidths, registerHeaderSection } = useHeaderMinWidths();
-
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
