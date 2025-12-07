@@ -131,11 +131,11 @@ const columnRenderers: ColumnRenderers<CacheEntity> = {
       renderCell: (name: string) => <span>{name}</span>,
     },
     entries: {
-      staticWidth: 150,
+      staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <EntriesCol cache={cache} />,
     },
     hit_rate: {
-      staticWidth: 150,
+      staticWidth: 'matchHeader',
       renderCell: (_arg: unknown, cache: CacheEntity) => <HitRateCol cache={cache} />,
     },
     throughput: {
