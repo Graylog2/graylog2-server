@@ -15,12 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useLayoutEffect } from 'react';
+import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
 import styled, { css } from 'styled-components';
 import type { Header, HeaderGroup } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import useResizeObserver from '@react-hook/resize-observer';
 
 import DragHandle from 'components/common/SortableList/DragHandle';
 import {
@@ -35,6 +36,7 @@ import SortIcon from './SortIcon';
 import DndStylesContext from './contexts/DndStylesContext';
 import ResizeHandle from './ResizeHandle';
 import type { EntityBase, ColumnMetaContext } from './types';
+import useHeaderSectionObserver from './hooks/useHeaderSectionObserver';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -103,17 +105,19 @@ const useSortableCol = (colId: string, disabled: boolean) => {
 const TableHeaderCell = <Entity extends EntityBase>({
   header,
   hasRowActions,
-  registerHeaderSection,
+  onHeaderSectionResize,
 }: {
   header: Header<Entity, unknown>;
   hasRowActions: boolean;
-  registerHeaderSection: (colId: string, part: 'left' | 'right') => (tableHeader: HTMLDivElement | null) => void;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
     header.column.id,
     !columnMeta?.enableColumnOrdering,
   );
+  const leftRef = useHeaderSectionObserver(header.column.id, 'left', onHeaderSectionResize);
+  const rightRef = useHeaderSectionObserver(header.column.id, 'right', onHeaderSectionResize);
 
   return (
     <Th
@@ -123,7 +127,7 @@ const TableHeaderCell = <Entity extends EntityBase>({
       $colId={header.column.id}
       $hidePadding={!hasRowActions && header.column.id === ACTIONS_COL_ID}>
       <ThInner>
-        <LeftCol ref={registerHeaderSection(header.column.id, 'left')}>
+        <LeftCol ref={leftRef}>
           {columnMeta?.enableColumnOrdering && (
             <DragHandle
               ref={setActivatorNodeRef}
@@ -136,7 +140,7 @@ const TableHeaderCell = <Entity extends EntityBase>({
           {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
           {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
         </LeftCol>
-        <RightCol ref={registerHeaderSection(header.column.id, 'right')}>
+        <RightCol ref={rightRef}>
           {header.column.getCanResize() && (
             <ResizeHandle
               onMouseDown={header.getResizeHandler()}
@@ -153,13 +157,13 @@ const TableHeaderCell = <Entity extends EntityBase>({
 type Props<Entity extends EntityBase> = {
   hasRowActions: boolean;
   headerGroups: Array<HeaderGroup<Entity>>;
-  registerHeaderSection: (colId: string, part: 'left' | 'right') => (tableHeader: HTMLDivElement | null) => void;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 };
 
 const TableHead = <Entity extends EntityBase>({
   headerGroups,
   hasRowActions,
-  registerHeaderSection,
+  onHeaderSectionResize,
 }: Props<Entity>) => (
   <Thead>
     {headerGroups.map((headerGroup) => (
@@ -169,7 +173,7 @@ const TableHead = <Entity extends EntityBase>({
             key={header.id}
             header={header}
             hasRowActions={hasRowActions}
-            registerHeaderSection={registerHeaderSection}
+            onHeaderSectionResize={onHeaderSectionResize}
           />
         ))}
       </tr>

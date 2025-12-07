@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -36,7 +36,6 @@ import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVi
 import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
 import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
 import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
-import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
@@ -252,7 +251,37 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
 }: Props<Entity, Meta>) => {
-  const { headerMinWidths, registerHeaderSection } = useHeaderMinWidths();
+  const [headerSectionsWidth, setHeaderSectionsWidth] = useState<{
+    [colId: string]: { left?: number; right?: number };
+  }>({});
+  const headerMinWidths = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(headerSectionsWidth).map(([colId, { left = 0, right = 0 }]) => [
+          colId,
+          Math.round(left + right),
+        ]),
+      ),
+    [headerSectionsWidth],
+  );
+
+  useEffect(() => {
+    // Reset header sections width when layout preferences change
+    console.log('headerMinWidths', headerMinWidths);
+  }, [headerMinWidths]);
+
+  const handleHeaderSectionResize = useCallback((colId: string, part: 'left' | 'right', width: number) => {
+    setHeaderSectionsWidth((cur) => {
+      const currentCol = cur[colId] ?? {};
+      const roundedWidth = Math.round(width);
+
+      if (currentCol[part] === roundedWidth) {
+        return cur;
+      }
+
+      return { ...cur, [colId]: { ...currentCol, [part]: roundedWidth } };
+    });
+  }, []);
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
@@ -359,7 +388,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                   $activeColId={activeColId}
                   $columnTransform={columnTransform}>
                   <Table<Entity>
-                    registerHeaderSection={registerHeaderSection}
+                    onHeaderSectionResize={handleHeaderSectionResize}
                     expandedSectionRenderers={expandedSectionRenderers}
                     headerGroups={headerGroups}
                     rows={table.getRowModel().rows}
