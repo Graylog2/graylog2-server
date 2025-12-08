@@ -124,7 +124,7 @@ public class CloudTrailDriver {
             final String newInputId = inputService.save(input);
             LOG.info("New CloudTrail input created. id [{}] request [{}]", newInputId, request);
 
-            return input;
+            return inputService.find(newInputId);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered. {}", ExceptionUtils.getRootCauseMessage(e));
             throw new NotFoundException("There is no such input type registered.", e);

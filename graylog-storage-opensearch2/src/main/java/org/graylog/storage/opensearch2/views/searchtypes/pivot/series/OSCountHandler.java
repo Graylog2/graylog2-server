@@ -30,7 +30,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch2.views.searchtypes.OSSearchTypeHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch2.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.slf4j.Logger;
@@ -47,12 +46,11 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, OSGeneratedQueryContext queryContext) {
         return count.field()
                 .map(field -> {
                     // the request was for a field count, we have to add a value_count sub aggregation
                     final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
-                    queryContext.recordNameForPivotSpec(pivot, count, name);
                     queryContext.recordNameForPivotSpec(pivot, count, name);
                     return List.of(SeriesAggregationBuilder.metric(value));
                 })
@@ -65,7 +63,6 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
                                         Count count,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
                                         OSGeneratedQueryContext esGeneratedQueryContext) {
         final Object value;
         if (valueCount == null) {
