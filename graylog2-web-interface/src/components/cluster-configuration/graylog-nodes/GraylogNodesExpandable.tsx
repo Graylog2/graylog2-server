@@ -97,7 +97,6 @@ const GraylogNodesExpandable = ({
             columnSchemas={columnSchemas}
             columnRenderers={columnRenderers}
             onResetLayoutPreferences={resetLayoutPreferences}
-            minActionsCellWidth={160}
           />
         );
       })()}

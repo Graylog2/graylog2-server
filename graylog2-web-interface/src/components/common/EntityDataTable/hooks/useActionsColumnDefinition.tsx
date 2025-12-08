@@ -16,46 +16,78 @@
  */
 
 import * as React from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useLayoutEffect } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import styled from 'styled-components';
+import useResizeObserver from '@react-hook/resize-observer';
 
 import { ButtonToolbar } from 'components/bootstrap';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
-const Actions = styled(ButtonToolbar)`
+const Actions = styled.div`
+  display: flex;
   justify-content: flex-end;
 `;
 
-const useActionsColumnDefinition = <Entity extends EntityBase>(
-  hasRowActions: boolean,
-  actionsColWidth: number,
-  entityActions: (entity: Entity) => React.ReactNode | undefined,
-  colRef: React.MutableRefObject<HTMLDivElement>,
-) => {
+const ActionCell = <Entity extends EntityBase>({
+  row,
+  entityActions,
+  onWidthChange,
+}: {
+  row: Row<Entity>;
+  entityActions: (entity: Entity) => React.ReactNode | undefined;
+  onWidthChange: (width: number) => void;
+}) => {
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (ref.current) {
+      onWidthChange(ref.current.getBoundingClientRect().width);
+    }
+  }, [onWidthChange]);
+
+  useResizeObserver(ref, ({ contentRect: { width } }) => onWidthChange(width));
+
+  return (
+    <Actions>
+      <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
+    </Actions>
+  );
+};
+
+const useActionsColumnDefinition = <Entity extends EntityBase>({
+  hasRowActions,
+  colWidth,
+  entityActions,
+  onWidthChange,
+}: {
+  hasRowActions: boolean;
+  colWidth: number;
+  entityActions: (entity: Entity) => React.ReactNode | undefined;
+  onWidthChange: (width: number) => void;
+}) => {
   const columnHelper = createColumnHelper<Entity>();
 
   const cell = useCallback(
-    ({ row }: { row: Row<Entity> }) => (
-      <div ref={colRef}>
-        <Actions>{entityActions(row.original)}</Actions>
-      </div>
-    ),
-    [colRef, entityActions],
+    ({ row }: { row: Row<Entity> }) =>
+      entityActions ? (
+        <ActionCell<Entity> row={row} entityActions={entityActions} onWidthChange={onWidthChange} />
+      ) : null,
+    [entityActions, onWidthChange],
   );
 
   return useMemo(
     () =>
       columnHelper.display({
         id: ACTIONS_COL_ID,
-        size: actionsColWidth,
+        size: colWidth,
         enableHiding: false,
         enableResizing: false,
         cell: hasRowActions ? cell : undefined,
       }),
-    [actionsColWidth, cell, columnHelper, hasRowActions],
+    [colWidth, cell, columnHelper, hasRowActions],
   );
 };
 export default useActionsColumnDefinition;

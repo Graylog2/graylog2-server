@@ -22,44 +22,43 @@ import type { ColumnSchema } from 'components/common/EntityDataTable';
 import useElementDimensions from 'hooks/useElementDimensions';
 import { BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
 import useColumnWidths from 'components/common/EntityDataTable/hooks/useColumnWidths';
+import useActionsColumnWidth from 'components/common/EntityDataTable/hooks/useActionsColumnWidth';
 
 type Props<Entity extends EntityBase, Meta> = {
-  columnSchemas: Array<ColumnSchema>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
-  displayBulkSelectCol: boolean;
-  fixedActionsCellWidth: number | undefined;
-  visibleColumns: Array<string>;
+  columnSchemas: Array<ColumnSchema>;
   columnWidthPreferences: { [colId: string]: number };
+  displayBulkSelectCol: boolean;
   headerMinWidths: { [colId: string]: number };
+  visibleColumns: Array<string>;
 };
 
 const useElementWidths = <Entity extends EntityBase, Meta>({
-  columnSchemas,
   columnRenderersByAttribute,
-  displayBulkSelectCol,
-  fixedActionsCellWidth,
-  visibleColumns,
+  columnSchemas,
   columnWidthPreferences,
+  displayBulkSelectCol,
   headerMinWidths,
+  visibleColumns,
 }: Props<Entity, Meta>) => {
   const tableRef = useRef<HTMLTableElement>(null);
-  const actionsRef = useRef<HTMLDivElement>();
+  const { maxWidth: actionsColWidth, handleWidthChange: handleActionsWidthChange } = useActionsColumnWidth();
   const { width: tableWidth } = useElementDimensions(tableRef);
   const columnIds = useMemo(
     () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
     [columnSchemas, visibleColumns],
   );
   const columnWidths = useColumnWidths<Entity>({
-    actionsColWidth: fixedActionsCellWidth,
+    actionsColWidth,
     bulkSelectColWidth: displayBulkSelectCol ? BULK_SELECT_COLUMN_WIDTH : 0,
-    columnRenderersByAttribute,
     columnIds,
-    tableWidth,
+    columnRenderersByAttribute,
     columnWidthPreferences,
     headerMinWidths,
+    tableWidth,
   });
 
-  return { tableRef, actionsRef, columnWidths };
+  return { tableRef, handleActionsWidthChange, columnWidths };
 };
 
 export default useElementWidths;

@@ -41,6 +41,7 @@ import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import { columnTransformVar, columnWidthVar, columnOpacityVar } from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
+import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
 import type {
   ColumnRenderers,
@@ -132,29 +133,34 @@ const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
   }, [columnSchemas, customColumnRenderers]);
 
 const useColumnDefinitions = <Entity extends EntityBase, Meta>({
-  actionsRef,
   columnRenderersByAttribute,
   columnSchemas,
   columnWidths,
-  hasRowActions,
   displayBulkSelectCol,
   entityActions,
   entityAttributesAreCamelCase,
+  hasRowActions,
   meta,
+  onActionsWidthChange,
 }: {
-  actionsRef: React.MutableRefObject<HTMLDivElement>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
   columnWidths: { [_attributeId: string]: number };
-  hasRowActions: boolean;
   displayBulkSelectCol: boolean;
   entityActions?: (entity: Entity) => React.ReactNode;
   entityAttributesAreCamelCase: boolean;
+  hasRowActions: boolean;
   meta: Meta;
+  onActionsWidthChange: (width: number) => void;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol);
-  const actionsCol = useActionsColumnDefinition(hasRowActions, columnWidths.actions, entityActions, actionsRef);
+  const actionsCol = useActionsColumnDefinition<Entity>({
+    colWidth: columnWidths[ACTIONS_COL_ID],
+    entityActions,
+    hasRowActions,
+    onWidthChange: onActionsWidthChange,
+  });
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
     columnSchemas,
     columnRenderersByAttribute,
@@ -174,8 +180,6 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
 };
 
 type Props<Entity extends EntityBase, Meta = unknown> = {
-  /** Min width of actions cell **/
-  minActionsCellWidth?: number;
   /** Currently active sort */
   activeSort?: Sort;
   /**
@@ -245,7 +249,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   expandedSectionRenderers = undefined,
   layoutPreferences,
   meta = undefined,
-  minActionsCellWidth: fixedActionsCellWidth = undefined,
   onLayoutPreferencesChange,
   onPageSizeChange = undefined,
   onResetLayoutPreferences,
@@ -281,27 +284,27 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
   );
 
-  const { tableRef, actionsRef, columnWidths } = useElementWidths<Entity, Meta>({
+  const { tableRef, columnWidths, handleActionsWidthChange } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidthPreferences: internalColumnWidthPreferences,
     displayBulkSelectCol,
-    fixedActionsCellWidth,
     headerMinWidths,
     visibleColumns: columnOrder,
   });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
-    actionsRef,
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
-    hasRowActions,
     displayBulkSelectCol,
     entityActions,
     entityAttributesAreCamelCase,
+    hasRowActions,
     meta,
+    onActionsWidthChange: handleActionsWidthChange,
   });
+
   const table = useTable<Entity>({
     columnOrder,
     columnRenderersByAttribute,

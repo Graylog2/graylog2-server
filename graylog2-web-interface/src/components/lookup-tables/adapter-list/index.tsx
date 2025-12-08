@@ -111,7 +111,6 @@ function DataAdapterList() {
               tableLayout={adapterListElements.defaultLayout}
               fetchEntities={handleFetchAdapters}
               keyFn={dataAdaptersKeyFn}
-              actionsCellWidth={100}
               entityAttributesAreCamelCase={false}
               columnRenderers={columnRenderers}
             />

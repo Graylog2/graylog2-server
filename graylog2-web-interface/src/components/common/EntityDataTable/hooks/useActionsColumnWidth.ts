@@ -14,20 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-import styled, { css } from 'styled-components';
 
-import OriginalButtonGroup from './ButtonGroup';
+import { useCallback, useState } from 'react';
 
-const StyledButtonToolbar = styled(OriginalButtonGroup)(
-  ({ theme }) => css`
-    gap: ${theme.spacings.xs};
-  `,
-);
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
-const ButtonToolbar = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof StyledButtonToolbar>>(
-  ({ ...props }, ref) => <StyledButtonToolbar ref={ref} {...props} />,
-);
+const useActionsColumnWidth = () => {
+  const [maxWidth, setMaxWidth] = useState(0);
 
-/** @component */
-export default ButtonToolbar;
+  const handleWidthChange = useCallback((width: number) => {
+    const rounded = Math.round(width);
+    if (rounded > 0) {
+      setMaxWidth((cur) => (rounded > cur ? rounded : cur));
+    }
+  }, []);
+
+  return { maxWidth: maxWidth + CELL_PADDING * 2, handleWidthChange };
+};
+
+export default useActionsColumnWidth;
