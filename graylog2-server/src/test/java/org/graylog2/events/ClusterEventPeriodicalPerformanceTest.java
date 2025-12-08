@@ -16,6 +16,7 @@
  */
 package org.graylog2.events;
 
+import com.github.joschi.jadconfig.util.Size;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -92,7 +93,7 @@ class ClusterEventPeriodicalPerformanceTest {
     private ClusterEventPeriodical createClusterEventPeriodical(NodeId nodeId, EventBus serverEventBus, ClusterEventBus clusterEventBus) {
         return new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
                 nodeId, new RestrictedChainingClassLoader(new ChainingClassLoader(this.getClass().getClassLoader()),
-                SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus, offset);
+                SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus, offset, Size.megabytes(100));
     }
 
     @Test

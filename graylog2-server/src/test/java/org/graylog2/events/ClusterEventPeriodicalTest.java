@@ -17,6 +17,7 @@
 package org.graylog2.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
@@ -57,6 +58,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.COLLECTION;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -67,6 +69,7 @@ import static org.mockito.Mockito.verify;
 @MockitoSettings(strictness = Strictness.WARN)
 public class ClusterEventPeriodicalTest {
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
+    private static final Size COLLECTION_SIZE = Size.megabytes(100);
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
@@ -95,7 +98,8 @@ public class ClusterEventPeriodicalTest {
                                 SimpleEvent.class.getName(), DebugEvent.class.getName(), Safe.class.getName()))),
                 serverEventBus,
                 clusterEventBus,
-                new Offset(TIME.minusSeconds(1).toDate(), null)
+                new Offset(TIME.minusSeconds(1).toDate(), null),
+                COLLECTION_SIZE
         );
     }
 
@@ -248,7 +252,7 @@ public class ClusterEventPeriodicalTest {
         assertThat(original.getName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(original.getIndexInfo()).hasSize(1);
 
-        final var collection = ClusterEventPeriodical.prepareCollection(mongoConnection, objectMapperProvider);
+        final var collection = ClusterEventPeriodical.prepareCollection(mongoConnection, objectMapperProvider, COLLECTION_SIZE);
         assertThat(collection.getNamespace().getCollectionName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.listIndexes()).hasSize(2);
         assertThat(collection.getWriteConcern()).isEqualTo(WriteConcern.JOURNALED);
@@ -260,7 +264,7 @@ public class ClusterEventPeriodicalTest {
         final DB database = mongoConnection.getDatabase();
         database.getCollection(ClusterEventPeriodical.COLLECTION_NAME).drop();
         assertThat(database.collectionExists(ClusterEventPeriodical.COLLECTION_NAME)).isFalse();
-        final var collection = ClusterEventPeriodical.prepareCollection(mongoConnection, objectMapperProvider);
+        final var collection = ClusterEventPeriodical.prepareCollection(mongoConnection, objectMapperProvider, COLLECTION_SIZE);
 
         assertThat(collection.getNamespace().getCollectionName()).isEqualTo(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(collection.listIndexes()).hasSize(2);
