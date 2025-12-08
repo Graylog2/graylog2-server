@@ -74,16 +74,21 @@ public class FieldTypeMappingsService {
         checkAllIndicesSupportFieldTypeChange(customMapping.fieldName(), indexSetsIds);
 
         for (String indexSetId : indexSetsIds) {
-            try {
-                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
+            final var indexSetConfigOptional = indexSetService.get(indexSetId);
+            if(indexSetConfigOptional.isPresent()) {
+                final var indexSetConfig = indexSetConfigOptional.get();
+                // creating a copy of the current mappings set for eventual rollback
+                final var previousCustomFieldMappings = new CustomFieldMappings(indexSetConfig.customFieldMappings());
+                try {
                     var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
                     if (rotateImmediately) {
                         updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
                     }
-                });
-            } catch (Exception ex) {
-                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
-                throw ex;
+                } catch (Exception ex) {
+                    LOG.error("Failed to update field type in index set : " + indexSetId, ex);
+                    rollbackMapping(indexSetConfig, previousCustomFieldMappings);
+                    throw new RuntimeException("Failed to update field type in index set : " + indexSetId + ", " + ex.getMessage(), ex);
+                }
             }
         }
     }
@@ -190,6 +195,17 @@ public class FieldTypeMappingsService {
                         .customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping))
                         .build()
         ));
+    }
+
+    private void rollbackMapping(final IndexSetConfig indexSetConfig,
+                                 final CustomFieldMappings previousCustomFieldMappings) {
+        // rolling back changes in MongoDB
+        mongoIndexSetService.save(
+                indexSetConfig.toBuilder()
+                        .customFieldMappings(previousCustomFieldMappings)
+                        .build()
+        );
+
     }
 
     private Optional<IndexSetConfig> setProfileForIndexSet(final String profileId,
