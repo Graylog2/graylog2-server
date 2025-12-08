@@ -23,6 +23,8 @@ import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
+import com.github.joschi.jadconfig.util.SizeUnit;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
@@ -301,8 +303,8 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
-    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class)
-    private java.time.Duration maxEventAge = java.time.Duration.ofDays(1L);
+    @Parameter(value = "max_events_collection_size")
+    private Size maxEventsCollectionSize = Size.megabytes(100);
 
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
