@@ -21,6 +21,8 @@ import com.mongodb.ErrorCategory;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoIterable;
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.FindOneAndUpdateOptions;
 import com.mongodb.client.model.ReplaceOptions;
@@ -32,12 +34,16 @@ import org.bson.BsonDocument;
 import org.bson.BsonDocumentWriter;
 import org.bson.BsonValue;
 import org.bson.codecs.EncoderContext;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.MongoEntity;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -262,5 +268,25 @@ public class MongoUtils<T extends MongoEntity> {
             collection.replaceOne(idEq(id), orig, new ReplaceOptions().upsert(true));
             return orig;
         }
+    }
+
+    /**
+     * Counts the number of documents for each distinct value of the given field.
+     *
+     * @param field the field to group by.
+     * @return Map of field values to their respective counts.
+     */
+    public Map<String, Long> countByField(String field) {
+        final Map<String, Long> counts = new HashMap<>();
+        collection.aggregate(
+                List.of(Aggregates.group("$" + field, Accumulators.sum("count", 1))),
+                Document.class
+        ).forEach(doc -> {
+            String id = doc.getString("_id");
+            if (id != null) {
+                counts.put(id, doc.getInteger("count").longValue());
+            }
+        });
+        return counts;
     }
 }
