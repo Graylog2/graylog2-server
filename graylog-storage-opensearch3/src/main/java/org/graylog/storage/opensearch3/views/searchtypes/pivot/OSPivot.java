@@ -167,7 +167,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                     if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
-                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext).stream();
+                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, queryContext).stream();
                 });
     }
 
@@ -252,7 +252,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         pivot.series().forEach(seriesSpec -> {
             final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
+            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext)
                     .map(value -> {
                         columnKeys.addLast(value.id());
                         final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);

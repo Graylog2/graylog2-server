@@ -30,7 +30,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.b
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.metrics.ValueCountAggregationBuilder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
-import org.graylog.storage.elasticsearch7.views.searchtypes.ESSearchTypeHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.ESPivotSeriesSpecHandler;
 import org.graylog.storage.elasticsearch7.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
 
     @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, ESSearchTypeHandler<Pivot> searchTypeHandler, ESGeneratedQueryContext queryContext) {
+    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Count count, ESGeneratedQueryContext queryContext) {
         return count.field()
                 .map(field -> {
                     // the request was for a field count, we have to add a value_count sub aggregation
@@ -64,7 +63,6 @@ public class ESCountHandler extends ESPivotSeriesSpecHandler<Count, ValueCount> 
                                         Count count,
                                         SearchResponse searchResult,
                                         ValueCount valueCount,
-                                        ESSearchTypeHandler<Pivot> searchTypeHandler,
                                         ESGeneratedQueryContext esGeneratedQueryContext) {
         final Object value;
         if (valueCount == null) {
