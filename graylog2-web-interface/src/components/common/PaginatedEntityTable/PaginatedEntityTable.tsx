@@ -44,6 +44,11 @@ const SearchRow = styled.div`
 `;
 
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
+type ExternalSearch = {
+  query: string;
+  onSearch: (query: string) => void;
+  onReset: () => void;
+};
 export type MiddleSectionProps = {
   searchParams: SearchParams;
   setFilters: (newFilters: UrlQueryFilters) => void;
@@ -83,6 +88,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   keyFn,
   layoutConfig,
   middleSection: MiddleSection = undefined,
+  externalSearch = undefined,
   onChangeFilters,
   paginationState,
   queryHelpComponent = undefined,
@@ -156,32 +162,34 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
         pageSize={layoutConfig.pageSize}
         showPageSizeSelect={false}
         totalItems={total}
-        useQueryParameter={!withoutURLParams}
-        onChange={
-          withoutURLParams
-            ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
-            : undefined
-        }>
-        <SearchRow>
-          <SearchForm
-            focusAfterMount={focusSearchAfterMount}
-            onSearch={onSearch}
-            onReset={onSearchReset}
-            query={fetchOptions.query}
-            placeholder={searchPlaceholder ?? `Search for ${humanName}`}
-            queryHelpComponent={queryHelpComponent}>
-            <div style={{ marginBottom: 5 }}>
-              <EntityFilters
-                attributes={attributes}
-                urlQueryFilters={fetchOptions.filters}
-                setUrlQueryFilters={onChangeFilters}
-                filterValueRenderers={filterValueRenderers}
-                appSection={appSection}
-              />
-            </div>
-          </SearchForm>
-          {topRightCol}
-        </SearchRow>
+      useQueryParameter={!withoutURLParams}
+      onChange={
+        withoutURLParams
+          ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
+          : undefined
+      }>
+        {!externalSearch && (
+          <SearchRow>
+            <SearchForm
+              focusAfterMount={focusSearchAfterMount}
+              onSearch={onSearch}
+              onReset={onSearchReset}
+              query={fetchOptions.query}
+              placeholder={searchPlaceholder ?? `Search for ${humanName}`}
+              queryHelpComponent={queryHelpComponent}>
+              <div style={{ marginBottom: 5 }}>
+                <EntityFilters
+                  attributes={attributes}
+                  urlQueryFilters={fetchOptions.filters}
+                  setUrlQueryFilters={onChangeFilters}
+                  filterValueRenderers={filterValueRenderers}
+                  appSection={appSection}
+                />
+              </div>
+            </SearchForm>
+            {topRightCol}
+          </SearchRow>
+        )}
         {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
 
         {list?.length === 0 ? (
@@ -224,12 +232,15 @@ type WrapperProps<T, M> = Props<T, M> & {
 
 const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, paginationState } = useWithLocalState(props.layoutConfig);
+  const effectiveFetchOptions = props.externalSearch
+    ? { ...fetchOptions, query: props.externalSearch.query }
+    : fetchOptions;
 
   return (
     <PaginatedEntityTableInner<T, M>
       {...props}
-      fetchOptions={fetchOptions}
-      setQuery={setQuery}
+      fetchOptions={effectiveFetchOptions}
+      setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
     />
@@ -238,12 +249,15 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
 
 const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, paginationState } = useWithURLParams(props.layoutConfig);
+  const effectiveFetchOptions = props.externalSearch
+    ? { ...fetchOptions, query: props.externalSearch.query }
+    : fetchOptions;
 
   return (
     <PaginatedEntityTableInner<T, M>
       {...props}
-      fetchOptions={fetchOptions}
-      setQuery={setQuery}
+      fetchOptions={effectiveFetchOptions}
+      setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
     />
@@ -258,6 +272,7 @@ type Props<T, M> = {
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
+  externalSearch?: ExternalSearch;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
