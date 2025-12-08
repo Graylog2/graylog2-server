@@ -41,10 +41,12 @@ public class V20251208120700_MigrateClusterEventsToCappedCollection extends Migr
 
         final var collectionExists = mongoConnection.getDatabase().collectionExists(COLLECTION_NAME);
         if (collectionExists) {
+            LOG.info("Converting cluster events to capped collection. This is a one-time operation, but could take a while.");
             mongoConnection.getMongoDatabase().runCommand(
                     new Document("convertToCapped", COLLECTION_NAME)
                     .append("size", maxEventsCollectionSize.toBytes())
             );
+            LOG.info("Done.");
         }
 
         clusterConfigService.write(new MigrationCompleted(collectionExists));

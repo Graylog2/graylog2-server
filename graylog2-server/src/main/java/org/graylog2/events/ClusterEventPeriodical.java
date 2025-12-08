@@ -92,7 +92,7 @@ public class ClusterEventPeriodical extends Periodical {
                                                            final Size maxEventsCollectionSize) {
         final var collectionExists = mongoConnection.getDatabase().collectionExists(COLLECTION_NAME);
         final var db = mongoConnection.getMongoDatabase();
-        if (collectionExists) {
+        if (!collectionExists) {
             db.createCollection(COLLECTION_NAME, new CreateCollectionOptions()
                     .capped(true)
                     .sizeInBytes(maxEventsCollectionSize.toBytes()));
