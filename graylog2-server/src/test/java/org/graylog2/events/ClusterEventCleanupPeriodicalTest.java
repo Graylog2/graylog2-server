@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.Duration;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,6 +44,7 @@ public class ClusterEventCleanupPeriodicalTest {
     @Rule
     public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
     private static final DateTime TIME = new DateTime(2015, 4, 1, 0, 0, DateTimeZone.UTC);
+    private static final Duration maxEventAge = Duration.ofDays(1);
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -59,7 +61,7 @@ public class ClusterEventCleanupPeriodicalTest {
 
         this.clusterEventCleanupPeriodical = new ClusterEventCleanupPeriodical(new MongoCollections(
                 new MongoJackObjectMapperProvider(objectMapper),
-                mongodb.mongoConnection()));
+                mongodb.mongoConnection()), maxEventAge);
     }
 
     @After
@@ -70,11 +72,12 @@ public class ClusterEventCleanupPeriodicalTest {
 
     @Test
     public void testDoRun() throws Exception {
+        final var maxEventAgeMillis = maxEventAge.toMillis();
         final DBCollection collection = mongoConnection.getDatabase().getCollection(ClusterEventPeriodical.COLLECTION_NAME);
         assertThat(insertEvent(collection, 0L)).isTrue();
         assertThat(insertEvent(collection, TIME.getMillis())).isTrue();
-        assertThat(insertEvent(collection, TIME.minus(ClusterEventCleanupPeriodical.DEFAULT_MAX_EVENT_AGE).getMillis())).isTrue();
-        assertThat(insertEvent(collection, TIME.minus(2 * ClusterEventCleanupPeriodical.DEFAULT_MAX_EVENT_AGE).getMillis())).isTrue();
+        assertThat(insertEvent(collection, TIME.minus(maxEventAgeMillis).getMillis())).isTrue();
+        assertThat(insertEvent(collection, TIME.minus(2 * maxEventAgeMillis).getMillis())).isTrue();
         assertThat(collection.count()).isEqualTo(4L);
 
         clusterEventCleanupPeriodical.run();
