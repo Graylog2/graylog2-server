@@ -183,35 +183,34 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
           {topRightCol}
         </SearchRow>
         {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
-        <div>
-          {list?.length === 0 ? (
-            <NoSearchResult>No {humanName} have been found.</NoSearchResult>
-          ) : (
-            <EntityDataTable<T, M>
-              entities={list}
-              defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
-              layoutPreferences={{
-                attributes: layoutConfig.attributes,
-                order: layoutConfig.order,
-              }}
-              defaultColumnOrder={tableLayout.defaultColumnOrder}
-              onResetLayoutPreferences={onResetLayoutPreferences}
-              onLayoutPreferencesChange={onLayoutPreferencesChange}
-              expandedSectionRenderers={expandedSectionRenderers}
-              bulkSelection={bulkSelection}
-              onSortChange={onSortChange}
-              onPageSizeChange={onPageSizeChange}
-              pageSize={layoutConfig.pageSize}
-              activeSort={layoutConfig.sort}
-              entityActions={entityActions}
-              minActionsCellWidth={actionsCellWidth}
-              columnRenderers={columnRenderers}
-              columnSchemas={columnSchemas}
-              entityAttributesAreCamelCase={entityAttributesAreCamelCase}
-              meta={meta}
-            />
-          )}
-        </div>
+
+        {list?.length === 0 ? (
+          <NoSearchResult>No {humanName} have been found.</NoSearchResult>
+        ) : (
+          <EntityDataTable<T, M>
+            entities={list}
+            defaultDisplayedColumns={tableLayout.defaultDisplayedAttributes}
+            layoutPreferences={{
+              attributes: layoutConfig.attributes,
+              order: layoutConfig.order,
+            }}
+            defaultColumnOrder={tableLayout.defaultColumnOrder}
+            onResetLayoutPreferences={onResetLayoutPreferences}
+            onLayoutPreferencesChange={onLayoutPreferencesChange}
+            expandedSectionRenderers={expandedSectionRenderers}
+            bulkSelection={bulkSelection}
+            onSortChange={onSortChange}
+            onPageSizeChange={onPageSizeChange}
+            pageSize={layoutConfig.pageSize}
+            activeSort={layoutConfig.sort}
+            entityActions={entityActions}
+            minActionsCellWidth={actionsCellWidth}
+            columnRenderers={columnRenderers}
+            columnSchemas={columnSchemas}
+            entityAttributesAreCamelCase={entityAttributesAreCamelCase}
+            meta={meta}
+          />
+        )}
       </PaginatedList>
     </TableFetchContextProvider>
   );

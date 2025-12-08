@@ -15,9 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { act } from 'wrappedTestingLibrary/hooks';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -308,10 +309,10 @@ describe('<Widget />', () => {
 
     const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
-    fireEvent.click(actionToggle);
+    await userEvent.click(actionToggle);
     const duplicateBtn = await screen.findByRole('menuitem', { name: /duplicate/i });
 
-    fireEvent.click(duplicateBtn);
+    await userEvent.click(duplicateBtn);
 
     await waitFor(() => expect(duplicateWidget).toHaveBeenCalled());
   });
@@ -325,7 +326,7 @@ describe('<Widget />', () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const cancel = await screen.findByText('Cancel');
-    fireEvent.click(cancel);
+    await userEvent.click(cancel);
 
     await waitFor(() => {
       expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
@@ -336,43 +337,43 @@ describe('<Widget />', () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const updateWidgetButton = getWidgetUpdateButton();
-    fireEvent.click(updateWidgetButton);
+    await userEvent.click(updateWidgetButton);
 
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
     expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
 
-  it('does not trigger action when clicking cancel after no changes were made', () => {
+  it('does not trigger action when clicking cancel after no changes were made', async () => {
     render(<DummyWidget editing />);
 
     const cancelBtn = screen.getByText('Cancel');
 
-    fireEvent.click(cancelBtn);
+    await userEvent.click(cancelBtn);
 
     expect(updateWidgetConfig).not.toHaveBeenCalled();
     expect(setGlobalOverrideQuery).not.toHaveBeenCalled();
     expect(setGlobalOverrideTimerange).not.toHaveBeenCalled();
   });
 
-  it('restores original state of widget config when clicking cancel after changes were made', () => {
+  it('restores original state of widget config when clicking cancel after changes were made', async () => {
     const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
     render(<DummyWidget editing widget={widgetWithConfig} />);
 
     const onChangeBtn = screen.getByText('Click me');
 
-    fireEvent.click(onChangeBtn);
+    await userEvent.click(onChangeBtn);
 
     expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const cancelButton = screen.getByText('Cancel');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     expect(updateWidget).toHaveBeenCalledWith('widgetId', widgetWithConfig);
   });
 
-  it('restores original global override when clicking cancel after changes were made', () => {
+  it('restores original global override when clicking cancel after changes were made', async () => {
     asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(globalTimerange, globalSearch));
     const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
     const { rerender } = render(<DummyWidget editing widget={widgetWithConfig} />);
@@ -385,7 +386,7 @@ describe('<Widget />', () => {
       rerender(<DummyWidget editing widget={widgetWithConfig} />);
     });
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     expect(setGlobalOverrideQuery).toHaveBeenCalledWith(globalSearch.query_string);
     expect(setGlobalOverrideTimerange).toHaveBeenCalledWith(globalTimerange);
@@ -397,12 +398,12 @@ describe('<Widget />', () => {
 
     const onChangeBtn = screen.getByText('Click me');
 
-    fireEvent.click(onChangeBtn);
+    await userEvent.click(onChangeBtn);
 
     expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const updateWidgetButton = getWidgetUpdateButton();
-    fireEvent.click(updateWidgetButton);
+    await userEvent.click(updateWidgetButton);
 
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
