@@ -17,6 +17,7 @@
 package org.graylog2.events;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
@@ -33,6 +34,7 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.UpdateOptions;
 import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.bson.Document;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollection;
@@ -72,12 +74,13 @@ public class ClusterEventPeriodical extends Periodical {
                                   final RestrictedChainingClassLoader chainingClassLoader,
                                   final EventBus serverEventBus,
                                   final ClusterEventBus clusterEventBus,
-                                  final Offset offset) {
+                                  final Offset offset,
+                                  @Named("max_events_collection_size") final Size maxEventsCollectionSize) {
         this.nodeId = nodeId;
         this.objectMapper = mapperProvider.get();
         this.chainingClassLoader = chainingClassLoader;
         this.serverEventBus = serverEventBus;
-        this.collection = prepareCollection(mongoConnection, mapperProvider);
+        this.collection = prepareCollection(mongoConnection, mapperProvider, maxEventsCollectionSize);
         this.offset = offset;
 
         clusterEventBus.registerClusterEventSubscriber(this);
@@ -85,12 +88,17 @@ public class ClusterEventPeriodical extends Periodical {
 
     @VisibleForTesting
     static MongoCollection<ClusterEvent> prepareCollection(final MongoConnection mongoConnection,
-                                                           final MongoJackObjectMapperProvider mapperProvider) {
-        final var db = mongoConnection.getDatabase();
-        if (!db.collectionExists(COLLECTION_NAME)) {
-            mongoConnection.getMongoDatabase().createCollection(COLLECTION_NAME, new CreateCollectionOptions()
+                                                           final MongoJackObjectMapperProvider mapperProvider,
+                                                           final Size maxEventsCollectionSize) {
+        final var collectionExists = mongoConnection.getDatabase().collectionExists(COLLECTION_NAME);
+        final var db = mongoConnection.getMongoDatabase();
+        if (collectionExists) {
+            db.createCollection(COLLECTION_NAME, new CreateCollectionOptions()
                     .capped(true)
-                    .sizeInBytes(1024 * 1024 * 1024));
+                    .sizeInBytes(maxEventsCollectionSize.toBytes()));
+        } else {
+            db.runCommand(new Document("collMod", COLLECTION_NAME)
+                    .append("cappedSize", maxEventsCollectionSize.toBytes()));
         }
         final var collection = new MongoCollections(mapperProvider, mongoConnection)
                 .collection(COLLECTION_NAME, ClusterEvent.class)
