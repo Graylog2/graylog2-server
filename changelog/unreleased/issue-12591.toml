@@ -1,5 +1,0 @@
-type = "f"
-message = "Cleanup and Compatibility Improvements for CloudTrail Input Rework."
-
-pulls = ["24355"]
-issues = ["12591"]

@@ -54,7 +54,7 @@ public class AWSProxyConfigurationProvider implements Provider<ApacheHttpClient.
         return httpClientBuilder;
     }
 
-    public static ProxyConfiguration buildProxyConfiguration(URI proxyUri) {
+    static ProxyConfiguration buildProxyConfiguration(URI proxyUri) {
         ProxyConfiguration.Builder proxyConfigBuilder = ProxyConfiguration.builder();
 
         if (proxyUri.getUserInfo() != null && !proxyUri.getUserInfo().isEmpty()) {
