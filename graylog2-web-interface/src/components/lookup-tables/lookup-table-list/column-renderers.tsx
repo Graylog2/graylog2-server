@@ -16,12 +16,13 @@
  */
 import * as React from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
 import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import ErrorPopover from 'components/lookup-tables/ErrorPopover';
 import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
-import LookupTableDetails from 'components/lookup-tables/LUTModals/LUTDrawer/lookup-table';
 import Cache from 'components/lookup-tables/Cache';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
 import type { LookupTableEntity, CachesMap, AdaptersMap } from 'components/lookup-tables/types';
@@ -45,30 +46,14 @@ const Title = styled.div`
   }
 `;
 
-const TitleCol = ({
-  lut,
-  caches,
-  adapters,
-  title,
-  children,
-}: {
-  lut: LookupTableEntity;
-  caches: CachesMap;
-  adapters: AdaptersMap;
-  title: string;
-  children: string;
-}) => {
+const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string }) => {
   const { errors } = useErrorsContext();
   const tableErrorText = errors?.lutErrors[lut.name];
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
   const onClick = React.useCallback(() => {
-    setModal('LUT');
-    setTitle(title);
-    setEntity(
-      <LookupTableDetails table={lut} cache={caches[lut.cache_id]} dataAdapter={adapters[lut.data_adapter_id]} />,
-    );
-  }, [lut, caches, adapters, title, setModal, setTitle, setEntity]);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.show(lut.id));
+  }, [navigate, lut.id]);
 
   return (
     <TitleRow>
@@ -128,11 +113,7 @@ const columnRenderers: ColumnRenderers<LookupTableEntity, { adapters: AdaptersMa
   attributes: {
     title: {
       width: 0.1,
-      renderCell: (title: string, lut, meta) => (
-        <TitleCol lut={lut} caches={meta?.caches} adapters={meta?.adapters} title={title}>
-          {title}
-        </TitleCol>
-      ),
+      renderCell: (title: string, lut) => <TitleCol lut={lut}>{title}</TitleCol>,
     },
     description: {
       width: 0.2,

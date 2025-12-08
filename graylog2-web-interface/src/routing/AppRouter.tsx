@@ -73,6 +73,7 @@ import {
   LUTDataAdaptersFormPage,
   LUTTablesPage,
   LUTFormPage,
+  LUTDetailsPage,
   NodeInputsPage,
   NotFoundPage,
   PipelineDetailsPage,
@@ -262,6 +263,7 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: withLUTModalProvider(LUTTablesPage) },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':lutIdOrName'), element: <LUTDetailsPage /> },
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTFormPage /> },
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':lutIdOrName'), element: <LUTFormPage /> },
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: withLUTModalProvider(LUTCachesPage) },

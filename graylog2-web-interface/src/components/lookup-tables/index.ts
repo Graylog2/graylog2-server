@@ -22,6 +22,7 @@ export { default as LUTTableEntry } from './LUTTableEntry';
 export { default as LookupTableView } from './LookupTableView';
 export { default as LookupTableFields } from './LookupTableFields';
 export { default as LookupTableWizard } from './lookup-table-form';
+export { default as LookupTableShow } from './lookup-table-view';
 
 export { default as CachesOverview } from './cache-list';
 export { default as CacheTableEntry } from './CacheTableEntry';

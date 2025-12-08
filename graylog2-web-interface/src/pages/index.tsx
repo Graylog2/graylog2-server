@@ -75,6 +75,7 @@ const LUTDataAdaptersPage = loadAsync(() => import('./LUTDataAdaptersPage'));
 const LUTDataAdaptersFormPage = loadAsync(() => import('./LUTDataAdaptersFormPage'));
 const LUTTablesPage = loadAsync(() => import('./LUTTablesPage'));
 const LUTFormPage = loadAsync(() => import('./LUTFormPage'));
+const LUTDetailsPage = loadAsync(() => import('./LUTDetailsPage'));
 const NodeInputsPage = loadAsync(() => import('./NodeInputsPage'));
 const NotFoundPage = loadAsync(() => import('./NotFoundPage'));
 const PipelineDetailsPage = loadAsync(() => import('./PipelineDetailsPage'));
@@ -176,6 +177,7 @@ export {
   LUTDataAdaptersFormPage,
   LUTTablesPage,
   LUTFormPage,
+  LUTDetailsPage,
   NodeInputsPage,
   NotFoundPage,
   PipelineDetailsPage,
