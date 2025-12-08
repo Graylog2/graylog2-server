@@ -20,16 +20,16 @@ import { useCallback, useState } from 'react';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 const useActionsColumnWidth = () => {
-  const [maxWidth, setMaxWidth] = useState(0);
+  const [colMinWidth, setColMinWidth] = useState(0);
 
   const handleWidthChange = useCallback((width: number) => {
     const rounded = Math.round(width);
     if (rounded > 0) {
-      setMaxWidth((cur) => (rounded > cur ? rounded : cur));
+      setColMinWidth((cur) => (rounded > cur ? rounded : cur));
     }
   }, []);
 
-  return { maxWidth: maxWidth + CELL_PADDING * 2, handleWidthChange };
+  return { colMinWidth: colMinWidth + CELL_PADDING * 2, handleWidthChange };
 };
 
 export default useActionsColumnWidth;

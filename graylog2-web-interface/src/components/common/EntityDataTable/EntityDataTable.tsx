@@ -39,9 +39,15 @@ import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hoo
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
-import { columnTransformVar, columnWidthVar, columnOpacityVar } from 'components/common/EntityDataTable/CSSVariables';
+import {
+  columnTransformVar,
+  columnWidthVar,
+  columnOpacityVar,
+  actionsHeaderWidthVar,
+} from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
-import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID, BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants';
+import useCanScrollRight from 'components/common/EntityDataTable/hooks/useHorizontalScrollShadow';
 
 import type {
   ColumnRenderers,
@@ -58,8 +64,9 @@ const ScrollContainer = styled.div<{
   $columnWidths: { [_attributeId: string]: number };
   $activeColId: string | null;
   $columnTransform: { [_attributeId: string]: string };
+  $actionsHeaderWidth: number;
 }>(
-  ({ $columnWidths, $activeColId, $columnTransform }) => css`
+  ({ $columnWidths, $activeColId, $columnTransform, $actionsHeaderWidth }) => css`
     width: 100%;
     overflow-x: auto;
 
@@ -73,6 +80,8 @@ const ScrollContainer = styled.div<{
     ${Object.entries($columnTransform)
       .map(([id, transform]) => `${columnTransformVar(id)}: ${transform};`)
       .join('\n')}
+
+    ${$actionsHeaderWidth ? `${actionsHeaderWidthVar}: ${$actionsHeaderWidth}px;` : ''}
   `,
 );
 
@@ -133,6 +142,7 @@ const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
   }, [columnSchemas, customColumnRenderers]);
 
 const useColumnDefinitions = <Entity extends EntityBase, Meta>({
+  actionsColMinWidth,
   columnRenderersByAttribute,
   columnSchemas,
   columnWidths,
@@ -142,7 +152,9 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   hasRowActions,
   meta,
   onActionsWidthChange,
+  onHeaderSectionResize,
 }: {
+  actionsColMinWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
   columnSchemas: Array<ColumnSchema>;
   columnWidths: { [_attributeId: string]: number };
@@ -152,11 +164,13 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   hasRowActions: boolean;
   meta: Meta;
   onActionsWidthChange: (width: number) => void;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
-  const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol);
+  const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
   const actionsCol = useActionsColumnDefinition<Entity>({
     colWidth: columnWidths[ACTIONS_COL_ID],
+    minWidth: actionsColMinWidth,
     entityActions,
     hasRowActions,
     onWidthChange: onActionsWidthChange,
@@ -168,6 +182,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     entityAttributesAreCamelCase,
     meta,
     columnHelper,
+    onHeaderSectionResize,
   });
 
   return useMemo(
@@ -284,7 +299,10 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
   );
 
-  const { tableRef, columnWidths, handleActionsWidthChange } = useElementWidths<Entity, Meta>({
+  const { tableRef, columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth } = useElementWidths<
+    Entity,
+    Meta
+  >({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidthPreferences: internalColumnWidthPreferences,
@@ -292,8 +310,10 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     headerMinWidths,
     visibleColumns: columnOrder,
   });
+  const canScrollRight = useCanScrollRight(tableRef, tableIsCompressed, columnWidths);
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
+    actionsColMinWidth,
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
     columnWidths,
@@ -303,6 +323,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     hasRowActions,
     meta,
     onActionsWidthChange: handleActionsWidthChange,
+    onHeaderSectionResize: handleHeaderSectionResize,
   });
 
   const table = useTable<Entity>({
@@ -359,15 +380,15 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                 <ScrollContainer
                   id="scroll-container"
                   ref={tableRef}
-                  $columnWidths={columnWidths}
+                  $actionsHeaderWidth={actionsColMinWidth}
                   $activeColId={activeColId}
-                  $columnTransform={columnTransform}>
+                  $columnTransform={columnTransform}
+                  $columnWidths={columnWidths}>
                   <Table<Entity>
-                    onHeaderSectionResize={handleHeaderSectionResize}
                     expandedSectionRenderers={expandedSectionRenderers}
                     headerGroups={headerGroups}
                     rows={table.getRowModel().rows}
-                    hasRowActions={hasRowActions}
+                    canScrollRight={canScrollRight}
                   />
                 </ScrollContainer>
               )}

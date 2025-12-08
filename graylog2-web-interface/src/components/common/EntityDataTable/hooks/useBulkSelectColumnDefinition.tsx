@@ -22,7 +22,7 @@ import { useMemo } from 'react';
 
 import RowCheckbox from 'components/common/EntityDataTable/RowCheckbox';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
-import { BULK_SELECT_COL_ID, BULK_SELECT_COLUMN_WIDTH } from 'components/common/EntityDataTable/Constants';
+import { BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants';
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => {
@@ -54,7 +54,7 @@ const BulkSelectCell = <Entity extends EntityBase>({ row }: { row: Row<Entity> }
   );
 };
 
-const useBulkSelectColumnDefinition = <Entity extends EntityBase>(displayBulkSelectCol: boolean) => {
+const useBulkSelectColumnDefinition = <Entity extends EntityBase>(displayBulkSelectCol: boolean, colWidth: number) => {
   const columnHelper = createColumnHelper<Entity>();
 
   return useMemo(
@@ -62,14 +62,14 @@ const useBulkSelectColumnDefinition = <Entity extends EntityBase>(displayBulkSel
       displayBulkSelectCol
         ? columnHelper.display({
             id: BULK_SELECT_COL_ID,
-            size: BULK_SELECT_COLUMN_WIDTH,
+            size: colWidth,
             header: BulkSelectHeader<Entity>,
             enableHiding: false,
             cell: BulkSelectCell<Entity>,
             enableResizing: false,
           })
         : null,
-    [displayBulkSelectCol, columnHelper],
+    [displayBulkSelectCol, columnHelper, colWidth],
   );
 };
 

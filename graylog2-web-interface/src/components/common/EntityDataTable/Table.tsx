@@ -24,12 +24,14 @@ import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections
 import { CELL_PADDING, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase, ExpandedSectionRenderers } from 'components/common/EntityDataTable/types';
 import { columnOpacityVar, columnTransformVar, columnTransition } from 'components/common/EntityDataTable/CSSVariables';
+import PinnedColScrollShadow from 'components/common/EntityDataTable/PinnedColScrollShadow';
 
 import TableHead from './TableHead';
 
 const StyledTable = styled(BaseTable)(
   ({ theme }) => css`
     table-layout: fixed;
+    margin-bottom: 0;
 
     thead > tr > th,
     tbody > tr > td {
@@ -48,8 +50,13 @@ const StyledTable = styled(BaseTable)(
   `,
 );
 
-const Td = styled.td<{ $colId: string; $hidePadding: boolean; $pinningPosition: ColumnPinningPosition }>(
-  ({ $colId, $hidePadding, $pinningPosition }) => css`
+const Td = styled.td<{
+  $colId: string;
+  $hidePadding: boolean;
+  $pinningPosition: ColumnPinningPosition;
+  $canScrollRight: boolean;
+}>(
+  ({ $colId, $hidePadding, $pinningPosition, $canScrollRight }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
@@ -68,30 +75,30 @@ const Td = styled.td<{ $colId: string; $hidePadding: boolean; $pinningPosition: 
         padding: 0;
       }
     `}
+
+    ${$colId === ACTIONS_COL_ID &&
+    css`
+      position: sticky;
+      ${$canScrollRight && PinnedColScrollShadow}
+    `}
   `,
 );
 
 type Props<Entity extends EntityBase> = {
-  hasRowActions: boolean;
+  canScrollRight: boolean;
   expandedSectionRenderers: ExpandedSectionRenderers<Entity> | undefined;
-  rows: Array<Row<Entity>>;
   headerGroups: Array<HeaderGroup<Entity>>;
-  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+  rows: Array<Row<Entity>>;
 };
 
 const Table = <Entity extends EntityBase>({
+  canScrollRight,
   expandedSectionRenderers,
-  rows,
   headerGroups,
-  hasRowActions,
-  onHeaderSectionResize,
+  rows,
 }: Props<Entity>) => (
   <StyledTable striped condensed hover>
-    <TableHead
-      headerGroups={headerGroups}
-      hasRowActions={hasRowActions}
-      onHeaderSectionResize={onHeaderSectionResize}
-    />
+    <TableHead headerGroups={headerGroups} canScrollRight={canScrollRight} />
     {rows.map((row) => (
       <tbody key={`table-row-${row.id}`} data-testid={`table-row-${row.id}`}>
         <tr>
@@ -100,7 +107,8 @@ const Table = <Entity extends EntityBase>({
               key={cell.id}
               $colId={cell.column.id}
               $pinningPosition={cell.column.getIsPinned()}
-              $hidePadding={cell.column.id === ACTIONS_COL_ID}>
+              $hidePadding={cell.column.id === ACTIONS_COL_ID}
+              $canScrollRight={canScrollRight}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           ))}

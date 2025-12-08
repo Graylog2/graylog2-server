@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import { css } from 'styled-components';
 
-export const CELL_PADDING = 5; // px
-export const DEFAULT_COL_MIN_WIDTH = 150; // px
-export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
-export const MORE_ACTIONS_TITLE = 'More';
-export const MORE_ACTIONS_HOVER_TITLE = 'More actions';
+const PinnedColScrollShadow = css`
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 8px;
+    pointer-events: none;
+    box-shadow: -4px 0 8px rgb(0 0 0 / 10%);
+    z-index: -1;
+  }
+`;
 
-export const BULK_SELECT_COLUMN_WIDTH = 15 + CELL_PADDING * 2; // px
-export const BULK_SELECT_COL_ID = 'bulk-select';
-
-export const ACTIONS_COL_ID = 'actions';
-
-export const UTILITY_COLUMNS = new Set([BULK_SELECT_COL_ID, ACTIONS_COL_ID]);
-
-export const ATTRIBUTE_STATUS = {
-  show: 'show',
-  hide: 'hide',
-} as const;
+export default PinnedColScrollShadow;

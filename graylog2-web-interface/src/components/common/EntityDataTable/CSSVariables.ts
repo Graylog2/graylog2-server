@@ -19,3 +19,4 @@ export const columnTransformVar = (colId: string) => `--col-${colId}-transform`;
 export const columnWidthVar = (colId: string) => `--col-${colId.replace(/\./g, '_')}-width`;
 export const columnOpacityVar = (colId: string) => `--col-${colId}-opacity`;
 export const columnTransition = () => `--col-transition`;
+export const actionsHeaderWidthVar = `--actions-header-width`;

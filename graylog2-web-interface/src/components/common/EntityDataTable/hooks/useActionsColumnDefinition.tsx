@@ -25,15 +25,24 @@ import useResizeObserver from '@react-hook/resize-observer';
 import { ButtonToolbar } from 'components/bootstrap';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { actionsHeaderWidthVar } from 'components/common/EntityDataTable/CSSVariables';
 
-const BackgroundFoundation = styled.div<{ $width?: number }>(
-  ({ theme, $width }) => css`
+const AlignRight = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  height: 100%;
+`;
+
+const BackgroundFoundation = styled.div(
+  ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
-    width: ${$width ? `${$width}px` : 'auto'};
     height: 100%;
   `,
 );
 
+const HeaderBackground = styled(BackgroundFoundation)`
+  width: var(${actionsHeaderWidthVar});
+`;
 const Actions = styled.div<{ $isEvenRow: boolean }>(
   ({ $isEvenRow, theme }) => css`
     display: flex;
@@ -64,23 +73,26 @@ const ActionCell = <Entity extends EntityBase>({
   useResizeObserver(ref, ({ contentRect: { width } }) => onWidthChange(width));
 
   return (
-    <BackgroundFoundation>
-      <Actions $isEvenRow={row.index % 2 === 0}>
-        <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
-      </Actions>
-    </BackgroundFoundation>
+    <AlignRight>
+      <BackgroundFoundation>
+        <Actions $isEvenRow={row.index % 2 === 0}>
+          <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
+        </Actions>
+      </BackgroundFoundation>
+    </AlignRight>
   );
 };
 
 const useActionsColumnDefinition = <Entity extends EntityBase>({
-  hasRowActions,
   colWidth,
   entityActions,
+  hasRowActions,
   onWidthChange,
 }: {
-  hasRowActions: boolean;
   colWidth: number;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
+  hasRowActions: boolean;
+  minWidth: number;
   onWidthChange: (width: number) => void;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
@@ -93,7 +105,14 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
     [entityActions, onWidthChange],
   );
 
-  const header = useCallback(() => <BackgroundFoundation $width={colWidth} />, [colWidth]);
+  const header = useCallback(
+    () => (
+      <AlignRight>
+        <HeaderBackground />
+      </AlignRight>
+    ),
+    [],
+  );
 
   return useMemo(
     () =>

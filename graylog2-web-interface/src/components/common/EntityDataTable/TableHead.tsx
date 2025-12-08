@@ -15,14 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useContext, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
 import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 
-import DragHandle from 'components/common/SortableList/DragHandle';
 import {
   columnTransformVar,
   columnOpacityVar,
@@ -30,12 +26,9 @@ import {
   columnTransition,
 } from 'components/common/EntityDataTable/CSSVariables';
 import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import PinnedColScrollShadow from 'components/common/EntityDataTable/PinnedColScrollShadow';
 
-import SortIcon from './SortIcon';
-import DndStylesContext from './contexts/DndStylesContext';
-import ResizeHandle from './ResizeHandle';
-import type { EntityBase, ColumnMetaContext } from './types';
-import useHeaderSectionObserver from './hooks/useHeaderSectionObserver';
+import type { EntityBase } from './types';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -43,8 +36,13 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $colId: string; $hidePadding: boolean; $pinningPosition: ColumnPinningPosition }>(
-  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
+export const Th = styled.th<{
+  $colId: string;
+  $hidePadding: boolean;
+  $pinningPosition: ColumnPinningPosition;
+  $showScrollShadow: boolean;
+}>(
+  ({ $colId, $hidePadding, $pinningPosition, $showScrollShadow, theme }) => css`
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
@@ -64,124 +62,44 @@ export const Th = styled.th<{ $colId: string; $hidePadding: boolean; $pinningPos
         padding: 0;
       }
     `}
+
+    ${$colId === ACTIONS_COL_ID &&
+    css`
+      position: sticky;
+      ${$showScrollShadow && PinnedColScrollShadow}
+    `}
   `,
 );
 
-export const ThInner = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-`;
-
-export const LeftCol = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const RightCol = styled.div`
-  display: flex;
-  align-items: center;
-`;
-
-const useSortableCol = (colId: string, disabled: boolean) => {
-  const { setColumnTransform } = useContext(DndStylesContext);
-  const { attributes, isDragging, listeners, setNodeRef, transform, setActivatorNodeRef } = useSortable({
-    id: colId,
-    disabled,
-  });
-  const cssTransform = CSS.Translate.toString(transform);
-
-  useLayoutEffect(() => {
-    setColumnTransform((cur) => ({
-      ...cur,
-      [colId]: cssTransform,
-    }));
-  }, [colId, setColumnTransform, cssTransform]);
-
-  return {
-    attributes,
-    isDragging,
-    listeners,
-    setNodeRef,
-    setActivatorNodeRef,
-  };
-};
-
 const TableHeaderCell = <Entity extends EntityBase>({
   header,
-  hasRowActions,
-  onHeaderSectionResize,
+  canScrollRight,
 }: {
   header: Header<Entity, unknown>;
-  hasRowActions: boolean;
-  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
-}) => {
-  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
-  const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
-    header.column.id,
-    !columnMeta?.enableColumnOrdering,
-  );
-  const leftRef = useHeaderSectionObserver(header.column.id, 'left', onHeaderSectionResize);
-  const rightRef = useHeaderSectionObserver(header.column.id, 'right', onHeaderSectionResize);
-
-  return (
-    <Th
-      key={header.id}
-      ref={setNodeRef}
-      colSpan={header.colSpan}
-      $colId={header.column.id}
-      $hidePadding={!hasRowActions && header.column.id === ACTIONS_COL_ID}
-      $pinningPosition={header.column.getIsPinned()}>
-      <ThInner>
-        <LeftCol ref={leftRef}>
-          {columnMeta?.enableColumnOrdering && (
-            <DragHandle
-              ref={setActivatorNodeRef}
-              index={header.index}
-              dragHandleProps={{ ...attributes, ...listeners }}
-              isDragging={isDragging}
-              itemTitle={columnMeta.label}
-            />
-          )}
-          {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-          {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
-        </LeftCol>
-        <RightCol ref={rightRef}>
-          {header.column.getCanResize() && (
-            <ResizeHandle
-              onMouseDown={header.getResizeHandler()}
-              onTouchStart={header.getResizeHandler()}
-              colTitle={columnMeta.label}
-            />
-          )}
-        </RightCol>
-      </ThInner>
-    </Th>
-  );
-};
+  canScrollRight: boolean;
+}) => (
+  <Th
+    key={header.id}
+    colSpan={header.colSpan}
+    $colId={header.column.id}
+    $hidePadding={header.column.id === ACTIONS_COL_ID}
+    $pinningPosition={header.column.getIsPinned()}
+    $showScrollShadow={canScrollRight}>
+    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+  </Th>
+);
 
 type Props<Entity extends EntityBase> = {
-  hasRowActions: boolean;
   headerGroups: Array<HeaderGroup<Entity>>;
-  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+  canScrollRight: boolean;
 };
 
-const TableHead = <Entity extends EntityBase>({
-  headerGroups,
-  hasRowActions,
-  onHeaderSectionResize,
-}: Props<Entity>) => (
+const TableHead = <Entity extends EntityBase>({ headerGroups, canScrollRight }: Props<Entity>) => (
   <Thead>
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeaderCell
-            key={header.id}
-            header={header}
-            hasRowActions={hasRowActions}
-            onHeaderSectionResize={onHeaderSectionResize}
-          />
+          <TableHeaderCell key={header.id} header={header} canScrollRight={canScrollRight} />
         ))}
       </tr>
     ))}
