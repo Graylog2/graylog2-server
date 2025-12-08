@@ -19,17 +19,30 @@ import * as React from 'react';
 import { useCallback, useMemo, useLayoutEffect } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import useResizeObserver from '@react-hook/resize-observer';
 
 import { ButtonToolbar } from 'components/bootstrap';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
-import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { ACTIONS_COL_ID, CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
-const Actions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
+const BackgroundFoundation = styled.div<{ $width?: number }>(
+  ({ theme, $width }) => css`
+    background-color: ${theme.colors.global.contentBackground};
+    width: ${$width ? `${$width}px` : 'auto'};
+    height: 100%;
+  `,
+);
+
+const Actions = styled.div<{ $isEvenRow: boolean }>(
+  ({ $isEvenRow, theme }) => css`
+    display: flex;
+    justify-content: flex-end;
+    padding: ${CELL_PADDING}px;
+    background: ${$isEvenRow ? theme.colors.global.contentBackground : theme.colors.table.row.backgroundStriped};
+    height: 100%;
+  `,
+);
 
 const ActionCell = <Entity extends EntityBase>({
   row,
@@ -51,9 +64,11 @@ const ActionCell = <Entity extends EntityBase>({
   useResizeObserver(ref, ({ contentRect: { width } }) => onWidthChange(width));
 
   return (
-    <Actions>
-      <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
-    </Actions>
+    <BackgroundFoundation>
+      <Actions $isEvenRow={row.index % 2 === 0}>
+        <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
+      </Actions>
+    </BackgroundFoundation>
   );
 };
 
@@ -78,16 +93,20 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
     [entityActions, onWidthChange],
   );
 
+  const header = useCallback(() => <BackgroundFoundation $width={colWidth} />, [colWidth]);
+
   return useMemo(
     () =>
       columnHelper.display({
         id: ACTIONS_COL_ID,
         size: colWidth,
         enableHiding: false,
+        enablePinning: true,
         enableResizing: false,
+        header,
         cell: hasRowActions ? cell : undefined,
       }),
-    [colWidth, cell, columnHelper, hasRowActions],
+    [colWidth, cell, columnHelper, hasRowActions, header],
   );
 };
 export default useActionsColumnDefinition;

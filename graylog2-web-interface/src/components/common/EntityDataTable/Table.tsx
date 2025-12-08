@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type { Row, HeaderGroup } from '@tanstack/react-table';
+import type { Row, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import styled, { css } from 'styled-components';
 
@@ -48,12 +48,20 @@ const StyledTable = styled(BaseTable)(
   `,
 );
 
-const Td = styled.td<{ $colId: string; $hidePadding: boolean }>(
-  ({ $colId, $hidePadding }) => css`
+const Td = styled.td<{ $colId: string; $hidePadding: boolean; $pinningPosition: ColumnPinningPosition }>(
+  ({ $colId, $hidePadding, $pinningPosition }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
     transition: var(${columnTransition()}, none);
+    height: 0;
+    ${$pinningPosition
+      ? css`
+          position: sticky;
+          ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+        `
+      : ''}
+
     ${$hidePadding &&
     css`
       && {
@@ -91,7 +99,8 @@ const Table = <Entity extends EntityBase>({
             <Td
               key={cell.id}
               $colId={cell.column.id}
-              $hidePadding={!hasRowActions && cell.column.id === ACTIONS_COL_ID}>
+              $pinningPosition={cell.column.getIsPinned()}
+              $hidePadding={cell.column.id === ACTIONS_COL_ID}>
               {flexRender(cell.column.columnDef.cell, cell.getContext())}
             </Td>
           ))}

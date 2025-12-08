@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useContext, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
-import type { Header, HeaderGroup } from '@tanstack/react-table';
+import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -43,13 +43,20 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $colId: string; $hidePadding }>(
-  ({ $colId, $hidePadding, theme }) => css`
+export const Th = styled.th<{ $colId: string; $hidePadding: boolean; $pinningPosition: ColumnPinningPosition }>(
+  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
     background-color: ${theme.colors.table.head.background};
     transition: var(${columnTransition()}, none);
+    height: 0;
+    ${$pinningPosition
+      ? css`
+          position: sticky;
+          ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+        `
+      : ''}
 
     ${$hidePadding &&
     css`
@@ -124,7 +131,8 @@ const TableHeaderCell = <Entity extends EntityBase>({
       ref={setNodeRef}
       colSpan={header.colSpan}
       $colId={header.column.id}
-      $hidePadding={!hasRowActions && header.column.id === ACTIONS_COL_ID}>
+      $hidePadding={!hasRowActions && header.column.id === ACTIONS_COL_ID}
+      $pinningPosition={header.column.getIsPinned()}>
       <ThInner>
         <LeftCol ref={leftRef}>
           {columnMeta?.enableColumnOrdering && (
