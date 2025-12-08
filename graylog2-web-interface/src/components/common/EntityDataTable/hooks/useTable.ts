@@ -202,14 +202,16 @@ const useTable = <Entity extends EntityBase>({
         updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
 
       const clampedAttributeWidths = Object.fromEntries(
-        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
-          colId,
-          Math.max(
-            width,
-            columnRenderersByAttribute[colId]?.minWidth ??
-              (headerMinWidths[colId] > DEFAULT_COL_MIN_WIDTH ? headerMinWidths[colId] : DEFAULT_COL_MIN_WIDTH),
-          ),
-        ]),
+        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => {
+          const effectiveMin = Math.max(
+            DEFAULT_COL_MIN_WIDTH,
+            headerMinWidths[colId] ?? 0,
+            columnRenderersByAttribute[colId]?.minWidth ?? 0,
+          );
+
+
+          return [colId, Math.max(width, effectiveMin)];
+        }),
       );
 
       setInternalColumnWidthPreferences(clampedAttributeWidths);
