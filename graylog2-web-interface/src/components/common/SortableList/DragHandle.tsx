@@ -22,11 +22,9 @@ import { Icon } from 'components/common';
 import type { DragHandleProps } from 'components/common/SortableList/types';
 
 export const DRAG_HANDLE_DEFAULT_TITLE = 'Drag or press space to reorder';
-export const DRAG_HANDLE_WIDTH = 20;
 
 const Container = styled.button<{ $isDragging: boolean }>(
   ({ $isDragging, theme }) => css`
-    width: ${DRAG_HANDLE_WIDTH}px;
     margin-right: ${theme.spacings.xxs};
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
     background: transparent;

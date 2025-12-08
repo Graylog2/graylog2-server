@@ -22,11 +22,8 @@ import type { Column } from '@tanstack/react-table';
 import CommonSortIcon from 'components/common/SortIcon';
 import type { ColumnMetaContext, EntityBase } from 'components/common/EntityDataTable/types';
 
-export const SORT_ICON_WIDTH = 20;
-
 const StyledCommonSortIcon = styled(CommonSortIcon)(
   ({ theme }) => css`
-    width: ${SORT_ICON_WIDTH}px;
     display: inline-block;
     margin-left: ${theme.spacings.xs};
     padding: 0;

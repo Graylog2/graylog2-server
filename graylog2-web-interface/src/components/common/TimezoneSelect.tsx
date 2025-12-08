@@ -120,7 +120,7 @@ class TimezoneSelect extends React.Component<
 
   render() {
     const timezones = this._formatTimezones();
-    const { onChange, value, ...otherProps } = this.props;
+    const { onChange, ...otherProps } = this.props;
 
     return (
       <Select
@@ -128,8 +128,6 @@ class TimezoneSelect extends React.Component<
           this.timezone = timezone;
         }}
         {...otherProps}
-        clearable={false}
-        value={value || 'Brwoser Time zone'}
         inputId="timezone-select"
         onChange={onChange}
         placeholder="Pick a time zone"
