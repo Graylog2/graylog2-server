@@ -40,7 +40,7 @@ import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import { columnTransformVar, columnWidthVar, columnOpacityVar } from 'components/common/EntityDataTable/CSSVariables';
-import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 
 import type {
   ColumnRenderers,
@@ -252,32 +252,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
 }: Props<Entity, Meta>) => {
-  const [headerSectionsWidth, setHeaderSectionsWidth] = useState<{
-    [colId: string]: { left?: number; right?: number };
-  }>({});
-  const headerMinWidths = useMemo(
-    () =>
-      Object.fromEntries(
-        Object.entries(headerSectionsWidth).map(([colId, { left = 0, right = 0 }]) => [
-          colId,
-          Math.round(left + right) + CELL_PADDING * 2,
-        ]),
-      ),
-    [headerSectionsWidth],
-  );
-
-  const handleHeaderSectionResize = useCallback((colId: string, part: 'left' | 'right', width: number) => {
-    setHeaderSectionsWidth((cur) => {
-      const currentCol = cur[colId] ?? {};
-      const roundedWidth = Math.round(width);
-
-      if (currentCol[part] === roundedWidth) {
-        return cur;
-      }
-
-      return { ...cur, [colId]: { ...currentCol, [part]: roundedWidth } };
-    });
-  }, []);
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
   const displayBulkAction = !!actions;
@@ -285,6 +259,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
+  const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
+
   const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
     layoutPreferences?.order ?? defaultColumnOrder,
   );
