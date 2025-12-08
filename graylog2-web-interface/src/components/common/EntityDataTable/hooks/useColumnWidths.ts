@@ -25,8 +25,6 @@ import {
 
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
-const HEADER_PADDING = 10; // px
-
 const assignableTableWidth = ({
   tableWidth,
   actionsColWidth,
@@ -114,7 +112,8 @@ const calculateStaticColumnWidths = ({
       return staticWidths;
     }
 
-    const resolvedStaticWidth = staticWidth === 'matchHeader' ? headerMinWidths[id] + HEADER_PADDING : staticWidth;
+    const resolvedStaticWidth =
+      staticWidth === 'matchHeader' || staticWidth < headerMinWidths[id] ? headerMinWidths[id] : staticWidth;
 
     return resolvedStaticWidth ? { ...staticWidths, [id]: resolvedStaticWidth } : staticWidths;
   }, {});

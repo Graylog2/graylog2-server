@@ -15,13 +15,12 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback, useContext, useLayoutEffect, useRef } from 'react';
+import { useContext, useLayoutEffect } from 'react';
 import styled, { css } from 'styled-components';
 import type { Header, HeaderGroup } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import useResizeObserver from '@react-hook/resize-observer';
 
 import DragHandle from 'components/common/SortableList/DragHandle';
 import {

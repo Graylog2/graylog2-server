@@ -24,6 +24,7 @@ describe('useColumnWidths hook test', () => {
     bulkSelectColWidth: 0,
     columnWidthPreferences: undefined,
     tableWidth: 600,
+    headerMinWidths: { title: 100, description: 110 },
     columnSchemas: [
       { id: 'title', title: 'Title' },
       { id: 'description', title: 'Description' },
@@ -97,6 +98,34 @@ describe('useColumnWidths hook test', () => {
       'bulk-select': 20,
       description: 313,
       title: 156,
+    });
+  });
+
+  it('should consider header min widths', async () => {
+    const columnRenderersByAttribute = {
+      title: { width: 1 },
+      description: { staticWidth: 100 },
+    };
+    const headerMinWidths = { description: 150 };
+    const columnIds = ['title', 'description'];
+
+    const { result } = renderHook(() =>
+      useColumnWidths({
+        ...defaultProps,
+        tableWidth: 1500,
+        actionsColWidth: 110,
+        bulkSelectColWidth: 20,
+        columnRenderersByAttribute,
+        columnIds,
+        headerMinWidths,
+      }),
+    );
+
+    expect(result.current).toEqual({
+      actions: 110,
+      'bulk-select': 20,
+      description: 150,
+      title: 1220,
     });
   });
 });

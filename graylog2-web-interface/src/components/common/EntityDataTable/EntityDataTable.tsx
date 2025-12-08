@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
 import merge from 'lodash/merge';
 import type { ColumnDef } from '@tanstack/react-table';
@@ -40,6 +40,7 @@ import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import { columnTransformVar, columnWidthVar, columnOpacityVar } from 'components/common/EntityDataTable/CSSVariables';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 import type {
   ColumnRenderers,
@@ -259,16 +260,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
       Object.fromEntries(
         Object.entries(headerSectionsWidth).map(([colId, { left = 0, right = 0 }]) => [
           colId,
-          Math.round(left + right),
+          Math.round(left + right) + CELL_PADDING * 2,
         ]),
       ),
     [headerSectionsWidth],
   );
-
-  useEffect(() => {
-    // Reset header sections width when layout preferences change
-    console.log('headerMinWidths', headerMinWidths);
-  }, [headerMinWidths]);
 
   const handleHeaderSectionResize = useCallback((colId: string, part: 'left' | 'right', width: number) => {
     setHeaderSectionsWidth((cur) => {
