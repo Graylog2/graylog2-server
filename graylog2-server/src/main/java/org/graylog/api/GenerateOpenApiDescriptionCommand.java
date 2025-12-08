@@ -57,6 +57,7 @@ import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIBindings;
 import org.graylog2.shared.rest.documentation.openapi.OpenAPIContextFactory;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -142,6 +143,14 @@ public class GenerateOpenApiDescriptionCommand extends Server {
 
         System.out.println("Writing description to file:" + outputFile);
 
+        if (!Files.exists(parentPath)) {
+            try {
+                Files.createDirectories(parentPath);
+            } catch (IOException e) {
+                System.out.println(f("Cannot create output directory at \"%s\": %s", parentPath, e.getMessage()));
+                System.exit(1);
+            }
+        }
         if ((Files.exists(targetPath) && !Files.isWritable(targetPath)) || !Files.isWritable(parentPath)) {
             System.out.println("Cannot write to file. Make sure that the following path is writeable: " + outputFile);
             System.exit(1);
