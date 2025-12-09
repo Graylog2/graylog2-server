@@ -116,11 +116,23 @@ public class DBJobTriggerService {
                                JobSchedulerClock clock,
                                SchedulerCapabilitiesService schedulerCapabilitiesService,
                                @Named(LOCK_EXPIRATION_DURATION) Duration lockExpirationDuration) {
+        this(mongoCollections, COLLECTION_NAME, nodeId, clock, schedulerCapabilitiesService, lockExpirationDuration);
+    }
+
+    /**
+     * Should only be used by subclasses.
+     */
+    protected DBJobTriggerService(MongoCollections mongoCollections,
+                                  String collectionName,
+                                  NodeId nodeId,
+                                  JobSchedulerClock clock,
+                                  SchedulerCapabilitiesService schedulerCapabilitiesService,
+                                  Duration lockExpirationDuration) {
         this.nodeId = nodeId.getNodeId();
         this.clock = clock;
         this.schedulerCapabilitiesService = schedulerCapabilitiesService;
         this.lockExpirationDuration = lockExpirationDuration;
-        this.collection = mongoCollections.collection(COLLECTION_NAME, JobTriggerDto.class);
+        this.collection = mongoCollections.collection(collectionName, JobTriggerDto.class);
         this.mongoUtils = mongoCollections.utils(collection);
 
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_ID));

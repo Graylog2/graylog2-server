@@ -63,17 +63,20 @@ public class JobExecutionEngine {
 
 
     public interface Factory {
-        JobExecutionEngine create(JobWorkerPool workerPool);
+        JobExecutionEngine create(String name,
+                                  JobWorkerPool workerPool,
+                                  JobDefinitionLookup jobDefinitionLookup,
+                                  DBJobTriggerService jobTriggerService);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(JobExecutionEngine.class);
 
     private final DBJobTriggerService jobTriggerService;
-    private final DBJobDefinitionService jobDefinitionService;
+    private final JobDefinitionLookup jobDefinitionLookup;
     private final JobSchedulerEventBus eventBus;
     private final JobScheduleStrategies scheduleStrategies;
     private final JobTriggerUpdates.Factory jobTriggerUpdatesFactory;
-    private final Map<String, Job.Factory> jobFactory;
+    private final Map<String, Job.Factory<? extends Job>> jobFactory;
     private final JobWorkerPool workerPool;
     private final RefreshingLockService.Factory refreshingLockServiceFactory;
     private final Map<String, Integer> concurrencyLimits;
@@ -90,34 +93,37 @@ public class JobExecutionEngine {
     private final AtomicBoolean shouldCleanup = new AtomicBoolean(true);
 
     @Inject
-    public JobExecutionEngine(DBJobTriggerService jobTriggerService,
-                              DBJobDefinitionService jobDefinitionService,
+    public JobExecutionEngine(@Assisted DBJobTriggerService jobTriggerService,
+                              @Assisted JobDefinitionLookup jobDefinitionLookup,
                               JobSchedulerEventBus eventBus,
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
                               RefreshingLockService.Factory refreshingLockServiceFactory,
-                              Map<String, Job.Factory> jobFactory,
+                              Map<String, Job.Factory<? extends Job>> jobFactory,
                               @Assisted JobWorkerPool workerPool,
+                              @Assisted String name,
                               JobSchedulerConfig schedulerConfig,
                               MetricRegistry metricRegistry) {
-        this(jobTriggerService, jobDefinitionService, eventBus, scheduleStrategies, jobTriggerUpdatesFactory,
-                refreshingLockServiceFactory, jobFactory, workerPool, schedulerConfig, metricRegistry, DEFAULT_BACKOFF);
+        this(jobTriggerService, jobDefinitionLookup, eventBus, scheduleStrategies, jobTriggerUpdatesFactory,
+                refreshingLockServiceFactory, jobFactory, workerPool, name, schedulerConfig,
+                metricRegistry, DEFAULT_BACKOFF);
     }
 
     @VisibleForTesting
     public JobExecutionEngine(DBJobTriggerService jobTriggerService,
-                              DBJobDefinitionService jobDefinitionService,
+                              JobDefinitionLookup jobDefinitionLookup,
                               JobSchedulerEventBus eventBus,
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
                               RefreshingLockService.Factory refreshingLockServiceFactory,
-                              Map<String, Job.Factory> jobFactory,
+                              Map<String, Job.Factory<? extends Job>> jobFactory,
                               JobWorkerPool workerPool,
+                              String name,
                               JobSchedulerConfig schedulerConfig,
                               MetricRegistry metricRegistry,
                               long backoffMillis) {
         this.jobTriggerService = jobTriggerService;
-        this.jobDefinitionService = jobDefinitionService;
+        this.jobDefinitionLookup = jobDefinitionLookup;
         this.eventBus = eventBus;
         this.scheduleStrategies = scheduleStrategies;
         this.jobTriggerUpdatesFactory = jobTriggerUpdatesFactory;
@@ -127,11 +133,11 @@ public class JobExecutionEngine {
         this.concurrencyLimits = schedulerConfig.concurrencyLimits();
         this.backoffMillis = backoffMillis;
 
-        this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "successful"));
-        this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), "executions", "failed"));
-        this.executionDenied = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "denied"));
-        this.executionRescheduled = metricRegistry.meter(MetricRegistry.name(getClass(), "executions", "rescheduled"));
-        this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), "executions", "time"));
+        this.executionSuccessful = metricRegistry.counter(MetricRegistry.name(getClass(), name, "executions", "successful"));
+        this.executionFailed = metricRegistry.counter(MetricRegistry.name(getClass(), name, "executions", "failed"));
+        this.executionDenied = metricRegistry.meter(MetricRegistry.name(getClass(), name, "executions", "denied"));
+        this.executionRescheduled = metricRegistry.meter(MetricRegistry.name(getClass(), name, "executions", "rescheduled"));
+        this.executionTime = metricRegistry.timer(MetricRegistry.name(getClass(), name, "executions", "time"));
 
         // We use a cache to avoid having every gauge metric hitting the database.
         this.gaugeCache = Caffeine.newBuilder()
@@ -254,7 +260,7 @@ public class JobExecutionEngine {
     private void handleTrigger(JobTriggerDto trigger) {
         LOG.trace("Locked trigger {} (owner={})", trigger.id(), trigger.lock().owner());
         try {
-            final JobDefinitionDto jobDefinition = jobDefinitionService.get(trigger.jobDefinitionId())
+            final JobDefinitionDto jobDefinition = jobDefinitionLookup.lookup(trigger.jobDefinitionId())
                     .orElseThrow(() -> new IllegalStateException("Couldn't find job definition " + trigger.jobDefinitionId()));
 
             final Job job = jobFactory.get(jobDefinition.config().type()).create(jobDefinition);

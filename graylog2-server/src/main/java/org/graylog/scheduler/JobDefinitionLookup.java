@@ -14,26 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler.eventbus;
+package org.graylog.scheduler;
 
-import com.codahale.metrics.MetricRegistry;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
+import java.util.Optional;
 
 /**
- * Creates a {@link JobSchedulerEventBus} instance.
+ * Lookup service for job definitions.
  */
-public class JobSchedulerEventBusProvider implements Provider<JobSchedulerEventBus> {
-    private final MetricRegistry metricRegistry;
-
-    @Inject
-    public JobSchedulerEventBusProvider(MetricRegistry metricRegistry) {
-        this.metricRegistry = metricRegistry;
-    }
-
-    @Override
-    public JobSchedulerEventBus get() {
-        return new JobSchedulerEventBus("system", metricRegistry);
-    }
+public interface JobDefinitionLookup {
+    /**
+     * Lookup a job definition by its ID.
+     *
+     * @param jobDefinitionId ID of the job definition to look up.
+     * @return An Optional containing the job definition if found, or empty if not found.
+     */
+    Optional<JobDefinitionDto> lookup(String jobDefinitionId);
 }

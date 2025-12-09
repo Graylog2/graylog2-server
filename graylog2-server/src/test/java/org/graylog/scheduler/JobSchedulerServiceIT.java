@@ -59,6 +59,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -82,7 +83,7 @@ class JobSchedulerServiceIT {
     private JobSchedulerClock clock;
 
     // intentionally mutable so that individual tests can add their factories
-    private final Map<String, Job.Factory> jobFactories = new HashMap<>();
+    private final Map<String, Job.Factory<? extends Job>> jobFactories = new HashMap<>();
 
     @BeforeEach
     void setUp(MongoDBTestService mongoDBTestService) throws Exception {
@@ -130,15 +131,16 @@ class JobSchedulerServiceIT {
                         .build()
         );
 
-        final JobExecutionEngine.Factory engineFactory = workerPool -> new JobExecutionEngine(
-                jobTriggerService,
-                jobDefinitionService,
+        final JobExecutionEngine.Factory engineFactory = (name, workerPool, definitionLookup, triggerService) -> new JobExecutionEngine(
+                triggerService,
+                definitionLookup,
                 eventBus,
                 scheduleStrategies,
                 jobTriggerUpdatesFactory,
                 () -> new RefreshingLockService(lockService, scheduler, leaderElectionLockTTL),
                 jobFactories,
                 workerPool,
+                "test",
                 schedulerConfig,
                 metricRegistry,
                 200);
@@ -146,9 +148,24 @@ class JobSchedulerServiceIT {
         final JobWorkerPool.Factory workerPoolFactory = (name, poolSize) ->
                 new JobWorkerPool(name, poolSize, metricRegistry);
 
-        final Duration loopSleepDuration = Duration.milliseconds(200);
+        jobSchedulerService = new TestJobSchedulerService(
+                workerPool -> engineFactory.create("test", workerPool,
+                        jobDefinitionService::get,
+                        jobTriggerService),
+                workerPoolFactory.create("test", schedulerConfig.numberOfWorkerThreads()), schedulerConfig, clock,
+                eventBus, serverStatus);
+    }
 
-        jobSchedulerService = new JobSchedulerService(engineFactory, workerPoolFactory, schedulerConfig, clock, eventBus, serverStatus, new GracefulShutdownService(), 30_000, loopSleepDuration);
+    static class TestJobSchedulerService extends JobSchedulerService {
+        public TestJobSchedulerService(Function<JobWorkerPool, JobExecutionEngine> engineFactory,
+                                       JobWorkerPool workerPool,
+                                       JobSchedulerConfig schedulerConfig,
+                                       JobSchedulerClock clock,
+                                       JobSchedulerEventBus schedulerEventBus,
+                                       ServerStatus serverStatus) {
+            super(engineFactory, workerPool, schedulerConfig, clock, schedulerEventBus,
+                    serverStatus, new GracefulShutdownService(), 30_000, Duration.milliseconds(200));
+        }
     }
 
     @Test

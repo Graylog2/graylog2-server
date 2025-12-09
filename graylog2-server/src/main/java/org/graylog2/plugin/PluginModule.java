@@ -306,20 +306,20 @@ public abstract class PluginModule extends Graylog2Module {
         registerJacksonSubtype(configClass, name);
     }
 
-    private MapBinder<String, Job.Factory> jobBinder() {
-        return MapBinder.newMapBinder(binder(), String.class, Job.Factory.class);
+    private MapBinder<String, Job.Factory<? extends Job>> jobBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>() {});
     }
 
     protected void addSchedulerJob(String name,
                                    Class<? extends Job> jobClass,
-                                   Class<? extends Job.Factory> factoryClass,
+                                   Class<? extends Job.Factory<? extends Job>> factoryClass,
                                    Class<? extends JobDefinitionConfig> configClass) {
         addSchedulerJob(name, jobClass, factoryClass, configClass, null);
     }
 
     protected void addSchedulerJob(String name,
                                    Class<? extends Job> jobClass,
-                                   Class<? extends Job.Factory> factoryClass,
+                                   Class<? extends Job.Factory<? extends Job>> factoryClass,
                                    Class<? extends JobDefinitionConfig> configClass,
                                    Class<? extends JobTriggerData> dataClass) {
         install(new FactoryModuleBuilder().implement(Job.class, jobClass).build(factoryClass));
