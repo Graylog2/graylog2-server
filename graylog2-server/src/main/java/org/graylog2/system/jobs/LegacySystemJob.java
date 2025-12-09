@@ -21,7 +21,7 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkState;
 
-public abstract class SystemJob {
+public abstract class LegacySystemJob {
 
     // Known types that can be resolved in the SystemJobFactory.
     public enum Type {

@@ -23,13 +23,12 @@ import com.google.common.base.Stopwatch;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog.tracing.GraylogSemanticAttributes;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,7 +46,7 @@ public class SystemJobManager {
 
     private final ActivityWriter activityWriter;
     private final ScheduledExecutorService executor;
-    private final Map<String, SystemJob> jobs;
+    private final Map<String, LegacySystemJob> jobs;
 
     @Inject
     public SystemJobManager(ActivityWriter activityWriter, MetricRegistry metricRegistry) {
@@ -64,11 +63,11 @@ public class SystemJobManager {
                 name(this.getClass(), "executor-service"));
     }
 
-    public String submit(final SystemJob job) throws SystemJobConcurrencyException {
+    public String submit(final LegacySystemJob job) throws SystemJobConcurrencyException {
         return submitWithDelay(job, 0, TimeUnit.SECONDS);
     }
 
-    public synchronized String submitWithDelay(final SystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
+    public synchronized String submitWithDelay(final LegacySystemJob job, final long delay, TimeUnit timeUnit) throws SystemJobConcurrencyException {
         // for immediate jobs, check allowed concurrency right now
         if (delay == 0) {
             checkAllowedConcurrency(job);
@@ -111,12 +110,12 @@ public class SystemJobManager {
     }
 
     @WithSpan
-    private void executeJob(SystemJob job) {
+    private void executeJob(LegacySystemJob job) {
         Span.current().setAttribute(GraylogSemanticAttributes.SYSTEM_JOB_TYPE, job.getClassName());
         job.execute();
     }
 
-    protected void checkAllowedConcurrency(SystemJob job) throws SystemJobConcurrencyException {
+    protected void checkAllowedConcurrency(LegacySystemJob job) throws SystemJobConcurrencyException {
         final int concurrent = concurrentJobs(job.getClass());
 
         if (concurrent >= job.maxConcurrency()) {
@@ -125,14 +124,14 @@ public class SystemJobManager {
         }
     }
 
-    public Map<String, SystemJob> getRunningJobs() {
+    public Map<String, LegacySystemJob> getRunningJobs() {
         return jobs;
     }
 
     public int concurrentJobs(Class jobClass) {
         int concurrent = 0;
 
-        for (final SystemJob job : jobs.values()) {
+        for (final LegacySystemJob job : jobs.values()) {
             if (job.getClass().equals(jobClass)) {
                 concurrent += 1;
             }

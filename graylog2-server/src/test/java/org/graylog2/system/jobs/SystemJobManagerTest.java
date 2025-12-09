@@ -19,9 +19,9 @@ package org.graylog2.system.jobs;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.Uninterruptibles;
+import jakarta.annotation.Nonnull;
 import org.assertj.core.api.Assertions;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
-import jakarta.annotation.Nonnull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
@@ -71,9 +71,9 @@ public class SystemJobManagerTest {
     public void testConcurrentJobs() throws Exception {
         SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
-        SystemJob job1 = new LongRunningJob(3);
-        SystemJob job2 = new LongRunningJob(3);
-        SystemJob job3 = new AnotherLongRunningJob(3);
+        LegacySystemJob job1 = new LongRunningJob(3);
+        LegacySystemJob job2 = new LongRunningJob(3);
+        LegacySystemJob job3 = new AnotherLongRunningJob(3);
 
         manager.submit(job1);
         manager.submit(job2);
@@ -91,7 +91,7 @@ public class SystemJobManagerTest {
 
         LongRunningJob job1 = new LongRunningJob(3);
         LongRunningJob job2 = new LongRunningJob(3);
-        SystemJob job3 = new AnotherLongRunningJob(3);
+        LegacySystemJob job3 = new AnotherLongRunningJob(3);
 
         // We have to set it for both instances in tests because the stubs are dynamic and no static max level can be set.
         job1.setMaxConcurrency(1);
@@ -130,7 +130,7 @@ public class SystemJobManagerTest {
         };
     }
 
-    private static class LongRunningJob extends SystemJob {
+    private static class LongRunningJob extends LegacySystemJob {
 
         private int seconds;
         private int maxConcurrency = 9001;
@@ -183,7 +183,7 @@ public class SystemJobManagerTest {
         }
     }
 
-    private static class AnotherLongRunningJob extends SystemJob {
+    private static class AnotherLongRunningJob extends LegacySystemJob {
 
         private int seconds;
 

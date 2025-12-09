@@ -16,10 +16,9 @@
  */
 package org.graylog2.system.jobs;
 
+import jakarta.inject.Inject;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
-
-import jakarta.inject.Inject;
 
 import java.util.Locale;
 
@@ -34,8 +33,8 @@ public class SystemJobFactory {
         this.fixDeflectorByDeleteJobFactory = fixDeflectorByDeleteJobFactory;
     }
 
-    public SystemJob build(String jobName) throws NoSuchJobException {
-        switch (SystemJob.Type.valueOf(jobName.toUpperCase(Locale.ENGLISH))) {
+    public LegacySystemJob build(String jobName) throws NoSuchJobException {
+        switch (LegacySystemJob.Type.valueOf(jobName.toUpperCase(Locale.ENGLISH))) {
             case FIX_DEFLECTOR_DELETE_INDEX:
                 return fixDeflectorByDeleteJobFactory.create();
             case FIX_DEFLECTOR_MOVE_INDEX:

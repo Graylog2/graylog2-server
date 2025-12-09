@@ -41,8 +41,8 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSet;
-import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.basic.BasicIndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -52,7 +52,7 @@ import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
@@ -202,7 +202,7 @@ public class IndexRangesResource extends RestResource {
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);
 
-        final SystemJob rebuildJob = singleIndexRangeJobFactory.create(index);
+        final LegacySystemJob rebuildJob = singleIndexRangeJobFactory.create(index);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {
@@ -215,7 +215,7 @@ public class IndexRangesResource extends RestResource {
     }
 
     public void submitIndexRangesJob(final Set<BasicIndexSet> indexSets) {
-        final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSets);
+        final LegacySystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSets);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {

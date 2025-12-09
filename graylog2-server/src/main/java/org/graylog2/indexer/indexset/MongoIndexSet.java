@@ -39,7 +39,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.joda.time.DateTime;
@@ -346,7 +346,7 @@ public class MongoIndexSet implements IndexSet {
         // it can happen that an index request still writes to the old deflector target, while we cycled it above.
         // setting the index to readOnly would result in ClusterBlockExceptions in the indexing request.
         // waiting 30 seconds to perform the background task should completely get rid of these errors.
-        final SystemJob setIndexReadOnlyAndCalculateRangeJob = jobFactory.create(indexName);
+        final LegacySystemJob setIndexReadOnlyAndCalculateRangeJob = jobFactory.create(indexName);
         try {
             systemJobManager.submitWithDelay(setIndexReadOnlyAndCalculateRangeJob, 30, TimeUnit.SECONDS);
         } catch (SystemJobConcurrencyException e) {

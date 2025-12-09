@@ -17,19 +17,18 @@
 package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.MongoIndexRangeService;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-
 import java.util.concurrent.atomic.AtomicLong;
 
-public class IndexSetCleanupJob extends SystemJob {
+public class IndexSetCleanupJob extends LegacySystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetCleanupJob.class);
     private static final int MAX_CONCURRENCY = 1_000;
 
