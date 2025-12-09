@@ -33,6 +33,7 @@ import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStyl
 import {
   actionsHeaderWidthVar,
   columnOpacityVar,
+  columnTransition,
   columnTransformVar,
   columnWidthVar,
   displayScrollRightIndicatorVar,
@@ -47,6 +48,10 @@ import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, Expa
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import BulkActionsRow from './BulkActionsRow';
 
+const cssVariable = (variable: string, value: string | number) => css`
+  ${variable}: ${value};
+`;
+
 const ScrollContainer = styled.div<{
   $columnWidths: { [_attributeId: string]: number };
   $activeColId: string | null;
@@ -58,22 +63,14 @@ const ScrollContainer = styled.div<{
     width: 100%;
     overflow-x: auto;
 
-    ${Object.entries($columnWidths)
-      .map(([id, width]) => `${columnWidthVar(id)}: ${width}px;`)
-      .join('\n')}
-
-    ${$activeColId ? `${columnOpacityVar($activeColId)}: 0.4;` : ''}
-    ${$activeColId ? `--col-transition: transform 0.2s ease-in-out;` : ''}
-
-    ${Object.entries($columnTransform)
-      .map(([id, transform]) => `${columnTransformVar(id)}: ${transform};`)
-      .join('\n')}
-
-    ${$actionsHeaderWidth ? `${actionsHeaderWidthVar}: ${$actionsHeaderWidth}px;` : ''}
-    
-    ${$canScrollRight &&
+    ${Object.entries($columnWidths).map(([id, width]) => cssVariable(columnWidthVar(id), `${width}px`))}
+    ${Object.entries($columnTransform).map(([id, transform]) => cssVariable(columnTransformVar(id), transform))}
+    ${$actionsHeaderWidth && cssVariable(actionsHeaderWidthVar, `${$actionsHeaderWidth}px`)}
+    ${$canScrollRight && cssVariable(displayScrollRightIndicatorVar, 'block')}
+    ${$activeColId &&
     css`
-      ${displayScrollRightIndicatorVar}: block;
+      ${cssVariable(columnOpacityVar($activeColId), 0.4)}
+      ${cssVariable(columnTransition(), 'transform 0.2s ease-in-out')}
     `}
   `,
 );

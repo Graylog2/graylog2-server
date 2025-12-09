@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useRef } from 'react';
 import styled, { css } from 'styled-components';
-import { useState, useEffect, useRef } from 'react';
 
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
 

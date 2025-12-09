@@ -28,7 +28,7 @@ import {
 import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 import PinnedColScrollShadow from 'components/common/EntityDataTable/PinnedColScrollShadow';
 
-import type { EntityBase } from './types';
+import type { EntityBase, ColumnMetaContext } from './types';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -70,16 +70,20 @@ export const Th = styled.th<{
   `,
 );
 
-const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => (
-  <Th
-    key={header.id}
-    colSpan={header.colSpan}
-    $colId={header.column.id}
-    $hidePadding={header.column.id === ACTIONS_COL_ID}
-    $pinningPosition={header.column.getIsPinned()}>
-    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-  </Th>
-);
+const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
+
+  return (
+    <Th
+      key={header.id}
+      colSpan={header.colSpan}
+      $colId={header.column.id}
+      $hidePadding={columnMeta?.hideCellPadding}
+      $pinningPosition={header.column.getIsPinned()}>
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+    </Th>
+  );
+};
 
 type Props<Entity extends EntityBase> = {
   headerGroups: Array<HeaderGroup<Entity>>;
