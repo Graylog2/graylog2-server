@@ -85,6 +85,5 @@ public class MigrationsModule extends PluginModule {
         addMigration(V20251003000000_AddMcpConfigurationMigration.class);
         addMigration(V20251021083100_CreatePipelineMetadata.class);
         addMigration(V20251103123300_MigrateEntityListPreferences.class);
-        addMigration(V20251208120700_MigrateClusterEventsToCappedCollection.class);
     }
 }
