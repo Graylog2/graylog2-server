@@ -46,8 +46,8 @@ const SearchRow = styled.div`
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
 type ExternalSearch = {
   query: string;
-  onSearch: (query: string) => void;
-  onReset: () => void;
+  onSearch?: (query: string) => void;
+  onReset?: () => void;
 };
 export type MiddleSectionProps = {
   searchParams: SearchParams;
