@@ -20,7 +20,6 @@ import org.graylog.plugins.views.search.Query;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.engine.SearchTypeHandler;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 
 /**
@@ -32,11 +31,8 @@ import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
 public interface OSSearchTypeHandler<S extends SearchType> extends SearchTypeHandler<S, OSGeneratedQueryContext, SearchResponse> {
     @Override
     default SearchType.Result doExtractResultImpl(Query query, S searchType, SearchResponse queryResult, OSGeneratedQueryContext queryContext) {
-        // if the search type was filtered, extract the sub-aggregation before passing it to the handler
-        // this way we don't have to duplicate this step everywhere
-        final Aggregations aggregations = queryResult.getAggregations();
-        return doExtractResult(query, searchType, queryResult, aggregations, queryContext);
+        return doExtractResult(query, searchType, queryResult, queryContext);
     }
 
-    SearchType.Result doExtractResult(Query query, S searchType, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext);
+    SearchType.Result doExtractResult(Query query, S searchType, SearchResponse queryResult, OSGeneratedQueryContext queryContext);
 }

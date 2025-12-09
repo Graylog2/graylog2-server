@@ -28,7 +28,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.core.common.text.Text;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryStringQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.fetch.subphase.highlight.HighlightField;
@@ -161,7 +160,7 @@ public class OSMessageList implements OSSearchTypeHandler<MessageList> {
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(Query query, MessageList searchType, org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(Query query, MessageList searchType, org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse result, OSGeneratedQueryContext queryContext) {
         final List<ResultMessageSummary> messages = StreamSupport.stream(result.getHits().spliterator(), false)
                 .map(this::resultMessageFromSearchHit)
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))

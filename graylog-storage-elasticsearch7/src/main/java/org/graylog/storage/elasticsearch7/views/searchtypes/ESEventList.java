@@ -29,7 +29,6 @@ import org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchR
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.index.query.QueryBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.SearchHit;
-import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.Aggregations;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.sort.SortOrder;
 import org.graylog.storage.elasticsearch7.views.ESGeneratedQueryContext;
@@ -101,7 +100,7 @@ public class ESEventList implements ESSearchTypeHandler<EventList> {
     @WithSpan
     @Override
     public SearchType.Result doExtractResult(Query query, EventList searchType, SearchResponse result,
-                                             Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+                                             ESGeneratedQueryContext queryContext) {
         final Set<String> effectiveStreams = searchType.streams().isEmpty()
                 ? query.usedStreamIds()
                 : searchType.streams();
