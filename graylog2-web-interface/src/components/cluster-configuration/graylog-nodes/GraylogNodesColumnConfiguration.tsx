@@ -46,15 +46,11 @@ export const DEFAULT_VISIBLE_COLUMNS = [
 ] as const;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'hostname', title: 'Node', sortable: true },
-  { id: 'lifecycle', title: 'State', sortable: true },
   { id: 'jvm', title: 'JVM', isDerived: true, sortable: false },
   { id: 'buffers', title: 'Buffers', isDerived: true, sortable: false },
   { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
   { id: 'dataLakeJournal', title: 'Data Lake Journal', isDerived: true, sortable: false },
   { id: 'throughput', title: 'Throughput', isDerived: true, sortable: false },
-  { id: 'is_processing', title: 'Message Processing', sortable: true },
-  { id: 'lb_status', title: 'Load Balancer', sortable: true },
 ];
 
 export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({

@@ -47,10 +47,6 @@ const STORAGE_WARNING_THRESHOLD = 0.7;
 const STORAGE_DANGER_THRESHOLD = 0.8;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
-  { id: 'hostname', title: 'Node', sortable: true },
-  { id: 'opensearch_roles', title: 'Role', sortable: true },
-  { id: 'datanode_version', title: 'Version', sortable: true },
-  { id: 'datanode_status', title: 'State', sortable: true },
   { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
   { id: 'memory', title: 'Memory', sortable: false, isDerived: true },
   { id: 'jvm', title: 'JVM', sortable: false, isDerived: true },
