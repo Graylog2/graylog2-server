@@ -64,6 +64,7 @@ public class JobExecutionEngine {
 
     public interface Factory {
         JobExecutionEngine create(String name,
+                                  Map<String, Job.Factory<? extends Job>> jobFactories,
                                   JobWorkerPool workerPool,
                                   JobDefinitionLookup jobDefinitionLookup,
                                   DBJobTriggerService jobTriggerService);
@@ -76,7 +77,7 @@ public class JobExecutionEngine {
     private final JobSchedulerEventBus eventBus;
     private final JobScheduleStrategies scheduleStrategies;
     private final JobTriggerUpdates.Factory jobTriggerUpdatesFactory;
-    private final Map<String, Job.Factory<? extends Job>> jobFactory;
+    private final Map<String, Job.Factory<? extends Job>> jobFactories;
     private final JobWorkerPool workerPool;
     private final RefreshingLockService.Factory refreshingLockServiceFactory;
     private final Map<String, Integer> concurrencyLimits;
@@ -99,13 +100,13 @@ public class JobExecutionEngine {
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
                               RefreshingLockService.Factory refreshingLockServiceFactory,
-                              Map<String, Job.Factory<? extends Job>> jobFactory,
+                              @Assisted Map<String, Job.Factory<? extends Job>> jobFactories,
                               @Assisted JobWorkerPool workerPool,
                               @Assisted String name,
                               JobSchedulerConfig schedulerConfig,
                               MetricRegistry metricRegistry) {
         this(jobTriggerService, jobDefinitionLookup, eventBus, scheduleStrategies, jobTriggerUpdatesFactory,
-                refreshingLockServiceFactory, jobFactory, workerPool, name, schedulerConfig,
+                refreshingLockServiceFactory, jobFactories, workerPool, name, schedulerConfig,
                 metricRegistry, DEFAULT_BACKOFF);
     }
 
@@ -116,7 +117,7 @@ public class JobExecutionEngine {
                               JobScheduleStrategies scheduleStrategies,
                               JobTriggerUpdates.Factory jobTriggerUpdatesFactory,
                               RefreshingLockService.Factory refreshingLockServiceFactory,
-                              Map<String, Job.Factory<? extends Job>> jobFactory,
+                              Map<String, Job.Factory<? extends Job>> jobFactories,
                               JobWorkerPool workerPool,
                               String name,
                               JobSchedulerConfig schedulerConfig,
@@ -127,7 +128,7 @@ public class JobExecutionEngine {
         this.eventBus = eventBus;
         this.scheduleStrategies = scheduleStrategies;
         this.jobTriggerUpdatesFactory = jobTriggerUpdatesFactory;
-        this.jobFactory = jobFactory;
+        this.jobFactories = jobFactories;
         this.workerPool = workerPool;
         this.refreshingLockServiceFactory = refreshingLockServiceFactory;
         this.concurrencyLimits = schedulerConfig.concurrencyLimits();
@@ -153,7 +154,7 @@ public class JobExecutionEngine {
                         // Since the DBJobTriggerService#numberOfOverdueTriggers only returns counts for existing
                         // triggers, we initialize all known job definition types with zero to always get counts
                         // for all types.
-                        return EntryStream.of(jobFactory.entrySet().stream())
+                        return EntryStream.of(jobFactories.entrySet().stream())
                                 .mapValues(Functions.constant(0L))
                                 .append(jobTriggerService.numberOfOverdueTriggers())
                                 .toMap((defaultValue, dbValue) -> dbValue);
@@ -161,10 +162,10 @@ public class JobExecutionEngine {
                 });
 
         // We always get the full set of job type names to populate the cache for the next gauge calls.
-        jobFactory.keySet().forEach(jobType -> MetricUtils.safelyRegister(
+        jobFactories.keySet().forEach(jobType -> MetricUtils.safelyRegister(
                 metricRegistry,
                 MetricRegistry.name(getClass(), "executions", "overdue", "type", jobType),
-                (Gauge<Long>) () -> gaugeCache.getAll(jobFactory.keySet()).get(jobType)
+                (Gauge<Long>) () -> gaugeCache.getAll(jobFactories.keySet()).get(jobType)
         ));
     }
 
@@ -263,7 +264,7 @@ public class JobExecutionEngine {
             final JobDefinitionDto jobDefinition = jobDefinitionLookup.lookup(trigger.jobDefinitionId())
                     .orElseThrow(() -> new IllegalStateException("Couldn't find job definition " + trigger.jobDefinitionId()));
 
-            final Job job = jobFactory.get(jobDefinition.config().type()).create(jobDefinition);
+            final Job job = jobFactories.get(jobDefinition.config().type()).create(jobDefinition);
             if (job == null) {
                 throw new IllegalStateException("Couldn't find job factory for type " + jobDefinition.config().type());
             }

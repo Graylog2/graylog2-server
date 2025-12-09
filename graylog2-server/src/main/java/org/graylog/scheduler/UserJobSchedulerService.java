@@ -28,6 +28,8 @@ import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 @Singleton
 public class UserJobSchedulerService extends JobSchedulerService {
     private static final Logger LOG = LoggerFactory.getLogger(UserJobSchedulerService.class);
@@ -39,6 +41,7 @@ public class UserJobSchedulerService extends JobSchedulerService {
                                    JobSchedulerConfig schedulerConfig,
                                    JobSchedulerClock clock,
                                    JobSchedulerEventBus.Factory schedulerEventBusFactory,
+                                   Map<String, Job.Factory<? extends Job>> jobFactories,
                                    DBJobDefinitionService jobDefinitionService,
                                    DBJobTriggerService jobTriggerService,
                                    ServerStatus serverStatus,
@@ -46,7 +49,7 @@ public class UserJobSchedulerService extends JobSchedulerService {
                                    @Named("shutdown_timeout") int shutdownTimeoutMs,
                                    @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration) {
         super(LOG,
-                (workerPool) -> engineFactory.create(NAME, workerPool, jobDefinitionService::get, jobTriggerService),
+                (workerPool) -> engineFactory.create(NAME, jobFactories, workerPool, jobDefinitionService::get, jobTriggerService),
                 workerPoolFactory.create(NAME, schedulerConfig.numberOfWorkerThreads()),
                 schedulerConfig,
                 clock,

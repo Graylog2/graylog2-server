@@ -133,7 +133,13 @@ class JobSchedulerServiceIT {
                         .build()
         );
 
-        final JobExecutionEngine.Factory engineFactory = (name, workerPool, definitionLookup, triggerService) -> new JobExecutionEngine(
+        final JobExecutionEngine.Factory engineFactory = (
+                name,
+                jobFactories,
+                workerPool,
+                definitionLookup,
+                triggerService
+        ) -> new JobExecutionEngine(
                 triggerService,
                 definitionLookup,
                 eventBus,
@@ -151,9 +157,13 @@ class JobSchedulerServiceIT {
                 new JobWorkerPool(name, poolSize, metricRegistry);
 
         jobSchedulerService = new TestJobSchedulerService(
-                workerPool -> engineFactory.create("test", workerPool,
+                workerPool -> engineFactory.create(
+                        "test",
+                        jobFactories,
+                        workerPool,
                         jobDefinitionService::get,
-                        jobTriggerService),
+                        jobTriggerService
+                ),
                 workerPoolFactory.create("test", schedulerConfig.numberOfWorkerThreads()), schedulerConfig, clock,
                 eventBus, serverStatus);
     }

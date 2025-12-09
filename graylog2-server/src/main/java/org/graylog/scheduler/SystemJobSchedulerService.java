@@ -28,6 +28,8 @@ import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
+
 @Singleton
 public class SystemJobSchedulerService extends JobSchedulerService {
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobSchedulerService.class);
@@ -39,6 +41,7 @@ public class SystemJobSchedulerService extends JobSchedulerService {
                                      JobSchedulerConfig schedulerConfig,
                                      JobSchedulerClock clock,
                                      JobSchedulerEventBus.Factory schedulerEventBusFactory,
+                                     Map<String, Job.Factory<? extends Job>> jobFactories,
                                      DBJobDefinitionService jobDefinitionService,
                                      DBSystemJobTriggerService systemJobTriggerService,
                                      ServerStatus serverStatus,
@@ -48,6 +51,7 @@ public class SystemJobSchedulerService extends JobSchedulerService {
         super(LOG,
                 (workerPool) -> engineFactory.create(
                         NAME,
+                        jobFactories, // TODO: Replace with system job factories!
                         workerPool,
                         jobDefinitionService::get, // TODO: Change this to lookup system jobs instead!
                         systemJobTriggerService // MUST be the system job trigger service!
