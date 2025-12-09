@@ -85,12 +85,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
   };
 
   const isFormValid = formValidation.isFormValid(
-    [
-      'awsCloudTrailName',
-      'awsCloudTrailSqsRegion',
-      'awsCloudTrailS3Region',
-      'awsCloudTrailSqsQueueName',
-    ],
+    ['awsCloudTrailName', 'awsCloudTrailSqsRegion', 'awsCloudTrailS3Region', 'awsCloudTrailSqsQueueName'],
     formData,
   );
 
