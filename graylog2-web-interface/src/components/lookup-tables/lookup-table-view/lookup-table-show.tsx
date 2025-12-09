@@ -37,11 +37,11 @@ export const Description = styled.span`
 
 type Props = {
   table: LookupTable;
-  cache: LookupTableCache;
-  dataAdapter: LookupTableAdapter;
+  cache?: LookupTableCache;
+  dataAdapter?: LookupTableAdapter;
 };
 
-function LookupTableShow({ table, cache, dataAdapter }: Props) {
+function LookupTableShow({ table, cache = undefined, dataAdapter = undefined }: Props) {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const canEdit = React.useMemo(
