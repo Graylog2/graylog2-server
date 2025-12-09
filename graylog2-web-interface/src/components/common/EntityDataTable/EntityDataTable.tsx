@@ -153,6 +153,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   meta,
   onActionsWidthChange,
   onHeaderSectionResize,
+  parentBgColor,
 }: {
   actionsColMinWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
@@ -165,6 +166,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   meta: Meta;
   onActionsWidthChange: (colId: string, width: number) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+  parentBgColor: string | undefined;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
@@ -174,6 +176,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     entityActions,
     hasRowActions,
     onWidthChange: onActionsWidthChange,
+    parentBgColor,
   });
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
     columnSchemas,
@@ -242,6 +245,8 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   onResetLayoutPreferences: () => Promise<void>;
   /** Active page size */
   pageSize?: number;
+  /** Required when parent container does not use the contentBackground color */
+  parentBgColor?: string;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Meta data. */
@@ -269,6 +274,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onResetLayoutPreferences,
   onSortChange,
   pageSize = undefined,
+  parentBgColor = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
@@ -325,6 +331,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     meta,
     onActionsWidthChange: handleActionsWidthChange,
     onHeaderSectionResize: handleHeaderSectionResize,
+    parentBgColor,
   });
 
   const table = useTable<Entity>({

@@ -63,7 +63,6 @@ const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArra
         .map((rowId) => rowWidths[rowId])
         .filter((width) => !!width),
     );
-    console.log(maxWidth);
 
     return maxWidth + CELL_PADDING * 2;
   }, [rowWidths, visibleRowIdsSet]);

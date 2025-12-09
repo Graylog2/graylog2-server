@@ -33,9 +33,9 @@ const AlignRight = styled.div`
   height: 100%;
 `;
 
-const BackgroundFoundation = styled.div(
-  ({ theme }) => css`
-    background-color: ${theme.colors.global.contentBackground};
+const BackgroundFoundation = styled.div<{ $parentBgColor: string }>(
+  ({ theme, $parentBgColor }) => css`
+    background-color: ${$parentBgColor ?? theme.colors.global.contentBackground};
     height: 100%;
     width: var(${actionsHeaderWidthVar});
   `,
@@ -46,7 +46,7 @@ const Actions = styled.div<{ $isEvenRow: boolean }>(
     display: flex;
     justify-content: flex-end;
     padding: ${CELL_PADDING}px;
-    background: ${$isEvenRow ? theme.colors.global.contentBackground : theme.colors.table.row.backgroundStriped};
+    background: ${$isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped};
     height: 100%;
   `,
 );
@@ -55,10 +55,12 @@ const ActionCell = <Entity extends EntityBase>({
   row,
   entityActions,
   onWidthChange,
+  parentBgColor,
 }: {
   row: Row<Entity>;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   onWidthChange: (rowId: string, width: number) => void;
+  parentBgColor: string | undefined;
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -72,7 +74,7 @@ const ActionCell = <Entity extends EntityBase>({
 
   return (
     <AlignRight>
-      <BackgroundFoundation>
+      <BackgroundFoundation $parentBgColor={parentBgColor}>
         <Actions $isEvenRow={row.index % 2 === 0}>
           <ButtonToolbar ref={ref}>{entityActions(row.original)}</ButtonToolbar>
         </Actions>
@@ -86,30 +88,37 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
   entityActions,
   hasRowActions,
   onWidthChange,
+  parentBgColor,
 }: {
   colWidth: number;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   hasRowActions: boolean;
   minWidth: number;
   onWidthChange: (colId: string, width: number) => void;
+  parentBgColor: string | undefined;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
 
   const cell = useCallback(
     ({ row }: { row: Row<Entity> }) =>
       entityActions ? (
-        <ActionCell<Entity> row={row} entityActions={entityActions} onWidthChange={onWidthChange} />
+        <ActionCell<Entity>
+          row={row}
+          entityActions={entityActions}
+          onWidthChange={onWidthChange}
+          parentBgColor={parentBgColor}
+        />
       ) : null,
-    [entityActions, onWidthChange],
+    [entityActions, onWidthChange, parentBgColor],
   );
 
   const header = useCallback(
     () => (
       <AlignRight>
-        <BackgroundFoundation />
+        <BackgroundFoundation $parentBgColor={parentBgColor} />
       </AlignRight>
     ),
-    [],
+    [parentBgColor],
   );
 
   return useMemo(
