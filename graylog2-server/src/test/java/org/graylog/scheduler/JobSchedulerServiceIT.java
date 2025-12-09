@@ -49,6 +49,8 @@ import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
@@ -157,13 +159,15 @@ class JobSchedulerServiceIT {
     }
 
     static class TestJobSchedulerService extends JobSchedulerService {
+        private static final Logger LOG = LoggerFactory.getLogger(TestJobSchedulerService.class);
+
         public TestJobSchedulerService(Function<JobWorkerPool, JobExecutionEngine> engineFactory,
                                        JobWorkerPool workerPool,
                                        JobSchedulerConfig schedulerConfig,
                                        JobSchedulerClock clock,
                                        JobSchedulerEventBus schedulerEventBus,
                                        ServerStatus serverStatus) {
-            super(engineFactory, workerPool, schedulerConfig, clock, schedulerEventBus,
+            super(LOG, engineFactory, workerPool, schedulerConfig, clock, schedulerEventBus,
                     serverStatus, new GracefulShutdownService(), 30_000, Duration.milliseconds(200));
         }
     }
