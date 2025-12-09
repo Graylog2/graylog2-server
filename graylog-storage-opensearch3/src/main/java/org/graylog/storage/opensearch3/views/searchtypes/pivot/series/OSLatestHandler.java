@@ -16,9 +16,7 @@
  */
 package org.graylog.storage.opensearch3.views.searchtypes.pivot.series;
 
-import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Latest;
-import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHits;
@@ -28,47 +26,33 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.TopHits;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
-import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 
-import javax.annotation.Nonnull;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
-public class OSLatestHandler extends OSPivotSeriesSpecHandler<Latest, ParsedFilter> {
+public class OSLatestHandler extends OSBasicSeriesSpecHandler<Latest, ParsedFilter> {
     private static final String AGG_NAME = "latest_aggregation";
 
-    @Nonnull
     @Override
-    public List<SeriesAggregationBuilder> doCreateAggregation(String name, Pivot pivot, Latest latestSpec, OSSearchTypeHandler<Pivot> searchTypeHandler, OSGeneratedQueryContext queryContext) {
+    protected SeriesAggregationBuilder createAggregationBuilder(final String name, final Latest latestSpec) {
         final FilterAggregationBuilder latest = AggregationBuilders.filter(name, QueryBuilders.existsQuery(latestSpec.field()))
                 .subAggregation(AggregationBuilders.topHits(AGG_NAME)
                         .size(1)
                         .fetchSource(latestSpec.field(), null)
                         .sort(SortBuilders.fieldSort("timestamp").order(SortOrder.DESC)));
-        record(queryContext, pivot, latestSpec, name, ParsedFilter.class);
-        return List.of(SeriesAggregationBuilder.metric(latest));
+        return SeriesAggregationBuilder.metric(latest);
     }
 
     @Override
-    public Stream<Value> doHandleResult(Pivot pivot,
-                                        Latest pivotSpec,
-                                        SearchResponse searchResult,
-                                        ParsedFilter filterAggregation,
-                                        OSSearchTypeHandler<Pivot> searchTypeHandler,
-                                        OSGeneratedQueryContext OSGeneratedQueryContext) {
+    protected Object getValueFromAggregationResult(final ParsedFilter filterAggregation, final Latest seriesSpec) {
         final TopHits latestAggregation = filterAggregation.getAggregations().get(AGG_NAME);
-        final Optional<Value> latestValue = Optional.ofNullable(latestAggregation)
+        return Optional.ofNullable(latestAggregation)
                 .map(TopHits::getHits)
                 .map(SearchHits::getHits)
                 .filter(hits -> hits.length > 0)
                 .map(hits -> hits[0])
                 .map(SearchHit::getSourceAsMap)
-                .map(source -> source.get(pivotSpec.field()))
-                .map(value -> Value.create(pivotSpec.id(), Latest.NAME, value));
-        return latestValue.stream();
+                .map(source -> source.get(seriesSpec.field()))
+                .orElse(null);
     }
 }

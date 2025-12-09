@@ -37,7 +37,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTimeZone;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
@@ -51,10 +50,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 
-@Disabled("Temporarily disabled because of flakiness")
 public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
-    private IndexLookup indexLookup;
     private OpenSearchExportBackend backend;
     private OpenSearchExportITHelper helper;
 
@@ -73,19 +70,14 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
     @BeforeEach
     public void setUp() {
-        indexLookup = mock(IndexLookup.class);
-        backend = new OpenSearchExportBackend(indexLookup, requestStrategy(), false, new IgnoreSearchFilters());
+        final IndexLookup indexLookup = mock(IndexLookup.class);
+        backend = new OpenSearchExportBackend(indexLookup, false, new IgnoreSearchFilters(), openSearchInstance.getOfficialOpensearchClient());
         helper = new OpenSearchExportITHelper(indexLookup, backend);
     }
 
     @AfterEach
     public void afterEach() {
         openSearchInstance.cleanUp();
-    }
-
-    private RequestStrategy requestStrategy() {
-        final ExportClient exportClient = new ExportClient(openSearchInstance.openSearchClient());
-        return new SearchAfter(exportClient);
     }
 
     @Test

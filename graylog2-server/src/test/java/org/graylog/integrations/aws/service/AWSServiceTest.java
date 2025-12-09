@@ -49,6 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -84,7 +85,8 @@ public class AWSServiceTest {
         when(inputService.save(isA(Input.class))).thenReturn("input-id");
         when(user.getName()).thenReturn("a-user-name");
         when(messageInputFactory.create(isA(InputCreateRequest.class), isA(String.class), isA(String.class), anyBoolean())).thenReturn(messageInput);
-
+        when(inputService.create(isA(HashMap.class))).thenReturn(mock(Input.class));
+        
         AWSInputCreateRequest request =
                 AWSInputCreateRequest.builder().region(Region.US_EAST_1.id())
                         .awsAccessKeyId("a-key")

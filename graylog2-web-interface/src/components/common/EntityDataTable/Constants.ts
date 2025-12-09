@@ -27,3 +27,8 @@ export const BULK_SELECT_COL_ID = 'bulk-select';
 export const ACTIONS_COL_ID = 'actions';
 
 export const UTILITY_COLUMNS = new Set([BULK_SELECT_COL_ID, ACTIONS_COL_ID]);
+
+export const ATTRIBUTE_STATUS = {
+  show: 'show',
+  hide: 'hide',
+} as const;

@@ -36,13 +36,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 
 @ExtendWith(MongoDBExtension.class)
 class ServerNodePaginatedServiceIT {
 
-    public static final int STALE_LEADER_TIMEOUT_MS = 2000;
+    public static final int STALE_LEADER_TIMEOUT_MS = 180_000;
 
     private ServerNodePaginatedService serverNodePaginatedService;
     private SearchQueryParser queryParser;
@@ -51,29 +50,44 @@ class ServerNodePaginatedServiceIT {
     void setUp(MongoCollections mongoCollections) throws ValidationException, RepositoryException {
         final Configuration configuration = configuration(Collections.singletonMap("stale_leader_timeout", String.valueOf(STALE_LEADER_TIMEOUT_MS)));
         final ServerNodeClusterService serverNodeService = new ServerNodeClusterService(mongoCollections.mongoConnection(), configuration);
-        serverNodeService.registerServer(node());
+        serverNodeService.registerServer(node("my-hostname", true, "5ca1ab1e-0000-4000-a000-100000000000"));
+        serverNodeService.registerServer(node("aaa-hostname", false, "5ca1ab1e-0000-4000-a000-200000000000"));
+        serverNodeService.registerServer(node("zzz-hostname", false, "5ca1ab1e-0000-4000-a000-300000000000"));
         serverNodePaginatedService = new ServerNodePaginatedService(mongoCollections);
         queryParser = new SearchQueryParser("hostname", ClusterResource.SERVER_NODE_ENTITY_SEARCH_MAPPINGS);
     }
 
-    private static NodeDto node() {
+    private static NodeDto node(String hostname, boolean leader, String nodeID) {
         return ServerNodeDto.Builder.builder()
-                .setHostname("my-hostname")
-                .setId(UUID.randomUUID().toString())
-                .setLeader(true)
-                .setTransportAddress("http://my-hostname:8999")
+                .setHostname(hostname)
+                .setId(nodeID)
+                .setLeader(leader)
+                .setTransportAddress("http://" + hostname + ":8999")
                 .setProcessing(true)
                 .setLifecycle(Lifecycle.RUNNING)
                 .build();
     }
 
     @Test
-    void testPaginatedAccess() {
-        final PaginatedList<ServerNodeDto> results = serverNodePaginatedService.searchPaginated(queryParser.parse(""), SortOrder.ASCENDING.toBsonSort("hostname"), 1, 1);
-        Assertions.assertThat(results.delegate())
-                .hasSize(1)
+    void testSorting() {
+        Assertions.assertThat(resultsWithSorting("hostname", SortOrder.DESCENDING, "").delegate())
+                .hasSize(3)
                 .extracting(NodeDto::getHostname)
-                .contains("my-hostname");
+                .containsExactly("zzz-hostname", "my-hostname", "aaa-hostname");
+
+        Assertions.assertThat(resultsWithSorting("hostname", SortOrder.ASCENDING, "").delegate())
+                .hasSize(3)
+                .extracting(NodeDto::getHostname)
+                .containsExactly("aaa-hostname", "my-hostname", "zzz-hostname");
+
+        Assertions.assertThat(resultsWithSorting("hostname", SortOrder.ASCENDING, "").delegate())
+                .hasSize(3)
+                .extracting(NodeDto::getHostname)
+                .containsExactly("aaa-hostname", "my-hostname", "zzz-hostname");
+    }
+
+    private PaginatedList<ServerNodeDto> resultsWithSorting(String field, SortOrder order, String query) {
+        return serverNodePaginatedService.searchPaginated(queryParser.parse(query), order.toBsonSort(field), 1, 10);
     }
 
     private Configuration configuration(Map<String, String> properties) throws RepositoryException, ValidationException {

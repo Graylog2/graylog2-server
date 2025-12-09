@@ -27,6 +27,7 @@ import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
 const ActionsHead = styled.div`
   text-align: right;
+  flex: 1;
 `;
 
 const Actions = styled(ButtonToolbar)`
@@ -36,7 +37,7 @@ const Actions = styled(ButtonToolbar)`
 const ActionsHeader = () => <ActionsHead>Actions</ActionsHead>;
 
 const useActionsColumnDefinition = <Entity extends EntityBase>(
-  displayActionsCol: boolean,
+  hasRowActions: boolean,
   actionsColWidth: number,
   entityActions: (entity: Entity) => React.ReactNode | undefined,
   colRef: React.MutableRefObject<HTMLDivElement>,
@@ -54,16 +55,15 @@ const useActionsColumnDefinition = <Entity extends EntityBase>(
 
   return useMemo(
     () =>
-      displayActionsCol
-        ? columnHelper.display({
-            id: ACTIONS_COL_ID,
-            size: actionsColWidth,
-            header: ActionsHeader,
-            enableHiding: false,
-            cell,
-          })
-        : null,
-    [actionsColWidth, cell, columnHelper, displayActionsCol],
+      columnHelper.display({
+        id: ACTIONS_COL_ID,
+        size: actionsColWidth,
+        header: hasRowActions ? ActionsHeader : undefined,
+        enableHiding: false,
+        enableResizing: false,
+        cell: hasRowActions ? cell : undefined,
+      }),
+    [actionsColWidth, cell, columnHelper, hasRowActions],
   );
 };
 export default useActionsColumnDefinition;

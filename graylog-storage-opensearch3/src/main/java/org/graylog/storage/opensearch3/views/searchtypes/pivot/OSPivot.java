@@ -18,20 +18,18 @@ package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
 import com.google.common.collect.ImmutableList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotResult;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
-import org.graylog.plugins.views.search.util.ListOfStringsComparator;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
@@ -42,8 +40,6 @@ import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -72,10 +68,6 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
     public void doGenerateQueryPart(Query query, Pivot pivot, OSGeneratedQueryContext queryContext) {
         LOG.debug("Generating aggregation for {}", pivot);
         final SearchSourceBuilder searchSourceBuilder = queryContext.searchSourceBuilder(pivot);
-
-        final Map<Object, Object> contextMap = queryContext.contextMap();
-        final AggTypes aggTypes = new AggTypes();
-        contextMap.put(pivot.id(), aggTypes);
 
         var generateRollups = pivot.rollup() || (pivot.rowGroups().isEmpty() && pivot.columnGroups().isEmpty());
 
@@ -173,13 +165,13 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                     if (esPivotSeriesSpecHandler == null) {
                         throw new IllegalArgumentException("No series handler registered for: " + seriesSpec.type());
                     }
-                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, this, queryContext).stream();
+                    return esPivotSeriesSpecHandler.createAggregation(seriesName, pivot, seriesSpec, queryContext).stream();
                 });
     }
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(Query query, Pivot pivot, SearchResponse queryResult, OSGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
 
         final var fieldsNames = pivot.rowGroups().stream().flatMap(bs -> bs.fields().stream());
@@ -258,7 +250,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
         pivot.series().forEach(seriesSpec -> {
             final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, this, queryContext)
+            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext)
                     .map(value -> {
                         columnKeys.addLast(value.id());
                         final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);

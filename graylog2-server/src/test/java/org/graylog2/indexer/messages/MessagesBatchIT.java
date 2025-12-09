@@ -19,7 +19,7 @@ package org.graylog2.indexer.messages;
 import com.google.common.base.Strings;
 import org.graylog.failure.FailureSubmissionService;
 import org.graylog.testing.elasticsearch.ElasticsearchBaseTest;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.TestMessageFactory;
 import org.graylog2.system.processing.ProcessingStatusRecorder;
@@ -93,7 +93,7 @@ public abstract class MessagesBatchIT extends ElasticsearchBaseTest {
 
         final String message = Strings.repeat("A", size);
         for (int i = 0; i < count; i++) {
-            messageList.add(new MessageWithIndex(ImmutableMessage.wrap(messageFactory.createMessage(i + message, "source", now())), indexSet));
+            messageList.add(new MessageWithIndex(ImmutableMessage.wrap(messageFactory.createMessage(i + message, "source", now())), indexSet.getWriteIndexAlias()));
         }
         return messageList;
     }

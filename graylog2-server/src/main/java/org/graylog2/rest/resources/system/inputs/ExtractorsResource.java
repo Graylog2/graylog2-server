@@ -199,7 +199,7 @@ public class ExtractorsResource extends RestResource {
 
         final Input input = inputService.find(inputId);
         final List<ExtractorSummary> extractors = Lists.newArrayList();
-        for (Extractor extractor : inputService.getExtractors(input)) {
+        for (Extractor extractor : inputService.getExtractors(input.getId())) {
             extractors.add(toSummary(extractor));
         }
 
@@ -288,7 +288,7 @@ public class ExtractorsResource extends RestResource {
         final Input mongoInput = inputService.find(inputPersistId);
         checkPermission(RestPermissions.INPUT_TYPES_CREATE, mongoInput.getType()); // remove after sharing inputs implemented
 
-        for (Extractor extractor : inputService.getExtractors(mongoInput)) {
+        for (Extractor extractor : inputService.getExtractors(mongoInput.getId())) {
             if (oer.order().containsValue(extractor.getId())) {
                 extractor.setOrder(Tools.getKeyByValue(oer.order(), extractor.getId()));
             }
