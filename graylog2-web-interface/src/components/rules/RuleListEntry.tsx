@@ -25,7 +25,6 @@ import Routes from 'routing/Routes';
 import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
 import StringUtils from 'util/StringUtils';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
-import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 
 type Props = {
   rule: RuleType;
@@ -55,6 +54,7 @@ const DefaultLabel = styled(Label)(
 const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(rule);
   const { id, title, description, created_at, modified_at } = rule;
+
   const pipelinesLength = usingPipelines.length;
   const isRuleBuilder = rule.rule_builder ? '?rule_builder=true' : '';
   const isManaged = scopePermissions && !scopePermissions?.is_mutable;
@@ -97,7 +97,7 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
             Managed by Application
           </DefaultLabel>
         )}
-        <RuleDeprecationInfo rule={rule} />
+        {/* TODO: Add rule deprecation info here */}
       </td>
       <td className="limited">{description}</td>
       <td className="limited">

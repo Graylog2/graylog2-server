@@ -60,7 +60,7 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
       <tr key={rule.id}>
         <td>
           {ruleTitle}
-          <RuleDeprecationInfo rule={rule} />
+          <RuleDeprecationInfo pipelineId={pipeline.id} />
         </td>
         <td>{rule.description}</td>
         <td>

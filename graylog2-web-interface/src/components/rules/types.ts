@@ -14,7 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
-const DEPRECATED_PIPELINE_FUNCTIONS: string[] = ['remove_field'];
-
-export default DEPRECATED_PIPELINE_FUNCTIONS;
+export type PipelineRulesMetadata = {
+  functions: string[];
+  streams: string[];
+  pipeline_id?: string;
+  rules: string[];
+  id?: string;
+  deprecated_functions: string[];
+  has_input_references?: boolean;
+};

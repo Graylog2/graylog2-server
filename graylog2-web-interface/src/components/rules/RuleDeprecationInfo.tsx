@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useState, useCallback, useEffect } from 'react';
 import styled, { css } from 'styled-components';
 import * as React from 'react';
 
 import { Label } from 'components/bootstrap';
-import DEPRECATED_PIPELINE_FUNCTIONS from 'components/pipelines/constants';
-import type { RuleType } from 'stores/rules/RulesStore';
 import { HoverForHelp } from 'components/common';
+import usePipelineRulesMetadata from 'components/rules/hooks/usePipelineRulesMetadata';
 
 type Props = {
-  rule: RuleType;
+  pipelineId: string;
+  showFor?: 'pipeline' | 'rule';
 };
 
 const DeprecatedLabel = styled(Label)(
@@ -47,26 +46,23 @@ const StyledList = styled.ul(
   `,
 );
 
-const RuleDeprecationInfo = ({ rule }: Props) => {
-  const [deprecatedFunctions, setDeprecatedFunctions] = useState<string[]>([]);
+const RuleDeprecationInfo = ({ pipelineId, showFor = 'rule' }: Props) => {
+  const { data, isLoading } = usePipelineRulesMetadata(pipelineId);
 
-  const findDeprecatedFunctions = useCallback(() => {
-    setDeprecatedFunctions(
-      rule?.rule_builder?.actions
-        ?.filter((act) => DEPRECATED_PIPELINE_FUNCTIONS.includes(act.function))
-        .map((act) => act.function),
-    );
-  }, [rule]);
-
-  useEffect(() => findDeprecatedFunctions(), [findDeprecatedFunctions]);
+  if (isLoading || !data) return null;
+  const deprecatedFunctions = data.deprecated_functions;
 
   if (deprecatedFunctions?.length === 0) return null;
 
   return (
     <DeprecatedLabel bsStyle="warning">
       <span>Deprecated Function</span>
-      <HoverForHelp trigger="hover" type="info" title="This rule contains at least one deprecated function:">
-        <StyledList>{deprecatedFunctions?.map((func) => <li>{func}</li>)}</StyledList>
+      <HoverForHelp trigger="hover" type="info" title={`This ${showFor} contains at least one deprecated function:`}>
+        <StyledList>
+          {deprecatedFunctions?.map((func) => (
+            <li key={func}>{func}</li>
+          ))}
+        </StyledList>
       </HoverForHelp>
     </DeprecatedLabel>
   );
