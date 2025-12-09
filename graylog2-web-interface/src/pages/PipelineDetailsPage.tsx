@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Col, Row } from 'components/bootstrap';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from 'components/pipelines/Pipeline';
 import NewPipeline from 'components/pipelines/NewPipeline';
 import SourceGenerator from 'logic/pipelines/SourceGenerator';
-import { StreamsStore } from 'stores/streams/StreamsStore';
 import { PipelineConnectionsStore, PipelineConnectionsActions } from 'stores/pipelines/PipelineConnectionsStore';
 import DocsHelper from 'util/DocsHelper';
 import { useStore } from 'stores/connect';
@@ -30,6 +29,7 @@ import useParams from 'routing/useParams';
 import { RulesActions } from 'stores/rules/RulesStore';
 import usePipeline from 'hooks/usePipeline';
 import usePipelineMutations from 'hooks/usePipelineMutations';
+import useEditableStreams from 'hooks/useEditableStreams';
 
 import PipelinesPageNavigation from '../components/pipelines/PipelinesPageNavigation';
 
@@ -45,17 +45,11 @@ const PipelineDetailsPage = () => {
   const connections = useStore(PipelineConnectionsStore, (state) =>
     state.connections?.filter((c) => c.pipeline_ids && c.pipeline_ids.includes(params.pipelineId)),
   );
-  const [streams, setStreams] = useState();
+  const streams = useEditableStreams();
 
   useEffect(() => {
     RulesActions.list();
     PipelineConnectionsActions.list();
-
-    StreamsStore.listStreams().then((_streams) => {
-      const filteredStreams = _streams.filter((s) => s.is_editable);
-
-      setStreams(filteredStreams);
-    });
   }, []);
 
   const _onConnectionsChange = (updatedConnections, callback) => {
