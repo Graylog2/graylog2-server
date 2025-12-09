@@ -20,9 +20,11 @@ import * as React from 'react';
 import { Label } from 'components/bootstrap';
 import { HoverForHelp } from 'components/common';
 import usePipelineRulesMetadata from 'components/rules/hooks/usePipelineRulesMetadata';
+import useRuleDeprecatedFunctions from 'components/rules/hooks/useRuleDeprecatedFunctions';
 
 type Props = {
-  pipelineId: string;
+  pipelineId?: string;
+  ruleId?: string;
   showFor?: 'pipeline' | 'rule';
 };
 
@@ -46,13 +48,41 @@ const StyledList = styled.ul(
   `,
 );
 
-const RuleDeprecationInfo = ({ pipelineId, showFor = 'rule' }: Props) => {
-  const { data, isLoading } = usePipelineRulesMetadata(pipelineId);
+const RuleDeprecationInfo = ({ pipelineId = undefined, ruleId = undefined, showFor = 'rule' }: Props) => {
+  const { data: pipelineMetaData, isLoading: isLoadingPipelineMetaData } = usePipelineRulesMetadata(pipelineId, {
+    enabled: !!pipelineId,
+  });
 
-  if (isLoading || !data) return null;
-  const deprecatedFunctions = data.deprecated_functions;
+  const { data: ruleDeprecatedFunctionsData, isLoading: isLoadingRuleDeprecatedFunctions } = useRuleDeprecatedFunctions(
+    ruleId,
+    {
+      enabled: !!ruleId,
+    },
+  );
 
-  if (deprecatedFunctions?.length === 0) return null;
+  if (
+    isLoadingPipelineMetaData ||
+    isLoadingRuleDeprecatedFunctions ||
+    !pipelineMetaData ||
+    !ruleDeprecatedFunctionsData
+  )
+    return null;
+
+  const getDeprecatedFunctions = () => {
+    if (pipelineMetaData?.deprecated_functions?.length > 0) {
+      return pipelineMetaData.deprecated_functions;
+    }
+
+    if (ruleDeprecatedFunctionsData?.length > 0) {
+      return ruleDeprecatedFunctionsData;
+    }
+
+    return [];
+  };
+
+  const deprecatedFunctions = getDeprecatedFunctions();
+
+  if (deprecatedFunctions.length === 0) return null;
 
   return (
     <DeprecatedLabel bsStyle="warning">

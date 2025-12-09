@@ -25,6 +25,7 @@ import Routes from 'routing/Routes';
 import type { RuleType, PipelineSummary } from 'stores/rules/RulesStore';
 import StringUtils from 'util/StringUtils';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 
 type Props = {
   rule: RuleType;
@@ -97,7 +98,7 @@ const RuleListEntry = ({ rule, onDelete, usingPipelines }: Props) => {
             Managed by Application
           </DefaultLabel>
         )}
-        {/* TODO: Add rule deprecation info here */}
+        <RuleDeprecationInfo ruleId={id} />
       </td>
       <td className="limited">{description}</td>
       <td className="limited">
