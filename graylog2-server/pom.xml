@@ -993,11 +993,6 @@
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>3.2.1</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.6.2</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
