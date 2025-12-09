@@ -34,9 +34,12 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.HasAggr
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.MultiBucketsAggregation;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MaxAggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.MinAggregationBuilder;
+import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.shaded.opensearch2.org.opensearch.search.builder.SearchSourceBuilder;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
 import org.graylog.storage.opensearch3.views.searchtypes.OSSearchTypeHandler;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.series.OSPercentageAggregationData;
+import org.graylog.storage.opensearch3.views.searchtypes.pivot.series.OSPercentageHandler;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -196,10 +199,9 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                             .key(rowKeys)
                             .source("leaf");
                     if (pivot.columnGroups().isEmpty() || pivot.rollup()) {
-                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
+                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf", initialBucket);
                     }
                     if (!pivot.columnGroups().isEmpty()) {
-                        var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
                         retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
                                 .forEach(columnBucketTuple -> {
                                     final ImmutableList<String> columnKeys = columnBucketTuple.keys();
@@ -207,7 +209,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
                                     final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
-                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf", rowBucket);
                                 });
                     }
                     resultBuilder.addRow(rowBuilder.build());
@@ -215,7 +217,7 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
 
         if (!pivot.rowGroups().isEmpty() && pivot.rollup()) {
             final PivotResult.Row.Builder rowBuilder = PivotResult.Row.builder().key(ImmutableList.of());
-            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner");
+            processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), initialBucket, true, "row-inner", initialBucket);
             resultBuilder.addRow(rowBuilder.source("non-leaf").build());
         }
 
@@ -246,12 +248,25 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                                ArrayDeque<String> columnKeys,
                                HasAggregations aggregation,
                                boolean rollup,
-                               String source) {
+                               String source,
+                               MultiBucketsAggregation.Bucket initialBucket) {
         pivot.series().forEach(seriesSpec -> {
             final OSPivotSeriesSpecHandler<? extends SeriesSpec, ? extends Aggregation> seriesHandler = seriesHandlers.get(seriesSpec.type());
             final Aggregation series = seriesHandler.extractAggregationFromResult(pivot, seriesSpec, aggregation, queryContext);
-            seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext)
-                    .map(value -> {
+            Stream<OSPivotSeriesSpecHandler.Value> valueStream;
+            if (seriesHandler instanceof OSPercentageHandler percentageHandler) {
+                valueStream = percentageHandler.handleResult(
+                        pivot,
+                        seriesSpec,
+                        searchResult,
+                        new OSPercentageAggregationData((ValueCount) series, initialBucket),
+                        queryContext
+                );
+
+            } else {
+                valueStream = seriesHandler.handleResult(pivot, seriesSpec, searchResult, series, queryContext);
+            }
+            valueStream.map(value -> {
                         columnKeys.addLast(value.id());
                         final PivotResult.Value v = PivotResult.Value.create(columnKeys, value.value(), rollup, source);
                         columnKeys.removeLast();

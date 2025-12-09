@@ -32,7 +32,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.bucket.
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ParsedSum;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.metrics.ValueCount;
 import org.graylog.storage.opensearch3.views.OSGeneratedQueryContext;
-import org.graylog.storage.opensearch3.views.searchtypes.pivot.InitialBucket;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.OSPivotSeriesSpecHandler;
 import org.graylog.storage.opensearch3.views.searchtypes.pivot.SeriesAggregationBuilder;
 import org.slf4j.Logger;
@@ -43,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, ValueCount> {
+public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, OSPercentageAggregationData> {
     private static final Logger LOG = LoggerFactory.getLogger(OSCountHandler.class);
     private final OSCountHandler osCountHandler;
     private final OSSumHandler osSumHandler;
@@ -106,8 +105,9 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
     public Stream<Value> doHandleResult(Pivot pivot,
                                         Percentage percentage,
                                         SearchResponse searchResult,
-                                        ValueCount valueCount,
+                                        OSPercentageAggregationData osPercentageAggregationData,
                                         OSGeneratedQueryContext osGeneratedQueryContext) {
+        ValueCount valueCount = osPercentageAggregationData.valueCount();
         final long value;
         if (valueCount == null) {
             LOG.error("Unexpected null aggregation result, returning 0 for the count. This is a bug.");
@@ -120,7 +120,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var initialBucket = osGeneratedQueryContext.rowBucket().orElseGet(() -> InitialBucket.create(searchResult));
+        var initialBucket = osPercentageAggregationData.initialBucket();
         var rootResult = extractNestedSeriesAggregation(pivot, percentage, initialBucket, osGeneratedQueryContext);
         var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, osGeneratedQueryContext);
 
