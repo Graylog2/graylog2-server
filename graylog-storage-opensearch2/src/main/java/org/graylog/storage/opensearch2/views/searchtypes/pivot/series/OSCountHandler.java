@@ -52,7 +52,6 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
                     // the request was for a field count, we have to add a value_count sub aggregation
                     final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
                     queryContext.recordNameForPivotSpec(pivot, count, name);
-                    queryContext.recordNameForPivotSpec(pivot, count, name);
                     return List.of(SeriesAggregationBuilder.metric(value));
                 })
                 // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
