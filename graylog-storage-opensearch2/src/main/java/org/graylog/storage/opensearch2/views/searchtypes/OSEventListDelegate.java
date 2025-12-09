@@ -18,7 +18,6 @@ package org.graylog.storage.opensearch2.views.searchtypes;
 
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
 import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchResponse;
@@ -37,8 +36,8 @@ public class OSEventListDelegate implements OSSearchTypeHandler<EventList> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, EventList searchType, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
-        return strategy.doExtractResult(job, query, searchType, queryResult, aggregations, queryContext);
+    public SearchType.Result doExtractResult(Query query, EventList searchType, SearchResponse queryResult, Aggregations aggregations, OSGeneratedQueryContext queryContext) {
+        return strategy.doExtractResult(query, searchType, queryResult, aggregations, queryContext);
     }
 
     @Override

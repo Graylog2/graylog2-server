@@ -21,7 +21,6 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
@@ -101,7 +100,7 @@ public class OSEventList implements EventListStrategy {
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, EventList searchType, SearchResponse result,
+    public SearchType.Result doExtractResult(Query query, EventList searchType, SearchResponse result,
                                              Aggregations aggregations, OSGeneratedQueryContext queryContext) {
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
                 .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))

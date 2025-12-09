@@ -21,7 +21,6 @@ import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import org.graylog.plugins.views.search.LegacyDecoratorProcessor;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.MessageList;
 import org.graylog.plugins.views.search.searchtypes.Sort;
@@ -162,7 +161,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, MessageList searchType, org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse result, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(Query query, MessageList searchType, org.graylog.shaded.elasticsearch7.org.elasticsearch.action.search.SearchResponse result, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
         final List<ResultMessageSummary> messages = StreamSupport.stream(result.getHits().spliterator(), false)
                 .map(this::resultMessageFromSearchHit)
                 .map((resultMessage) -> ResultMessageSummary.create(resultMessage.highlightRanges, resultMessage.getMessage().getFields(), resultMessage.getIndex()))

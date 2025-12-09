@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
@@ -173,7 +172,7 @@ public class ESPivot implements ESSearchTypeHandler<Pivot> {
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(Query query, Pivot pivot, SearchResponse queryResult, Aggregations aggregations, ESGeneratedQueryContext queryContext) {
         final AbsoluteRange effectiveTimerange = this.effectiveTimeRangeExtractor.extract(queryResult, query, pivot);
 
         final var fieldsNames = pivot.rowGroups().stream().flatMap(bs -> bs.fields().stream());
