@@ -164,14 +164,14 @@
         <log4j.version>2.25.2</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <metrics.version>4.2.37</metrics.version>
-        <mongodb-driver.version>5.6.1</mongodb-driver.version>
+        <mongodb-driver.version>5.6.2</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.7.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.56.0</opentelemetry.version>
+        <opentelemetry.version>1.57.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.22.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
