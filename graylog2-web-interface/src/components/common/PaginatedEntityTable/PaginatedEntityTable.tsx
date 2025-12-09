@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
@@ -65,6 +65,7 @@ type InnerProps = {
   fetchOptions: SearchParams;
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
+  onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
   onChangeFilters: (newFilters: UrlQueryFilters) => void;
   paginationState: PaginationQueryParameterResult;
   reactQueryOptions: FetchOptions;
@@ -90,6 +91,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   middleSection: MiddleSection = undefined,
   externalSearch = undefined,
   onChangeFilters,
+  onDataLoaded = undefined,
   paginationState,
   queryHelpComponent = undefined,
   reactQueryOptions,
@@ -116,6 +118,12 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   });
 
   useOnRefresh(refetch);
+
+  useEffect(() => {
+    if (onDataLoaded) {
+      onDataLoaded(paginatedEntities);
+    }
+  }, [onDataLoaded, paginatedEntities]);
 
   const appSection = `${tableLayout.entityTableId}-list`;
 
@@ -228,6 +236,7 @@ type WrapperProps<T, M> = Props<T, M> & {
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   reactQueryOptions: FetchOptions;
+  onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
 };
 
 const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
@@ -243,6 +252,7 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
       setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
+      onDataLoaded={props.onDataLoaded as ((data: PaginatedResponse<T, M>) => void) | undefined}
     />
   );
 };
@@ -260,6 +270,7 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
       setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
+      onDataLoaded={props.onDataLoaded as ((data: PaginatedResponse<T, M>) => void) | undefined}
     />
   );
 };
@@ -273,6 +284,7 @@ type Props<T, M> = {
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
   externalSearch?: ExternalSearch;
+  onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
@@ -306,6 +318,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
       layoutConfig={layoutConfig}
       isLoadingLayoutPreferences={isLoadingLayoutPreferences}
       reactQueryOptions={reactQueryOptions}
+      onDataLoaded={props.onDataLoaded}
     />
   );
 };
