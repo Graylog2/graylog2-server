@@ -21,6 +21,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.security.certutil.ConfigureCertRenewalJobOnStartupService;
 import org.graylog2.events.ClusterEventService;
+import org.graylog2.events.Offset;
+import org.graylog2.events.OffsetFromCurrentMongoDBTimeProvider;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.shared.initializers.InputSetupService;
 import org.graylog2.shared.initializers.JerseyService;
@@ -33,6 +35,7 @@ public class GenericInitializerBindings extends AbstractModule {
     @Override
     protected void configure() {
         bind(ProcessingStatusRecorder.class).to(MongoDBProcessingStatusRecorderService.class).asEagerSingleton();
+        bind(Offset.class).toProvider(OffsetFromCurrentMongoDBTimeProvider.class).asEagerSingleton();
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(InputSetupService.class);
