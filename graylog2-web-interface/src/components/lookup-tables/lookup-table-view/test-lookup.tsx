@@ -138,7 +138,12 @@ function TestLookup({ table }: Props) {
                 <Button name="reset" disabled={!lookupResult} onClick={onReset}>
                   Reset
                 </Button>
-                <Button type="submit" name="lookupbutton" bsStyle="primary" disabled={!lookupKey.valid}>
+                <Button
+                  type="submit"
+                  name="lookupbutton"
+                  bsStyle="primary"
+                  data-testid="lookupbutton"
+                  disabled={!lookupKey.valid}>
                   Look up
                 </Button>
               </Row>

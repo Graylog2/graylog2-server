@@ -72,6 +72,7 @@ function PurgeCache({ table }: Props) {
             name="purgekey"
             placeholder="Insert key which should be purged"
             label="Key"
+            data-testid="purgekey"
             onChange={onChange}
             help="Key to purge from cache"
             required
