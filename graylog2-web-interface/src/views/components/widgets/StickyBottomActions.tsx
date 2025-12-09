@@ -16,7 +16,9 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+import useIntersectionObserver from 'hooks/useIntersectionObserver';
 
 const Container = styled.div`
   height: 100%;
@@ -66,35 +68,6 @@ const ScrolledToBottomIndicator = styled.div`
   z-index: 0;
 `;
 
-const useScrolledToBottom = (): {
-  setScrolledToBottomIndicatorRef: (ref: HTMLDivElement) => void;
-  scrolledToBottom: boolean;
-} => {
-  const [scrolledToBottomIndicatorRef, setScrolledToBottomIndicatorRef] = useState(null);
-  const [scrolledToBottom, setScrolledToBottom] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setScrolledToBottom(!entry.isIntersecting);
-      },
-      { threshold: 0.9 },
-    );
-
-    if (scrolledToBottomIndicatorRef) {
-      observer.observe(scrolledToBottomIndicatorRef);
-    }
-
-    return () => {
-      if (scrolledToBottomIndicatorRef) {
-        observer.unobserve(scrolledToBottomIndicatorRef);
-      }
-    };
-  }, [scrolledToBottomIndicatorRef]);
-
-  return { setScrolledToBottomIndicatorRef, scrolledToBottom };
-};
-
 type Props = {
   actions: React.ReactNode;
   children: React.ReactNode;
@@ -104,14 +77,15 @@ type Props = {
 };
 
 const StickyBottomActions = ({ actions, children, className = undefined, alignActionsAtBottom = false }: Props) => {
-  const { setScrolledToBottomIndicatorRef, scrolledToBottom } = useScrolledToBottom();
+  const scrolledToBottomIndicatorRef = useRef<HTMLDivElement>();
+  const scrolledToBottom = useIntersectionObserver(scrolledToBottomIndicatorRef);
 
   return (
     <Container className={className}>
       <ScrollContainer>
         <Content>
           {children}
-          <ScrolledToBottomIndicator ref={setScrolledToBottomIndicatorRef} />
+          <ScrolledToBottomIndicator ref={scrolledToBottomIndicatorRef} />
         </Content>
       </ScrollContainer>
       <Actions $scrolledToBottom={scrolledToBottom} $alignAtBottom={alignActionsAtBottom}>

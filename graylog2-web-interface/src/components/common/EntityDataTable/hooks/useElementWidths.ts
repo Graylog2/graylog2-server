@@ -63,6 +63,7 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
 
   return {
     tableRef,
+    tableWidth,
     handleActionsWidthChange,
     columnWidths,
     tableIsCompressed: actionsColMinWidth === columnWidths[ACTIONS_COL_ID],

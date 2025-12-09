@@ -20,3 +20,4 @@ export const columnWidthVar = (colId: string) => `--col-${colId.replace(/\./g, '
 export const columnOpacityVar = (colId: string) => `--col-${colId}-opacity`;
 export const columnTransition = () => `--col-transition`;
 export const actionsHeaderWidthVar = `--actions-header-width`;
+export const displayScrollRightIndicatorVar = `--display-scroll-right-indicator`;

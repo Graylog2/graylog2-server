@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import { ButtonGroup } from 'components/bootstrap';
@@ -31,16 +31,17 @@ import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import {
+  actionsHeaderWidthVar,
+  columnOpacityVar,
   columnTransformVar,
   columnWidthVar,
-  columnOpacityVar,
-  actionsHeaderWidthVar,
+  displayScrollRightIndicatorVar,
 } from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
-import useCanScrollRight from 'components/common/EntityDataTable/hooks/useHorizontalScrollShadow';
 import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
 import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColumnRenderers';
 import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
+import useIntersectionObserver from 'hooks/useIntersectionObserver';
 
 import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, ExpandedSectionRenderers } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
@@ -51,8 +52,9 @@ const ScrollContainer = styled.div<{
   $activeColId: string | null;
   $columnTransform: { [_attributeId: string]: string };
   $actionsHeaderWidth: number;
+  $canScrollRight: boolean;
 }>(
-  ({ $columnWidths, $activeColId, $columnTransform, $actionsHeaderWidth }) => css`
+  ({ $columnWidths, $activeColId, $columnTransform, $actionsHeaderWidth, $canScrollRight }) => css`
     width: 100%;
     overflow-x: auto;
 
@@ -68,8 +70,34 @@ const ScrollContainer = styled.div<{
       .join('\n')}
 
     ${$actionsHeaderWidth ? `${actionsHeaderWidthVar}: ${$actionsHeaderWidth}px;` : ''}
+    
+    ${$canScrollRight &&
+    css`
+      ${displayScrollRightIndicatorVar}: block;
+    `}
   `,
 );
+
+const ScrollRightIndicator = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+
+  /* "End" of horizontal scroll area */
+  right: 0;
+
+  /* Don't take space, but must have a tiny size */
+  width: 10px;
+
+  pointer-events: none;
+  z-index: 2;
+`;
+
+const InnerContainer = styled.div`
+  position: relative;
+  height: 100%;
+  width: fit-content;
+`;
 
 const ActionsRow = styled.div`
   display: flex;
@@ -173,6 +201,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
   const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
+  const scrolledToRightIndicator = useRef<HTMLDivElement>();
+  const scrolledToRight = useIntersectionObserver(scrolledToRightIndicator);
 
   const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
     layoutPreferences?.order ?? defaultColumnOrder,
@@ -206,7 +236,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     visibleColumns: columnOrder,
     entities,
   });
-  const canScrollRight = useCanScrollRight(tableRef, tableIsCompressed, columnWidths);
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
     actionsColMinWidth,
@@ -280,13 +309,16 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                   $actionsHeaderWidth={actionsColMinWidth}
                   $activeColId={activeColId}
                   $columnTransform={columnTransform}
-                  $columnWidths={columnWidths}>
-                  <Table<Entity>
-                    expandedSectionRenderers={expandedSectionRenderers}
-                    headerGroups={headerGroups}
-                    rows={table.getRowModel().rows}
-                    canScrollRight={canScrollRight}
-                  />
+                  $columnWidths={columnWidths}
+                  $canScrollRight={scrolledToRight && tableIsCompressed}>
+                  <InnerContainer>
+                    <Table<Entity>
+                      expandedSectionRenderers={expandedSectionRenderers}
+                      headerGroups={headerGroups}
+                      rows={table.getRowModel().rows}
+                    />
+                    <ScrollRightIndicator ref={scrolledToRightIndicator} />
+                  </InnerContainer>
                 </ScrollContainer>
               )}
             </DndStylesContext.Consumer>

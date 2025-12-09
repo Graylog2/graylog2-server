@@ -16,13 +16,17 @@
  */
 import { css } from 'styled-components';
 
+import { displayScrollRightIndicatorVar } from 'components/common/EntityDataTable/CSSVariables';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+
 const PinnedColScrollShadow = css`
   &::before {
     content: '';
     position: absolute;
     top: 0;
+    display: var(${displayScrollRightIndicatorVar}, none);
     bottom: 0;
-    width: 8px;
+    width: ${CELL_PADDING}px;
     pointer-events: none;
     box-shadow: -4px 0 8px rgb(0 0 0 / 10%);
     z-index: -1;

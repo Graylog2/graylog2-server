@@ -40,9 +40,8 @@ export const Th = styled.th<{
   $colId: string;
   $hidePadding: boolean;
   $pinningPosition: ColumnPinningPosition;
-  $showScrollShadow: boolean;
 }>(
-  ({ $colId, $hidePadding, $pinningPosition, $showScrollShadow, theme }) => css`
+  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
     width: var(${columnWidthVar($colId)});
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
@@ -66,40 +65,32 @@ export const Th = styled.th<{
     ${$colId === ACTIONS_COL_ID &&
     css`
       position: sticky;
-      ${$showScrollShadow && PinnedColScrollShadow}
+      ${PinnedColScrollShadow}
     `}
   `,
 );
 
-const TableHeaderCell = <Entity extends EntityBase>({
-  header,
-  canScrollRight,
-}: {
-  header: Header<Entity, unknown>;
-  canScrollRight: boolean;
-}) => (
+const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => (
   <Th
     key={header.id}
     colSpan={header.colSpan}
     $colId={header.column.id}
     $hidePadding={header.column.id === ACTIONS_COL_ID}
-    $pinningPosition={header.column.getIsPinned()}
-    $showScrollShadow={canScrollRight}>
+    $pinningPosition={header.column.getIsPinned()}>
     {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
   </Th>
 );
 
 type Props<Entity extends EntityBase> = {
   headerGroups: Array<HeaderGroup<Entity>>;
-  canScrollRight: boolean;
 };
 
-const TableHead = <Entity extends EntityBase>({ headerGroups, canScrollRight }: Props<Entity>) => (
+const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
   <Thead>
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeaderCell key={header.id} header={header} canScrollRight={canScrollRight} />
+          <TableHeaderCell key={header.id} header={header} />
         ))}
       </tr>
     ))}
