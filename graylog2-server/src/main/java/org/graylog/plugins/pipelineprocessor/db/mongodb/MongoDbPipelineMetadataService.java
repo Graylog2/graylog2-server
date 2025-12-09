@@ -31,7 +31,6 @@ import org.graylog2.database.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -120,13 +119,18 @@ public class MongoDbPipelineMetadataService {
         }
     }
 
-    @Nullable
-    public Boolean hasDeprecatedFunctions(String id) {
+    public Set<String> deprecatedFunctionsPipeline(String pipelineId) {
         try {
-            final PipelineRulesMetadataDao dao = get(id);
-            return !(dao.deprecatedFunctions().isEmpty());
+            final PipelineRulesMetadataDao dao = get(pipelineId);
+            return dao.deprecatedFunctions();
         } catch (NotFoundException ignored) {
-            return null;
+            return Set.of();
         }
+    }
+
+    public Set<String> deprecatedFunctionsRule(String ruleId) {
+        return getPipelinesByRule(ruleId).stream()
+                .flatMap(pipelineId -> deprecatedFunctionsPipeline(pipelineId).stream())
+                .collect(Collectors.toSet());
     }
 }
