@@ -31,7 +31,7 @@ type Props = {
 };
 
 const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
-  const headers = ['Title', '', 'Description', 'Throughput', 'Errors'];
+  const headers = ['Title', 'Description', 'Throughput', 'Errors'];
 
   const _ruleRowFormatter = (ruleArg, ruleIdx) => {
     let rule = ruleArg;
