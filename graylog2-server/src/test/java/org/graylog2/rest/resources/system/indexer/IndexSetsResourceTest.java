@@ -44,7 +44,7 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -95,7 +95,7 @@ public class IndexSetsResourceTest {
     @Mock
     private IndexSetStatsCreator indexSetStatsCreator;
     @Mock
-    private SystemJobManager systemJobManager;
+    private LegacySystemJobManager systemJobManager;
     @Mock
     private ClusterConfigService clusterConfigService;
     @Mock
@@ -119,7 +119,7 @@ public class IndexSetsResourceTest {
         });
         when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean())).then(invocationOnMock -> {
             IndexSetUpdateRequest request = invocationOnMock.getArgument(0);
-            IndexSetConfig config = invocationOnMock.getArgument(1 );
+            IndexSetConfig config = invocationOnMock.getArgument(1);
             return request.toIndexSetConfig(config);
         });
     }
@@ -202,7 +202,7 @@ public class IndexSetsResourceTest {
 
         Throwable exception = assertThrows(NotFoundException.class, () ->
 
-            indexSetsResource.get("id"));
+                indexSetsResource.get("id"));
         org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't find index set with ID <id>"));
     }
 
@@ -663,7 +663,7 @@ public class IndexSetsResourceTest {
         TestResource(Indices indices, IndexSetService indexSetService, IndexSetRegistry indexSetRegistry,
                      IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                      IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
-                     SystemJobManager systemJobManager, Provider<Boolean> permitted,
+                     LegacySystemJobManager systemJobManager, Provider<Boolean> permitted,
                      Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),

@@ -54,7 +54,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +75,7 @@ public class IndexRangesResource extends RestResource {
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
     private final IndexSetRegistry indexSetRegistry;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
     private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
 
     @Inject
@@ -83,7 +83,7 @@ public class IndexRangesResource extends RestResource {
                                RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
                                IndexSetRegistry indexSetRegistry,
-                               SystemJobManager systemJobManager,
+                               LegacySystemJobManager systemJobManager,
                                IndexRangesCleanupPeriodical indexRangesCleanupPeriodical) {
         this.indexRangeService = indexRangeService;
         this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;

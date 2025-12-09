@@ -29,7 +29,7 @@ import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends LegacySystemJob {
     private final IndexFieldTypesService indexFieldTypesService;
     private final IndexFieldTypePoller indexFieldTypePoller;
     private final ActivityWriter activityWriter;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
     private final String indexName;
 
     @Inject
@@ -55,7 +55,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends LegacySystemJob {
                                                 IndexFieldTypesService indexFieldTypesService,
                                                 IndexFieldTypePoller indexFieldTypePoller,
                                                 ActivityWriter activityWriter,
-                                                SystemJobManager systemJobManager,
+                                                LegacySystemJobManager systemJobManager,
                                                 @Assisted String indexName) {
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;

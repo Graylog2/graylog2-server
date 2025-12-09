@@ -22,13 +22,13 @@ import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 
 import java.util.Locale;
 
-public class SystemJobFactory {
+public class LegacySystemJobFactory {
     private final FixDeflectorByMoveJob.Factory fixDeflectorByMoveJobFactory;
     private final FixDeflectorByDeleteJob.Factory fixDeflectorByDeleteJobFactory;
 
     @Inject
-    public SystemJobFactory(FixDeflectorByMoveJob.Factory fixDeflectorByMoveJobFactory,
-                            FixDeflectorByDeleteJob.Factory fixDeflectorByDeleteJobFactory) {
+    public LegacySystemJobFactory(FixDeflectorByMoveJob.Factory fixDeflectorByMoveJobFactory,
+                                  FixDeflectorByDeleteJob.Factory fixDeflectorByDeleteJobFactory) {
         this.fixDeflectorByMoveJobFactory = fixDeflectorByMoveJobFactory;
         this.fixDeflectorByDeleteJobFactory = fixDeflectorByDeleteJobFactory;
     }

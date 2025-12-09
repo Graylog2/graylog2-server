@@ -17,23 +17,22 @@
 package org.graylog2.bindings.providers;
 
 import com.codahale.metrics.MetricRegistry;
-import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJobManager;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 
-public class SystemJobManagerProvider implements Provider<SystemJobManager> {
-    private static SystemJobManager systemJobManager = null;
+public class LegacySystemJobManagerProvider implements Provider<LegacySystemJobManager> {
+    private static LegacySystemJobManager systemJobManager = null;
 
     @Inject
-    public SystemJobManagerProvider(ActivityWriter activityWriter, MetricRegistry metricRegistry) {
+    public LegacySystemJobManagerProvider(ActivityWriter activityWriter, MetricRegistry metricRegistry) {
         if (systemJobManager == null)
-            systemJobManager = new SystemJobManager(activityWriter, metricRegistry);
+            systemJobManager = new LegacySystemJobManager(activityWriter, metricRegistry);
     }
 
     @Override
-    public SystemJobManager get() {
+    public LegacySystemJobManager get() {
         return systemJobManager;
     }
 }

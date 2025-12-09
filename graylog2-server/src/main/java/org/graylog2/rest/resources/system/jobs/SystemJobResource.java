@@ -54,8 +54,8 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.NoSuchJobException;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobFactory;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobFactory;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,15 +69,15 @@ public class SystemJobResource extends RestResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SystemJobResource.class);
 
-    private final SystemJobFactory systemJobFactory;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobFactory systemJobFactory;
+    private final LegacySystemJobManager systemJobManager;
     private final NodeId nodeId;
 
     private final JobResourceHandlerService jobResourceHandlerService;
 
     @Inject
-    public SystemJobResource(SystemJobFactory systemJobFactory,
-                             SystemJobManager systemJobManager,
+    public SystemJobResource(LegacySystemJobFactory systemJobFactory,
+                             LegacySystemJobManager systemJobManager,
                              NodeId nodeId,
                              JobResourceHandlerService jobResourceHandlerService) {
         this.systemJobFactory = systemJobFactory;

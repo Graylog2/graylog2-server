@@ -51,7 +51,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testGetRunningJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
+        LegacySystemJobManager manager = new LegacySystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
         LongRunningJob job1 = new LongRunningJob(1);
         LongRunningJob job2 = new LongRunningJob(1);
@@ -69,7 +69,7 @@ public class SystemJobManagerTest {
 
     @Test
     public void testConcurrentJobs() throws Exception {
-        SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
+        LegacySystemJobManager manager = new LegacySystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
         LegacySystemJob job1 = new LongRunningJob(3);
         LegacySystemJob job2 = new LongRunningJob(3);
@@ -85,7 +85,7 @@ public class SystemJobManagerTest {
 
     @RepeatedTest(100)
     public void testSubmitThrowsExceptionIfMaxConcurrencyLevelReached() throws Exception {
-        SystemJobManager manager = new SystemJobManager(systemMessageActivityWriter, new MetricRegistry());
+        LegacySystemJobManager manager = new LegacySystemJobManager(systemMessageActivityWriter, new MetricRegistry());
 
         final ExecutorService executorService = Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("job-trigger-%d").build());
 
@@ -120,7 +120,7 @@ public class SystemJobManagerTest {
     }
 
     @Nonnull
-    private static Callable<Optional<String>> wrapJobCatchException(SystemJobManager manager, LongRunningJob job1) {
+    private static Callable<Optional<String>> wrapJobCatchException(LegacySystemJobManager manager, LongRunningJob job1) {
         return () -> {
             try {
                 return Optional.of(manager.submit(job1));

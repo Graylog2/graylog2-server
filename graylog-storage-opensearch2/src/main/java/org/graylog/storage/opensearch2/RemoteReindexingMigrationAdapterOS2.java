@@ -84,7 +84,7 @@ import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
 import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -136,7 +136,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
     private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
     private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
 
     private final DatanodeMigrationLockService migrationLockService;
 
@@ -152,7 +152,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                IndexRangesCleanupPeriodical indexRangesCleanupPeriodical,
                                                RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
                                                CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
-                                               SystemJobManager systemJobManager,
+                                               LegacySystemJobManager systemJobManager,
                                                DatanodeMigrationLockService migrationLockService) {
         this.client = client;
         this.indices = indices;

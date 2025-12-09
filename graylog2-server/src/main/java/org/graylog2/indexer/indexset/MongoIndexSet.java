@@ -41,7 +41,7 @@ import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -76,7 +76,7 @@ public class MongoIndexSet implements IndexSet {
     private final IndexRangeService indexRangeService;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
     private final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     private final ActivityWriter activityWriter;
     private final NotificationService notificationService;
@@ -88,7 +88,7 @@ public class MongoIndexSet implements IndexSet {
                          final NodeId nodeId,
                          final IndexRangeService indexRangeService,
                          final AuditEventSender auditEventSender,
-                         final SystemJobManager systemJobManager,
+                         final LegacySystemJobManager systemJobManager,
                          final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory,
                          final ActivityWriter activityWriter, NotificationService notificationService
     ) {

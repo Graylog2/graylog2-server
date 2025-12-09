@@ -39,9 +39,9 @@ import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
-public class SystemJobManager {
+public class LegacySystemJobManager {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SystemJobManager.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LegacySystemJobManager.class);
     private static final int THREAD_POOL_SIZE = 15;
 
     private final ActivityWriter activityWriter;
@@ -49,7 +49,7 @@ public class SystemJobManager {
     private final Map<String, LegacySystemJob> jobs;
 
     @Inject
-    public SystemJobManager(ActivityWriter activityWriter, MetricRegistry metricRegistry) {
+    public LegacySystemJobManager(ActivityWriter activityWriter, MetricRegistry metricRegistry) {
         this.activityWriter = activityWriter;
         this.executor = executorService(metricRegistry);
         this.jobs = new ConcurrentHashMap<>();
@@ -95,7 +95,7 @@ public class SystemJobManager {
                     final String msg = "SystemJob <" + job.getId() + "> [" + jobClass + "] finished in " + x.elapsed(
                             TimeUnit.MILLISECONDS) + "ms.";
                     LOG.info(msg);
-                    activityWriter.write(new Activity(msg, SystemJobManager.class));
+                    activityWriter.write(new Activity(msg, LegacySystemJobManager.class));
                 } catch (SystemJobConcurrencyException ignored) {
                 } catch (Exception e) {
                     LOG.error("Unhandled error while running SystemJob <" + job.getId() + "> [" + jobClass + "]", e);
