@@ -22,7 +22,7 @@ import DataNodeStatusCell from 'components/datanode/DataNodeList/DataNodeStatusC
 import type { DataNode } from 'components/datanode/Types';
 import Routes from 'routing/Routes';
 
-import type { ClusterDataNode } from './useClusterDataNodes';
+import type { ClusterDataNode } from './fetchClusterDataNodes';
 import CpuMetricsCell from './cells/CpuMetricsCell';
 import IndexingMetricsCell from './cells/IndexingMetricsCell';
 

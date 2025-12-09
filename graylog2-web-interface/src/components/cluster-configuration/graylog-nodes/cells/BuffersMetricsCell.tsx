@@ -18,10 +18,10 @@ import React from 'react';
 
 import { buildRatioIndicator, computeRatio } from '../../shared-components/RatioIndicator';
 import { MetricPlaceholder, MetricsColumn, MetricsRow, SecondaryText } from '../../shared-components/NodeMetricsLayout';
-import type { GraylogNodeWithMetrics as GraylogNode } from '../fetchClusterGraylogNodes';
+import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
 
 type Props = {
-  node: GraylogNode;
+  node: ClusterGraylogNode;
   warningThreshold?: number;
   dangerThreshold?: number;
 };

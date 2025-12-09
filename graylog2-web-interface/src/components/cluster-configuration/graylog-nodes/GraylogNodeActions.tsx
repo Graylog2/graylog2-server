@@ -25,7 +25,7 @@ import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
 import { SystemProcessingStore } from 'stores/system-processing/SystemProcessingStore';
 
-import type { GraylogNode } from './useClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
 
 type Props = {
   node: GraylogNode;

@@ -63,7 +63,7 @@ export type GraylogNode = {
 };
 
 export type GraylogNodes = Array<GraylogNode>;
-export type GraylogNodeWithMetrics = GraylogNode & { metrics: GraylogNodeMetrics };
+export type ClusterGraylogNode = GraylogNode & { metrics: GraylogNodeMetrics };
 
 export type GraylogNodesResponse = {
   list: GraylogNodes;
@@ -169,7 +169,7 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
 
 export const fetchClusterGraylogNodesWithMetrics = async (
   searchParams: SearchParams = DEFAULT_GRAYLOG_NODES_SEARCH_PARAMS,
-): Promise<GraylogNodesResponse & { list: Array<GraylogNodeWithMetrics> }> => {
+): Promise<GraylogNodesResponse & { list: Array<ClusterGraylogNode> }> => {
   const base = await fetchGraylogNodes(searchParams);
   const nodeIds = Array.from(new Set(base.list.map(({ node_id }) => node_id).filter(Boolean)));
   const metricsByNodeId = nodeIds.length ? await fetchGraylogNodeMetrics(nodeIds) : {};

@@ -18,7 +18,7 @@ import React from 'react';
 
 import type { ColumnRenderers, ColumnSchema } from 'components/common/EntityDataTable';
 
-import type { GraylogNode } from './useClusterGraylogNodes';
+import type { ClusterGraylogNode as GraylogNode } from './fetchClusterGraylogNodes';
 import BuffersMetricsCell from './cells/BuffersMetricsCell';
 import HostnameCell from './cells/HostnameCell';
 import LifecycleCell from './cells/LifecycleCell';

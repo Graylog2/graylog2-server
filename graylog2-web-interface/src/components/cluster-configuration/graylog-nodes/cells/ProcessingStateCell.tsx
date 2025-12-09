@@ -16,11 +16,11 @@
  */
 import React from 'react';
 
-import type { GraylogNodeWithMetrics as GraylogNode } from '../fetchClusterGraylogNodes';
+import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
 import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
-  node: GraylogNode;
+  node: ClusterGraylogNode;
 };
 
 const ProcessingStateCell = ({ node }: Props) => {
