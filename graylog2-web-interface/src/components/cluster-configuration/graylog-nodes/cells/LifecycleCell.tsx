@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import type { GraylogNode } from '../useClusterGraylogNodes';
+import type { GraylogNodeWithMetrics as GraylogNode } from '../fetchClusterGraylogNodes';
 import { MetricsColumn, MetricsRow, StyledLabel } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {

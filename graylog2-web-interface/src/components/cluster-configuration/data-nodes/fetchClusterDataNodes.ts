@@ -14,17 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
-
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import { defaultOnError } from 'util/conditional/onError';
 import type { Metric, NodeMetric } from 'stores/metrics/MetricsStore';
+import type { SearchParams } from 'stores/PaginationTypes';
 import type { DataNode } from 'components/datanode/Types';
+import { fetchDataNodes, keyFn as dataNodesKeyFn, type DataNodeResponse } from 'components/datanode/hooks/useDataNodes';
 
-const METRIC_NAMES = {
+export const DATANODE_METRIC_NAMES = {
   totalMemory: 'opensearch.os.mem.total_in_bytes',
   usedMemory: 'opensearch.os.mem.used_in_bytes',
   jvmMemoryHeapUsed: 'opensearch.jvm.mem.heap_used_in_bytes',
@@ -37,19 +36,24 @@ const METRIC_NAMES = {
   availableFsBytes: 'opensearch.fs.total.available_in_bytes',
 } as const;
 
-type MetricNameKey = keyof typeof METRIC_NAMES;
-const METRIC_SHORT_NAMES = Object.keys(METRIC_NAMES) as Array<MetricNameKey>;
-const METRIC_NAMES_LIST = Object.values(METRIC_NAMES);
+type MetricNameKey = keyof typeof DATANODE_METRIC_NAMES;
+const METRIC_SHORT_NAMES = Object.keys(DATANODE_METRIC_NAMES) as Array<MetricNameKey>;
+const METRIC_NAMES_LIST = Object.values(DATANODE_METRIC_NAMES);
 
 export type DataNodeMetrics = Partial<Record<MetricNameKey, number | undefined | null>>;
+export type ClusterDataNode = DataNode & { metrics: DataNodeMetrics };
+
+export const DEFAULT_CLUSTER_DATA_NODES_SEARCH_PARAMS: SearchParams = {
+  query: '-datanode_status:UNAVAILABLE',
+  page: 1,
+  pageSize: 0,
+  sort: undefined,
+};
 
 type MetricsSummaryResponse = {
   total: number;
   metrics: Array<Metric>;
 };
-
-const buildMetricsWithDefaults = (metrics: Partial<DataNodeMetrics> = {}): DataNodeMetrics =>
-  METRIC_SHORT_NAMES.reduce<DataNodeMetrics>((acc, key) => ({ ...acc, [key]: metrics[key] }), {} as DataNodeMetrics);
 
 const toNodeMetric = (response?: MetricsSummaryResponse): NodeMetric | undefined => {
   if (!response?.metrics?.length) {
@@ -62,6 +66,9 @@ const toNodeMetric = (response?: MetricsSummaryResponse): NodeMetric | undefined
   );
 };
 
+export const buildMetricsWithDefaults = (metrics: Partial<DataNodeMetrics> = {}): DataNodeMetrics =>
+  METRIC_SHORT_NAMES.reduce<DataNodeMetrics>((acc, key) => ({ ...acc, [key]: metrics[key] }), {} as DataNodeMetrics);
+
 const extractMetrics = (response?: MetricsSummaryResponse): DataNodeMetrics => {
   const nodeMetric = toNodeMetric(response);
 
@@ -69,7 +76,7 @@ const extractMetrics = (response?: MetricsSummaryResponse): DataNodeMetrics => {
     return buildMetricsWithDefaults();
   }
 
-  const extracted = MetricsExtractor.getValuesForNode(nodeMetric, METRIC_NAMES);
+  const extracted = MetricsExtractor.getValuesForNode(nodeMetric, DATANODE_METRIC_NAMES);
 
   return buildMetricsWithDefaults(extracted as DataNodeMetrics);
 };
@@ -86,7 +93,7 @@ const fetchMetrics = async (hostname: string) => {
   }
 };
 
-const fetchMetricsForHostnames = async (hostnames: string[]) => {
+export const fetchMetricsForHostnames = async (hostnames: string[]) => {
   const responses = await Promise.all(
     hostnames.map(async (hostname) => ({ hostname, response: await fetchMetrics(hostname) })),
   );
@@ -100,34 +107,21 @@ const fetchMetricsForHostnames = async (hostnames: string[]) => {
   );
 };
 
-type UseAddMetricsToDataNodesOptions = {
-  refetchInterval?: number | false;
-  enabled?: boolean;
+export const fetchClusterDataNodesWithMetrics = async (
+  searchParams: SearchParams = DEFAULT_CLUSTER_DATA_NODES_SEARCH_PARAMS,
+): Promise<DataNodeResponse & { list: Array<ClusterDataNode> }> => {
+  const base = await fetchDataNodes(searchParams);
+  const hostnames = Array.from(new Set(base.list.map(({ hostname }) => hostname).filter(Boolean)));
+  const metricsByHostname = hostnames.length ? await fetchMetricsForHostnames(hostnames) : {};
+
+  return {
+    ...base,
+    list: base.list.map((node) => ({
+      ...node,
+      metrics: metricsByHostname[node.hostname] ?? buildMetricsWithDefaults(),
+    })),
+  };
 };
 
-const useAddMetricsToDataNodes = <Node extends Pick<DataNode, 'hostname'>>(
-  nodes: ReadonlyArray<Node> | null | undefined,
-  { refetchInterval = false, enabled = true }: UseAddMetricsToDataNodesOptions = {},
-): Array<Node & { metrics: DataNodeMetrics }> => {
-  const safeNodes = useMemo(() => (nodes ?? []).filter((node): node is Node => Boolean(node?.hostname)), [nodes]);
-
-  const hostnames = useMemo(() => Array.from(new Set(safeNodes.map(({ hostname }) => hostname))).sort(), [safeNodes]);
-
-  const { data: metricsByHostname = {} } = useQuery({
-    queryKey: ['datanode-metrics', hostnames],
-    queryFn: () => fetchMetricsForHostnames(hostnames),
-    enabled: enabled && hostnames.length > 0,
-    refetchInterval,
-  });
-
-  return useMemo(
-    () =>
-      safeNodes.map((node) => ({
-        ...node,
-        metrics: metricsByHostname[node.hostname] ?? buildMetricsWithDefaults(),
-      })),
-    [metricsByHostname, safeNodes],
-  );
-};
-
-export default useAddMetricsToDataNodes;
+export const clusterDataNodesKeyFn = (searchParams: SearchParams = DEFAULT_CLUSTER_DATA_NODES_SEARCH_PARAMS) =>
+  dataNodesKeyFn(searchParams);

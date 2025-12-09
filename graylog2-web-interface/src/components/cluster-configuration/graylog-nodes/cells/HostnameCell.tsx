@@ -19,7 +19,7 @@ import React from 'react';
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 
-import type { GraylogNode } from '../useClusterGraylogNodes';
+import type { GraylogNodeWithMetrics as GraylogNode } from '../fetchClusterGraylogNodes';
 import { NodePrimary, SecondaryText, StyledLabel } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
