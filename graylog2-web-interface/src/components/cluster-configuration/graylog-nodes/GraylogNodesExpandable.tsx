@@ -19,6 +19,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { PaginatedEntityTable } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import useProductName from 'brand-customization/useProductName';
 
 import type { ClusterGraylogNode } from './fetchClusterGraylogNodes';
 import { clusterGraylogNodesKeyFn, fetchClusterGraylogNodesWithMetrics } from './fetchClusterGraylogNodes';
@@ -42,6 +43,7 @@ const GraylogNodesExpandable = ({
   pageSizeLimit = undefined,
   refetchInterval = undefined,
 }: Props) => {
+  const productName = useProductName();
   const [totalGraylogNodes, setTotalGraylogNodes] = useState<number | undefined>(undefined);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
@@ -63,7 +65,7 @@ const GraylogNodesExpandable = ({
 
   return (
     <ClusterNodesSectionWrapper
-      title="Graylog Nodes"
+      title={`${productName} Nodes`}
       titleCount={totalGraylogNodes}
       onTitleCountClick={onSelectNodeType ?? null}
       collapsible={collapsible}>
@@ -75,7 +77,7 @@ const GraylogNodesExpandable = ({
         columnRenderers={columnRenderers}
         entityActions={renderActions}
         entityAttributesAreCamelCase={false}
-        humanName="Graylog Nodes"
+        humanName={`${productName} Nodes`}
         actionsCellWidth={160}
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
