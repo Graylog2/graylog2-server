@@ -25,7 +25,7 @@ import {
 } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 
-import LookupTableShow from './lookup-table-view';
+import LookupTableShow from './lookup-table-show';
 
 function LookupTableView() {
   const { lutIdOrName } = useParams<{ lutIdOrName: string }>();

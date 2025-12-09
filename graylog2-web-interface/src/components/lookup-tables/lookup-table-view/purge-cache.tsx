@@ -21,7 +21,7 @@ import { Col, Row } from 'components/lookup-tables/layout-componets';
 import type { LookupTable } from 'logic/lookup-tables/types';
 import { usePurgeAllLookupTableKey, usePurgeLookupTableKey } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
-import { Description } from './lookup-table-view';
+import { Description } from './lookup-table-show';
 
 const INIT_INPUT = { value: '', valid: false };
 

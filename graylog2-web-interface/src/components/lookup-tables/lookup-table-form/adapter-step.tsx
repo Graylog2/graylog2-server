@@ -20,28 +20,11 @@ import { useFormikContext } from 'formik';
 import { Spinner } from 'components/common';
 import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
 import useScopePermissions from 'hooks/useScopePermissions';
-import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchDataAdapter, useFetchAllDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import DataAdapter from 'components/lookup-tables/DataAdapter';
 import DataAdapterPicker from 'components/lookup-tables/adapter-form/AdapterPicker';
 import DataAdapterFormView from 'components/lookup-tables/adapter-form/AdapterFormView';
 import type { LookupTable, LookupTableAdapter } from 'logic/lookup-tables/types';
-
-function AdapterReadOnly({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
-  const plugins = usePluginEntities('lookupTableAdapters');
-  const adapterPlugin = React.useMemo(
-    () => plugins.find((p: any) => p.type === dataAdapter?.config?.type),
-    [dataAdapter?.config?.type, plugins],
-  );
-  const DocComponent = React.useMemo(() => adapterPlugin.documentationComponent, [adapterPlugin]);
-
-  return (
-    <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">
-      <DataAdapter dataAdapter={dataAdapter} noEdit />
-      {DocComponent && <DocComponent dataAdapterId={dataAdapter?.id} />}
-    </RowContainer>
-  );
-}
+import AdapterShow from 'components/lookup-tables/adapter-view/adapter-show';
 
 function DataAdapterFormStep() {
   const { values, setFieldValue } = useFormikContext<LookupTable>();
@@ -84,7 +67,7 @@ function DataAdapterFormStep() {
               <DataAdapterPicker onCreateClick={onCreateClick} dataAdapters={allDataAdapters} />
             </RowContainer>
           )}
-          {showAdapter && !loadingDataAdapter && <AdapterReadOnly dataAdapter={dataAdapter} />}
+          {showAdapter && !loadingDataAdapter && <AdapterShow dataAdapter={dataAdapter} />}
           {showForm && !showAdapter && <DataAdapterFormView onCancel={onCancel} saved={onSaved} isStep />}
         </>
       )}

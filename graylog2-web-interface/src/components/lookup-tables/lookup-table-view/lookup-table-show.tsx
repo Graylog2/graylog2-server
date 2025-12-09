@@ -18,7 +18,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { Col as BSCol, Alert } from 'components/bootstrap';
-import { Col, Row, DataWell } from 'components/lookup-tables/layout-componets';
+import { Col, Row, DataWell, RowContainer } from 'components/lookup-tables/layout-componets';
 import useScopePermissions from 'hooks/useScopePermissions';
 import Cache from 'components/lookup-tables/Cache';
 import DataAdapter from 'components/lookup-tables/DataAdapter';
@@ -41,7 +41,7 @@ type Props = {
   dataAdapter: LookupTableAdapter;
 };
 
-function LookupTableView({ table, cache, dataAdapter }: Props) {
+function LookupTableShow({ table, cache, dataAdapter }: Props) {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(table);
 
   const canEdit = React.useMemo(
@@ -50,7 +50,7 @@ function LookupTableView({ table, cache, dataAdapter }: Props) {
   );
 
   return (
-    <Row $align="stretch" $gap="xl">
+    <RowContainer $gap="xl" $withDocs $justify="center">
       <Col $gap="lg" $width="50%" style={{ flexShrink: 0 }}>
         <LookupTableDetails table={table} canEdit={canEdit} />
         <Col $gap="xs">
@@ -105,8 +105,8 @@ function LookupTableView({ table, cache, dataAdapter }: Props) {
           </BSCol>
         </Col>
       </Col>
-    </Row>
+    </RowContainer>
   );
 }
 
-export default LookupTableView;
+export default LookupTableShow;

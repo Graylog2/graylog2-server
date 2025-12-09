@@ -24,7 +24,7 @@ import { Button, Input, Alert } from 'components/bootstrap';
 import { useFetchLookupPreview, useTestLookupTableKey } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { LookupTable } from 'logic/lookup-tables/types';
 
-import { Description } from './lookup-table-view';
+import { Description } from './lookup-table-show';
 
 const StyledDataWell = styled(DataWell)`
   line-height: normal;
