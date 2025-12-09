@@ -99,10 +99,8 @@ public class ClusterEventService extends AbstractExecutionThreadService {
                 db.runCommand(new Document("collMod", COLLECTION_NAME)
                         .append("cappedSize", maxCollectionSize));
             } else {
-                mongoConnection.getMongoDatabase().runCommand(
-                        new Document("convertToCapped", COLLECTION_NAME)
-                                .append("size", maxCollectionSize)
-                );
+                db.runCommand(new Document("convertToCapped", COLLECTION_NAME)
+                        .append("size", maxCollectionSize));
             }
         }
         final var collection = new MongoCollections(mapperProvider, mongoConnection)
