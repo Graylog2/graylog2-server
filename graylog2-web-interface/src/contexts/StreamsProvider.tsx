@@ -15,29 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useEffect } from 'react';
 
-import connect from 'stores/connect';
-import type { Stream } from 'views/stores/StreamsStore';
-import { StreamsActions, StreamsStore } from 'views/stores/StreamsStore';
+import { useStore } from 'stores/connect';
+import { StreamsStore } from 'views/stores/StreamsStore';
 
 import StreamsContext from './StreamsContext';
 
 type Props = {
   children: React.ReactElement;
-  streams: Array<Stream> | undefined | null;
 };
 
-const StreamsProvider = ({ children, streams }: Props) => {
-  useEffect(() => {
-    StreamsActions.refresh();
-  }, []);
+const StreamsProvider = ({ children }: Props) => {
+  const _streams = useStore(StreamsStore, ({ streams }) => streams);
 
-  return <StreamsContext.Provider value={streams}>{children}</StreamsContext.Provider>;
+  return <StreamsContext.Provider value={_streams}>{children}</StreamsContext.Provider>;
 };
 
-export default connect(
-  StreamsProvider,
-  { streams: StreamsStore },
-  ({ streams: { streams } = { streams: undefined } }) => ({ streams }),
-);
+export default StreamsProvider;
