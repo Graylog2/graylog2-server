@@ -22,6 +22,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.mongodb.CursorType;
 import com.mongodb.MongoException;
 import com.mongodb.MongoQueryException;
@@ -31,7 +32,6 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
-import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.UpdateOptions;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -40,8 +40,6 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
-import org.graylog2.database.utils.MongoUtils;
-import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.security.RestrictedChainingClassLoader;
 import org.graylog2.security.UnsafeClassLoadingAttemptException;
@@ -49,13 +47,11 @@ import org.graylog2.shared.utilities.AutoValueUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
-public class ClusterEventPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterEventPeriodical.class);
+public class ClusterEventService extends AbstractExecutionThreadService {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterEventService.class);
 
     @VisibleForTesting
     static final String COLLECTION_NAME = "cluster_events";
@@ -68,14 +64,14 @@ public class ClusterEventPeriodical extends Periodical {
     private Offset offset;
 
     @Inject
-    public ClusterEventPeriodical(final MongoJackObjectMapperProvider mapperProvider,
-                                  final MongoConnection mongoConnection,
-                                  final NodeId nodeId,
-                                  final RestrictedChainingClassLoader chainingClassLoader,
-                                  final EventBus serverEventBus,
-                                  final ClusterEventBus clusterEventBus,
-                                  final Offset offset,
-                                  @Named("max_events_collection_size") final Size maxEventsCollectionSize) {
+    public ClusterEventService(final MongoJackObjectMapperProvider mapperProvider,
+                               final MongoConnection mongoConnection,
+                               final NodeId nodeId,
+                               final RestrictedChainingClassLoader chainingClassLoader,
+                               final EventBus serverEventBus,
+                               final ClusterEventBus clusterEventBus,
+                               final Offset offset,
+                               @Named("max_events_collection_size") final Size maxEventsCollectionSize) {
         this.nodeId = nodeId;
         this.objectMapper = mapperProvider.get();
         this.chainingClassLoader = chainingClassLoader;
@@ -92,13 +88,22 @@ public class ClusterEventPeriodical extends Periodical {
                                                            final Size maxEventsCollectionSize) {
         final var collectionExists = mongoConnection.getDatabase().collectionExists(COLLECTION_NAME);
         final var db = mongoConnection.getMongoDatabase();
+        final long maxCollectionSize = maxEventsCollectionSize.toBytes();
         if (!collectionExists) {
             db.createCollection(COLLECTION_NAME, new CreateCollectionOptions()
                     .capped(true)
-                    .sizeInBytes(maxEventsCollectionSize.toBytes()));
+                    .sizeInBytes(maxCollectionSize));
         } else {
-            db.runCommand(new Document("collMod", COLLECTION_NAME)
-                    .append("cappedSize", maxEventsCollectionSize.toBytes()));
+            final var isCapped = mongoConnection.getMongoDatabase().runCommand(new Document("collStats", COLLECTION_NAME)).getBoolean("capped");
+            if (isCapped) {
+                db.runCommand(new Document("collMod", COLLECTION_NAME)
+                        .append("cappedSize", maxCollectionSize));
+            } else {
+                mongoConnection.getMongoDatabase().runCommand(
+                        new Document("convertToCapped", COLLECTION_NAME)
+                                .append("size", maxCollectionSize)
+                );
+            }
         }
         final var collection = new MongoCollections(mapperProvider, mongoConnection)
                 .collection(COLLECTION_NAME, ClusterEvent.class)
@@ -112,68 +117,13 @@ public class ClusterEventPeriodical extends Periodical {
     }
 
     @Override
-    public boolean runsForever() {
-        return true;
-    }
-
-    @Override
-    public boolean stopOnGracefulShutdown() {
-        return true;
-    }
-
-    @Override
-    public boolean leaderOnly() {
-        return false;
-    }
-
-    @Override
-    public boolean startOnThisNode() {
-        return true;
-    }
-
-    @Override
-    public boolean isDaemon() {
-        return true;
-    }
-
-    @Override
-    public int getInitialDelaySeconds() {
-        return 0;
-    }
-
-    @Override
-    public int getPeriodSeconds() {
-        return 1;
-    }
-
-    @Override
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    @Override
-    public void doRun() {
+    protected void run() {
         while (!Thread.currentThread().isInterrupted()) {
             final var events = eventsIterable(this.offset)
                     .cursorType(CursorType.TailableAwait)
                     .noCursorTimeout(true);
             try (final var cursor = events.iterator()) {
-                LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
-                while (cursor.hasNext()) {
-                    final var clusterEvent = cursor.tryNext();
-                    if (clusterEvent != null) {
-                        LOG.trace("Processing cluster event: {}", clusterEvent);
-                        Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
-                        if (payload != null) {
-                            serverEventBus.post(payload);
-                        } else {
-                            LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
-                            LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
-                        }
-
-                        this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
-                    }
-                }
+                iterateEvents(cursor);
                 Thread.sleep(1000);
             } catch (Exception e) {
                 if (!(e instanceof MongoQueryException mqe && mqe.getErrorCodeName().equals("QueryPlanKilled"))) {
@@ -181,6 +131,26 @@ public class ClusterEventPeriodical extends Periodical {
                 }
             }
         }
+    }
+
+    @VisibleForTesting
+    void iterateEvents(MongoCursor<ClusterEvent> cursor) {
+            LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
+            while (cursor.hasNext()) {
+                final var clusterEvent = cursor.tryNext();
+                if (clusterEvent != null) {
+                    LOG.trace("Processing cluster event: {}", clusterEvent);
+                    Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
+                    if (payload != null) {
+                        serverEventBus.post(payload);
+                    } else {
+                        LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
+                        LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
+                    }
+
+                    this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
+                }
+            }
     }
 
     @Subscribe
@@ -218,7 +188,8 @@ public class ClusterEventPeriodical extends Periodical {
         return result.getUpsertedId().asObjectId().getValue().toHexString();
     }
 
-    private FindIterable<ClusterEvent> eventsIterable(Offset offset) {
+    @VisibleForTesting
+    FindIterable<ClusterEvent> eventsIterable(Offset offset) {
         final var timestampQuery = offset.lastId() == null
                 ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen())
                 : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()),

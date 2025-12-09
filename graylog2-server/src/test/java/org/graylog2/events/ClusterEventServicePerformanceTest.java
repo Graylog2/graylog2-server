@@ -37,7 +37,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -50,8 +49,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
-class ClusterEventPeriodicalPerformanceTest {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterEventPeriodicalPerformanceTest.class);
+class ClusterEventServicePerformanceTest {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterEventServicePerformanceTest.class);
     private static final int CONSUMER_COUNT = 10;
     private static final int PRODUCER_COUNT = 5;
     private static final int EVENTS_PER_PRODUCER = 1000;
@@ -90,8 +89,8 @@ class ClusterEventPeriodicalPerformanceTest {
         }
     }
 
-    private ClusterEventPeriodical createClusterEventPeriodical(NodeId nodeId, EventBus serverEventBus, ClusterEventBus clusterEventBus) {
-        return new ClusterEventPeriodical(objectMapperProvider, mongodb.mongoConnection(),
+    private ClusterEventService createClusterEventPeriodical(NodeId nodeId, EventBus serverEventBus, ClusterEventBus clusterEventBus) {
+        return new ClusterEventService(objectMapperProvider, mongodb.mongoConnection(),
                 nodeId, new RestrictedChainingClassLoader(new ChainingClassLoader(this.getClass().getClassLoader()),
                 SafeClasses.allGraylogInternal()), serverEventBus, clusterEventBus, offset, Size.megabytes(100));
     }
@@ -110,7 +109,7 @@ class ClusterEventPeriodicalPerformanceTest {
             final var serverEventBus = new EventBus();
             final var clusterEventBus = new ClusterEventBus();
             final var periodical = createClusterEventPeriodical(new SimpleNodeId("consumer-" + i), serverEventBus, clusterEventBus);
-            threadPool.submit(periodical);
+            threadPool.submit(periodical::run);
 
             serverEventBus.register(new EventSubscriber(consumerCountdown::countDown));
         }
@@ -121,7 +120,7 @@ class ClusterEventPeriodicalPerformanceTest {
             final var nodeId = new SimpleNodeId("producer-" + i);
             final var periodical = createClusterEventPeriodical(nodeId, serverEventBus, clusterEventBus);
 
-            threadPool.submit(periodical);
+            threadPool.submit(periodical::run);
 
             threadPool.submit(() -> {
                 for (int count = 0; count < EVENTS_PER_PRODUCER; count++) {

@@ -20,7 +20,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
 import org.graylog.scheduler.periodicals.ScheduleTriggerCleanUp;
 import org.graylog2.bootstrap.preflight.GraylogCertificateProvisioningPeriodical;
-import org.graylog2.events.ClusterEventPeriodical;
 import org.graylog2.events.Offset;
 import org.graylog2.events.OffsetFromCurrentMongoDBTimeProvider;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePollerPeriodical;
@@ -60,7 +59,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(LeaderPresenceCheckPeriodical.class);
         periodicalBinder.addBinding().to(VersionCheckThread.class);
         periodicalBinder.addBinding().to(ThrottleStateUpdaterThread.class);
-        periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
         periodicalBinder.addBinding().to(IndexRangesCleanupPeriodical.class);
         periodicalBinder.addBinding().to(TrafficCounterPeriodical.class);
         periodicalBinder.addBinding().to(IndexFieldTypePollerPeriodical.class).asEagerSingleton();

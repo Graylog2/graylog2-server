@@ -38,7 +38,7 @@ import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.events.ClusterEventPeriodical;
+import org.graylog2.events.ClusterEventService;
 import org.graylog2.events.Offset;
 import org.graylog2.events.OffsetFromCurrentMongoDBTimeProvider;
 import org.graylog2.migrations.V20230929142900_CreateInitialPreflightPassword;
@@ -85,11 +85,11 @@ public class PreflightWebModule extends Graylog2Module {
         bind(Offset.class).toProvider(OffsetFromCurrentMongoDBTimeProvider.class).asEagerSingleton();
         Multibinder<Periodical> periodicalBinder = Multibinder.newSetBinder(binder(), Periodical.class);
         periodicalBinder.addBinding().to(GraylogCertificateProvisioningPeriodical.class);
-        periodicalBinder.addBinding().to(ClusterEventPeriodical.class);
 
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PreflightJerseyService.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
+        serviceBinder.addBinding().to(ClusterEventService.class);
 
         install(new LockServiceModule());
         install(new LeaderElectionModule(configuration));
