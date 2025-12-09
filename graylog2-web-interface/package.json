@@ -71,7 +71,6 @@
     "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "html-react-parser": "^5.2.6",
     "immutable": "^3.8.1",
-    "interactjs": "^1.4.0-rc.13",
     "leaflet": "^1.5.1",
     "lodash": "^4.17.4",
     "marked": "^16.2.1",
