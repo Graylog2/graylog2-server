@@ -58,7 +58,7 @@ public class OSMessageListTest {
 
         when(result.getHits()).thenReturn(SearchHits.empty());
 
-        final SearchType.Result searchTypeResult = esMessageList.doExtractResult(null, someQuery(), messageList, result, null, null);
+        final SearchType.Result searchTypeResult = esMessageList.doExtractResult(someQuery(), messageList, result, null);
 
         assertThat(searchTypeResult.name()).contains("customResult");
     }
