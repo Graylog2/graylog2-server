@@ -97,7 +97,12 @@ const AWSAuthenticationTypes = ({ onChange, requireCredentials = true }: AWSAuth
             {isType(AWS_AUTH_TYPES.automatic) && <Automatic />}
 
             {isType(AWS_AUTH_TYPES.keysecret) && (
-              <KeySecret awsKey={awsAccessKey} awsSecret={awsSecretKey} onChange={onChange} required={requireCredentials} />
+              <KeySecret
+                awsKey={awsAccessKey}
+                awsSecret={awsSecretKey}
+                onChange={onChange}
+                required={requireCredentials}
+              />
             )}
           </AuthWrapper>
         </>

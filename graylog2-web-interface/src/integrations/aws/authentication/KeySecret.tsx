@@ -42,7 +42,11 @@ const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined, requir
       fieldData={awsKey}
       autoComplete="off"
       maxLength={512}
-      help={required ? 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK".' : 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK". (Optional - will use legacy AWS plugin configuration if not provided)'}
+      help={
+        required
+          ? 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK".'
+          : 'Your AWS Key should be a 20-character long, alphanumeric string that starts with the letters "AK". (Optional - will use legacy AWS plugin configuration if not provided)'
+      }
       required={required}
     />
 
@@ -54,7 +58,11 @@ const KeySecret = ({ onChange, awsKey = undefined, awsSecret = undefined, requir
       fieldData={awsSecret}
       autoComplete="off"
       maxLength={512}
-      help={required ? "Your AWS Secret is usually a 40-character long, base-64 encoded string." : "Your AWS Secret is usually a 40-character long, base-64 encoded string. (Optional - will use legacy AWS plugin configuration if not provided)"}
+      help={
+        required
+          ? 'Your AWS Secret is usually a 40-character long, base-64 encoded string.'
+          : 'Your AWS Secret is usually a 40-character long, base-64 encoded string. (Optional - will use legacy AWS plugin configuration if not provided)'
+      }
       required={required}
     />
   </>
