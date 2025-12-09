@@ -103,7 +103,6 @@
     "react-ultimate-pagination": "^1.2.0",
     "react-window": "^1.8.2",
     "react-window-infinite-loader": "^1.0.8",
-    "twix": "^1.1.4",
     "urijs": "^1.19.6",
     "uuid": "11.1.0",
     "wicg-inert": "^3.1.2"
