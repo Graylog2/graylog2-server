@@ -17,15 +17,9 @@
 import * as React from 'react';
 import { useMemo, useState, useCallback } from 'react';
 import styled, { css } from 'styled-components';
-import merge from 'lodash/merge';
-import type { ColumnDef } from '@tanstack/react-table';
-import { createColumnHelper } from '@tanstack/react-table';
 
 import { ButtonGroup } from 'components/bootstrap';
-import { isPermitted, isAnyPermitted } from 'util/PermissionsMixin';
-import useCurrentUser from 'hooks/useCurrentUser';
 import ColumnsVisibilitySelect from 'components/common/EntityDataTable/ColumnsVisibilitySelect';
-import DefaultColumnRenderers from 'components/common/EntityDataTable/DefaultColumnRenderers';
 import type { Sort } from 'stores/PaginationTypes';
 import { PageSizeSelect } from 'components/common';
 import SelectedEntitiesProvider from 'components/common/EntityDataTable/contexts/SelectedEntitiesProvider';
@@ -33,9 +27,6 @@ import MetaDataProvider from 'components/common/EntityDataTable/contexts/MetaDat
 import useTable from 'components/common/EntityDataTable/hooks/useTable';
 import useElementWidths from 'components/common/EntityDataTable/hooks/useElementWidths';
 import useVisibleColumnOrder from 'components/common/EntityDataTable/hooks/useVisibleColumnOrder';
-import useBulkSelectColumnDefinition from 'components/common/EntityDataTable/hooks/useBulkSelectColumnDefinition';
-import useActionsColumnDefinition from 'components/common/EntityDataTable/hooks/useActionsColumnDefinition';
-import useAttributeColumnDefinitions from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider';
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
@@ -46,17 +37,12 @@ import {
   actionsHeaderWidthVar,
 } from 'components/common/EntityDataTable/CSSVariables';
 import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
-import { ACTIONS_COL_ID, BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants';
 import useCanScrollRight from 'components/common/EntityDataTable/hooks/useHorizontalScrollShadow';
+import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useColumnDefinitions';
+import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColumnRenderers';
+import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
 
-import type {
-  ColumnRenderers,
-  ColumnSchema,
-  EntityBase,
-  ColumnRenderersByAttribute,
-  ColumnPreferences,
-  ExpandedSectionRenderers,
-} from './types';
+import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, ExpandedSectionRenderers } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
 import BulkActionsRow from './BulkActionsRow';
 
@@ -99,103 +85,6 @@ const LayoutConfigRow = styled.div`
   align-items: center;
   gap: 5px;
 `;
-
-const useAuthorizedColumnSchemas = (columnSchemas: Array<ColumnSchema>) => {
-  const currentUser = useCurrentUser();
-
-  return useMemo(
-    () =>
-      columnSchemas.filter(({ permissions, anyPermissions, hidden }) => {
-        if (hidden) {
-          return false;
-        }
-
-        if (permissions?.length) {
-          return anyPermissions
-            ? isAnyPermitted(currentUser.permissions, permissions)
-            : isPermitted(currentUser.permissions, permissions);
-        }
-
-        return true;
-      }),
-    [columnSchemas, currentUser.permissions],
-  );
-};
-
-const useColumnRenderers = <Entity extends EntityBase, Meta = unknown>(
-  columnSchemas: Array<ColumnSchema>,
-  customColumnRenderers: ColumnRenderers<Entity, Meta>,
-) =>
-  useMemo(() => {
-    const renderers = merge({}, DefaultColumnRenderers, customColumnRenderers);
-
-    return Object.fromEntries(
-      columnSchemas.map(({ id, type }) => {
-        const typeRenderer = renderers.types?.[type];
-        const attributeRenderer = renderers.attributes?.[id];
-
-        const columnRenderer = merge({}, typeRenderer, attributeRenderer);
-
-        return [id, columnRenderer];
-      }),
-    );
-  }, [columnSchemas, customColumnRenderers]);
-
-const useColumnDefinitions = <Entity extends EntityBase, Meta>({
-  actionsColMinWidth,
-  columnRenderersByAttribute,
-  columnSchemas,
-  columnWidths,
-  displayBulkSelectCol,
-  entityActions,
-  entityAttributesAreCamelCase,
-  hasRowActions,
-  meta,
-  onActionsWidthChange,
-  onHeaderSectionResize,
-  parentBgColor,
-}: {
-  actionsColMinWidth: number;
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
-  columnSchemas: Array<ColumnSchema>;
-  columnWidths: { [_attributeId: string]: number };
-  displayBulkSelectCol: boolean;
-  entityActions?: (entity: Entity) => React.ReactNode;
-  entityAttributesAreCamelCase: boolean;
-  hasRowActions: boolean;
-  meta: Meta;
-  onActionsWidthChange: (colId: string, width: number) => void;
-  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
-  parentBgColor: string | undefined;
-}) => {
-  const columnHelper = createColumnHelper<Entity>();
-  const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
-  const actionsCol = useActionsColumnDefinition<Entity>({
-    colWidth: columnWidths[ACTIONS_COL_ID],
-    minWidth: actionsColMinWidth,
-    entityActions,
-    hasRowActions,
-    onWidthChange: onActionsWidthChange,
-    parentBgColor,
-  });
-  const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
-    columnSchemas,
-    columnRenderersByAttribute,
-    columnWidths,
-    entityAttributesAreCamelCase,
-    meta,
-    columnHelper,
-    onHeaderSectionResize,
-  });
-
-  return useMemo(
-    () =>
-      [...(bulkSelectCol ? [bulkSelectCol] : []), ...attributeCols, ...(actionsCol ? [actionsCol] : [])] as Array<
-        ColumnDef<Entity, unknown>
-      >,
-    [bulkSelectCol, attributeCols, actionsCol],
-  );
-};
 
 type Props<Entity extends EntityBase, Meta = unknown> = {
   /** Currently active sort */
@@ -245,7 +134,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   onResetLayoutPreferences: () => Promise<void>;
   /** Active page size */
   pageSize?: number;
-  /** Required when parent container does not use the contentBackground color */
+  /** Required when parent container does not use contentBackground for the background */
   parentBgColor?: string;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
