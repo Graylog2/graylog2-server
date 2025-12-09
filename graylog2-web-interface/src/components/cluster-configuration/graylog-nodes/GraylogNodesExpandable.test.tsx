@@ -17,13 +17,15 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
-import { PaginatedEntityTable } from 'components/common';
+import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+import asMock from 'helpers/mocking/AsMock';
 
 import GraylogNodesExpandable from './GraylogNodesExpandable';
 
-jest.mock('components/common', () => ({
-  ...jest.requireActual('components/common'),
-  PaginatedEntityTable: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
+jest.mock('components/common/PaginatedEntityTable', () => ({
+  __esModule: true,
+  default: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
+  useTableFetchContext: jest.fn(),
 }));
 
 describe('<GraylogNodesExpandable />', () => {
@@ -32,11 +34,15 @@ describe('<GraylogNodesExpandable />', () => {
   });
 
   it('renders paginated graylog nodes table', () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+
     render(<GraylogNodesExpandable searchQuery="foo" refetchInterval={10000} />);
 
     expect(screen.getByText('Paginated Graylog Nodes')).toBeInTheDocument();
-    expect(PaginatedEntityTable).toHaveBeenCalledTimes(1);
-    const callProps = (PaginatedEntityTable as jest.Mock).mock.calls[0][0];
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1);
+    const callProps = mockPaginatedEntityTable.mock.calls[0][0] as PaginatedEntityTableProps<any, any>;
+    expect(callProps.humanName).toBe('Graylog Nodes');
     expect(callProps.externalSearch.query).toBe('foo');
     expect(callProps.fetchOptions.refetchInterval).toBe(10000);
   });

@@ -17,12 +17,16 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
+import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+
 import DataNodesExpandable from './DataNodesExpandable';
 import { clusterDataNodesKeyFn, fetchClusterDataNodesWithMetrics } from './fetchClusterDataNodes';
 
-jest.mock('components/common', () => ({
-  ...jest.requireActual('components/common'),
-  PaginatedEntityTable: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
+jest.mock('components/common/PaginatedEntityTable', () => ({
+  __esModule: true,
+  default: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
+  useTableFetchContext: jest.fn(),
 }));
 
 describe('<DataNodesExpandable />', () => {
@@ -31,14 +35,15 @@ describe('<DataNodesExpandable />', () => {
   });
 
   it('renders paginated entity table with proper props', () => {
-    const { PaginatedEntityTable } = jest.requireMock('components/common');
+    const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(PaginatedEntityTable);
 
     render(<DataNodesExpandable searchQuery="status:up" refetchInterval={10000} />);
 
     expect(screen.getByText('Paginated Data Nodes')).toBeInTheDocument();
-    expect(PaginatedEntityTable).toHaveBeenCalledTimes(1);
-    const callProps = (PaginatedEntityTable as jest.Mock).mock.calls[0][0];
-
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1);
+    const callProps = mockPaginatedEntityTable.mock.calls[0][0] as PaginatedEntityTableProps<any, any>;
+    expect(callProps.humanName).toBe('Data Nodes');
     expect(callProps.fetchEntities).toBe(fetchClusterDataNodesWithMetrics);
     expect(callProps.keyFn).toBe(clusterDataNodesKeyFn);
     expect(callProps.externalSearch.query).toBe('status:up');

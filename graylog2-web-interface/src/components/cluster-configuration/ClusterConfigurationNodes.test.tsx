@@ -19,13 +19,14 @@ import React from 'react';
 import { act, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { SEARCH_DEBOUNCE_THRESHOLD } from 'components/common/SearchForm';
-import { PaginatedEntityTable } from 'components/common';
+import asMock from 'helpers/mocking/AsMock';
 
 import ClusterConfigurationNodes from './ClusterConfigurationNodes';
 
-jest.mock('components/common', () => ({
-  ...jest.requireActual('components/common'),
-  PaginatedEntityTable: jest.fn(() => <div role="table">paginated-table</div>),
+jest.mock('components/common/PaginatedEntityTable', () => ({
+  __esModule: true,
+  default: jest.fn(() => <div role="table">paginated-table</div>),
+  useTableFetchContext: jest.fn(),
 }));
 
 describe('<ClusterConfigurationNodes />', () => {
@@ -39,29 +40,45 @@ describe('<ClusterConfigurationNodes />', () => {
   });
 
   it('renders both node types with default paging and refresh settings in "all" view', () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+
     render(<ClusterConfigurationNodes />);
 
     expect(screen.getAllByRole('table')).toHaveLength(2);
-    expect(PaginatedEntityTable).toHaveBeenCalledTimes(2);
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(2);
   });
 
   it('switches to a specific node type when segmented control is used', async () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+
     render(<ClusterConfigurationNodes />);
+
+    mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
 
-    await waitFor(() => expect(PaginatedEntityTable).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
 
   it('uses child "select node type" handler to switch view', async () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+
     render(<ClusterConfigurationNodes />);
+
+    mockPaginatedEntityTable.mockClear();
 
     await userEvent.click(screen.getByRole('radio', { name: 'Data Nodes' }));
 
-    await waitFor(() => expect(PaginatedEntityTable).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1));
   });
 
   it('passes trimmed search query to children', async () => {
+    const { default: MockPaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(MockPaginatedEntityTable);
+
     render(<ClusterConfigurationNodes />);
 
     const searchInput = screen.getByPlaceholderText('Search nodes…');
@@ -71,6 +88,6 @@ describe('<ClusterConfigurationNodes />', () => {
       jest.advanceTimersByTime(SEARCH_DEBOUNCE_THRESHOLD + 10);
     });
 
-    await waitFor(() => expect(PaginatedEntityTable).toHaveBeenCalled());
+    await waitFor(() => expect(mockPaginatedEntityTable).toHaveBeenCalled());
   });
 });

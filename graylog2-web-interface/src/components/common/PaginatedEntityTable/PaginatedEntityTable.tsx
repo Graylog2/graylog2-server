@@ -100,7 +100,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   tableLayout,
   topRightCol = undefined,
   withoutURLParams = false,
-}: Props<T, M> & InnerProps) => {
+}: PaginatedEntityTableProps<T, M> & InnerProps) => {
   const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
 
@@ -232,7 +232,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   );
 };
 
-type WrapperProps<T, M> = Props<T, M> & {
+type WrapperProps<T, M> = PaginatedEntityTableProps<T, M> & {
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   reactQueryOptions: FetchOptions;
@@ -275,7 +275,7 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
   );
 };
 
-type Props<T, M> = {
+export type PaginatedEntityTableProps<T, M> = {
   actionsCellWidth?: EntityDataTableProps['minActionsCellWidth'];
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
@@ -307,7 +307,7 @@ type Props<T, M> = {
 const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   fetchOptions: reactQueryOptions = undefined,
   ...props
-}: Props<T, M>) => {
+}: PaginatedEntityTableProps<T, M>) => {
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(props.tableLayout);
 
   const Wrapper = props.withoutURLParams ? TableWithLocalState : TableWithURLParams;
