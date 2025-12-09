@@ -109,6 +109,8 @@ export interface SharedBackendProps {
 
   defaultRoles: AuthenticationBackend['defaultRoles'];
 
+  defaultUserTimezone: AuthenticationBackend['defaultUserTimezone'];
+
   title: AuthenticationBackend['title'];
 
   description: AuthenticationBackend['description'];
