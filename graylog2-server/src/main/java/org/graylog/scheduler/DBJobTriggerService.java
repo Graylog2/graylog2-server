@@ -110,6 +110,9 @@ public class DBJobTriggerService {
     private final MongoCollection<JobTriggerDto> collection;
     private final MongoUtils<JobTriggerDto> mongoUtils;
 
+    /**
+     * Creates a new job trigger service for user job triggers. Use {@link DBSystemJobTriggerService} for system job triggers.
+     */
     @Inject
     public DBJobTriggerService(MongoCollections mongoCollections,
                                NodeId nodeId,
