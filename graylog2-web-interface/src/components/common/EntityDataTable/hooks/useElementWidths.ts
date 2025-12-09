@@ -31,6 +31,7 @@ type Props<Entity extends EntityBase, Meta> = {
   displayBulkSelectCol: boolean;
   headerMinWidths: { [colId: string]: number };
   visibleColumns: Array<string>;
+  entities: ReadonlyArray<Entity>;
 };
 
 const useElementWidths = <Entity extends EntityBase, Meta>({
@@ -40,9 +41,11 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
   displayBulkSelectCol,
   headerMinWidths,
   visibleColumns,
+  entities,
 }: Props<Entity, Meta>) => {
   const tableRef = useRef<HTMLDivElement>(null);
-  const { colMinWidth: actionsColMinWidth, handleWidthChange: handleActionsWidthChange } = useActionsColumnWidth();
+  const { colMinWidth: actionsColMinWidth, handleWidthChange: handleActionsWidthChange } =
+    useActionsColumnWidth<Entity>(entities);
   const { width: tableWidth } = useElementDimensions(tableRef);
   const columnIds = useMemo(
     () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),

@@ -37,12 +37,10 @@ const BackgroundFoundation = styled.div(
   ({ theme }) => css`
     background-color: ${theme.colors.global.contentBackground};
     height: 100%;
+    width: var(${actionsHeaderWidthVar});
   `,
 );
 
-const HeaderBackground = styled(BackgroundFoundation)`
-  width: var(${actionsHeaderWidthVar});
-`;
 const Actions = styled.div<{ $isEvenRow: boolean }>(
   ({ $isEvenRow, theme }) => css`
     display: flex;
@@ -60,17 +58,17 @@ const ActionCell = <Entity extends EntityBase>({
 }: {
   row: Row<Entity>;
   entityActions: (entity: Entity) => React.ReactNode | undefined;
-  onWidthChange: (width: number) => void;
+  onWidthChange: (rowId: string, width: number) => void;
 }) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     if (ref.current) {
-      onWidthChange(ref.current.getBoundingClientRect().width);
+      onWidthChange(row.id, ref.current.getBoundingClientRect().width);
     }
-  }, [onWidthChange]);
+  }, [row.id, onWidthChange]);
 
-  useResizeObserver(ref, ({ contentRect: { width } }) => onWidthChange(width));
+  useResizeObserver(ref, ({ contentRect: { width } }) => onWidthChange(row.id, width));
 
   return (
     <AlignRight>
@@ -93,7 +91,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
   entityActions: (entity: Entity) => React.ReactNode | undefined;
   hasRowActions: boolean;
   minWidth: number;
-  onWidthChange: (width: number) => void;
+  onWidthChange: (colId: string, width: number) => void;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
 
@@ -108,7 +106,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
   const header = useCallback(
     () => (
       <AlignRight>
-        <HeaderBackground />
+        <BackgroundFoundation />
       </AlignRight>
     ),
     [],

@@ -163,7 +163,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   entityAttributesAreCamelCase: boolean;
   hasRowActions: boolean;
   meta: Meta;
-  onActionsWidthChange: (width: number) => void;
+  onActionsWidthChange: (colId: string, width: number) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
@@ -309,6 +309,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
     headerMinWidths,
     visibleColumns: columnOrder,
+    entities,
   });
   const canScrollRight = useCanScrollRight(tableRef, tableIsCompressed, columnWidths);
 

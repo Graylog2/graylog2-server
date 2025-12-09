@@ -15,21 +15,60 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
-const useActionsColumnWidth = () => {
-  const [colMinWidth, setColMinWidth] = useState(0);
+import type { EntityBase } from '../types';
 
-  const handleWidthChange = useCallback((width: number) => {
-    const rounded = Math.round(width);
-    if (rounded > 0) {
-      setColMinWidth((cur) => (rounded > cur ? rounded : cur));
+const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArray<Entity>) => {
+  const [rowWidths, setRowWidths] = useState<{ [rowId: string]: number }>({});
+  const visibleRowIdsSet = useMemo(() => new Set(entities.map(({ id }) => id)), [entities]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRowWidths((cur) => {
+      const curEntries = Object.entries(cur);
+      const filteredEntries = curEntries.filter(([rowId]) => visibleRowIdsSet.has(rowId));
+
+      if (filteredEntries.length === curEntries.length) {
+        return cur;
+      }
+
+      return Object.fromEntries(filteredEntries);
+    });
+  }, [visibleRowIdsSet]);
+
+  const handleWidthChange = useCallback(
+    (rowId: string, width: number) => {
+      const rounded = Math.round(width);
+
+      if (rounded <= 0 || !visibleRowIdsSet.has(rowId)) {
+        return;
+      }
+
+      setRowWidths((cur) => (cur[rowId] === rounded ? cur : { ...cur, [rowId]: rounded }));
+    },
+    [visibleRowIdsSet],
+  );
+
+  const colMinWidth = useMemo(() => {
+    if (!visibleRowIdsSet.size) {
+      return CELL_PADDING * 2;
     }
-  }, []);
 
-  return { colMinWidth: colMinWidth + CELL_PADDING * 2, handleWidthChange };
+    const maxWidth = Math.max(
+      0,
+      ...Array.from(visibleRowIdsSet)
+        .map((rowId) => rowWidths[rowId])
+        .filter((width) => !!width),
+    );
+    console.log(maxWidth);
+
+    return maxWidth + CELL_PADDING * 2;
+  }, [rowWidths, visibleRowIdsSet]);
+
+  return { colMinWidth, handleWidthChange };
 };
 
 export default useActionsColumnWidth;
