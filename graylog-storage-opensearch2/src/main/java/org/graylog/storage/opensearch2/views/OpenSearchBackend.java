@@ -316,7 +316,7 @@ public class OpenSearchBackend implements QueryBackend<OSGeneratedQueryContext> 
                 queryContext.addError(SearchTypeErrorParser.parse(query, searchTypeId, e));
             } else {
                 try {
-                    final SearchType.Result searchTypeResult = handler.extractResult(job, query, searchType, multiSearchResponse.getResponse(), queryContext);
+                    final SearchType.Result searchTypeResult = handler.extractResult(query, searchType, multiSearchResponse.getResponse(), queryContext);
                     if (searchTypeResult != null) {
                         resultsMap.put(searchTypeId, searchTypeResult);
                     }
