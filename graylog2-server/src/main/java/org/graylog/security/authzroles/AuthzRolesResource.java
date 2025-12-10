@@ -44,6 +44,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -230,11 +231,11 @@ public class AuthzRolesResource extends RestResource {
         return PaginatedResponse.create("roles", result, query);
     }
 
-    // Audit logging in updateUserRole to provide the desired attribute values
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation("Add user to role")
     @Path("{roleId}/assignees")
+    @NoAuditEvent("Has custom audit events")
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "usernames") Set<String> usernames,
@@ -242,10 +243,10 @@ public class AuthzRolesResource extends RestResource {
         updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_UPDATE, roleId, usernames, Set::add);
     }
 
-    // Audit logging in updateUserRole to provide the desired attribute values
     @DELETE
     @ApiOperation("Remove user from role")
     @Path("{roleId}/assignee/{username}")
+    @NoAuditEvent("Has custom audit events")
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username,
