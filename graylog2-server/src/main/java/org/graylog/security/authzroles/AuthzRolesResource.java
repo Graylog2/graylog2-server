@@ -239,7 +239,7 @@ public class AuthzRolesResource extends RestResource {
     public void addUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "usernames") Set<String> usernames,
-            @Context UserContext userContext) throws ValidationException {
+            @Context UserContext userContext) {
         updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_UPDATE, roleId, usernames, Set::add);
     }
 
@@ -250,7 +250,7 @@ public class AuthzRolesResource extends RestResource {
     public void removeUser(
             @ApiParam(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
             @ApiParam(name = "username") @PathParam("username") @NotBlank String username,
-            @Context UserContext userContext) throws ValidationException {
+            @Context UserContext userContext) {
         updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_DELETE, roleId, ImmutableSet.of(username), Set::remove);
     }
 
