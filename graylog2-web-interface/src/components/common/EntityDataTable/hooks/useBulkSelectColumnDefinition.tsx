@@ -26,14 +26,14 @@ import { BULK_SELECT_COL_ID } from 'components/common/EntityDataTable/Constants'
 import useSelectedEntities from 'components/common/EntityDataTable/hooks/useSelectedEntities';
 
 const BulkSelectHeader = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => {
-  const checked = table.getIsAllRowsSelected();
-  const title = `${checked ? 'Deselect' : 'Select'} all visible entities`;
+  const { isSomeRowsSelected, isAllRowsSelected } = useSelectedEntities();
+  const title = `${isAllRowsSelected ? 'Deselect' : 'Select'} all visible entities`;
 
   return (
     <RowCheckbox
       onChange={table.getToggleAllRowsSelectedHandler()}
-      checked={checked}
-      indeterminate={table.getIsSomeRowsSelected()}
+      checked={isAllRowsSelected}
+      indeterminate={isSomeRowsSelected}
       title={title}
       disabled={!table.options?.data?.length}
       aria-label={title}

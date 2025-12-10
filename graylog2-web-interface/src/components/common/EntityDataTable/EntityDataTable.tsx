@@ -282,7 +282,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   return (
     <MetaDataProvider<Meta> meta={meta}>
-      <SelectedEntitiesProvider<Entity> table={table} selectedEntities={selectedEntities}>
+      <SelectedEntitiesProvider<Entity>
+        table={table}
+        selectedEntities={selectedEntities}
+        isSomeRowsSelected={table.getIsSomeRowsSelected()}
+        isAllRowsSelected={table.getIsAllRowsSelected()}>
         <ExpandedSectionsProvider>
           <ActionsRow>
             <div>{displayBulkAction && <BulkActionsRow bulkActions={actions} />}</div>
