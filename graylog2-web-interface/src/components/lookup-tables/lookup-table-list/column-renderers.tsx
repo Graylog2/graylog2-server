@@ -49,8 +49,8 @@ const TitleCol = ({ lut, children }: { lut: LookupTableEntity; children: string 
   const navigate = useNavigate();
 
   const onClick = React.useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.show(lut.id));
-  }, [navigate, lut.id]);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.show(lut.name));
+  }, [navigate, lut.name]);
 
   return (
     <TitleRow>
@@ -65,8 +65,8 @@ const CacheCol = ({ cacheId, caches }: { cacheId: string; caches: CachesMap }) =
   const navigate = useNavigate();
 
   const onClick = React.useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(cacheId));
-  }, [cacheId, navigate]);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.show(caches?.[cacheId]?.name));
+  }, [cacheId, caches, navigate]);
 
   if (!caches || !cacheId || !caches[cacheId]) return <i>No cache</i>;
 
@@ -85,8 +85,8 @@ const DataAdapterCol = ({ dataAdapterId, dataAdapters }: { dataAdapterId: string
   const navigate = useNavigate();
 
   const onClick = React.useCallback(() => {
-    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapterId));
-  }, [dataAdapterId, navigate]);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(dataAdapters?.[dataAdapterId]?.name));
+  }, [dataAdapterId, dataAdapters, navigate]);
 
   if (!dataAdapters || !dataAdapterId || !dataAdapters[dataAdapterId]) return <i>No data adapters</i>;
 

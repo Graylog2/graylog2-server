@@ -32,7 +32,7 @@ function CacheFormStep() {
   const { allCaches, loadingAllCaches } = useFetchAllCaches();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
   const [showForm, setShowForm] = React.useState<boolean>(false);
-  const showCache = React.useMemo(() => values.cache_id, [values.cache_id]);
+  const showCache = React.useMemo(() => !!cache, [cache]);
 
   const canModify = React.useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),

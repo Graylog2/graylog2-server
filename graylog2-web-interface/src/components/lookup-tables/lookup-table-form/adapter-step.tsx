@@ -32,7 +32,7 @@ function DataAdapterFormStep() {
   const { allDataAdapters, loadingAllDataAdapters } = useFetchAllDataAdapters();
   const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(values.data_adapter_id);
   const [showForm, setShowForm] = React.useState<boolean>(false);
-  const showAdapter = React.useMemo(() => values.data_adapter_id, [values.data_adapter_id]);
+  const showAdapter = React.useMemo(() => !!dataAdapter, [dataAdapter]);
 
   const canModify = React.useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
