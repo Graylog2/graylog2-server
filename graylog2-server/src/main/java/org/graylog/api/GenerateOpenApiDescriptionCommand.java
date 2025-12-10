@@ -137,7 +137,7 @@ public class GenerateOpenApiDescriptionCommand extends Server {
             System.out.println(f("Validation completed. [took %s ms]", validationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
         }
 
-        final var targetPath = Path.of(outputFile);
+        final var targetPath = Path.of(outputFile).toAbsolutePath();
         final var parentPath = targetPath.getParent();
 
         System.out.println("Writing description to file:" + outputFile);
