@@ -104,6 +104,8 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
       return 'Sigma Rules must be deleted from the Sigma Rules page';
     }
 
+    if (!scopePermissions?.is_deletable) return "This Event Definition can't be deleted";
+
     return undefined;
   };
 
@@ -289,10 +291,16 @@ const EventDefinitionActions = ({ eventDefinition }: Props) => {
             <IfPermitted permissions={`eventdefinitions:delete:${eventDefinition.id}`}>
               <MenuItem divider />
               <DeleteMenuItem
-                disabled={isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)}
+                disabled={
+                  isSystemEventDefinition(eventDefinition) ||
+                  isSigmaEventDefinition(eventDefinition) ||
+                  !scopePermissions?.is_deletable
+                }
                 title={getDeleteActionTitle()}
                 onClick={
-                  isSystemEventDefinition(eventDefinition) || isSigmaEventDefinition(eventDefinition)
+                  isSystemEventDefinition(eventDefinition) ||
+                  isSigmaEventDefinition(eventDefinition) ||
+                  !scopePermissions?.is_deletable
                     ? undefined
                     : () => handleAction(DIALOG_TYPES.DELETE, eventDefinition)
                 }
