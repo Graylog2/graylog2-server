@@ -75,6 +75,12 @@ const ScrollContainer = styled.div<{
   `,
 );
 
+const InnerContainer = styled.div`
+  position: relative;
+  height: 100%;
+  width: fit-content;
+`;
+
 const ScrollRightIndicator = styled.div`
   position: absolute;
   top: 0;
@@ -88,12 +94,6 @@ const ScrollRightIndicator = styled.div`
 
   pointer-events: none;
   z-index: 2;
-`;
-
-const InnerContainer = styled.div`
-  position: relative;
-  height: 100%;
-  width: fit-content;
 `;
 
 const ActionsRow = styled.div`
@@ -198,8 +198,9 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
   const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrolledToRightIndicator = useRef<HTMLDivElement>();
-  const scrolledToRight = useIntersectionObserver(scrolledToRightIndicator);
+  const scrolledToRight = useIntersectionObserver(scrollContainerRef, scrolledToRightIndicator);
 
   const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
     layoutPreferences?.order ?? defaultColumnOrder,
@@ -221,7 +222,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     displayBulkSelectCol,
   );
 
-  const { tableRef, columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth } = useElementWidths<
+  const { columnWidths, handleActionsWidthChange, tableIsCompressed, actionsColMinWidth } = useElementWidths<
     Entity,
     Meta
   >({
@@ -229,9 +230,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     columnSchemas: authorizedColumnSchemas,
     columnWidthPreferences: internalColumnWidthPreferences,
     displayBulkSelectCol,
-    headerMinWidths,
-    visibleColumns: columnOrder,
     entities,
+    hasRowActions,
+    headerMinWidths,
+    scrollContainerRef,
+    visibleColumns: columnOrder,
   });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
@@ -302,7 +305,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
               {({ activeColId, columnTransform }) => (
                 <ScrollContainer
                   id="scroll-container"
-                  ref={tableRef}
+                  ref={scrollContainerRef}
                   $actionsHeaderWidth={actionsColMinWidth}
                   $activeColId={activeColId}
                   $columnTransform={columnTransform}

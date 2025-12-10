@@ -26,7 +26,7 @@ import {
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
 const assignableTableWidth = ({
-  tableWidth,
+  scrollContainerWidth,
   actionsColMinWidth,
   bulkSelectColWidth,
   columnIds,
@@ -35,12 +35,12 @@ const assignableTableWidth = ({
   actionsColMinWidth: number;
   bulkSelectColWidth: number;
   columnIds: Array<string>;
-  tableWidth: number;
+  scrollContainerWidth: number;
   staticColumnWidths: { [colId: string]: number };
 }) => {
   const staticColWidths = columnIds.reduce((total, id) => total + (staticColumnWidths[id] ?? 0), 0);
 
-  return tableWidth - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
+  return scrollContainerWidth - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
 };
 
 const calculateColumnWidths = ({
@@ -118,7 +118,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   bulkSelectColWidth,
   columnRenderersByAttribute,
   columnIds,
-  tableWidth,
+  scrollContainerWidth,
   columnWidthPreferences,
   headerMinWidths,
 }: {
@@ -126,7 +126,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   bulkSelectColWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnIds: Array<string>;
-  tableWidth: number;
+  scrollContainerWidth: number;
   columnWidthPreferences: { [key: string]: number } | undefined;
   headerMinWidths: { [colId: string]: number };
 }) => {
@@ -143,7 +143,7 @@ const useColumnWidths = <Entity extends EntityBase>({
   );
 
   useLayoutEffect(() => {
-    if (!tableWidth) {
+    if (!scrollContainerWidth) {
       return;
     }
 
@@ -152,7 +152,7 @@ const useColumnWidths = <Entity extends EntityBase>({
       actionsColMinWidth,
       columnIds,
       bulkSelectColWidth,
-      tableWidth,
+      scrollContainerWidth,
       staticColumnWidths,
     });
 
@@ -173,7 +173,7 @@ const useColumnWidths = <Entity extends EntityBase>({
     bulkSelectColWidth,
     columnRenderersByAttribute,
     columnIds,
-    tableWidth,
+    scrollContainerWidth,
     columnWidthPreferences,
     staticColumnWidths,
     headerMinWidths,

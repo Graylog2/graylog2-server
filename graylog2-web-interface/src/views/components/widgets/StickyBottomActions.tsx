@@ -19,6 +19,7 @@ import { useRef } from 'react';
 import styled, { css } from 'styled-components';
 
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
 const Container = styled.div`
   height: 100%;
@@ -47,15 +48,9 @@ const Actions = styled.div<{ $scrolledToBottom: boolean; $alignAtBottom: boolean
     justify-content: ${$alignAtBottom ? 'flex-end' : 'space-between'};
     padding-top: 5px;
 
+    ${ScrollShadow('top')}
     &::before {
-      box-shadow: 1px -2px 3px rgb(0 0 0 / 25%);
-      content: ' ';
       display: ${$scrolledToBottom ? 'block' : 'none'};
-      height: 3px;
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
     }
   `,
 );
@@ -77,12 +72,13 @@ type Props = {
 };
 
 const StickyBottomActions = ({ actions, children, className = undefined, alignActionsAtBottom = false }: Props) => {
+  const scrollContainerRef = useRef<HTMLDivElement>();
   const scrolledToBottomIndicatorRef = useRef<HTMLDivElement>();
-  const scrolledToBottom = useIntersectionObserver(scrolledToBottomIndicatorRef);
+  const scrolledToBottom = useIntersectionObserver(scrollContainerRef, scrolledToBottomIndicatorRef);
 
   return (
     <Container className={className}>
-      <ScrollContainer>
+      <ScrollContainer ref={scrollContainerRef}>
         <Content>
           {children}
           <ScrolledToBottomIndicator ref={scrolledToBottomIndicatorRef} />

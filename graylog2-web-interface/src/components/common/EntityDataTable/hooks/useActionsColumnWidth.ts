@@ -21,7 +21,7 @@ import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase } from '../types';
 
-const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArray<Entity>) => {
+const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArray<Entity>, hasRowActions: boolean) => {
   const [rowWidths, setRowWidths] = useState<{ [rowId: string]: number }>({});
   const visibleRowIdsSet = useMemo(() => new Set(entities.map(({ id }) => id)), [entities]);
 
@@ -64,7 +64,7 @@ const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArra
         .filter((width) => !!width),
     );
 
-    return maxWidth + CELL_PADDING * 2;
+    return hasRowActions ? maxWidth + CELL_PADDING * 2 : 0;
   }, [rowWidths, visibleRowIdsSet]);
 
   return { colMinWidth, handleWidthChange };

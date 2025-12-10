@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useRef, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import type { EntityBase, ColumnRenderersByAttribute } from 'components/common/EntityDataTable/types';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
@@ -29,9 +29,11 @@ type Props<Entity extends EntityBase, Meta> = {
   columnSchemas: Array<ColumnSchema>;
   columnWidthPreferences: { [colId: string]: number };
   displayBulkSelectCol: boolean;
+  hasRowActions: boolean;
   headerMinWidths: { [colId: string]: number };
   visibleColumns: Array<string>;
   entities: ReadonlyArray<Entity>;
+  scrollContainerRef: React.RefObject<HTMLDivElement>;
 };
 
 const useElementWidths = <Entity extends EntityBase, Meta>({
@@ -39,14 +41,15 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
   columnSchemas,
   columnWidthPreferences,
   displayBulkSelectCol,
-  headerMinWidths,
-  visibleColumns,
   entities,
+  hasRowActions,
+  headerMinWidths,
+  scrollContainerRef,
+  visibleColumns,
 }: Props<Entity, Meta>) => {
-  const tableRef = useRef<HTMLDivElement>(null);
   const { colMinWidth: actionsColMinWidth, handleWidthChange: handleActionsWidthChange } =
-    useActionsColumnWidth<Entity>(entities);
-  const { width: tableWidth } = useElementDimensions(tableRef);
+    useActionsColumnWidth<Entity>(entities, hasRowActions);
+  const { width: scrollContainerWidth } = useElementDimensions(scrollContainerRef);
   const columnIds = useMemo(
     () => columnSchemas.filter(({ id }) => visibleColumns.includes(id)).map(({ id }) => id),
     [columnSchemas, visibleColumns],
@@ -58,12 +61,10 @@ const useElementWidths = <Entity extends EntityBase, Meta>({
     columnRenderersByAttribute,
     columnWidthPreferences,
     headerMinWidths,
-    tableWidth,
+    scrollContainerWidth,
   });
 
   return {
-    tableRef,
-    tableWidth,
     handleActionsWidthChange,
     columnWidths,
     tableIsCompressed: actionsColMinWidth === columnWidths[ACTIONS_COL_ID],

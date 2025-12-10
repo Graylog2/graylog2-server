@@ -23,7 +23,7 @@ describe('useColumnWidths hook test', () => {
     actionsColMinWidth: 0,
     bulkSelectColWidth: 0,
     columnWidthPreferences: undefined,
-    tableWidth: 600,
+    scrollContainerWidth: 600,
     headerMinWidths: { title: 100, description: 110 },
     columnSchemas: [
       { id: 'title', title: 'Title' },
@@ -112,7 +112,7 @@ describe('useColumnWidths hook test', () => {
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
-        tableWidth: 1500,
+        scrollContainerWidth: 1500,
         actionsColMinWidth: 110,
         bulkSelectColWidth: 20,
         columnRenderersByAttribute,

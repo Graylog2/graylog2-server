@@ -129,7 +129,7 @@ const useActionsColumnDefinition = <Entity extends EntityBase>({
         enableHiding: false,
         enablePinning: true,
         enableResizing: false,
-        header,
+        header: hasRowActions ? header : undefined,
         cell: hasRowActions ? cell : undefined,
         meta: {
           hideCellPadding: true,

@@ -23,8 +23,13 @@ import { Table as BaseTable } from 'components/bootstrap';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
 import { CELL_PADDING, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase, ExpandedSectionRenderers, ColumnMetaContext } from 'components/common/EntityDataTable/types';
-import { columnOpacityVar, columnTransformVar, columnTransition } from 'components/common/EntityDataTable/CSSVariables';
-import PinnedColScrollShadow from 'components/common/EntityDataTable/PinnedColScrollShadow';
+import {
+  columnOpacityVar,
+  columnTransformVar,
+  columnTransition,
+  displayScrollRightIndicatorVar,
+} from 'components/common/EntityDataTable/CSSVariables';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
 import TableHead from './TableHead';
 
@@ -78,7 +83,10 @@ const Td = styled.td<{
     ${$colId === ACTIONS_COL_ID &&
     css`
       position: sticky;
-      ${PinnedColScrollShadow}
+      ${ScrollShadow('left')}
+      &::before {
+        display: var(${displayScrollRightIndicatorVar}, none);
+      }
     `}
   `,
 );

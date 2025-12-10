@@ -24,9 +24,10 @@ import {
   columnOpacityVar,
   columnWidthVar,
   columnTransition,
+  displayScrollRightIndicatorVar,
 } from 'components/common/EntityDataTable/CSSVariables';
 import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
-import PinnedColScrollShadow from 'components/common/EntityDataTable/PinnedColScrollShadow';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
 import type { EntityBase, ColumnMetaContext } from './types';
 
@@ -65,7 +66,10 @@ export const Th = styled.th<{
     ${$colId === ACTIONS_COL_ID &&
     css`
       position: sticky;
-      ${PinnedColScrollShadow}
+      ${ScrollShadow('left')}
+      &::before {
+        display: var(${displayScrollRightIndicatorVar}, none);
+      }
     `}
   `,
 );

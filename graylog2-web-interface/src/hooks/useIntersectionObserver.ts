@@ -17,7 +17,10 @@
 
 import { useEffect, useState } from 'react';
 
-const useIntersectionObserver = (ref: React.RefObject<HTMLDivElement>) => {
+const useIntersectionObserver = (
+  containerRef: React.RefObject<HTMLDivElement>,
+  targetElementRef: React.RefObject<HTMLDivElement>,
+) => {
   const [elementIsVisible, setElementIsVisible] = useState(false);
 
   useEffect(() => {
@@ -25,10 +28,10 @@ const useIntersectionObserver = (ref: React.RefObject<HTMLDivElement>) => {
       ([entry]) => {
         setElementIsVisible(!entry.isIntersecting);
       },
-      { threshold: 0.9 },
+      { threshold: 0.9, root: containerRef.current },
     );
 
-    const indicatorElement = ref.current;
+    const indicatorElement = targetElementRef.current;
 
     if (indicatorElement) {
       observer.observe(indicatorElement);
@@ -39,7 +42,7 @@ const useIntersectionObserver = (ref: React.RefObject<HTMLDivElement>) => {
         observer.unobserve(indicatorElement);
       }
     };
-  }, [ref]);
+  }, [containerRef, targetElementRef]);
 
   return elementIsVisible;
 };
