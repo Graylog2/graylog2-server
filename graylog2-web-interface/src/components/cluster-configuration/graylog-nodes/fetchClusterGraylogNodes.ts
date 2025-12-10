@@ -113,10 +113,9 @@ const METRIC_SHORT_NAMES = Object.keys(GRAYLOG_NODE_METRIC_NAMES);
 
 export type GraylogNodeMetrics = { [key: string]: number | undefined | null };
 
-export const EMPTY_GRAYLOG_NODE_METRICS: GraylogNodeMetrics = METRIC_SHORT_NAMES.reduce(
-  (acc, name) => ({ ...acc, [name]: undefined }),
-  {} as GraylogNodeMetrics,
-);
+export const EMPTY_GRAYLOG_NODE_METRICS: GraylogNodeMetrics = Object.fromEntries(
+  METRIC_SHORT_NAMES.map((name) => [name, undefined]),
+) as GraylogNodeMetrics;
 
 type MetricsSummaryResponse = {
   metrics?: Array<Metric>;
@@ -127,10 +126,7 @@ const toNodeMetric = (response?: MetricsSummaryResponse): NodeMetric | undefined
     return undefined;
   }
 
-  return response.metrics.reduce<NodeMetric>(
-    (acc, metric) => ({ ...acc, [metric.full_name]: metric }),
-    {} as NodeMetric,
-  );
+  return Object.fromEntries(response.metrics.map((metric) => [metric.full_name, metric])) as NodeMetric;
 };
 
 const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
@@ -156,15 +152,17 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
     }),
   );
 
-  return results.reduce<Record<string, GraylogNodeMetrics>>((acc, { nodeId, response }) => {
-    const nodeMetric = toNodeMetric(response as MetricsSummaryResponse);
-    const extracted = nodeMetric ? MetricsExtractor.getValuesForNode(nodeMetric, GRAYLOG_NODE_METRIC_NAMES) : undefined;
+  return Object.fromEntries(
+    results.map(({ nodeId, response }) => {
+      const nodeMetric = toNodeMetric(response as MetricsSummaryResponse);
+      const extracted = nodeMetric ? MetricsExtractor.getValuesForNode(nodeMetric, GRAYLOG_NODE_METRIC_NAMES) : undefined;
 
-    return {
-      ...acc,
-      [nodeId]: extracted ? { ...EMPTY_GRAYLOG_NODE_METRICS, ...(extracted as GraylogNodeMetrics) } : EMPTY_GRAYLOG_NODE_METRICS,
-    };
-  }, {});
+      return [
+        nodeId,
+        extracted ? { ...EMPTY_GRAYLOG_NODE_METRICS, ...(extracted as GraylogNodeMetrics) } : EMPTY_GRAYLOG_NODE_METRICS,
+      ];
+    }),
+  );
 };
 
 export const fetchClusterGraylogNodesWithMetrics = async (
