@@ -120,10 +120,12 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   useOnRefresh(refetch);
 
   useEffect(() => {
-    if (onDataLoaded) {
-      onDataLoaded(paginatedEntities);
+    if (!onDataLoaded || isLoadingEntities) {
+      return;
     }
-  }, [onDataLoaded, paginatedEntities]);
+
+    onDataLoaded(paginatedEntities);
+  }, [isLoadingEntities, onDataLoaded, paginatedEntities]);
 
   const appSection = `${tableLayout.entityTableId}-list`;
 
