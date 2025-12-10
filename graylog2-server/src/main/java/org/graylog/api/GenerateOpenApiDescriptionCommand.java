@@ -129,10 +129,10 @@ public class GenerateOpenApiDescriptionCommand extends Server {
         System.out.println(f("Generation completed. [took %s ms]", generationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
 
         if (skipValidation) {
-            System.out.println("Skipping description validation.");
+            System.out.println("Skipping OpenAPI description validation.");
         } else {
             final var validationStopwatch = Stopwatch.createStarted();
-            System.out.println("Validating description...");
+            System.out.println("Validating OpenAPI description...");
 
             validate(serialized);
             System.out.println(f("Validation completed. [took %s ms]", validationStopwatch.stop().elapsed(TimeUnit.MILLISECONDS)));
@@ -141,28 +141,29 @@ public class GenerateOpenApiDescriptionCommand extends Server {
         final var targetPath = Path.of(outputFile).toAbsolutePath();
         final var parentPath = targetPath.getParent();
 
-        System.out.println("Writing description to file:" + outputFile);
+        System.out.println(f("Writing OpenAPI description to \"%s\"", targetPath));
 
         if (!Files.exists(parentPath)) {
             try {
                 Files.createDirectories(parentPath);
             } catch (IOException e) {
-                System.out.println(f("Cannot create output directory at \"%s\": %s", parentPath, e.getMessage()));
+                System.out.println(f("Cannot create output directory \"%s\": %s", parentPath, e.getMessage()));
                 System.exit(1);
             }
         }
         if ((Files.exists(targetPath) && !Files.isWritable(targetPath)) || !Files.isWritable(parentPath)) {
-            System.out.println("Cannot write to file. Make sure that the following path is writeable: " + outputFile);
+            System.out.println(f("Cannot write OpenAPI description. Make sure that the following path is writable: \"%s\"",
+                    targetPath));
             System.exit(1);
         }
         if (Files.exists(targetPath)) {
-            System.out.println("Overwriting existing file...");
+            System.out.println("Overwriting existing OpenAPI description...");
         }
 
         try {
             Files.writeString(targetPath, serialized);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to write OpenAPI description to file: " + outputFile, e);
+            throw new RuntimeException(f("Failed to write OpenAPI description to \"%s\"", targetPath), e);
         }
 
         System.out.println("OpenAPI description written.");
