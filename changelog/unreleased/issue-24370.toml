@@ -1,0 +1,5 @@
+type = "f"
+message = "Make modal footer sticky to always show modal action buttons."
+
+pulls = ["24303"]
+issues = ["24370"]
