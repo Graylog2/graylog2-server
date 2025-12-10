@@ -1,16 +1,12 @@
 openapi: 3.1.0
 info:
-  contact:
-    name: Graylog
-    url: https://www.graylog.com
-  description: |
-    The Graylog REST API provides programmatic access to Graylog for automating functions
-    or for integrating with other systems. The REST API allows you to perform any actions
-    that you can perform through the Graylog web interface.
+  description: The REST API provides programmatic access for automating functions
+    or for integrating with other systems. The REST API allows you to perform any
+    actions that you can perform through the web interface.
   license:
     name: SSPLv1
     url: https://www.mongodb.com/licensing/server-side-public-license
-  title: Graylog REST API
+  title: REST API
   version: 0.0.0
 servers:
 - description: REST API endpoint that is also used by the web interface.

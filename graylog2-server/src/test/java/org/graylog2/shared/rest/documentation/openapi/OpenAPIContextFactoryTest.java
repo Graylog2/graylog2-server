@@ -83,11 +83,9 @@ class OpenAPIContextFactoryTest {
         try {
             assertThat(generatedDescription).isNotNull();
             assertThat(generatedDescription.getInfo()).isNotNull();
-            assertThat(generatedDescription.getInfo().getTitle()).isEqualTo("Graylog REST API");
+            assertThat(generatedDescription.getInfo().getTitle()).isEqualTo("REST API");
             assertThat(generatedDescription.getInfo().getVersion()).isEqualTo("1.0.0");
             assertThat(generatedDescription.getInfo().getDescription()).contains("REST API");
-            assertThat(generatedDescription.getInfo().getContact()).isNotNull();
-            assertThat(generatedDescription.getInfo().getContact().getName()).isEqualTo("Graylog");
             assertThat(generatedDescription.getInfo().getLicense()).isNotNull();
             assertThat(generatedDescription.getInfo().getLicense().getName()).isEqualTo("SSPLv1");
 
@@ -227,7 +225,7 @@ class OpenAPIContextFactoryTest {
     }
 
     @Test
-    void handlesSchemaNameConflict() throws Exception {
+    void handlesSchemaNameConflict() {
         try {
             final var schemas = generatedDescription.getComponents().getSchemas();
             assertThat(schemas.keySet())
@@ -241,7 +239,7 @@ class OpenAPIContextFactoryTest {
     }
 
     @Test
-    void usesMapSchemaForImmutableMaps() throws Exception {
+    void usesMapSchemaForImmutableMaps() {
         try {
             // Verify ChildType1 has allOf with ParentType reference
             final Schema<?> mapSchema = generatedDescription.getPaths().get("/plugins/my.plugin.id/immutable-maps")

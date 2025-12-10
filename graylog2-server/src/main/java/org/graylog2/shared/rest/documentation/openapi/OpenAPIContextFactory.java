@@ -26,7 +26,6 @@ import io.swagger.v3.oas.integration.SwaggerConfiguration;
 import io.swagger.v3.oas.integration.api.OpenApiContext;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
@@ -101,14 +100,11 @@ public class OpenAPIContextFactory {
 
     private SwaggerConfiguration swaggerConfig() {
         final var info = new Info()
-                .title("Graylog REST API")
+                .title("REST API")
                 .version(version.toString())
-                .description("""
-                        The Graylog REST API provides programmatic access to Graylog for automating functions
-                        or for integrating with other systems. The REST API allows you to perform any actions
-                        that you can perform through the Graylog web interface.
-                        """)
-                .contact(new Contact().name("Graylog").url("https://www.graylog.com"))
+                .description("The REST API provides programmatic access for automating functions or for integrating " +
+                        "with other systems. The REST API allows you to perform any actions that you can " +
+                        "perform through the web interface.")
                 .license(new License().name("SSPLv1").url("https://www.mongodb.com/licensing/server-side-public-license"));
 
         final var securitySchemes = new Components()
