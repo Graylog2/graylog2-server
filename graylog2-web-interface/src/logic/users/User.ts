@@ -515,8 +515,8 @@ class Builder {
     return new Builder(this.value.set('grnPermissions', value));
   }
 
-  permissions(value: InternalState['permissions']) {
-    return new Builder(this.value.set('permissions', value));
+  permissions(value: InternalState['permissions'] | Array<Permission>) {
+    return new Builder(this.value.set('permissions', Immutable.List(value)));
   }
 
   timezone(value: InternalState['timezone']) {
