@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.opensearch2.views.searchtypes.pivot.series;
 
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
@@ -52,7 +53,6 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
                     // the request was for a field count, we have to add a value_count sub aggregation
                     final ValueCountAggregationBuilder value = AggregationBuilders.count(name).field(field);
                     queryContext.recordNameForPivotSpec(pivot, count, name);
-                    queryContext.recordNameForPivotSpec(pivot, count, name);
                     return List.of(SeriesAggregationBuilder.metric(value));
                 })
                 // doc_count is always present in elasticsearch's bucket aggregations, no need to add it
@@ -80,7 +80,7 @@ public class OSCountHandler extends OSPivotSeriesSpecHandler<Count, ValueCount> 
     }
 
     @Override
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, OSGeneratedQueryContext queryContext) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations aggregations, IndexerGeneratedQueryContext<?> queryContext) {
         final String agg = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
         if (agg == null) {
             if (aggregations instanceof MultiBucketsAggregation.Bucket) {
