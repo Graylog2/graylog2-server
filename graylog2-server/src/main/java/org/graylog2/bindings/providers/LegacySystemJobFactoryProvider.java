@@ -18,13 +18,15 @@ package org.graylog2.bindings.providers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.graylog.scheduler.SystemJob;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.system.jobs.LegacySystemJobFactory;
 
 /**
- * @author Dennis Oelkers <dennis@torch.sh>
+ * Deprecated: Use {@link SystemJob.Factory} and related classes instead.
  */
+@Deprecated(since = "7.1", forRemoval = true)
 public class LegacySystemJobFactoryProvider implements Provider<LegacySystemJobFactory> {
     private static LegacySystemJobFactory systemJobFactory = null;
 

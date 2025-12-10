@@ -22,6 +22,10 @@ import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 
 import java.util.Locale;
 
+/**
+ * Deprecated: Use the {@link org.graylog.scheduler.SystemJob} interface and related classes instead.
+ */
+@Deprecated(since = "7.1", forRemoval = true)
 public class LegacySystemJobFactory {
     private final FixDeflectorByMoveJob.Factory fixDeflectorByMoveJobFactory;
     private final FixDeflectorByDeleteJob.Factory fixDeflectorByDeleteJobFactory;

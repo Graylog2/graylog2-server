@@ -21,6 +21,10 @@ import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkState;
 
+/**
+ * Deprecated: Use {@link org.graylog.scheduler.SystemJob} interface and related classes instead.
+ */
+@Deprecated(since = "7.1", forRemoval = true)
 public abstract class LegacySystemJob {
 
     // Known types that can be resolved in the SystemJobFactory.

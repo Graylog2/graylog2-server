@@ -24,6 +24,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
+import org.graylog.scheduler.SystemJobManager;
 import org.graylog.tracing.GraylogSemanticAttributes;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -39,6 +40,10 @@ import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
+/**
+ * Deprecated: Use {@link SystemJobManager} instead.
+ */
+@Deprecated(since = "7.1", forRemoval = true)
 public class LegacySystemJobManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(LegacySystemJobManager.class);

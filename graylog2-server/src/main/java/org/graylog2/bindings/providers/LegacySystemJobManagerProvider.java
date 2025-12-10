@@ -22,6 +22,10 @@ import jakarta.inject.Provider;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.LegacySystemJobManager;
 
+/**
+ * Deprecated: Use {@link org.graylog.scheduler.SystemJobManager} instead.
+ */
+@Deprecated(since = "7.1", forRemoval = true)
 public class LegacySystemJobManagerProvider implements Provider<LegacySystemJobManager> {
     private static LegacySystemJobManager systemJobManager = null;
 
