@@ -272,34 +272,6 @@ type CreatorTelemetryEvent = {
   actionValue: string;
 };
 
-export interface PermissionEntity {
-  dashboards: true;
-  streams: true;
-  users: true;
-  alerts: true;
-  eventdefinitions: true;
-  inputs: true;
-  eventnotifications: true;
-  pipeline: true;
-  indexsets: true;
-}
-type Entity = keyof PermissionEntity;
-type Verb = 'create' | 'view' | 'edit' | 'delete' | 'manage';
-type Id = string;
-type VerbPermission = `${Entity}:${Verb}`;
-type EntityIDPermission = `${VerbPermission}:${Id}`;
-
-type Permission = VerbPermission | EntityIDPermission;
-type Permissions = Permission | Array<Permission>;
-
-interface EntityCreator {
-  id: string;
-  title: string;
-  path: QualifiedUrl<string>;
-  permissions?: Permissions;
-  telemetryEvent?: CreatorTelemetryEvent;
-}
-
 type HelpMenuItem = {
   description: string;
   permissions?: string | Array<string>;
@@ -317,6 +289,54 @@ type IndexRetentionConfig = {
 };
 
 declare module 'graylog-web-plugin/plugin' {
+  type Id = string;
+  type Wildcard = '*';
+  type Permission =
+    | Wildcard
+    | {
+        [Entity in keyof EntityActions]:
+          | `${Entity}:${EntityActions[Entity]}`
+          | `${Entity}:${EntityActions[Entity]}:${Id}`;
+      }[keyof EntityActions];
+  type Permissions = Permission | Array<Permission>;
+
+  interface EntityCreator {
+    id: string;
+    title: string;
+    path: QualifiedUrl<string>;
+    permissions?: Permissions;
+    telemetryEvent?: CreatorTelemetryEvent;
+  }
+
+  interface EntityActions {
+    alerts: 'create';
+    buffers: 'read';
+    clusterconfigentry: 'read' | 'edit';
+    dashboards: 'create' | 'read';
+    decorators: 'read';
+    eventdefinitions: 'create' | 'read';
+    eventnotifications: 'create' | 'read';
+    fieldnames: 'read';
+    indexercluster: 'read';
+    indexranges: 'rebuild';
+    indexsets: 'create' | 'edit';
+    input_types: 'create';
+    inputs: 'create' | 'edit' | 'read';
+    journal: 'read';
+    jvmstats: 'read';
+    metrics: 'read';
+    messagecount: 'read';
+    messages: 'analyze' | 'read';
+    pipeline: 'create';
+    roles: 'delete';
+    streams: 'create' | 'read' | 'edit';
+    system: 'read';
+    throughput: 'read';
+    typemappings: 'edit';
+    users: 'create' | 'edit' | 'tokenlist' | 'tokencreate' | 'tokenremove' | 'passwordchange';
+    view: 'edit' | 'read';
+  }
+
   interface PluginExports {
     navigation?: Array<PluginNavigation>;
     /**
