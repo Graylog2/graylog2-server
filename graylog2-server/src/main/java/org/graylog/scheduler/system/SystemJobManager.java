@@ -18,6 +18,7 @@ package org.graylog.scheduler.system;
 
 import com.google.common.primitives.Ints;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.scheduler.DBSystemJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
 import org.graylog.scheduler.clock.JobSchedulerClock;
@@ -27,6 +28,7 @@ import org.joda.time.DateTimeZone;
 
 import java.time.Duration;
 
+@Singleton
 public class SystemJobManager {
     private final DBSystemJobTriggerService triggerService;
     private final JobSchedulerClock clock;
@@ -48,7 +50,7 @@ public class SystemJobManager {
                 .jobDefinitionType(SystemJobDefinitionConfig.TYPE_NAME)
                 .jobDefinitionId(config.type())
                 .data(config)
-                .nextTime(Duration.ZERO.equals(delay) ? now : now.plusMillis(Ints.saturatedCast(delay.toMillis())))
+                .nextTime(now.plusMillis(Ints.saturatedCast(delay.toMillis())))
                 .schedule(OnceJobSchedule.create())
                 .build();
 

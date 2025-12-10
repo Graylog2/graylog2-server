@@ -22,6 +22,8 @@ import org.graylog.scheduler.audit.JobSchedulerAuditEventTypes;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.clock.JobSchedulerSystemClock;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
+import org.graylog.scheduler.system.SystemJobManager;
+import org.graylog.scheduler.system.SystemJobSchedulerService;
 import org.graylog.scheduler.worker.JobWorkerPool;
 import org.graylog2.plugin.PluginModule;
 
@@ -34,6 +36,7 @@ public class JobSchedulerModule extends PluginModule {
         bind(SystemJobSchedulerService.class).asEagerSingleton();
         bind(UserJobSchedulerService.class).asEagerSingleton();
         bind(JobSchedulerClock.class).toInstance(JobSchedulerSystemClock.INSTANCE);
+        bind(SystemJobManager.class).asEagerSingleton();
 
         install(new FactoryModuleBuilder().build(JobSchedulerEventBus.Factory.class));
         install(new FactoryModuleBuilder().build(JobExecutionEngine.Factory.class));
