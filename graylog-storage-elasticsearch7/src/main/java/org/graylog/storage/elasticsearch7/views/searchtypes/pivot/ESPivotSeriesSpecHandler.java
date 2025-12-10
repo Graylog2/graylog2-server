@@ -16,6 +16,7 @@
  */
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
 import org.graylog.plugins.views.search.searchtypes.pivot.PivotSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
@@ -30,7 +31,7 @@ import java.util.stream.Stream;
 public abstract class ESPivotSeriesSpecHandler<SPEC_TYPE extends SeriesSpec, AGGREGATION_RESULT extends Aggregation>
         implements SeriesSpecHandler<SPEC_TYPE, SeriesAggregationBuilder, SearchResponse, AGGREGATION_RESULT, ESGeneratedQueryContext> {
 
-    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, ESGeneratedQueryContext queryContext) {
+    public Aggregation extractAggregationFromResult(Pivot pivot, PivotSpec spec, HasAggregations currentAggregationOrBucket, IndexerGeneratedQueryContext<?> queryContext) {
         final String aggName = queryContext.getAggNameForPivotSpecFromContext(pivot, spec);
         return currentAggregationOrBucket.getAggregations().get(aggName);
     }
