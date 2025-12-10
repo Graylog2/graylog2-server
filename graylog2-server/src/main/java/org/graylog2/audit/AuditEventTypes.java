@@ -133,6 +133,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String NODE_SHUTDOWN_INITIATE = PREFIX + "node_shutdown:initiate";
     public static final String NODE_STARTUP_COMPLETE = PREFIX + "node_startup:complete";
     public static final String NODE_STARTUP_INITIATE = PREFIX + "node_startup:initiate";
+    public static final String ROLE_AUTHZ_DELETE = PREFIX + "role_authz_membership:delete";
+    public static final String ROLE_AUTHZ_UPDATE = PREFIX + "role_authz_membership:update";
     public static final String ROLE_CREATE = PREFIX + "role:create";
     public static final String ROLE_DELETE = PREFIX + "role:delete";
     public static final String ROLE_MEMBERSHIP_DELETE = PREFIX + "role_membership:delete";
@@ -300,6 +302,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(NODE_SHUTDOWN_INITIATE)
             .add(NODE_STARTUP_COMPLETE)
             .add(NODE_STARTUP_INITIATE)
+            .add(ROLE_AUTHZ_DELETE)
+            .add(ROLE_AUTHZ_UPDATE)
             .add(ROLE_CREATE)
             .add(ROLE_DELETE)
             .add(ROLE_MEMBERSHIP_DELETE)
