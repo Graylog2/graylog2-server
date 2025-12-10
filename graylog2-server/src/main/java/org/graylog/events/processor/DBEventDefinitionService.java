@@ -29,6 +29,7 @@ import org.graylog.security.entities.EntityRegistrar;
 import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.NonDeletableSystemScope;
 import org.graylog2.database.entities.ScopedEntity;
@@ -45,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -63,6 +65,8 @@ public class DBEventDefinitionService {
 
     public static final String COLLECTION_NAME = "event_definitions";
     public static final String SYSTEM_NOTIFICATION_EVENT_DEFINITION = "System notification events";
+
+    private static final String ILLUMINATE_SCOPE_NAME = "ILLUMINATE";
 
     private final MongoCollection<EventDefinitionDto> collection;
     private final MongoUtils<EventDefinitionDto> mongoUtils;
@@ -254,5 +258,22 @@ public class DBEventDefinitionService {
         collection.updateMany(
                 Filters.eq(EventDefinitionDto.FIELD_EVENT_PROCEDURE, procedureId),
                 Updates.unset(EventDefinitionDto.FIELD_EVENT_PROCEDURE));
+    }
+
+    /**
+     * @return a map with counts of event definitions grouped by source (Illuminate vs user-created).
+     */
+    public Map<String, Long> countBySource() {
+        long illuminateEventCount = collection.countDocuments(
+                Filters.eq(ScopedEntity.FIELD_SCOPE, ILLUMINATE_SCOPE_NAME)
+        );
+        long userEventCount = collection.countDocuments(
+                Filters.eq(ScopedEntity.FIELD_SCOPE, DefaultEntityScope.NAME)
+        );
+
+        return Map.of(
+                "illuminate_event_definitions", illuminateEventCount,
+                "user_event_definitions", userEventCount
+        );
     }
 }
