@@ -181,48 +181,6 @@ export type FieldValueProvider = {
   requiredFields: string[];
 };
 
-interface PluginDataLake {
-  StreamDataLake: React.ComponentType<{
-    permissions: Immutable.List<string>;
-  }>;
-  DataLakeStatus: React.ComponentType<{
-    dataLakeEnabled: boolean;
-  }>;
-  DataLakeJournal: React.ComponentType<{
-    nodeId: string;
-  }>;
-  DataLakeJobs: React.ComponentType<{
-    permissions: Immutable.List<string>;
-    streamId: string;
-  }>;
-  StreamIlluminateProcessingSection: React.ComponentType<{
-    stream: Stream;
-  }>;
-  StreamIndexSetDataLakeWarning: React.ComponentType<{ streamId: string; isArchivingEnabled: boolean }>;
-  fetchStreamDataLakeStatus: (streamId: string) => Promise<{
-    id: string;
-    archive_name: string;
-    enabled: boolean;
-    stream_id: string;
-    retention_time: number;
-  }>;
-  fetchStreamDataLake: (streamId: string) => Promise<{
-    id: string;
-    archive_config_id: string;
-    message_count: number;
-    archive_name: string;
-    timestamp_from: string;
-    timestamp_to: string;
-    restore_history: Array<{ id: string }>;
-  }>;
-  getStreamDataLakeTableElements: (permission: Immutable.List<string>) => {
-    attributeName: string;
-    attributes: Array<{ id: string; title: string }>;
-    columnRenderer: { data_lake: ColumnRenderer<Stream> };
-  };
-  DataLakeStreamDeleteWarning: React.ComponentType;
-}
-
 type CreatorTelemetryEvent = {
   type: TelemetryEventType;
   section: string;
@@ -329,6 +287,48 @@ declare module 'graylog-web-plugin/plugin' {
       | 'rolesedit'
       | 'list';
     view: 'edit' | 'read';
+  }
+
+  interface PluginDataLake {
+    StreamDataLake: React.ComponentType<{
+      permissions: Immutable.List<Permission>;
+    }>;
+    DataLakeStatus: React.ComponentType<{
+      dataLakeEnabled: boolean;
+    }>;
+    DataLakeJournal: React.ComponentType<{
+      nodeId: string;
+    }>;
+    DataLakeJobs: React.ComponentType<{
+      permissions: Immutable.List<Permission>;
+      streamId: string;
+    }>;
+    StreamIlluminateProcessingSection: React.ComponentType<{
+      stream: Stream;
+    }>;
+    StreamIndexSetDataLakeWarning: React.ComponentType<{ streamId: string; isArchivingEnabled: boolean }>;
+    fetchStreamDataLakeStatus: (streamId: string) => Promise<{
+      id: string;
+      archive_name: string;
+      enabled: boolean;
+      stream_id: string;
+      retention_time: number;
+    }>;
+    fetchStreamDataLake: (streamId: string) => Promise<{
+      id: string;
+      archive_config_id: string;
+      message_count: number;
+      archive_name: string;
+      timestamp_from: string;
+      timestamp_to: string;
+      restore_history: Array<{ id: string }>;
+    }>;
+    getStreamDataLakeTableElements: (permission: Immutable.List<string>) => {
+      attributeName: string;
+      attributes: Array<{ id: string; title: string }>;
+      columnRenderer: { data_lake: ColumnRenderer<Stream> };
+    };
+    DataLakeStreamDeleteWarning: React.ComponentType;
   }
 
   type HelpMenuItem = {
