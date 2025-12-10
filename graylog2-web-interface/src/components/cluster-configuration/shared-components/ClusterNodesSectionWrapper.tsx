@@ -45,8 +45,12 @@ const TitleCountButton = styled.button`
 const TableWrapper = styled.div.withConfig({
   shouldForwardProp: (prop) => prop !== 'maxHeight',
 })<{ maxHeight?: string }>(
-  ({ maxHeight, theme }) => css`
-    margin-top: calc(-1 * ${theme.spacings.lg});
+  ({ maxHeight }) => css`
+    margin-top: -12px;
+
+    div#scroll-container table thead {
+      background: inherit;
+    }
 
     ${maxHeight &&
     css`
@@ -59,7 +63,6 @@ const TableWrapper = styled.div.withConfig({
         position: sticky;
         top: 0;
         z-index: 1;
-        background: ${theme.colors.table.head.background};
       }
     `}
   `,
