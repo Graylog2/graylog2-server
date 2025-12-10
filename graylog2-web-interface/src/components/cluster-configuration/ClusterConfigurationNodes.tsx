@@ -43,8 +43,8 @@ type NodeType = 'all' | 'graylog' | 'data';
 
 const ALL_NODES_PAGE_SIZE = 10;
 const SINGLE_NODE_TYPE_PAGE_SIZE = 100;
-const ALL_NODES_REFETCH_INTERVAL = 5000;
-const SINGLE_NODE_TYPE_REFETCH_INTERVAL = 10000;
+const ALL_NODES_REFETCH_INTERVAL = 10000;
+const SINGLE_NODE_TYPE_REFETCH_INTERVAL = 20000;
 
 const ClusterConfigurationNodes = () => {
   const productName = useProductName();
