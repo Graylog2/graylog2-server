@@ -66,6 +66,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     public static final String SAFE_CLASSES = "safe_classes";
 
     public static final String CONTENT_PACKS_DIR = "content_packs_dir";
+    private static final String NODE_ID_FILE = "node_id_file";
     /**
      * Deprecated! Use isLeader() instead.
      */
@@ -98,8 +99,8 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "outputbuffer_processor_threads_core_pool_size", required = true, validators = PositiveIntegerValidator.class)
     private int outputBufferProcessorThreadsCorePoolSize = 3;
 
-    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
-    private String nodeIdFile = "/etc/graylog/server/node-id";
+    @Parameter(value = NODE_ID_FILE, validators = NodeIdFileValidator.class)
+    private String nodeIdFile;
 
     @Parameter(value = "root_username")
     private String rootUsername = "admin";
@@ -397,8 +398,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         return skipPreflightChecks;
     }
 
+    @NamedBindingOverride(value = NODE_ID_FILE)
     public String getNodeIdFile() {
-        return nodeIdFile;
+        return Optional.ofNullable(nodeIdFile).orElse(getDataDir().resolve("node_id").toString());
     }
 
     public String getRootUsername() {
