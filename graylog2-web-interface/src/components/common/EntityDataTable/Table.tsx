@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components';
 
 import { Table as BaseTable } from 'components/bootstrap';
 import ExpandedSections from 'components/common/EntityDataTable/ExpandedSections';
-import { CELL_PADDING, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import type { EntityBase, ExpandedSectionRenderers, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 import {
   columnOpacityVar,
@@ -65,7 +65,7 @@ const Td = styled.td<{
     opacity: var(${columnOpacityVar($colId)}, 1);
     transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
-    height: 0;
+    height: 0; // required to be able to use height: 100% in child elements
     ${$pinningPosition
       ? css`
           position: sticky;

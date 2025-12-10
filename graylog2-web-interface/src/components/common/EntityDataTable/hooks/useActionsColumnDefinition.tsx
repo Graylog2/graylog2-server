@@ -48,6 +48,7 @@ const Actions = styled.div<{ $isEvenRow: boolean }>(
     padding: ${CELL_PADDING}px;
     background: ${$isEvenRow ? theme.colors.table.row.background : theme.colors.table.row.backgroundStriped};
     height: 100%;
+    align-items: flex-start;
   `,
 );
 
