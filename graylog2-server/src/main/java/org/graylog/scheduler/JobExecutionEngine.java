@@ -264,7 +264,7 @@ public class JobExecutionEngine {
             final JobDefinitionDto jobDefinition = jobDefinitionLookup.lookup(trigger.jobDefinitionId())
                     .orElseThrow(() -> new IllegalStateException("Couldn't find job definition " + trigger.jobDefinitionId()));
 
-            final Job job = jobFactories.get(jobDefinition.config().type()).create(jobDefinition);
+            final Job job = jobFactories.get(jobDefinition.config().jobFactoryType()).create(jobDefinition);
             if (job == null) {
                 throw new IllegalStateException("Couldn't find job factory for type " + jobDefinition.config().type());
             }
