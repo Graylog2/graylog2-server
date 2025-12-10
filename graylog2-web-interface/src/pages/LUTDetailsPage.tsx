@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import { LookupTableShow } from 'components/lookup-tables';
+import { LookupTableView } from 'components/lookup-tables';
 
 const FlexContainer = styled.div`
   display: flex;
@@ -58,7 +58,7 @@ function LUTDetailsPage() {
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
           <FlexCol md={12}>
-            <LookupTableShow />
+            <LookupTableView />
           </FlexCol>
         </Row>
       </LUTPageLayout>

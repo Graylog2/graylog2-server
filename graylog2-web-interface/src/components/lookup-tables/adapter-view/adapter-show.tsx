@@ -28,7 +28,7 @@ function AdapterShow({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
     [dataAdapter?.config?.type, plugins],
   );
 
-  const DocComponent = React.useMemo(() => adapterPlugin.documentationComponent, [adapterPlugin]);
+  const DocComponent = React.useMemo(() => adapterPlugin?.documentationComponent, [adapterPlugin]);
 
   return (
     <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">

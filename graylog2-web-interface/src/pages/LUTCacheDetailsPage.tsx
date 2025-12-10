@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { Button, Row, Col } from 'components/bootstrap';
 import { LUTPageLayout } from 'components/lookup-tables/layout-componets';
-import { CacheShow } from 'components/lookup-tables';
+import { CacheView } from 'components/lookup-tables';
 
 const FlexContainer = styled.div`
   display: flex;
@@ -42,7 +42,7 @@ const FlexCol = styled(Col)`
   }
 `;
 
-function LUTDataAdaptersDetailsPage() {
+function LUTCacheDetailsPage() {
   const navigate = useNavigate();
 
   return (
@@ -50,7 +50,7 @@ function LUTDataAdaptersDetailsPage() {
       <LUTPageLayout
         documentTitle="Lookup Tables - Caches Details"
         pageTitle="Caches Details for Lookup Tables"
-        pageDescription="Caches provide the actual values for lookup tables."
+        pageDescription="Caches store values for lookup tables to improve performance."
         actions={
           <Button bsStyle="primary" onClick={() => navigate(-1)}>
             Back to list
@@ -58,7 +58,7 @@ function LUTDataAdaptersDetailsPage() {
         }>
         <Row className="content" style={{ flexGrow: 1 }}>
           <FlexCol md={12}>
-            <CacheShow />
+            <CacheView />
           </FlexCol>
         </Row>
       </LUTPageLayout>
@@ -66,4 +66,4 @@ function LUTDataAdaptersDetailsPage() {
   );
 }
 
-export default LUTDataAdaptersDetailsPage;
+export default LUTCacheDetailsPage;
