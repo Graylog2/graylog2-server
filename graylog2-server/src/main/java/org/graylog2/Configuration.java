@@ -303,6 +303,11 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
+    @Documentation("""
+            This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
+            be overwritten. This should be as small as possible (for performance), but large enough to hold events long
+            enough for all nodes to process them.
+            """)
     @Parameter(value = "max_events_collection_size")
     private Size maxEventsCollectionSize = Size.megabytes(100);
 
