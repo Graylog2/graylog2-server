@@ -266,6 +266,8 @@ declare module 'graylog-web-plugin/plugin' {
     api_browser: 'read';
     authentication: 'edit';
     buffers: 'read';
+    // Do we need both of the following?
+    clusterconfig: 'read';
     clusterconfigentry: 'read' | 'edit';
     clusterconfiguration: 'read';
     contentpack: 'read';
