@@ -18,7 +18,7 @@ package org.graylog2.bindings.providers;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
-import org.graylog.scheduler.SystemJob;
+import org.graylog.scheduler.system.SystemJob;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 import org.graylog2.system.jobs.LegacySystemJobFactory;

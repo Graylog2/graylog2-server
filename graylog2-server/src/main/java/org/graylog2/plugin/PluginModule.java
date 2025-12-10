@@ -45,6 +45,8 @@ import org.graylog.scheduler.JobSchedule;
 import org.graylog.scheduler.JobTriggerData;
 import org.graylog.scheduler.capabilities.SchedulerCapabilities;
 import org.graylog.scheduler.rest.JobResourceHandler;
+import org.graylog.scheduler.system.SystemJob;
+import org.graylog.scheduler.system.SystemJobConfig;
 import org.graylog.security.authservice.AuthServiceBackend;
 import org.graylog.security.authservice.AuthServiceBackendConfig;
 import org.graylog.security.entities.EntityRegistrationHandler;
@@ -330,6 +332,19 @@ public abstract class PluginModule extends Graylog2Module {
         if (dataClass != null) {
             registerJacksonSubtype(dataClass, name);
         }
+    }
+
+    private MapBinder<String, SystemJob.Factory<? extends SystemJob<? extends SystemJobConfig>>> systemJobBinder() {
+        return MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>() {});
+    }
+
+    protected void addSystemSchedulerJob(String name,
+                                         Class<? extends SystemJob<? extends SystemJobConfig>> jobClass,
+                                         Class<? extends SystemJob.Factory<? extends SystemJob<? extends SystemJobConfig>>> factoryClass,
+                                         Class<? extends JobTriggerData> dataClass) {
+        install(new FactoryModuleBuilder().implement(SystemJob.class, jobClass).build(factoryClass));
+        systemJobBinder().addBinding(name).to(factoryClass);
+        registerJacksonSubtype(dataClass, name);
     }
 
     protected void addJobSchedulerSchedule(String name, Class<? extends JobSchedule> scheduleClass) {

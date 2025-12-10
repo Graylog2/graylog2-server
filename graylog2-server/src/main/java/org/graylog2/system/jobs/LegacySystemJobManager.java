@@ -24,7 +24,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
-import org.graylog.scheduler.SystemJobManager;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog.tracing.GraylogSemanticAttributes;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;

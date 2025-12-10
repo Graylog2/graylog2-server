@@ -16,13 +16,14 @@
  */
 package org.graylog2.system.jobs;
 
+import org.graylog.scheduler.system.SystemJob;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Deprecated: Use {@link org.graylog.scheduler.SystemJob} interface and related classes instead.
+ * Deprecated: Use {@link SystemJob} interface and related classes instead.
  */
 @Deprecated(since = "7.1", forRemoval = true)
 public abstract class LegacySystemJob {

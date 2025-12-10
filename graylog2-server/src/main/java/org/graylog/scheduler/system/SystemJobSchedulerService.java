@@ -14,12 +14,18 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler;
+package org.graylog.scheduler.system;
 
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.inject.Singleton;
+import org.graylog.scheduler.DBSystemJobTriggerService;
+import org.graylog.scheduler.JobDefinitionDto;
+import org.graylog.scheduler.JobExecutionEngine;
+import org.graylog.scheduler.JobSchedulerConfig;
+import org.graylog.scheduler.JobSchedulerConfiguration;
+import org.graylog.scheduler.JobSchedulerService;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
 import org.graylog.scheduler.worker.JobWorkerPool;
@@ -28,7 +34,9 @@ import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
+import java.util.Optional;
+
+import static org.graylog2.shared.utilities.StringUtils.f;
 
 @Singleton
 public class SystemJobSchedulerService extends JobSchedulerService {
@@ -41,8 +49,7 @@ public class SystemJobSchedulerService extends JobSchedulerService {
                                      JobSchedulerConfig schedulerConfig,
                                      JobSchedulerClock clock,
                                      JobSchedulerEventBus.Factory schedulerEventBusFactory,
-                                     Map<String, Job.Factory<? extends Job>> jobFactories,
-                                     DBJobDefinitionService jobDefinitionService,
+                                     SystemJobFactories systemJobFactories,
                                      DBSystemJobTriggerService systemJobTriggerService,
                                      ServerStatus serverStatus,
                                      GracefulShutdownService gracefulShutdownService,
@@ -51,9 +58,9 @@ public class SystemJobSchedulerService extends JobSchedulerService {
         super(LOG,
                 (workerPool) -> engineFactory.create(
                         NAME,
-                        jobFactories, // TODO: Replace with system job factories!
+                        systemJobFactories.getJobFactories(),
                         workerPool,
-                        jobDefinitionService::get, // TODO: Change this to lookup system jobs instead!
+                        SystemJobSchedulerService::createJobDefinitionLookup,
                         systemJobTriggerService // MUST be the system job trigger service!
                 ),
                 workerPoolFactory.create(NAME, schedulerConfig.numberOfWorkerThreads()),
@@ -64,5 +71,16 @@ public class SystemJobSchedulerService extends JobSchedulerService {
                 gracefulShutdownService,
                 shutdownTimeoutMs,
                 loopSleepDuration);
+    }
+
+    private static Optional<JobDefinitionDto> createJobDefinitionLookup(String jobType) {
+        // We use a single job definition for all system jobs, as they are all pre-defined and known to the system.
+        // We use the job type as ID to be able to distinguish between different system jobs in the scheduler.
+        return Optional.of(JobDefinitionDto.builder()
+                .id(jobType)
+                .title(f("%s:%s", SystemJobDefinitionConfig.TYPE_NAME, jobType))
+                .description("")
+                .config(SystemJobDefinitionConfig.forJobType(jobType))
+                .build());
     }
 }

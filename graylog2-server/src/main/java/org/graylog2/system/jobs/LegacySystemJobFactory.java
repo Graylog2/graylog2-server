@@ -17,13 +17,14 @@
 package org.graylog2.system.jobs;
 
 import jakarta.inject.Inject;
+import org.graylog.scheduler.system.SystemJob;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
 
 import java.util.Locale;
 
 /**
- * Deprecated: Use the {@link org.graylog.scheduler.SystemJob} interface and related classes instead.
+ * Deprecated: Use the {@link SystemJob} interface and related classes instead.
  */
 @Deprecated(since = "7.1", forRemoval = true)
 public class LegacySystemJobFactory {
