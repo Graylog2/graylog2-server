@@ -46,9 +46,11 @@ public class RenameFields extends AbstractFunction<Void> {
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
 
         if (fields != null) {
-            for (String oldName : fields.keySet()) {
-                final String newName = fields.get(oldName);
-                if (message.hasField(oldName) && !oldName.equals(newName)) {
+            for (Map.Entry<String, String> entry : fields.entrySet()) {
+                final String oldName = entry.getKey();
+                final String newName = entry.getValue();
+                
+                if (!oldName.equals(newName) && message.hasField(oldName)) {
                     message.addField(newName, message.getField(oldName));
                     message.removeField(oldName);
                 }
