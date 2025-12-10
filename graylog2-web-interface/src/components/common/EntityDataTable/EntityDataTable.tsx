@@ -43,6 +43,7 @@ import useColumnDefinitions from 'components/common/EntityDataTable/hooks/useCol
 import useColumnRenderers from 'components/common/EntityDataTable/hooks/useColumnRenderers';
 import useAuthorizedColumnSchemas from 'components/common/EntityDataTable/hooks/useAuthorizedColumnSchemas';
 import useIntersectionObserver from 'hooks/useIntersectionObserver';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 import type { ColumnRenderers, ColumnSchema, EntityBase, ColumnPreferences, ExpandedSectionRenderers } from './types';
 import ExpandedSectionsProvider from './contexts/ExpandedSectionsProvider';
@@ -85,13 +86,8 @@ const ScrollRightIndicator = styled.div`
   position: absolute;
   top: 0;
   bottom: 0;
-
-  /* "End" of horizontal scroll area */
   right: 0;
-
-  /* Don't take space, but must have a tiny size */
-  width: 10px;
-
+  width: ${CELL_PADDING}px;
   pointer-events: none;
   z-index: 2;
 `;

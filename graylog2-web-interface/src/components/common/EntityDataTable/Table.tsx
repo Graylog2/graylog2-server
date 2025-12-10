@@ -63,13 +63,17 @@ const Td = styled.td<{
   ({ $colId, $hidePadding, $pinningPosition }) => css`
     word-break: break-word;
     opacity: var(${columnOpacityVar($colId)}, 1);
-    transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
+    transform: var(${columnTransformVar($colId)}, none);
     transition: var(${columnTransition()}, none);
     height: 0;
     ${$pinningPosition
       ? css`
           position: sticky;
           ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+          ${ScrollShadow('left')}
+          &::before {
+            display: var(${displayScrollRightIndicatorVar}, none);
+          }
         `
       : ''}
 
@@ -77,15 +81,6 @@ const Td = styled.td<{
     css`
       && {
         padding: 0;
-      }
-    `}
-
-    ${$colId === ACTIONS_COL_ID &&
-    css`
-      position: sticky;
-      ${ScrollShadow('left')}
-      &::before {
-        display: var(${displayScrollRightIndicatorVar}, none);
       }
     `}
   `,

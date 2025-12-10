@@ -65,7 +65,7 @@ const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArra
     );
 
     return hasRowActions ? maxWidth + CELL_PADDING * 2 : 0;
-  }, [rowWidths, visibleRowIdsSet]);
+  }, [hasRowActions, rowWidths, visibleRowIdsSet]);
 
   return { colMinWidth, handleWidthChange };
 };
