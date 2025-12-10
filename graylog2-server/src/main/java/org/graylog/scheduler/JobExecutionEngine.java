@@ -266,7 +266,7 @@ public class JobExecutionEngine {
 
             final Job job = jobFactories.get(jobDefinition.config().jobFactoryType()).create(jobDefinition);
             if (job == null) {
-                throw new IllegalStateException("Couldn't find job factory for type " + jobDefinition.config().type());
+                throw new IllegalStateException("Couldn't find job factory for type " + jobDefinition.config().jobFactoryType());
             }
 
             executionTime.time(() -> executeJob(trigger, jobDefinition, job));
