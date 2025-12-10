@@ -35,14 +35,15 @@ public class ConfigurationHelper {
         return initPathConfig(config, new HashMap<>());
     }
 
-    public static <T extends Configuration> T initConfig(T config) throws ValidationException, RepositoryException {
-        return initConfig(config, new HashMap<>());
+    public static <T extends Configuration> T initConfig(T config, Path tempDir) throws ValidationException, RepositoryException {
+        return initConfig(config, new HashMap<>(), tempDir);
     }
 
-    public static <T extends Configuration> T initConfig(T config, Map<String, String> properties) throws ValidationException, RepositoryException {
+    public static <T extends Configuration> T initConfig(T config, Map<String, String> properties, Path tempDir) throws ValidationException, RepositoryException {
         Map<String, String> props = new HashMap<>();
         props.put("password_secret", "ipNUnWxmBLCxTEzXcyamrdy0Q3G7HxdKsAvyg30R9SCof0JydiZFiA3dLSkRsbLF");
         props.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918");
+        props.put("node_id_file", tempDir.resolve("node_id_file").toAbsolutePath().toString());
         props.putAll(properties);
 
         return initPathConfig(config, props);

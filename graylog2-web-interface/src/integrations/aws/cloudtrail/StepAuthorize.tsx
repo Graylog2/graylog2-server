@@ -20,7 +20,6 @@ import FormDataContext from 'integrations/contexts/FormDataContext';
 import { qualifyUrl } from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 import formValidation from 'integrations/aws/utils/formValidation';
-import { AWS_AUTH_TYPES } from 'integrations/aws/common/constants';
 
 import { ApiRoutes } from './common/Routes';
 import type { ErrorMessageType, HandleFieldUpdateType, HandleSubmitType } from './types';
@@ -85,16 +84,8 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
       });
   };
 
-  const authType = formData.awsAuthenticationType && formData.awsAuthenticationType.value;
-
   const isFormValid = formValidation.isFormValid(
-    [
-      'awsCloudTrailName',
-      ...(authType !== AWS_AUTH_TYPES.automatic ? ['awsAccessKey', 'awsSecretKey'] : []),
-      'awsCloudTrailSqsRegion',
-      'awsCloudTrailS3Region',
-      'awsCloudTrailSqsQueueName',
-    ],
+    ['awsCloudTrailName', 'awsCloudTrailSqsRegion', 'awsCloudTrailS3Region', 'awsCloudTrailSqsQueueName'],
     formData,
   );
 
@@ -121,7 +112,7 @@ const StepAuthorize = ({ onSubmit, onChange }: StepAuthorizeProps) => {
         required
       />
 
-      <AWSAuthenticationTypes onChange={onChange} />
+      <AWSAuthenticationTypes onChange={onChange} requireCredentials={false} />
 
       <ValidatedInput
         type="select"

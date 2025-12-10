@@ -22,6 +22,7 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import org.assertj.core.api.Assertions;
 import org.graylog.datanode.Configuration;
+import org.graylog.datanode.DatanodeTestUtils;
 import org.graylog.datanode.configuration.DatanodeDirectories;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
 import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
@@ -42,12 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 class SearchableSnapshotsConfigurationBeanTest {
-    Configuration defaultConfiguration = datanodeConfiguration(Map.of(
-            "node_search_cache_size", "10gb",
-            "opensearch_logs_location", ".",
-            "opensearch_config_location", ".",
-            "node_id_file", "node-id"
-    ));
+
     @Test
     void testS3Repo(@TempDir Path tempDir) throws ValidationException, RepositoryException {
         final S3RepositoryConfiguration config = s3Configuration(Map.of(
@@ -58,7 +54,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                defaultConfiguration,
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -95,7 +93,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                defaultConfiguration,
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 gcsRepositoryConfiguration,
@@ -123,7 +123,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                defaultConfiguration,
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 new S3RepositoryConfiguration(),
                 new GCSRepositoryConfiguration(),
@@ -152,13 +154,10 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "path_repo", snapshotsPath,
-                        "node_search_cache_size", "10gb",
-                        "opensearch_logs_location", ".",
-                        "opensearch_config_location", ".",
-                        "node_id_file", "node-id"
-                )),
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -185,7 +184,9 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                defaultConfiguration,
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -214,7 +215,9 @@ class SearchableSnapshotsConfigurationBeanTest {
         ));
 
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                defaultConfiguration,
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -235,13 +238,11 @@ class SearchableSnapshotsConfigurationBeanTest {
 
         // only path_repo in general datanode configuration
         final SearchableSnapshotsConfigurationBean bean = new SearchableSnapshotsConfigurationBean(
-                datanodeConfiguration(Map.of(
+                DatanodeTestUtils.datanodeConfiguration(Map.of(
                         "node_roles", "cluster_manager,data,ingest,remote_cluster_client",
                         "path_repo", snapshotsPath,
-                        "node_search_cache_size", "10gb",
-                        "opensearch_logs_location", ".",
-                        "node_id_file", "node-id"
-                )),
+                        "node_search_cache_size", "10gb"
+                ), tempDir),
                 datanodeDirectories(tempDir),
                 config,
                 new GCSRepositoryConfiguration(),
@@ -274,19 +275,5 @@ class SearchableSnapshotsConfigurationBeanTest {
         final HdfsRepositoryConfiguration configuration = new HdfsRepositoryConfiguration();
         new JadConfig(new InMemoryRepository(properties), configuration).process();
         return configuration;
-    }
-
-    private static Configuration datanodeConfiguration(Map<String, String> properties) {
-        try {
-            final Configuration configuration = new Configuration();
-            final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
-                    "opensearch_config_location", ".",
-                    "password_secret", "thisisverysecretpassword"
-            ));
-            new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
-            return configuration;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
