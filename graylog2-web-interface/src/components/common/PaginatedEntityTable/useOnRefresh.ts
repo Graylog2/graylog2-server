@@ -21,7 +21,7 @@ import AutoRefreshContext from 'views/components/contexts/AutoRefreshContext';
 const useOnRefresh = (fn: () => void) => {
   const context = useContext(AutoRefreshContext);
   useEffect(() => {
-    if (context?.animationId !== null) {
+    if (context?.animationId !== null && context?.animationId !== undefined) {
       fn();
     }
   }, [context?.animationId, fn]);
