@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
-import { Drawer } from 'components/common';
+import { Spinner } from 'components/common';
+import { useFetchDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
-type Props = {
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  double?: boolean;
-};
+import AdapterShow from './adapter-show';
 
-const LUTDrawer = ({ onClose, title, double = false, children }: Props) => (
-  <Drawer size="lg" double={double} onClose={onClose} position="right" title={title}>
-    {children}
-  </Drawer>
-);
+function AdapterView() {
+  const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
+  const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(adapterIdOrName);
 
-export default LUTDrawer;
+  if (loadingDataAdapter) return <Spinner text="Loading data adapter details" />;
+
+  return <AdapterShow dataAdapter={dataAdapter} />;
+}
+
+export default AdapterView;

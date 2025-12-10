@@ -22,8 +22,6 @@ import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import ErrorsConsumer from 'components/lookup-tables/lookup-table-list/errors-consumer';
 import { useFetchDataAdapters } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
-import LUTModals from 'components/lookup-tables/LUTModals';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { DataAdapterEntity } from 'components/lookup-tables/types';
 
@@ -99,27 +97,24 @@ function DataAdapterList() {
   );
 
   return (
-    <ModalProvider>
-      <ErrorsProvider>
-        <ErrorsConsumer adapterNames={adapterNames} />
-        <Row className="content">
-          <Col md={12}>
-            <PaginatedEntityTable<DataAdapterEntity>
-              humanName="data adapter"
-              entityActions={renderActions}
-              queryHelpComponent={queryHelpComponent}
-              tableLayout={adapterListElements.defaultLayout}
-              fetchEntities={handleFetchAdapters}
-              keyFn={dataAdaptersKeyFn}
-              actionsCellWidth={100}
-              entityAttributesAreCamelCase={false}
-              columnRenderers={columnRenderers}
-            />
-          </Col>
-        </Row>
-        <LUTModals />
-      </ErrorsProvider>
-    </ModalProvider>
+    <ErrorsProvider>
+      <ErrorsConsumer adapterNames={adapterNames} />
+      <Row className="content">
+        <Col md={12}>
+          <PaginatedEntityTable<DataAdapterEntity>
+            humanName="data adapter"
+            entityActions={renderActions}
+            queryHelpComponent={queryHelpComponent}
+            tableLayout={adapterListElements.defaultLayout}
+            fetchEntities={handleFetchAdapters}
+            keyFn={dataAdaptersKeyFn}
+            actionsCellWidth={100}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+          />
+        </Col>
+      </Row>
+    </ErrorsProvider>
   );
 }
 
