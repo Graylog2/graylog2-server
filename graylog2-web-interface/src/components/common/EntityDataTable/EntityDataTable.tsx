@@ -40,6 +40,7 @@ import TableDndProvider from 'components/common/EntityDataTable/TableDndProvider
 import Table from 'components/common/EntityDataTable/Table';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import { columnTransformVar, columnWidthVar, columnOpacityVar } from 'components/common/EntityDataTable/CSSVariables';
+import useHeaderMinWidths from 'components/common/EntityDataTable/hooks/useHeaderMinWidths';
 
 import type {
   ColumnRenderers,
@@ -258,6 +259,8 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const displayPageSizeSelect = typeof onPageSizeChange === 'function';
   const authorizedColumnSchemas = useAuthorizedColumnSchemas(columnSchemas);
   const columnRenderersByAttribute = useColumnRenderers<Entity, Meta>(authorizedColumnSchemas, customColumnRenderers);
+  const { headerMinWidths, handleHeaderSectionResize } = useHeaderMinWidths();
+
   const [internalAttributeColumnOrder, setInternalAttributeColumnOrder] = useState<Array<string>>(
     layoutPreferences?.order ?? defaultColumnOrder,
   );
@@ -281,10 +284,11 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   const { tableRef, actionsRef, columnWidths } = useElementWidths<Entity, Meta>({
     columnRenderersByAttribute,
     columnSchemas: authorizedColumnSchemas,
+    columnWidthPreferences: internalColumnWidthPreferences,
     displayBulkSelectCol,
     fixedActionsCellWidth,
+    headerMinWidths,
     visibleColumns: columnOrder,
-    columnWidthPreferences: internalColumnWidthPreferences,
   });
 
   const columnDefinitions = useColumnDefinitions<Entity, Meta>({
@@ -298,7 +302,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     entityAttributesAreCamelCase,
     meta,
   });
-
   const table = useTable<Entity>({
     columnOrder,
     columnRenderersByAttribute,
@@ -307,6 +310,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     defaultColumnOrder,
     displayBulkSelectCol,
     entities,
+    headerMinWidths,
     internalColumnWidthPreferences,
     isEntitySelectable,
     layoutPreferences,
@@ -356,6 +360,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
                   $activeColId={activeColId}
                   $columnTransform={columnTransform}>
                   <Table<Entity>
+                    onHeaderSectionResize={handleHeaderSectionResize}
                     expandedSectionRenderers={expandedSectionRenderers}
                     headerGroups={headerGroups}
                     rows={table.getRowModel().rows}
