@@ -14,8 +14,9 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
-import { asElement, fireEvent, render, waitFor, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { Formik, Form } from 'formik';
 import { act } from 'react';
 
@@ -72,9 +73,8 @@ describe('TabKeywordTimeRange', () => {
 
   const changeInput = async (input, value) =>
     act(async () => {
-      const { name } = asElement(input, HTMLInputElement);
-
-      fireEvent.change(input, { target: { value, name } });
+      await userEvent.clear(input);
+      await userEvent.type(input, value);
     });
 
   const asyncRender = async (element) => {

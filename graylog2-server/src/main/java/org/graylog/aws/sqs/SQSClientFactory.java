@@ -17,23 +17,24 @@
 package org.graylog.aws.sqs;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
+import org.graylog.aws.AWSProxyConfigurationProvider;
 import org.graylog.aws.notifications.SQSClient;
 import org.graylog2.plugin.InputFailureRecorder;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 
-import java.net.URI;
 
 public class SQSClientFactory {
     private final ObjectMapper objectMapper;
+    private final AWSProxyConfigurationProvider proxyConfigurationProvider;
 
     @Inject
-    public SQSClientFactory(ObjectMapper objectMapper) {
+    public SQSClientFactory(ObjectMapper objectMapper, AWSProxyConfigurationProvider proxyConfigurationProvider) {
         this.objectMapper = objectMapper;
+        this.proxyConfigurationProvider = proxyConfigurationProvider;
     }
 
-    public SQSClient create(String queueName, String region, AwsCredentialsProvider credentialsProvider, @Nullable URI proxyUri, InputFailureRecorder inputFailureRecorder) {
-        return new SQSClient(queueName, region, credentialsProvider, objectMapper, inputFailureRecorder, proxyUri);
+    public SQSClient create(String queueName, String region, AwsCredentialsProvider credentialsProvider, InputFailureRecorder inputFailureRecorder) {
+        return new SQSClient(queueName, region, credentialsProvider, objectMapper, inputFailureRecorder, proxyConfigurationProvider.get());
     }
 }
