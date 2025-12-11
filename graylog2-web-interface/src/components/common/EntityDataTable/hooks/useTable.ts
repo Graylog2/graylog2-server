@@ -22,7 +22,7 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type { Sort } from 'stores/PaginationTypes';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 
-import type { ColumnPreferences, EntityBase, ColumnRenderersByAttribute } from '../types';
+import type { ColumnPreferences, EntityBase } from '../types';
 import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, ACTIONS_COL_ID } from '../Constants';
 
 const COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS = 500;
@@ -65,7 +65,6 @@ const updateColumnPreferences = (
 type Props<Entity extends EntityBase> = {
   columnOrder: Array<string>;
   columnDefinitions: Array<ColumnDef<Entity>>;
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnWidths: { [colId: string]: number };
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
@@ -90,7 +89,6 @@ type Props<Entity extends EntityBase> = {
 const useTable = <Entity extends EntityBase>({
   columnOrder,
   columnDefinitions,
-  columnRenderersByAttribute,
   columnWidths,
   defaultColumnOrder,
   displayBulkSelectCol,
@@ -226,7 +224,6 @@ const useTable = <Entity extends EntityBase>({
       return debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
     },
     [
-      columnRenderersByAttribute,
       debouncedOnLayoutPreferencesChange,
       headerMinWidths,
       internalColumnWidthPreferences,

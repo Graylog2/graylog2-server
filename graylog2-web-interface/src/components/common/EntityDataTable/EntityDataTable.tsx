@@ -250,7 +250,6 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
 
   const table = useTable<Entity>({
     columnOrder,
-    columnRenderersByAttribute,
     columnWidths,
     columnDefinitions,
     defaultColumnOrder,
