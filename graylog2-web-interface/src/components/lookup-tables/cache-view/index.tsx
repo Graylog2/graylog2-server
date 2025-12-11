@@ -15,20 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
-import { Drawer } from 'components/common';
+import { Spinner } from 'components/common';
+import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
-type Props = {
-  onClose: () => void;
-  title: string;
-  children: React.ReactNode;
-  double?: boolean;
-};
+import CacheShow from './cache-show';
 
-const LUTDrawer = ({ onClose, title, double = false, children }: Props) => (
-  <Drawer opened size="lg" double={double} onClose={onClose} position="right" title={title}>
-    {children}
-  </Drawer>
-);
+function CacheView() {
+  const { cacheIdOrName } = useParams<{ cacheIdOrName: string }>();
+  const { cache, loadingCache } = useFetchCache(cacheIdOrName);
 
-export default LUTDrawer;
+  if (loadingCache) return <Spinner text="Loading cache details" />;
+
+  return <CacheShow cache={cache} />;
+}
+
+export default CacheView;
