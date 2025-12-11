@@ -185,7 +185,7 @@ public class StageIteratorTest {
     }
 
     @Test
-    public void configurationIteratorGroupsStagesByNumber() {
+    public void configurationOnlyProducesActualStagesToIterate() {
         final Stage stageMinusOne = Stage.builder()
                 .stage(-1)
                 .match(Stage.Match.ALL)
