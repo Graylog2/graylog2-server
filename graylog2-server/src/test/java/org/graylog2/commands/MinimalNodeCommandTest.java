@@ -17,6 +17,7 @@
 package org.graylog2.commands;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.google.inject.Module;
 import jakarta.annotation.Nonnull;
 import org.graylog2.GraylogNodeConfiguration;
@@ -70,6 +71,7 @@ public class MinimalNodeCommandTest {
         }
 
         static class MinimalNodeConfiguration implements GraylogNodeConfiguration {
+            @Documentation(visible = false)
             @Parameter("password_secret")
             String passwordSecret;
 

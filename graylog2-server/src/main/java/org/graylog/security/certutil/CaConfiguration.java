@@ -17,14 +17,17 @@
 package org.graylog.security.certutil;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import org.graylog2.plugin.BaseConfiguration;
 
 import java.nio.file.Path;
 
 public class CaConfiguration extends BaseConfiguration {
+    @Documentation("tbd")
     @Parameter(value = "ca_keystore_file")
     private Path caKeystoreFile;
 
+    @Documentation("tbd")
     @Parameter(value = "ca_password")
     private String caPassword;
 
