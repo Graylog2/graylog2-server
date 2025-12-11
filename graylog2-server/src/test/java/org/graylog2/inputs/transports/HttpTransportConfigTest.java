@@ -36,6 +36,11 @@ public class HttpTransportConfigTest {
         assertEquals(ConfigurationField.Optional.OPTIONAL, requestedConfiguration.getField(HttpTransport.CK_ENABLE_BULK_RECEIVING).isOptional());
         assertEquals(false, requestedConfiguration.getField(HttpTransport.CK_ENABLE_BULK_RECEIVING).getDefaultValue());
 
+        assertTrue(requestedConfiguration.containsField(HttpTransport.CK_ENABLE_JSON_ARRAY_PROCESSING));
+        assertEquals(ConfigurationField.Optional.OPTIONAL,
+                requestedConfiguration.getField(HttpTransport.CK_ENABLE_JSON_ARRAY_PROCESSING).isOptional());
+        assertEquals(false, requestedConfiguration.getField(HttpTransport.CK_ENABLE_JSON_ARRAY_PROCESSING).getDefaultValue());
+
         assertTrue(requestedConfiguration.containsField(HttpTransport.CK_ENABLE_CORS));
         assertEquals(ConfigurationField.Optional.OPTIONAL, requestedConfiguration.getField(HttpTransport.CK_ENABLE_CORS).isOptional());
         assertEquals(true, requestedConfiguration.getField(HttpTransport.CK_ENABLE_CORS).getDefaultValue());
