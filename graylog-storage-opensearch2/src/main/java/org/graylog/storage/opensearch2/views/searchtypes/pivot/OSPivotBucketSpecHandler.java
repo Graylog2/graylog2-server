@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
@@ -61,18 +62,22 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                     if (sortSpec instanceof SeriesSort) {
                         final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
                                 .stream()
-                                .filter(series -> series.literal().equals(sortSpec.field()))
+                                .filter(series ->
+                                        series.literal().equals(sortSpec.field())
+                                                || (series instanceof Percentile && sortSpec.field().equals(series.id()))
+                                )
                                 .findFirst();
                         return matchingSeriesSpec
                                 .map(seriesSpec -> {
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(isAscending);
-                                    }
-                                    String orderPath = seriesSpec.statsSubfieldName()
-                                            .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "." + subField)
-                                            .orElse(queryContext.seriesName(seriesSpec, pivot));
+                                    } else {
+                                        String orderPath = seriesSpec.statsSubfieldName()
+                                                .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "." + subField)
+                                                .orElse(queryContext.seriesName(seriesSpec, pivot));
 
-                                    return BucketOrder.aggregation(orderPath, isAscending);
+                                        return BucketOrder.aggregation(orderPath, isAscending);
+                                    }
                                 })
                                 .orElse(null);
                     }

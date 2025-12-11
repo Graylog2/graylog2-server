@@ -49,6 +49,11 @@ public abstract class Percentile implements SeriesSpec, HasField {
         return type() + "(" + field() + "," + percentile() + ")";
     }
 
+    @Override
+    public Optional<String> statsSubfieldName() {
+        return Optional.of(String.valueOf(percentile().longValue()));
+    }
+
     public abstract Builder toBuilder();
 
     @Override
