@@ -83,7 +83,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
     },
     datanode_status: {
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
-      staticWidth: 200,
+      staticWidth: 'matchHeader' as const,
     },
     memory: {
       renderCell: (_value, entity) => (
@@ -93,7 +93,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           warningThreshold={MEMORY_WARNING_THRESHOLD}
         />
       ),
-      staticWidth: 200,
+      staticWidth: 120,
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -104,11 +104,11 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           warningThreshold={JVM_WARNING_THRESHOLD}
         />
       ),
-      staticWidth: 200,
+      staticWidth: 120,
     },
     cpu: {
       renderCell: (_value, entity) => <CpuMetricsCell loadAverage={entity.metrics?.cpuLoadAverage1m} />,
-      staticWidth: 200,
+      staticWidth: 120,
     },
     indexing: {
       renderCell: (_value, entity) => (
@@ -117,7 +117,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           indexTimeInMillis={entity.metrics?.indexTimeInMillis}
         />
       ),
-      staticWidth: 200,
+      staticWidth: 120,
     },
     storage: {
       renderCell: (_value, entity) => (
@@ -128,7 +128,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           dangerThreshold={STORAGE_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 200,
+      staticWidth: 120,
     },
     datanode_version: {
       renderCell: (_value, entity) => (
@@ -136,7 +136,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           <span>{entity.datanode_version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      staticWidth: 200,
+      staticWidth: 120,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
