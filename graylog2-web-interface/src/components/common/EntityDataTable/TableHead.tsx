@@ -35,6 +35,7 @@ import SortIcon from './SortIcon';
 import DndStylesContext from './contexts/DndStylesContext';
 import ResizeHandle from './ResizeHandle';
 import type { EntityBase, ColumnMetaContext } from './types';
+import useHeaderSectionObserver from './hooks/useHeaderSectionObserver';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -67,7 +68,11 @@ export const ThInner = styled.div`
 `;
 
 export const LeftCol = styled.div`
-  flex: 1;
+  display: flex;
+  align-items: center;
+`;
+
+const RightCol = styled.div`
   display: flex;
   align-items: center;
 `;
@@ -99,15 +104,19 @@ const useSortableCol = (colId: string, disabled: boolean) => {
 const TableHeaderCell = <Entity extends EntityBase>({
   header,
   hasRowActions,
+  onHeaderSectionResize,
 }: {
   header: Header<Entity, unknown>;
-  hasRowActions;
+  hasRowActions: boolean;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 }) => {
   const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
   const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
     header.column.id,
     !columnMeta?.enableColumnOrdering,
   );
+  const leftRef = useHeaderSectionObserver(header.column.id, 'left', onHeaderSectionResize);
+  const rightRef = useHeaderSectionObserver(header.column.id, 'right', onHeaderSectionResize);
 
   return (
     <Th
@@ -117,7 +126,7 @@ const TableHeaderCell = <Entity extends EntityBase>({
       $colId={header.column.id}
       $hidePadding={!hasRowActions && header.column.id === ACTIONS_COL_ID}>
       <ThInner>
-        <LeftCol>
+        <LeftCol ref={leftRef}>
           {columnMeta?.enableColumnOrdering && (
             <DragHandle
               ref={setActivatorNodeRef}
@@ -130,13 +139,15 @@ const TableHeaderCell = <Entity extends EntityBase>({
           {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
           {header.column.getCanSort() && <SortIcon<Entity> column={header.column} />}
         </LeftCol>
-        {header.column.getCanResize() && (
-          <ResizeHandle
-            onMouseDown={header.getResizeHandler()}
-            onTouchStart={header.getResizeHandler()}
-            colTitle={columnMeta.label}
-          />
-        )}
+        <RightCol ref={rightRef}>
+          {header.column.getCanResize() && (
+            <ResizeHandle
+              onMouseDown={header.getResizeHandler()}
+              onTouchStart={header.getResizeHandler()}
+              colTitle={columnMeta.label}
+            />
+          )}
+        </RightCol>
       </ThInner>
     </Th>
   );
@@ -145,14 +156,24 @@ const TableHeaderCell = <Entity extends EntityBase>({
 type Props<Entity extends EntityBase> = {
   hasRowActions: boolean;
   headerGroups: Array<HeaderGroup<Entity>>;
+  onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 };
 
-const TableHead = <Entity extends EntityBase>({ headerGroups, hasRowActions }: Props<Entity>) => (
+const TableHead = <Entity extends EntityBase>({
+  headerGroups,
+  hasRowActions,
+  onHeaderSectionResize,
+}: Props<Entity>) => (
   <Thead>
     {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <TableHeaderCell key={header.id} header={header} hasRowActions={hasRowActions} />
+          <TableHeaderCell
+            key={header.id}
+            header={header}
+            hasRowActions={hasRowActions}
+            onHeaderSectionResize={onHeaderSectionResize}
+          />
         ))}
       </tr>
     ))}

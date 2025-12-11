@@ -25,16 +25,9 @@ import { ButtonToolbar } from 'components/bootstrap';
 import type { EntityBase } from 'components/common/EntityDataTable/types';
 import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
 
-const ActionsHead = styled.div`
-  text-align: right;
-  flex: 1;
-`;
-
 const Actions = styled(ButtonToolbar)`
   justify-content: flex-end;
 `;
-
-const ActionsHeader = () => <ActionsHead>Actions</ActionsHead>;
 
 const useActionsColumnDefinition = <Entity extends EntityBase>(
   hasRowActions: boolean,
@@ -58,7 +51,6 @@ const useActionsColumnDefinition = <Entity extends EntityBase>(
       columnHelper.display({
         id: ACTIONS_COL_ID,
         size: actionsColWidth,
-        header: hasRowActions ? ActionsHeader : undefined,
         enableHiding: false,
         enableResizing: false,
         cell: hasRowActions ? cell : undefined,
