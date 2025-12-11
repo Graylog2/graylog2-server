@@ -14,10 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.docs;
+import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
-import java.util.List;
+import { Spinner } from 'components/common';
+import { useFetchDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
-public interface DocumentedBeansService {
-    List<Object> getDocumentedConfigurationBeans();
+import AdapterShow from './adapter-show';
+
+function AdapterView() {
+  const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
+  const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(adapterIdOrName);
+
+  if (loadingDataAdapter) return <Spinner text="Loading data adapter details" />;
+
+  return <AdapterShow dataAdapter={dataAdapter} />;
 }
+
+export default AdapterView;

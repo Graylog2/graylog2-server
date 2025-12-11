@@ -19,8 +19,8 @@ package org.graylog2;
 import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import org.graylog2.configuration.ConfigurationHelper;
 import org.graylog2.plugin.Tools;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
@@ -29,7 +29,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +39,6 @@ import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.graylog2.configuration.ConfigurationHelper.initConfig;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -45,50 +46,44 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ConfigurationTest {
 
     @TempDir
-    public File temporaryFolder;
-
-    private Map<String, String> validProperties;
-
-    @BeforeEach
-    public void setUp() throws Exception {
-        validProperties = new HashMap<>();
-    }
+    public Path temporaryFolder;
 
     @Test
     public void testPasswordSecretIsTooShort() {
-        validProperties.put("password_secret", "too short");
+        final Map<String, String> validProperties = Map.of("password_secret", "too short");
 
         Throwable exception = assertThrows(ValidationException.class, () ->
 
-            initConfig(new Configuration(), validProperties));
+                ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder));
         org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("The minimum length for \"password_secret\" is 16 characters."));
     }
 
     @Test
     public void testPasswordSecretIsEmpty() {
-        validProperties.put("password_secret", "");
+        final Map<String, String> validProperties = Map.of("password_secret", "");
 
         Throwable exception = assertThrows(ValidationException.class, () ->
 
-            initConfig(new Configuration(), validProperties));
+                ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder));
         org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Parameter password_secret should not be blank"));
     }
 
     @Test
     public void testPasswordSecretIsNull() {
+        final HashMap<String, String> validProperties = new HashMap<>();
         validProperties.put("password_secret", null);
 
         Throwable exception = assertThrows(ParameterException.class, () ->
 
-            initConfig(new Configuration(), validProperties));
+                ConfigurationHelper.initConfig(new Configuration(), (Map<String, String>) validProperties, temporaryFolder));
         org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Required parameter \"password_secret\" not found."));
     }
 
     @Test
     public void testPasswordSecretIsValid() throws ValidationException, RepositoryException {
-        validProperties.put("password_secret", "abcdefghijklmnopqrstuvwxyz");
+        final Map<String, String> validProperties = Map.of("password_secret", "abcdefghijklmnopqrstuvwxyz");
 
-        Configuration configuration = initConfig(new Configuration(), validProperties);
+        Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
 
         assertThat(configuration.getPasswordSecret()).isEqualTo("abcdefghijklmnopqrstuvwxyz");
     }
@@ -147,38 +142,41 @@ public class ConfigurationTest {
 
     @Test
     public void leaderElectionTTLTimeoutTooShort() {
-        validProperties.put("leader_election_mode", "automatic");
-        validProperties.put("lock_service_lock_ttl", "3s");
+        final Map<String, String> validProperties = Map.of(
+                "leader_election_mode", "automatic",
+                "lock_service_lock_ttl", "3s");
 
-        assertThatThrownBy(() -> initConfig(new Configuration(), validProperties))
+        assertThatThrownBy(() -> ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageStartingWith("The minimum valid \"lock_service_lock_ttl\" is");
     }
 
     @Test
     public void leaderElectionMinimumPollingInterval() {
-        validProperties.put("leader_election_mode", "automatic");
-        validProperties.put("leader_election_lock_polling_interval", "100ms");
+        final Map<String, String> validProperties = Map.of(
+                "leader_election_mode", "automatic",
+                "leader_election_lock_polling_interval", "100ms");
 
-        assertThatThrownBy(() -> initConfig(new Configuration(), validProperties))
+        assertThatThrownBy(() -> ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageStartingWith("The minimum valid \"leader_election_lock_polling_interval\" is");
     }
 
     @Test
     public void leaderElectionTimeoutDiscrepancy() {
-        validProperties.put("leader_election_mode", "automatic");
-        validProperties.put("leader_election_lock_polling_interval", "2m");
-        validProperties.put("lock_service_lock_ttl", "1m");
+        final Map<String, String> validProperties = Map.of(
+                "leader_election_mode", "automatic",
+                "leader_election_lock_polling_interval", "2m",
+                "lock_service_lock_ttl", "1m");
 
-        assertThatThrownBy(() -> initConfig(new Configuration(), validProperties))
+        assertThatThrownBy(() -> ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("needs to be greater than");
     }
 
     @Test
     public void isLeaderByDefault() throws Exception {
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), Collections.emptyMap(), temporaryFolder);
 
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
@@ -186,108 +184,113 @@ public class ConfigurationTest {
 
     @Test
     public void isMasterSetToTrue() throws Exception {
-        validProperties.put("is_master", "true");
+        final Map<String, String> validProperties = Map.of("is_master", "true");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
 
     @Test
     public void isMasterSetToFalse() throws Exception {
-        validProperties.put("is_master", "false");
+        final Map<String, String> validProperties = Map.of("is_master", "false");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
 
     @Test
     public void isLeaderSetToTrue() throws Exception {
-        validProperties.put("is_leader", "true");
+        final Map<String, String> validProperties = Map.of("is_leader", "true");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
 
     @Test
     public void isLeaderSetToFalse() throws Exception {
-        validProperties.put("is_leader", "false");
+        final Map<String, String> validProperties = Map.of("is_leader", "false");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
 
     @Test
     public void isMasterSetToTrueAndIsLeaderSetToTrue() throws Exception {
-        validProperties.put("is_master", "true");
-        validProperties.put("is_leader", "true");
+        final Map<String, String> validProperties = Map.of(
+                "is_master", "true",
+                "is_leader", "true");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
 
     @Test
     public void isMasterSetToTrueAndIsLeaderSetToFalse() throws Exception {
-        validProperties.put("is_master", "true");
-        validProperties.put("is_leader", "false");
+        final Map<String, String> validProperties = Map.of(
+                "is_master", "true",
+                "is_leader", "false");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
 
     @Test
     public void isMasterSetToFalseAndIsLeaderSetToTrue() throws Exception {
-        validProperties.put("is_master", "false");
-        validProperties.put("is_leader", "true");
+        final Map<String, String> validProperties = Map.of(
+                "is_master", "false",
+                "is_leader", "true");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isTrue();
         assertThat(configuration.isLeader()).isTrue();
     }
 
     @Test
     public void isMasterSetToFalseAndIsLeaderSetToFalse() throws Exception {
-        validProperties.put("is_master", "false");
-        validProperties.put("is_leader", "false");
+        final Map<String, String> validProperties = Map.of(
+                "is_master", "false",
+                "is_leader", "false");
 
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.isMaster()).isFalse();
         assertThat(configuration.isLeader()).isFalse();
     }
 
     @Test
     public void defaultStaleLeaderTimeout() throws Exception {
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), Collections.emptyMap(), temporaryFolder);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(2000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(2000);
     }
 
     @Test
     public void staleMasterTimeoutSet() throws Exception {
-        validProperties.put("stale_master_timeout", "1000");
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Map<String, String> validProperties = Map.of("stale_master_timeout", "1000");
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(1000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(1000);
     }
 
     @Test
     public void staleLeaderTimeoutSet() throws Exception {
-        validProperties.put("stale_leader_timeout", "1000");
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Map<String, String> validProperties = Map.of("stale_leader_timeout", "1000");
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(1000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(1000);
     }
 
     @Test
     public void staleLeaderTimeoutAndStaleMasterTimeoutSet() throws Exception {
-        validProperties.put("stale_master_timeout", "1000");
-        validProperties.put("stale_leader_timeout", "3000");
-        final Configuration configuration = initConfig(new Configuration(), validProperties);
+        final Map<String, String> validProperties = Map.of(
+                "stale_master_timeout", "1000",
+                "stale_leader_timeout", "3000");
+        final Configuration configuration = ConfigurationHelper.initConfig(new Configuration(), validProperties, temporaryFolder);
         assertThat(configuration.getStaleMasterTimeout()).isEqualTo(3000);
         assertThat(configuration.getStaleLeaderTimeout()).isEqualTo(3000);
     }
@@ -319,7 +322,7 @@ public class ConfigurationTest {
         for (int i = 0; i < actual.length; i++) {
             try (final var tools = Mockito.mockStatic(Tools.class)) {
                 tools.when(Tools::availableProcessors).thenReturn(i + 1);
-                final Configuration config = initConfig(new Configuration(), validProperties);
+                final Configuration config = ConfigurationHelper.initConfig(new Configuration(), Collections.emptyMap(), temporaryFolder);
                 actual[i][0] = config.getProcessBufferProcessors();
                 actual[i][1] = config.getOutputBufferProcessors();
             }
@@ -348,19 +351,12 @@ public class ConfigurationTest {
         return true;
     }
 
-    private static File newFile(File parent, String child) throws IOException {
-        File result = new File(parent, child);
-        result.createNewFile();
-        return result;
+    private static File newFile(Path parent, String child) throws IOException {
+        return Files.createFile(parent.resolve(child)).toFile();
     }
 
-    private static File newFolder(File root, String... subDirs) throws IOException {
-        String subFolder = String.join("/", subDirs);
-        File result = new File(root, subFolder);
-        if (!result.mkdirs()) {
-            throw new IOException("Couldn't create folders " + root);
-        }
-        return result;
+    private static File newFolder(Path root, String... subDirs) throws IOException {
+        final Path path = Path.of(root.toString(), subDirs);
+        return Files.createDirectories(path).toFile();
     }
-
 }
