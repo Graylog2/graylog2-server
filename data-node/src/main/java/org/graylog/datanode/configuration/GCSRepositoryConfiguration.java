@@ -17,7 +17,7 @@
 package org.graylog.datanode.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
-import org.graylog2.configuration.Documentation;
+import com.github.joschi.jadconfig.documentation.Documentation;
 
 import java.nio.file.Path;
 

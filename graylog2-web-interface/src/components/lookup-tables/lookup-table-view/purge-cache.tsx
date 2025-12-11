@@ -21,7 +21,7 @@ import { Col, Row } from 'components/lookup-tables/layout-componets';
 import type { LookupTable } from 'logic/lookup-tables/types';
 import { usePurgeAllLookupTableKey, usePurgeLookupTableKey } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
-import { Description } from '.';
+import { Description } from './lookup-table-show';
 
 const INIT_INPUT = { value: '', valid: false };
 
@@ -70,9 +70,9 @@ function PurgeCache({ table }: Props) {
             type="text"
             id="purge-key"
             name="purgekey"
-            aria-label="Purge key"
             placeholder="Insert key which should be purged"
             label="Key"
+            data-testid="purgekey"
             onChange={onChange}
             help="Key to purge from cache"
             required
