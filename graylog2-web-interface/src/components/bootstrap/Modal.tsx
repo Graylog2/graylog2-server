@@ -39,7 +39,7 @@ const StyledModalFooter = styled(MantineModal.Body)(
     bottom: 0;
     background-color: ${theme.colors.global.contentBackground};
     padding: ${theme.spacings.md};
-    z-index: 1;
+    z-index: ${zIndices.modalBody};
   `,
 );
 
