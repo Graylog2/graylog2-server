@@ -14,19 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.docs;
+import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
-import java.util.Collection;
-import java.util.List;
-import java.util.ServiceLoader;
+import { Spinner } from 'components/common';
+import { useFetchCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
-public class ConfigurationBeansSPI {
-    public static List<Object> loadConfigurationBeans() {
-        return ServiceLoader.load(DocumentedBeansService.class).stream()
-                .map(ServiceLoader.Provider::get)
-                .map(DocumentedBeansService::getDocumentedConfigurationBeans)
-                .flatMap(Collection::stream)
-                .distinct()
-                .toList();
-    }
+import CacheShow from './cache-show';
+
+function CacheView() {
+  const { cacheIdOrName } = useParams<{ cacheIdOrName: string }>();
+  const { cache, loadingCache } = useFetchCache(cacheIdOrName);
+
+  if (loadingCache) return <Spinner text="Loading cache details" />;
+
+  return <CacheShow cache={cache} />;
 }
+
+export default CacheView;

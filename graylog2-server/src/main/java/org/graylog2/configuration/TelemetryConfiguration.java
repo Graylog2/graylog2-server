@@ -19,26 +19,33 @@ package org.graylog2.configuration;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.Validator;
+import com.github.joschi.jadconfig.documentation.Documentation;
+import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import org.graylog2.configuration.converters.JavaDurationConverter;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
 import java.util.Map;
 
+@DocumentationSection(heading = "Telemetry configuration", description = "")
 public class TelemetryConfiguration {
 
     public static final String TELEMETRY_ENABLED = "telemetry_enabled";
     public static final String TELEMETRY_CLUSTER_INFO_TTL = "telemetry_cluster_info_ttl";
 
+    @Documentation(value = "tbd")
     @Parameter(value = "telemetry_api_key", required = true)
     private String telemetryApiKey = "phc_t3lgBB66QsPW4HEfiGopO14um4XGNtBcefEKYWelWda";
 
+    @Documentation(value = "tbd")
     @Parameter(value = "telemetry_host")
     private String telemetryApiHost = "https://telemetry.graylog.cloud";
 
+    @Documentation(value = "tbd")
     @Parameter(value = TELEMETRY_ENABLED)
     private boolean telemetryEnabled = true;
 
+    @Documentation(value = "tbd")
     @Parameter(value = "telemetry_cluster_info_ttl", converter = JavaDurationConverter.class, validators = Minimum10MinuteValidator.class)
     private Duration telemetryClusterInfoTtl = Duration.ofMinutes(10);
 

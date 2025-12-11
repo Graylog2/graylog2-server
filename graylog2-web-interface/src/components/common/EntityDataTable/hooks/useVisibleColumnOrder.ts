@@ -24,20 +24,17 @@ const getVisibleAttributeColumns = (
   defaultDisplayedColumns: Array<string>,
   userColumnPreferences: ColumnPreferences | undefined = {},
 ) => {
-  const visible = new Set(
+  const userSelection = new Set(
     Object.entries(userColumnPreferences)
       .filter(([, { status }]) => status === ATTRIBUTE_STATUS.show)
       .map(([attr]) => attr),
   );
 
-  // Add default columns, which are not explicitly hidden
-  defaultDisplayedColumns.forEach((attr) => {
-    if (!(userColumnPreferences[attr]?.status === 'hide')) {
-      visible.add(attr);
-    }
-  });
+  if (userSelection.size > 0) {
+    return userSelection;
+  }
 
-  return visible;
+  return new Set(defaultDisplayedColumns);
 };
 const useVisibleColumnOrder = (
   columnPreferences: ColumnPreferences | undefined,

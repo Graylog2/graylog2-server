@@ -43,17 +43,18 @@ const columnVisibilityChanges = (prevVisibleColumns: VisibilityState, currVisibl
 };
 
 const updateColumnPreferences = (
-  addedColumns: Set<string>,
+  visibleAttributeColumns: Set<string>,
   removedColumns: Set<string>,
   columnPreferences: ColumnPreferences | undefined = {},
 ) => {
   const updatedPreferences = { ...columnPreferences };
 
-  // only update the preferences for columns which have been shown/hidden by the user
-  addedColumns.forEach((col) => {
+  // All currently visible columns will be marked as 'show'
+  visibleAttributeColumns.forEach((col) => {
     updatedPreferences[col] = { status: ATTRIBUTE_STATUS.show };
   });
 
+  // Only explicitly hidden columns will be marked as 'hide'
   removedColumns.forEach((col) => {
     updatedPreferences[col] = { status: ATTRIBUTE_STATUS.hide };
   });
@@ -130,13 +131,16 @@ const useTable = <Entity extends EntityBase>({
   const onColumnVisibilityChange = useCallback(
     (updater: Updater<VisibilityState>) => {
       const newColumnVisibility = updater instanceof Function ? updater(columnVisibility) : updater;
+      const visibleAttributeColumns = new Set(
+        Object.keys(newColumnVisibility).filter((colId) => newColumnVisibility[colId] && !UTILITY_COLUMNS.has(colId)),
+      );
       const { addedColumns, removedColumns } = columnVisibilityChanges(columnVisibility, newColumnVisibility);
 
       const newLayoutPreferences: {
         attributes?: ColumnPreferences;
         order?: Array<string>;
       } = {
-        attributes: updateColumnPreferences(addedColumns, removedColumns, layoutPreferences.attributes),
+        attributes: updateColumnPreferences(visibleAttributeColumns, removedColumns, layoutPreferences.attributes),
       };
 
       // if user has a custom order, we need to update it to reflect the visibility changes
