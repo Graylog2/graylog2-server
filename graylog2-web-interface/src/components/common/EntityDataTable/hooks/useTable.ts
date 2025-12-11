@@ -204,11 +204,7 @@ const useTable = <Entity extends EntityBase>({
       const clampedAttributeWidths = Object.fromEntries(
         Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
           colId,
-          Math.max(
-            width,
-            columnRenderersByAttribute[colId]?.minWidth ??
-              (headerMinWidths[colId] > DEFAULT_COL_MIN_WIDTH ? headerMinWidths[colId] : DEFAULT_COL_MIN_WIDTH),
-          ),
+          Math.max(width, headerMinWidths[colId]),
         ]),
       );
 
