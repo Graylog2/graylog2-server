@@ -72,7 +72,7 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(isAscending);
                                     } else {
-                                        String orderPath = seriesSpec.statsSubfieldName()
+                                        String orderPath = seriesSpec.multiValueAggSubfieldName()
                                                 .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "." + subField)
                                                 .orElse(queryContext.seriesName(seriesSpec, pivot));
 

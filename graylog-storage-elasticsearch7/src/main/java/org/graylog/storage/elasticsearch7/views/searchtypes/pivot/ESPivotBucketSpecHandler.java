@@ -24,6 +24,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.search.aggregations.BucketOrder;
@@ -61,19 +62,23 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                     if (sortSpec instanceof SeriesSort) {
                         final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
                                 .stream()
-                                .filter(series -> series.literal().equals(sortSpec.field()))
+                                .filter(series ->
+                                        series.literal().equals(sortSpec.field())
+                                                || (series instanceof Percentile && sortSpec.field().equals(series.id()))
+                                )
                                 .findFirst();
                         return matchingSeriesSpec
                                 .map(seriesSpec -> {
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(isAscending);
+                                    } else {
+
+                                        String orderPath = seriesSpec.multiValueAggSubfieldName()
+                                                .map(subField -> esGeneratedQueryContext.seriesName(seriesSpec, pivot) + "." + subField)
+                                                .orElse(esGeneratedQueryContext.seriesName(seriesSpec, pivot));
+
+                                        return BucketOrder.aggregation(orderPath, isAscending);
                                     }
-
-                                    String orderPath = seriesSpec.statsSubfieldName()
-                                            .map(subField -> esGeneratedQueryContext.seriesName(seriesSpec, pivot) + "." + subField)
-                                            .orElse(esGeneratedQueryContext.seriesName(seriesSpec, pivot));
-
-                                    return BucketOrder.aggregation(orderPath, isAscending);
                                 })
                                 .orElse(null);
                     }
