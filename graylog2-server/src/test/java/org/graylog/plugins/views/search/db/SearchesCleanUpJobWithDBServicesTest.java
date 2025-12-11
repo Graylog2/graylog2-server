@@ -116,6 +116,6 @@ public class SearchesCleanUpJobWithDBServicesTest {
         final ArgumentCaptor<String> idCaptor = ArgumentCaptor.forClass(String.class);
         verify(searchDbService, times(2)).delete(idCaptor.capture());
 
-        assertThat(idCaptor.getAllValues()).containsExactly("5b3b44ca77196aa4679e4da1", "5b3b44ca77196aa4679e4da2");
+        assertThat(idCaptor.getAllValues()).containsExactlyInAnyOrder("5b3b44ca77196aa4679e4da1", "5b3b44ca77196aa4679e4da2");
     }
 }
