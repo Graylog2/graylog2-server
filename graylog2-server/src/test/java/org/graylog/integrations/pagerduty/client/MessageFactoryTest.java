@@ -31,7 +31,6 @@ import org.graylog.integrations.pagerduty.dto.PagerDutyMessage;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.streams.StreamService;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,8 +50,6 @@ class MessageFactoryTest {
     private static final String CLIENT_URL = "http://localhost/";
 
     @Mock
-    private StreamService streamService;
-    @Mock
     private EventNotificationService eventNotificationService;
 
     private TemplateModelProvider templateModelProvider;
@@ -61,7 +58,7 @@ class MessageFactoryTest {
     @BeforeEach
     void setUp() {
         templateModelProvider = new TemplateModelProvider(CustomizationConfig.empty(), new ObjectMapperProvider(), new HttpConfiguration());
-        messageFactory = new MessageFactory(streamService,
+        messageFactory = new MessageFactory(
                 eventNotificationService,
                 CustomizationConfig.empty(),
                 Engine.createEngine(),

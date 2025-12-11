@@ -29,7 +29,6 @@ import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.pagerduty.dto.Link;
 import org.graylog.integrations.pagerduty.dto.PagerDutyMessage;
 import org.graylog2.plugin.MessageSummary;
-import org.graylog2.streams.StreamService;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTimeZone;
 
@@ -54,18 +53,16 @@ import java.util.Map;
 public class MessageFactory {
     private static final List<String> PAGER_DUTY_PRIORITIES = Arrays.asList("info", "warning", "critical", "critical");
 
-    private final StreamService streamService;
     private final EventNotificationService eventNotificationService;
     private final CustomizationConfig customizationConfig;
     private final Engine templateEngine;
     private final TemplateModelProvider templateModelProvider;
 
     @Inject
-    MessageFactory(StreamService streamService, EventNotificationService eventNotificationService,
+    MessageFactory(EventNotificationService eventNotificationService,
                    CustomizationConfig customizationConfig,
                    @Named("JsonSafe") Engine jsonTemplateEngine,
                    TemplateModelProvider templateModelProvider) {
-        this.streamService = streamService;
         this.eventNotificationService = eventNotificationService;
         this.customizationConfig = customizationConfig;
         this.templateEngine = jsonTemplateEngine;
