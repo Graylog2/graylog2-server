@@ -142,7 +142,7 @@
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.20.1</jackson.version>
-        <jadconfig.version>0.15.0</jadconfig.version>
+        <jadconfig.version>1.0.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
@@ -211,7 +211,7 @@
         <equalsverifier.version>4.2.5</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.1</junit-jupiter.version>
-        <mockito.version>5.20.0</mockito.version>
+        <mockito.version>5.21.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
         <testcontainers.version>2.0.2</testcontainers.version>
         <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
@@ -693,6 +693,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.5.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

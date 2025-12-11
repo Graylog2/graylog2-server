@@ -26,13 +26,14 @@ import type { EntityBase, ColumnMetaContext } from 'components/common/EntityData
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import { ThInner, LeftCol } from 'components/common/EntityDataTable/TableHead';
+import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
     background-color: ${theme.colors.global.contentBackground};
     z-index: ${zIndices.dropdownMenu};
-    padding: ${theme.spacings.xs};
-    width: ${$minWidth}px;
+    padding: ${CELL_PADDING}px;
+    width: ${$minWidth + CELL_PADDING}px;
     font-weight: bold;
     white-space: nowrap;
     max-width: 300px;
@@ -50,9 +51,10 @@ const CustomDragOverlay = styled.div<{ $minWidth: number }>(
 );
 
 const DragHandle = styled.div<{ $isDragging: boolean }>(
-  ({ $isDragging }) => css`
+  ({ $isDragging, theme }) => css`
     display: inline-block;
     cursor: ${$isDragging ? 'grabbing' : 'grab'};
+    margin-right: ${theme.spacings.xxs};
   `,
 );
 
