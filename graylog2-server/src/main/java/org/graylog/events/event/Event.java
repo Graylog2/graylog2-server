@@ -123,6 +123,7 @@ public interface Event extends Indexable {
         from.sourceStreams().forEach(event::addSourceStream);
         event.setFields(from.fields());
         event.setGroupByFields(from.groupByFields());
+        event.setAggregationConditions(from.aggregationConditions());
         event.setPriority(from.priority());
         from.scores().forEach(event::setScore);
 
