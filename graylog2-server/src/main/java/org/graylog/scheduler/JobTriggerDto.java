@@ -118,6 +118,10 @@ public abstract class JobTriggerDto implements MongoEntity {
         return Builder.create(clock);
     }
 
+    public static String lockOwnerField() {
+        return FIELD_LOCK + "." + JobTriggerLock.FIELD_OWNER;
+    }
+
     public abstract Builder toBuilder();
 
     @AutoValue.Builder

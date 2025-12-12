@@ -17,16 +17,23 @@
 package org.graylog.scheduler.system;
 
 import com.google.common.primitives.Ints;
+import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.bson.conversions.Bson;
 import org.graylog.scheduler.DBSystemJobTriggerService;
 import org.graylog.scheduler.JobTriggerDto;
+import org.graylog.scheduler.JobTriggerStatus;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.rest.models.system.SystemJobSummary;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
 
 @Singleton
 public class SystemJobManager {
@@ -55,5 +62,45 @@ public class SystemJobManager {
                 .build();
 
         triggerService.create(trigger);
+    }
+
+    public List<SystemJobSummary> getRunningJobs() {
+        return getJobsByQuery(Filters.eq(JobTriggerDto.FIELD_STATUS, JobTriggerStatus.RUNNING));
+    }
+
+    public List<SystemJobSummary> getRunningJobs(NodeId nodeId) {
+        return getJobsByQuery(
+                Filters.and(
+                        Filters.eq(JobTriggerDto.lockOwnerField(), nodeId.getNodeId()),
+                        Filters.eq(JobTriggerDto.FIELD_STATUS, JobTriggerStatus.RUNNING)
+                )
+        );
+    }
+
+    private List<SystemJobSummary> getJobsByQuery(Bson query) {
+        try (var stream = triggerService.streamByQuery(query)) {
+            return stream.map(this::toSystemJobInfo).toList();
+        }
+    }
+
+    private SystemJobSummary toSystemJobInfo(JobTriggerDto trigger) {
+        final var data = trigger.data()
+                .map(SystemJobConfig.class::cast)
+                // This must not be any system job without data.
+                .orElseThrow(() -> new IllegalStateException("System job trigger " + trigger.id() + " has no associated config"));
+
+        return SystemJobSummary.create(
+                trigger.id(),
+                data.toInfo().description(),
+                trigger.jobDefinitionId(), // The job definition ID is the type name for system jobs
+                data.toInfo().statusInfo(),
+                trigger.lock().owner(),
+                trigger.startTime(),
+                Duration.ofMillis(Instant.now().toEpochMilli() - trigger.startTime().getMillis()),
+                trigger.lock().progress(),
+                true,
+                true,
+                trigger.status()
+        );
     }
 }

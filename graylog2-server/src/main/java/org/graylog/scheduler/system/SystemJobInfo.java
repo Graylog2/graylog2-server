@@ -16,22 +16,15 @@
  */
 package org.graylog.scheduler.system;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog.scheduler.JobTriggerData;
-
 /**
- * Marker interface for system job configuration data to abstract from regular job trigger data.
+ * Record representing information about a system job.
+ *
+ * @param type        type of the system job
+ * @param description description of the system job
+ * @param statusInfo  status information about the system job
  */
-public interface SystemJobConfig extends JobTriggerData {
-    interface Builder<SELF> extends JobTriggerData.Builder<SELF> {
-        @JsonProperty(TYPE_FIELD)
-        SELF type(String type);
+public record SystemJobInfo(String type, String description, String statusInfo) {
+    public static SystemJobInfo of(String type, String description, String statusInfo) {
+        return new SystemJobInfo(type, description, statusInfo);
     }
-
-    /**
-     * Returns a human-readable info string about the job configuration.
-     *
-     * @return the info object
-     */
-    SystemJobInfo toInfo();
 }
