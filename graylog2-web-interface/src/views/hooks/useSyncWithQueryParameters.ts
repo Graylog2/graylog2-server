@@ -134,16 +134,15 @@ const useSyncWithQueryParameters = (currentUri: string) => {
       return;
     }
 
-    const currentViewHasCorrectUri = isSameUri(currentUri, uriForCurrentView);
+    const currentUriMatchesCurrentView = isSameUri(currentUri, uriForCurrentView);
+    const currentUriMatchesLastSync = isSameUri(currentUri, lastSyncedUriRef.current);
 
     // Don't update the URI if it was changed outside of this sync. For example when using the browser navigation.
-    const uriChangedOutsideSync = !isSameUri(currentUri, lastSyncedUriRef.current) && !currentViewHasCorrectUri;
-
-    if (uriChangedOutsideSync) {
+    if (!currentUriMatchesLastSync && !currentUriMatchesCurrentView) {
       return;
     }
 
-    if (!currentViewHasCorrectUri) {
+    if (!currentUriMatchesCurrentView) {
       const updateHistory = isFirstSyncRef.current ? history.replace : history.push;
       updateHistory(uriForCurrentView);
     }

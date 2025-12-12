@@ -15,17 +15,17 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
 import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
 import { asMock } from 'helpers/mocking';
-import mockHistory from 'helpers/mocking/mockHistory';
-import useHistory from 'routing/useHistory';
 import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
 import useViewType from 'views/hooks/useViewType';
+import useHistory from 'routing/useHistory';
+import mockHistory from 'helpers/mocking/mockHistory';
 
 import useSyncWithQueryParameters from './useSyncWithQueryParameters';
 
@@ -42,35 +42,30 @@ const createQuery = (timerange: TimeRange = lastFiveMinutes, streams: Array<stri
     .build();
 
 describe('SyncWithQueryParameters', () => {
-  const syncWithQueryParameters = (
-    currentUri: string,
-    query: Query | undefined,
-    viewType: ViewType = View.Type.Search,
-  ) => {
-    const history = mockHistory();
+  let history;
 
+  beforeEach(() => {
+    history = mockHistory();
     asMock(useHistory).mockReturnValue(history);
-    asMock(useViewType).mockReturnValue(viewType);
-    asMock(useCurrentQuery).mockReturnValue(query);
-
-    renderHook(() => useSyncWithQueryParameters(currentUri));
-
-    return history;
-  };
+    asMock(useViewType).mockReturnValue(View.Type.Search);
+    asMock(useCurrentQuery).mockReturnValue(createQuery(lastFiveMinutes));
+  });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('does not do anything if no view is loaded', () => {
-    const history = syncWithQueryParameters('/search', undefined);
+    asMock(useViewType).mockReturnValue(undefined);
+    renderHook(() => useSyncWithQueryParameters('/search'));
 
     expect(history.replace).not.toHaveBeenCalled();
     expect(history.push).not.toHaveBeenCalled();
   });
 
   it('does not do anything if current view is not a search', () => {
-    const history = syncWithQueryParameters('/search', createQuery(), View.Type.Dashboard);
+    asMock(useViewType).mockReturnValue(View.Type.Dashboard);
+    renderHook(() => useSyncWithQueryParameters('/search'));
 
     expect(history.replace).not.toHaveBeenCalled();
     expect(history.push).not.toHaveBeenCalled();
@@ -78,16 +73,15 @@ describe('SyncWithQueryParameters', () => {
 
   describe('if current view is search, adds state to history', () => {
     it('with current time range and query', () => {
-      const history = syncWithQueryParameters('/search', createQuery({ type: 'relative', range: 600 }));
+      asMock(useCurrentQuery).mockReturnValue(createQuery({ type: 'relative', range: 600 }));
+      renderHook(() => useSyncWithQueryParameters('/search'));
 
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
     });
 
     it('preserving query parameters present before', () => {
-      const history = syncWithQueryParameters(
-        '/search?somevalue=23&somethingelse=foo',
-        createQuery({ type: 'relative', range: 600 }),
-      );
+      asMock(useCurrentQuery).mockReturnValue(createQuery({ type: 'relative', range: 600 }));
+      renderHook(() => useSyncWithQueryParameters('/search?somevalue=23&somethingelse=foo'));
 
       expect(history.replace).toHaveBeenCalledWith(
         '/search?somevalue=23&somethingelse=foo&q=foo%3A42&rangetype=relative&relative=600',
@@ -95,26 +89,28 @@ describe('SyncWithQueryParameters', () => {
     });
 
     it('if time range is relative with from and to', () => {
-      const history = syncWithQueryParameters('/search', createQuery({ ...lastFiveMinutes, to: 240 }));
+      asMock(useCurrentQuery).mockReturnValue(createQuery({ ...lastFiveMinutes, to: 240 }));
+      renderHook(() => useSyncWithQueryParameters('/search'));
 
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&to=240');
     });
 
     it('if time range is relative with from only', () => {
-      const history = syncWithQueryParameters('/search', createQuery(lastFiveMinutes));
+      asMock(useCurrentQuery).mockReturnValue(createQuery(lastFiveMinutes));
+      renderHook(() => useSyncWithQueryParameters('/search'));
 
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
 
     it('if time range is absolute', () => {
-      const history = syncWithQueryParameters(
-        '/search',
+      asMock(useCurrentQuery).mockReturnValue(
         createQuery({
           type: 'absolute',
           from: '2019-01-12T13:42:23.000Z',
           to: '2020-01-12T13:42:23.000Z',
         }),
       );
+      renderHook(() => useSyncWithQueryParameters('/search'));
 
       expect(history.replace).toHaveBeenCalledWith(
         '/search?q=foo%3A42&rangetype=absolute&from=2019-01-12T13%3A42%3A23.000Z&to=2020-01-12T13%3A42%3A23.000Z',
@@ -122,19 +118,20 @@ describe('SyncWithQueryParameters', () => {
     });
 
     it('if time range is keyword time range', () => {
-      const history = syncWithQueryParameters(
-        '/search',
+      asMock(useCurrentQuery).mockReturnValue(
         createQuery({
           type: 'keyword',
           keyword: 'Last five minutes',
         }),
       );
+      renderHook(() => useSyncWithQueryParameters('/search'));
 
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
     });
 
     it('adds list of streams to query', () => {
-      const history = syncWithQueryParameters('/search', createQuery(lastFiveMinutes, ['stream1', 'stream2']));
+      asMock(useCurrentQuery).mockReturnValue(createQuery(lastFiveMinutes, ['stream1', 'stream2']));
+      renderHook(() => useSyncWithQueryParameters('/search'));
 
       expect(history.replace).toHaveBeenCalledWith(
         '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2',
@@ -142,22 +139,38 @@ describe('SyncWithQueryParameters', () => {
     });
 
     it('removes list of streams to query if they become empty', () => {
-      const history = syncWithQueryParameters(
-        '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2',
-        createQuery(lastFiveMinutes),
+      renderHook(() =>
+        useSyncWithQueryParameters('/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2'),
       );
 
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
 
     it('does not update history if query parameters only differ in order', () => {
-      const history = syncWithQueryParameters(
-        '/search?rangetype=relative&from=300&q=foo%3A42',
-        createQuery(lastFiveMinutes),
-      );
+      renderHook(() => useSyncWithQueryParameters('/search?rangetype=relative&from=300&q=foo%3A42'));
 
       expect(history.replace).not.toHaveBeenCalled();
       expect(history.push).not.toHaveBeenCalled();
+    });
+
+    it('uses push on updates after the initial sync', async () => {
+      asMock(useCurrentQuery).mockReturnValue(createQuery({ type: 'relative', range: 300 }));
+
+      const { rerender } = renderHook(({ uri }) => useSyncWithQueryParameters(uri), {
+        initialProps: { uri: '/search' },
+      });
+
+      await waitFor(() =>
+        expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300'),
+      );
+
+      asMock(useCurrentQuery).mockReturnValue(createQuery({ type: 'relative', range: 900 }));
+
+      rerender({ uri: '/search?q=foo%3A42&rangetype=relative&relative=300' });
+
+      await waitFor(() =>
+        expect(history.push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=900'),
+      );
     });
   });
 });
