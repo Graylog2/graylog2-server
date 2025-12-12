@@ -93,7 +93,7 @@ const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQuer
     timeRange,
     streamsFilter,
     streamCategoriesFilter,
-    queryString: queryString ? createElasticsearchQueryString(queryString) : null,
+    queryString: queryString ? createElasticsearchQueryString(queryString) : undefined,
   };
 };
 

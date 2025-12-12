@@ -15,15 +15,23 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
 
+import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
+import { asMock } from 'helpers/mocking';
+import mockHistory from 'helpers/mocking/mockHistory';
+import useHistory from 'routing/useHistory';
+import useCurrentQuery from 'views/logic/queries/useCurrentQuery';
+import useViewType from 'views/hooks/useViewType';
 
 import useSyncWithQueryParameters from './useSyncWithQueryParameters';
 
 jest.mock('views/logic/queries/useCurrentQuery');
 jest.mock('views/hooks/useViewType');
+jest.mock('routing/useHistory');
 
 const lastFiveMinutes: RelativeTimeRange = { type: 'relative', from: 300 };
 const createQuery = (timerange: TimeRange = lastFiveMinutes, streams: Array<string> = [], queryString = 'foo:42') =>
@@ -34,124 +42,122 @@ const createQuery = (timerange: TimeRange = lastFiveMinutes, streams: Array<stri
     .build();
 
 describe('SyncWithQueryParameters', () => {
+  const syncWithQueryParameters = (
+    currentUri: string,
+    query: Query | undefined,
+    viewType: ViewType = View.Type.Search,
+  ) => {
+    const history = mockHistory();
+
+    asMock(useHistory).mockReturnValue(history);
+    asMock(useViewType).mockReturnValue(viewType);
+    asMock(useCurrentQuery).mockReturnValue(query);
+
+    renderHook(() => useSyncWithQueryParameters(currentUri));
+
+    return history;
+  };
+
   afterEach(() => {
     jest.clearAllMocks();
   });
 
   it('does not do anything if no view is loaded', () => {
-    const push = jest.fn();
-    useSyncWithQueryParameters(View.Type.Search, '', undefined, push);
+    const history = syncWithQueryParameters('/search', undefined);
 
-    expect(push).not.toHaveBeenCalled();
+    expect(history.replace).not.toHaveBeenCalled();
+    expect(history.push).not.toHaveBeenCalled();
   });
 
   it('does not do anything if current view is not a search', () => {
-    const push = jest.fn();
-    useSyncWithQueryParameters(View.Type.Dashboard, '', undefined, push);
+    const history = syncWithQueryParameters('/search', createQuery(), View.Type.Dashboard);
 
-    expect(push).not.toHaveBeenCalled();
+    expect(history.replace).not.toHaveBeenCalled();
+    expect(history.push).not.toHaveBeenCalled();
   });
 
   describe('if current view is search, adds state to history', () => {
     it('with current time range and query', () => {
-      const push = jest.fn();
-      useSyncWithQueryParameters(View.Type.Search, '/search', createQuery({ type: 'relative', range: 600 }), push);
+      const history = syncWithQueryParameters('/search', createQuery({ type: 'relative', range: 600 }));
 
-      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
     });
 
     it('preserving query parameters present before', () => {
-      const push = jest.fn();
-      useSyncWithQueryParameters(
-        View.Type.Search,
+      const history = syncWithQueryParameters(
         '/search?somevalue=23&somethingelse=foo',
         createQuery({ type: 'relative', range: 600 }),
-        push,
       );
 
-      expect(push).toHaveBeenCalledWith(
+      expect(history.replace).toHaveBeenCalledWith(
         '/search?somevalue=23&somethingelse=foo&q=foo%3A42&rangetype=relative&relative=600',
       );
     });
 
     it('if time range is relative with from and to', () => {
-      const push = jest.fn();
-      useSyncWithQueryParameters(View.Type.Search, '/search', createQuery({ ...lastFiveMinutes, to: 240 }), push);
+      const history = syncWithQueryParameters('/search', createQuery({ ...lastFiveMinutes, to: 240 }));
 
-      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&to=240');
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&to=240');
     });
 
     it('if time range is relative with from only', () => {
-      const push = jest.fn();
-      useSyncWithQueryParameters(View.Type.Search, '/search', createQuery(lastFiveMinutes), push);
+      const history = syncWithQueryParameters('/search', createQuery(lastFiveMinutes));
 
-      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
 
     it('if time range is absolute', () => {
-      const push = jest.fn();
-
-      useSyncWithQueryParameters(
-        View.Type.Search,
+      const history = syncWithQueryParameters(
         '/search',
         createQuery({
           type: 'absolute',
           from: '2019-01-12T13:42:23.000Z',
           to: '2020-01-12T13:42:23.000Z',
         }),
-        push,
       );
 
-      expect(push).toHaveBeenCalledWith(
+      expect(history.replace).toHaveBeenCalledWith(
         '/search?q=foo%3A42&rangetype=absolute&from=2019-01-12T13%3A42%3A23.000Z&to=2020-01-12T13%3A42%3A23.000Z',
       );
     });
 
     it('if time range is keyword time range', () => {
-      const push = jest.fn();
-
-      useSyncWithQueryParameters(
-        View.Type.Search,
+      const history = syncWithQueryParameters(
         '/search',
         createQuery({
           type: 'keyword',
           keyword: 'Last five minutes',
         }),
-        push,
       );
 
-      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
-    });
-
-    it('by calling the provided action', () => {
-      const replace = jest.fn();
-      useSyncWithQueryParameters(View.Type.Search, '/search', createQuery({ type: 'relative', range: 600 }), replace);
-
-      expect(replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=600');
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=keyword&keyword=Last+five+minutes');
     });
 
     it('adds list of streams to query', () => {
-      const push = jest.fn();
-      useSyncWithQueryParameters(
-        View.Type.Search,
-        '/search',
-        createQuery(lastFiveMinutes, ['stream1', 'stream2']),
-        push,
-      );
+      const history = syncWithQueryParameters('/search', createQuery(lastFiveMinutes, ['stream1', 'stream2']));
 
-      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2');
+      expect(history.replace).toHaveBeenCalledWith(
+        '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2',
+      );
     });
 
     it('removes list of streams to query if they become empty', () => {
-      const push = jest.fn();
-      useSyncWithQueryParameters(
-        View.Type.Search,
+      const history = syncWithQueryParameters(
         '/search?q=foo%3A42&rangetype=relative&from=300&streams=stream1%2Cstream2',
         createQuery(lastFiveMinutes),
-        push,
       );
 
-      expect(push).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
+    });
+
+    it('does not update history if query parameters only differ in order', () => {
+      const history = syncWithQueryParameters(
+        '/search?rangetype=relative&from=300&q=foo%3A42',
+        createQuery(lastFiveMinutes),
+      );
+
+      expect(history.replace).not.toHaveBeenCalled();
+      expect(history.push).not.toHaveBeenCalled();
     });
   });
 });

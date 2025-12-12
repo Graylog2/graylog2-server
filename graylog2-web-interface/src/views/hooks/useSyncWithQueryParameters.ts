@@ -119,7 +119,7 @@ function isSameUri(a: string, b: string) {
   return canonicalizeUri(a) === canonicalizeUri(b);
 }
 
-// Update the URL query parameters when the current query changes.
+// Update the URL query parameters when the current view changes.
 const useSyncWithQueryParameters = (currentUri: string) => {
   const viewType = useViewType();
   const currentQuery = useCurrentQuery();
