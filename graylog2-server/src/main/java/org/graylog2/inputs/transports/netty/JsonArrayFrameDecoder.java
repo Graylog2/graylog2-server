@@ -67,6 +67,9 @@ public class JsonArrayFrameDecoder extends ByteToMessageDecoder {
      * @param maxObjectLength the maximum length of a single JSON object.
      *                        A {@link TooLongFrameException} is thrown if
      *                        the length of a JSON object exceeds this value.
+     * <p>
+     * By default, {@code failFast} is set to {@code true}, meaning a {@link TooLongFrameException}
+     * will be thrown as soon as the decoder notices the length of a JSON object will exceed {@code maxObjectLength}.
      */
     public JsonArrayFrameDecoder(final int maxObjectLength) {
         this(maxObjectLength, true);
