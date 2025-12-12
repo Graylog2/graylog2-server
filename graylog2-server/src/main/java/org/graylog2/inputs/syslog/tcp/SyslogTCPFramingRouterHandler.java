@@ -21,11 +21,14 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import io.netty.util.ReferenceCountUtil;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final int maxFrameLength;
     private final ByteBuf[] delimiter;
+    private final Collection<ByteBuf> retainedBuffers = new LinkedList<>();
     private ChannelInboundHandler handler = null;
 
     public SyslogTCPFramingRouterHandler(int maxFrameLength, ByteBuf[] delimiter) {
@@ -45,17 +48,38 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<B
                     handler = new DelimiterBasedFrameDecoder(maxFrameLength, delimiter);
                 }
             }
-            try {
-                handler.channelRead(ctx, ReferenceCountUtil.retain(msg));
-            } catch (Exception e) {
-                // Because we've retained the buffer, we must release it in case of an exception to avoid memory leaks
-                ReferenceCountUtil.release(msg);
-                throw e;
-            }
-
+            // Retain message for possible next frame.
+            retainedBuffers.add(msg.retain());
+            handler.channelRead(ctx, msg);
         } else {
             ctx.fireChannelRead(msg);
         }
+
+        // In case the TCP-connection is kept open for a long time, and there's some traffic happening,
+        // we can skim through the retained buffers we keep track of and forget the ones that are freed already.
+        // This does not help for long, idle connections and gigantic frames.
+        retainedBuffers.removeIf(buf -> buf.refCnt() == 0);
+    }
+
+    private void cleanup() {
+        for (ByteBuf buf : retainedBuffers) {
+            if (buf.refCnt() > 0) {
+                buf.release();
+            }
+        }
+        retainedBuffers.clear();
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        cleanup();
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cleanup();
+        super.exceptionCaught(ctx, cause);
     }
 
     private boolean usesOctetCountFraming(ByteBuf message) {
