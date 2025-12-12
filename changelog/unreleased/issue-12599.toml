@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix Raw HTTP input to correctly parse and extract individual log messages from bulk JSON arrays "
+
+pulls = ["24514"]
+issues = ["graylog-plugin-enterprise#12599"]

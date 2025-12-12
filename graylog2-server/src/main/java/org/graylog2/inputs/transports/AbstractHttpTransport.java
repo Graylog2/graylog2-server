@@ -31,6 +31,7 @@ import org.graylog2.configuration.TLSProtocolsConfiguration;
 import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.HttpForwardedForHandler;
 import org.graylog2.inputs.transports.netty.HttpHandler;
+import org.graylog2.inputs.transports.netty.JsonArrayFrameDecoder;
 import org.graylog2.inputs.transports.netty.LenientDelimiterBasedFrameDecoder;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.LocalMetricRegistry;
@@ -63,6 +64,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     private static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
     static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
+    static final String CK_ENABLE_JSON_ARRAY_PROCESSING = "enable_json_array_processing";
     static final String CK_ENABLE_CORS = "enable_cors";
     static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
     static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
@@ -76,6 +78,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     static final String CK_ENABLE_REAL_IP_HEADER = "enable_real_ip_header";
 
     protected final boolean enableBulkReceiving;
+    protected final boolean enableJsonArrayProcessing;
     protected final boolean enableCors;
     protected final int maxChunkSize;
     private final int idleWriterTimeout;
@@ -105,9 +108,12 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                 nettyTransportConfiguration,
                 tlsConfiguration);
         this.enableBulkReceiving = configuration.getBoolean(CK_ENABLE_BULK_RECEIVING);
+        this.enableJsonArrayProcessing = configuration.getBoolean(CK_ENABLE_JSON_ARRAY_PROCESSING);
         this.enableCors = configuration.getBoolean(CK_ENABLE_CORS);
         this.maxChunkSize = parseMaxChunkSize(configuration);
-        this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT) ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT) : DEFAULT_IDLE_WRITER_TIMEOUT;
+        this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT)
+                ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT)
+                : DEFAULT_IDLE_WRITER_TIMEOUT;
         this.authorizationHeader = configuration.getString(CK_AUTHORIZATION_HEADER_NAME);
         this.authorizationHeaderValue = configuration.getString(CK_AUTHORIZATION_HEADER_VALUE);
         this.enableForwardedFor = configuration.getBoolean(CK_ENABLE_FORWARDED_FOR);
@@ -119,7 +125,8 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     }
 
     /**
-     * @return If the configured Max Chunk Size is less than zero, return {@link AbstractHttpTransport#DEFAULT_MAX_CHUNK_SIZE}.
+     * @return If the configured Max Chunk Size is less than zero, return
+     * {@link AbstractHttpTransport#DEFAULT_MAX_CHUNK_SIZE}.
      */
     protected static int parseMaxChunkSize(Configuration configuration) {
         int maxChunkSize = configuration.getInt(CK_MAX_CHUNK_SIZE, DEFAULT_MAX_CHUNK_SIZE);
@@ -127,41 +134,58 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(
+            MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
         if (idleWriterTimeout > 0) {
             // Install read timeout handler to close idle connections after a timeout.
-            // This avoids dangling HTTP connections when the HTTP client does not close the connection properly.
-            // For details see: https://github.com/Graylog2/graylog2-server/issues/3223#issuecomment-270350500
-            handlers.put("read-timeout-handler", () -> new ReadTimeoutHandler(idleWriterTimeout, TimeUnit.SECONDS));
+            // This avoids dangling HTTP connections when the HTTP client does not close the
+            // connection properly.
+            // For details see:
+            // https://github.com/Graylog2/graylog2-server/issues/3223#issuecomment-270350500
+            handlers.put("read-timeout-handler",
+                    () -> new ReadTimeoutHandler(idleWriterTimeout, TimeUnit.SECONDS));
         }
 
-        handlers.put("decoder", () -> new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize));
+        handlers.put("decoder", () -> new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH,
+                DEFAULT_MAX_HEADER_SIZE, maxChunkSize));
         handlers.put("decompressor", HttpContentDecompressor::new);
         handlers.put("encoder", HttpResponseEncoder::new);
         handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
-        handlers.put("http-forwarded-for-handler", () -> new HttpForwardedForHandler(enableForwardedFor, enableRealIpHeader, realIpHeaders, requireTrustedProxies, trustedProxies));
-        handlers.put("http-handler", () -> new HttpHandler(enableCors, authorizationHeader, authorizationHeaderValue, path));
+        handlers.put("http-forwarded-for-handler", () -> new HttpForwardedForHandler(enableForwardedFor,
+                enableRealIpHeader, realIpHeaders, requireTrustedProxies, trustedProxies));
+        handlers.put("http-handler",
+                () -> new HttpHandler(enableCors, authorizationHeader, authorizationHeaderValue, path));
         if (enableBulkReceiving) {
             handlers.put("http-bulk-newline-decoder",
-                    () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize, Delimiters.lineDelimiter()));
+                    () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize,
+                            Delimiters.lineDelimiter()));
+        }
+        if (enableJsonArrayProcessing) {
+            handlers.put("http-json-array-decoder",
+                    () -> new JsonArrayFrameDecoder(maxChunkSize));
         }
         handlers.putAll(super.getCustomChildChannelHandlers(input));
         return handlers;
     }
 
     @Override
-    public void launch(MessageInput input, @Nullable InputFailureRecorder inputFailureRecorder) throws MisfireException {
+    public void launch(MessageInput input, @Nullable InputFailureRecorder inputFailureRecorder)
+            throws MisfireException {
         if (isNotBlank(authorizationHeader) && isBlank(authorizationHeaderValue)) {
-            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_NAME_LABEL, AUTHORIZATION_HEADER_VALUE_LABEL);
+            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_NAME_LABEL,
+                    AUTHORIZATION_HEADER_VALUE_LABEL);
         } else if (isNotBlank(authorizationHeaderValue) && isBlank(authorizationHeader)) {
-            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_VALUE_LABEL, AUTHORIZATION_HEADER_NAME_LABEL);
+            checkForConfigFieldDependencies(AUTHORIZATION_HEADER_VALUE_LABEL,
+                    AUTHORIZATION_HEADER_NAME_LABEL);
         }
         super.launch(input, inputFailureRecorder);
     }
 
     private void checkForConfigFieldDependencies(String configParam1, String configParam2) throws MisfireException {
-        throw new MisfireException(f("The [%s] configuration parameter cannot be used without also specifying a value for [%s].", configParam1, configParam2));
+        throw new MisfireException(f(
+                "The [%s] configuration parameter cannot be used without also specifying a value for [%s].",
+                configParam1, configParam2));
     }
 
     @ConfigClass
@@ -173,6 +197,10 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     "Enable Bulk Receiving",
                     false,
                     "Enables bulk receiving of messages separated by newlines (\\n or \\r\\n)"));
+            r.addField(new BooleanField(CK_ENABLE_JSON_ARRAY_PROCESSING,
+                    "Enable JSON Array Processing",
+                    false,
+                    "Enables processing of JSON arrays by extracting individual JSON objects from the array."));
             r.addField(new BooleanField(CK_ENABLE_CORS,
                     "Enable CORS",
                     true,
@@ -205,27 +233,23 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                     CK_ENABLE_FORWARDED_FOR,
                     "Take original client IP from X-Forwarded-For or Forwarded headers",
                     false,
-                    "Parse X-Forwarded-For and Forwarded (RFC 7239) headers to find the original client IP address, when relayed through proxies or load balancers."
-            ));
+                    "Parse X-Forwarded-For and Forwarded (RFC 7239) headers to find the original client IP address, when relayed through proxies or load balancers."));
             r.addField(new BooleanField(
                     CK_REQUIRE_TRUSTED_PROXIES,
                     "Only allow trusted proxies",
                     false,
-                    "Check all relaying proxies in forwarded-for headers to match the server configuration's trusted_proxies setting."
-            ));
+                    "Check all relaying proxies in forwarded-for headers to match the server configuration's trusted_proxies setting."));
             r.addField(new BooleanField(
                     CK_ENABLE_REAL_IP_HEADER,
                     "Enable trusting the original client IP header(s)",
                     false,
-                    "If enabled try to find the original client IP in one of the specified 'real ip' headers."
-            ));
+                    "If enabled try to find the original client IP in one of the specified 'real ip' headers."));
             r.addField(new TextField(
                     CK_REAL_IP_HEADER_NAME,
                     "Header(s) containing the original client IP",
                     "X-Real-IP, X-Client-IP, CF-Connecting-IP, True-Client-IP, Fastly-Client-IP",
                     "Some services and proxies set the first non-proxy IP address in a special header, these headers are checked in order if specified. Separate multiple headers by comma.",
-                    ConfigurationField.Optional.OPTIONAL
-            ));
+                    ConfigurationField.Optional.OPTIONAL));
             return r;
         }
     }
