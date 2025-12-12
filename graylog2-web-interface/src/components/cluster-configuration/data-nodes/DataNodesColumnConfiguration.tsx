@@ -119,7 +119,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           indexTimeInMillis={entity.metrics?.indexTimeInMillis}
         />
       ),
-      staticWidth: 120,
+      staticWidth: 130,
     },
     storage: {
       renderCell: (_value, entity) => (
@@ -138,7 +138,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           <span>{entity.datanode_version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      staticWidth: 150,
+      staticWidth: 160,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
