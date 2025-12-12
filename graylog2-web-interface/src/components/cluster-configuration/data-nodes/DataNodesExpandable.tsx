@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import { EntityDataTable, NoSearchResult, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
@@ -46,6 +46,7 @@ const DataNodesExpandable = ({
   pageSizeLimit = undefined,
   refetchInterval = undefined,
 }: Props) => {
+  const theme = useTheme();
   const {
     defaultDisplayedColumns,
     defaultColumnOrder,
@@ -111,6 +112,7 @@ const DataNodesExpandable = ({
             entityActions={renderActions}
             columnSchemas={columnSchemas}
             columnRenderers={columnRenderers}
+            parentBgColor={theme.colors.section.filled.background}
           />
         );
       })()}
