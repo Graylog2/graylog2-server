@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Fail.fail;
-import static org.graylog2.shared.utilities.StringUtils.f;
 
 class SyslogTCPFramingRouterHandlerTest {
     private EmbeddedChannel channel;
@@ -89,14 +88,10 @@ class SyslogTCPFramingRouterHandlerTest {
         final ByteBuf buf1 = Unpooled.copiedBuffer("<45>", StandardCharsets.US_ASCII);
         final ByteBuf buf2 = Unpooled.copiedBuffer("Test 123\n", StandardCharsets.US_ASCII);
         final ByteBuf expectedBuffer = Unpooled.copiedBuffer("<45>Test 123", StandardCharsets.US_ASCII);
-        System.out.println(f("1: msg1 refCnt: %d, msg2: %d", buf1.refCnt(), buf2.refCnt()));
         assertThat(channel.writeInbound(buf1)).isFalse();
-        System.out.println(f("2: msg1 refCnt: %d, msg2: %d", buf1.refCnt(), buf2.refCnt()));
         assertThat(channel.writeInbound(buf2)).isTrue();
-        System.out.println(f("3: msg1 refCnt: %d, msg2: %d", buf1.refCnt(), buf2.refCnt()));
         assertThat((ByteBuf) channel.readInbound()).isEqualTo(expectedBuffer);
         assertThat((ByteBuf) channel.readInbound()).isNull();
-        System.out.println(f("4: msg1 refCnt: %d, msg2: %d", buf1.refCnt(), buf2.refCnt()));
     }
 
     @Test
@@ -146,8 +141,7 @@ class SyslogTCPFramingRouterHandlerTest {
                 final byte[] bytes = is.readAllBytes();
                 final String expected = new String(bytes, StandardCharsets.US_ASCII).substring(0, bytes.length - 2);
                 final ByteBuf buf = Unpooled.copiedBuffer(bytes);
-                final boolean added = channel.writeInbound(buf);
-                System.out.println("Added sth to the inbound buffer: " + added);
+                assertThat(channel.writeInbound(buf)).isTrue();
                 final ByteBuf result = channel.readInbound();
                 final String actual = result.readCharSequence(result.maxCapacity() - 1, StandardCharsets.US_ASCII).toString();
                 assertThat(actual).isEqualTo(expected);
