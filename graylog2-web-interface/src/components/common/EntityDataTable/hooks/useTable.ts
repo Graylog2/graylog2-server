@@ -213,7 +213,6 @@ const useTable = <Entity extends EntityBase>({
             columnRenderersByAttribute[colId]?.minWidth ?? 0,
           );
 
-
           return [colId, Math.max(width, effectiveMin)];
         }),
       );
