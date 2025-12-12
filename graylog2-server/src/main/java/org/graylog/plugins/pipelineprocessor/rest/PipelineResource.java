@@ -77,6 +77,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -264,6 +265,14 @@ public class PipelineResource extends RestResource implements PluginRestResource
         return metadataService.get(id);
     }
 
+    @ApiOperation(value = "Get list of deprecated functions used in specified rule")
+    @Path("/rule/{id}/deprecated_functions")
+    @GET
+    public Set<String> getDeprecatedFunctionsForRule(@ApiParam(name = "id") @PathParam("id") String id) {
+        checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
+        return metadataService.deprecatedFunctionsRule(id);
+    }
+
     @ApiOperation(value = "Modify a processing pipeline", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @PUT
@@ -306,7 +315,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
 
         // Add rule to existing pipeline
         PipelineSource pipelineSource = PipelineSource.fromDao(pipelineRuleParser, pipelineDao);
-        final List<String> rules0 = pipelineSource.stages().get(0).rules();
+        final List<String> rules0 = pipelineSource.stages().getFirst().rules();
         if (rules0.stream().filter(ruleRef -> ruleRef.equals(ruleDao.title())).findFirst().isEmpty()) {
             rules0.add(ruleDao.title());
             pipelineSource = pipelineSource.toBuilder()

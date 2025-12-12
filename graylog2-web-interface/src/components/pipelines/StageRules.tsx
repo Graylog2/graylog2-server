@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import styled from 'styled-components';
 
 import { DataTable, Icon } from 'components/common';
 import { Link } from 'components/common/router';
@@ -23,10 +22,7 @@ import Routes from 'routing/Routes';
 import { MetricContainer, CounterRate } from 'components/metrics';
 import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { RuleType } from 'stores/rules/RulesStore';
-
-const TitleTd = styled.td`
-  width: 400px;
-`;
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 
 type Props = {
   pipeline: PipelineType;
@@ -62,7 +58,10 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
 
     return (
       <tr key={rule.id}>
-        <TitleTd>{ruleTitle}</TitleTd>
+        <td>
+          {ruleTitle}
+          <RuleDeprecationInfo pipelineId={pipeline.id} />
+        </td>
         <td>{rule.description}</td>
         <td>
           <MetricContainer
