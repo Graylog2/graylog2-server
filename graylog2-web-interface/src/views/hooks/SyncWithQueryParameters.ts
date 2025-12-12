@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as Immutable from 'immutable';
 import URI from 'urijs';
 
@@ -58,14 +58,9 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
   }
 };
 
-export const syncWithQueryParameters = (
-  viewType: ViewType,
-  query: string,
-  searchQuery: Query,
-  action: (to: string) => unknown,
-) => {
+export const uriForView = (viewType: ViewType, query: string, searchQuery: Query): string | undefined => {
   if (viewType !== View.Type.Search) {
-    return;
+    return undefined;
   }
 
   if (searchQuery) {
@@ -95,21 +90,39 @@ export const syncWithQueryParameters = (
       ? uriWithStreams.removeSearch('stream_categories')
       : uriWithStreams.setSearch('stream_categories', currentStreamCategories.join(','));
 
-    if (query !== uri.toString()) {
-      action(uri.toString());
-    }
+    return uri.toString();
   }
+
+  return undefined;
 };
 
 export const useSyncWithQueryParameters = (query: string) => {
   const viewType = useViewType();
   const currentQuery = useCurrentQuery();
   const history = useHistory();
+  const lastSyncedQueryRef = useRef(query);
+  const isFirstSyncRef = useRef(true);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => syncWithQueryParameters(viewType, query, currentQuery, history.replace), []);
-  useEffect(
-    () => syncWithQueryParameters(viewType, query, currentQuery, history.push),
-    [currentQuery, history.push, query, viewType],
-  );
+  useEffect(() => {
+    const uri = uriForView(viewType, query, currentQuery);
+
+    if (!uri) {
+      return;
+    }
+
+    const urlChangedOutsideSync = query !== lastSyncedQueryRef.current && query !== uri;
+
+    if (urlChangedOutsideSync) {
+      return;
+    }
+
+    const updateHistory = isFirstSyncRef.current ? history.replace : history.push;
+
+    if (query !== uri) {
+      updateHistory(uri);
+    }
+
+    isFirstSyncRef.current = false;
+    lastSyncedQueryRef.current = uri;
+  }, [currentQuery, history, query, viewType]);
 };
