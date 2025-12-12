@@ -80,10 +80,11 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
 
         return <Link to={Routes.SYSTEM.CLUSTER.DATANODE_SHOW(datanodeRouteId)}>{nodeName}</Link>;
       },
+      minWidth: 300,
     },
     datanode_status: {
       renderCell: (_value, entity) => <DataNodeStatusCell dataNode={entity} />,
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 130,
     },
     memory: {
       renderCell: (_value, entity) => (
@@ -93,7 +94,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           warningThreshold={MEMORY_WARNING_THRESHOLD}
         />
       ),
-      staticWidth: 120,
+      staticWidth: 130,
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -104,13 +105,13 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           warningThreshold={JVM_WARNING_THRESHOLD}
         />
       ),
-      staticWidth: 120,
+      staticWidth: 130,
     },
     cpu: {
       renderCell: (_value, entity) => (
         <CpuMetricsCell loadAverage={entity.metrics?.cpuLoadAverage1m} cpuPercent={entity.metrics?.cpuPercent} />
       ),
-      staticWidth: 120,
+      staticWidth: 130,
     },
     indexing: {
       renderCell: (_value, entity) => (
@@ -130,7 +131,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           dangerThreshold={STORAGE_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 120,
+      staticWidth: 130,
     },
     datanode_version: {
       renderCell: (_value, entity) => (
@@ -138,10 +139,11 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           <span>{entity.datanode_version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      staticWidth: 160,
+      minWidth: 200,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),
+      minWidth: 220,
     },
   },
 });

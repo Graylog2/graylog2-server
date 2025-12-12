@@ -60,10 +60,11 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
   attributes: {
     hostname: {
       renderCell: (_value, entity) => <HostnameCell node={entity} />,
+      minWidth: 300,
     },
     lifecycle: {
       renderCell: (_value, entity) => <LifecycleCell node={entity} />,
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 130,
     },
     is_processing: {
       renderCell: (_value, entity) => <ProcessingStateCell node={entity} />,
@@ -75,7 +76,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     cpu: {
       renderCell: (_value, entity) => <CpuMetricsCell cpuPercent={entity.metrics?.cpuPercent} />,
-      staticWidth: 120,
+      staticWidth: 130,
     },
     journal: {
       renderCell: (_value, entity) => (
@@ -87,7 +88,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           dangerThreshold={JOURNAL_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 120,
+      staticWidth: 130,
     },
     dataLakeJournal: {
       renderCell: (_value, entity) => (
@@ -108,11 +109,11 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           warningThreshold={JVM_WARNING_THRESHOLD}
         />
       ),
-      staticWidth: 120,
+      staticWidth: 130,
     },
     buffers: {
       renderCell: (_value, entity) => <BuffersMetricsCell node={entity} warningThreshold={BUFFER_WARNING_THRESHOLD} />,
-      staticWidth: 120,
+      staticWidth: 130,
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
