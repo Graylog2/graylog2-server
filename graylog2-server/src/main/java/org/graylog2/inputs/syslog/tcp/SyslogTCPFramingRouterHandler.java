@@ -54,6 +54,11 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<B
         } else {
             ctx.fireChannelRead(msg);
         }
+
+        // In case the TCP-connection is kept open for a long time, and there's some traffic happening,
+        // we can skim through the retained buffers we keep track of and forget the ones that are freed already.
+        // This does not help for long, idle connections and gigantic frames.
+        retainedBuffers.removeIf(buf -> buf.refCnt() == 0);
     }
 
     private void cleanup() {
@@ -61,7 +66,6 @@ public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<B
             if (buf.refCnt() > 0) {
                 buf.release();
             }
-
         }
         retainedBuffers.clear();
     }
