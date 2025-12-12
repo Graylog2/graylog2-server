@@ -78,7 +78,6 @@ const GraylogNodesExpandable = ({
         entityActions={renderActions}
         entityAttributesAreCamelCase={false}
         humanName={`${productName} Nodes`}
-        actionsCellWidth={160}
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
         onDataLoaded={(data) => setTotalGraylogNodes(data.pagination?.total ?? data.list.length)}

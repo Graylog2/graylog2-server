@@ -76,7 +76,6 @@ const DataNodesExpandable = ({
         entityAttributesAreCamelCase
         entityActions={renderActions}
         humanName="Data Nodes"
-        actionsCellWidth={160}
         externalSearch={externalSearch}
         fetchOptions={fetchOptions}
         onDataLoaded={(data) => setTotalDataNodes(data.pagination?.total ?? data.list.length)}
