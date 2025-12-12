@@ -76,13 +76,9 @@ const usePluggableSearchAction = (loaded: boolean, view: View) => {
     .filter((perspective) => (perspective.useCondition ? !!perspective.useCondition() : true))
     .map(({ component: PluggableSearchAction, key, modals }) => {
       if (modals) {
-        const refs = modals
-          .map(({ key: modalKey }) => modalKey)
-          .reduce((acc, mKey: string) => {
-            acc[mKey] = () => modalRefs.current[mKey];
-
-            return acc;
-          }, {});
+        const refs = Object.fromEntries(
+          modals.map(({ key: modalKey }) => modalKey).map((mKey) => [mKey, () => modalRefs.current[mKey]]),
+        );
 
         return <PluggableSearchAction key={key} loaded={loaded} search={view} modalRefs={refs} />;
       }
