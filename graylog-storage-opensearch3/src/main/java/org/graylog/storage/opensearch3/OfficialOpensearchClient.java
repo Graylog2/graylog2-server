@@ -24,6 +24,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.graylog2.indexer.ParentCircuitBreakingException;
 import org.opensearch.client.opensearch.OpenSearchAsyncClient;
 import org.opensearch.client.opensearch.OpenSearchClient;
 import org.opensearch.client.opensearch._types.ErrorCause;
@@ -145,6 +146,9 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
             if (isMapperParsingExceptionException(openSearchException)) {
                 return new MapperParsingException(openSearchException.getMessage());
             }
+            if (isParentCircuitBreakingException(openSearchException)) {
+                return new ParentCircuitBreakingException(openSearchException.getMessage());
+            }
         } else if (t instanceof ResponseException responseException) {
             if (responseException.status() == 429) {
                 return new BatchSizeTooLargeException(t.getMessage());
@@ -188,6 +192,19 @@ public record OfficialOpensearchClient(OpenSearchClient sync, OpenSearchAsyncCli
             if (parsedException.type().equals("search_phase_execution_exception")) {
                 ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getCause().getMessage());
                 return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isParentCircuitBreakingException(OpenSearchException openSearchException) {
+        try {
+            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
+            if (parsedException.type().equals("circuit_breaking_exception")) {
+                ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getCause().getMessage());
+                return parsedCause.reason().contains("[parent] Data too large");
             }
         } catch (Exception e) {
             return false;
