@@ -53,7 +53,8 @@ public abstract class EventDto {
     public static final String FIELD_SCORES = "scores";
     public static final String FIELD_ASSOCIATED_ASSETS = "associated_assets";
     public static final String FIELD_FIELDS = "fields";
-    private static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
+    public static final String FIELD_GROUP_BY_FIELDS = "group_by_fields";
+    public static final String FIELD_AGGREGATION_CONDITIONS = "aggregation_conditions";
     public static final String FIELD_REPLAY_INFO = "replay_info";
 
     @JsonProperty(FIELD_ID)
@@ -117,6 +118,10 @@ public abstract class EventDto {
     @JsonProperty(FIELD_GROUP_BY_FIELDS)
     public abstract Map<String, String> groupByFields();
 
+    @JsonProperty(FIELD_AGGREGATION_CONDITIONS)
+    @Nullable
+    public abstract Map<String, Double> aggregationConditions();
+
     @JsonProperty(FIELD_REPLAY_INFO)
     public abstract Optional<EventReplayInfo> replayInfo();
 
@@ -135,6 +140,7 @@ public abstract class EventDto {
             return new AutoValue_EventDto.Builder()
                     .sourceStreams(ImmutableSet.of())
                     .groupByFields(ImmutableMap.of())
+                    .aggregationConditions(ImmutableMap.of())
                     .scores(ImmutableMap.of())
                     .associatedAssets(ImmutableSet.of());
         }
@@ -202,6 +208,9 @@ public abstract class EventDto {
 
         @JsonProperty(FIELD_GROUP_BY_FIELDS)
         public abstract Builder groupByFields(Map<String, String> fields);
+
+        @JsonProperty(FIELD_AGGREGATION_CONDITIONS)
+        public abstract Builder aggregationConditions(@Nullable Map<String, Double> conditions);
 
         @JsonProperty(FIELD_REPLAY_INFO)
         public abstract Builder replayInfo(@Nullable EventReplayInfo replayInfo);
