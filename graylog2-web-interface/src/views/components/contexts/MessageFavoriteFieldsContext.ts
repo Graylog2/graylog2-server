@@ -16,17 +16,14 @@
  */
 
 import React from 'react';
-import Immutable from 'immutable';
 
 import { singleton } from 'logic/singleton';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { Message } from 'views/components/messagelist/Types';
 import type { Stream } from 'logic/streams/types';
 
 export type MessageFavoriteFieldsContextState = {
   favoriteFields: Array<string>;
   saveFavoriteField: (favorites: Array<string>) => void;
-  messageFields: FieldTypeMappingsList;
   toggleField: (field: string) => void;
   message: Message;
   editableStreams: Array<Stream>;
@@ -36,7 +33,6 @@ export type MessageFavoriteFieldsContextState = {
 const MessageFavoriteFieldsContext = React.createContext<MessageFavoriteFieldsContextState>({
   favoriteFields: [],
   saveFavoriteField: () => {},
-  messageFields: Immutable.List([]),
   toggleField: () => {},
   message: undefined,
   editableStreams: [],

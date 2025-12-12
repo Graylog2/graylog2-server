@@ -136,12 +136,9 @@ const MessageDetail = ({
   const messageTitle = _formatMessageTitle(index, id);
 
   return (
-    <MessageFavoriteFieldsProvider
-      message={message}
-      messageFields={messageFields}
-      isFeatureEnabled={isFavoriteFieldsEnabled}>
-      <MessageDetailAdditionalContextProvider isLocalNode={isLocalNode}>
-        <MessageDetailProviders message={message}>
+    <MessageDetailProviders message={message}>
+      <MessageFavoriteFieldsProvider message={message} isFeatureEnabled={isFavoriteFieldsEnabled}>
+        <MessageDetailAdditionalContextProvider isLocalNode={isLocalNode}>
           <>
             <Row className="row-sm">
               <Col md={12}>
@@ -202,9 +199,9 @@ const MessageDetail = ({
               </Col>
             </Row>
           </>
-        </MessageDetailProviders>
-      </MessageDetailAdditionalContextProvider>
-    </MessageFavoriteFieldsProvider>
+        </MessageDetailAdditionalContextProvider>
+      </MessageFavoriteFieldsProvider>
+    </MessageDetailProviders>
   );
 };
 

@@ -22,7 +22,6 @@ import flattenDeep from 'lodash/flattenDeep';
 
 import type { Message } from 'views/components/messagelist/Types';
 import MessageFavoriteFieldsContext from 'views/components/contexts/MessageFavoriteFieldsContext';
-import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import useMessageFavoriteFieldsMutation from 'views/components/messagelist/MessageFields/hooks/useMessageFavoriteFieldsMutation';
 import { useStore } from 'stores/connect';
 import { StreamsStore } from 'views/stores/StreamsStore';
@@ -33,10 +32,9 @@ import useCurrentUser from 'hooks/useCurrentUser';
 
 type OriginalProps = React.PropsWithChildren<{
   message: Message;
-  messageFields: FieldTypeMappingsList;
 }>;
 
-const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messageFields }: OriginalProps) => {
+const OriginalMessageFavoriteFieldsProvider = ({ children = null, message }: OriginalProps) => {
   const { streams: streamsList = [] } = useStore(StreamsStore);
   const { permissions } = useCurrentUser();
   const streams = useMemo<Array<Stream>>(() => {
@@ -69,21 +67,12 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
     () => ({
       favoriteFields: initialFavoriteFields,
       saveFavoriteField,
-      messageFields,
       message,
       toggleField,
       editableStreams,
       setFieldsIsPending,
     }),
-    [
-      initialFavoriteFields,
-      saveFavoriteField,
-      messageFields,
-      message,
-      toggleField,
-      editableStreams,
-      setFieldsIsPending,
-    ],
+    [initialFavoriteFields, saveFavoriteField, message, toggleField, editableStreams, setFieldsIsPending],
   );
 
   return <MessageFavoriteFieldsContext.Provider value={contextValue}>{children}</MessageFavoriteFieldsContext.Provider>;
@@ -92,15 +81,10 @@ const OriginalMessageFavoriteFieldsProvider = ({ children = null, message, messa
 const MessageFavoriteFieldsProvider = ({
   children = null,
   message,
-  messageFields,
   isFeatureEnabled,
 }: OriginalProps & { isFeatureEnabled: boolean }) => {
   if (!isFeatureEnabled) return children;
 
-  return (
-    <OriginalMessageFavoriteFieldsProvider message={message} messageFields={messageFields}>
-      {children}
-    </OriginalMessageFavoriteFieldsProvider>
-  );
+  return <OriginalMessageFavoriteFieldsProvider message={message}>{children}</OriginalMessageFavoriteFieldsProvider>;
 };
 export default MessageFavoriteFieldsProvider;
