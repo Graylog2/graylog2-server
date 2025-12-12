@@ -22,8 +22,8 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type { Sort } from 'stores/PaginationTypes';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 
-import type { ColumnPreferences, EntityBase, ColumnRenderersByAttribute } from '../types';
-import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, DEFAULT_COL_MIN_WIDTH } from '../Constants';
+import type { ColumnPreferences, EntityBase } from '../types';
+import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, ACTIONS_COL_ID } from '../Constants';
 
 const COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS = 500;
 
@@ -65,7 +65,6 @@ const updateColumnPreferences = (
 type Props<Entity extends EntityBase> = {
   columnOrder: Array<string>;
   columnDefinitions: Array<ColumnDef<Entity>>;
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnWidths: { [colId: string]: number };
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
@@ -90,7 +89,6 @@ type Props<Entity extends EntityBase> = {
 const useTable = <Entity extends EntityBase>({
   columnOrder,
   columnDefinitions,
-  columnRenderersByAttribute,
   columnWidths,
   defaultColumnOrder,
   displayBulkSelectCol,
@@ -206,16 +204,10 @@ const useTable = <Entity extends EntityBase>({
         updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
 
       const clampedAttributeWidths = Object.fromEntries(
-        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => {
-          const effectiveMin = Math.max(
-            DEFAULT_COL_MIN_WIDTH,
-            headerMinWidths[colId] ?? 0,
-            columnRenderersByAttribute[colId]?.minWidth ?? 0,
-          );
-
-
-          return [colId, Math.max(width, effectiveMin)];
-        }),
+        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
+          colId,
+          Math.max(width, headerMinWidths[colId]),
+        ]),
       );
 
       setInternalColumnWidthPreferences(clampedAttributeWidths);
@@ -232,7 +224,6 @@ const useTable = <Entity extends EntityBase>({
       return debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
     },
     [
-      columnRenderersByAttribute,
       debouncedOnLayoutPreferencesChange,
       headerMinWidths,
       internalColumnWidthPreferences,
@@ -256,6 +247,11 @@ const useTable = <Entity extends EntityBase>({
     onRowSelectionChange,
     onSortingChange,
     onColumnSizingChange,
+    initialState: {
+      columnPinning: {
+        right: [ACTIONS_COL_ID],
+      },
+    },
     state: {
       columnOrder,
       columnVisibility,
