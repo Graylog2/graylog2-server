@@ -19,6 +19,7 @@ import Routes from 'integrations/aws/common/Routes';
 import AWSInputConfiguration from './aws/AWSInputConfiguration';
 import AWSCloudWatchApp from './aws/cloudwatch/CloudWatchApp';
 import EmbeddedCloudWatchApp from './aws/cloudwatch/EmbeddedCloudWatchApp';
+import { defaultConfig as PagerDutyDefaultConfig } from './pager-duty/PagerDutyConfig';
 import PagerDutyNotificationDetails from './pager-duty/PagerDutyNotificationDetails';
 import PagerDutyNotificationForm from './pager-duty/PagerDutyNotificationForm';
 import PagerDutyNotificationSummary from './pager-duty/PagerDutyNotificationSummary';
@@ -51,7 +52,7 @@ const bindings = {
       formComponent: PagerDutyNotificationForm,
       summaryComponent: PagerDutyNotificationSummary,
       detailsComponent: PagerDutyNotificationDetails,
-      defaultConfig: PagerDutyNotificationForm.defaultConfig,
+      defaultConfig: PagerDutyDefaultConfig,
     },
     {
       type: 'slack-notification-v1',
