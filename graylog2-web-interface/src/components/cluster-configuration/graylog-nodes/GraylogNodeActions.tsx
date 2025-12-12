@@ -19,7 +19,8 @@ import URI from 'urijs';
 
 import { LinkContainer } from 'components/common/router';
 import { ConfirmDialog, ExternalLink, IfPermitted } from 'components/common';
-import { DropdownButton, MenuItem } from 'components/bootstrap';
+import { MoreActions } from 'components/common/EntityDataTable';
+import { MenuItem } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import HideOnCloud from 'util/conditional/HideOnCloud';
 import { SystemLoadBalancerStore } from 'stores/load-balancer/SystemLoadBalancerStore';
@@ -56,7 +57,7 @@ const GraylogNodeActions = ({ node }: Props) => {
 
   return (
     <>
-      <DropdownButton bsSize="xs" title="More" id={`more-actions-dropdown-${node.node_id}`} pullRight>
+      <MoreActions>
         <IfPermitted permissions="processing:changestate">
           <MenuItem onSelect={() => setShowMessageProcessingModal(true)}>
             {node.is_processing ? 'Pause' : 'Resume'} message processing
@@ -108,7 +109,7 @@ const GraylogNodeActions = ({ node }: Props) => {
             <ExternalLink>API Browser</ExternalLink>
           </MenuItem>
         </IfPermitted>
-      </DropdownButton>
+      </MoreActions>
       {showMessageProcessingModal && (
         <ConfirmDialog
           show
