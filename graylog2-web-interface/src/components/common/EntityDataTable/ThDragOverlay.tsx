@@ -25,15 +25,16 @@ import Icon from 'components/common/Icon';
 import type { EntityBase, ColumnMetaContext } from 'components/common/EntityDataTable/types';
 import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
-import { ThInner, LeftCol } from 'components/common/EntityDataTable/TableHead';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
+import { ThInner, LeftCol } from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
 
 const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
     background-color: ${theme.colors.global.contentBackground};
     z-index: ${zIndices.dropdownMenu};
     padding: ${CELL_PADDING}px;
-    width: ${$minWidth + CELL_PADDING}px;
+    width: ${$minWidth}px;
+    min-width: fit-content;
     font-weight: bold;
     white-space: nowrap;
     max-width: 300px;
