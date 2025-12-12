@@ -73,18 +73,22 @@ public class FieldTypeMappingsService {
         checkType(customMapping);
         checkAllIndicesSupportFieldTypeChange(customMapping.fieldName(), indexSetsIds);
 
-        for (String indexSetId : indexSetsIds) {
-            try {
-                indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
-                    var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
-                    if (rotateImmediately) {
-                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
-                    }
-                });
-            } catch (Exception ex) {
-                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
-                throw ex;
+        final Map<String, CustomFieldMappings> changedIndexSets = new HashMap<>();
+
+        try {
+            final var changed = indexSetsIds.stream()
+                    .map(indexSetService::get).filter(Optional::isPresent).map(Optional::get)
+                    .map(indexSetConfig -> {
+                        // creating a copy of the current mappings set for eventual rollback
+                        changedIndexSets.put(indexSetConfig.id(), new CustomFieldMappings(indexSetConfig.customFieldMappings()));
+                        return storeMapping(customMapping, indexSetConfig);
+                    }).filter(Optional::isPresent).map(Optional::get).collect(Collectors.toSet());
+            if(rotateImmediately) {
+                changed.forEach(this::cycleIndexSet);
             }
+        } catch (Exception ex) {
+            rollbackMappings(changedIndexSets);
+            throw new RuntimeException("Failed to update field type in index sets: " + ex.getMessage(), ex);
         }
     }
 
@@ -190,6 +194,20 @@ public class FieldTypeMappingsService {
                         .customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping))
                         .build()
         ));
+    }
+
+    // rolling back changes in MongoDB
+    private void rollbackMappings(final Map<String, CustomFieldMappings> changedIndexSets) {
+        changedIndexSets.forEach((fieldName, previousCustomFieldMappings) -> {
+            indexSetService.get(fieldName).ifPresent(indexSetConfig -> {
+                // rolling back changes in MongoDB
+                mongoIndexSetService.save(
+                        indexSetConfig.toBuilder()
+                                .customFieldMappings(previousCustomFieldMappings)
+                                .build()
+                );
+            });
+        });
     }
 
     private Optional<IndexSetConfig> setProfileForIndexSet(final String profileId,
