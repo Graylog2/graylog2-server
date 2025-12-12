@@ -1,3 +1,3 @@
-# See https://github.com/Graylog2/.github-private/blob/main/.github/runs-on.yml
+# See https://github.com/Graylog2/graylog-project-internal/blob/main/.github/runs-on.yml
 # for the shared configuration file.
-extends: ".github-private"
+extends: "graylog-project-internal"
