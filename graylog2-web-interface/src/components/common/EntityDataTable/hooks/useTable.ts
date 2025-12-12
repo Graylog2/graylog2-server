@@ -22,8 +22,8 @@ import { getCoreRowModel, useReactTable } from '@tanstack/react-table';
 import type { Sort } from 'stores/PaginationTypes';
 import debounceWithPromise from 'views/logic/debounceWithPromise';
 
-import type { ColumnPreferences, EntityBase, ColumnRenderersByAttribute } from '../types';
-import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, DEFAULT_COL_MIN_WIDTH } from '../Constants';
+import type { ColumnPreferences, EntityBase } from '../types';
+import { UTILITY_COLUMNS, ATTRIBUTE_STATUS, ACTIONS_COL_ID } from '../Constants';
 
 const COLUMN_SIZING_PERSIST_DEBOUNCE_IN_MS = 500;
 
@@ -43,17 +43,18 @@ const columnVisibilityChanges = (prevVisibleColumns: VisibilityState, currVisibl
 };
 
 const updateColumnPreferences = (
-  addedColumns: Set<string>,
+  visibleAttributeColumns: Set<string>,
   removedColumns: Set<string>,
   columnPreferences: ColumnPreferences | undefined = {},
 ) => {
   const updatedPreferences = { ...columnPreferences };
 
-  // only update the preferences for columns which have been shown/hidden by the user
-  addedColumns.forEach((col) => {
+  // All currently visible columns will be marked as 'show'
+  visibleAttributeColumns.forEach((col) => {
     updatedPreferences[col] = { status: ATTRIBUTE_STATUS.show };
   });
 
+  // Only explicitly hidden columns will be marked as 'hide'
   removedColumns.forEach((col) => {
     updatedPreferences[col] = { status: ATTRIBUTE_STATUS.hide };
   });
@@ -64,11 +65,11 @@ const updateColumnPreferences = (
 type Props<Entity extends EntityBase> = {
   columnOrder: Array<string>;
   columnDefinitions: Array<ColumnDef<Entity>>;
-  columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnWidths: { [colId: string]: number };
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
+  headerMinWidths: { [colId: string]: number };
   isEntitySelectable: (entity: Entity) => boolean | undefined;
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -88,11 +89,11 @@ type Props<Entity extends EntityBase> = {
 const useTable = <Entity extends EntityBase>({
   columnOrder,
   columnDefinitions,
-  columnRenderersByAttribute,
   columnWidths,
   defaultColumnOrder,
   displayBulkSelectCol,
   entities,
+  headerMinWidths,
   isEntitySelectable = () => true,
   layoutPreferences,
   onChangeSelection,
@@ -128,13 +129,16 @@ const useTable = <Entity extends EntityBase>({
   const onColumnVisibilityChange = useCallback(
     (updater: Updater<VisibilityState>) => {
       const newColumnVisibility = updater instanceof Function ? updater(columnVisibility) : updater;
+      const visibleAttributeColumns = new Set(
+        Object.keys(newColumnVisibility).filter((colId) => newColumnVisibility[colId] && !UTILITY_COLUMNS.has(colId)),
+      );
       const { addedColumns, removedColumns } = columnVisibilityChanges(columnVisibility, newColumnVisibility);
 
       const newLayoutPreferences: {
         attributes?: ColumnPreferences;
         order?: Array<string>;
       } = {
-        attributes: updateColumnPreferences(addedColumns, removedColumns, layoutPreferences.attributes),
+        attributes: updateColumnPreferences(visibleAttributeColumns, removedColumns, layoutPreferences.attributes),
       };
 
       // if user has a custom order, we need to update it to reflect the visibility changes
@@ -202,7 +206,7 @@ const useTable = <Entity extends EntityBase>({
       const clampedAttributeWidths = Object.fromEntries(
         Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
           colId,
-          Math.max(width, columnRenderersByAttribute[colId]?.minWidth ?? DEFAULT_COL_MIN_WIDTH),
+          Math.max(width, headerMinWidths[colId]),
         ]),
       );
 
@@ -220,8 +224,8 @@ const useTable = <Entity extends EntityBase>({
       return debouncedOnLayoutPreferencesChange({ attributes: newAttributePreferences });
     },
     [
-      columnRenderersByAttribute,
       debouncedOnLayoutPreferencesChange,
+      headerMinWidths,
       internalColumnWidthPreferences,
       layoutPreferences?.attributes,
       setInternalColumnWidthPreferences,
@@ -243,6 +247,11 @@ const useTable = <Entity extends EntityBase>({
     onRowSelectionChange,
     onSortingChange,
     onColumnSizingChange,
+    initialState: {
+      columnPinning: {
+        right: [ACTIONS_COL_ID],
+      },
+    },
     state: {
       columnOrder,
       columnVisibility,
