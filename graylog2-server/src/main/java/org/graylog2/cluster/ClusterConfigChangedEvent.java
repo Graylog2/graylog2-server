@@ -20,23 +20,20 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-import org.joda.time.DateTime;
-
 import jakarta.validation.constraints.NotEmpty;
+import org.joda.time.DateTime;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ClusterConfigChangedEvent {
-    @JsonProperty
+    @JsonProperty("date")
     public abstract DateTime date();
 
-    @JsonProperty
+    @JsonProperty("node_id")
     @NotEmpty
     public abstract String nodeId();
 
-    @JsonProperty
+    @JsonProperty("type")
     @NotEmpty
     public abstract String type();
 

@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.views;
 
-import  au.com.bytecode.opencsv.CSVParser;
+import au.com.bytecode.opencsv.CSVParser;
 import io.restassured.http.Header;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ValidatableResponse;
@@ -27,9 +27,10 @@ import org.graylog.testing.completebackend.apis.Sharing;
 import org.graylog.testing.completebackend.apis.SharingRequest;
 import org.graylog.testing.completebackend.apis.Streams;
 import org.graylog.testing.completebackend.apis.Users;
-import org.graylog.testing.containermatrix.SearchServer;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTest;
-import org.graylog.testing.containermatrix.annotations.ContainerMatrixTestsConfiguration;
+import org.graylog.testing.completebackend.FullBackendTest;
+import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog2.indexer.fieldtypes.FieldTypeMapper;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.rest.MoreMediaTypes;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
@@ -46,30 +47,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Java6Assertions.within;
+import static org.assertj.core.api.Assertions.within;
 import static org.graylog.testing.completebackend.Lifecycle.CLASS;
 import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.hasEntry;
 
-@ContainerMatrixTestsConfiguration(serverLifecycle = CLASS,
-                                   searchVersions = {SearchServer.ES7, SearchServer.OS2})
+@GraylogBackendConfiguration(serverLifecycle = CLASS)
 public class ScriptingApiResourceIT {
 
     public static final String DEFAULT_STREAM = "000000000000000000000001";
-    private final GraylogApis api;
+    private static GraylogApis api;
 
-    private String stream1Id;
-    private String stream2Id;
-
-    public ScriptingApiResourceIT(GraylogApis apis) {
-        this.api = apis;
-    }
+    private static String stream1Id;
+    private static String stream2Id;
 
     @BeforeAll
-    public void beforeAll() {
+    static void beforeAll(GraylogApis graylogApis) {
+        api = graylogApis;
 
         final String defaultIndexSetId = api.indices().defaultIndexSetId();
 
@@ -78,8 +76,8 @@ public class ScriptingApiResourceIT {
         final String userId = user.getString("id");
 
 
-        this.stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
-        this.stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, Streams.StreamRule.exact("stream2", "target_stream", false));
+        stream1Id = api.streams().createStream("Stream #1", defaultIndexSetId, Streams.StreamRule.exact("stream1", "target_stream", false));
+        stream2Id = api.streams().createStream("Stream #2", defaultIndexSetId, Streams.StreamRule.exact("stream2", "target_stream", false));
 
         api.sharing().setSharing(new SharingRequest(
                 new SharingRequest.Entity(Sharing.ENTITY_STREAM, stream2Id),
@@ -90,20 +88,20 @@ public class ScriptingApiResourceIT {
         api.gelf()
                 .createGelfHttpInput(12201)
                 .postMessage("""
-                        {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1, "_target_stream": "stream1"}
+                        {"short_message":"search-sync-test", "host":"example.org", "facility":"test", "_level":1, "_target_stream": "stream1", "date_field": "2025-10-20T12:00:10.123Z"}
                         """)
                 .postMessage("""
-                        {"short_message":"search-sync-test-2", "host":"example.org", "facility":"another-test", "_level":2, "_target_stream": "stream2"}
+                        {"short_message":"search-sync-test-2", "host":"example.org", "facility":"another-test", "_level":2, "_target_stream": "stream2", "date_field": "2025-10-20T12:10:42.123Z"}
                         """)
                 .postMessage("""
-                        {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2"}
+                        {"short_message":"search-sync-test-3", "host":"lorem-ipsum.com", "facility":"another-test", "_level":3, "_http_method":"POST", "_target_stream": "stream2", "date_field": "2025-10-21T12:01:30.123Z"}
                         """);
 
-        api.search().waitForMessagesCount(3);
-        api.fieldTypes().waitForFieldTypeDefinitions("source", "facility", "level");
+        api.search().waitForMessages("search-sync-test", "search-sync-test-2", "search-sync-test-3");
+        api.fieldTypes().waitForFieldTypeDefinitions("source", "facility", "level", "date_field");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAggregationByStream() {
         final ValidatableResponse validatableResponse =
                 api.post("/search/aggregate", """
@@ -119,7 +117,7 @@ public class ScriptingApiResourceIT {
                              }
                            ]
                         }
-                         """, 200);
+                        """, 200);
 
         validatableResponse.log().ifValidationFails()
                 .assertThat().body("datarows", Matchers.hasSize(3));
@@ -129,7 +127,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, stream1Id, 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testStdDevSorting() {
         final GraylogApiResponse responseDesc =
                 new GraylogApiResponse(api.post("/search/aggregate", """
@@ -147,7 +145,7 @@ public class ScriptingApiResourceIT {
                         		}
                         	]
                         }
-                         """, 200));
+                        """, 200));
 
         responseDesc.validatableResponse().log().ifValidationFails()
                 .assertThat().body("datarows", Matchers.hasSize(2));
@@ -173,7 +171,7 @@ public class ScriptingApiResourceIT {
                         		}
                         	]
                         }
-                         """, 200));
+                        """, 200));
 
         List<Double> stddevAsc = responseAsc.properJSONPath().read("datarows.*[1]");
         org.assertj.core.api.Assertions.assertThat(stddevAsc)
@@ -181,7 +179,7 @@ public class ScriptingApiResourceIT {
                 .containsExactly(0.0, 0.5);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAggregationByStreamTitle() {
         final ValidatableResponse validatableResponse =
                 api.post("/search/aggregate", """
@@ -197,7 +195,7 @@ public class ScriptingApiResourceIT {
                              }
                            ]
                         }
-                         """, 200);
+                        """, 200);
 
         validatableResponse.log().ifValidationFails()
                 .assertThat().body("datarows", Matchers.hasSize(3));
@@ -207,7 +205,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "Stream #1", 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testUserWithLimitedPermissionRequest() {
 
         final ValidatableResponse validatableResponse = given()
@@ -228,7 +226,7 @@ public class ScriptingApiResourceIT {
                              }
                            ]
                         }
-                         """)
+                        """)
                 .post("/search/aggregate")
                 .then()
                 .log().ifStatusCodeMatches(not(200))
@@ -238,7 +236,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "another-test", 2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSchema() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -267,7 +265,7 @@ public class ScriptingApiResourceIT {
         validateSchema(validatableResponse, "metric: count(facility)", "numeric", "facility");
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMinimalRequest() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -296,7 +294,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAsciiRender() {
         final String response = given()
                 .spec(api.requestSpecification())
@@ -335,7 +333,7 @@ public class ScriptingApiResourceIT {
         assertThat(response).isEqualTo(expected.trim());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testGetRequestAcii() {
         final String response = given()
                 .spec(api.requestSpecification())
@@ -358,7 +356,7 @@ public class ScriptingApiResourceIT {
         assertThat(response).isEqualTo(expected.trim());
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testCsvRender() throws Exception {
         final InputStream response = given()
                 .spec(api.requestSpecification())
@@ -388,11 +386,11 @@ public class ScriptingApiResourceIT {
         final List<String[]> lines = parseCsvLines(response);
 
         // headers
-        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+        Assertions.assertArrayEquals(new String[]{"grouping: facility", "metric: count(facility)"}, lines.get(0));
 
         //rows
-        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
-        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
+        Assertions.assertArrayEquals(new String[]{"another-test", "2"}, lines.get(1));
+        Assertions.assertArrayEquals(new String[]{"test", "1"}, lines.get(2));
     }
 
     private List<String[]> parseCsvLines(InputStream inputStream) throws Exception {
@@ -408,7 +406,7 @@ public class ScriptingApiResourceIT {
         return lines;
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testGetRequestCsv() throws Exception {
 
         final InputStream response = given()
@@ -425,14 +423,14 @@ public class ScriptingApiResourceIT {
         final List<String[]> lines = parseCsvLines(response);
 
         // headers
-        Assertions.assertArrayEquals(lines.get(0), new String[]{"grouping: facility", "metric: count(facility)"});
+        Assertions.assertArrayEquals(new String[]{"grouping: facility", "metric: count(facility)"}, lines.get(0));
 
         //rows
-        Assertions.assertArrayEquals(lines.get(1), new String[]{"another-test", "2"});
-        Assertions.assertArrayEquals(lines.get(2), new String[]{"test", "1"});
+        Assertions.assertArrayEquals(new String[]{"another-test", "2"}, lines.get(1));
+        Assertions.assertArrayEquals(new String[]{"test", "1"}, lines.get(2));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testGetRequestJson() {
         final ValidatableResponse response = given()
                 .spec(api.requestSpecification())
@@ -447,7 +445,7 @@ public class ScriptingApiResourceIT {
         validateRow(response, "test", 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testTwoAggregations() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -480,7 +478,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1, 1.0f);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testDuplicatedMetrics() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -511,7 +509,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1, 1);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testAggregationWithoutMatchingField() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -540,7 +538,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "(Empty Value)", 2);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMissingDataInRow() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -577,7 +575,7 @@ public class ScriptingApiResourceIT {
         validateRow(validatableResponse, "test", 1, "-", 1.0f);
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testStreamFiltering() {
         final String req = """
                 {
@@ -608,7 +606,7 @@ public class ScriptingApiResourceIT {
         validatableResponse.assertThat().body("datarows", Matchers.hasSize(1));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testSorting() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -635,12 +633,12 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         final List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
-        Assertions.assertEquals(rows.size(), 2);
+        Assertions.assertEquals(2, rows.size());
         Assertions.assertEquals(Arrays.asList("test", (Object) 1), rows.get(0));
         Assertions.assertEquals(Arrays.asList("another-test", (Object) 2), rows.get(1));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMetadata() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -679,9 +677,9 @@ public class ScriptingApiResourceIT {
         assertThat(diff).isCloseTo(300_000, within(10_000f));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testErrorHandling() {
-        final ValidatableResponse validatableResponse = given()
+        final ValidatableResponse ignored = given()
                 .spec(api.requestSpecification())
                 .when()
                 .body("""
@@ -707,7 +705,7 @@ public class ScriptingApiResourceIT {
                 .body("message", Matchers.containsString("Failed to obtain results"));
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMessages() {
         final ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -732,7 +730,7 @@ public class ScriptingApiResourceIT {
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMessagesWithSorting() {
         ValidatableResponse validatableResponse = given()
                 .spec(api.requestSpecification())
@@ -750,7 +748,7 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         List<List<Object>> rows = validatableResponse.extract().body().jsonPath().getList("datarows");
-        Assertions.assertEquals(rows.size(), 3);
+        Assertions.assertEquals(3, rows.size());
         assertThat(rows.get(0)).contains(3);
         assertThat(rows.get(1)).contains(2);
         assertThat(rows.get(2)).contains(1);
@@ -771,14 +769,14 @@ public class ScriptingApiResourceIT {
                 .statusCode(200);
 
         rows = validatableResponse.extract().body().jsonPath().getList("datarows");
-        Assertions.assertEquals(rows.size(), 3);
+        Assertions.assertEquals(3, rows.size());
         assertThat(rows.get(0)).contains("another-test");
         assertThat(rows.get(1)).contains("another-test");
         assertThat(rows.get(2)).contains("test");
 
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testMessagesGetRequestAscii() {
         final List<String> response = given()
                 .spec(api.requestSpecification())
@@ -803,7 +801,7 @@ public class ScriptingApiResourceIT {
         assertThat(expected.containsAll(response)).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetric() {
         final String req = """
                 {
@@ -843,7 +841,7 @@ public class ScriptingApiResourceIT {
         assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithFieldName() {
         final String req = """
                 {
@@ -885,7 +883,7 @@ public class ScriptingApiResourceIT {
         assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
     }
 
-    @ContainerMatrixTest
+    @FullBackendTest
     void testPercentageMetricWithConfig() {
         final String req = """
                 {
@@ -928,6 +926,195 @@ public class ScriptingApiResourceIT {
 
         assertThat(response.size()).isEqualTo(percentageMetricExpectedResult.size());
         assertThat(percentageMetricExpectedResult.containsAll(response)).isTrue();
+    }
+
+    @FullBackendTest
+    void testTimestampGroupingBy1Hour() {
+        api.waitFor(() -> {
+            var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
+            return fieldTypes.stream().anyMatch(type -> type.name().equals("date_field") && type.type().equals(FieldTypeMapper.DATE_TYPE));
+        }, "'date_field' should exist as a date type field in graylog so that bucketing works");
+
+        final var req = """
+                        {
+                          "timerange": {
+                            "type": "relative",
+                            "range": 0
+                           },
+                           "group_by": [
+                             {
+                               "field": "date_field",
+                               "timeunit": "1h"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                        """;
+
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(req)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expectedResult = """
+                                            ┌────────────────────────┬───────────────────────┐
+                                            │grouping: date_field    │metric: count()        │
+                                            ├────────────────────────┼───────────────────────┤
+                                            │2025-10-20T12:00:00.000Z│2                      │
+                                            │2025-10-20T13:00:00.000Z│0                      │
+                                            │2025-10-20T14:00:00.000Z│0                      │
+                                            │2025-10-20T15:00:00.000Z│0                      │
+                                            │2025-10-20T16:00:00.000Z│0                      │
+                                            │2025-10-20T17:00:00.000Z│0                      │
+                                            │2025-10-20T18:00:00.000Z│0                      │
+                                            │2025-10-20T19:00:00.000Z│0                      │
+                                            │2025-10-20T20:00:00.000Z│0                      │
+                                            │2025-10-20T21:00:00.000Z│0                      │
+                                            │2025-10-20T22:00:00.000Z│0                      │
+                                            │2025-10-20T23:00:00.000Z│0                      │
+                                            │2025-10-21T00:00:00.000Z│0                      │
+                                            │2025-10-21T01:00:00.000Z│0                      │
+                                            │2025-10-21T02:00:00.000Z│0                      │
+                                            │2025-10-21T03:00:00.000Z│0                      │
+                                            │2025-10-21T04:00:00.000Z│0                      │
+                                            │2025-10-21T05:00:00.000Z│0                      │
+                                            │2025-10-21T06:00:00.000Z│0                      │
+                                            │2025-10-21T07:00:00.000Z│0                      │
+                                            │2025-10-21T08:00:00.000Z│0                      │
+                                            │2025-10-21T09:00:00.000Z│0                      │
+                                            │2025-10-21T10:00:00.000Z│0                      │
+                                            │2025-10-21T11:00:00.000Z│0                      │
+                                            │2025-10-21T12:00:00.000Z│1                      │
+                                            └────────────────────────┴───────────────────────┘
+                                            """.strip().lines().toList();
+
+        assertThat(response.size())
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response))
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isTrue();
+    }
+
+    @FullBackendTest
+    void testTimestampGroupingBy1Day() {
+        api.waitFor(() -> {
+            var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
+            return fieldTypes.stream().anyMatch(type -> type.name().equals("date_field") && type.type().equals(FieldTypeMapper.DATE_TYPE));
+        }, "'date_field' should exist as a date type field in graylog so that bucketing works");
+
+        final var req = """
+                        {
+                          "timerange": {
+                            "type": "relative",
+                            "range": 0
+                           },
+                           "group_by": [
+                             {
+                               "field": "date_field",
+                               "timeunit": "1d"
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                        """;
+
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(req)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expectedResult = """
+                                            ┌────────────────────────┬───────────────────────┐
+                                            │grouping: date_field    │metric: count()        │
+                                            ├────────────────────────┼───────────────────────┤
+                                            │2025-10-20T00:00:00.000Z│2                      │
+                                            │2025-10-21T00:00:00.000Z│1                      │
+                                            └────────────────────────┴───────────────────────┘
+                                            """.strip().lines().toList();
+
+        assertThat(response.size())
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response))
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isTrue();
+    }
+
+    @FullBackendTest
+    void testTimestampGroupingByScaling() {
+        api.waitFor(() -> {
+            var fieldTypes = api.fieldTypes().getFieldTypes(RelativeRange.allTime(), Set.of(stream1Id, stream2Id));
+            return fieldTypes.stream().anyMatch(type -> type.name().equals("date_field") && type.type().equals(FieldTypeMapper.DATE_TYPE));
+        }, "'date_field' should exist as a date type field in graylog so that bucketing works");
+
+        final var req = """
+                        {
+                          "timerange": {
+                            "type": "relative",
+                            "range": 0
+                           },
+                           "group_by": [
+                             {
+                               "field": "date_field",
+                               "scaling": 3.0
+                             }
+                           ],
+                           "metrics": [
+                             {
+                               "function": "count"
+                             }
+                           ]
+                        }
+                        """;
+
+        final var response = given()
+                .spec(api.requestSpecification())
+                .when()
+                .header(new Header("Accept", MediaType.TEXT_PLAIN))
+                .body(req)
+                .post("/search/aggregate")
+                .then()
+                .log().ifStatusCodeMatches(not(200))
+                .statusCode(200)
+                .extract().body().asString().strip().lines().toList();
+
+        final List<String> expectedResult = """
+                                            ┌────────────────────────┬───────────────────────┐
+                                            │grouping: date_field    │metric: count()        │
+                                            ├────────────────────────┼───────────────────────┤
+                                            │2025-10-20T12:00:00.000Z│2                      │
+                                            │2025-10-21T00:00:00.000Z│0                      │
+                                            │2025-10-21T12:00:00.000Z│1                      │
+                                            └────────────────────────┴───────────────────────┘
+                                            """.strip().lines().toList();
+
+        assertThat(response.size())
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isEqualTo(expectedResult.size());
+        assertThat(expectedResult.containsAll(response))
+                .withFailMessage("Comparison failed:\n\n%s\n\nbut expected:\n\n%s", String.join("\n", response), String.join("\n", expectedResult))
+                .isTrue();
     }
 
     private void validateSchema(ValidatableResponse response, String name, String type, String field) {

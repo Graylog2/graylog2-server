@@ -69,6 +69,7 @@ public class Permissions {
 
     public Set<String> userSelfEditPermissions(String username, boolean isAllowedToCreateToken) {
         ImmutableSet.Builder<String> perms = ImmutableSet.builder();
+        perms.add(perInstance(RestPermissions.USERS_READ, username));
         perms.add(perInstance(RestPermissions.USERS_EDIT, username));
         perms.add(perInstance(RestPermissions.USERS_PASSWORDCHANGE, username));
         perms.add(perInstance(RestPermissions.USERS_TOKENLIST, username));

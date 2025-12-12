@@ -27,7 +27,7 @@ type Props = {
 const WrappingContainer = ({ children }: Props) => (
   <DefaultQueryClientProvider>
     <MemoryRouter>
-      <DefaultProviders>{children}</DefaultProviders>
+      <DefaultProviders env="test">{children}</DefaultProviders>
     </MemoryRouter>
   </DefaultQueryClientProvider>
 );

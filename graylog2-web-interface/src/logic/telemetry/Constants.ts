@@ -47,6 +47,14 @@ export const TELEMETRY_EVENT_TYPE = {
     WIDGET_CONFIG_UPDATED: 'Search Widget Config Updated',
     EXPORT: 'Search Widget Exported',
   },
+  FAVORITE_FIELDS: {
+    EDIT_OPEN: 'Favorite Fields Edit Open',
+    EDIT_CANCELED: 'Favorite Fields Edit Canceled',
+    EDIT_SAVED: 'Favorite Fields Edit Saved',
+    TOGGLED: 'Favorite Field Toggled',
+    REORDERED: 'Favorite Field Reordered',
+    NON_FAVORITE_SHOW_TOGGLED: 'Non Favorite Field Show Toggled',
+  },
   SEARCH_WIDGET_CREATE: {
     AGGREGATION: 'Search Widget Aggregation Created',
     MESSAGE_COUNT: 'Search Widget Message Count Created',
@@ -188,10 +196,8 @@ export const TELEMETRY_EVENT_TYPE = {
     STREAM_ITEM_DATA_ROUTING_STREAM_INDEXSET_UPDATE_OPENED: 'Stream Item Data Routing Stream IndexSet Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Indexer Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_INDEXER_FILTER_CREATE_OPENED: 'Stream Item Data Routing Indexer Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_CREATE_OPENED:
-      'Stream Item Data Routing Data Warehouse Filter Create Opened',
-    STREAM_ITEM_DATA_ROUTING_DATA_WAREHOUSE_FILTER_UPDATE_OPENED:
-      'Stream Item Data Routing Data Warehouse Filter Update Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_CREATE_OPENED: 'Stream Item Data Routing Data Lake Filter Create Opened',
+    STREAM_ITEM_DATA_ROUTING_DATA_LAKE_FILTER_UPDATE_OPENED: 'Stream Item Data Routing Data Lake Filter Update Opened',
     STREAM_ITEM_DATA_ROUTING_FILTER_DELETE_OPENED: 'Stream Item Data Routing Filter Delete Opened',
     STREAM_ITEM_DATA_ROUTING_INTAKE_OPENED: 'Stream Item Data Routing Intake Opened',
     STREAM_ITEM_DATA_ROUTING_PROCESSING_OPENED: 'Stream Item Data Routing Processing Opened',
@@ -246,12 +252,13 @@ export const TELEMETRY_EVENT_TYPE = {
     THREATINTEL_CONFIGURATION_UPDATED: 'Configurations Threat Intel Configuration Updated',
     PERMISSIONS_UPDATED: 'Configurations Permissions Updated',
     SEARCHES_UPDATED: 'Configurations Searches Updated',
-    URL_WHITE_LIST_UPDATED: 'Configurations Url White List Updated',
+    URL_ALLOW_LIST_UPDATED: 'Configurations Url Allow List Updated',
     USER_UPDATED: 'Configurations User Updated',
     CERTIFICATE_RENEWAL_UPDATED: 'Configurations Certificate Renewal Updated',
     CERTIFICATE_RENEWAL_POLICY_UPDATED: 'Configurations Certificate Renewal Policy Updated',
     DECORATORS_UPDATED: 'Configurations Decorators Updated',
     GEOLOCATION_CONFIGURATION_UPDATED: 'Configurations Geolocation Configuration Updated',
+    MARKDOWN_UPDATED: 'Configurations Markdown Updated',
   },
   INPUTS: {
     INPUT_SELECTED: 'Inputs Input Selected',
@@ -343,7 +350,7 @@ export const TELEMETRY_EVENT_TYPE = {
     LOG_COLLECTOR_DELETED: 'Sidecar Log Collector Deleted',
   },
   TRAFFIC_GRAPH_DAYS_CHANGED: 'Traffic Graph Days Changed',
-  URLWHITELIST_CONFIGURATION_UPDATED: 'Urlwhitelist Configuration Updated',
+  URLALLOWLIST_CONFIGURATION_UPDATED: 'Urlallowlist Configuration Updated',
   CONTENT_PACK: {
     INSTALLED: 'Content Pack Installed',
     DOWNLOADED: 'Content Pack Downloaded',
@@ -420,7 +427,9 @@ export const TELEMETRY_EVENT_TYPE = {
     ACTION_RAN: 'Alerts And Events Action Ran',
   },
   ENTITY_DATA_TABLE: {
+    COLUMNS_RESET: 'Entity Data Table Columns Reset',
     COLUMNS_CHANGED: 'Entity Data Table Columns Changed',
+    COLUMN_ORDER_CHANGED: 'Entity Data Table Column Order Changed',
     SORT_CHANGED: 'Entity Data Table Sort Changed',
     PAGE_SIZE_CHANGED: 'Entity Data Table Page Size Changed',
     FILTER_CREATED: 'Entity Data Table Filter Created',

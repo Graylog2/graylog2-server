@@ -21,12 +21,13 @@ import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 import { Icon, StatusIcon } from 'components/common';
-import { FormDataContext } from 'integrations/aws/context/FormData';
+import FormDataContext from 'integrations/contexts/FormDataContext';
 import { ApiContext } from 'integrations/aws/context/Api';
-import useFetch from 'integrations/aws/common/hooks/useFetch';
+import useFetch from 'integrations/hooks/useFetch';
 import FormWrap from 'integrations/aws/common/FormWrap';
 import { ApiRoutes } from 'integrations/aws/common/Routes';
 import { DEFAULT_KINESIS_LOG_TYPE, KINESIS_LOG_TYPES } from 'integrations/aws/common/constants';
+import { toAWSRequest } from 'integrations/aws/common/formDataAdapter';
 
 const Container = styled.div`
   border: 1px solid #a6afbd;
@@ -104,8 +105,8 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
   const {
     awsAuthenticationType,
     awsCloudWatchAddFlowLogPrefix = { value: undefined },
-    awsCloudWatchAssumeARN = { value: undefined },
-    awsCloudWatchAwsKey = { value: undefined },
+    awsAssumeRoleARN = { value: undefined },
+    awsAccessKey = { value: undefined },
     awsCloudWatchAwsRegion,
     awsCloudWatchBatchSize,
     awsEndpointCloudWatch = { value: undefined },
@@ -129,7 +130,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       onSubmit();
     },
     'POST',
-    {
+    toAWSRequest(formData, {
       name: awsCloudWatchName.value,
       region: awsCloudWatchAwsRegion.value,
       aws_input_type: awsCloudWatchKinesisInputType.value,
@@ -139,7 +140,7 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
       add_flow_log_prefix: addPrefix,
       kinesis_stream_arn: awsCloudwatchKinesisStreamArn,
       override_source: overrideSource?.value ?? '',
-    },
+    }),
   );
 
   useEffect(() => {
@@ -187,17 +188,17 @@ const StepReview = ({ onSubmit, onEditClick, externalInputSubmit = false }: Step
             <span>{awsAuthenticationType.value}</span>
           </li>
 
-          {awsCloudWatchAwsKey.value && (
+          {awsAccessKey.value && (
             <li>
               <strong>AWS Key</strong>
-              <span>{awsCloudWatchAwsKey.value}</span>
+              <span>{awsAccessKey.value}</span>
             </li>
           )}
 
-          {awsCloudWatchAssumeARN.value && (
+          {awsAssumeRoleARN.value && (
             <li>
               <strong>AWS Assumed ARN Role</strong>
-              <span>{awsCloudWatchAssumeARN.value}</span>
+              <span>{awsAssumeRoleARN.value}</span>
             </li>
           )}
 

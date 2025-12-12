@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.Configuration;
 import org.graylog2.outputs.BatchSizeConfig;
 import org.joda.time.Period;
@@ -31,12 +30,11 @@ import java.nio.file.Path;
 /**
  * List of configuration values that are safe to return, i.e. do not include any sensitive
  * information. Building a list manually because we need to guarantee never to return any
- * sensitive variables like passwords etc. - See this as a whitelist approach.
+ * sensitive variables like passwords etc. - See this as an allowlist approach.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class ExposedConfiguration {
     @JsonProperty("inputbuffer_processors")
     public abstract int inputBufferProcessors();

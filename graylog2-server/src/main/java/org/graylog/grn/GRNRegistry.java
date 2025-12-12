@@ -188,4 +188,13 @@ public class GRNRegistry {
 
         return type.trim().toLowerCase(Locale.US);
     }
+
+    /**
+     * Checks if a given type is  supported by this registry.
+     *
+     * @param type the type to check for support
+     */
+    public boolean supportsType(String type) {
+        return REGISTRY.containsKey(toKey(type));
+    }
 }

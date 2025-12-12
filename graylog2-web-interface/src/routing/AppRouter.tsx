@@ -67,9 +67,15 @@ import {
   InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoggersPage,
+  LUTCacheDetailsPage,
   LUTCachesPage,
+  LUTCachesFormPage,
   LUTDataAdaptersPage,
+  LUTDataAdaptersFormPage,
+  LUTDataAdapterDetailsPage,
   LUTTablesPage,
+  LUTFormPage,
+  LUTDetailsPage,
   NodeInputsPage,
   NotFoundPage,
   PipelineDetailsPage,
@@ -123,6 +129,7 @@ import RouterErrorBoundary from 'components/errors/RouterErrorBoundary';
 import usePluginEntities from 'hooks/usePluginEntities';
 import GlobalContextProviders from 'contexts/GlobalContextProviders';
 import TokenManagementPage from 'pages/TokenManagementPage';
+import { withLUTModalProvider } from 'components/lookup-tables/contexts/ModalContext';
 
 const renderPluginRoute = ({ path, component: Component, parentComponent, requiredFeatureFlag }: PluginRoute) => {
   if (requiredFeatureFlag && !AppConfig.isFeatureEnabled(requiredFeatureFlag)) {
@@ -191,6 +198,7 @@ const AppRouter = () => {
             { path: RoutePaths.message_show(':index', ':messageId'), element: <ShowMessagePage /> },
             { path: RoutePaths.WELCOME, element: <WelcomePage /> },
             { path: RoutePaths.STREAMS, element: <StreamsPage /> },
+            { path: RoutePaths.STREAM_NEW, element: <StreamsPage /> },
             { path: RoutePaths.stream_view(':streamId'), element: <StreamDetailsPage /> },
             { path: RoutePaths.stream_edit(':streamId'), element: <StreamEditPage /> },
             !isCloud && { path: RoutePaths.stream_outputs(':streamId'), element: <StreamOutputsPage /> },
@@ -256,34 +264,27 @@ const AppRouter = () => {
             { path: RoutePaths.SYSTEM.INDICES.LIST, element: <IndicesPage /> },
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: <LUTTablesPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTTablesPage action="create" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':tableName'), element: <LUTTablesPage action="show" /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':tableName'), element: <LUTTablesPage action="edit" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: withLUTModalProvider(LUTTablesPage) },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':lutIdOrName'), element: <LUTDetailsPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':lutIdOrName'), element: <LUTFormPage /> },
 
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: <LUTCachesPage /> },
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesPage action="create" /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: withLUTModalProvider(LUTCachesPage) },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheIdOrName'), element: <LUTCacheDetailsPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheIdOrName'), element: <LUTCachesFormPage /> },
             {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName'),
-              element: <LUTCachesPage action="show" />,
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW,
+              element: withLUTModalProvider(LUTDataAdaptersPage),
+            },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE, element: <LUTDataAdaptersFormPage /> },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterIdOrName'),
+              element: <LUTDataAdaptersFormPage />,
             },
             {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheName'),
-              element: <LUTCachesPage action="edit" />,
-            },
-
-            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW, element: <LUTDataAdaptersPage /> },
-            {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE,
-              element: <LUTDataAdaptersPage action="create" />,
-            },
-            {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName'),
-              element: <LUTDataAdaptersPage action="show" />,
-            },
-            {
-              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName'),
-              element: <LUTDataAdaptersPage action="edit" />,
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterIdOrName'),
+              element: <LUTDataAdapterDetailsPage />,
             },
 
             { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },

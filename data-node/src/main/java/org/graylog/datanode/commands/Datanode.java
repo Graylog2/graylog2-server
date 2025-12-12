@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.commands;
 
+import com.github.joschi.jadconfig.documentation.DocumentedBeansService;
 import com.github.rvesse.airline.annotations.Command;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
@@ -34,8 +35,8 @@ import org.graylog.datanode.bootstrap.DatanodeBootstrap;
 import org.graylog.datanode.bootstrap.Main;
 import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
 import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
+import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
 import org.graylog.datanode.configuration.S3RepositoryConfiguration;
-import org.graylog.datanode.docs.DocumentedBeansService;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -63,6 +64,7 @@ public class Datanode extends DatanodeBootstrap implements DocumentedBeansServic
     private final S3RepositoryConfiguration s3RepositoryConfiguration = new S3RepositoryConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
     private final GCSRepositoryConfiguration gcsRepositoryConfiguration = new GCSRepositoryConfiguration();
+    private final HdfsRepositoryConfiguration hdfsRepositoryConfiguration = new HdfsRepositoryConfiguration();
 
     public Datanode() {
         super("datanode", new Configuration());
@@ -83,10 +85,11 @@ public class Datanode extends DatanodeBootstrap implements DocumentedBeansServic
 
     @Override
     public @Nonnull List<Object> getNodeCommandConfigurationBeans() {
-        return Arrays.asList(configuration,
+        return Arrays.asList(
                 tlsConfiguration,
                 s3RepositoryConfiguration,
-                gcsRepositoryConfiguration);
+                gcsRepositoryConfiguration,
+                hdfsRepositoryConfiguration);
     }
 
     @Override

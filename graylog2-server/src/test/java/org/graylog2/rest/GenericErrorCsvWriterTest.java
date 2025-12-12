@@ -25,9 +25,8 @@ import org.graylog2.plugin.rest.ValidationApiError;
 import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchError;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
-import org.junit.BeforeClass;
-import org.junit.Test;
-
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.core.Application;
@@ -48,7 +47,7 @@ public class GenericErrorCsvWriterTest extends JerseyTest {
         return new ResourceConfig(Resource.class, GenericErrorCsvWriter.class);
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void setUpInjector() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }

@@ -63,8 +63,20 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
             "Timerange Start:      ${event.timerange_start}\n" +
             "Timerange End:        ${event.timerange_end}\n" +
             "Source Streams:       ${event.source_streams}\n" +
+            "${if event.fields}\n" +
             "Fields:\n" +
             "${foreach event.fields field}  ${field.key}: ${field.value}\n" +
+            "${end}\n" +
+            "${end}\n" +
+            "${if event.group_by_fields}\n" +
+            "Group By Fields:\n" +
+            "${foreach event.group_by_fields field}  ${field.key}: ${field.value}\n" +
+            "${end}\n" +
+            "${end}\n" +
+            "${if event.aggregation_conditions}\n" +
+            "Aggregation Conditions:\n" +
+            "${foreach event.aggregation_conditions condition}  ${condition.key}: ${condition.value}\n" +
+            "${end}\n" +
             "${end}\n" +
             "${if backlog}\n" +
             "--- [Backlog] ------------------------------------\n" +
@@ -103,6 +115,7 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     private static final String FIELD_LOOKUP_BCC_EMAILS = "lookup_bcc_emails";
     private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_NAME = "bcc_emails_lut_name";
     private static final String FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY = "bcc_emails_lut_key";
+    private static final String FIELD_INCLUDE_EVENT_PROCEDURE = "include_event_procedure";
 
     @JsonProperty(FIELD_SENDER)
     public abstract String sender();
@@ -199,6 +212,11 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
     @Nullable
     public abstract String bccEmailsLUTKey();
 
+    @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+    public abstract boolean includeEventProcedure();
+
+    public abstract Builder toBuilder();
+
     @Override
     @JsonIgnore
     public JobTriggerData toJobTriggerData(EventDto dto) {
@@ -290,7 +308,8 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                     .bccUsers(Set.of())
                     .bccEmails(Set.of())
                     .lookupCcEmails(false)
-                    .lookupBccEmails(false);
+                    .lookupBccEmails(false)
+                    .includeEventProcedure(false);
         }
 
         @JsonProperty(FIELD_SENDER)
@@ -377,6 +396,9 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
         @JsonProperty(FIELD_BCC_EMAILS_LOOKUP_TABLE_KEY)
         public abstract Builder bccEmailsLUTKey(String bccEmailsLUTKey);
 
+        @JsonProperty(FIELD_INCLUDE_EVENT_PROCEDURE)
+        public abstract Builder includeEventProcedure(boolean includeEventProcedure);
+
         public abstract EmailEventNotificationConfig build();
     }
 
@@ -400,7 +422,8 @@ public abstract class EmailEventNotificationConfig implements EventNotificationC
                 .bccUsers(bccUsers())
                 .bccEmails(bccEmails())
                 .lookupCcEmails(ValueReference.of(lookupCcEmails()))
-                .lookupBccEmails(ValueReference.of(lookupBccEmails()));
+                .lookupBccEmails(ValueReference.of(lookupBccEmails()))
+                .includeEventProcedure(ValueReference.of(includeEventProcedure()));
         if (lookupRecipientEmails()) {
             builder.recipientsLUTName(ValueReference.ofNullable(recipientsLUTName()))
                     .recipientsLUTKey(ValueReference.ofNullable(recipientsLUTKey()));

@@ -17,7 +17,8 @@
 package org.graylog.integrations.aws;
 
 
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -26,33 +27,46 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 
 public class AWSAuthFactoryTest {
+    private AWSAuthFactory awsAuthFactory;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        awsAuthFactory = new AWSAuthFactory();
+    }
 
     @Test
     public void testAutomaticAuth() {
-        assertThat(AWSAuthFactory.create(false, null, null, null, null))
+        assertThat(awsAuthFactory.create(false, null, null, null, null))
                 .isExactlyInstanceOf(DefaultCredentialsProvider.class);
     }
 
     @Test
     public void testAutomaticAuthIsFailingInCloudWithInvalidAccessKey() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                        AWSAuthFactory.create(true, null, null, "secret", null))
+                        awsAuthFactory.create(true, null, null, "secret", null))
                 .withMessageContaining("Access key");
     }
 
     @Test
     public void testAutomaticAuthIsFailingInCloudWithInvalidSecretKey() {
         assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
-                        AWSAuthFactory.create(true, null, "key", null, null))
+                        awsAuthFactory.create(true, null, "key", null, null))
                 .withMessageContaining("Secret key");
     }
 
 
     @Test
     public void testKeySecret() {
-        final AwsCredentialsProvider awsCredentialsProvider = AWSAuthFactory.create(false, null, "key", "secret", null);
+        final AwsCredentialsProvider awsCredentialsProvider = awsAuthFactory.create(false, null, "key", "secret", null);
         assertThat(awsCredentialsProvider).isExactlyInstanceOf(StaticCredentialsProvider.class);
         assertThat("key").isEqualTo(awsCredentialsProvider.resolveCredentials().accessKeyId());
         assertThat("secret").isEqualTo(awsCredentialsProvider.resolveCredentials().secretAccessKey());
+    }
+
+    @Test
+    public void testKeySecret_exceptionThrownWhenRequired() {
+        assertThatExceptionOfType(IllegalArgumentException.class).isThrownBy(() ->
+                        awsAuthFactory.create(true, null, null, null, null))
+                .withMessageContaining("Access key is required.");
     }
 }

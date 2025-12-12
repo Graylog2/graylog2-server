@@ -24,22 +24,27 @@ import useColumnRenderers from 'views/components/dashboard/DashboardsOverview/us
 import getDashboardTableElements from 'views/components/dashboard/DashboardsOverview/Constants';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import usePluggableEntityTableElements from 'hooks/usePluggableEntityTableElements';
+import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import { CurrentUserStore } from 'stores/users/CurrentUserStore';
+import type { SearchParamsForDashboards } from 'views/components/dashboard/SearchParamsForDashboards';
 
 import BulkActions from './BulkActions';
 
 type Props = {
-  isEvidenceModal?: boolean;
+  hideShare?: boolean;
+  hideAdditionalColumns?: boolean;
+  hideDelete?: boolean;
 };
 
-const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
+const DashboardsOverview = ({ hideAdditionalColumns = false, hideShare = false, hideDelete = false }: Props) => {
   const { pluggableColumnRenderers, pluggableAttributes, pluggableExpandedSections } =
     usePluggableEntityTableElements<View>(null, 'dashboard');
-  const { getDefaultLayout, columnOrder, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
+  const { getDefaultLayout, additionalAttributes } = getDashboardTableElements(pluggableAttributes);
   const customColumnRenderers = useColumnRenderers(pluggableColumnRenderers);
 
   const renderDashboardActions = useCallback(
-    (dashboard: View) => <DashboardActions dashboard={dashboard} isEvidenceModal={isEvidenceModal} />,
-    [isEvidenceModal],
+    (dashboard: View) => <DashboardActions dashboard={dashboard} hideDelete={hideDelete} hideShare={hideShare} />,
+    [hideDelete, hideShare],
   );
   const expandedSections = useMemo(
     () => ({
@@ -48,18 +53,23 @@ const DashboardsOverview = ({ isEvidenceModal = false }: Props) => {
     [pluggableExpandedSections],
   );
 
+  const fetchEntities = (searchParams: SearchParamsForDashboards): Promise<PaginatedResponse<View>> => {
+    CurrentUserStore.update(CurrentUserStore.getInitialState().currentUser.username);
+
+    return fetchDashboards(searchParams);
+  };
+
   return (
     <PaginatedEntityTable<View>
       humanName="dashboards"
-      columnsOrder={columnOrder}
       queryHelpComponent={
         <QueryHelper entityName="dashboard" commonFields={['id', 'title', 'description', 'summary']} />
       }
       entityActions={renderDashboardActions}
-      tableLayout={getDefaultLayout(isEvidenceModal)}
-      fetchEntities={fetchDashboards}
+      tableLayout={getDefaultLayout(hideAdditionalColumns)}
+      fetchEntities={fetchEntities}
       additionalAttributes={additionalAttributes}
-      expandedSectionsRenderer={expandedSections}
+      expandedSectionRenderers={expandedSections}
       keyFn={keyFn}
       entityAttributesAreCamelCase
       bulkSelection={{ actions: <BulkActions /> }}

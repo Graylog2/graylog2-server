@@ -81,7 +81,7 @@ const DestinationOutputs = ({ stream }: Props) => {
         <IfPermitted permissions="stream_outputs:create">
           <AddOutputButton
             stream={stream}
-            availableOutputTypes={availableOutputTypes.types}
+            availableOutputTypes={availableOutputTypes}
             assignableOutputs={assignableOutputs}
             getTypeDefinition={getTypeDefinition}
           />

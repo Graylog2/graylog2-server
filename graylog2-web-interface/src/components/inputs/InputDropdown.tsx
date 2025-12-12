@@ -46,7 +46,7 @@ type InputType = {
 
 const InputOption = ({ input }: { input: InputType }) => {
   const inputTypes = useInputTypes();
-  const inputType = inputTypes[input.type] ?? 'Unknown Input Type';
+  const inputType = inputTypes?.[input.type] ?? 'Unknown Input Type';
 
   return <option value={input.id}>{`${input.title} (${inputType})`}</option>;
 };

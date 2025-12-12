@@ -23,9 +23,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.DbEntity;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -42,10 +42,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamImpl.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ)
@@ -69,11 +69,15 @@ public abstract class StreamImpl implements Stream {
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
     public static final String FIELD_CATEGORIES = "categories";
+    public static final String FIELD_FAVORITE_FIELDS = "favorite_fields";
     public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
 
     @Id
     @JsonProperty("id")
     public abstract String id();
+
+    @JsonProperty(FIELD_SCOPE)
+    public abstract String scope();
 
     @JsonProperty(FIELD_CREATOR_USER_ID)
     public abstract String creatorUserId();
@@ -130,6 +134,10 @@ public abstract class StreamImpl implements Stream {
     @Nullable
     public abstract List<String> categories();
 
+    @JsonProperty(FIELD_FAVORITE_FIELDS)
+    @Nullable
+    public abstract List<String> favoriteFields();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -154,9 +162,10 @@ public abstract class StreamImpl implements Stream {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamImpl.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .matchingType(DEFAULT_MATCHING_TYPE)
                     .isDefault(false)
-                    .isEditable(false)
+                    .isEditable(true)
                     .removeMatchesFromDefaultStream(false)
                     .categories(List.of())
                     .outputIds(Set.of())
@@ -165,6 +174,9 @@ public abstract class StreamImpl implements Stream {
 
         @JsonProperty("id")
         public abstract Builder id(String id);
+
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
@@ -222,12 +234,12 @@ public abstract class StreamImpl implements Stream {
         @JsonProperty(FIELD_CATEGORIES)
         public abstract Builder categories(List<String> categories);
 
-        public abstract String id();
+        @JsonProperty(FIELD_FAVORITE_FIELDS)
+        public abstract Builder favoriteFields(List<String> favoriteFields);
 
         public abstract StreamImpl autoBuild();
 
         public StreamImpl build() {
-            isEditable(Stream.streamIsEditable(id()));
             return autoBuild();
         }
     }
@@ -236,6 +248,12 @@ public abstract class StreamImpl implements Stream {
     @JsonIgnore
     public String getId() {
         return id();
+    }
+
+    @Override
+    @JsonIgnore
+    public String getScope() {
+        return scope();
     }
 
     @Override
@@ -350,10 +368,17 @@ public abstract class StreamImpl implements Stream {
         return indexSetId();
     }
 
+    @Override
+    @JsonIgnore
+    public List<String> getFavoriteFields() {
+        return favoriteFields();
+    }
+
     // Package-private to prevent usage outside the streams package.
     @JsonIgnore
     StreamDTO toDTO() {
         return StreamDTO.builder()
+                .favoriteFields(favoriteFields())
                 .creatorUserId(creatorUserId())
                 .outputIds(outputIds())
                 .matchingType(matchingType())
@@ -369,6 +394,7 @@ public abstract class StreamImpl implements Stream {
                 .indexSetId(indexSetId())
                 .isEditable(isEditable())
                 .categories(categories())
+                .scope(scope())
                 .id(id())
                 .build();
     }
@@ -377,6 +403,8 @@ public abstract class StreamImpl implements Stream {
     // Package-private to prevent usage outside the streams package.
     static StreamImpl fromDTO(StreamDTO dto) {
         return StreamImpl.builder()
+                .favoriteFields(dto.favoriteFields())
+                .scope(dto.scope())
                 .creatorUserId(dto.creatorUserId())
                 .outputIds(dto.outputIds())
                 .matchingType(dto.matchingType())

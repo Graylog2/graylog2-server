@@ -25,7 +25,6 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.jackson.TypeReferences;
 
 import javax.annotation.Nullable;
@@ -151,7 +150,6 @@ public class JsonUtils {
     }
 
     @AutoValue
-    @WithBeanGetter
     protected abstract static class Entry {
         public abstract String key();
 
@@ -173,8 +171,11 @@ public class JsonUtils {
     @AutoValue
     protected abstract static class ExtractFlags {
         public abstract boolean flattenObjects();
+
         public abstract boolean escapeArrays();
+
         public abstract boolean deleteArrays();
+
         public static Builder builder() {
             return new AutoValue_JsonUtils_ExtractFlags.Builder();
         }
@@ -182,8 +183,11 @@ public class JsonUtils {
         @AutoValue.Builder
         public abstract static class Builder {
             public abstract Builder flattenObjects(boolean flattenObjects);
+
             public abstract Builder escapeArrays(boolean escapeArrays);
+
             public abstract Builder deleteArrays(boolean deleteArrays);
+
             public abstract JsonUtils.ExtractFlags build();
         }
     }

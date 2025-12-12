@@ -17,7 +17,7 @@
 package org.graylog.integrations.aws.transports;
 
 import org.graylog2.plugin.inputs.MisfireException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
@@ -35,6 +35,11 @@ public class KinesisTransportTest {
 
         // Verify exception occurs for invalid URI.
         assertThatThrownBy(() -> KinesisTransport.validateEndpoint("haha not a url", "Bad URI"))
+                .isExactlyInstanceOf(MisfireException.class)
+                .hasMessageContaining("Override Endpoint")
+                .hasMessageContaining("is invalid");
+
+        assertThatThrownBy(() -> KinesisTransport.validateEndpoint("unknown-scheme://graylog.org", "Graylog"))
                 .isExactlyInstanceOf(MisfireException.class)
                 .hasMessageContaining("Override Endpoint")
                 .hasMessageContaining("is invalid");

@@ -41,6 +41,8 @@ describe('DashboardsOverview BulkActionsRow', () => {
     selectEntity: () => {},
     deselectEntity: () => {},
     toggleEntitySelect: () => {},
+    isSomeRowsSelected: false,
+    isAllRowsSelected: false,
   };
 
   const openActionsDropdown = async () => {
@@ -72,6 +74,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
       ...useSelectedEntitiesResponse,
       selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
       setSelectedEntities,
+      isAllRowsSelected: true,
     });
 
     render(<BulkActions />);
@@ -104,6 +107,7 @@ describe('DashboardsOverview BulkActionsRow', () => {
       ...useSelectedEntitiesResponse,
       selectedEntities: ['dashboard-id-1', 'dashboard-id-2'],
       setSelectedEntities,
+      isAllRowsSelected: true,
     });
 
     render(<BulkActions />);

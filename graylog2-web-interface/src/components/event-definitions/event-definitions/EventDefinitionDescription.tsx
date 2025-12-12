@@ -17,7 +17,6 @@
 import React from 'react';
 import moment from 'moment';
 import 'moment-duration-format';
-import get from 'lodash/get';
 import styled, { css } from 'styled-components';
 
 import { describeExpression } from 'util/CronUtils';
@@ -35,7 +34,7 @@ const DetailTitle = styled.dt`
 const DetailValue = styled.dd(
   ({ theme }) => css`
     margin-left: 180px;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 
     &:not(:last-child) {
       border-bottom: 1px solid ${theme.colors.variant.lightest.default};
@@ -88,7 +87,11 @@ class EventDefinitionDescription extends React.Component<
         .duration(definition.config.search_within_ms)
         .format('d [days] h [hours] m [minutes] s [seconds]', { trim: 'all' });
 
-      schedulingInformation = `Runs ${executeEveryFormatted}, searching within the last ${searchWithinFormatted}.`;
+      const searchWithinMessage = definition.config.search_within_ms
+        ? `, searching within the last ${searchWithinFormatted}.`
+        : '.';
+
+      schedulingInformation = `Runs ${executeEveryFormatted}${searchWithinMessage}`;
     }
 
     return schedulingInformation;
@@ -135,7 +138,7 @@ class EventDefinitionDescription extends React.Component<
       return null;
     }
 
-    const scheduleCtx = get(context, `scheduler.${definition.id}`, null);
+    const scheduleCtx = context?.scheduler?.[definition.id] ?? null;
 
     if (!scheduleCtx.is_scheduled) {
       return <p>Event definition is not scheduled, no details available.</p>;
@@ -143,7 +146,7 @@ class EventDefinitionDescription extends React.Component<
 
     let timerange = null;
 
-    if (get(scheduleCtx, 'data.type', null) === 'event-processor-execution-v1') {
+    if (scheduleCtx?.data?.type === 'event-processor-execution-v1') {
       const from = scheduleCtx.data.timerange_from;
       const to = scheduleCtx.data.timerange_to;
 

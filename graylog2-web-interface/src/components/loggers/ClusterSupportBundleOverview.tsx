@@ -77,7 +77,7 @@ const ClusterSupportBundleOverview = () => {
         <Col xs={12}>
           <Header>
             <h2>Cluster Support Bundle</h2>
-            <Button bsStyle="success" onClick={onCreate} disabled={isCreating}>
+            <Button bsStyle="primary" onClick={onCreate} disabled={isCreating}>
               Create Support Bundle
               {isCreating && <LoadingSpinner text="" delay={0} />}
             </Button>

@@ -25,6 +25,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
@@ -51,7 +52,7 @@ public class IndexLookup {
         this.indexRangeContainsOneOfStreams = indexRangeContainsOneOfStreams;
     }
 
-    public Set<String> indexNamesForStreamsInTimeRange(final Set<String> streamIds,
+    public Set<String> indexNamesForStreamsInTimeRange(final Collection<String> streamIds,
                                                        final TimeRange timeRange) {
 
         Set<String> dataStreamIndices = streamIds.stream()
@@ -64,7 +65,7 @@ public class IndexLookup {
         return Sets.union(dataStreamIndices, candidateIndices);
     }
 
-    public Set<IndexRange> indexRangesForStreamsInTimeRange(final Set<String> streamIds,
+    public Set<IndexRange> indexRangesForStreamsInTimeRange(final Collection<String> streamIds,
                                                             final TimeRange timeRange) {
 
         if (streamIds.isEmpty()) {

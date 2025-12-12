@@ -35,16 +35,17 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
       'matched_at',
       ...(pluggableAttributes?.attributeNames || []),
     ],
+    defaultColumnOrder: [
+      'title',
+      'description',
+      'priority',
+      '_entity_source.source',
+      'matched_at',
+      'status',
+      'scheduling',
+      ...(pluggableAttributes?.attributeNames || []),
+    ],
   };
-  const columnOrder = [
-    'title',
-    'description',
-    'priority',
-    'matched_at',
-    'status',
-    'scheduling',
-    ...(pluggableAttributes?.attributeNames || []),
-  ];
 
   const additionalAttributes = [
     { id: 'scheduling', title: 'Scheduling', sortable: false },
@@ -54,7 +55,6 @@ const getEventDefinitionTableElements = (pluggableAttributes?: {
 
   return {
     defaultLayout,
-    columnOrder,
     additionalAttributes,
   };
 };

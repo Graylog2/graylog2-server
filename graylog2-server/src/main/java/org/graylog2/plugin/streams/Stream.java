@@ -19,7 +19,7 @@ package org.graylog2.plugin.streams;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.joda.time.DateTime;
 
 import java.util.List;
@@ -83,6 +83,10 @@ public interface Stream {
 
     String getId();
 
+    String getScope();
+
+    boolean isEditable();
+
     String getTitle();
 
     String getDescription();
@@ -115,6 +119,8 @@ public interface Stream {
 
     String getIndexSetId();
 
+    List<String> getFavoriteFields();
+
     /**
      * A hash code for the stream based on stream routing related fields to determine if
      * {@link org.graylog2.streams.StreamRouter} needs to reload its engine.
@@ -122,12 +128,4 @@ public interface Stream {
      * @return hash code based on routing related fields
      */
     int getFingerprint();
-
-    static boolean isSystemStreamId(String id) {
-        return ALL_SYSTEM_STREAM_IDS.contains(id);
-    }
-
-    static boolean streamIsEditable(String streamId) {
-        return !NON_EDITABLE_STREAM_IDS.contains(streamId);
-    }
 }

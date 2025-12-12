@@ -18,9 +18,7 @@ import * as React from 'react';
 import { useCallback } from 'react';
 import styled, { css } from 'styled-components';
 
-import { LinkContainer } from 'components/common/router';
 import { Row, Col, ButtonToolbar, Button } from 'components/bootstrap';
-import Routes from 'routing/Routes';
 import Spinner from 'components/common/Spinner';
 import UserNotification from 'util/UserNotification';
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -29,6 +27,8 @@ import ContentPackUploadControls from 'components/content-packs/ContentPackUploa
 import { ContentPacksActions } from 'stores/content-packs/ContentPacksStore';
 import useContentPacks from 'components/content-packs/hooks/useContentPacks';
 import MarketplaceLink from 'components/support/MarketplaceLink';
+import type { EntitySharePayload } from 'actions/permissions/EntityShareActions';
+import CreateButton from 'components/common/CreateButton';
 
 const ConfigurationBundles = styled.div(
   ({ theme }) => css`
@@ -67,8 +67,8 @@ const ContentPacksPage = () => {
   );
 
   const _installContentPack = useCallback(
-    (contentPackId: string, contentPackRev: string, parameters: unknown) => {
-      ContentPacksActions.install(contentPackId, contentPackRev, parameters).then(
+    (contentPackId: string, contentPackRev: number, parameters: unknown, shareRequest: EntitySharePayload) => {
+      ContentPacksActions.install(contentPackId, contentPackRev, parameters, shareRequest).then(
         () => {
           UserNotification.success('Content Pack installed successfully.', 'Success');
           refetch();
@@ -97,9 +97,7 @@ const ContentPacksPage = () => {
           actions={
             <ButtonToolbar>
               <ContentPackUploadControls />
-              <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.CREATE}>
-                <Button bsStyle="success">Create a content pack</Button>
-              </LinkContainer>
+              <CreateButton entityKey="Content Pack" />
             </ButtonToolbar>
           }>
           <span>

@@ -22,13 +22,14 @@ import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.NotFoundException;
 import org.apache.shiro.subject.Subject;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.IndexSetStatsCreator;
-import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indexset.restrictions.IndexSetRestrictionsService;
+import org.graylog2.indexer.indexset.validation.IndexSetValidator;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
@@ -37,21 +38,22 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.models.system.indices.DataTieringStatusService;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
-import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.system.jobs.SystemJobManager;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -62,7 +64,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.rest.resources.system.indexer.IndexSetTestUtils.createIndexSetConfig;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -72,11 +78,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class IndexSetsResourceTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private Indices indices;
@@ -94,6 +98,8 @@ public class IndexSetsResourceTest {
     private SystemJobManager systemJobManager;
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock
+    private IndexSetRestrictionsService indexSetRestrictionsService;
 
     public IndexSetsResourceTest() {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
@@ -103,10 +109,19 @@ public class IndexSetsResourceTest {
 
     private Boolean permitted;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         this.permitted = true;
         this.indexSetsResource = createIndexSetsResource(Set.of());
+        when(indexSetRestrictionsService.createIndexSetConfig(any(), anyBoolean())).then(invocationOnMock -> {
+            IndexSetCreationRequest request = invocationOnMock.getArgument(0);
+            return request.toIndexSetConfig(true, null);
+        });
+        when(indexSetRestrictionsService.updateIndexSetConfig(any(), any(), anyBoolean())).then(invocationOnMock -> {
+            IndexSetUpdateRequest request = invocationOnMock.getArgument(0);
+            IndexSetConfig config = invocationOnMock.getArgument(1 );
+            return request.toIndexSetConfig(config);
+        });
     }
 
     private void notPermitted() {
@@ -115,38 +130,38 @@ public class IndexSetsResourceTest {
 
     @Test
     public void list() {
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig();
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
 
         assertThat(list.total()).isEqualTo(1);
-        assertThat(list.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+        assertThat(list.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexSetConfig, false, null));
     }
 
     @Test
     public void listWithOnlyOpenFilters() {
-        final IndexSetConfig indexA = createTestConfig("a", "title");
-        final IndexSetConfig indexB = createTestConfig("b", "title");
-        final IndexSetConfig indexC = createTestConfig("c", "title");
+        final IndexSetConfig indexA = createIndexSetConfig("a", "title");
+        final IndexSetConfig indexB = createIndexSetConfig("b", "title");
+        final IndexSetConfig indexC = createIndexSetConfig("c", "title");
         when(indexSetService.findAll()).thenReturn(List.of(indexA, indexB, indexC));
 
         indexSetsResource = createIndexSetsResource(Set.of(
                 () -> indexSetConfig -> !Objects.equals(indexSetConfig.id(), indexB.id()),
                 () -> indexSetConfig -> !Objects.equals(indexSetConfig.id(), indexC.id())
         ));
-        final IndexSetResponse filteredList = indexSetsResource.list(0, 0, false, true);
-        final IndexSetResponse unfilteredList = indexSetsResource.list(0, 0, false, false);
+        final IndexSetsResponse filteredList = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse unfilteredList = indexSetsResource.list(0, 0, false, false);
 
-        assertThat(filteredList.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexA, false));
+        assertThat(filteredList.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexA, false, null));
         assertThat(unfilteredList.indexSets()).containsExactly(
-                IndexSetSummary.fromIndexSetConfig(indexA, false),
-                IndexSetSummary.fromIndexSetConfig(indexB, false),
-                IndexSetSummary.fromIndexSetConfig(indexC, false)
+                IndexSetResponse.fromIndexSetConfig(indexA, false, null),
+                IndexSetResponse.fromIndexSetConfig(indexB, false, null),
+                IndexSetResponse.fromIndexSetConfig(indexC, false, null)
         );
     }
 
@@ -154,10 +169,10 @@ public class IndexSetsResourceTest {
     public void listDenied() {
         notPermitted();
 
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id", "title");
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -171,7 +186,7 @@ public class IndexSetsResourceTest {
     public void list0() {
         when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0, false, true);
+        final IndexSetsResponse list = indexSetsResource.list(0, 0, false, true);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -185,24 +200,25 @@ public class IndexSetsResourceTest {
     public void get0() {
         when(indexSetService.get("id")).thenReturn(Optional.empty());
 
-        expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("Couldn't find index set with ID <id>");
+        Throwable exception = assertThrows(NotFoundException.class, () ->
 
-        indexSetsResource.get("id");
+            indexSetsResource.get("id"));
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't find index set with ID <id>"));
     }
 
     @Test
     public void getDenied() {
         notPermitted();
 
-        expectedException.expect(ForbiddenException.class);
-        expectedException.expectMessage("Not authorized to access resource id <id>");
+        Throwable exception = assertThrows(ForbiddenException.class, () -> {
 
-        try {
-            indexSetsResource.get("id");
-        } finally {
-            verifyNoMoreInteractions(indexSetService);
-        }
+            try {
+                indexSetsResource.get("id");
+            } finally {
+                verifyNoMoreInteractions(indexSetService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized to access resource id <id>"));
     }
 
     @Test
@@ -220,29 +236,31 @@ public class IndexSetsResourceTest {
     public void indexSetStatistics0() {
         when(indexSetRegistry.get("id")).thenReturn(Optional.empty());
 
-        expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("Couldn't load index set with ID <id>");
+        Throwable exception = assertThrows(NotFoundException.class, () -> {
 
-        try {
-            indexSetsResource.indexSetStatistics("id");
-        } finally {
-            verify(indexSetRegistry, times(1)).get("id");
-            verifyNoMoreInteractions(indexSetRegistry);
-        }
+            try {
+                indexSetsResource.indexSetStatistics("id");
+            } finally {
+                verify(indexSetRegistry, times(1)).get("id");
+                verifyNoMoreInteractions(indexSetRegistry);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't load index set with ID <id>"));
     }
 
     @Test
     public void indexSetStatisticsDenied() {
         notPermitted();
 
-        expectedException.expect(ForbiddenException.class);
-        expectedException.expectMessage("Not authorized to access resource id <id>");
+        Throwable exception = assertThrows(ForbiddenException.class, () -> {
 
-        try {
-            indexSetsResource.indexSetStatistics("id");
-        } finally {
-            verifyNoMoreInteractions(indexSetRegistry);
-        }
+            try {
+                indexSetsResource.indexSetStatistics("id");
+            } finally {
+                verifyNoMoreInteractions(indexSetRegistry);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized to access resource id <id>"));
     }
 
     @Test
@@ -271,16 +289,17 @@ public class IndexSetsResourceTest {
 
         when(indexSetService.save(indexSetConfig)).thenReturn(savedIndexSetConfig);
 
-        final IndexSetSummary summary = indexSetsResource.save(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+        IndexSetResponse response = indexSetsResource.save(IndexSetTestUtils.toCreationRequest(indexSetConfig));
+
 
         verify(indexSetService, times(1)).save(indexSetConfig);
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
-        assertThat(summary.toIndexSetConfig(true)).isEqualTo(savedIndexSetConfig);
+        assertThat(response).isEqualTo(IndexSetResponse.fromIndexSetConfig(savedIndexSetConfig, false, null));
     }
 
     @Test
-    @Ignore("Currently doesn't work with @RequiresPermissions")
+    @Disabled("Currently doesn't work with @RequiresPermissions")
     public void saveDenied() {
         notPermitted();
 
@@ -303,29 +322,31 @@ public class IndexSetsResourceTest {
                 false
         );
 
-        expectedException.expect(ForbiddenException.class);
-        expectedException.expectMessage("Not authorized to access resource id <id>");
+        Throwable exception = assertThrows(ForbiddenException.class, () -> {
 
-        try {
-            indexSetsResource.save(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
-        } finally {
-            verifyNoMoreInteractions(indexSetService);
-        }
+            try {
+                indexSetsResource.save(IndexSetTestUtils.toCreationRequest(indexSetConfig));
+            } finally {
+                verifyNoMoreInteractions(indexSetService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized to access resource id <id>"));
     }
 
     @Test
     public void updateDenied() {
         notPermitted();
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id", "title");
 
-        expectedException.expect(ForbiddenException.class);
-        expectedException.expectMessage("Not authorized to access resource id <wrong-id>");
+        Throwable exception = assertThrows(ForbiddenException.class, () -> {
 
-        try {
-            indexSetsResource.update("wrong-id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
-        } finally {
-            verifyNoMoreInteractions(indexSetService);
-        }
+            try {
+                indexSetsResource.update("wrong-id", IndexSetTestUtils.toUpdateRequest(indexSetConfig));
+            } finally {
+                verifyNoMoreInteractions(indexSetService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized to access resource id <wrong-id>"));
     }
 
     @Test
@@ -356,14 +377,15 @@ public class IndexSetsResourceTest {
 
         final IndexSetConfig defaultIndexSetConfigSetReadOnly = defaultIndexSetConfig.toBuilder().isWritable(false).build();
 
-        expectedException.expect(ClientErrorException.class);
-        expectedException.expectMessage("Default index set must be writable.");
+        Throwable exception = assertThrows(ClientErrorException.class, () -> {
 
-        try {
-            indexSetsResource.update("defaultIndexSet", IndexSetUpdateRequest.fromIndexSetConfig(defaultIndexSetConfigSetReadOnly));
-        } finally {
-            verify(indexSetService, never()).save(any());
-        }
+            try {
+                indexSetsResource.update("defaultIndexSet", IndexSetTestUtils.toUpdateRequest(defaultIndexSetConfigSetReadOnly));
+            } finally {
+                verify(indexSetService, never()).save(any());
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Default index set must be writable."));
     }
 
     @Test
@@ -396,20 +418,21 @@ public class IndexSetsResourceTest {
         when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
         when(indexSetService.delete("id")).thenReturn(0);
 
-        expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("Couldn't delete index set with ID <id>");
+        Throwable exception = assertThrows(NotFoundException.class, () -> {
 
-        try {
-            indexSetsResource.delete("id", false);
-        } finally {
-            verify(indexSetRegistry, times(1)).getDefault();
-            verify(indexSetService, times(1)).delete("id");
-            verifyNoMoreInteractions(indexSetService);
-        }
+            try {
+                indexSetsResource.delete("id", false);
+            } finally {
+                verify(indexSetRegistry, times(1)).getDefault();
+                verify(indexSetService, times(1)).delete("id");
+                verifyNoMoreInteractions(indexSetService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Couldn't delete index set with ID <id>"));
     }
 
     @Test
-    public void deleteDefaultIndexSet() throws Exception {
+    public void deleteDefaultIndexSet() {
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -419,42 +442,45 @@ public class IndexSetsResourceTest {
         when(indexSetCleanupJobFactory.create(indexSet)).thenReturn(mock(IndexSetCleanupJob.class));
         when(indexSetService.delete("id")).thenReturn(1);
 
-        expectedException.expect(BadRequestException.class);
+        assertThrows(BadRequestException.class, () -> {
 
-        indexSetsResource.delete("id", false);
-        indexSetsResource.delete("id", true);
+            indexSetsResource.delete("id", false);
+            indexSetsResource.delete("id", true);
 
-        verify(indexSetService, never()).delete("id");
-        verify(systemJobManager, never()).submit(any(IndexSetCleanupJob.class));
-        verifyNoMoreInteractions(indexSetService);
+            verify(indexSetService, never()).delete("id");
+            verify(systemJobManager, never()).submit(any(IndexSetCleanupJob.class));
+            verifyNoMoreInteractions(indexSetService);
+        });
     }
 
     @Test
     public void deleteDenied() {
         notPermitted();
 
-        expectedException.expect(ForbiddenException.class);
-        expectedException.expectMessage("Not authorized to access resource id <id>");
+        Throwable exception = assertThrows(ForbiddenException.class, () -> {
 
-        try {
-            indexSetsResource.delete("id", false);
-        } finally {
-            verifyNoMoreInteractions(indexSetService);
-        }
+            try {
+                indexSetsResource.delete("id", false);
+            } finally {
+                verifyNoMoreInteractions(indexSetService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized to access resource id <id>"));
     }
 
     @Test
     public void globalStatsDenied() {
         notPermitted();
 
-        expectedException.expect(ForbiddenException.class);
-        expectedException.expectMessage("Not authorized");
+        Throwable exception = assertThrows(ForbiddenException.class, () -> {
 
-        try {
-            indexSetsResource.globalStats();
-        } finally {
-            verifyNoMoreInteractions(indexSetService);
-        }
+            try {
+                indexSetsResource.globalStats();
+            } finally {
+                verifyNoMoreInteractions(indexSetService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized"));
     }
 
     @Test
@@ -498,15 +524,16 @@ public class IndexSetsResourceTest {
     public void setDefaultDoesNotDoAnyThingIfNotPermitted() {
         notPermitted();
 
-        expectedException.expect(ForbiddenException.class);
-        expectedException.expectMessage("Not authorized to access resource id <someIndexSetId>");
+        Throwable exception = assertThrows(ForbiddenException.class, () -> {
 
-        try {
-            indexSetsResource.setDefault("someIndexSetId");
-        } finally {
-            verifyNoMoreInteractions(indexSetService);
-            verifyNoMoreInteractions(clusterConfigService);
-        }
+            try {
+                indexSetsResource.setDefault("someIndexSetId");
+            } finally {
+                verifyNoMoreInteractions(indexSetService);
+                verifyNoMoreInteractions(clusterConfigService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Not authorized to access resource id <someIndexSetId>"));
     }
 
     @Test
@@ -515,14 +542,15 @@ public class IndexSetsResourceTest {
 
         when(indexSetService.get(nonExistingIndexSetId)).thenReturn(Optional.empty());
 
-        expectedException.expect(NotFoundException.class);
-        expectedException.expectMessage("Index set <" + nonExistingIndexSetId + "> does not exist");
+        Throwable exception = assertThrows(NotFoundException.class, () -> {
 
-        try {
-            indexSetsResource.setDefault(nonExistingIndexSetId);
-        } finally {
-            verifyNoMoreInteractions(clusterConfigService);
-        }
+            try {
+                indexSetsResource.setDefault(nonExistingIndexSetId);
+            } finally {
+                verifyNoMoreInteractions(clusterConfigService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index set <" + nonExistingIndexSetId + "> does not exist"));
     }
 
     @Test
@@ -533,7 +561,7 @@ public class IndexSetsResourceTest {
                 readOnlyIndexSetId,
                 "title",
                 "description",
-                false, true,
+                false, null,
                 "prefix",
                 1,
                 0,
@@ -552,14 +580,15 @@ public class IndexSetsResourceTest {
         when(readOnlyIndexSet.getConfig()).thenReturn(readOnlyIndexSetConfig);
         when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
 
-        expectedException.expect(ClientErrorException.class);
-        expectedException.expectMessage("Index set not eligible as default");
+        Throwable exception = assertThrows(ClientErrorException.class, () -> {
 
-        try {
-            indexSetsResource.setDefault(readOnlyIndexSetId);
-        } finally {
-            verifyNoMoreInteractions(clusterConfigService);
-        }
+            try {
+                indexSetsResource.setDefault(readOnlyIndexSetId);
+            } finally {
+                verifyNoMoreInteractions(clusterConfigService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index set not eligible as default"));
     }
 
     @Test
@@ -589,62 +618,42 @@ public class IndexSetsResourceTest {
         when(readOnlyIndexSet.getConfig()).thenReturn(readOnlyIndexSetConfig);
         when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
 
-        expectedException.expect(ClientErrorException.class);
-        expectedException.expectMessage("Index set not eligible as default");
+        Throwable exception = assertThrows(ClientErrorException.class, () -> {
 
-        try {
-            indexSetsResource.setDefault(readOnlyIndexSetId);
-        } finally {
-            verifyNoMoreInteractions(clusterConfigService);
-        }
+            try {
+                indexSetsResource.setDefault(readOnlyIndexSetId);
+            } finally {
+                verifyNoMoreInteractions(clusterConfigService);
+            }
+        });
+        org.hamcrest.MatcherAssert.assertThat(exception.getMessage(), containsString("Index set not eligible as default"));
     }
 
     @Test
     public void testSearchIndexSets() {
-        final IndexSetConfig indexSetConfig = createTestConfig("id", "title");
+        final IndexSetConfig indexSetConfig = createIndexSetConfig("id", "title");
         String searchTitle = "Title";
         when(indexSetService.searchByTitle(searchTitle)).thenReturn(Collections.singletonList(indexSetConfig));
-        final IndexSetResponse firstPage = indexSetsResource.search(searchTitle, 0, 0, false);
+        final IndexSetsResponse firstPage = indexSetsResource.search(searchTitle, 0, 0, false);
 
         verify(indexSetService, times(1)).searchByTitle(searchTitle);
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
 
         assertThat(firstPage.total()).isEqualTo(1);
-        assertThat(firstPage.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig, false));
+        assertThat(firstPage.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexSetConfig, false, null));
 
-        final IndexSetConfig indexSetConfig2 = createTestConfig("id2", "title2");
+        final IndexSetConfig indexSetConfig2 = createIndexSetConfig("id2", "title2");
         when(indexSetService.searchByTitle(searchTitle)).thenReturn(List.of(indexSetConfig, indexSetConfig2));
-        final IndexSetResponse secondPage = indexSetsResource.search(searchTitle, 1, 0, false);
+        final IndexSetsResponse secondPage = indexSetsResource.search(searchTitle, 1, 0, false);
 
-        assertThat(secondPage.indexSets()).containsExactly(IndexSetSummary.fromIndexSetConfig(indexSetConfig2, false));
-    }
-
-    private IndexSetConfig createTestConfig(String id, String title) {
-        return IndexSetConfig.create(
-                id,
-                title,
-                "description",
-                true, true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                null,
-                1,
-                false
-        );
+        assertThat(secondPage.indexSets()).containsExactly(IndexSetResponse.fromIndexSetConfig(indexSetConfig2, false, null));
     }
 
     private TestResource createIndexSetsResource(Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
         return new TestResource(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
-                indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories);
+                indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted, openIndexSetFilterFactories,
+                indexSetRestrictionsService);
     }
 
     private static class TestResource extends IndexSetsResource {
@@ -655,10 +664,10 @@ public class IndexSetsResourceTest {
                      IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                      IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService,
                      SystemJobManager systemJobManager, Provider<Boolean> permitted,
-                     Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories) {
+                     Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
             super(indices, indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory,
                     indexSetStatsCreator, clusterConfigService, systemJobManager, mock(DataTieringStatusService.class),
-                    openIndexSetFilterFactories);
+                    openIndexSetFilterFactories, indexSetRestrictionsService);
             this.permitted = permitted;
         }
 

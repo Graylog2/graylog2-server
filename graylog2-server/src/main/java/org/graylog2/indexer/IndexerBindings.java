@@ -18,8 +18,16 @@ package org.graylog2.indexer;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.multibindings.OptionalBinder;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.indexset.basic.ExtendedBasicIndexSets;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
+import org.graylog2.indexer.indexset.registry.MongoIndexSetRegistry;
+import org.graylog2.indexer.indexset.restrictions.DefaultIndexSetConfigTransformer;
+import org.graylog2.indexer.indexset.restrictions.IndexSetConfigTransformer;
 import org.graylog2.indexer.indexset.template.requirement.EnterprisePluginRequirement;
 import org.graylog2.indexer.indexset.template.requirement.IndexSetTemplateRequirement;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -30,10 +38,13 @@ public class IndexerBindings extends Graylog2Module {
     protected void configure() {
         bind(IndexSetService.class).to(MongoIndexSetService.class);
 
-        install(new FactoryModuleBuilder().build(MongoIndexSet.Factory.class));
+        install(new FactoryModuleBuilder().implement(IndexSet.class, MongoIndexSet.class).build(MongoIndexSet.Factory.class));
         bind(IndexSetRegistry.class).to(MongoIndexSetRegistry.class);
 
         Multibinder.newSetBinder(binder(), IndexSetTemplateRequirement.class).addBinding().to(EnterprisePluginRequirement.class);
         Multibinder.newSetBinder(binder(), OpenIndexSetFilterFactory.class);
+        Multibinder.newSetBinder(binder(), ExtendedBasicIndexSets.class);
+
+        OptionalBinder.newOptionalBinder(binder(), IndexSetConfigTransformer.class).setDefault().to(DefaultIndexSetConfigTransformer.class);
     }
 }

@@ -14,21 +14,25 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import isNumber from 'lodash/isNumber';
+
 import type { AggregationWidgetConfigBuilder } from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import type AggregationWidgetConfig from 'views/logic/aggregationbuilder/AggregationWidgetConfig';
 import Series, { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import SeriesConfig from 'views/logic/aggregationbuilder/SeriesConfig';
+import { thresholdsSupportedVisualizations } from 'views/Constants';
 
 import MetricsConfiguration from './MetricsConfiguration';
 
 import type { AggregationElement } from '../AggregationElementType';
-import type { WidgetConfigFormValues, MetricFormValues } from '../WidgetConfigForm';
+import type { WidgetConfigFormValues, MetricFormValues, VisualizationFormValues } from '../WidgetConfigForm';
 
-type MetricError = {
+export type MetricError = {
   function?: string;
   field?: string;
   percentile?: string;
   name?: string;
+  thresholds?: Array<{ value: string }>;
 };
 
 const hasErrors = <T extends {}>(errors: Array<T>): boolean =>
@@ -63,6 +67,16 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
       metricError.name = 'Name must be unique.';
     }
 
+    const thresholdErrors: MetricError['thresholds'] = metric?.thresholds?.map((threshold) => {
+      if (!isNumber(threshold?.value)) return { value: 'Threshold value is required.' };
+
+      return undefined;
+    });
+
+    if (thresholdErrors?.filter((thresholdError) => !!thresholdError?.value).length) {
+      metricError.thresholds = thresholdErrors;
+    }
+
     return metricError;
   });
 
@@ -82,14 +96,23 @@ export const parameterForMetric = (metric: MetricFormValues) => {
 
 const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
 
-// SeriesAlso has parameter it defines here
-export const metricToSeries = (metric: MetricFormValues) =>
-  Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
-    .toBuilder()
-    .config(SeriesConfig.empty().toBuilder().name(metric.name).build())
-    .build();
+export const metricToSeries = (metric: MetricFormValues, visualization?: VisualizationFormValues) =>
+    Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
+      .toBuilder()
+      .config(
+        SeriesConfig.empty()
+          .toBuilder()
+          .name(metric.name)
+          .thresholds(
+            visualization && metric?.showThresholds && thresholdsSupportedVisualizations.includes(visualization.type)
+              ? metric.thresholds
+              : null,
+          )
+          .build(),
+      )
+      .build()
 
-export const metricsToSeries = (formMetrics: Array<MetricFormValues>) => formMetrics.map(metricToSeries);
+export const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: VisualizationFormValues) => formMetrics.map(metricToSeries, visualization);
 
 export const seriesToMetrics = (series: Array<Series>) =>
   series.map((s: Series) => {
@@ -99,6 +122,8 @@ export const seriesToMetrics = (series: Array<Series>) =>
       function: func,
       field,
       name: s.config?.name,
+      thresholds: s.config.thresholds,
+      showThresholds: !!s.config.thresholds?.length,
     };
 
     if (percentile) {
@@ -130,7 +155,7 @@ const MetricElement: AggregationElement<'metrics'> = {
     metrics: seriesToMetrics(config.series),
   }),
   toConfig: (formValues: WidgetConfigFormValues, configBuilder: AggregationWidgetConfigBuilder) =>
-    configBuilder.series(metricsToSeries(formValues.metrics)),
+    configBuilder.series(metricsToSeries(formValues.metrics, formValues.visualization)),
   onRemove: (index, formValues) => ({
     ...formValues,
     metrics: formValues.metrics.filter((_value, i) => index !== i),

@@ -132,29 +132,29 @@ const ToolsStore = {
 
     return promise;
   },
-  urlWhiteListCheck(urlToCheck: string): Promise<{
+  urlAllowListCheck(urlToCheck: string): Promise<{
     url: string;
-    is_whitelisted: boolean;
+    is_allowlisted: boolean;
   }> {
-    const { url } = ApiRoutes.ToolsApiController.urlWhitelistCheck();
+    const { url } = ApiRoutes.ToolsApiController.urlAllowlistCheck();
     const promise = fetch('POST', qualifyUrl(url), {
       url: urlToCheck,
     });
 
     promise.catch((errorThrown) => {
-      UserNotification.error(`Details: ${errorThrown}`, 'Could not verify if the url is in the whitelist.');
+      UserNotification.error(`Details: ${errorThrown}`, 'Could not verify if the url is in the allowlist.');
     });
 
     return promise;
   },
-  urlWhiteListGenerateRegex(
+  urlAllowListGenerateRegex(
     urlTemplate: string,
     placeholder: string,
   ): Promise<{
     url_template: string;
     placeholder: string;
   }> {
-    const { url } = ApiRoutes.ToolsApiController.urlWhitelistGenerateRegex();
+    const { url } = ApiRoutes.ToolsApiController.urlAllowlistGenerateRegex();
     const promise = fetch('POST', qualifyUrl(url), {
       url_template: urlTemplate,
       placeholder,

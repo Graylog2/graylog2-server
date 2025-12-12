@@ -18,7 +18,7 @@ import React, { useState } from 'react';
 
 import AppConfig from 'util/AppConfig';
 import { Button, Row, Col } from 'components/bootstrap';
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import { CreateIndexSet, IndicesPageNavigation } from 'components/indices';
 import DocsHelper from 'util/DocsHelper';
 import SelectIndexSetTemplateProvider from 'components/indices/IndexSetTemplates/contexts/SelectedIndexSetTemplateProvider';
@@ -44,7 +44,11 @@ const IndexSetCreationPage = () => {
               title: 'Index model documentation',
               path: DocsHelper.PAGES.INDEX_MODEL,
             }}
-            actions={<SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />}>
+            actions={
+              <IfPermitted permissions="indexset_templates:read">
+                <SelectTemplateButton onClick={() => setShowSelectTemplateModal(true)} />
+              </IfPermitted>
+            }>
             <span>
               Create a new index set that will let you configure the retention, sharding, and replication of messages
               coming from one or more streams.

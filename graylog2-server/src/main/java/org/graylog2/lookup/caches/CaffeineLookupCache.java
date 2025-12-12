@@ -35,7 +35,6 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.Min;
-import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupCacheKey;
@@ -84,14 +83,14 @@ public class CaffeineLookupCache extends LookupCache {
                                String name,
                                LookupCacheConfiguration c,
                                MetricRegistry metricRegistry,
-                               Ticker fakeTicker) {
+                               Ticker ticker) {
         super(id, name, c, metricRegistry);
         config = (Config) c;
         cache = Caffeine.newBuilder()
                 .recordStats(() -> new MetricStatsCounter(this))
                 .maximumSize(config.maxSize())
                 .expireAfter(buildExpiry(config))
-                .ticker(fakeTicker)
+                .ticker(ticker)
                 .build();
     }
 
@@ -256,7 +255,6 @@ public class CaffeineLookupCache extends LookupCache {
 
     @JsonAutoDetect
     @AutoValue
-    @WithBeanGetter
     @JsonDeserialize(builder = AutoValue_CaffeineLookupCache_Config.Builder.class)
     @JsonTypeName(NAME)
     public abstract static class Config implements LookupCacheConfiguration {

@@ -32,7 +32,7 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 public abstract class AlertImpl implements Alert {
-    static final String FIELD_ID = "_id";
+    static final String FIELD_ID = "id";
     static final String FIELD_CONDITION_ID = "condition_id";
     static final String FIELD_STREAM_ID = "stream_id";
     static final String FIELD_DESCRIPTION = "description";

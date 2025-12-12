@@ -56,7 +56,7 @@ public class ClientCertGenerator {
     }
 
     public ClientCert generateClientCert(final String principal,
-                                         final String role,
+                                         final List<String> roles,
                                          @Nullable final String privateKeyPassword,
                                          Duration certificateLifetime) throws ClientCertGenerationException {
 
@@ -68,8 +68,10 @@ public class ClientCertGenerator {
             final InMemoryKeystoreInformation keystoreInformation = new InMemoryKeystoreInformation(keystore, randomKeystorePassword.toCharArray());
             var csr = CsrGenerator.generateCSR(keystoreInformation, alias, principal, List.of(principal));
             final CertificateChain certChain = caKeystore.signCertificateRequest(new CertificateSigningRequest(principal, csr), certificateLifetime);
-            securityAdapter.addUserToRoleMapping(role, principal);
-            return toClientCert(principal, role, certChain, keyPair, privateKeyPassword);
+            roles.forEach(role -> {
+                securityAdapter.addUserToRoleMapping(role, principal);
+            });
+            return toClientCert(principal, roles, certChain, keyPair, privateKeyPassword);
         } catch (Exception e) {
             throw new ClientCertGenerationException("Failed to generate client certificate: " + e.getMessage(), e);
         }
@@ -88,11 +90,11 @@ public class ClientCertGenerator {
     }
 
     @Nonnull
-    private ClientCert toClientCert(String principal, String role, CertificateChain certChain, KeyPair keyPair, @Nullable String privateKeyPassword) throws IOException, OperatorCreationException {
+    private ClientCert toClientCert(String principal, List<String> roles, CertificateChain certChain, KeyPair keyPair, @Nullable String privateKeyPassword) throws IOException, OperatorCreationException {
         final String caCertificate = serializeAsPEM(certChain.caCertificates().iterator().next());
         final String privateKey = serializePrivateKey(keyPair.privateKey(), privateKeyPassword);
         final String certificate = serializeAsPEM(certChain.signedCertificate());
-        return new ClientCert(principal, role, caCertificate, privateKey, certificate);
+        return new ClientCert(principal, roles, caCertificate, privateKey, certificate);
     }
 
     private String serializePrivateKey(PrivateKey privateKey, @Nullable String privateKeyPassword) throws IOException, OperatorCreationException {

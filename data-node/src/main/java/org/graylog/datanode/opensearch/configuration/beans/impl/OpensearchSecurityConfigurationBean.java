@@ -66,14 +66,14 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
      * The target configuration is regenerated during each startup, so it could also be a random filename
      * as long as we use the same name as a copy-target and opensearch config property.
      */
-    private static final String TARGET_DATANODE_HTTP_KEYSTORE_FILENAME = "http-keystore.p12";
+    public static final String TARGET_DATANODE_HTTP_KEYSTORE_FILENAME = "http-keystore.p12";
     /**
      * This filename is used only internally - we copy user-provided certificates to this location and
      * we configure opensearch to read this file. It doesn't have to match naming provided by user.
      * The target configuration is regenerated during each startup, so it could also be a random filename
      * as long as we use the same name as a copy-target and opensearch config property.
      */
-    private static final String TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME = "transport-keystore.p12";
+    public static final String TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME = "transport-keystore.p12";
 
     private static final Path TRUSTSTORE_FILE = Path.of("datanode-truststore.p12");
 
@@ -101,47 +101,30 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
                 .map(OpensearchCertificatesProvider::build);
 
         configurationBuilder.securityConfigured(opensearchCertificates.isPresent()); // Caution, this may include insecure_startup config with no certs!
+        opensearchCertificates.ifPresent(configurationBuilder::opensearchCertificates);
 
-        final String truststorePassword = RandomStringUtils.randomAlphabetic(256);
+        final String truststorePassword = RandomStringUtils.secure().nextAlphabetic(256);
 
         final TruststoreCreator truststoreCreator = TruststoreCreator.newDefaultJvm()
                 .addCertificates(opensearchConfigurationParams.trustedCertificates());
 
-        final Optional<KeystoreInformation> httpCert = opensearchCertificates
-                .map(OpensearchCertificates::getHttpCertificate);
 
-        final Optional<KeystoreInformation> transportCert = opensearchCertificates
-                .map(OpensearchCertificates::getTransportCertificate);
-
-        httpCert.ifPresent(cert -> {
+        opensearchCertificates.filter(OpensearchCertificates::hasCertificates).ifPresent(c -> {
             try {
-                configurationBuilder.httpCertificate(cert);
-                configurationBuilder.withConfigFile(new KeystoreConfigFile(Path.of(TARGET_DATANODE_HTTP_KEYSTORE_FILENAME), cert));
-                truststoreCreator.addCertificates(cert);
-                logCertificateInformation("HTTP certificate", cert);
-            } catch (GeneralSecurityException | IOException e) {
-                throw new OpensearchConfigurationException(e);
-            }
-        });
-
-        transportCert.ifPresent(cert -> {
-            try {
-                configurationBuilder.transportCertificate(cert);
-                configurationBuilder.withConfigFile(new KeystoreConfigFile(Path.of(TARGET_DATANODE_TRANSPORT_KEYSTORE_FILENAME), cert));
-                truststoreCreator.addCertificates(cert);
-                logCertificateInformation("Transport certificate", cert);
-            } catch (GeneralSecurityException | IOException e) {
-                throw new OpensearchConfigurationException(e);
+                truststoreCreator.addCertificates(new InMemoryKeystoreInformation(c.getHttpKeystore().get(), c.getPassword()));
+                truststoreCreator.addCertificates(new InMemoryKeystoreInformation(c.getTransportKeystore().get(), c.getPassword()));
+            } catch (IOException | GeneralSecurityException e) {
+                throw new RuntimeException(e);
             }
         });
 
         return configurationBuilder
                 .properties(properties(opensearchCertificates))
-                .keystoreItems(keystoreItems(truststorePassword, httpCert, transportCert))
+                .keystoreItems(keystoreItems(truststorePassword, opensearchCertificates))
                 .javaOpts(javaOptions(truststorePassword))
                 .trustStore(truststoreCreator.getTruststore())
                 .withConfigFile(truststoreFile(truststoreCreator, truststorePassword))
-                .withConfigFile(new OpensearchSecurityConfigurationFile(jwtSecret))
+                .withConfigFile(new OpensearchSecurityConfigurationFile(jwtSecret, localConfiguration.getIndexerJwtAuthTokenClockSkewTolerance()))
                 .build();
     }
 
@@ -163,7 +146,7 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
         config.put("plugins.security.restapi.admin.enabled", "true");
 
 
-        if (opensearchCertificates.map(OpensearchCertificates::hasBothCertificates).orElse(false)) {
+        if (opensearchCertificates.map(OpensearchCertificates::hasCertificates).orElse(false)) {
             config.putAll(commonSecurityConfig());
 
             config.put("plugins.security.ssl.transport.keystore_type", KEYSTORE_FORMAT);
@@ -207,6 +190,8 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
         final ImmutableMap.Builder<String, String> config = ImmutableMap.builder();
         config.put("plugins.security.disabled", "false");
 
+        config.put("plugins.security.ssl.certificates_hot_reload.enabled", "true");
+
         config.put("plugins.security.nodes_dn", "CN=*");
         config.put("plugins.security.allow_default_init_securityindex", "true");
         //config.put("plugins.security.authcz.admin_dn", "CN=kirk,OU=client,O=client,L=test,C=de");
@@ -214,18 +199,20 @@ public class OpensearchSecurityConfigurationBean implements DatanodeConfiguratio
         config.put("plugins.security.enable_snapshot_restore_privilege", "true");
         config.put("plugins.security.check_snapshot_restore_write_privileges", "true");
         config.put("plugins.security.restapi.roles_enabled", "all_access,security_rest_api_access,readall");
-        config.put("plugins.security.system_indices.enabled", "true");
-        config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store");
+        config.put("plugins.security.system_indices.enabled", "false");
+//        config.put("plugins.security.system_indices.indices", ".plugins-ml-model,.plugins-ml-task,.opendistro-alerting-config,.opendistro-alerting-alert*,.opendistro-anomaly-results*,.opendistro-anomaly-detector*,.opendistro-anomaly-checkpoints,.opendistro-anomaly-detection-state,.opendistro-reports-*,.opensearch-notifications-*,.opensearch-notebooks,.opensearch-observability,.opendistro-asynchronous-search-response*,.replication-metadata-store,.opendistro-ism-config,.opendistro-job-scheduler-lock");
 
         return config.build();
     }
 
-    private Collection<OpensearchKeystoreItem> keystoreItems(String truststorePassword, Optional<KeystoreInformation> httpCert, Optional<KeystoreInformation> transportCert) {
+    private Collection<OpensearchKeystoreItem> keystoreItems(String truststorePassword, Optional<OpensearchCertificates> reloadableCertificates) {
         final ImmutableList.Builder<OpensearchKeystoreItem> config = ImmutableList.builder();
-        config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.transport.truststore_password_secure", new String(truststorePassword)));
-        config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.http.truststore_password_secure", new String(truststorePassword)));
-        httpCert.ifPresent(c -> config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.http.keystore_password_secure", new String(c.password()))));
-        transportCert.ifPresent(c -> config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.transport.keystore_password_secure", new String(c.password()))));
+        config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.transport.truststore_password_secure", truststorePassword));
+        config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.http.truststore_password_secure", truststorePassword));
+        reloadableCertificates.map(OpensearchCertificates::getPassword).map(String::new).ifPresent(p -> {
+            config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.http.keystore_password_secure", p));
+            config.add(new OpensearchKeystoreStringItem("plugins.security.ssl.transport.keystore_password_secure", p));
+        });
         return config.build();
     }
 

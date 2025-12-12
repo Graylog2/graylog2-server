@@ -16,19 +16,19 @@
  */
 package org.graylog.plugins.views.search.views;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.security.entities.EntityRegistrar;
-import org.graylog.testing.ObjectMapperExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
+import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
+import org.graylog2.database.entities.source.EntitySourceService;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.rest.models.SortOrder;
@@ -50,7 +50,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
-@ExtendWith(ObjectMapperExtension.class)
+@ExtendWith(MongoJackExtension.class)
 public class ViewServiceTest {
     private ViewService dbService;
 
@@ -58,12 +58,10 @@ public class ViewServiceTest {
     private MongoDBTestService mongodb;
 
     @BeforeEach
-    public void setUp(MongoDBTestService mongodb, ObjectMapper objectMapper) throws Exception {
+    public void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider mongoJackObjectMapperProvider, MongoCollections mongoCollections) throws Exception {
         this.mongodb = mongodb;
-        final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
-        final MongoCollections mongoCollections = new MongoCollections(objectMapperProvider, mongodb.mongoConnection());
         ClusterConfigServiceImpl clusterConfigService = new ClusterConfigServiceImpl(
-                objectMapperProvider,
+                mongoJackObjectMapperProvider,
                 mongodb.mongoConnection(),
                 new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000"),
                 new RestrictedChainingClassLoader(
@@ -75,6 +73,7 @@ public class ViewServiceTest {
                 view -> new ViewRequirements(Collections.emptySet(), view),
                 mock(EntityRegistrar.class),
                 mock(ViewSummaryService.class),
+                mock(EntitySourceService.class),
                 mongoCollections);
         this.searchUser = TestSearchUser.builder().build();
     }

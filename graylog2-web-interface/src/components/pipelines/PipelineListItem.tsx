@@ -50,7 +50,7 @@ const PipelineNameTD = styled.td`
 const StreamListTD = styled.td`
   max-width: 150px;
   width: 150px;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 `;
 
 const PipelineStage = styled.div<{ $idle?: boolean }>(

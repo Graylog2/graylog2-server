@@ -128,27 +128,23 @@ const EntityShareSettings = ({
           formRef={granteesSelectFormRef}
         />
       </Section>
-      <Section>
-        <GranteesList
-          activeShares={activeShares}
-          availableCapabilities={availableCapabilities}
+      <GranteesList
+        activeShares={activeShares}
+        availableCapabilities={availableCapabilities}
+        entityType={entityType}
+        entityTypeTitle={entityTypeTitle}
+        onDelete={_handleDeletion}
+        onCapabilityChange={_handleSelection}
+        selectedGrantees={selectedGrantees}
+        title="Direct Collaborators"
+      />
+      {CollectionGranteeList && (
+        <CollectionGranteeList
+          title="Shared via Collections"
           entityType={entityType}
           entityTypeTitle={entityTypeTitle}
-          onDelete={_handleDeletion}
-          onCapabilityChange={_handleSelection}
-          selectedGrantees={selectedGrantees}
-          title="Direct Collaborators"
+          entityGRN={entityGRN}
         />
-      </Section>
-      {CollectionGranteeList && (
-        <Section>
-          <CollectionGranteeList
-            title="Collection Collaborators"
-            entityType={entityType}
-            entityTypeTitle={entityTypeTitle}
-            entityGRN={entityGRN}
-          />
-        </Section>
       )}
       <EntityShareValidationsDependencies
         missingDependencies={missingDependencies}

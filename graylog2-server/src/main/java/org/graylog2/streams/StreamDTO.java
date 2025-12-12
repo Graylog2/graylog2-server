@@ -22,9 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
-import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.database.BuildableMongoEntity;
 import org.graylog2.database.DbEntity;
+import org.graylog2.database.entities.DefaultEntityScope;
+import org.graylog2.database.entities.ScopedEntity;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.AlertReceivers;
 import org.graylog2.rest.models.streams.alerts.AlertConditionSummary;
@@ -38,12 +38,11 @@ import java.util.Set;
 import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @AutoValue
-@WithBeanGetter
 @JsonAutoDetect
 @JsonDeserialize(builder = StreamDTO.Builder.class)
 @DbEntity(collection = "streams", readPermission = STREAMS_READ)
 // Package-private to prevent usage outside the streams package.
-abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Builder> {
+abstract class StreamDTO implements ScopedEntity<StreamDTO.Builder> {
     public static final String FIELD_TITLE = "title";
     public static final String FIELD_DESCRIPTION = "description";
     public static final String FIELD_RULES = "rules";
@@ -60,6 +59,7 @@ abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Bu
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
     public static final String FIELD_IS_EDITABLE = "is_editable";
     public static final String FIELD_CATEGORIES = "categories";
+    public static final String FIELD_FAVORITE_FIELDS = "favorite_fields";
     public static final Stream.MatchingType DEFAULT_MATCHING_TYPE = Stream.MatchingType.AND;
 
     @JsonProperty(FIELD_CREATOR_USER_ID)
@@ -117,6 +117,10 @@ abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Bu
     @Nullable
     public abstract List<String> categories();
 
+    @JsonProperty(FIELD_FAVORITE_FIELDS)
+    @Nullable
+    public abstract List<String> favoriteFields();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -125,10 +129,11 @@ abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Bu
 
     @AutoValue.Builder
     // Package-private to prevent usage outside the streams package.
-    abstract static class Builder implements BuildableMongoEntity.Builder<StreamDTO, Builder> {
+    abstract static class Builder implements ScopedEntity.Builder<Builder> {
         @JsonCreator
         public static Builder create() {
             return new AutoValue_StreamDTO.Builder()
+                    .scope(DefaultEntityScope.NAME)
                     .matchingType(DEFAULT_MATCHING_TYPE)
                     .isDefault(false)
                     .isEditable(false)
@@ -136,6 +141,9 @@ abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Bu
                     .categories(List.of())
                     .outputIds(Set.of());
         }
+
+        @JsonProperty(FIELD_SCOPE)
+        public abstract Builder scope(String scope);
 
         @JsonProperty(FIELD_CREATOR_USER_ID)
         public abstract Builder creatorUserId(String creatorUserId);
@@ -184,12 +192,14 @@ abstract class StreamDTO implements BuildableMongoEntity<StreamDTO, StreamDTO.Bu
         @JsonProperty(FIELD_CATEGORIES)
         public abstract Builder categories(List<String> categories);
 
+        @JsonProperty(FIELD_FAVORITE_FIELDS)
+        public abstract Builder favoriteFields(List<String> favoriteFields);
+
         public abstract String id();
 
         public abstract StreamDTO autoBuild();
 
         public StreamDTO build() {
-            isEditable(Stream.streamIsEditable(id()));
             return autoBuild();
         }
     }

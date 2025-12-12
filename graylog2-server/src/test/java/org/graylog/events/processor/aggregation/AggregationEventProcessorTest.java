@@ -45,12 +45,13 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +62,7 @@ import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -69,11 +71,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AggregationEventProcessorTest {
     public static final int SEARCH_WINDOW_MS = 30000;
     private static final String QUERY_STRING = "aQueryString";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private AggregationSearch.Factory searchFactory;
@@ -98,7 +100,7 @@ public class AggregationEventProcessorTest {
     private EventStreamService eventStreamService;
     private final MessageFactory messageFactory = new TestMessageFactory();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(streamService.streamAllIds()).thenAnswer(inv -> java.util.stream.Stream.of(
                 "stream-1",
@@ -116,6 +118,7 @@ public class AggregationEventProcessorTest {
     @Test
     public void createEventsWithFilter() throws Exception {
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(TimeRange.class))).thenReturn(true);
+        when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
@@ -175,7 +178,7 @@ public class AggregationEventProcessorTest {
 
         // If the dependency check returns true, there should be no exception raised and the state service should be called
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(true);
-
+        when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {})).doesNotThrowAnyException();
 
         verify(stateService, times(1)).setState("dto-id-1", timerange.from(), timerange.to());

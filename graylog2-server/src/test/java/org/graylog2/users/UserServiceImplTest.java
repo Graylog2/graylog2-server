@@ -16,6 +16,7 @@
  */
 package org.graylog2.users;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
@@ -28,9 +29,10 @@ import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.security.PermissionAndRoleResolver;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
+import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBFixtures;
-import org.graylog.testing.mongodb.MongoDBInstance;
 import org.graylog2.Configuration;
+import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.users.User;
@@ -40,17 +42,19 @@ import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.security.Permissions;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.UserService;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,16 +65,15 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@ExtendWith(MongoDBExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class UserServiceImplTest {
-    @Rule
-    public final MongoDBInstance mongodb = MongoDBInstance.createForClass();
-
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private MongoConnection mongoConnection;
     private Configuration configuration;
@@ -90,16 +93,16 @@ public class UserServiceImplTest {
     @Mock
     private ClusterConfigService configService;
 
-    @Before
-    public void setUp() {
-        this.mongoConnection = mongodb.mongoConnection();
+    @BeforeEach
+    public void setUp(MongoCollections mongoCollections) {
+        this.mongoConnection = mongoCollections.connection();
         this.configuration = new Configuration();
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
         this.userFactory = new UserImplFactory(configuration, permissions, configService);
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
                 userFactory, permissionsResolver, serverEventBus, GRNRegistry.createWithBuiltinTypes(), permissionAndRoleResolver);
 
-        lenient().when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
+        lenient().when(roleService.getAdminRoleObjectId()).thenReturn("deadbeefdeadbeefdeadbeef");
         lenient().when(configService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES))
                 .thenReturn(UserConfiguration.DEFAULT_VALUES);
     }
@@ -161,10 +164,11 @@ public class UserServiceImplTest {
         assertThat(users.get(0).getEmail()).isEmpty();
     }
 
-    @Test(expected = RuntimeException.class)
+    @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadDuplicateUser() {
-        userService.load("user-duplicate");
+        assertThrows(RuntimeException.class, () ->
+            userService.load("user-duplicate"));
     }
 
     @Test
@@ -238,7 +242,7 @@ public class UserServiceImplTest {
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testLoadAll() {
-        assertThat(userService.loadAll()).hasSize(5);
+        assertThat(userService.loadAll()).hasSize(6);
     }
 
     @Test
@@ -286,14 +290,16 @@ public class UserServiceImplTest {
     @Test
     @MongoDBFixtures("UserServiceImplTest.json")
     public void testCount() {
-        assertThat(userService.count()).isEqualTo(5L);
+        assertThat(userService.count()).isEqualTo(6L);
     }
 
+    @ExtendWith(MongoDBExtension.class)
     public static class UserImplFactory implements UserImpl.Factory {
         private final Configuration configuration;
         private final Permissions permissions;
         private final PasswordAlgorithmFactory passwordAlgorithmFactory;
         private final ClusterConfigService configService;
+        private final ObjectMapper objectMapper;
 
         public UserImplFactory(Configuration configuration, Permissions permissions, ClusterConfigService configService) {
             this.configuration = configuration;
@@ -301,21 +307,22 @@ public class UserServiceImplTest {
             this.configService = configService;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.<String, PasswordAlgorithm>emptyMap(),
                     new SHA1HashPasswordAlgorithm("TESTSECRET"));
+            this.objectMapper = new ObjectMapperProvider().get();
         }
 
         @Override
         public UserImpl create(Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, fields);
         }
 
         @Override
         public UserImpl create(ObjectId id, Map<String, Object> fields) {
-            return new UserImpl(passwordAlgorithmFactory, permissions, configService, id, fields);
+            return new UserImpl(passwordAlgorithmFactory, permissions, configService, objectMapper, id, fields);
         }
 
         @Override
         public UserImpl.LocalAdminUser createLocalAdminUser(String adminRoleObjectId) {
-            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, configService, adminRoleObjectId);
+            return new UserImpl.LocalAdminUser(passwordAlgorithmFactory, configuration, configService, objectMapper, adminRoleObjectId);
         }
     }
 
@@ -377,8 +384,18 @@ public class UserServiceImplTest {
         when(permissionResolver.resolveStringPermission(roleId)).thenReturn(ImmutableSet.of("perm:from:role"));
 
         assertThat(userService.getPermissionsForUser(user).stream().map(p -> p instanceof CaseSensitiveWildcardPermission ? p.toString() : p).collect(Collectors.toSet()))
-                .containsExactlyInAnyOrder("users:passwordchange:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
+                .containsExactlyInAnyOrder("users:passwordchange:user", "users:read:user", "users:edit:user", "foo:bar", "hello:world", "users:tokenlist:user",
                         "users:tokenremove:user", "perm:from:grant", ownerShipPermission, "perm:from:role");
+    }
+
+    @Test
+    @MongoDBFixtures("UserServiceImplTest.json")
+    public void testCountByPrivilege() {
+        final Map<String, Long> counts = userService.countByPrivilege();
+
+        assertThat(counts)
+                .containsEntry("admin_users", 2L)
+                .containsEntry("non_admin_users", 4L);
     }
 
     private UserImpl createDummyUser(String username, String authServiceUid) {

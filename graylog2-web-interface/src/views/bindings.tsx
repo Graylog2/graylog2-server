@@ -121,6 +121,8 @@ import AddTextWidget, { CreateTextWidget } from 'views/logic/creatoractions/AddT
 import TextWidget from 'views/logic/widgets/TextWidget';
 import TextVisualization from 'views/components/widgets/text/TextVisualization';
 import TextWidgetEdit from 'views/components/widgets/text/TextWidgetEdit';
+import hasMultipleValueForActions from 'views/components/visualizations/utils/hasMultipleValueForActions';
+import ToggleFavoriteField from 'views/logic/fieldactions/ToggleFavoriteField';
 
 import type { ActionHandlerArguments } from './components/actions/ActionHandler';
 import NumberVisualizationConfig from './logic/aggregationbuilder/visualizations/NumberVisualizationConfig';
@@ -159,9 +161,9 @@ const exports: PluginExports = {
   },
   routes: [
     { path: newDashboardsPath, component: NewDashboardPage, parentComponent: App },
-    { path: dashboardsTvPath, component: ShowDashboardInBigDisplayMode, parentComponent: null },
+    { path: dashboardsTvPath(), component: ShowDashboardInBigDisplayMode, parentComponent: null },
     { path: dashboardsPath, component: DashboardsPage },
-    { path: showDashboardsPath, component: ShowViewPage, parentComponent: App },
+    { path: showDashboardsPath(), component: ShowViewPage, parentComponent: App },
 
     { path: newSearchPath, component: NewSearchRedirectPage, parentComponent: null },
     { path: showSearchPath, component: ShowViewPage, parentComponent: App },
@@ -243,7 +245,7 @@ const exports: PluginExports = {
     },
     {
       type: 'TEXT',
-      displayName: 'Text (Markdown) Widget',
+      displayName: 'Text/Markdown',
       defaultHeight: 3,
       defaultWidth: 3,
       hasEditSubmitButton: false,
@@ -354,6 +356,22 @@ const exports: PluginExports = {
       component: ChangeFieldType,
       help: ChangeFieldTypeHelp,
     },
+    {
+      type: 'add-field-to-favorite',
+      title: 'Add field to favorites',
+      handler: ToggleFavoriteField,
+      isEnabled: () => true,
+      resetFocus: false,
+      isHidden: (props) => ToggleFavoriteField.isHidden(true, props),
+    },
+    {
+      type: 'remove-field-to-favorite',
+      title: 'Remove field from favorites',
+      handler: ToggleFavoriteField,
+      isEnabled: () => true,
+      resetFocus: false,
+      isHidden: (props) => ToggleFavoriteField.isHidden(false, props),
+    },
   ],
   valueActions: filterCloudValueActions(
     [
@@ -361,14 +379,16 @@ const exports: PluginExports = {
         type: 'exclude',
         title: 'Exclude from results',
         thunk: ExcludeFromQueryHandler,
-        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        isEnabled: ({ field, type, contexts }: ActionHandlerArguments) =>
+          (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
       {
         type: 'add-to-query',
         title: 'Add to query',
         thunk: AddToQueryHandler,
-        isEnabled: ({ field, type }: ActionHandlerArguments) => !isFunction(field) && !type.isDecorated(),
+        isEnabled: ({ field, type, contexts }: ActionHandlerArguments) =>
+          (!isFunction(field) || hasMultipleValueForActions(contexts)) && !type.isDecorated(),
         resetFocus: false,
       },
       {
@@ -396,7 +416,7 @@ const exports: PluginExports = {
         type: 'copy-value-to-clipboard',
         title: 'Copy value to clipboard',
         handler: CopyValueToClipboard,
-        isEnabled: () => true,
+        isEnabled: CopyValueToClipboard.isEnabled,
         resetFocus: false,
       },
       {
@@ -433,7 +453,7 @@ const exports: PluginExports = {
       icon: () => <Icon name="report" type="regular" />,
     },
     {
-      title: 'Text (Markdown) Widget',
+      title: 'Text/Markdown',
       func: CreateTextWidget,
       icon: () => <Icon name="description" />,
     },
@@ -461,7 +481,7 @@ const exports: PluginExports = {
     },
     {
       type: 'generic',
-      title: 'Text (Markdown) Widget',
+      title: 'Text/Markdown',
       func: AddTextWidget,
     },
   ],

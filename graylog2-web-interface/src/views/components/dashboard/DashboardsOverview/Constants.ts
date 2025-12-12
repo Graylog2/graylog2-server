@@ -21,31 +21,30 @@ const getDashboardTableElements = (pluggableAttributes?: {
   attributeNames?: Array<string>;
   attributes?: Array<Attribute>;
 }) => {
-  const getDefaultLayout = (isEvidenceModal: boolean) => ({
+  const getDefaultLayout = (hideAdditionalColumns: boolean) => ({
     entityTableId: 'dashboards',
     defaultPageSize: 20,
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-    defaultDisplayedAttributes: isEvidenceModal
+    defaultDisplayedAttributes: hideAdditionalColumns
       ? ['title', 'description', 'summary']
       : ['title', 'description', 'summary', 'favorite', ...(pluggableAttributes?.attributeNames || [])],
+    defaultColumnOrder: [
+      'title',
+      'summary',
+      'description',
+      'owner',
+      '_entity_source.source',
+      'created_at',
+      'last_updated_at',
+      ...(pluggableAttributes?.attributeNames || []),
+      'favorite',
+    ],
   });
-
-  const columnOrder = [
-    'title',
-    'summary',
-    'description',
-    'owner',
-    'created_at',
-    'last_updated_at',
-    'favorite',
-    ...(pluggableAttributes?.attributeNames || []),
-  ];
 
   const additionalAttributes = [...(pluggableAttributes?.attributes || [])];
 
   return {
     getDefaultLayout,
-    columnOrder,
     additionalAttributes,
   };
 };

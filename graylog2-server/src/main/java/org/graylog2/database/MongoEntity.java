@@ -26,6 +26,8 @@ import org.mongojack.ObjectId;
  */
 public interface MongoEntity {
 
+    String FIELD_ID = "id";
+
     /**
      * ID of the entity. Will be stored as field "_id" with type ObjectId in MongoDB.
      *
@@ -34,6 +36,6 @@ public interface MongoEntity {
     @Nullable
     @ObjectId
     @Id
-    @JsonProperty("id")
+    @JsonProperty(FIELD_ID)
     String id();
 }

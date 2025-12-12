@@ -45,6 +45,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.ListConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
@@ -118,6 +119,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveMultipleFi
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveSingleField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveStringFieldsByValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameFields;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -150,7 +152,6 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConvers
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
-import org.graylog.plugins.pipelineprocessor.functions.urls.URL;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlEncode;
@@ -236,6 +237,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(MapConversion.NAME, new MapConversion());
+        functions.put(ListConversion.NAME, new ListConversion());
         functions.put(HexToDecimalConversion.NAME, new HexToDecimalConversion());
 
         // message related functions
@@ -243,6 +245,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SetField.NAME, new SetField());
         functions.put(SetFields.NAME, new SetFields());
         functions.put(RenameField.NAME, new RenameField());
+        functions.put(RenameFields.NAME, new RenameFields());
         functions.put(RemoveField.NAME, new RemoveField());
         functions.put(RemoveSingleField.NAME, new RemoveSingleField());
         functions.put(RemoveMultipleFields.NAME, new RemoveMultipleFields());
@@ -1028,6 +1031,28 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    void renameFields() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = messageFactory.createMessage("bulk rename", "bulk-source", Tools.nowUTC());
+        in.addField("old_field_one", "value-1");
+        in.addField("old_field_two", 42);
+        in.addField("present", "value");
+        in.addField("unchanged_field", "still-here");
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.hasField("old_field_one")).isFalse();
+        assertThat(message.hasField("old_field_two")).isFalse();
+        assertThat(message.getField("new_field_one")).isEqualTo("value-1");
+        assertThat(message.getField("new_field_two")).isEqualTo(42);
+        assertThat(message.getField("unchanged_field")).isEqualTo("still-here");
+        assertThat(message.hasField("present")).isFalse();
+        assertThat(message.getField("renamed")).isEqualTo("value");
+        assertThat(message.hasField("ignored_new_name")).isFalse();
+    }
+
+    @Test
     void normalizeFields() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
 
@@ -1149,6 +1174,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
         assertThat(message.getField("map_default_null")).isNull();
         assertThat(message.getField("map_default_null_set_single_field")).isNull();
+
+        assertThat(message.getField("list_1")).isEqualTo(List.of("foo"));
+        assertThat(message.getField("list_2")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_3")).isEqualTo(Collections.emptyList());
+        assertThat(message.getField("list_default_null_set_single_field")).isNull();
     }
 
     @Test

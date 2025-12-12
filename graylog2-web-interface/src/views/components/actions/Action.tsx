@@ -17,8 +17,9 @@
 import * as React from 'react';
 import { useCallback, useState } from 'react';
 
-import type { ActionHandlerArguments, ActionComponents } from 'views/components/actions/ActionHandler';
+import type { ActionHandlerArguments } from 'views/components/actions/ActionHandler';
 import OverlayDropdown from 'components/common/OverlayDropdown';
+import useOverflowingComponents from 'views/hooks/useOverflowingComponents';
 
 import ActionDropdown from './ActionDropdown';
 
@@ -32,8 +33,8 @@ type Props = {
 
 const Action = ({ type, handlerArgs, menuContainer, element: Element, children }: Props) => {
   const [open, setOpen] = useState(false);
-  const [overflowingComponents, setOverflowingComponents] = useState<ActionComponents>({});
-
+  const { overflowingComponents, setOverflowingComponents, isFromContext } = useOverflowingComponents();
+  const _onMenuClose = useCallback(() => setOpen(false), []);
   const _onMenuToggle = useCallback(() => setOpen(!open), [open]);
   const overflowingComponentsValues: Array<React.ReactNode> = Object.values(overflowingComponents);
   const element = (
@@ -50,8 +51,8 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
         toggleChild={element}
         placement="right"
         onToggle={_onMenuToggle}
-        menuContainer={menuContainer}
-        dropdownZIndex={1031}>
+        onClose={_onMenuClose}
+        menuContainer={menuContainer}>
         <ActionDropdown
           handlerArgs={handlerArgs}
           type={type}
@@ -61,7 +62,7 @@ const Action = ({ type, handlerArgs, menuContainer, element: Element, children }
           {children}
         </ActionDropdown>
       </OverlayDropdown>
-      {overflowingComponentsValues}
+      {!isFromContext && overflowingComponentsValues}
     </>
   );
 };

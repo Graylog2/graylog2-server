@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
@@ -41,12 +42,6 @@ const renderProfileForm = ({ initialValues }) =>
 jest.mock('views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypesForMappings', () => jest.fn());
 
 jest.mock('views/logic/fieldtypes/useFieldTypes', () => jest.fn());
-
-const selectItem = async (select: HTMLElement, option: string | RegExp) => {
-  selectEvent.openMenu(select);
-
-  return selectEvent.select(select, option);
-};
 
 describe('IndexSetFieldTypesList', () => {
   useViewsPlugin();
@@ -77,7 +72,7 @@ describe('IndexSetFieldTypesList', () => {
     });
 
     const submitButton = await screen.findByLabelText('Submit');
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });
@@ -92,18 +87,17 @@ describe('IndexSetFieldTypesList', () => {
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
-    fireEvent.click(addMappingButton);
+    await userEvent.click(addMappingButton);
 
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectItem(typeSecond, 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('String type')).toHaveLength(2);
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });
@@ -118,20 +112,18 @@ describe('IndexSetFieldTypesList', () => {
 
     const addMappingButton = await screen.findByRole('button', { name: /add mapping/i });
 
-    fireEvent.click(addMappingButton);
+    await userEvent.click(addMappingButton);
 
-    const fieldSecond = await screen.findByLabelText(/select customFieldMappings.1.field/i);
-    const typeSecond = await screen.findByLabelText(/select customFieldMappings.1.type/i);
     const submitButton = await screen.findByLabelText('Submit');
 
-    await selectItem(typeSecond, 'String type');
-    await selectItem(fieldSecond, 'http_method');
+    await selectEvent.chooseOption('select customFieldMappings.1.type', 'String type');
+    await selectEvent.chooseOption('select customFieldMappings.1.field', 'http_method');
 
     await waitFor(async () => {
       expect(screen.queryAllByText('http_method')).toHaveLength(2);
     });
 
-    fireEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     expect(mockSubmit).not.toHaveBeenCalled();
   });

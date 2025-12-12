@@ -62,6 +62,7 @@ const SUT = (props: Partial<React.ComponentProps<typeof DataTableEntry>>) => (
   <table>
     <tbody>
       <DataTableEntry
+        index={1}
         columnPivots={columnPivots}
         columnPivotValues={columnPivotValues}
         fields={fields}
@@ -70,6 +71,7 @@ const SUT = (props: Partial<React.ComponentProps<typeof DataTableEntry>>) => (
         types={List([])}
         valuePath={valuePath}
         units={UnitsConfig.empty()}
+        showRowNumbers
         {...props}
       />
     </tbody>

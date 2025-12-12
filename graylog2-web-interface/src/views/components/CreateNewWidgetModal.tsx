@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import upperCase from 'lodash/upperCase';
 
@@ -28,8 +28,7 @@ import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { addWidget } from 'views/logic/slices/widgetActions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import { getPathnameWithoutId } from 'util/URLUtils';
-import useLocation from 'routing/useLocation';
+import WidgetFocusContext from 'views/components/contexts/WidgetFocusContext';
 
 const modalTitle = 'Create new widget';
 
@@ -54,7 +53,7 @@ const ButtonInner = styled.div`
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
   white-space: break-spaces;
   text-align: center;
   gap: 0.3rem;
@@ -75,22 +74,24 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
   const creators = usePluginEntities('widgetCreators');
   const view = useView();
   const dispatch = useViewsDispatch();
-  const location = useLocation();
   const sendTelemetry = useSendTelemetry();
+  const { setWidgetEditing } = useContext(WidgetFocusContext);
 
   const widgetButtons = useMemo(
     () =>
       creators.map(({ title, func, icon: WidgetIcon }) => {
         const onClick = async () => {
           sendTelemetry(TELEMETRY_EVENT_TYPE.SEARCH_WIDGET_CREATE[upperCase(title).replace(/ /g, '_')], {
-            app_pathname: getPathnameWithoutId(location.pathname),
             app_section: 'search-widget',
           });
 
           const newId = generateId();
           const newWidget = func({ view }).toBuilder().id(newId).build();
 
-          return dispatch(addWidget(newWidget, position));
+          const result = await dispatch(addWidget(newWidget, position));
+          await setWidgetEditing(newId);
+
+          return result;
         };
 
         return (
@@ -104,7 +105,7 @@ const CreateNewWidgetModal = ({ onCancel, position }: Props) => {
           </CreateWidgetButton>
         );
       }),
-    [creators, dispatch, location.pathname, position, sendTelemetry, view],
+    [creators, dispatch, position, sendTelemetry, setWidgetEditing, view],
   );
 
   return (

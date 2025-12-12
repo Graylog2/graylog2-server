@@ -20,7 +20,7 @@ import sum from 'lodash/sum';
 import flattenDeep from 'lodash/flattenDeep';
 import type { DefaultTheme } from 'styled-components';
 
-import type { FieldUnitType } from 'views/types';
+import type { DefaultAxisKey, FieldUnitType } from 'views/types';
 import type Series from 'views/logic/aggregationbuilder/Series';
 import { parseSeries } from 'views/logic/aggregationbuilder/Series';
 import type { BarMode } from 'views/logic/aggregationbuilder/visualizations/BarVisualizationConfig';
@@ -37,8 +37,9 @@ import {
   DEFAULT_AXIS_KEY,
   TIME_AXIS_LABELS_QUANTITY,
   DECIMAL_PLACES,
-  Y_POSITION_AXIS_STEP,
   NO_FIELD_NAME_SERIES,
+  TICK_VALS_SECOND_MARGIN,
+  TICK_VALS_FIRST_MARGIN,
 } from 'views/components/visualizations/Constants';
 import type UnitsConfig from 'views/logic/aggregationbuilder/UnitsConfig';
 import getFieldNameFromTrace from 'views/components/visualizations/utils/getFieldNameFromTrace';
@@ -46,19 +47,10 @@ import type { PieHoverTemplateSettings } from 'views/components/visualizations/h
 import getDefaultPlotYLayoutSettings from 'views/components/visualizations/utils/getDefaultPlotYLayoutSettings';
 import formatValueWithUnitLabel from 'views/components/visualizations/utils/formatValueWithUnitLabel';
 
-type DefaultAxisKey = 'withoutUnit';
+export const getTickLabelShift = (axisCount: number) =>
+  axisCount > 2 ? TICK_VALS_SECOND_MARGIN : TICK_VALS_FIRST_MARGIN;
 
-const getYAxisPosition = (axisCount: number) => {
-  const diff = Math.floor(axisCount / 2) * Y_POSITION_AXIS_STEP;
-
-  if (axisCount % 2 === 0) {
-    return 1 - diff + Y_POSITION_AXIS_STEP;
-  }
-
-  return diff;
-};
-
-const getYAxisSide = (axisCount: number) => {
+export const getYAxisSide = (axisCount: number) => {
   if (axisCount % 2 === 0) {
     return 'right';
   }
@@ -66,20 +58,13 @@ const getYAxisSide = (axisCount: number) => {
   return 'left';
 };
 
-const getTicklabelPositionSettings = (axisCount: number) => {
-  switch (axisCount) {
-    case 4:
-      return { ticklabelposition: 'inside' };
-    default:
-      return {};
-  }
-};
-
 const getYAxisPositioningSettings = (axisCount: number) => ({
-  position: getYAxisPosition(axisCount),
   side: getYAxisSide(axisCount),
   overlaying: axisCount > 1 ? 'y' : undefined,
-  ...getTicklabelPositionSettings(axisCount),
+  automargin: true,
+  autoshift: true,
+  ticklabelposition: 'outside',
+  ticklabelstandoff: getTickLabelShift(axisCount),
 });
 
 const defaultSettings = {
@@ -124,7 +109,7 @@ const getFormatSettingsWithCustomTickVals = (values: Array<any>, fieldType: Fiel
   };
 };
 
-const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
+export const getFormatSettingsByData = (unitTypeKey: FieldUnitType | DefaultAxisKey, values: Array<any>) => {
   switch (unitTypeKey) {
     case 'percent':
       return {
@@ -146,11 +131,12 @@ const getUnitLayoutWithData = (
   axisCount: number,
   values: Array<any>,
   theme: DefaultTheme,
+  config: AggregationWidgetConfig,
 ) => ({
   ...getFormatSettingsByData(unitTypeKey, values),
   ...getYAxisPositioningSettings(axisCount),
   ...defaultSettings,
-  ...getDefaultPlotYLayoutSettings(theme),
+  ...getDefaultPlotYLayoutSettings(theme, unitTypeKey, config),
 });
 
 type SeriesName = string;
@@ -281,6 +267,7 @@ export const generateLayouts = ({
       const unitType = unit?.unitType ?? DEFAULT_AXIS_KEY;
 
       if (!res[unitType]) {
+        // eslint-disable-next-line no-param-reassign
         res[unitType] = [value.y];
       } else {
         res[unitType].push(value.y);
@@ -295,7 +282,7 @@ export const generateLayouts = ({
     Object.entries(unitTypeMapper).map(([unitTypeKey, { axisKeyName, axisCount }]) => {
       const unitValues = joinValues(groupYValuesByUnitTypeKey[unitTypeKey], barmode);
 
-      return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme)];
+      return [axisKeyName, getUnitLayoutWithData(unitTypeKey as FieldUnitType, axisCount, unitValues, theme, config)];
     }),
   );
 };
@@ -318,16 +305,16 @@ const getHoverTexts = ({ convertedValues, unit }: { convertedValues: Array<any>;
 export const getHoverTemplateSettings = ({
   convertedValues,
   unit,
-  name,
+  name = undefined,
 }: {
   convertedValues: Array<any>;
   unit: FieldUnit;
-  name: string;
+  name?: string;
 }): { text: Array<string>; hovertemplate: string; meta: string } | {} => {
   if (unit?.unitType === 'time' || unit?.unitType === 'size') {
     return {
       text: getHoverTexts({ convertedValues, unit }),
-      hovertemplate: '%{text}<br><extra>%{meta}</extra>',
+      hovertemplate: `%{text}<br>${name ? '<extra>%{meta}</extra>' : '<extra></extra>'}`,
       meta: name,
     };
   }

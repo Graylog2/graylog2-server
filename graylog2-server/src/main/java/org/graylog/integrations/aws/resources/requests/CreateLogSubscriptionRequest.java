@@ -20,10 +20,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
-@WithBeanGetter
 @JsonDeserialize(builder = CreateLogSubscriptionRequest.Builder.class)
 public abstract class CreateLogSubscriptionRequest implements AWSRequest {
 

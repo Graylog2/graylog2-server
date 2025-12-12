@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, fireEvent, waitFor, screen } from 'wrappedTestingLibrary';
-import { act } from 'react';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import asMock from 'helpers/mocking/AsMock';
 import { createEntityShareState, everyone, viewer } from 'fixtures/entityShareState';
 import { EntityShareStore, EntityShareActions } from 'stores/permissions/EntityShareStore';
-import MockComponent from 'helpers/mocking/MockComponent';
 import usePluggableEntityShareFormGroup from 'hooks/usePluggableEntityShareFormGroup';
 
 import EntityCreateShareFormGroup from './EntityCreateShareFormGroup';
@@ -60,7 +59,7 @@ const SUT = ({ ...props }) => (
 describe('EntityCreateShareFormGroup', () => {
   beforeEach(() => {
     asMock(EntityShareStore.getInitialState).mockReturnValue({ state: createEntityShareState });
-    asMock(usePluggableEntityShareFormGroup).mockReturnValue(MockComponent('FormGroup'));
+    asMock(usePluggableEntityShareFormGroup).mockReturnValue(() => <span />);
   });
 
   beforeAll(() => {
@@ -75,12 +74,7 @@ describe('EntityCreateShareFormGroup', () => {
     render(<SUT />);
 
     await waitFor(() => {
-      expect(EntityShareActions.prepare).toHaveBeenCalledWith(
-        mockEntity.entityType,
-        '',
-        mockEntity.entityId,
-        undefined,
-      );
+      expect(EntityShareActions.prepare).toHaveBeenCalledWith(mockEntity.entityType, '', mockEntity.entityId, {});
     });
   });
 
@@ -88,33 +82,18 @@ describe('EntityCreateShareFormGroup', () => {
     const mockOnSetEntityShare = jest.fn();
 
     render(<SUT onSetEntityShare={mockOnSetEntityShare} />);
+
     // Select a grantee
-    const granteesSelect = await screen.findByLabelText('Search for users and teams');
-
-    await act(async () => {
-      await selectEvent.openMenu(granteesSelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(granteesSelect, everyone.title);
-    });
+    await selectEvent.chooseOption('Search for users and teams', everyone.title);
 
     // Select a capability
-    const capabilitySelect = await screen.findByLabelText('Select a capability');
-
-    await act(async () => {
-      await selectEvent.openMenu(capabilitySelect);
-    });
-
-    await act(async () => {
-      await selectEvent.select(capabilitySelect, viewer.title);
-    });
+    await selectEvent.chooseOption('Select a capability', viewer.title);
 
     const addCollaborator = await screen.findByRole('button', {
       name: /add collaborator/i,
     });
 
-    fireEvent.click(addCollaborator);
+    await userEvent.click(addCollaborator);
 
     await waitFor(() => {
       expect(EntityShareActions.prepare).toHaveBeenCalledWith('stream', '', null, {

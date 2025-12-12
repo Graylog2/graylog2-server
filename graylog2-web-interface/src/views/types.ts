@@ -39,6 +39,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import type Query from 'views/logic/queries/Query';
 import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange, QueryId } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
@@ -47,7 +48,6 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
-import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
@@ -64,6 +64,9 @@ import type { PluggableReducer } from 'store';
 import type { WidgetMapping } from 'views/logic/views/types';
 import type { ValueRendererProps } from 'views/components/messagelist/decoration/ValueRenderer';
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
+import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
+import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -130,8 +133,9 @@ type BaseField = {
   title: string;
   name: string;
   helpComponent?: React.ComponentType;
+  inputHelp?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) => string;
   description?: string;
-  isShown?: (formValues: VisualizationConfigFormValues) => boolean;
+  isShown?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues?: WidgetConfigFormValues) => boolean;
 };
 
 type BaseRequiredField = BaseField & {
@@ -157,7 +161,25 @@ export type NumericField = BaseRequiredField & {
   step?: string;
 };
 
-export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField;
+export type TextField = BaseField & {
+  type: 'text';
+};
+
+export type CustomField = BaseField & {
+  type: 'custom';
+  id: string;
+  component: React.ComponentType<CustomFieldComponentProps>;
+};
+
+export type CustomFieldComponentProps = {
+  field: CustomField;
+  name: string;
+  title: React.ReactElement;
+  id: string;
+  inputHelp?: string;
+};
+
+export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField | TextField | CustomField;
 
 export interface VisualizationCapabilities {
   'event-annotations': undefined;
@@ -220,6 +242,18 @@ export interface SystemConfiguration {
   readPermission?: string; // the '?' should be removed once all plugins have a permission config set to enforce it for future plugins right from the beginning
 }
 
+export interface CoreSystemConfiguration {
+  name: string;
+  SectionComponent: React.ComponentType;
+  permissions?: Array<string>;
+  showCaret?: boolean;
+  catchAll?: boolean;
+  props?: {
+    ConfigurationComponent: React.ComponentType;
+    title: string;
+  };
+}
+
 export type GenericResult = {
   type: string;
   effective_timerange: AbsoluteTimeRange;
@@ -247,6 +281,9 @@ export interface ActionContexts {
   isLocalNode: boolean;
   parameters?: Immutable.Set<Parameter>;
   parameterBindings?: ParameterBindings;
+  fieldTypes?: FieldTypeMappingsList;
+  toggleFavoriteField?: (field: string) => void;
+  favoriteFields?: Array<string>;
 }
 
 export type SearchTypeResult = SearchTypeResultTypes[keyof SearchTypeResultTypes];
@@ -319,16 +356,20 @@ type AssetInformationComponentProps = {
 };
 
 type EventProcedureFormProps = {
-  eventProcedureID: string | undefined;
-  remediationSteps: string;
-  onClose: () => void;
-  onSave: (eventProcedureId: string) => void;
+  eventProcedureId: string | undefined;
+  remediationSteps?: string;
+  onClose?: () => void;
+  onSave?: (eventProcedureId: string) => void;
+  onRemove?: (eventProcedureId: string) => void;
 };
 
 type EventProcedureSummaryProps = {
-  eventDefinitionEventProcedure: string | undefined;
+  eventProcedureId: string;
   eventId?: string;
-  event?: Event;
+  canEdit?: boolean;
+  onRemove?: () => void;
+  onEdit?: () => void;
+  row?: boolean;
 };
 
 type SearchAction = {
@@ -372,6 +413,11 @@ type EventProcedureForm = {
 
 type EventProcedureSummary = {
   component: React.ComponentType<EventProcedureSummaryProps>;
+  key: string;
+};
+
+type SecurityEventsPage = {
+  component: React.ComponentType<{}>;
   key: string;
 };
 
@@ -493,6 +539,7 @@ export interface RootState {
   searchExecution: SearchExecution;
   searchMetadata: SearchMetadataState;
   undoRedo: UndoRedoState;
+  widgets: WidgetsState;
 }
 
 export interface ExtraArguments {
@@ -515,6 +562,8 @@ export interface WidgetCreator {
 }
 
 export type FieldUnitType = 'size' | 'time' | 'percent';
+
+export type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
 export type FieldUnitsFormValues = Record<string, { abbrev: string; unitType: FieldUnitType }>;
 
@@ -569,12 +618,14 @@ declare module 'graylog-web-plugin/plugin' {
     }>;
     messageAugmentations?: Array<MessageAugmentation>;
     searchTypes?: Array<SearchType<any, any>>;
+    coreSystemConfigurations?: Array<CoreSystemConfiguration>;
     systemConfigurations?: Array<SystemConfiguration>;
     valueActions?: Array<ActionDefinition>;
     'views.completers'?: Array<Completer>;
     'views.components.assetInformationActions'?: Array<AssetInformation>;
     'views.components.eventProcedureForm'?: Array<EventProcedureForm>;
     'views.components.eventProcedureSummary'?: Array<EventProcedureSummary>;
+    'views.components.securityEventsPage'?: Array<SecurityEventsPage>;
     'views.components.dashboardActions'?: Array<DashboardAction<unknown>>;
     'views.components.eventActions'?: Array<EventAction<unknown>>;
     'views.components.widgets.messageTable.previewOptions'?: Array<MessagePreviewOption>;

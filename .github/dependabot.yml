@@ -10,21 +10,21 @@ updates:
       # The AWS SDKs receive patch updates almost every day. Reduce dependabot
       # pull-request noise by ignoring patch updates.
       - dependency-name: "software.amazon.awssdk:bom"
-        # We don't want to pull newer versions than 2.29 until the compatibility
-        # with S3-compatible services is restored or a different solution
-        # is found.
-        # See:
-        # - https://github.com/apache/iceberg/pull/12264
-        # - https://github.com/Graylog2/graylog-plugin-enterprise/issues/10504
-        #update-types: ["version-update:semver-patch"]
-        versions:
-          - ">= 2.30"
+        update-types: ["version-update:semver-patch"]
       - dependency-name: "com.amazonaws:aws-java-sdk-bom"
         update-types: ["version-update:semver-patch"]
       # Lucene >=10 requires JDK 21
       - dependency-name: "org.apache.lucene:lucene-*"
         versions:
           - ">= 10"
+      # we want to manually update the opensearch-java client as long as it requires intensive testing
+      - dependency-name: "org.opensearch.client:opensearch-java"
+    groups:
+      openrewrite:
+        patterns:
+          - "org.openrewrite:*"
+          - "org.openrewrite.maven:*"
+          - "org.openrewrite.recipe:*"
     open-pull-requests-limit: 25
     labels:
       - dependencies
@@ -37,6 +37,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -53,6 +55,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -63,6 +67,9 @@ updates:
           - "< 5"
     rebase-strategy: "disabled"
     groups:
+      dnd-kit:
+        patterns:
+          - "@dnd-kit/*"
       mantine:
         patterns:
           - "@mantine/*"
@@ -79,6 +86,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -94,6 +103,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -109,6 +120,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -127,6 +140,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -138,6 +153,8 @@ updates:
       interval: daily
       time: "02:00"
       timezone: "Europe/Berlin"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 10
     labels:
       - dependencies

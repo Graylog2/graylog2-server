@@ -14,13 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { useContext } from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import * as Immutable from 'immutable';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import userEvent from '@testing-library/user-event';
 
 import selectEvent from 'helpers/selectEvent';
 import AggregationWizard from 'views/components/aggregationwizard/AggregationWizard';
@@ -134,12 +134,6 @@ const expectSubmitButtonToBeDisabled = async () => {
   expect(submitButton).toBeDisabled();
 };
 
-const selectOption = async (ariaLabel: string, option: string) => {
-  const select = await screen.findByLabelText(ariaLabel);
-  await selectEvent.openMenu(select);
-  await selectEvent.select(select, option);
-};
-
 describe('AggregationWizard/Visualizations', () => {
   beforeAll(() => PluginStore.register(visualizationPlugin));
 
@@ -156,12 +150,9 @@ describe('AggregationWizard/Visualizations', () => {
     const onChange = jest.fn();
     render(<SimpleAggregationWizard onChange={onChange} />);
 
-    const visualizationSelect = await screen.findByLabelText('Select visualization type');
+    await selectEvent.chooseOption('Select visualization type', 'Without Config');
 
-    await selectEvent.openMenu(visualizationSelect);
-    await selectEvent.select(visualizationSelect, 'Without Config');
-
-    userEvent.click(await findWidgetConfigSubmitButton());
+    await userEvent.click(await findWidgetConfigSubmitButton());
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(
@@ -174,7 +165,7 @@ describe('AggregationWizard/Visualizations', () => {
     const onChange = jest.fn();
     render(<SimpleAggregationWizard onChange={onChange} />);
 
-    await selectOption('Select visualization type', 'Extra Config Required');
+    await selectEvent.chooseOption('Select visualization type', 'Extra Config Required');
 
     await waitFor(async () => {
       await expectSubmitButtonToBeDisabled();
@@ -182,19 +173,20 @@ describe('AggregationWizard/Visualizations', () => {
 
     const factorInput = await screen.findByRole('spinbutton', { name: 'Important Factor' });
 
-    fireEvent.change(factorInput, { target: { value: '10' } });
+    await userEvent.clear(factorInput);
+    await userEvent.type(factorInput, '10');
 
     await waitFor(async () => {
       expect(await findWidgetConfigSubmitButton()).not.toBeDisabled();
     });
 
-    await selectOption('Select Mode', 'anothermode');
+    await selectEvent.chooseOption('Select Mode', 'anothermode');
 
     await waitFor(async () => {
       await expectSubmitButtonToBeDisabled();
     });
 
-    await selectOption('Select Favorite Color', 'Yellow');
+    await selectEvent.chooseOption('Select Favorite Color', 'Yellow');
 
     const submitButton = await findWidgetConfigSubmitButton();
 
@@ -202,7 +194,7 @@ describe('AggregationWizard/Visualizations', () => {
       expect(submitButton).not.toBeDisabled();
     });
 
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(
@@ -239,9 +231,9 @@ describe('AggregationWizard/Visualizations', () => {
     );
 
     const updateViewportButton = await screen.findByRole('button', { name: 'Change Viewport' });
-    userEvent.click(updateViewportButton);
+    await userEvent.click(updateViewportButton);
     const submitButton = await findWidgetConfigSubmitButton();
-    userEvent.click(submitButton);
+    await userEvent.click(submitButton);
 
     await waitFor(() =>
       expect(onChange).toHaveBeenCalledWith(

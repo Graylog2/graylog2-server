@@ -18,7 +18,7 @@ const path = require('path');
 
 const webpack = require('webpack');
 const AssetsPlugin = require('assets-webpack-plugin');
-const merge = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const { EsbuildPlugin } = require('esbuild-loader');
 const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
 

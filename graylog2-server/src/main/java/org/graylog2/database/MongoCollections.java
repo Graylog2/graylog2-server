@@ -98,7 +98,7 @@ public class MongoCollections {
     /**
      * Provides utility methods for creating, updating, and deleting ScopedEntity objects
      */
-    public <T extends ScopedEntity> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
+    public <T extends ScopedEntity<?>> ScopedEntityMongoUtils<T> scopedEntityUtils(MongoCollection<T> collection, EntityScopeService entityScopeService) {
         return new ScopedEntityMongoUtils<>(collection, entityScopeService);
     }
 
@@ -116,5 +116,17 @@ public class MongoCollections {
                 collection.getCodecRegistry());
         jacksonCodecRegistry.addCodecForClass(valueType);
         return collection.withCodecRegistry(jacksonCodecRegistry);
+    }
+
+    /**
+     * Provides access to the underlying MongoConnection for custom aggregation code or tests.
+     * @return the underlying MongoConnection
+     */
+    public MongoConnection connection() {
+        return mongoConnection;
+    }
+
+    public MongoConnection mongoConnection() {
+        return connection();
     }
 }

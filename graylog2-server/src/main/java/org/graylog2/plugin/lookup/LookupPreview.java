@@ -18,8 +18,16 @@ package org.graylog2.plugin.lookup;
 
 import java.util.Map;
 
-public record LookupPreview(long total, Map<Object, Object> results) {
+public record LookupPreview(boolean supported, long total, Map<Object, Object> results) {
     public static LookupPreview empty() {
-        return new LookupPreview(0, Map.of());
+        return new LookupPreview(true, 0, Map.of());
+    }
+
+    public static LookupPreview unsupported() {
+        return new LookupPreview(false, 0, Map.of());
+    }
+
+    public LookupPreview(long total, Map<Object, Object> results) {
+        this(true, total, results);
     }
 }

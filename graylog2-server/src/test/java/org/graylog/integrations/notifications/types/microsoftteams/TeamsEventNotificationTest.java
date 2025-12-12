@@ -46,26 +46,29 @@ import org.graylog2.web.customization.Config;
 import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@MockitoSettings(strictness = Strictness.WARN)
+@ExtendWith(MockitoExtension.class)
 public class TeamsEventNotificationTest {
 
     //code under test
@@ -89,7 +92,7 @@ public class TeamsEventNotificationTest {
     private final String expectedColor = "#FF2052";
     private final String expectedImage = "iconUrl";
 
-    @Before
+    @BeforeEach
     public void setUp() {
 
         getDummyTeamsNotificationConfig();
@@ -157,7 +160,7 @@ public class TeamsEventNotificationTest {
         assertThat(section.text().contains("a custom message")).isTrue();
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         teamsEventNotification = null;
         teamsEventNotificationConfig = null;
@@ -187,22 +190,26 @@ public class TeamsEventNotificationTest {
     }
 
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithInvalidWebhookUrl() throws EventNotificationException {
-        givenGoodNotificationService();
-        givenTeamsClientThrowsPermException();
-        //when execute is called with a invalid webhook URL, we expect a event notification exception
-        teamsEventNotification.execute(eventNotificationContext);
+    @Test
+    public void executeWithInvalidWebhookUrl() {
+        assertThrows(EventNotificationException.class, () -> {
+            givenGoodNotificationService();
+            givenTeamsClientThrowsPermException();
+            //when execute is called with a invalid webhook URL, we expect a event notification exception
+            teamsEventNotification.execute(eventNotificationContext);
+        });
     }
 
 
-    @Test(expected = EventNotificationException.class)
-    public void executeWithNullEventTimerange() throws EventNotificationException {
-        EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
-        assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
-        assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
-        assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfig.TYPE_NAME);
-        teamsEventNotification.execute(yetAnotherContext);
+    @Test
+    public void executeWithNullEventTimerange() {
+        assertThrows(EventNotificationException.class, () -> {
+            EventNotificationContext yetAnotherContext = getEventNotificationContextToSimulateNullPointerException();
+            assertThat(yetAnotherContext.event().timerangeStart().isPresent()).isFalse();
+            assertThat(yetAnotherContext.event().timerangeEnd().isPresent()).isFalse();
+            assertThat(yetAnotherContext.notificationConfig().type()).isEqualTo(TeamsEventNotificationConfig.TYPE_NAME);
+            teamsEventNotification.execute(yetAnotherContext);
+        });
     }
 
     private EventNotificationContext getEventNotificationContextToSimulateNullPointerException() {
@@ -256,10 +263,12 @@ public class TeamsEventNotificationTest {
 
     }
 
-    @Test(expected = PermanentEventNotificationException.class)
+    @Test
     public void buildCustomMessageWithInvalidTemplate() throws EventNotificationException {
-        teamsEventNotificationConfig = buildInvalidTemplate();
-        teamsEventNotification.buildCustomMessage(eventNotificationContext, teamsEventNotificationConfig, "Title:       ${does't exist}");
+        assertThrows(PermanentEventNotificationException.class, () -> {
+            teamsEventNotificationConfig = buildInvalidTemplate();
+            teamsEventNotification.buildCustomMessage(eventNotificationContext, teamsEventNotificationConfig, "Title:       ${does't exist}");
+        });
     }
 
 
@@ -335,8 +344,7 @@ public class TeamsEventNotificationTest {
     @Test
     public void testProductNameInDefaultMessage() throws EventNotificationException {
         final var productName = "SuperDuperLog";
-        final var config = new Config(Optional.of(productName), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty());
+        final var config = Config.forProductName(productName);
         final var customizationConfig = new CustomizationConfig(config);
 
         final var teamsEventNotification = new TeamsEventNotification(notificationCallbackService,

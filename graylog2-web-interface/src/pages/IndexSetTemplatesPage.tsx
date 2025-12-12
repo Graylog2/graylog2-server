@@ -16,7 +16,7 @@
  */
 import React from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, IfPermitted } from 'components/common';
 import { Alert, Row, Col } from 'components/bootstrap';
 import IndexSetTemplatesList from 'components/indices/IndexSetTemplates/IndexSetTemplatesList';
 import CreateIndexSetTemplateButton from 'components/indices/IndexSetTemplates/CreateIndexSetTemplateButton';
@@ -25,7 +25,13 @@ import { IndicesPageNavigation } from 'components/indices';
 const IndexSetTemplatesPage = () => (
   <DocumentTitle title="Index Set Templates">
     <IndicesPageNavigation />
-    <PageHeader title="Index Set Templates" actions={<CreateIndexSetTemplateButton />}>
+    <PageHeader
+      title="Index Set Templates"
+      actions={
+        <IfPermitted permissions="indexset_templates:create">
+          <CreateIndexSetTemplateButton />
+        </IfPermitted>
+      }>
       <span>
         View and manage your Index Set Templates. These allow Index Set configurations to be saved and re-used upon
         creating a new Index Sets.

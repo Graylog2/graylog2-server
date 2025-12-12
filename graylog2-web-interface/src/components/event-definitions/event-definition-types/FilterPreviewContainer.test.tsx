@@ -28,6 +28,10 @@ const eventDefinition: EventDefinition = {
   title: 'Sample Event Definition',
   description: 'Sample Event Definition',
   _scope: 'test',
+  _entity_source: {
+    source: 'USER_DEFINED',
+    entity_type: 'event_definition',
+  },
   priority: 1,
   alert: true,
   config: {

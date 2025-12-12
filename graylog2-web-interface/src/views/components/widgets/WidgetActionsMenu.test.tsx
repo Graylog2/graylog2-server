@@ -16,16 +16,15 @@
  */
 import React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import { Map } from 'immutable';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import userEvent from '@testing-library/user-event';
 
-import mockAction from 'helpers/mocking/MockAction';
 import asMock from 'helpers/mocking/AsMock';
 import WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import WidgetModel from 'views/logic/widgets/Widget';
 import View from 'views/logic/views/View';
-import { ViewManagementActions } from 'views/stores/ViewManagementStore';
 import Search from 'views/logic/search/Search';
 import Query from 'views/logic/queries/Query';
 import CopyWidgetToDashboard from 'views/logic/views/CopyWidgetToDashboard';
@@ -42,6 +41,7 @@ import fetchSearch from 'views/logic/views/fetchSearch';
 import useWidgetResults from 'views/components/useWidgetResults';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
 import useWindowConfirmMock from 'helpers/mocking/useWindowConfirmMock';
+import { getView, updateView } from 'views/api/views';
 
 import WidgetActionsMenu from './WidgetActionsMenu';
 
@@ -56,6 +56,7 @@ jest.mock('views/logic/views/Actions');
 jest.mock('views/logic/slices/createSearch');
 jest.mock('views/hooks/useViewType');
 jest.mock('views/logic/views/fetchSearch');
+jest.mock('views/api/views');
 
 jest.mock('views/logic/slices/widgetActions', () => ({
   ...jest.requireActual('views/logic/slices/widgetActions'),
@@ -66,7 +67,7 @@ jest.mock('views/logic/slices/widgetActions', () => ({
 const openActionDropdown = async () => {
   const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
-  fireEvent.click(actionToggle);
+  await userEvent.click(actionToggle);
   await screen.findByRole('heading', { name: 'Actions' });
 };
 
@@ -158,18 +159,18 @@ describe('<WidgetActionsMenu />', () => {
 
     const focusButton = await screen.findByTitle('Focus this widget');
 
-    fireEvent.click(focusButton);
+    await userEvent.click(focusButton);
 
     expect(mockSetWidgetFocusing).toHaveBeenCalledWith('widget-id');
   });
 
-  it('is updating widget focus context on un-focus', () => {
+  it('is updating widget focus context on un-focus', async () => {
     const mockUnsetWidgetFocusing = jest.fn();
     render(<DummyWidget title="Dummy Widget" isFocused unsetWidgetFocusing={mockUnsetWidgetFocusing} />);
 
     const unfocusButton = screen.getByTitle('Un-focus widget');
 
-    fireEvent.click(unfocusButton);
+    await userEvent.click(unfocusButton);
 
     expect(mockUnsetWidgetFocusing).toHaveBeenCalledTimes(1);
   });
@@ -181,7 +182,7 @@ describe('<WidgetActionsMenu />', () => {
 
     const duplicateBtn = await screen.findByText('Duplicate');
 
-    fireEvent.click(duplicateBtn);
+    await userEvent.click(duplicateBtn);
 
     await waitFor(() => expect(duplicateWidget).toHaveBeenCalledWith(widget.id, 'Dummy Widget'));
   });
@@ -204,7 +205,7 @@ describe('<WidgetActionsMenu />', () => {
 
     const exportButton = screen.queryByRole('button', { name: /Export all search results/i });
 
-    fireEvent.click(exportButton);
+    await userEvent.click(exportButton);
 
     expect(screen.getByText('Export message table search results')).not.toBeNull();
 
@@ -234,8 +235,8 @@ describe('<WidgetActionsMenu />', () => {
         refetch: () => {},
       });
 
-      ViewManagementActions.get = mockAction(jest.fn(async () => Promise.resolve(dashboard1.toJSON())));
-      ViewManagementActions.update = mockAction(jest.fn((view) => Promise.resolve(view)));
+      asMock(getView).mockResolvedValue(dashboard1.toJSON());
+      asMock(updateView).mockImplementation(async (view) => view);
       asMock(fetchSearch).mockResolvedValue(searchDB1.toJSON());
 
       asMock(CopyWidgetToDashboard).mockImplementation(() =>
@@ -252,22 +253,22 @@ describe('<WidgetActionsMenu />', () => {
 
       const copyToDashboard = screen.getByText('Copy to Dashboard');
 
-      fireEvent.click(copyToDashboard);
+      await userEvent.click(copyToDashboard);
       const view1ListItem = screen.getByText('view 1');
 
-      fireEvent.click(view1ListItem);
+      await userEvent.click(view1ListItem);
       const selectBtn = await screen.findByRole('button', { name: /copy widget/i });
 
-      fireEvent.click(selectBtn);
+      await userEvent.click(selectBtn);
     };
 
     it('should get dashboard from backend', async () => {
       await renderAndClick();
-      await waitFor(() => expect(ViewManagementActions.get).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(getView).toHaveBeenCalledTimes(1));
 
       await waitFor(() => expect(loadDashboard).toHaveBeenCalled());
 
-      expect(ViewManagementActions.get).toHaveBeenCalledWith('view-1');
+      expect(getView).toHaveBeenCalledWith('view-1');
     });
 
     it('should get corresponding search to dashboard', async () => {
@@ -286,9 +287,9 @@ describe('<WidgetActionsMenu />', () => {
 
     it('should update dashboard with new search and widget', async () => {
       await renderAndClick();
-      await waitFor(() => expect(ViewManagementActions.update).toHaveBeenCalledTimes(1));
+      await waitFor(() => expect(updateView).toHaveBeenCalledTimes(1));
 
-      expect(ViewManagementActions.update).toHaveBeenCalledWith(
+      expect(updateView).toHaveBeenCalledWith(
         View.builder().search(Search.builder().id('search-id').build()).id('new-id').type(View.Type.Dashboard).build(),
       );
     });
@@ -311,7 +312,7 @@ describe('<WidgetActionsMenu />', () => {
 
       await openActionDropdown();
 
-      fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
       await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
     });
@@ -323,7 +324,7 @@ describe('<WidgetActionsMenu />', () => {
 
       await openActionDropdown();
 
-      fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+      await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
       await waitFor(() => expect(window.confirm).toHaveBeenCalled());
 
@@ -355,7 +356,7 @@ describe('<WidgetActionsMenu />', () => {
 
         await openActionDropdown();
 
-        fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+        await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
         await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
 
@@ -370,7 +371,7 @@ describe('<WidgetActionsMenu />', () => {
 
         await openActionDropdown();
 
-        fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+        await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
         expect(removeWidget).not.toHaveBeenCalledWith('widget-id');
 
@@ -388,11 +389,11 @@ describe('<WidgetActionsMenu />', () => {
 
         await openActionDropdown();
 
-        fireEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
-
         /* eslint-disable no-console */
         const oldConsoleTrace = console.trace;
         console.trace = jest.fn();
+
+        await userEvent.click(await screen.findByRole('menuitem', { name: 'Delete' }));
 
         await waitFor(() => expect(removeWidget).toHaveBeenCalledWith('widget-id'));
 

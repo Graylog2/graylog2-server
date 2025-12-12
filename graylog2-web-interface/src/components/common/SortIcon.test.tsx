@@ -16,7 +16,7 @@
  */
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import { fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import SortIcon from 'components/common/SortIcon';
 import Direction from 'views/logic/aggregationbuilder/Direction';
@@ -55,7 +55,7 @@ describe('SortIcon', () => {
     render(<SortIcon onChange={onChange} activeDirection={Direction.Ascending.direction} />);
     const Button = await screen.findByRole('button');
 
-    fireEvent.click(Button);
+    await userEvent.click(Button);
 
     await expect(onChange).toHaveBeenCalledWith(Direction.Ascending.direction);
   });

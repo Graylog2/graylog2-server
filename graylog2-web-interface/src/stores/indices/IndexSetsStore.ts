@@ -25,6 +25,12 @@ import { singletonStore, singletonActions } from 'logic/singleton';
 import type { RetentionStrategyConfig, RotationStrategyConfig } from 'components/indices/Types';
 import type { DataTieringConfig, DataTieringFormValues, DataTieringStatus } from 'components/indices/data-tiering';
 
+export type IndexSetFieldRestrictionType = { type: 'immutable' | 'hidden' };
+
+export type IndexSetFieldRestrictions = {
+  [field_name: string]: Array<IndexSetFieldRestrictionType>;
+};
+
 export type IndexSetConfig = {
   can_be_default?: boolean;
   id?: string;
@@ -44,9 +50,11 @@ export type IndexSetConfig = {
   field_type_refresh_interval: number;
   field_type_profile?: string | null;
   index_template_type?: string;
+  index_set_template_id?: string | null;
   writable: boolean;
   default?: boolean;
   use_legacy_rotation?: boolean;
+  field_restrictions?: IndexSetFieldRestrictions;
 };
 
 export type IndexSet = IndexSetConfig & {

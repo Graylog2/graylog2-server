@@ -36,7 +36,7 @@ type LoaderTabsProps = {
   index?: string;
   onMessageLoaded?: (...args: any[]) => void;
   selectedInputId?: string;
-  customFieldActions?: React.ReactNode;
+  customFieldActions?: React.ReactElement;
   inputs?: any;
 };
 

@@ -19,7 +19,7 @@ import React from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 import styled from 'styled-components';
 
-import { Select, SourceCodeEditor, TimezoneSelect, URLWhiteListInput } from 'components/common';
+import { Select, SourceCodeEditor, TimezoneSelect, URLAllowListInput } from 'components/common';
 import { Button, Checkbox, Col, ControlLabel, FormGroup, HelpBlock, Input, Row } from 'components/bootstrap';
 import * as FormsUtils from 'util/FormsUtils';
 import type { EventNotificationTypes } from 'components/event-notifications/types';
@@ -213,7 +213,7 @@ class HttpNotificationFormV2 extends React.Component<Props, any> {
 
     return (
       <>
-        <URLWhiteListInput
+        <URLAllowListInput
           label="URL"
           onChange={this.handleUrlChange}
           validationState={validation.errors.url ? 'error' : null}

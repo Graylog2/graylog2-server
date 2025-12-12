@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import { ScratchpadContext } from 'contexts/ScratchpadProvider';
 
@@ -32,6 +33,7 @@ const SUT = () => (
       isScratchpadVisible: true,
       localStorageItem: 'gl-scratchpad-jest',
       setScratchpadVisibility,
+      toggleScratchpadVisibility: jest.fn(),
     }}>
     <Scratchpad />
   </ScratchpadContext.Provider>
@@ -48,7 +50,7 @@ describe('<Scratchpad />', () => {
     await screen.findByRole('textbox');
   });
 
-  it('renders & dismisses alert', () => {
+  it('renders & dismisses alert', async () => {
     const { rerender } = render(<SUT />);
 
     const alert = screen.getByRole('alert');
@@ -58,19 +60,19 @@ describe('<Scratchpad />', () => {
 
     expect(alert).toBeInTheDocument();
 
-    fireEvent.click(btnGotIt);
+    await userEvent.click(btnGotIt);
 
     rerender(<SUT />);
 
     expect(alert).not.toBeInTheDocument();
   });
 
-  it('calls setScratchpadVisibility on close', () => {
+  it('calls setScratchpadVisibility on close', async () => {
     render(<SUT />);
 
     const btnClose = screen.getByRole('button', { name: /close/i });
 
-    fireEvent.click(btnClose);
+    await userEvent.click(btnClose);
 
     expect(setScratchpadVisibility).toHaveBeenCalledWith(false);
   });
@@ -81,7 +83,7 @@ describe('<Scratchpad />', () => {
     const textarea = screen.getByRole('textbox');
     textarea.focus();
 
-    fireEvent.change(textarea, { target: { value: 'foo' } });
+    await userEvent.type(textarea, 'foo');
 
     await screen.findByText(/auto saved\./i);
   });
@@ -91,11 +93,11 @@ describe('<Scratchpad />', () => {
 
     const textarea = screen.getByRole('textbox');
     textarea.focus();
-    fireEvent.change(textarea, { target: { value: 'foo' } });
+    await userEvent.type(textarea, 'foo');
 
     const btnCopy = screen.getByRole('button', { name: /copy/i });
 
-    fireEvent.click(btnCopy);
+    await userEvent.click(btnCopy);
 
     await screen.findByText(/copied!/i);
 
@@ -107,15 +109,15 @@ describe('<Scratchpad />', () => {
 
     const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
     textarea.focus();
-    fireEvent.change(textarea, { target: { value: 'foo' } });
+    await userEvent.type(textarea, 'foo');
 
     const btnClear = screen.getByRole('button', { name: /clear/i });
 
-    fireEvent.click(btnClear);
+    await userEvent.click(btnClear);
 
     const confirmBtn = await screen.findByRole('button', { name: /confirm/i });
 
-    fireEvent.click(confirmBtn);
+    await userEvent.click(confirmBtn);
 
     await screen.findByText(/cleared\./i);
 

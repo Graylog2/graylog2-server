@@ -15,8 +15,10 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, waitFor, fireEvent, screen } from 'wrappedTestingLibrary';
+import { render, waitFor, screen } from 'wrappedTestingLibrary';
 import type { PluginRegistration } from 'graylog-web-plugin/plugin';
+import { act } from 'wrappedTestingLibrary/hooks';
+import userEvent from '@testing-library/user-event';
 
 import asMock from 'helpers/mocking/AsMock';
 import WidgetModel from 'views/logic/widgets/Widget';
@@ -25,10 +27,15 @@ import useWidgetResults from 'views/components/useWidgetResults';
 import SearchError from 'views/logic/SearchError';
 import TestStoreProvider from 'views/test/TestStoreProvider';
 import { duplicateWidget, updateWidgetConfig, updateWidget } from 'views/logic/slices/widgetActions';
+import { setGlobalOverrideQuery, setGlobalOverrideTimerange } from 'views/logic/slices/searchExecutionSlice';
 import useViewsPlugin from 'views/test/testViewsPlugin';
 import { usePlugin } from 'views/test/testPlugins';
 import SearchExplainContext from 'views/components/contexts/SearchExplainContext';
 import TestFieldTypesContextProvider from 'views/components/contexts/TestFieldTypesContextProvider';
+import useGlobalOverride from 'views/hooks/useGlobalOverride';
+import GlobalOverride from 'views/logic/search/GlobalOverride';
+import type { TimeRange } from 'views/logic/queries/Query';
+import type { QueryString } from 'views/logic/queries/types';
 
 import Widget from './Widget';
 import type { Props as WidgetComponentProps } from './Widget';
@@ -82,6 +89,13 @@ jest.mock('views/logic/slices/widgetActions', () => ({
   updateWidget: jest.fn(() => async () => {}),
   updateWidgetConfig: jest.fn(() => async () => {}),
 }));
+
+jest.mock('views/logic/slices/searchExecutionSlice', () => ({
+  ...jest.requireActual('views/logic/slices/searchExecutionSlice'),
+  setGlobalOverrideQuery: jest.fn(() => async () => {}),
+  setGlobalOverrideTimerange: jest.fn(() => async () => {}),
+}));
+jest.mock('views/hooks/useGlobalOverride');
 
 const pluginManifest: PluginRegistration = {
   exports: {
@@ -164,8 +178,16 @@ describe('<Widget />', () => {
 
   const getWidgetUpdateButton = () => screen.getByRole('button', { name: /update widget/i });
 
+  const globalTimerange: TimeRange = {
+    type: 'absolute',
+    from: '2020-01-01T10:00:00.850Z',
+    to: '2020-01-02T10:00:00.000Z',
+  };
+  const globalSearch: QueryString = { type: 'elasticsearch', query_string: 'source:foo' };
+
   beforeEach(() => {
     asMock(useWidgetResults).mockReturnValue({ widgetData: undefined, error: undefined });
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
   });
 
   it('should render with empty props', async () => {
@@ -287,10 +309,10 @@ describe('<Widget />', () => {
 
     const actionToggle = await screen.findByRole('button', { name: /open actions dropdown/i });
 
-    fireEvent.click(actionToggle);
+    await userEvent.click(actionToggle);
     const duplicateBtn = await screen.findByRole('menuitem', { name: /duplicate/i });
 
-    fireEvent.click(duplicateBtn);
+    await userEvent.click(duplicateBtn);
 
     await waitFor(() => expect(duplicateWidget).toHaveBeenCalled());
   });
@@ -304,7 +326,7 @@ describe('<Widget />', () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const cancel = await screen.findByText('Cancel');
-    fireEvent.click(cancel);
+    await userEvent.click(cancel);
 
     await waitFor(() => {
       expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
@@ -315,38 +337,59 @@ describe('<Widget />', () => {
     const mockUnsetWidgetEditing = jest.fn();
     render(<DummyWidget editing unsetWidgetEditing={mockUnsetWidgetEditing} />);
     const updateWidgetButton = getWidgetUpdateButton();
-    fireEvent.click(updateWidgetButton);
+    await userEvent.click(updateWidgetButton);
 
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 
     expect(mockUnsetWidgetEditing).toHaveBeenCalledTimes(1);
   });
 
-  it('does not trigger action when clicking cancel after no changes were made', () => {
+  it('does not trigger action when clicking cancel after no changes were made', async () => {
     render(<DummyWidget editing />);
 
     const cancelBtn = screen.getByText('Cancel');
 
-    fireEvent.click(cancelBtn);
+    await userEvent.click(cancelBtn);
 
     expect(updateWidgetConfig).not.toHaveBeenCalled();
+    expect(setGlobalOverrideQuery).not.toHaveBeenCalled();
+    expect(setGlobalOverrideTimerange).not.toHaveBeenCalled();
   });
 
-  it('restores original state of widget config when clicking cancel after changes were made', () => {
+  it('restores original state of widget config when clicking cancel after changes were made', async () => {
     const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
     render(<DummyWidget editing widget={widgetWithConfig} />);
 
     const onChangeBtn = screen.getByText('Click me');
 
-    fireEvent.click(onChangeBtn);
+    await userEvent.click(onChangeBtn);
 
     expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const cancelButton = screen.getByText('Cancel');
 
-    fireEvent.click(cancelButton);
+    await userEvent.click(cancelButton);
 
     expect(updateWidget).toHaveBeenCalledWith('widgetId', widgetWithConfig);
+  });
+
+  it('restores original global override when clicking cancel after changes were made', async () => {
+    asMock(useGlobalOverride).mockReturnValue(GlobalOverride.create(globalTimerange, globalSearch));
+    const widgetWithConfig = WidgetModel.builder().id('widgetId').type('dummy').config({ foo: 42 }).build();
+    const { rerender } = render(<DummyWidget editing widget={widgetWithConfig} />);
+
+    const cancelButton = screen.getByText('Cancel');
+
+    // reset overrides
+    act(() => {
+      asMock(useGlobalOverride).mockReturnValue(GlobalOverride.empty());
+      rerender(<DummyWidget editing widget={widgetWithConfig} />);
+    });
+
+    await userEvent.click(cancelButton);
+
+    expect(setGlobalOverrideQuery).toHaveBeenCalledWith(globalSearch.query_string);
+    expect(setGlobalOverrideTimerange).toHaveBeenCalledWith(globalTimerange);
   });
 
   it('does not restore original state of widget config when clicking "Update widget"', async () => {
@@ -355,12 +398,12 @@ describe('<Widget />', () => {
 
     const onChangeBtn = screen.getByText('Click me');
 
-    fireEvent.click(onChangeBtn);
+    await userEvent.click(onChangeBtn);
 
     expect(updateWidgetConfig).toHaveBeenCalledWith('widgetId', { foo: 23 });
 
     const updateWidgetButton = getWidgetUpdateButton();
-    fireEvent.click(updateWidgetButton);
+    await userEvent.click(updateWidgetButton);
 
     await waitFor(() => expect(updateWidgetButton).not.toBeDisabled());
 

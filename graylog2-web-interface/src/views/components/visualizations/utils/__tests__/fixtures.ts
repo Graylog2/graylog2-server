@@ -18,6 +18,7 @@ import type { DefaultTheme } from 'styled-components';
 
 import type { ChartDefinition } from 'views/components/visualizations/ChartData';
 import type { UnitTypeMapper } from 'views/components/visualizations/utils/chartLayoutGenerators';
+import { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export const layoutMapperWith4AxisFor4series = {
   fieldNameToAxisCountMapper: {
@@ -42,7 +43,7 @@ export const layoutMapperWith4AxisFor4series = {
     'avg(field1)': 'time',
     'avg(field2)': 'size',
     'avg(field3)': 'percent',
-    'count()': 'withoutUnit',
+    'count()': DEFAULT_AXIS_KEY,
   },
   unitTypeMapper: {
     percent: {
@@ -57,7 +58,7 @@ export const layoutMapperWith4AxisFor4series = {
       axisCount: 1,
       axisKeyName: 'yaxis',
     },
-    withoutUnit: {
+    [DEFAULT_AXIS_KEY]: {
       axisCount: 4,
       axisKeyName: 'yaxis4',
     },
@@ -95,7 +96,7 @@ export const layoutMapperWith4AxisFor6series = {
     'avg(field1)': 'time',
     'avg(field2)': 'size',
     'avg(field3)': 'percent',
-    'count()': 'withoutUnit',
+    'count()': DEFAULT_AXIS_KEY,
     'latest(field3)': 'percent',
     'sum(field2)': 'size',
   },
@@ -112,7 +113,7 @@ export const layoutMapperWith4AxisFor6series = {
       axisCount: 1,
       axisKeyName: 'yaxis',
     },
-    withoutUnit: {
+    [DEFAULT_AXIS_KEY]: {
       axisCount: 4,
       axisKeyName: 'yaxis4',
     },
@@ -305,7 +306,7 @@ export const unitTypeMapper4Charts: UnitTypeMapper = {
     axisCount: 3,
     axisKeyName: 'yaxis3',
   },
-  withoutUnit: {
+  [DEFAULT_AXIS_KEY]: {
     axisCount: 4,
     axisKeyName: 'yaxis4',
   },
@@ -320,6 +321,10 @@ export const theme = {
     family: { body: 'defaultFont' },
     size: { small: '1rem' },
   },
+  utils: {
+    opacify: (color: string, _: number) => color,
+    readableColor: (color: string) => color,
+  },
 } as DefaultTheme;
 
 export const layoutsFor4axis = {
@@ -328,8 +333,7 @@ export const layoutsFor4axis = {
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
-    overlaying: undefined,
-    position: 0,
+    range: [0, 0.21],
     rangemode: 'tozero',
     side: 'left',
     tickfont: {
@@ -337,24 +341,29 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 10,
     ticktext: ['55 ms', '105 ms', '160 ms', '210 ms'],
     tickvals: [0.055, 0.105, 0.16, 0.21],
-    range: [0, 0.21],
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis2: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 1,
+    range: [0, 525],
     rangemode: 'tozero',
     side: 'right',
     tickfont: {
@@ -362,24 +371,28 @@ export const layoutsFor4axis = {
       family: 'defaultFont',
       size: 16,
     },
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 10,
     ticktext: ['135 B', '265 B', '395 B', '525 B'],
     tickvals: [135, 265, 395, 525],
-    range: [0, 525],
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis3: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 0.1,
     rangemode: 'tozero',
     side: 'left',
     tickfont: {
@@ -388,21 +401,26 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: '.1%',
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 80,
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
+
   yaxis4: {
     automargin: true,
     autoshift: true,
     fixedrange: true,
     gridcolor: '#000',
     overlaying: 'y',
-    position: 0.9,
     rangemode: 'tozero',
     side: 'right',
     tickfont: {
@@ -411,13 +429,17 @@ export const layoutsFor4axis = {
       size: 16,
     },
     tickformat: ',~r',
-    ticklabelposition: 'inside',
+    ticklabelposition: 'outside',
+    ticklabelstandoff: 80,
     title: {
+      automargin: true,
       font: {
         color: '#fff',
         family: 'defaultFont',
         size: 16,
       },
+      standoff: 10,
+      text: null,
     },
   },
 };
