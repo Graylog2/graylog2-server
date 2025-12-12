@@ -109,23 +109,22 @@ function LookupTableList() {
 
   return (
     <ErrorsProvider>
-      <ErrorsConsumer lutNames={lutNames} cacheNames={cacheNames} adapterNames={adapterNames} />
-      <Row className="content">
-        <Col md={12}>
-          <PaginatedEntityTable<LookupTableEntity>
-            humanName="lookup tables"
-            entityActions={renderActions}
-            queryHelpComponent={queryHelpComponent}
-            tableLayout={lutListElements.defaultLayout}
-            fetchEntities={handleFetchTables}
-            keyFn={lookupTablesKeyFn}
-            actionsCellWidth={100}
-            entityAttributesAreCamelCase={false}
-            columnRenderers={columnRenderers}
-          />
-        </Col>
-      </Row>
-    </ErrorsProvider>
+        <ErrorsConsumer lutNames={lutNames} cacheNames={cacheNames} adapterNames={adapterNames} />
+        <Row className="content">
+          <Col md={12}>
+            <PaginatedEntityTable<LookupTableEntity>
+              humanName="lookup tables"
+              entityActions={renderActions}
+              queryHelpComponent={queryHelpComponent}
+              tableLayout={lutListElements.defaultLayout}
+              fetchEntities={handleFetchTables}
+              keyFn={lookupTablesKeyFn}
+              entityAttributesAreCamelCase={false}
+              columnRenderers={columnRenderers}
+            />
+          </Col>
+        </Row>
+        </ErrorsProvider>
   );
 }
 
