@@ -48,6 +48,8 @@ jobs:
 
       - name: "Build with Maven"
         run: "./mvnw -Pedantic clean -Dspotbugs.skip -DskipTests package javadoc:javadoc"
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
 
   frontend-tests:
     name: "Frontend Tests"
@@ -64,6 +66,8 @@ jobs:
 
       - name: "Build with Maven"
         run: "./mvnw -Pedantic -Dspotbugs.skip -Dmaven.test.skip -Dskip.datanode -Dcyclonedx.skip clean test"
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
 
   backend-tests:
     name: "Backend Tests"
@@ -121,3 +125,5 @@ jobs:
           -Dtest.integration.search-server.distribution=${{ matrix.service.search-server-distribution || '' }}
           -Dtest.integration.search-server.version=${{ matrix.service.search-server-version || '' }}
           -Dtest.integration.mongodb.version=${{ matrix.service.mongodb-version || '' }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
