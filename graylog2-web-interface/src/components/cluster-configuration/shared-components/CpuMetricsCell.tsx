@@ -18,29 +18,47 @@ import React from 'react';
 
 import NumberUtils from 'util/NumberUtils';
 
+import { buildRatioIndicator } from './RatioIndicator';
 import { MetricPlaceholder, MetricsColumn, MetricsRow, SecondaryText } from './NodeMetricsLayout';
 
 type Props = {
   loadAverage?: number | null;
   cpuPercent?: number | null;
+  warningThreshold?: number;
+  dangerThreshold?: number;
 };
 
 const formatNumberValue = (value: number | undefined | null, suffix = '') =>
   value == null ? '' : `${NumberUtils.formatNumber(value)}${suffix}`;
 
-const CpuMetricsCell = ({ loadAverage = null, cpuPercent = null }: Props) => {
+const toRatio = (percent: number | undefined | null) => {
+  if (percent == null) {
+    return null;
+  }
+
+  return percent > 1 ? percent / 100 : percent;
+};
+
+const CpuMetricsCell = ({
+  loadAverage = null,
+  cpuPercent = null,
+  warningThreshold = Number.NaN,
+  dangerThreshold = Number.NaN,
+}: Props) => {
   const loadLabel = formatNumberValue(loadAverage);
   const percentLabel = formatNumberValue(cpuPercent, '%');
+  const percentIndicator =
+    cpuPercent == null ? null : buildRatioIndicator(toRatio(cpuPercent), warningThreshold, dangerThreshold);
 
-  if (!loadLabel && !percentLabel) {
+  if (!loadLabel && !percentLabel && !percentIndicator) {
     return <MetricPlaceholder />;
   }
 
   return (
     <MetricsColumn>
-      {percentLabel && (
+      {(percentIndicator || percentLabel) && (
         <MetricsRow>
-          <span>{percentLabel}</span>
+          {percentIndicator ?? <span>{percentLabel}</span>}
         </MetricsRow>
       )}
       {loadLabel && (

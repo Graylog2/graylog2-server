@@ -45,6 +45,8 @@ const JVM_WARNING_THRESHOLD = 0.95;
 const MEMORY_WARNING_THRESHOLD = 0.95;
 const STORAGE_WARNING_THRESHOLD = 0.7;
 const STORAGE_DANGER_THRESHOLD = 0.8;
+const CPU_WARNING_THRESHOLD = 0.7;
+const CPU_DANGER_THRESHOLD = 0.9;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'cpu', title: 'CPU', sortable: false, isDerived: true },
@@ -109,7 +111,12 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
     },
     cpu: {
       renderCell: (_value, entity) => (
-        <CpuMetricsCell loadAverage={entity.metrics?.cpuLoadAverage1m} cpuPercent={entity.metrics?.cpuPercent} />
+        <CpuMetricsCell
+          loadAverage={entity.metrics?.cpuLoadAverage1m}
+          cpuPercent={entity.metrics?.cpuPercent}
+          warningThreshold={CPU_WARNING_THRESHOLD}
+          dangerThreshold={CPU_DANGER_THRESHOLD}
+        />
       ),
       staticWidth: 130,
     },

@@ -33,6 +33,8 @@ const JOURNAL_WARNING_THRESHOLD = 0.1;
 const JOURNAL_DANGER_THRESHOLD = 0.4;
 const BUFFER_WARNING_THRESHOLD = 0.95;
 const JVM_WARNING_THRESHOLD = 0.95;
+const CPU_WARNING_THRESHOLD = 0.7;
+const CPU_DANGER_THRESHOLD = 0.9;
 
 export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
@@ -75,7 +77,13 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
       staticWidth: 'matchHeader' as const,
     },
     cpu: {
-      renderCell: (_value, entity) => <CpuMetricsCell cpuPercent={entity.metrics?.cpuPercent} />,
+      renderCell: (_value, entity) => (
+        <CpuMetricsCell
+          cpuPercent={entity.metrics?.cpuPercent}
+          warningThreshold={CPU_WARNING_THRESHOLD}
+          dangerThreshold={CPU_DANGER_THRESHOLD}
+        />
+      ),
       staticWidth: 130,
     },
     journal: {
