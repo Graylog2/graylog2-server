@@ -53,6 +53,7 @@ public class V20230502164900_AddSidecarManagerAndReaderRole extends Migration {
                 "Grants access to read, register and pull configurations for Sidecars (built-in)",
                 ImmutableSet.of(
                         permissionForUser(RestPermissions.USERS_READ, sidecarUser),
+                        permissionForUser(RestPermissions.USERS_EDIT, sidecarUser),
                         permissionForUser(RestPermissions.USERS_TOKENCREATE, sidecarUser),
                         permissionForUser(RestPermissions.USERS_TOKENLIST, sidecarUser),
                         permissionForUser(RestPermissions.USERS_TOKENREMOVE, sidecarUser),
