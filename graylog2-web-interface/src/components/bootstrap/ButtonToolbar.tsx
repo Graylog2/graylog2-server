@@ -25,8 +25,8 @@ const StyledButtonToolbar = styled(OriginalButtonGroup)(
   `,
 );
 
-const ButtonToolbar = ({ ...props }: React.ComponentProps<typeof StyledButtonToolbar>) => (
-  <StyledButtonToolbar {...props} />
+const ButtonToolbar = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof StyledButtonToolbar>>(
+  ({ ...props }, ref) => <StyledButtonToolbar ref={ref} {...props} />,
 );
 
 /** @component */
