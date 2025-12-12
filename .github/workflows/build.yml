@@ -35,7 +35,7 @@ env:
 jobs:
   build-artifacts:
     name: "Artifacts"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-build-artifacts/runner=ubuntu-4-core"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -51,7 +51,7 @@ jobs:
 
   frontend-tests:
     name: "Frontend Tests"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-frontend-tests/runner=ubuntu-4-core"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -67,7 +67,7 @@ jobs:
 
   backend-tests:
     name: "Backend Tests"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-backend-tests/runner=ubuntu-4-core"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -83,7 +83,7 @@ jobs:
 
   full-backend-tests:
     name: "Full Backend Tests"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-full-backend-tests/runner=ubuntu-4-core"
 
     strategy:
       fail-fast: false
