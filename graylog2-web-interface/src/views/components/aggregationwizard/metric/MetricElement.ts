@@ -83,7 +83,7 @@ const validateMetrics = (values: WidgetConfigFormValues) => {
   return hasErrors(metricsErrors) ? { metrics: metricsErrors } : {};
 };
 
-const parameterForMetric = (metric: MetricFormValues) => {
+export const parameterForMetric = (metric: MetricFormValues) => {
   switch (metric.function) {
     case 'percentage':
       return metric.strategy;
@@ -96,8 +96,7 @@ const parameterForMetric = (metric: MetricFormValues) => {
 
 const emptyToUndefined = (s: string) => (s?.trim() === '' ? undefined : s);
 
-const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: VisualizationFormValues) =>
-  formMetrics.map((metric) =>
+export const metricToSeries = (metric: MetricFormValues, visualization?: VisualizationFormValues) =>
     Series.create(metric.function, emptyToUndefined(metric.field), parameterForMetric(metric))
       .toBuilder()
       .config(
@@ -105,14 +104,15 @@ const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: Vi
           .toBuilder()
           .name(metric.name)
           .thresholds(
-            metric?.showThresholds && thresholdsSupportedVisualizations.includes(visualization.type)
+            visualization && metric?.showThresholds && thresholdsSupportedVisualizations.includes(visualization.type)
               ? metric.thresholds
               : null,
           )
           .build(),
       )
-      .build(),
-  );
+      .build()
+
+export const metricsToSeries = (formMetrics: Array<MetricFormValues>, visualization: VisualizationFormValues) => formMetrics.map(metricToSeries, visualization);
 
 export const seriesToMetrics = (series: Array<Series>) =>
   series.map((s: Series) => {
