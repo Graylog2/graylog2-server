@@ -41,6 +41,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.events.processor.systemnotification.TemplateRenderRequest;
 import org.graylog.plugins.views.audit.ViewsAuditEventTypes;
 import org.graylog.plugins.views.search.ExplainResults;
 import org.graylog.plugins.views.search.Search;
@@ -107,7 +108,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     @Consumes({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public Response createSearch(@RequestBody SearchDTO searchRequest, @Context SearchUser searchUser) {
+    public Response createSearch(@RequestBody(required = true) SearchDTO searchRequest, @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
 
         final Search saved = searchDomain.saveForUser(search, searchUser);
@@ -128,7 +129,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @AuditEvent(type = ViewsAuditEventTypes.SEARCH_CREATE)
     @Consumes({SEARCH_FORMAT_V2})
     @Produces({SEARCH_FORMAT_V2})
-    public Response createSearchV2(@RequestBody SearchDTOv2 searchRequest, @Context SearchUser searchUser) {
+    public Response createSearchV2(SearchDTOv2 searchRequest, @Context SearchUser searchUser) {
         final Search search = searchRequest.toSearch();
 
         final Search saved = searchDomain.saveForUser(search, searchUser);
@@ -168,7 +169,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Creating audit event manually in method body.")
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     public Response executeQuery(@Parameter(name = "id") @PathParam("id") String id,
-                                 @RequestBody ExecutionState executionState,
+                                 @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ExecutionState.class)))
+                                 ExecutionState executionState,
                                  @Context SearchUser searchUser) {
 
         final SearchesClusterConfig searchesClusterConfig = clusterConfigService.get(SearchesClusterConfig.class);
@@ -195,7 +197,8 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("{id}/explain")
     @NoAuditEvent("Does not return any actual data")
     public ExplainResults explainQuery(@Parameter(name = "id") @PathParam("id") String id,
-                                       @RequestBody ExecutionState executionState,
+                                       @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = ExecutionState.class)))
+                                       ExecutionState executionState,
                                        @Context SearchUser searchUser) {
         return searchExecutor.explain(id, searchUser, executionState);
     }
@@ -210,7 +213,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Creating audit event manually in method body.")
     @Consumes({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
     @Produces({MediaType.APPLICATION_JSON, SEARCH_FORMAT_V1})
-    public Response executeSyncJob(@RequestBody @NotNull(message = "Search body is mandatory") SearchDTO searchRequest,
+    public Response executeSyncJob(@RequestBody(required = true) @NotNull(message = "Search body is mandatory") SearchDTO searchRequest,
                                    @Parameter(name = "timeout")
                                    @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
                                    @Context SearchUser searchUser) {
@@ -228,7 +231,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Creating audit event manually in method body.")
     @Consumes({SEARCH_FORMAT_V2})
     @Produces({SEARCH_FORMAT_V2})
-    public Response executeSyncJobv2(@RequestBody @NotNull(message = "Search body is mandatory") SearchDTOv2 searchRequest,
+    public Response executeSyncJobv2(@RequestBody(required = true) @NotNull(message = "Search body is mandatory") SearchDTOv2 searchRequest,
                                      @Parameter(name = "timeout")
                                      @QueryParam("timeout") @DefaultValue("60000") @Deprecated long timeout,
                                      @Context SearchUser searchUser) {

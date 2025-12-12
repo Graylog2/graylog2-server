@@ -54,7 +54,7 @@ public class ExportJobsResource extends RestResource {
     @Operation(summary = "Create job to export a defined set of messages")
     @POST
     @AuditEvent(type = ViewsAuditEventTypes.EXPORT_JOB_CREATED)
-    public String create(@RequestBody @Valid MessagesRequest rawrequest) {
+    public String create(@RequestBody(required = true) @Valid MessagesRequest rawrequest) {
         return exportJobService.save(exportJobFactory.fromMessagesRequest(rawrequest));
     }
 

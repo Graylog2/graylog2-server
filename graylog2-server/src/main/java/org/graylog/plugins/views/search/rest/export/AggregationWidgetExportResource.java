@@ -55,7 +55,7 @@ public class AggregationWidgetExportResource extends RestResource {
             MediaType.APPLICATION_XML,
             MoreMediaTypes.APPLICATION_XLS})
     @Path("/{filename}")
-    public Response exportData(@RequestBody @Valid PivotResult pivotResult,
+    public Response exportData(@RequestBody(required = true) @Valid PivotResult pivotResult,
                                @HeaderParam("Accept") String mediaType,
                                @Parameter(name = "filename") @PathParam("filename") String filename) {
         return RestTools.respondWithFile(

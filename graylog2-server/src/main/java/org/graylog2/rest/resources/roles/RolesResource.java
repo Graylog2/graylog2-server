@@ -253,7 +253,7 @@ public class RolesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     public Response addMember(@Parameter(name = "rolename") @PathParam("rolename") String rolename,
                               @Parameter(name = "username") @PathParam("username") String username,
-                              @RequestBody(description = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.") String body) throws NotFoundException {
+                              @RequestBody(description = "Placeholder because PUT requests should have a body. Set to '{}', the content will be ignored.", required = true) String body) throws NotFoundException {
         checkPermission(RestPermissions.USERS_EDIT, username);
         checkPermission(RestPermissions.ROLES_ASSIGN, rolename);
 

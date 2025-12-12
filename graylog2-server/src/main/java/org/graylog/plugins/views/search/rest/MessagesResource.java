@@ -125,7 +125,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
-    public ChunkedOutput<SimpleMessageChunk> retrieve(@RequestBody @Valid MessagesRequest rawrequest,
+    public ChunkedOutput<SimpleMessageChunk> retrieve(@RequestBody(required = true) @Valid MessagesRequest rawrequest,
                                                       @Context SearchUser searchUser) {
 
         final MessagesRequest request = fillInIfNecessary(rawrequest, searchUser);
