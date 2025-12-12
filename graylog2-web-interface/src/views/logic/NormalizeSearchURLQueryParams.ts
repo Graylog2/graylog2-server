@@ -93,7 +93,7 @@ const normalizeSearchURLQueryParams = (query: RawQuery): NormalizedSearchURLQuer
     timeRange,
     streamsFilter,
     streamCategoriesFilter,
-    queryString: queryString ? createElasticsearchQueryString(queryString) : undefined,
+    queryString: createElasticsearchQueryString(queryString),
   };
 };
 
@@ -109,6 +109,7 @@ export const useSearchURLQueryParams = () => {
       streams: filtersToStreamSet(streamsFilter).toArray(),
       streamCategories: filtersToStreamCategorySet(streamCategoriesFilter).toArray(),
     };
+    // eslint-disable-next-line @tanstack/query/no-unstable-deps
   }, [query]);
 };
 
