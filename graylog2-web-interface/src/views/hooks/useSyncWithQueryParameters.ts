@@ -58,7 +58,7 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
   }
 };
 
-export const uriForView = (viewType: ViewType, query: string, searchQuery: Query): string | undefined => {
+const uriForView = (viewType: ViewType, query: string, searchQuery: Query) => {
   if (viewType !== View.Type.Search) {
     return undefined;
   }
@@ -96,33 +96,61 @@ export const uriForView = (viewType: ViewType, query: string, searchQuery: Query
   return undefined;
 };
 
-export const useSyncWithQueryParameters = (query: string) => {
+function canonicalizeUri(uri: string) {
+  const [path, queryString = ''] = uri.split('?', 2);
+  if (!queryString) return path;
+
+  const params = queryString
+    .split('&')
+    .filter(Boolean)
+    .map((part) => {
+      const [k, v = ''] = part.split('=', 2);
+
+      return [k, v];
+    })
+    .sort(([k1, v1], [k2, v2]) => (k1 === k2 ? v1.localeCompare(v2) : k1.localeCompare(k2)));
+
+  const canonicalQuery = params.map(([k, v]) => `${k}=${v}`).join('&');
+
+  return `${path}?${canonicalQuery}`;
+}
+
+function isSameUri(a: string, b: string) {
+  return canonicalizeUri(a) === canonicalizeUri(b);
+}
+
+// Update the URL query parameters when the current query changes.
+const useSyncWithQueryParameters = (currentUri: string) => {
   const viewType = useViewType();
   const currentQuery = useCurrentQuery();
   const history = useHistory();
-  const lastSyncedQueryRef = useRef(query);
+  const lastSyncedUriRef = useRef(currentUri);
   const isFirstSyncRef = useRef(true);
 
   useEffect(() => {
-    const uri = uriForView(viewType, query, currentQuery);
+    const uriForCurrentView = uriForView(viewType, currentUri, currentQuery);
 
-    if (!uri) {
+    if (!uriForCurrentView) {
       return;
     }
 
-    const urlChangedOutsideSync = query !== lastSyncedQueryRef.current && query !== uri;
+    const currentViewHasCorrectUri = isSameUri(currentUri, uriForCurrentView);
 
-    if (urlChangedOutsideSync) {
+    // Don't update the URI if it was changed outside of this sync. For example when using the browser navigation.
+    const uriChangedOutsideSync = !isSameUri(currentUri, lastSyncedUriRef.current) && !currentViewHasCorrectUri;
+
+    if (uriChangedOutsideSync) {
       return;
     }
 
-    const updateHistory = isFirstSyncRef.current ? history.replace : history.push;
-
-    if (query !== uri) {
-      updateHistory(uri);
+    if (!currentViewHasCorrectUri) {
+      const updateHistory = isFirstSyncRef.current ? history.replace : history.push;
+      updateHistory(uriForCurrentView);
     }
 
     isFirstSyncRef.current = false;
-    lastSyncedQueryRef.current = uri;
-  }, [currentQuery, history, query, viewType]);
+    lastSyncedUriRef.current = uriForCurrentView;
+  }, [currentQuery, history, currentUri, viewType]);
 };
+
+export default useSyncWithQueryParameters;

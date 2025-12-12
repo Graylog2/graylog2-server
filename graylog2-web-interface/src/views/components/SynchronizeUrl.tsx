@@ -16,7 +16,7 @@
  */
 import { useEffect } from 'react';
 
-import { useSyncWithQueryParameters } from 'views/hooks/SyncWithQueryParameters';
+import useSyncWithQueryParameters from 'views/hooks/useSyncWithQueryParameters';
 import bindSearchParamsFromQuery from 'views/hooks/BindSearchParamsFromQuery';
 import type { ViewsDispatch } from 'views/stores/useViewsDispatch';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
