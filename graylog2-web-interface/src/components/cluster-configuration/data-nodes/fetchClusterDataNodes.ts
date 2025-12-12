@@ -30,6 +30,7 @@ export const DATANODE_METRIC_NAMES = {
   jvmMemoryHeapMax: 'opensearch.jvm.mem.heap_max_in_bytes',
   jvmMemoryHeapUsedPercent: 'opensearch.jvm.mem.heap_used_percent',
   cpuLoadAverage1m: 'opensearch.os.cpu.load_average.1m',
+  cpuPercent: 'opensearch.os.cpu.percent',
   indexTotal: 'opensearch.indices.indexing.index_total',
   indexTimeInMillis: 'opensearch.indices.indexing.index_time_in_millis',
   totalFsBytes: 'opensearch.fs.total.total_in_bytes',

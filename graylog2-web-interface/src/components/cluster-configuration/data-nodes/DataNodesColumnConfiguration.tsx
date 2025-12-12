@@ -23,9 +23,9 @@ import type { DataNode } from 'components/datanode/Types';
 import Routes from 'routing/Routes';
 
 import type { ClusterDataNode } from './fetchClusterDataNodes';
-import CpuMetricsCell from './cells/CpuMetricsCell';
 import IndexingMetricsCell from './cells/IndexingMetricsCell';
 
+import CpuMetricsCell from '../shared-components/CpuMetricsCell';
 import { RoleLabel, SecondaryText } from '../shared-components/NodeMetricsLayout';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
@@ -107,7 +107,9 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
       staticWidth: 120,
     },
     cpu: {
-      renderCell: (_value, entity) => <CpuMetricsCell loadAverage={entity.metrics?.cpuLoadAverage1m} />,
+      renderCell: (_value, entity) => (
+        <CpuMetricsCell loadAverage={entity.metrics?.cpuLoadAverage1m} cpuPercent={entity.metrics?.cpuPercent} />
+      ),
       staticWidth: 120,
     },
     indexing: {
@@ -136,7 +138,7 @@ export const createColumnRenderers = (): ColumnRenderers<ClusterDataNode> => ({
           <span>{entity.datanode_version ?? 'N/A'}</span>
         </SecondaryText>
       ),
-      staticWidth: 120,
+      staticWidth: 150,
     },
     opensearch_roles: {
       renderCell: (_value, entity) => getRoleLabels(getDataNodeRoles(entity)),

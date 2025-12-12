@@ -38,6 +38,7 @@ export const GRAYLOG_NODE_METRIC_NAMES = {
   bufferProcessSize: 'org.graylog2.buffers.process.size',
   throughputIn: 'org.graylog2.throughput.input.1-sec-rate',
   throughputOut: 'org.graylog2.throughput.output.1-sec-rate',
+  cpuPercent: 'org.graylog2.system.cpu.percent',
 } as const;
 
 export type GraylogNode = {

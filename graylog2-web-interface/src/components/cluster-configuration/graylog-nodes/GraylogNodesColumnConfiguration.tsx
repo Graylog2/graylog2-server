@@ -26,6 +26,7 @@ import LoadBalancerStatusCell from './cells/LoadBalancerStatusCell';
 import ProcessingStateCell from './cells/ProcessingStateCell';
 import ThroughputMetricsCell from './cells/ThroughputMetricsCell';
 
+import CpuMetricsCell from '../shared-components/CpuMetricsCell';
 import SizeAndRatioMetric from '../shared-components/SizeAndRatioMetric';
 
 const JOURNAL_WARNING_THRESHOLD = 0.1;
@@ -36,6 +37,7 @@ const JVM_WARNING_THRESHOLD = 0.95;
 export const DEFAULT_VISIBLE_COLUMNS = [
   'hostname',
   'lifecycle',
+  'cpu',
   'jvm',
   'buffers',
   'journal',
@@ -46,6 +48,7 @@ export const DEFAULT_VISIBLE_COLUMNS = [
 ] as const;
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
+  { id: 'cpu', title: 'CPU', isDerived: true, sortable: false },
   { id: 'jvm', title: 'JVM', isDerived: true, sortable: false },
   { id: 'buffers', title: 'Buffers', isDerived: true, sortable: false },
   { id: 'journal', title: 'Journal', isDerived: true, sortable: false },
@@ -69,6 +72,10 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     lb_status: {
       renderCell: (_value, entity) => <LoadBalancerStatusCell node={entity} />,
       staticWidth: 'matchHeader' as const,
+    },
+    cpu: {
+      renderCell: (_value, entity) => <CpuMetricsCell cpuPercent={entity.metrics?.cpuPercent} />,
+      staticWidth: 120,
     },
     journal: {
       renderCell: (_value, entity) => (

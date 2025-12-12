@@ -18,30 +18,39 @@ import React from 'react';
 
 import NumberUtils from 'util/NumberUtils';
 
-import { MetricPlaceholder, MetricsColumn, MetricsRow, SecondaryText } from '../../shared-components/NodeMetricsLayout';
+import { MetricPlaceholder, MetricsColumn, MetricsRow, SecondaryText } from './NodeMetricsLayout';
 
 type Props = {
-  loadAverage: number | undefined | null;
+  loadAverage?: number | null;
+  cpuPercent?: number | null;
 };
 
 const formatNumberValue = (value: number | undefined | null, suffix = '') =>
   value == null ? '' : `${NumberUtils.formatNumber(value)}${suffix}`;
 
-const CpuMetricsCell = ({ loadAverage }: Props) => {
+const CpuMetricsCell = ({ loadAverage = null, cpuPercent = null }: Props) => {
   const loadLabel = formatNumberValue(loadAverage);
+  const percentLabel = formatNumberValue(cpuPercent, '%');
 
-  if (!loadLabel) {
+  if (!loadLabel && !percentLabel) {
     return <MetricPlaceholder />;
   }
 
   return (
     <MetricsColumn>
-      <MetricsRow>
-        <span>Load (1m)</span>
-        <SecondaryText>
-          <span>{loadLabel}</span>
-        </SecondaryText>
-      </MetricsRow>
+      {percentLabel && (
+        <MetricsRow>
+          <span>{percentLabel}</span>
+        </MetricsRow>
+      )}
+      {loadLabel && (
+        <MetricsRow>
+          <span>Load (1m)</span>
+          <SecondaryText>
+            <span>{loadLabel}</span>
+          </SecondaryText>
+        </MetricsRow>
+      )}
     </MetricsColumn>
   );
 };
