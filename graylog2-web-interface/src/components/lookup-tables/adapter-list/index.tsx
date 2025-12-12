@@ -98,22 +98,22 @@ function DataAdapterList() {
 
   return (
     <ErrorsProvider>
-        <ErrorsConsumer adapterNames={adapterNames} />
-        <Row className="content">
-          <Col md={12}>
-            <PaginatedEntityTable<DataAdapterEntity>
-              humanName="data adapter"
-              entityActions={renderActions}
-              queryHelpComponent={queryHelpComponent}
-              tableLayout={adapterListElements.defaultLayout}
-              fetchEntities={handleFetchAdapters}
-              keyFn={dataAdaptersKeyFn}
-              entityAttributesAreCamelCase={false}
-              columnRenderers={columnRenderers}
-            />
-          </Col>
-        </Row>
-        </ErrorsProvider>
+      <ErrorsConsumer adapterNames={adapterNames} />
+      <Row className="content">
+        <Col md={12}>
+          <PaginatedEntityTable<DataAdapterEntity>
+            humanName="data adapter"
+            entityActions={renderActions}
+            queryHelpComponent={queryHelpComponent}
+            tableLayout={adapterListElements.defaultLayout}
+            fetchEntities={handleFetchAdapters}
+            keyFn={dataAdaptersKeyFn}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+          />
+        </Col>
+      </Row>
+    </ErrorsProvider>
   );
 }
 
