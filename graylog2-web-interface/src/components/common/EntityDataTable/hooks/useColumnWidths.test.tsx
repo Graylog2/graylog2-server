@@ -20,10 +20,10 @@ import useColumnWidths from './useColumnWidths';
 
 describe('useColumnWidths hook test', () => {
   const defaultProps = {
-    actionsColWidth: 0,
+    actionsColMinWidth: 0,
     bulkSelectColWidth: 0,
     columnWidthPreferences: undefined,
-    tableWidth: 600,
+    scrollContainerWidth: 600,
     headerMinWidths: { title: 100, description: 110 },
     columnSchemas: [
       { id: 'title', title: 'Title' },
@@ -86,7 +86,7 @@ describe('useColumnWidths hook test', () => {
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
-        actionsColWidth: 110,
+        actionsColMinWidth: 110,
         bulkSelectColWidth: 20,
         columnRenderersByAttribute,
         columnIds,
@@ -112,8 +112,8 @@ describe('useColumnWidths hook test', () => {
     const { result } = renderHook(() =>
       useColumnWidths({
         ...defaultProps,
-        tableWidth: 1500,
-        actionsColWidth: 110,
+        scrollContainerWidth: 1500,
+        actionsColMinWidth: 110,
         bulkSelectColWidth: 20,
         columnRenderersByAttribute,
         columnIds,

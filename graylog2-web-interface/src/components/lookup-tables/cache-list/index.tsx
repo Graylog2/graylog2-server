@@ -90,22 +90,21 @@ function CacheList() {
 
   return (
     <ErrorsProvider>
-      <Row className="content">
-        <Col md={12}>
-          <PaginatedEntityTable<CacheEntity>
-            humanName="caches"
-            entityActions={renderActions}
-            queryHelpComponent={queryHelpComponent}
-            tableLayout={cacheListElements.defaultLayout}
-            fetchEntities={handleFetchCaches}
-            keyFn={cachesKeyFn}
-            actionsCellWidth={100}
-            entityAttributesAreCamelCase={false}
-            columnRenderers={columnRenderers}
-          />
-        </Col>
-      </Row>
-    </ErrorsProvider>
+        <Row className="content">
+          <Col md={12}>
+            <PaginatedEntityTable<CacheEntity>
+              humanName="caches"
+              entityActions={renderActions}
+              queryHelpComponent={queryHelpComponent}
+              tableLayout={cacheListElements.defaultLayout}
+              fetchEntities={handleFetchCaches}
+              keyFn={cachesKeyFn}
+              entityAttributesAreCamelCase={false}
+              columnRenderers={columnRenderers}
+            />
+          </Col>
+        </Row>
+        </ErrorsProvider>
   );
 }
 

@@ -86,8 +86,8 @@ const EventProcedureRenderer = ({ eventProcedureId, eventId }: { eventProcedureI
 
   return (
     <>
-      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary }) => (
-        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} eventId={eventId} />
+      {pluggableEventProcedureSummary.map(({ component: PluggableEventProcedureSummary, key }) => (
+        <PluggableEventProcedureSummary eventProcedureId={eventProcedureId} eventId={eventId} key={key} />
       ))}
     </>
   );
@@ -164,7 +164,8 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
     staticWidth: 400,
   },
 });
-const customColumnRenderers = (): ColumnRenderers<Event> => ({
+
+const CustomColumnRenderers: ColumnRenderers<Event> = {
   attributes: {
     ...getGeneralEventAttributeRenderers<Event>(),
     event_definition_id: {
@@ -194,8 +195,6 @@ const customColumnRenderers = (): ColumnRenderers<Event> => ({
       staticWidth: 320,
     },
   },
-});
+};
 
-const useColumnRenderers = () => useMemo<ColumnRenderers<Event>>(customColumnRenderers, []);
-
-export default useColumnRenderers;
+export default CustomColumnRenderers;
