@@ -43,17 +43,18 @@ const columnVisibilityChanges = (prevVisibleColumns: VisibilityState, currVisibl
 };
 
 const updateColumnPreferences = (
-  addedColumns: Set<string>,
+  visibleAttributeColumns: Set<string>,
   removedColumns: Set<string>,
   columnPreferences: ColumnPreferences | undefined = {},
 ) => {
   const updatedPreferences = { ...columnPreferences };
 
-  // only update the preferences for columns which have been shown/hidden by the user
-  addedColumns.forEach((col) => {
+  // All currently visible columns will be marked as 'show'
+  visibleAttributeColumns.forEach((col) => {
     updatedPreferences[col] = { status: ATTRIBUTE_STATUS.show };
   });
 
+  // Only explicitly hidden columns will be marked as 'hide'
   removedColumns.forEach((col) => {
     updatedPreferences[col] = { status: ATTRIBUTE_STATUS.hide };
   });
@@ -69,6 +70,7 @@ type Props<Entity extends EntityBase> = {
   defaultColumnOrder: Array<string>;
   displayBulkSelectCol: boolean;
   entities: ReadonlyArray<Entity>;
+  headerMinWidths: { [colId: string]: number };
   isEntitySelectable: (entity: Entity) => boolean | undefined;
   layoutPreferences: {
     attributes?: ColumnPreferences;
@@ -93,6 +95,7 @@ const useTable = <Entity extends EntityBase>({
   defaultColumnOrder,
   displayBulkSelectCol,
   entities,
+  headerMinWidths,
   isEntitySelectable = () => true,
   layoutPreferences,
   onChangeSelection,
@@ -128,13 +131,16 @@ const useTable = <Entity extends EntityBase>({
   const onColumnVisibilityChange = useCallback(
     (updater: Updater<VisibilityState>) => {
       const newColumnVisibility = updater instanceof Function ? updater(columnVisibility) : updater;
+      const visibleAttributeColumns = new Set(
+        Object.keys(newColumnVisibility).filter((colId) => newColumnVisibility[colId] && !UTILITY_COLUMNS.has(colId)),
+      );
       const { addedColumns, removedColumns } = columnVisibilityChanges(columnVisibility, newColumnVisibility);
 
       const newLayoutPreferences: {
         attributes?: ColumnPreferences;
         order?: Array<string>;
       } = {
-        attributes: updateColumnPreferences(addedColumns, removedColumns, layoutPreferences.attributes),
+        attributes: updateColumnPreferences(visibleAttributeColumns, removedColumns, layoutPreferences.attributes),
       };
 
       // if user has a custom order, we need to update it to reflect the visibility changes
@@ -200,10 +206,15 @@ const useTable = <Entity extends EntityBase>({
         updater instanceof Function ? updater(internalColumnWidthPreferences) : updater;
 
       const clampedAttributeWidths = Object.fromEntries(
-        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => [
-          colId,
-          Math.max(width, columnRenderersByAttribute[colId]?.minWidth ?? DEFAULT_COL_MIN_WIDTH),
-        ]),
+        Object.entries(newAttributeWidthPreferences).map(([colId, width]) => {
+          const effectiveMin = Math.max(
+            DEFAULT_COL_MIN_WIDTH,
+            headerMinWidths[colId] ?? 0,
+            columnRenderersByAttribute[colId]?.minWidth ?? 0,
+          );
+
+          return [colId, Math.max(width, effectiveMin)];
+        }),
       );
 
       setInternalColumnWidthPreferences(clampedAttributeWidths);
@@ -222,6 +233,7 @@ const useTable = <Entity extends EntityBase>({
     [
       columnRenderersByAttribute,
       debouncedOnLayoutPreferencesChange,
+      headerMinWidths,
       internalColumnWidthPreferences,
       layoutPreferences?.attributes,
       setInternalColumnWidthPreferences,

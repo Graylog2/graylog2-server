@@ -246,7 +246,36 @@ describe('<EntityDataTable />', () => {
     expect(rowCheckboxes[0]).not.toBeChecked();
   });
 
-  it('should display default columns, which are not hidden via user column preferences and update visibility correctly', async () => {
+  it('user preferences should include all currently visible columns on preferences update', async () => {
+    const onLayoutPreferencesChange = jest.fn();
+
+    render(
+      <EntityDataTable
+        {...defaultProps}
+        layoutPreferences={{}}
+        defaultDisplayedColumns={['description', 'status', 'title']}
+        defaultColumnOrder={['description', 'status', 'title']}
+        onLayoutPreferencesChange={onLayoutPreferencesChange}
+      />,
+    );
+
+    await screen.findByRole('columnheader', { name: /title/i });
+    await screen.findByRole('columnheader', { name: /status/i });
+    await screen.findByRole('columnheader', { name: /description/i });
+
+    userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
+    userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
+
+    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
+      attributes: {
+        description: { status: ATTRIBUTE_STATUS.show },
+        status: { status: ATTRIBUTE_STATUS.show },
+        title: { status: 'hide' },
+      },
+    });
+  });
+
+  it('if there are user preferences, only selected columns should be displayed', async () => {
     const onLayoutPreferencesChange = jest.fn();
 
     render(
@@ -265,15 +294,13 @@ describe('<EntityDataTable />', () => {
     );
 
     userEvent.click(await screen.findByRole('button', { name: /configure visible columns/i }));
-    userEvent.click(await screen.findByRole('menuitem', { name: /hide title/i }));
+    await screen.findByRole('menuitem', { name: /show title/i });
 
-    expect(onLayoutPreferencesChange).toHaveBeenCalledWith({
-      attributes: {
-        description: { status: ATTRIBUTE_STATUS.show },
-        status: { status: ATTRIBUTE_STATUS.show },
-        title: { status: 'hide' },
-      },
-    });
+    expect(
+      screen.queryByRole('columnheader', {
+        name: /title/i,
+      }),
+    ).not.toBeInTheDocument();
   });
 
   it('should reset layout preferences via reset all columns action', async () => {
