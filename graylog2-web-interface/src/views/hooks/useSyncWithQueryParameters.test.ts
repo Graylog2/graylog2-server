@@ -17,7 +17,6 @@
 import * as Immutable from 'immutable';
 import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
 
-import type { ViewType } from 'views/logic/views/View';
 import View from 'views/logic/views/View';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
 import type { TimeRange, RelativeTimeRange } from 'views/logic/queries/Query';
@@ -146,8 +145,19 @@ describe('SyncWithQueryParameters', () => {
       expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&from=300');
     });
 
-    it('does not update history if query parameters only differ in order', () => {
+    it('does not update history if URI is already correct for current view', () => {
       renderHook(() => useSyncWithQueryParameters('/search?rangetype=relative&from=300&q=foo%3A42'));
+
+      expect(history.replace).not.toHaveBeenCalled();
+      expect(history.push).not.toHaveBeenCalled();
+    });
+
+    it('does not update history if query parameters only differ in order', () => {
+      const { rerender } = renderHook(({ uri }) => useSyncWithQueryParameters(uri), {
+        initialProps: { uri: '/search?rangetype=relative&from=300&q=foo%3A42' },
+      });
+
+      rerender({ uri: '/search?q=foo%3A42&rangetype=relative&from=300' });
 
       expect(history.replace).not.toHaveBeenCalled();
       expect(history.push).not.toHaveBeenCalled();
@@ -160,9 +170,7 @@ describe('SyncWithQueryParameters', () => {
         initialProps: { uri: '/search' },
       });
 
-      await waitFor(() =>
-        expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300'),
-      );
+      expect(history.replace).toHaveBeenCalledWith('/search?q=foo%3A42&rangetype=relative&relative=300');
 
       asMock(useCurrentQuery).mockReturnValue(createQuery({ type: 'relative', range: 900 }));
 
