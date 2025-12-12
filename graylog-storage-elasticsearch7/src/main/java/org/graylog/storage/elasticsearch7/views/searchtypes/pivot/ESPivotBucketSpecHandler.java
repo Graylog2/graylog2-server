@@ -17,6 +17,7 @@
 package org.graylog.storage.elasticsearch7.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -42,14 +43,14 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
 
     public record SortOrders(List<BucketOrder> orders, List<AggregationBuilder> sortingAggregations) {}
 
-    protected SortOrders orderListForPivot(Pivot pivot, ESGeneratedQueryContext esGeneratedQueryContext, BucketOrder defaultOrder, Query query) {
+    protected SortOrders orderListForPivot(Pivot pivot, IndexerGeneratedQueryContext<?> queryContext, BucketOrder defaultOrder, Query query) {
         final List<AggregationBuilder> sortingAggregations = new ArrayList<>();
         final List<BucketOrder> ordering = pivot.sort()
                 .stream()
                 .map(sortSpec -> {
                     final var isAscending = sortSpec.direction().equals(SortSpec.Direction.Ascending);
                     if (sortSpec instanceof PivotSort pivotSort) {
-                        if (isSortOnNumericPivotField(pivot, pivotSort, esGeneratedQueryContext, query)) {
+                        if (isSortOnNumericPivotField(pivot, pivotSort, queryContext, query)) {
                             /* When we sort on a numeric pivot field, we create a metric sub-aggregation for that field, which returns
                             the numeric value of it, so that we can sort on it numerically. Any metric aggregation (min/max/avg) will work. */
                             final var aggregationName = "sort_helper" + pivotSort.field();
@@ -64,7 +65,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                                 .stream()
                                 .filter(series ->
                                         series.literal().equals(sortSpec.field())
-                                                || (series instanceof Percentile && sortSpec.field().equals(series.id()))
+                                                || (series instanceof Percentile && sortSpec.field().equals(series.id())) //TODO: possibly could be removed if FE used real numbers instead of integers in percentile series sort field
                                 )
                                 .findFirst();
                         return matchingSeriesSpec
@@ -74,8 +75,8 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                                     } else {
 
                                         String orderPath = seriesSpec.multiValueAggSubfieldName()
-                                                .map(subField -> esGeneratedQueryContext.seriesName(seriesSpec, pivot) + "[" + subField + "]")
-                                                .orElse(esGeneratedQueryContext.seriesName(seriesSpec, pivot));
+                                                .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "[" + subField + "]")
+                                                .orElse(queryContext.seriesName(seriesSpec, pivot));
 
                                         return BucketOrder.aggregation(orderPath, isAscending);
                                     }
@@ -92,7 +93,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                 : new SortOrders(ordering, List.copyOf(sortingAggregations));
     }
 
-    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, ESGeneratedQueryContext queryContext, Query query) {
+    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?> queryContext, Query query) {
         return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
                 .filter(this::isNumericFieldType)
                 .isPresent();
