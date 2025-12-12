@@ -102,6 +102,8 @@ public class GenerateOpenApiDescriptionCommand extends Server {
         final var jacksonSubTypesModule = extractJacksonSubTypesModule(moduleElements);
 
         // Return a minimal injector with just the bindings we need for OpenAPI generation
+        // The generator's classes never need to construct any instances other than sets of class objects,
+        // so this is safe, no matter what the resources actually need to have injected.
         return Guice.createInjector(Stage.PRODUCTION,
                 systemRestResourcesModule, pluginRestResourcesModule, jacksonSubTypesModule, new OpenAPIBindings(),
                 binder -> {
