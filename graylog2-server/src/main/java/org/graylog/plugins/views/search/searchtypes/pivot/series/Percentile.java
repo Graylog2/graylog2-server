@@ -51,7 +51,7 @@ public abstract class Percentile implements SeriesSpec, HasField {
 
     @Override
     public Optional<String> multiValueAggSubfieldName() {
-        return Optional.of(String.valueOf(percentile().longValue()));
+        return Optional.of(String.valueOf(percentile()));
     }
 
     public abstract Builder toBuilder();

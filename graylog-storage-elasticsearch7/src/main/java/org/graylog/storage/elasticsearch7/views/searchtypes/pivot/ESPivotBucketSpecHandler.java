@@ -74,7 +74,7 @@ public abstract class ESPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                                     } else {
 
                                         String orderPath = seriesSpec.multiValueAggSubfieldName()
-                                                .map(subField -> esGeneratedQueryContext.seriesName(seriesSpec, pivot) + "." + subField)
+                                                .map(subField -> esGeneratedQueryContext.seriesName(seriesSpec, pivot) + "[" + subField + "]")
                                                 .orElse(esGeneratedQueryContext.seriesName(seriesSpec, pivot));
 
                                         return BucketOrder.aggregation(orderPath, isAscending);
