@@ -16,15 +16,68 @@
  */
 package org.graylog.scheduler.system;
 
+import com.google.auto.value.AutoValue;
+
 /**
- * Record representing information about a system job.
- *
- * @param type        type of the system job
- * @param description description of the system job
- * @param statusInfo  status information about the system job
+ * Information about a system job.
  */
-public record SystemJobInfo(String type, String description, String statusInfo) {
-    public static SystemJobInfo of(String type, String description, String statusInfo) {
-        return new SystemJobInfo(type, description, statusInfo);
+@AutoValue
+public abstract class SystemJobInfo {
+    /**
+     * The type of the system job.
+     *
+     * @return the job type
+     */
+    public abstract String type();
+
+    /**
+     * A short description of the system job.
+     *
+     * @return the job description
+     */
+    public abstract String description();
+
+    /**
+     * Status information about the system job. This may include configuration details or other
+     * relevant information.
+     *
+     * @return the job status information
+     */
+    public abstract String statusInfo();
+
+    /**
+     * Whether the system job can be canceled while running.
+     *
+     * @return true if the job is cancelable, false otherwise
+     */
+    public abstract boolean isCancelable();
+
+    /**
+     * Whether the system job reports progress during its execution.
+     *
+     * @return true if the job reports progress, false otherwise
+     */
+    public abstract boolean reportsProgress();
+
+    public static Builder builder() {
+        return new AutoValue_SystemJobInfo.Builder()
+                .isCancelable(false)
+                .reportsProgress(false);
+    }
+
+    @AutoValue.Builder
+    public static abstract class Builder {
+        public abstract Builder type(String type);
+
+        public abstract Builder description(String description);
+
+        public abstract Builder statusInfo(String statusInfo);
+
+        public abstract Builder isCancelable(boolean isCancelable);
+
+        public abstract Builder reportsProgress(boolean reportsProgress);
+
+        public abstract SystemJobInfo build();
+
     }
 }

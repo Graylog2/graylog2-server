@@ -88,18 +88,19 @@ public class SystemJobManager {
                 .map(SystemJobConfig.class::cast)
                 // This must not be any system job without data.
                 .orElseThrow(() -> new IllegalStateException("System job trigger " + trigger.id() + " has no associated config"));
+        final var info = data.toInfo();
 
         return SystemJobSummary.create(
                 trigger.id(),
-                data.toInfo().description(),
+                info.description(),
                 trigger.jobDefinitionId(), // The job definition ID is the type name for system jobs
-                data.toInfo().statusInfo(),
+                info.statusInfo(),
                 trigger.lock().owner(),
                 trigger.startTime(),
                 Duration.ofMillis(Instant.now().toEpochMilli() - trigger.startTime().getMillis()),
                 trigger.lock().progress(),
-                true,
-                true,
+                info.isCancelable(),
+                info.reportsProgress(),
                 trigger.status()
         );
     }
