@@ -72,7 +72,7 @@ public class RebuildIndexRangesJob extends SystemJob {
             return 0;
         }
 
-        return Tools.percentageOf(indicesToCalculate, indicesCalculated.intValue());
+        return Tools.percentageOfRounded(indicesToCalculate, indicesCalculated.intValue());
     }
 
     @Override

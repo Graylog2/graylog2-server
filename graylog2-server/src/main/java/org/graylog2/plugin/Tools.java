@@ -676,7 +676,32 @@ public final class Tools {
     }
 
     /**
-     * Calculate percentage from total and value.
+     * Calculate percentage from total and value, returning a double for precision.
+     *
+     * @param total The total number of items
+     * @param value The value to calculate percentage for
+     * @return A double between 0.0 and 100.0 representing the percentage.
+     * Returns 0.0 if total is 0 or negative, or if value is 0 or negative.
+     * Returns 100.0 if value is greater than or equal to total.
+     */
+    public static double percentageOf(long total, long value) {
+        // Handle invalid inputs
+        if (total <= 0 || value <= 0) {
+            return 0.0;
+        }
+
+        // Cap at 100% if value exceeds total
+        if (value >= total) {
+            return 100.0;
+        }
+
+        // Calculate percentage with full precision
+        return (double) value * 100.0 / (double) total;
+    }
+
+    /**
+     * Calculate percentage from total and value, returning rounded integer.
+     * Uses Math.round() for banker's rounding instead of floor.
      *
      * @param total The total number of items
      * @param value The value to calculate percentage for
@@ -684,7 +709,7 @@ public final class Tools {
      * Returns 0 if total is 0 or negative, or if value is 0 or negative.
      * Returns 100 if value is greater than or equal to total.
      */
-    public static int percentageOf(long total, long value) {
+    public static int percentageOfRounded(long total, long value) {
         // Handle invalid inputs
         if (total <= 0 || value <= 0) {
             return 0;
@@ -695,7 +720,7 @@ public final class Tools {
             return 100;
         }
 
-        // Calculate percentage using double to avoid overflow and floor for rounding
-        return (int) Math.floor((double) value * 100.0 / (double) total);
+        // Calculate percentage using double and round for banker's rounding
+        return Math.toIntExact(Math.round((double) value * 100.0 / (double) total));
     }
 }

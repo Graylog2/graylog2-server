@@ -95,7 +95,7 @@ public class IndexSetCleanupJob extends SystemJob {
         if (total <= 0) {
             return 0;
         }
-        return Tools.percentageOf(total, deleted.intValue());
+        return Tools.percentageOfRounded(total, deleted.intValue());
     }
 
     @Override
