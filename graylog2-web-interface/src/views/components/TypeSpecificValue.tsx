@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
-import isString from 'lodash/isString';
 import trim from 'lodash/trim';
 import trunc from 'lodash/truncate';
 
@@ -44,8 +43,18 @@ const usePluggableValueRenderer = () => {
 
 const defaultComponent = ({ value }: ValueRendererProps) => value;
 
+const stringify = (value: any) => {
+  switch (typeof value) {
+    case 'bigint':
+      return value.toString();
+    case 'string':
+      return value;
+    default:
+      return JSON.stringify(value);
+  }
+};
 const _formatValue = (field: string, value: any, truncate: boolean, render: ValueRenderer, type: FieldType) => {
-  const stringified = isString(value) ? value : JSON.stringify(value);
+  const stringified = stringify(value);
   const Component = render;
 
   return trim(stringified) === '' ? (
