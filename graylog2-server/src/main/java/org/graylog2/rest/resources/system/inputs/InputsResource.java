@@ -370,6 +370,7 @@ public class InputsResource extends AbstractInputsResource {
     @Path("/{inputId}")
     @Operation(summary = "Terminate input on this node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such input on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_DELETE)

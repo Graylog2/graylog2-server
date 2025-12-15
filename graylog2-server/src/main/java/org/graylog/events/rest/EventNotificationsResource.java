@@ -277,6 +277,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @Path("/{notificationId}/test")
     @Operation(summary = "Send a test alert for a given event notification")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Event notification not found."),
             @ApiResponse(responseCode = "500", description = "Error while testing event notification")
     })
@@ -298,6 +299,7 @@ public class EventNotificationsResource extends RestResource implements PluginRe
     @RequiresPermissions(RestPermissions.EVENT_NOTIFICATIONS_CREATE)
     @Operation(summary = "Send a test alert for a given event notification")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Event notification is invalid."),
             @ApiResponse(responseCode = "500", description = "Error while testing event notification")
     })

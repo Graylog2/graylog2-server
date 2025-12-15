@@ -22,6 +22,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -194,6 +195,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Path("/{sidecarId}")
     @Operation(summary = "Returns at most one Sidecar summary for the specified id")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No Sidecar with the specified id exists")
     })
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
@@ -212,6 +214,8 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Operation(summary = "Create/update a Sidecar registration",
                   description = "This is a stateless method which upserts a Sidecar registration")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Returns registration response",
+                    content = @Content(schema = @Schema(implementation = RegistrationResponse.class))),
             @ApiResponse(responseCode = "400", description = "The supplied request is not valid.")
     })
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
@@ -307,6 +311,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @Path("/user")
     @Operation(summary = "Get basic sidecar user")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "The sidecar user could not be found.")
     })
     public BasicUserResponse getBasicSidecarUser() {

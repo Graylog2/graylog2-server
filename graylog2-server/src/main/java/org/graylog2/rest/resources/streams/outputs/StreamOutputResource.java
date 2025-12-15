@@ -76,6 +76,7 @@ public class StreamOutputResource extends RestResource {
     @Operation(summary = "Get a list of all outputs for a stream")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such stream on this node.")
     })
     public OutputListResponse get(@Parameter(name = "streamid", description = "The id of the stream whose outputs we want.", required = true)
@@ -107,6 +108,7 @@ public class StreamOutputResource extends RestResource {
     @Operation(summary = "Get specific output of a stream")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such stream/output on this node.")
     })
     public OutputSummary get(@Parameter(name = "streamid", description = "The id of the stream whose outputs we want.", required = true) @PathParam("streamid") String streamid,
@@ -127,6 +129,7 @@ public class StreamOutputResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Accepted"),
             @ApiResponse(responseCode = "400", description = "Invalid output specification in input.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_ASSIGNMENT_CREATE)
@@ -161,6 +164,7 @@ public class StreamOutputResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Delete output of a stream")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such stream/output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.STREAM_OUTPUT_ASSIGNMENT_DELETE)

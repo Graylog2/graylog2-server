@@ -79,6 +79,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @Timed
     @Operation(summary = "Start or restart specified input in all nodes")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
@@ -91,6 +92,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @Timed
     @Operation(summary = "Switch specified input to setup mode in all nodes")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
@@ -103,6 +105,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @Timed
     @Operation(summary = "Stop specified input in all nodes")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)

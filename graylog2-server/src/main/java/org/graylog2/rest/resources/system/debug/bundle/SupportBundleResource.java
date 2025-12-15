@@ -19,6 +19,10 @@ package org.graylog2.rest.resources.system.debug.bundle;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.DELETE;
@@ -76,6 +80,12 @@ public class SupportBundleResource extends RestResource {
     @GET
     @Path("/logfile/{id}")
     @Operation(summary = "Retrieve the nodes' server logfile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM,
+                            schema = @Schema(type = "string", format = "binary"))),
+            @ApiResponse(responseCode = "404", description = "Logfile not found")
+    })
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
     public Response getLogFile(@PathParam("id") @Parameter(name = "id", description = "The id of the logfile as referenced from the Support Bundle Manifest") String id) {
@@ -113,6 +123,11 @@ public class SupportBundleResource extends RestResource {
     @GET
     @Path("/bundle/download/{filename}")
     @Operation(summary = "Downloads the requested bundle")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MediaType.APPLICATION_OCTET_STREAM,
+                            schema = @Schema(type = "string", format = "binary")))
+    })
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @RestrictToLeader
     @Produces(MediaType.APPLICATION_OCTET_STREAM)

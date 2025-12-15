@@ -1036,6 +1036,14 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputSetup"
+          description: Success
         "404":
           description: No such input.
       summary: Switch specified input to setup mode in all nodes
@@ -1051,6 +1059,14 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputDeleted"
+          description: Success
         "404":
           description: No such input.
       summary: Stop specified input in all nodes
@@ -1065,6 +1081,14 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputCreated"
+          description: Success
         "404":
           description: No such input.
       summary: Start or restart specified input in all nodes
@@ -1137,6 +1161,8 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest"
         required: true
       responses:
+        "200":
+          description: Success
         "400":
           description: Malformed body
       summary: Get all metrics of all nodes in the cluster
@@ -1224,6 +1250,11 @@ paths:
           default: 1000
           minimum: 0
       responses:
+        "200":
+          content:
+            text/plain:
+              schema: {}
+          description: Success
         "404":
           description: Memory appender is disabled.
         "500":
@@ -1299,6 +1330,8 @@ paths:
           type: string
           minLength: 1
       responses:
+        "204":
+          description: Success
         "404":
           description: No such subsystem.
       summary: Set the loglevel of a whole subsystem
@@ -1411,6 +1444,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse"
+          description: Success
         "400":
           description: Malformed body
       summary: Get the values of multiple metrics at once from node
@@ -1452,6 +1491,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse"
+          description: Success
         "404":
           description: No such metric namespace
       summary: Get all metrics of a namespace from node
@@ -2789,6 +2834,8 @@ paths:
             schema:
               $ref: "#/components/schemas/org.graylog.events.notifications.NotificationDto"
       responses:
+        "200":
+          description: Success
         "400":
           description: Event notification is invalid.
         "500":
@@ -2867,6 +2914,8 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          description: Success
         "404":
           description: Event notification not found.
         "500":
@@ -3080,6 +3129,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.messages.requests.MessageParseRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.indexer.results.ResultMessage"
+          description: Returns parsed message
         "400":
           description: Could not decode message.
         "404":
@@ -3112,6 +3167,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.messages.responses.MessageTokens"
+          description: Returns tokens
         "404":
           description: Specified index does not exist.
       summary: Analyze a message string
@@ -3133,6 +3194,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.indexer.results.ResultMessage"
+          description: Returns the message
         "404":
           description: Message does not exist.
       summary: Get a single message.
@@ -3660,6 +3727,7 @@ paths:
               type: string
         description: "Placeholder because PUT requests should have a body. Set to\
           \ '{}', the content will be ignored."
+        required: true
       responses:
         default:
           content:
@@ -4112,6 +4180,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            text/csv:
+              schema:
+                format: binary
+          description: Success
         "400":
           description: Invalid timerange parameters provided.
       summary: Message search with absolute timerange.
@@ -4182,6 +4256,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            text/csv:
+              schema:
+                format: binary
+          description: Success
         "400":
           description: Invalid timerange parameters provided.
       summary: Export message search with absolute timerange.
@@ -4250,6 +4330,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            text/csv:
+              schema:
+                format: binary
+          description: Success
         "400":
           description: Invalid keyword provided.
       summary: Message search with keyword as timerange.
@@ -4318,6 +4404,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            text/csv:
+              schema:
+                format: binary
+          description: Success
         "400":
           description: Invalid keyword provided.
       summary: Export message search with keyword as timerange.
@@ -4380,6 +4472,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            text/csv:
+              schema:
+                format: binary
+          description: Success
         "400":
           description: Invalid timerange parameters provided.
       summary: Message search with relative timerange.
@@ -4442,6 +4540,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            text/csv:
+              schema:
+                format: binary
+          description: Success
         "400":
           description: Invalid timerange parameters provided.
       summary: Export message search with relative timerange.
@@ -4476,6 +4580,14 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.models.CollectorAction"
+          description: Success
         "404":
           description: No actions found for specified id
       summary: Returns queued actions for the specified Sidecar id
@@ -4500,6 +4612,8 @@ paths:
                 $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.models.CollectorAction"
         required: true
       responses:
+        "202":
+          description: Accepted
         "400":
           description: The supplied action is not valid.
       summary: Set a collector action
@@ -4535,6 +4649,8 @@ paths:
               $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.requests.BulkActionsRequest"
         required: true
       responses:
+        "202":
+          description: Accepted
         "400":
           description: The supplied action is not valid.
       summary: Set collector actions in bulk
@@ -5146,6 +5262,12 @@ paths:
     get:
       operationId: getBasicSidecarUser
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.users.responses.BasicUserResponse"
+          description: Success
         "404":
           description: The sidecar user could not be found.
       summary: Get basic sidecar user
@@ -5162,6 +5284,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.models.SidecarSummary"
+          description: Success
         "404":
           description: No Sidecar with the specified id exists
       summary: Returns at most one Sidecar summary for the specified id
@@ -5195,6 +5323,12 @@ paths:
               $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.requests.RegistrationRequest"
         required: true
       responses:
+        "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.responses.RegistrationResponse"
+          description: Returns registration response
         "400":
           description: The supplied request is not valid.
       summary: Create/update a Sidecar registration
@@ -5433,6 +5567,8 @@ paths:
                 type: string
         required: true
       responses:
+        "200":
+          description: Success
         "404":
           description: Index set not found.
       summary: Assign multiple streams to index set
@@ -5558,6 +5694,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "400":
           description: Invalid ObjectId.
         "404":
@@ -5575,6 +5713,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.streams.responses.StreamResponse"
+          description: Returns the stream
         "400":
           description: Invalid ObjectId.
         "404":
@@ -5597,6 +5741,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.streams.requests.UpdateStreamRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.streams.responses.StreamResponse"
+          description: Returns updated stream
         "400":
           description: Invalid ObjectId.
         "404":
@@ -5620,6 +5770,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.streams.requests.CloneStreamRequest"
         required: true
       responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.streams.responses.StreamCreatedResponse"
+          description: Success
         "400":
           description: Invalid or missing Stream id.
         "404":
@@ -5839,6 +5995,8 @@ paths:
           type: string
           minLength: 1
       responses:
+        "204":
+          description: Success
         "400":
           description: Invalid or missing Stream id.
         "404":
@@ -5878,6 +6036,8 @@ paths:
           type: string
           minLength: 1
       responses:
+        "204":
+          description: Success
         "400":
           description: Invalid or missing Stream id.
         "404":
@@ -5904,6 +6064,12 @@ paths:
                 additionalProperties: {}
         required: true
       responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.streams.responses.TestMatchResponse"
+          description: Returns test result
         "400":
           description: Invalid or missing Stream id.
         "404":
@@ -5922,6 +6088,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.streams.outputs.OutputListResponse"
+          description: Success
         "404":
           description: No such stream on this node.
       summary: Get a list of all outputs for a stream
@@ -5943,6 +6115,8 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.streams.outputs.requests.AddOutputRequest"
         required: true
       responses:
+        "202":
+          description: Accepted
         "400":
           description: Invalid output specification in input.
       summary: Associate outputs with a stream
@@ -5965,6 +6139,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "404":
           description: No such stream/output on this node.
       summary: Delete output of a stream
@@ -5986,6 +6162,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.outputs.responses.OutputSummary"
+          description: Success
         "404":
           description: No such stream/output on this node.
       summary: Get specific output of a stream
@@ -6073,6 +6255,8 @@ paths:
           type: string
           minLength: 1
       responses:
+        "204":
+          description: Success
         "400":
           description: Invalid ObjectId.
         "404":
@@ -6156,6 +6340,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.streams.responses.SingleStreamRuleSummaryResponse"
+          description: Success
         "400":
           description: Invalid JSON Body.
         "404":
@@ -6665,6 +6855,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.cluster.responses.NodeSummary"
+          description: Returns node information
         "404":
           description: Node not found.
       summary: Information about a node.
@@ -6875,6 +7071,12 @@ paths:
     get:
       operationId: listContentPacks
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackList"
+          description: Success
         "500":
           description: Error loading content packs
       summary: List available content packs
@@ -6890,6 +7092,8 @@ paths:
         description: Content pack
         required: true
       responses:
+        "201":
+          description: Created
         "400":
           description: Missing or invalid content pack
         "500":
@@ -6901,6 +7105,12 @@ paths:
     get:
       operationId: listLatestContentPacks
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackList"
+          description: Success
         "500":
           description: Error loading content packs
       summary: List latest available content packs
@@ -6917,6 +7127,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "400":
           description: Missing or invalid content pack
         "500":
@@ -6934,6 +7146,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackRevisions"
+          description: Success
         "500":
           description: Error loading content packs
       summary: List all revisions of a content pack
@@ -6950,6 +7168,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackInstallationsResponse"
+          description: Success
         "500":
           description: Error loading content packs
       summary: Get details about the installations of a content pack
@@ -6972,6 +7196,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.contentpacks.ContentPackResource.ContentPackUninstallResponse"
+          description: Success
         "500":
           description: Error loading content packs
       summary: Uninstall a content pack installation
@@ -6994,6 +7224,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPackUninstallDetails"
+          description: Success
         "500":
           description: Error loading content packs
       summary: Get details about which entities will actually be uninstalled
@@ -7017,6 +7253,8 @@ paths:
           type: integer
           format: int32
       responses:
+        "204":
+          description: Success
         "400":
           description: Missing or invalid content pack
         "500":
@@ -7041,6 +7279,12 @@ paths:
           type: integer
           format: int32
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.contentpacks.responses.ContentPackResponse"
+          description: Success
         "500":
           description: Error loading content packs
       summary: Get a revision of a content pack
@@ -7064,6 +7308,12 @@ paths:
           type: integer
           format: int32
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
+          description: Success
         "500":
           description: Error loading content packs
       summary: Download a revision of a content pack
@@ -7094,6 +7344,12 @@ paths:
         description: Content pack installation request
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPackInstallation"
+          description: Success
         "500":
           description: Error loading content packs
       summary: Install a revision of a content pack
@@ -7175,10 +7431,12 @@ paths:
         schema:
           type: string
       responses:
-        default:
+        "200":
           content:
-            application/octet-stream: {}
-          description: default response
+            application/octet-stream:
+              schema:
+                format: binary
+          description: Success
       summary: Downloads the requested bundle
       tags:
       - System/Debug/SupportBundle
@@ -7225,10 +7483,14 @@ paths:
         schema:
           type: string
       responses:
-        default:
+        "200":
           content:
-            application/octet-stream: {}
-          description: default response
+            application/octet-stream:
+              schema:
+                format: binary
+          description: Success
+        "404":
+          description: Logfile not found
       summary: Retrieve the nodes' server logfile
       tags:
       - System/Debug/SupportBundle
@@ -7627,6 +7889,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.indexer.responses.FailureCount"
+          description: Success
         "400":
           description: Invalid date parameter provided.
       summary: Total count of failed index operations since the given date.
@@ -7865,6 +8133,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "403":
           description: You cannot delete the current deflector target index.
       summary: Delete an index. This will also trigger an index ranges rebuild job.
@@ -7898,6 +8168,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "403":
           description: You cannot close the current deflector target index.
       summary: Close an index. This will also trigger an index ranges rebuild job.
@@ -8007,6 +8279,12 @@ paths:
           type: boolean
           default: false
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse"
+          description: Returns index sets
         "403":
           description: Unauthorized
       summary: Get a list of all index sets
@@ -8021,6 +8299,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.requests.IndexSetCreationRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse"
+          description: Returns created index set
         "403":
           description: Unauthorized
       summary: Create index set
@@ -8198,6 +8482,12 @@ paths:
           type: boolean
           default: false
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse"
+          description: Returns index sets
         "403":
           description: Unauthorized
       summary: Get a list of all index sets
@@ -8207,6 +8497,12 @@ paths:
     get:
       operationId: globalStats
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetStats"
+          description: Returns global stats
         "403":
           description: Unauthorized
       summary: Get stats of all index sets
@@ -8573,6 +8869,8 @@ paths:
           type: boolean
           default: true
       responses:
+        "204":
+          description: Success
         "403":
           description: Unauthorized
         "404":
@@ -8589,6 +8887,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse"
+          description: Returns the index set
         "403":
           description: Unauthorized
         "404":
@@ -8611,6 +8915,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse"
+          description: Returns updated index set
         "403":
           description: Unauthorized
         "409":
@@ -8628,6 +8938,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse"
+          description: Returns default index set
         "403":
           description: Unauthorized
       summary: Set default index set
@@ -8643,6 +8959,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetStats"
+          description: Returns statistics
         "403":
           description: Unauthorized
         "404":
@@ -8660,6 +8982,14 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.system.field_types.FieldTypeChangeRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType"
+          description: Success
         "403":
           description: Unauthorized
       summary: Change field type for certain index sets
@@ -8675,6 +9005,14 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.system.field_types.CustomFieldMappingRemovalRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: "#/components/schemas/org.graylog2.rest.resources.system.field_types.FieldTypeMappingsResource.MappingRemovalResult"
+          description: Success
         "403":
           description: Unauthorized
       summary: Remove custom field mapping for certain index sets
@@ -8690,6 +9028,8 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.system.field_types.FieldTypeProfileUnsetRequest"
         required: true
       responses:
+        "200":
+          description: Success
         "403":
           description: Unauthorized
       summary: Remove field type profile from certain index sets
@@ -8705,6 +9045,8 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.resources.system.field_types.FieldTypeProfileChangeRequest"
         required: true
       responses:
+        "200":
+          description: Success
         "403":
           description: Unauthorized
       summary: Set field type profile for certain index sets
@@ -8939,6 +9281,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputDiagnostics"
+          description: Returns diagnostics
         "404":
           description: No such input.
       summary: Get diagnostic information of a single input
@@ -8977,6 +9325,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao"
+          description: Returns metadata
         "404":
           description: No such input.
       summary: Get information about usage of input in pipeline rules
@@ -9051,6 +9405,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.inputs.InputsResource.InputReferences"
+          description: Returns references
         "404":
           description: No such input.
       summary: Returns any streams or pipeline that reference the given input
@@ -9094,6 +9454,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputTypeInfo"
+          description: Returns type info
         "404":
           description: No such input type registered.
       summary: Get information about a single input type
@@ -9109,6 +9475,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "404":
           description: No such input on this node.
       summary: Terminate input on this node
@@ -9123,6 +9491,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputSummary"
+          description: Returns the input
         "404":
           description: No such input.
       summary: Get information of a single input on this node
@@ -9166,6 +9540,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList"
+          description: Returns extractors
         "404":
           description: No such input on this node.
       summary: List all extractors of an input
@@ -9216,6 +9596,8 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.extractors.requests.OrderExtractorsRequest"
         required: true
       responses:
+        "204":
+          description: Success
         "404":
           description: No such input on this node.
       summary: Update extractor order of an input
@@ -9236,6 +9618,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "400":
           description: Invalid request.
         "404":
@@ -9257,6 +9641,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary"
+          description: Returns extractor information
         "404":
           description: No such extractor on this input.
       summary: Get information of a single extractor of an input
@@ -9282,6 +9672,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.extractors.requests.CreateExtractorRequest"
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary"
+          description: Returns updated extractor
         "400":
           description: Missing or invalid configuration.
         "404":
@@ -9305,6 +9701,8 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.requests.CreateStaticFieldRequest"
         required: true
       responses:
+        "201":
+          description: Created
         "400":
           description: Missing or invalid configuration.
         "404":
@@ -9327,6 +9725,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "404":
           description: No such static field.
       summary: Remove static field of an input
@@ -9355,6 +9755,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputSetup"
+          description: Returns ID of input switched to setup mode
         "404":
           description: No such input on this node.
       summary: Switch specified input to setup mode
@@ -9370,6 +9776,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputDeleted"
+          description: Returns ID of stopped input
         "404":
           description: No such input on this node.
       summary: Stop specified input on this node
@@ -9384,6 +9796,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputStateSummary"
+          description: Returns input state
         "404":
           description: No such input on this node.
       summary: Get input state for specified input id on this node
@@ -9398,6 +9816,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.inputs.responses.InputCreated"
+          description: Returns ID of started input
         "404":
           description: No such input on this node.
       summary: (Re-)Start specified input on this node
@@ -9430,6 +9854,10 @@ paths:
         required: true
       responses:
         "202":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.resources.system.jobs.SystemJobResource.TriggerResponse"
           description: Job accepted.
         "400":
           description: There is no such systemjob type.
@@ -9486,6 +9914,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.SystemJobSummary"
+          description: Success
         "404":
           description: Job not found.
       summary: Get information of a specific currently running job
@@ -9521,10 +9955,21 @@ paths:
     get:
       operationId: status_3
       responses:
-        default:
+        "200":
           content:
-            text/plain: {}
-          description: default response
+            text/plain:
+              schema: {}
+          description: ALIVE
+        "429":
+          content:
+            text/plain:
+              schema: {}
+          description: THROTTLED
+        "503":
+          content:
+            text/plain:
+              schema: {}
+          description: DEAD
       summary: "Get status of this Graylog server node for load balancers. Returns\
         \ ALIVE with HTTP 200, DEAD with HTTP 503, or THROTTLED with HTTP 429."
       tags:
@@ -9588,6 +10033,11 @@ paths:
           default: 1000
           minimum: 0
       responses:
+        "200":
+          content:
+            text/plain:
+              schema: {}
+          description: Success
         "404":
           description: Memory appender is disabled.
         "500":
@@ -9626,6 +10076,8 @@ paths:
           type: string
           minLength: 1
       responses:
+        "204":
+          description: Success
         "404":
           description: No such subsystem.
       summary: Set the loglevel of a whole subsystem
@@ -9710,6 +10162,12 @@ paths:
       - System/Lookup
     post:
       operationId: createAdapter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.DataAdapterApi"
+        required: true
       responses:
         default:
           content:
@@ -9723,6 +10181,12 @@ paths:
   /system/lookup/adapters/validate:
     post:
       operationId: validateAdapter
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.DataAdapterApi"
+        required: true
       responses:
         default:
           content:
@@ -9783,6 +10247,12 @@ paths:
         schema:
           type: string
           minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.DataAdapterApi"
+        required: true
       responses:
         default:
           content:
@@ -9810,6 +10280,12 @@ paths:
           type: string
           minLength: 1
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.plugin.lookup.LookupResult"
+          description: Returns lookup result
         "404":
           description: If the adapter cannot be found (if it failed or doesn't exist
             at all)
@@ -9870,6 +10346,12 @@ paths:
       - System/Lookup
     post:
       operationId: createCache
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.CacheApi"
+        required: true
       responses:
         default:
           content:
@@ -9883,6 +10365,12 @@ paths:
   /system/lookup/caches/validate:
     post:
       operationId: validateCache
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.CacheApi"
+        required: true
       responses:
         default:
           content:
@@ -9943,6 +10431,12 @@ paths:
         schema:
           type: string
           minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.CacheApi"
+        required: true
       responses:
         default:
           content:
@@ -10031,6 +10525,12 @@ paths:
       - System/Lookup
     post:
       operationId: createTable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.LookupTableApi"
+        required: true
       responses:
         default:
           content:
@@ -10070,6 +10570,12 @@ paths:
   /system/lookup/tables/validate:
     post:
       operationId: validateTable
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.LookupTableApi"
+        required: true
       responses:
         default:
           content:
@@ -10133,6 +10639,12 @@ paths:
         schema:
           type: string
           minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog2.rest.models.system.lookup.LookupTableApi"
+        required: true
       responses:
         default:
           content:
@@ -10297,6 +10809,12 @@ paths:
               $ref: "#/components/schemas/org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest"
         required: true
       responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse"
+          description: Returns metrics
         "400":
           description: Malformed body
       summary: Get the values of multiple metrics at once
@@ -10325,6 +10843,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse"
+          description: Returns metrics by namespace
         "404":
           description: No such metric namespace
       summary: Get all metrics of a namespace
@@ -10340,6 +10864,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/com.codahale.metrics.Metric"
+          description: Returns the metric
         "404":
           description: No such metric
       summary: Get a single metric
@@ -10398,6 +10928,11 @@ paths:
           - data_node_version_mismatch
           - data_tiering_rollover_error
           - data_node_heap_warning
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.events.processor.systemnotification.TemplateRenderRequest"
       responses:
         default:
           content:
@@ -10466,6 +11001,11 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.events.processor.systemnotification.TemplateRenderRequest"
       responses:
         default:
           content:
@@ -10529,6 +11069,11 @@ paths:
           - data_node_version_mismatch
           - data_tiering_rollover_error
           - data_node_heap_warning
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.events.processor.systemnotification.TemplateRenderRequest"
       responses:
         default:
           content:
@@ -10597,6 +11142,11 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.events.processor.systemnotification.TemplateRenderRequest"
       responses:
         default:
           content:
@@ -10630,6 +11180,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "404":
           description: No such notification type.
       summary: Delete a notification by type
@@ -10650,6 +11202,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "404":
           description: No such notification type.
       summary: Delete a notification by type and key
@@ -10716,6 +11270,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "404":
           description: No such stream/output on this node.
       summary: Delete output
@@ -10731,6 +11287,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.system.outputs.responses.OutputSummary"
+          description: Success
         "404":
           description: No such output on this node.
       summary: Get specific output
@@ -10753,6 +11315,12 @@ paths:
               additionalProperties: {}
         required: true
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.plugin.streams.Output"
+          description: Success
         "404":
           description: No such output on this node.
       summary: Update output
@@ -11888,6 +12456,12 @@ paths:
     get:
       operationId: getTelemetryUserSettings
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.telemetry.rest.TelemetryUserSettings"
+          description: Returns user settings
         "404":
           description: Current user not found.
       summary: Retrieve a user's telemetry settings.
@@ -11903,6 +12477,8 @@ paths:
         description: The telemetry settings to assign to the user.
         required: true
       responses:
+        "204":
+          description: Success
         "404":
           description: Current user not found.
       summary: Update a user's telemetry settings.
@@ -12395,6 +12971,8 @@ paths:
           \ of permissions."
         required: true
       responses:
+        "201":
+          description: Created
         "400":
           description: Missing or invalid user details.
       summary: Create a new user account.
@@ -12411,6 +12989,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.users.responses.BasicUserResponse"
+          description: Returns user info
         "404":
           description: The user could not be found.
       summary: Get basic user data by userId
@@ -12427,6 +13011,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "400":
           description: When attempting to remove a read only user (e.g. built-in or
             LDAP user).
@@ -12445,6 +13031,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.users.responses.UserSummary"
+          description: Returns the user
         "404":
           description: The user could not be found.
       summary: Get user details by userId
@@ -12538,6 +13130,8 @@ paths:
         description: Updated user information.
         required: true
       responses:
+        "204":
+          description: Success
         "400":
           description: Missing or invalid user details.
       summary: Modify user details.
@@ -12688,6 +13282,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "400":
           description: When attempting to remove a read only user (e.g. built-in or
             LDAP user).
@@ -12707,6 +13303,12 @@ paths:
         schema:
           type: string
       responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/org.graylog2.rest.models.users.responses.UserSummary"
+          description: Returns the user
         "404":
           description: The user could not be found.
       summary: Get user details
@@ -12723,6 +13325,8 @@ paths:
         schema:
           type: string
       responses:
+        "204":
+          description: Success
         "500":
           description: When saving the user failed.
       summary: Revoke all permissions for a user without deleting the account.
@@ -12745,6 +13349,8 @@ paths:
         description: The list of permissions to assign to the user.
         required: true
       responses:
+        "204":
+          description: Success
         "400":
           description: Missing or invalid permission data.
       summary: Update a user's permission set.
@@ -12768,6 +13374,8 @@ paths:
         description: The map of preferences to assign to the user.
         required: true
       responses:
+        "204":
+          description: Success
         "400":
           description: Missing or invalid permission data.
       summary: Update a user's preferences set.
@@ -12832,6 +13440,12 @@ paths:
       - Views
     post:
       operationId: create_5
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/org.graylog.security.shares.CreateEntityRequestOrg.graylog.plugins.views.search.views.ViewDTO"
+        required: true
       responses:
         default:
           content:
@@ -12864,6 +13478,12 @@ paths:
   /views/export:
     post:
       operationId: create_4
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.export.MessagesRequest"
+        required: true
       responses:
         default:
           content:
@@ -13029,6 +13649,11 @@ paths:
       - Search
     post:
       operationId: createSearchV2
+      requestBody:
+        content:
+          application/vnd.graylog.search.v2+json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.SearchDTOv2"
       responses:
         "201":
           content:
@@ -13060,6 +13685,12 @@ paths:
       description: "Use this endpoint, if you want to configure export parameters\
         \ freely instead of relying on an existing Search"
       operationId: retrieve
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.export.MessagesRequest"
+        required: true
       responses:
         default:
           content:
@@ -13206,6 +13837,12 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.searchtypes.pivot.PivotResult"
+        required: true
       responses:
         default:
           content:
@@ -13259,6 +13896,12 @@ paths:
           type: integer
           format: int64
           default: 60000
+      requestBody:
+        content:
+          application/vnd.graylog.search.v2+json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.SearchDTOv2"
+        required: true
       responses:
         "200":
           content:
@@ -13302,6 +13945,11 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.ExecutionState"
       responses:
         default:
           content:
@@ -13320,6 +13968,11 @@ paths:
         required: true
         schema:
           type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/org.graylog.plugins.views.search.rest.ExecutionState"
       responses:
         "200":
           content:
@@ -13440,6 +14093,12 @@ paths:
         schema:
           type: string
           minLength: 1
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/org.graylog.security.shares.CreateEntityRequestOrg.graylog.plugins.views.search.views.ViewDTO"
+        required: true
       responses:
         default:
           content:
@@ -13459,6 +14118,12 @@ paths:
         schema:
           type: string
           minLength: 1
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: "#/components/schemas/org.graylog.security.shares.CreateEntityRequestOrg.graylog.plugins.views.search.views.ViewDTO"
+        required: true
       responses:
         default:
           content:
@@ -13780,6 +14445,21 @@ components:
         - view
         - manage
         - own
+      properties:
+        empty:
+          type: boolean
+    com.google.common.collect.ImmutableMapOrg.graylog2.contentpacks.model.ModelIdJava.lang.Object:
+      type: object
+      additionalProperties: {}
+      properties:
+        empty:
+          type: boolean
+    com.google.common.collect.ImmutableMapOrg.graylog2.contentpacks.model.ModelIdJava.util.ListOrg.graylog.security.GrantDTO:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: "#/components/schemas/org.graylog.security.GrantDTO"
       properties:
         empty:
           type: boolean
@@ -16224,6 +16904,14 @@ components:
         load_1:
           type: number
           format: float
+    org.graylog.plugins.sidecar.rest.models.SidecarRegistrationConfiguration:
+      type: object
+      properties:
+        send_status:
+          type: boolean
+        update_interval:
+          type: integer
+          format: int64
     org.graylog.plugins.sidecar.rest.models.SidecarSummary:
       type: object
       properties:
@@ -16372,6 +17060,21 @@ components:
           type: array
           items:
             type: string
+    org.graylog.plugins.sidecar.rest.responses.RegistrationResponse:
+      type: object
+      properties:
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.models.CollectorAction"
+        assignments:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment"
+        configuration:
+          $ref: "#/components/schemas/org.graylog.plugins.sidecar.rest.models.SidecarRegistrationConfiguration"
+        configuration_override:
+          type: boolean
     org.graylog.plugins.sidecar.rest.responses.SidecarListResponse:
       type: object
       properties:
@@ -18348,6 +19051,37 @@ components:
       properties:
         type:
           type: string
+    org.graylog.security.GrantDTO:
+      type: object
+      properties:
+        capability:
+          type: string
+          enum:
+          - view
+          - manage
+          - own
+        created_at:
+          type: string
+          format: date-time
+        created_by:
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+        grantee:
+          $ref: "#/components/schemas/org.graylog.grn.GRN"
+        id:
+          type: string
+        target:
+          $ref: "#/components/schemas/org.graylog.grn.GRN"
+        updated_at:
+          type: string
+          format: date-time
+        updated_by:
+          type: string
+      required:
+      - capability
+      - target
     org.graylog.security.authservice.AuthServiceBackendConfig:
       type: object
       discriminator:
@@ -19266,6 +20000,48 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor"
+          uniqueItems: true
+    org.graylog2.contentpacks.model.ContentPackUninstallation:
+      type: object
+      properties:
+        entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor"
+          properties:
+            empty:
+              type: boolean
+          uniqueItems: true
+        entity_grants:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              $ref: "#/components/schemas/org.graylog.security.GrantDTO"
+          properties:
+            empty:
+              type: boolean
+        entity_objects:
+          type: object
+          additionalProperties: {}
+          properties:
+            empty:
+              type: boolean
+        failed_entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor"
+          properties:
+            empty:
+              type: boolean
+          uniqueItems: true
+        skipped_entities:
+          type: array
+          items:
+            $ref: "#/components/schemas/org.graylog2.contentpacks.model.entities.NativeEntityDescriptor"
+          properties:
+            empty:
+              type: boolean
           uniqueItems: true
     org.graylog2.contentpacks.model.ContentPackV1:
       allOf:
@@ -23529,6 +24305,13 @@ components:
           items:
             type: string
           uniqueItems: true
+    org.graylog2.rest.resources.system.contentpacks.ContentPackResource.ContentPackUninstallResponse:
+      type: object
+      properties:
+        content_pack:
+          $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPack"
+        uninstalled:
+          $ref: "#/components/schemas/org.graylog2.contentpacks.model.ContentPackUninstallation"
     org.graylog2.rest.resources.system.contentpacks.titles.model.EntitiesTitleResponse:
       type: object
       properties:
@@ -23989,6 +24772,11 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/org.graylog2.rest.resources.system.inputs.InputsResource.InputReference"
+    org.graylog2.rest.resources.system.jobs.SystemJobResource.TriggerResponse:
+      type: object
+      properties:
+        system_job_id:
+          type: string
     org.graylog2.rest.resources.system.lookup.LookupTableResource.CachesPage:
       type: object
       properties:

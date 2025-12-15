@@ -378,6 +378,7 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_CREATE)
     @Operation(summary = "Create a new user account.")
     @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid user details.")
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
@@ -520,6 +521,7 @@ public class UsersResource extends RestResource {
     @Path("{userId}")
     @Operation(summary = "Modify user details.")
     @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Attempted to modify a read only user account (e.g. built-in or LDAP users)."),
             @ApiResponse(responseCode = "400", description = "Missing or invalid user details.")
     })
@@ -623,7 +625,10 @@ public class UsersResource extends RestResource {
     @DELETE
     @Path("{username}")
     @Operation(summary = "Removes a user account.")
-    @ApiResponses({@ApiResponse(responseCode = "400", description = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "When attempting to remove a read only user (e.g. built-in or LDAP user).")
+    })
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUser(@Parameter(name = "username", description = "The name of the user to delete.", required = true)
                            @PathParam("username") String username) {
@@ -637,7 +642,10 @@ public class UsersResource extends RestResource {
     @DELETE
     @Path("id/{userId}")
     @Operation(summary = "Removes a user account.")
-    @ApiResponses({@ApiResponse(responseCode = "400", description = "When attempting to remove a read only user (e.g. built-in or LDAP user).")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "When attempting to remove a read only user (e.g. built-in or LDAP user).")
+    })
     @AuditEvent(type = AuditEventTypes.USER_DELETE)
     public void deleteUserById(@Parameter(name = "userId", description = "The id of the user to delete.", required = true)
                                @PathParam("userId") String userId) {
@@ -654,6 +662,7 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
     @Operation(summary = "Update a user's permission set.")
     @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid permission data.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_UPDATE)
@@ -674,6 +683,7 @@ public class UsersResource extends RestResource {
     @Path("{username}/preferences")
     @Operation(summary = "Update a user's preferences set.")
     @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid permission data.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PREFERENCES_UPDATE)
@@ -697,6 +707,7 @@ public class UsersResource extends RestResource {
     @RequiresPermissions(RestPermissions.USERS_PERMISSIONSEDIT)
     @Operation(summary = "Revoke all permissions for a user without deleting the account.")
     @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "500", description = "When saving the user failed.")
     })
     @AuditEvent(type = AuditEventTypes.USER_PERMISSIONS_DELETE)

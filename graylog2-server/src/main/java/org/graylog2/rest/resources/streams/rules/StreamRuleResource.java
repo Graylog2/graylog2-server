@@ -108,6 +108,7 @@ public class StreamRuleResource extends RestResource {
     @Timed
     @Operation(summary = "Update a stream rule")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Stream or stream rule not found."),
             @ApiResponse(responseCode = "400", description = "Invalid JSON Body.")
     })
@@ -192,6 +193,7 @@ public class StreamRuleResource extends RestResource {
     @Timed
     @Operation(summary = "Delete a stream rule")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Stream rule not found."),
             @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })

@@ -67,6 +67,7 @@ public class FailuresResource extends RestResource {
     @Timed
     @Operation(summary = "Total count of failed index operations since the given date.")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "400", description = "Invalid date parameter provided.")
     })
     @RequiresPermissions(RestPermissions.INDICES_FAILURES)

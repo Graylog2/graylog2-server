@@ -219,6 +219,7 @@ public class IndicesResource extends RestResource {
     @Operation(summary = "Close an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "403", description = "You cannot close the current deflector target index.")
     })
     @AuditEvent(type = AuditEventTypes.ES_INDEX_CLOSE)
@@ -244,6 +245,7 @@ public class IndicesResource extends RestResource {
     @Operation(summary = "Delete an index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "403", description = "You cannot delete the current deflector target index.")
     })
     @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)

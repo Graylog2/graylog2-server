@@ -75,6 +75,7 @@ public class ClusterMetricsResource extends ProxiedResource {
     @Path("/multiple")
     @Operation(summary = "Get all metrics of all nodes in the cluster")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Malformed body")
     })
     @NoAuditEvent("only used to retrieve metrics of all nodes")

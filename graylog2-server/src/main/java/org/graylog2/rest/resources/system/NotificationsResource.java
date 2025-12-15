@@ -84,6 +84,7 @@ public class NotificationsResource extends RestResource {
     @Operation(summary = "Delete a notification by type")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such notification type.")
     })
     @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)
@@ -98,6 +99,7 @@ public class NotificationsResource extends RestResource {
     @Operation(summary = "Delete a notification by type and key")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such notification type.")
     })
     @AuditEvent(type = AuditEventTypes.SYSTEM_NOTIFICATION_DELETE)

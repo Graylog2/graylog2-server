@@ -398,6 +398,7 @@ public class StreamResource extends RestResource {
     @Timed
     @Operation(summary = "Delete a stream")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Stream not found."),
             @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })
@@ -497,6 +498,7 @@ public class StreamResource extends RestResource {
     @Timed
     @Operation(summary = "Pause a stream")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Stream not found."),
             @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })
@@ -520,6 +522,7 @@ public class StreamResource extends RestResource {
     @Timed
     @Operation(summary = "Resume a stream")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Stream not found."),
             @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })
@@ -585,6 +588,8 @@ public class StreamResource extends RestResource {
     @Timed
     @Operation(summary = "Clone a stream")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Success",
+                    content = @Content(schema = @Schema(implementation = StreamCreatedResponse.class))),
             @ApiResponse(responseCode = "404", description = "Stream not found."),
             @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })
@@ -693,6 +698,7 @@ public class StreamResource extends RestResource {
     @Timed
     @Operation(summary = "Assign multiple streams to index set")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "404", description = "Index set not found.")
     })
     @Consumes(MediaType.APPLICATION_JSON)

@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.search;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -115,6 +117,9 @@ public class RelativeSearchResource extends SearchResource {
                           "Example: 300 means search from 5 minutes ago to now.")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MoreMediaTypes.TEXT_CSV,
+                            schema = @Schema(type = "string", format = "binary"))),
             @ApiResponse(responseCode = "400", description = "Invalid timerange parameters provided.")
     })
     public ChunkedOutput<ResultChunk> searchRelativeChunked(
@@ -148,6 +153,9 @@ public class RelativeSearchResource extends SearchResource {
                           "Example: 300 means search from 5 minutes ago to now.")
     @Produces(MoreMediaTypes.TEXT_CSV)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MoreMediaTypes.TEXT_CSV,
+                            schema = @Schema(type = "string", format = "binary"))),
             @ApiResponse(responseCode = "400", description = "Invalid timerange parameters provided.")
     })
     public Response exportSearchRelativeChunked(

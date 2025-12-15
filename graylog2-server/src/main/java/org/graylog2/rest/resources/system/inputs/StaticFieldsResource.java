@@ -75,6 +75,7 @@ public class StaticFieldsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Add a static field to an input")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
             @ApiResponse(responseCode = "400", description = "Field/Key is reserved."),
             @ApiResponse(responseCode = "400", description = "Missing or invalid configuration.")
@@ -130,6 +131,7 @@ public class StaticFieldsResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Remove static field of an input")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
             @ApiResponse(responseCode = "404", description = "No such static field.")
     })

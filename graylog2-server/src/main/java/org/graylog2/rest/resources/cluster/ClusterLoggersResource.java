@@ -19,6 +19,8 @@ package org.graylog2.rest.resources.cluster;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -91,6 +93,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @Operation(summary = "Set the loglevel of a whole subsystem",
                   description = "Provided level is falling back to DEBUG if it does not exist")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such subsystem.")
     })
     @NoAuditEvent("proxy resource, audit event will be emitted on target nodes")
@@ -121,6 +124,9 @@ public class ClusterLoggersResource extends ProxiedResource {
     @Path("messages/recent/{nodeId}")
     @Operation(summary = "Get recent internal log messages from a specific node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"))),
             @ApiResponse(responseCode = "404", description = "Memory appender is disabled."),
             @ApiResponse(responseCode = "500", description = "Memory appender is broken.")
     })

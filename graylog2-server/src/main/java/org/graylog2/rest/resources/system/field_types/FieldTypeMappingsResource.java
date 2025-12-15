@@ -83,6 +83,7 @@ public class FieldTypeMappingsResource extends RestResource {
     @Timed
     @Operation(summary = "Change field type for certain index sets")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_CREATE)
@@ -115,6 +116,7 @@ public class FieldTypeMappingsResource extends RestResource {
     @Timed
     @Operation(summary = "Set field type profile for certain index sets")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = INDEX_SET_UPDATE)
@@ -132,6 +134,7 @@ public class FieldTypeMappingsResource extends RestResource {
     @Timed
     @Operation(summary = "Remove field type profile from certain index sets")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success"),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = INDEX_SET_UPDATE)
@@ -149,6 +152,7 @@ public class FieldTypeMappingsResource extends RestResource {
     @Timed
     @Operation(summary = "Remove custom field mapping for certain index sets")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_DELETE)

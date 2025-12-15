@@ -19,6 +19,10 @@ package org.graylog2.shared.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -65,6 +69,17 @@ public class LoadBalancerStatusResource extends RestResource {
     @Produces(MediaType.TEXT_PLAIN)
     @Operation(summary = "Get status of this Graylog server node for load balancers. " +
             "Returns ALIVE with HTTP 200, DEAD with HTTP 503, or THROTTLED with HTTP 429.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "ALIVE",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "429", description = "THROTTLED",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"))),
+            @ApiResponse(responseCode = "503", description = "DEAD",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string")))
+    })
     public Response status() {
         final LoadBalancerStatus lbStatus = serverStatus.getLifecycle().getLoadbalancerStatus();
 

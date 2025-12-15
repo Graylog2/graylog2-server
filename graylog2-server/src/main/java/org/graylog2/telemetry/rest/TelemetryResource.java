@@ -82,7 +82,10 @@ public class TelemetryResource extends RestResource {
     @PUT
     @Path("user/settings")
     @Operation(summary = "Update a user's telemetry settings.")
-    @ApiResponses({@ApiResponse(responseCode = "404", description = "Current user not found.")})
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "Current user not found.")
+    })
     @NoAuditEvent("Audit event is sent manually.")
     public void saveTelemetryUserSettings(@RequestBody(description = "The telemetry settings to assign to the user.", required = true)
                                           @Valid @NotNull TelemetryUserSettings telemetryUserSettings) {

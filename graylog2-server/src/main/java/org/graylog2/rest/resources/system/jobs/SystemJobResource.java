@@ -17,10 +17,13 @@
 package org.graylog2.rest.resources.system.jobs;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -121,6 +124,7 @@ public class SystemJobResource extends RestResource {
     @Operation(summary = "Get information of a specific currently running job")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Job not found.")
     })
     public SystemJobSummary get(@Parameter(name = "jobId", required = true)
@@ -152,7 +156,8 @@ public class SystemJobResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "202", description = "Job accepted."),
+            @ApiResponse(responseCode = "202", description = "Job accepted.",
+                         content = @Content(schema = @Schema(implementation = TriggerResponse.class))),
             @ApiResponse(responseCode = "400", description = "There is no such systemjob type."),
             @ApiResponse(responseCode = "403", description = "Maximum concurrency level of this systemjob type reached.")
     })
@@ -177,7 +182,7 @@ public class SystemJobResource extends RestResource {
             throw new ForbiddenException("Maximum concurrency level of this job reached", e);
         }
 
-        return Response.accepted().entity(ImmutableMap.of("system_job_id", job.getId())).build();
+        return Response.accepted().entity(new TriggerResponse(job.getId())).build();
     }
 
     @DELETE
@@ -225,4 +230,6 @@ public class SystemJobResource extends RestResource {
         }
         return Response.accepted().build();
     }
+
+    private record TriggerResponse(@JsonProperty("system_job_id") String systemJobId) {}
 }

@@ -23,6 +23,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -169,6 +171,7 @@ public class LoggersResource extends RestResource {
     @Operation(summary = "Set the loglevel of a whole subsystem",
                   description = "Provided level is falling back to DEBUG if it does not exist")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such subsystem.")
     })
     @Path("/subsystems/{subsystem}/level/{level}")
@@ -212,6 +215,9 @@ public class LoggersResource extends RestResource {
     @Timed
     @Operation(summary = "Get recent internal log messages")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = @Content(mediaType = MediaType.TEXT_PLAIN,
+                            schema = @Schema(type = "string"))),
             @ApiResponse(responseCode = "404", description = "Memory appender is disabled."),
             @ApiResponse(responseCode = "500", description = "Memory appender is broken.")
     })

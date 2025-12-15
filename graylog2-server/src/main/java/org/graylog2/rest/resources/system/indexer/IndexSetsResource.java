@@ -368,6 +368,7 @@ public class IndexSetsResource extends RestResource {
     @Operation(summary = "Delete index set")
     @AuditEvent(type = AuditEventTypes.INDEX_SET_DELETE)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Index set not found"),
     })

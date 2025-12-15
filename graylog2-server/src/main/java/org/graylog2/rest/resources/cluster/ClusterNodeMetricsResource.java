@@ -96,6 +96,7 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @Path("/multiple")
     @Operation(summary = "Get the values of multiple metrics at once from node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "400", description = "Malformed body")
     })
     @NoAuditEvent("only used to get multiple metric values")
@@ -116,6 +117,7 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @Path("/namespace/{namespace}")
     @Operation(summary = "Get all metrics of a namespace from node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such metric namespace")
     })
     public MetricsSummaryResponse byNamespace(@Parameter(name = "nodeId", description = "The id of the node whose metrics we want.", required = true)

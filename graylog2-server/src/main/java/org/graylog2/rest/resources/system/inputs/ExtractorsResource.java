@@ -246,6 +246,7 @@ public class ExtractorsResource extends RestResource {
     @Operation(summary = "Delete an extractor")
     @Path("/{extractorId}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Invalid request."),
             @ApiResponse(responseCode = "404", description = "Input not found."),
             @ApiResponse(responseCode = "404", description = "Extractor not found.")
@@ -283,6 +284,7 @@ public class ExtractorsResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Update extractor order of an input")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such input on this node.")
     })
     @Path("order")

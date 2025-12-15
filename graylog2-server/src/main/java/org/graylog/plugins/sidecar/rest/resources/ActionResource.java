@@ -69,6 +69,7 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @Path("/{sidecarId}")
     @Operation(summary = "Returns queued actions for the specified Sidecar id")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No actions found for specified id")
     })
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
@@ -86,7 +87,10 @@ public class ActionResource extends RestResource implements PluginRestResource {
     @Path("/{sidecarId}")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @Operation(summary = "Set a collector action")
-    @ApiResponses(value = {@ApiResponse(responseCode = "400", description = "The supplied action is not valid.")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "202", description = "Accepted"),
+            @ApiResponse(responseCode = "400", description = "The supplied action is not valid.")
+    })
     @AuditEvent(type = SidecarAuditEventTypes.ACTION_UPDATE)
     public Response setAction(@Parameter(name = "sidecarId", description = "The id this Sidecar is registering as.", required = true)
                               @PathParam("sidecarId") @NotEmpty String sidecarId,

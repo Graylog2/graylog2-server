@@ -103,6 +103,7 @@ public class OutputResource extends RestResource {
     @Operation(summary = "Get specific output")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such output on this node.")
     })
     public OutputSummary get(@Parameter(name = "outputId", description = "The id of the output we want.", required = true) @PathParam("outputId") String outputId) throws NotFoundException {
@@ -162,6 +163,7 @@ public class OutputResource extends RestResource {
     @Operation(summary = "Delete output")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "404", description = "No such stream/output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_DELETE)
@@ -188,6 +190,7 @@ public class OutputResource extends RestResource {
     @Operation(summary = "Update output")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such output on this node.")
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_OUTPUT_UPDATE)

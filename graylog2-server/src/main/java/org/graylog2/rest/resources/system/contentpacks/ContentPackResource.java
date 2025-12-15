@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system.contentpacks;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.ImmutableMap;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -102,6 +102,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "List available content packs")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
@@ -120,6 +121,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "List latest available content packs")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
@@ -138,6 +140,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "List all revisions of a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
@@ -163,6 +166,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Get a revision of a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
@@ -185,6 +189,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Download a revision of a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
@@ -206,6 +211,7 @@ public class ContentPackResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Upload a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Created"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid content pack"),
             @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
@@ -229,6 +235,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Delete all revisions of a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid content pack"),
             @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
@@ -252,6 +259,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Delete one revision of a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Success"),
             @ApiResponse(responseCode = "400", description = "Missing or invalid content pack"),
             @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
@@ -280,6 +288,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Install a revision of a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_INSTALL)
@@ -310,6 +319,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Get details about the installations of a content pack")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
@@ -327,6 +337,7 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Get details about which entities will actually be uninstalled")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
@@ -351,11 +362,12 @@ public class ContentPackResource extends RestResource {
     @Timed
     @Operation(summary = "Uninstall a content pack installation")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_UNINSTALL)
     @JsonView(ContentPackView.HttpView.class)
-    public Response deleteContentPackInstallationById(
+    public ContentPackUninstallResponse deleteContentPackInstallationById(
             @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId contentPackId,
             @Parameter(name = "installationId", description = "Installation ID", required = true)
@@ -370,9 +382,10 @@ public class ContentPackResource extends RestResource {
 
         final ContentPackUninstallation removedInstallation = contentPackService.uninstallContentPack(contentPack, installation);
 
-        return Response.ok(ImmutableMap.of(
-                "content_pack", contentPack,
-                "uninstalled", removedInstallation
-        )).build();
+        return new ContentPackUninstallResponse(contentPack, removedInstallation);
     }
+
+    private record ContentPackUninstallResponse(
+            @JsonProperty("content_pack") ContentPack contentPack,
+            @JsonProperty("uninstalled") ContentPackUninstallation uninstalled) {}
 }

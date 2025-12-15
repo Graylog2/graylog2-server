@@ -18,6 +18,10 @@ package org.graylog2.rest.resources.system.monitoring;
 
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -79,6 +83,15 @@ public class MonitoringResource extends RestResource {
     @GET
     @Timed
     @Operation(summary = "Get timerange-based histogram of queries durations and percentage in recent query population")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Success",
+                    content = {
+                            @Content(mediaType = MediaType.APPLICATION_JSON,
+                                    schema = @Schema(implementation = Histogram.class)),
+                            @Content(mediaType = MoreMediaTypes.TEXT_CSV,
+                                    schema = @Schema(type = "string", format = "binary"))
+                    })
+    })
     @Path("query_duration_histogram")
     @Produces({MediaType.APPLICATION_JSON, MoreMediaTypes.TEXT_CSV})
     @RequiresPermissions({RestPermissions.MONITORING_READ})
