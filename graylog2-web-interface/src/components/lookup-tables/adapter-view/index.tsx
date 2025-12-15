@@ -15,34 +15,20 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useParams } from 'react-router-dom';
 
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
+import { Spinner } from 'components/common';
+import { useFetchDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 
-import LUTdrawer from './LUTDrawer';
+import AdapterShow from './adapter-show';
 
-export type ModalTypes = 'LUT' | 'CACHE' | 'DATA-ADAPTER';
+function AdapterView() {
+  const { adapterIdOrName } = useParams<{ adapterIdOrName: string }>();
+  const { dataAdapter, loadingDataAdapter } = useFetchDataAdapter(adapterIdOrName);
 
-function LUTModals() {
-  const { modal, setModal, entity, setEntity, title, setTitle, double } = useModalContext();
+  if (loadingDataAdapter) return <Spinner text="Loading data adapter details" />;
 
-  const onClose = () => {
-    setModal(null);
-    setTitle(null);
-    setEntity(null);
-  };
-
-  switch (modal) {
-    case 'LUT':
-    case 'CACHE':
-    case 'DATA-ADAPTER':
-      return (
-        <LUTdrawer title={title} onClose={onClose} double={double}>
-          {entity}
-        </LUTdrawer>
-      );
-    default:
-      return null;
-  }
+  return <AdapterShow dataAdapter={dataAdapter} />;
 }
 
-export default LUTModals;
+export default AdapterView;

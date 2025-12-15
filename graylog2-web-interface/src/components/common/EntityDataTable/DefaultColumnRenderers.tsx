@@ -37,9 +37,6 @@ const DefaultColumnRenderers = {
     summary: {
       width: 1.5,
     },
-    owner: {
-      staticWidth: 120,
-    },
     favorite: {
       renderHeader: () => '',
       staticWidth: 30,
