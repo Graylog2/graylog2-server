@@ -55,6 +55,10 @@ const FilterValueDropdown = ({
     setShowDropdown((cur) => !cur);
   };
 
+  const _onClose = () => {
+    setShowDropdown(false);
+  };
+
   const onSubmit = (newFilter: { title: string; value: string }) => {
     onChangeFilter(attribute.id, value, { value: newFilter.value, title: newFilter.title });
     _onToggle();
@@ -71,6 +75,7 @@ const FilterValueDropdown = ({
       }
       placement="bottom"
       onToggle={_onToggle}
+      onClose={_onClose}
       dropdownZIndex={1050}>
       <FilterConfiguration
         attribute={attribute}

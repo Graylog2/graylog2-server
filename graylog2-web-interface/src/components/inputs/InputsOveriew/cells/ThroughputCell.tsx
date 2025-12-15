@@ -52,7 +52,7 @@ const ThroughputCell = ({ input }: Props) => {
   }, [metricName]);
 
   if (!metrics) {
-    return <Spinner />;
+    return <Spinner size="xs" />;
   }
 
   const incomingMessages =
