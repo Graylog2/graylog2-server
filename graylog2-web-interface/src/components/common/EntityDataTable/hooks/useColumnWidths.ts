@@ -26,25 +26,25 @@ import {
 import type { EntityBase, ColumnRenderersByAttribute } from '../types';
 
 const assignableTableWidth = ({
-  tableWidth,
-  actionsColWidth,
+  scrollContainerWidth,
+  actionsColMinWidth,
   bulkSelectColWidth,
   columnIds,
   staticColumnWidths,
 }: {
-  actionsColWidth: number;
+  actionsColMinWidth: number;
   bulkSelectColWidth: number;
   columnIds: Array<string>;
-  tableWidth: number;
+  scrollContainerWidth: number;
   staticColumnWidths: { [colId: string]: number };
 }) => {
   const staticColWidths = columnIds.reduce((total, id) => total + (staticColumnWidths[id] ?? 0), 0);
 
-  return tableWidth - bulkSelectColWidth - actionsColWidth - staticColWidths;
+  return scrollContainerWidth - bulkSelectColWidth - actionsColMinWidth - staticColWidths;
 };
 
 const calculateColumnWidths = ({
-  actionColMinWidth,
+  actionsColMinWidth,
   assignableWidth,
   attributeColumnIds,
   attributeColumnRenderers,
@@ -52,7 +52,7 @@ const calculateColumnWidths = ({
   staticColumnWidths,
   headerMinWidths,
 }: {
-  actionColMinWidth: number;
+  actionsColMinWidth: number;
   assignableWidth: number;
   attributeColumnRenderers: ColumnRenderersByAttribute<EntityBase>;
   attributeColumnIds: Array<string>;
@@ -84,7 +84,7 @@ const calculateColumnWidths = ({
       }),
     ),
     [ACTIONS_COL_ID]:
-      assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionColMinWidth : actionColMinWidth,
+      assignableWidth > 0 && !totalFlexColumns ? assignableWidth + actionsColMinWidth : actionsColMinWidth,
     ...(bulkSelectColWidth ? { [BULK_SELECT_COL_ID]: bulkSelectColWidth } : {}),
   };
 };
@@ -114,19 +114,19 @@ const calculateStaticColumnWidths = ({
   }, {});
 
 const useColumnWidths = <Entity extends EntityBase>({
-  actionsColWidth,
+  actionsColMinWidth,
   bulkSelectColWidth,
   columnRenderersByAttribute,
   columnIds,
-  tableWidth,
+  scrollContainerWidth,
   columnWidthPreferences,
   headerMinWidths,
 }: {
-  actionsColWidth: number;
+  actionsColMinWidth: number;
   bulkSelectColWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity>;
   columnIds: Array<string>;
-  tableWidth: number;
+  scrollContainerWidth: number;
   columnWidthPreferences: { [key: string]: number } | undefined;
   headerMinWidths: { [colId: string]: number };
 }) => {
@@ -143,23 +143,23 @@ const useColumnWidths = <Entity extends EntityBase>({
   );
 
   useLayoutEffect(() => {
-    if (!tableWidth) {
+    if (!scrollContainerWidth) {
       return;
     }
 
     // Calculate available width for columns which do not have a static width
     const assignableWidth = assignableTableWidth({
-      actionsColWidth,
+      actionsColMinWidth,
       columnIds,
       bulkSelectColWidth,
-      tableWidth,
+      scrollContainerWidth,
       staticColumnWidths,
     });
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setColumnWidths(
       calculateColumnWidths({
-        actionColMinWidth: actionsColWidth,
+        actionsColMinWidth,
         assignableWidth,
         attributeColumnIds: columnIds,
         attributeColumnRenderers: columnRenderersByAttribute,
@@ -169,11 +169,11 @@ const useColumnWidths = <Entity extends EntityBase>({
       }),
     );
   }, [
-    actionsColWidth,
+    actionsColMinWidth,
     bulkSelectColWidth,
     columnRenderersByAttribute,
     columnIds,
-    tableWidth,
+    scrollContainerWidth,
     columnWidthPreferences,
     staticColumnWidths,
     headerMinWidths,
