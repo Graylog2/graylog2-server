@@ -65,7 +65,7 @@ function TestLookup({ table }: Props) {
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
 
   const dataPreview = React.useMemo(() => {
-    if (total < 1) return 'No results to show';
+    if (total === 0) return 'No results to show';
 
     return JSON.stringify(results, null, 2);
   }, [results, total]);
