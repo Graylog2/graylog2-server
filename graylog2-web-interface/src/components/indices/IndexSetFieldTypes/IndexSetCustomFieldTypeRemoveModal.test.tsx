@@ -63,6 +63,8 @@ describe('IndexSetFieldTypesList', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: true,
+      isAllRowsSelected: false,
     });
 
     asMock(useRemoveCustomFieldTypeMutation).mockReturnValue({

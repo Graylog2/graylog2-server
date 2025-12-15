@@ -17,6 +17,7 @@
 package org.graylog.storage.opensearch3.views.searchtypes.pivot;
 
 import org.graylog.plugins.views.search.Query;
+import org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.BucketSpecHandler;
 import org.graylog.plugins.views.search.searchtypes.pivot.Pivot;
@@ -24,6 +25,7 @@ import org.graylog.plugins.views.search.searchtypes.pivot.PivotSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSort;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.SortSpec;
+import org.graylog.plugins.views.search.searchtypes.pivot.series.Percentile;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.AggregationBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.BucketOrder;
@@ -41,7 +43,7 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
 
     public record SortOrders(List<BucketOrder> orders, List<AggregationBuilder> sortingAggregations) {}
 
-    protected SortOrders orderListForPivot(Pivot pivot, OSGeneratedQueryContext queryContext, BucketOrder defaultOrder, Query query) {
+    protected SortOrders orderListForPivot(Pivot pivot, IndexerGeneratedQueryContext<?> queryContext, BucketOrder defaultOrder, Query query) {
         final List<AggregationBuilder> sortingAggregations = new ArrayList<>();
         final List<BucketOrder> ordering = pivot.sort()
                 .stream()
@@ -61,18 +63,22 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                     if (sortSpec instanceof SeriesSort) {
                         final Optional<SeriesSpec> matchingSeriesSpec = pivot.series()
                                 .stream()
-                                .filter(series -> series.literal().equals(sortSpec.field()))
+                                .filter(series ->
+                                        series.literal().equals(sortSpec.field())
+                                                || (series instanceof Percentile && sortSpec.field().equals(series.id())) //TODO: possibly could be removed if FE used real numbers instead of integers in percentile series sort field
+                                )
                                 .findFirst();
                         return matchingSeriesSpec
                                 .map(seriesSpec -> {
                                     if (seriesSpec.literal().equals("count()")) {
                                         return BucketOrder.count(isAscending);
-                                    }
-                                    String orderPath = seriesSpec.statsSubfieldName()
-                                            .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "." + subField)
-                                            .orElse(queryContext.seriesName(seriesSpec, pivot));
+                                    } else {
+                                        String orderPath = seriesSpec.multiValueAggSubfieldName()
+                                                .map(subField -> queryContext.seriesName(seriesSpec, pivot) + "[" + subField + "]")
+                                                .orElse(queryContext.seriesName(seriesSpec, pivot));
 
-                                    return BucketOrder.aggregation(orderPath, isAscending);
+                                        return BucketOrder.aggregation(orderPath, isAscending);
+                                    }
                                 })
                                 .orElse(null);
                     }
@@ -86,7 +92,7 @@ public abstract class OSPivotBucketSpecHandler<SPEC_TYPE extends BucketSpec>
                 : new SortOrders(ordering, List.copyOf(sortingAggregations));
     }
 
-    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, OSGeneratedQueryContext queryContext, Query query) {
+    private boolean isSortOnNumericPivotField(Pivot pivot, PivotSort pivotSort, IndexerGeneratedQueryContext<?> queryContext, Query query) {
         return queryContext.fieldType(query.effectiveStreams(pivot), pivotSort.field())
                 .filter(this::isNumericFieldType)
                 .isPresent();

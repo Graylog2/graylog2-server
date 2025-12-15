@@ -14,21 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+export type PagerDutyConfig = {
+  routing_key: string;
+  pager_duty_title?: string;
+  custom_incident?: boolean;
+  key_prefix?: string;
+  incident_key?: string;
+  client_name: string;
+  client_url: string;
+};
 
-export const CELL_PADDING = 5; // px
-export const DEFAULT_COL_MIN_WIDTH = 150; // px
-export const DEFAULT_COL_WIDTH = 1; // fraction, similar to CSS unit fr.
-export const MORE_ACTIONS_TITLE = 'More';
-export const MORE_ACTIONS_HOVER_TITLE = 'More actions';
-
-export const BULK_SELECT_COLUMN_WIDTH = 15 + CELL_PADDING * 2; // px
-export const BULK_SELECT_COL_ID = 'bulk-select';
-
-export const ACTIONS_COL_ID = 'actions';
-
-export const UTILITY_COLUMNS = new Set([BULK_SELECT_COL_ID, ACTIONS_COL_ID]);
-
-export const ATTRIBUTE_STATUS = {
-  show: 'show',
-  hide: 'hide',
-} as const;
+export const defaultConfig = {
+  client_name: '',
+  client_url: '',
+  custom_incident: false,
+  key_prefix: '',
+  routing_key: '',
+  pager_duty_title: null,
+  incident_key: null,
+};
