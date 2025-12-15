@@ -198,6 +198,7 @@ public class UsersResource extends RestResource {
     @Operation(summary = "Get user details", description = "The user's permissions are only included if a user asks for his " +
             "own account or for users with the necessary permissions to edit permissions.")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns the user", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "The user could not be found.")
     })
     public UserSummary get(@Parameter(name = "username", description = "The username to return information for.", required = true)
@@ -221,6 +222,7 @@ public class UsersResource extends RestResource {
     @Operation(summary = "Get user details by userId", description = "The user's permissions are only included if a user asks for his " +
             "own account or for users with the necessary permissions to edit permissions.")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns the user", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "The user could not be found.")
     })
     public UserSummary getbyId(@Parameter(name = "userId", description = "The userId to return information for.", required = true)
@@ -249,6 +251,7 @@ public class UsersResource extends RestResource {
     @Path("/basic/id/{userId}")
     @Operation(summary = "Get basic user data by userId")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns user info", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "The user could not be found.")
     })
     public BasicUserResponse getBasicUserById(@Parameter(name = "userId", description = "The userId to return information for.", required = true)

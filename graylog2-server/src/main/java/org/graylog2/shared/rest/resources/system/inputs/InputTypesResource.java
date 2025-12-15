@@ -104,6 +104,7 @@ public class InputTypesResource extends RestResource {
     @Path("{inputType}")
     @Operation(summary = "Get information about a single input type")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns type info", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input type registered.")
     })
     public InputTypeInfo info(@Parameter(name = "inputType", required = true) @PathParam("inputType") String inputType) {

@@ -94,6 +94,7 @@ public class InputStatesResource extends AbstractInputsResource {
     @Timed
     @Operation(summary = "Get input state for specified input id on this node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns input state", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     public InputStateSummary get(@Parameter(name = "inputId", required = true) @PathParam("inputId") String inputId) {
@@ -110,6 +111,7 @@ public class InputStatesResource extends AbstractInputsResource {
     @Timed
     @Operation(summary = "(Re-)Start specified input on this node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns ID of started input", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
@@ -134,6 +136,7 @@ public class InputStatesResource extends AbstractInputsResource {
     @Timed
     @Operation(summary = "Switch specified input to setup mode")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns ID of input switched to setup mode", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_SETUP)
@@ -158,6 +161,7 @@ public class InputStatesResource extends AbstractInputsResource {
     @Timed
     @Operation(summary = "Stop specified input on this node")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns ID of stopped input", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)

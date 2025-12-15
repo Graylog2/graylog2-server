@@ -130,6 +130,7 @@ public class IndexSetsResource extends RestResource {
     @Timed
     @Operation(summary = "Get a list of all index sets")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetsResponse list(@Parameter(name = "skip", description = "The number of elements to skip (offset).", required = true)
@@ -158,6 +159,7 @@ public class IndexSetsResource extends RestResource {
     @Timed
     @Operation(summary = "Get a list of all index sets")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns index sets", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetsResponse search(@Parameter(name = "searchTitle", description = "The number of elements to skip (offset).")
@@ -206,6 +208,7 @@ public class IndexSetsResource extends RestResource {
     @Timed
     @Operation(summary = "Get stats of all index sets")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns global stats", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetStats globalStats() {
@@ -218,6 +221,7 @@ public class IndexSetsResource extends RestResource {
     @Timed
     @Operation(summary = "Get index set")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Index set not found"),
     })
@@ -239,6 +243,7 @@ public class IndexSetsResource extends RestResource {
     @Timed
     @Operation(summary = "Get index set statistics")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns statistics", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
             @ApiResponse(responseCode = "404", description = "Index set not found"),
     })
@@ -257,6 +262,7 @@ public class IndexSetsResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.INDEX_SET_CREATE)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns created index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetResponse save(@Parameter(name = "Index set configuration", required = true)
@@ -287,6 +293,7 @@ public class IndexSetsResource extends RestResource {
     @Operation(summary = "Update index set")
     @AuditEvent(type = AuditEventTypes.INDEX_SET_UPDATE)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns updated index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
             @ApiResponse(responseCode = "409", description = "Mismatch of IDs in URI path and payload"),
     })
@@ -334,6 +341,7 @@ public class IndexSetsResource extends RestResource {
     @Operation(summary = "Set default index set")
     @AuditEvent(type = AuditEventTypes.INDEX_SET_UPDATE)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns default index set", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "403", description = "Unauthorized"),
     })
     public IndexSetResponse setDefault(@Parameter(name = "id", required = true)

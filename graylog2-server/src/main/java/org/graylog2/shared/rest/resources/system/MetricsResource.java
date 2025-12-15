@@ -91,6 +91,7 @@ public class MetricsResource extends RestResource {
     @Path("/{metricName}")
     @Operation(summary = "Get a single metric")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the metric", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such metric")
     })
     @Produces(MediaType.APPLICATION_JSON)
@@ -113,6 +114,7 @@ public class MetricsResource extends RestResource {
     @Path("/multiple")
     @Operation(summary = "Get the values of multiple metrics at once")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns metrics", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "400", description = "Malformed body")
     })
     @NoAuditEvent("only used to retrieve multiple metrics")
@@ -141,6 +143,7 @@ public class MetricsResource extends RestResource {
     @Path("/namespace/{namespace}")
     @Operation(summary = "Get all metrics of a namespace")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns metrics by namespace", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such metric namespace")
     })
     @Produces(MediaType.APPLICATION_JSON)

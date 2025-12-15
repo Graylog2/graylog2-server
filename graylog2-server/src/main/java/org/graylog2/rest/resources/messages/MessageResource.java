@@ -94,6 +94,7 @@ public class MessageResource extends RestResource {
     @Timed
     @Operation(summary = "Get a single message.")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the message", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Specified index does not exist."),
             @ApiResponse(responseCode = "404", description = "Message does not exist.")
     })
@@ -139,6 +140,7 @@ public class MessageResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Parse a raw message")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns parsed message", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Specified codec does not exist."),
             @ApiResponse(responseCode = "400", description = "Could not decode message.")
     })
@@ -192,6 +194,7 @@ public class MessageResource extends RestResource {
                   description = "Returns what tokens/terms a message string (message or full_message) is split to.")
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns tokens", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Specified index does not exist."),
     })
     public MessageTokens analyze(

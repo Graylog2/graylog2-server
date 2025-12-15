@@ -566,6 +566,7 @@ public class LookupTableResource extends RestResource {
     @Path("adapters/{name}/query")
     @Operation(summary = "Query a lookup table")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns lookup result", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "If the adapter cannot be found (if it failed or doesn't exist at all)")
     })
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)

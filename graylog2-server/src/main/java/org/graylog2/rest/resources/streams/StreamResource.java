@@ -356,6 +356,7 @@ public class StreamResource extends RestResource {
     @Operation(summary = "Get a single stream")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the stream", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Stream not found."),
             @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })
@@ -373,6 +374,7 @@ public class StreamResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns updated stream", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Stream not found."),
             @ApiResponse(responseCode = "400", description = "Invalid ObjectId.")
     })
@@ -541,6 +543,7 @@ public class StreamResource extends RestResource {
     @Timed
     @Operation(summary = "Test matching of a stream against a supplied message")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns test result", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Stream not found."),
             @ApiResponse(responseCode = "400", description = "Invalid or missing Stream id.")
     })

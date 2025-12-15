@@ -155,6 +155,7 @@ public class ExtractorsResource extends RestResource {
     @Operation(summary = "Update an extractor")
     @Path("/{extractorId}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns updated extractor", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
             @ApiResponse(responseCode = "404", description = "No such extractor on this input."),
             @ApiResponse(responseCode = "400", description = "No such extractor type."),
@@ -194,6 +195,7 @@ public class ExtractorsResource extends RestResource {
     @Timed
     @Operation(summary = "List all extractors of an input")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns extractors", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input on this node.")
     })
     @Produces(MediaType.APPLICATION_JSON)
@@ -215,6 +217,7 @@ public class ExtractorsResource extends RestResource {
     @Operation(summary = "Get information of a single extractor of an input")
     @Path("/{extractorId}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns extractor information", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input on this node."),
             @ApiResponse(responseCode = "404", description = "No such extractor on this input.")
     })

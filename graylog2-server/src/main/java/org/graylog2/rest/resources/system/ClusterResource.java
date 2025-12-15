@@ -38,7 +38,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
-import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.cluster.nodes.ServerNodePaginatedService;
 import org.graylog2.database.PaginatedList;
@@ -186,6 +185,7 @@ public class ClusterResource extends RestResource {
                   description = "This is returning information of a node in context to its state in the cluster. " +
                           "Use the system API of the node itself to get system information.")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns node information", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Node not found.")
     })
     public NodeSummary node(@Parameter(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId) throws NodeNotFoundException {

@@ -72,6 +72,7 @@ public class TelemetryResource extends RestResource {
     @Path("user/settings")
     @Operation(summary = "Retrieve a user's telemetry settings.")
     @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Returns user settings", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "Current user not found.")
     })
     public TelemetryUserSettings getTelemetryUserSettings() {

@@ -161,6 +161,7 @@ public class InputsResource extends AbstractInputsResource {
     @Operation(summary = "Get information of a single input on this node")
     @Path("/{inputId}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns the input", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input.")
     })
     public InputSummary get(@Parameter(name = "inputId", required = true)
@@ -177,6 +178,7 @@ public class InputsResource extends AbstractInputsResource {
     @Operation(summary = "Get diagnostic information of a single input")
     @Path("/diagnostics/{inputId}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns diagnostics", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input.")
     })
     public InputDiagnostics diagnostics(@Parameter(name = "inputId", required = true)
@@ -192,6 +194,7 @@ public class InputsResource extends AbstractInputsResource {
     @Operation(summary = "Get information about usage of input in pipeline rules")
     @Path("meta/{inputId}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns metadata", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input.")
     })
     public PipelineInputsMetadataDao pipelineMetadata(@Parameter(name = "inputId", required = true)
@@ -243,6 +246,7 @@ public class InputsResource extends AbstractInputsResource {
     @Operation(summary = "Returns any streams or pipeline that reference the given input")
     @Path("/references/{inputId}")
     @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns references", useReturnTypeSchema = true),
             @ApiResponse(responseCode = "404", description = "No such input.")
     })
     public InputReferences getReferences(@Parameter(name = "inputId", required = true)
