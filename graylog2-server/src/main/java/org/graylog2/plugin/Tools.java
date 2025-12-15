@@ -674,4 +674,28 @@ public final class Tools {
     public static int availableProcessors() {
         return AVAILABLE_PROCESSORS;
     }
+
+    /**
+     * Calculate percentage from total and value.
+     *
+     * @param total The total number of items
+     * @param value The value to calculate percentage for
+     * @return An integer between 0 and 100 representing the percentage.
+     * Returns 0 if total is 0 or negative, or if value is 0 or negative.
+     * Returns 100 if value is greater than or equal to total.
+     */
+    public static int percentageOf(long total, long value) {
+        // Handle invalid inputs
+        if (total <= 0 || value <= 0) {
+            return 0;
+        }
+
+        // Cap at 100% if value exceeds total
+        if (value >= total) {
+            return 100;
+        }
+
+        // Calculate percentage using double to avoid overflow and floor for rounding
+        return (int) Math.floor((double) value * 100.0 / (double) total);
+    }
 }

@@ -337,4 +337,49 @@ public class ToolsTest {
         assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("198.51.100.23")));
         assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("2001:DB8::42")));
     }
+
+    @Test
+    public void percentageOfNormalCases() {
+        assertEquals(0, Tools.percentageOf(100, 0));
+        assertEquals(1, Tools.percentageOf(100, 1));
+        assertEquals(50, Tools.percentageOf(100, 50));
+        assertEquals(99, Tools.percentageOf(100, 99));
+        assertEquals(100, Tools.percentageOf(100, 100));
+        assertEquals(25, Tools.percentageOf(200, 50));
+        assertEquals(33, Tools.percentageOf(300, 100));
+    }
+
+    @Test
+    public void percentageOfWithZeroTotal() {
+        assertEquals(0, Tools.percentageOf(0, 0));
+        assertEquals(0, Tools.percentageOf(0, 50));
+    }
+
+    @Test
+    public void percentageOfWithNegativeValues() {
+        assertEquals(0, Tools.percentageOf(-100, 50));
+        assertEquals(0, Tools.percentageOf(100, -50));
+        assertEquals(0, Tools.percentageOf(-100, -50));
+    }
+
+    @Test
+    public void percentageOfWhenValueExceedsTotal() {
+        assertEquals(100, Tools.percentageOf(100, 150));
+        assertEquals(100, Tools.percentageOf(50, 100));
+    }
+
+    @Test
+    public void percentageOfWithLargeValues() {
+        // Test with large long values to ensure no overflow
+        assertEquals(50, Tools.percentageOf(Long.MAX_VALUE, Long.MAX_VALUE / 2));
+        assertEquals(75, Tools.percentageOf(1000000000000L, 750000000000L));
+    }
+
+    @Test
+    public void percentageOfRoundingBehavior() {
+        // Test floor rounding behavior
+        assertEquals(33, Tools.percentageOf(3, 1)); // 33.33... -> 33
+        assertEquals(66, Tools.percentageOf(3, 2)); // 66.66... -> 66
+        assertEquals(99, Tools.percentageOf(1000, 999)); // 99.9 -> 99
+    }
 }
