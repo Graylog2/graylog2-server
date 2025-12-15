@@ -161,7 +161,7 @@ function TestLookup({ table }: Props) {
           <h4 style={{ width: '100%' }}>
             <Row $align="center" $justify="space-between">
               <span>Lookup result</span>
-              {((supported && total > 0) || lookupResult) && (
+              {supported && total > 0 && !lookupResult && (
                 <Row $width="auto" $align="center">
                   <NoMarginInput>
                     <Input
