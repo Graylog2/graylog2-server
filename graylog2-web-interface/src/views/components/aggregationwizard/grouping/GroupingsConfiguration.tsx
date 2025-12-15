@@ -88,13 +88,11 @@ const GroupingsConfiguration = () => {
   const isEmpty = (groupBy?.groupings ?? []).length === 0;
 
   const GroupingsItem = useCallback(
-    ({ item, index, dragHandleProps, draggableProps, className, ref }: GroupingsItemProps) => (
+    ({ item, index, dragHandle, className, ref }: GroupingsItemProps) => (
       <ElementConfigurationContainer
         key={`grouping-${item.id}`}
-        dragHandleProps={dragHandleProps}
-        draggableProps={draggableProps}
+        dragHandle={dragHandle}
         className={className}
-        testIdPrefix={`grouping-${index}`}
         onRemove={removeGrouping(index)}
         elementTitle={GroupingElement.title}
         ref={ref}>

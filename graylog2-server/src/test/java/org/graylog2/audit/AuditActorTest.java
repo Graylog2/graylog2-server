@@ -18,9 +18,10 @@ package org.graylog2.audit;
 
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AuditActorTest {
     @Test
@@ -30,14 +31,16 @@ public class AuditActorTest {
         assertThat(actor.urn()).isEqualTo("urn:graylog:user:jane");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testEmptyUser() {
-        AuditActor.user("");
+        assertThrows(IllegalArgumentException.class, () ->
+            AuditActor.user(""));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testNullUser() {
-        AuditActor.user(null);
+        assertThrows(IllegalArgumentException.class, () ->
+            AuditActor.user(null));
     }
 
     @Test
@@ -48,8 +51,9 @@ public class AuditActorTest {
         assertThat(actor.urn()).isEqualTo("urn:graylog:node:28164cbe-4ad9-4c9c-a76e-088655aa78892");
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void testNullSystem() {
-        AuditActor.system(null);
+        assertThrows(NullPointerException.class, () ->
+            AuditActor.system(null));
     }
 }

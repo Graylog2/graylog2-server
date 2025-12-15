@@ -22,14 +22,14 @@ import jakarta.inject.Provider;
 import org.assertj.core.api.Assertions;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.datatiering.DataTieringOrchestrator;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.datanode.DatanodeMigrationLockService;
 import org.graylog2.indexer.datanode.DatanodeMigrationLockServiceImpl;
 import org.graylog2.indexer.datanode.DatanodeMigrationLockWaitConfig;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
@@ -37,17 +37,16 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.system.activities.NullActivityWriter;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
+import java.util.Set;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -55,9 +54,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class IndexRotationThreadTest {
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
     @Mock
     private IndexSet indexSet;
@@ -74,8 +73,8 @@ public class IndexRotationThreadTest {
     @Mock
     private DataTieringOrchestrator dataTieringOrchestrator;
 
-    @Before
-    public void setUp() throws Exception {
+    @BeforeEach
+    public void setUp() {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
     }
 
@@ -194,15 +193,7 @@ public class IndexRotationThreadTest {
     @Nonnull
     private IndexSetRegistry mockIndexSetRegistry(IndexSet... indexSets) {
         final IndexSetRegistry registry = Mockito.mock(IndexSetRegistry.class);
-        final List<IndexSet> sets = Arrays.asList(indexSets);
-
-        // mock the Iterable forEach implementation :-/
-        Mockito.doAnswer(invocation -> {
-            Consumer<IndexSet> action = invocation.getArgument(0);
-            sets.forEach(action);
-            return null;
-        }).when(registry).forEach(Mockito.any());
-
+        Mockito.when(registry.getAllIndexSets()).thenReturn(Set.of(indexSets));
         return registry;
     }
 

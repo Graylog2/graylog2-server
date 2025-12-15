@@ -15,14 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 
+import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
 import { Icon, Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteLookupTable } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { useModalContext } from 'components/lookup-tables/contexts/ModalContext';
 import type { LookupTableEntity } from 'components/lookup-tables/types';
 
 type ActionsProps = {
@@ -34,13 +35,11 @@ function Actions({ lut }: ActionsProps) {
   const sendTelemetry = useSendTelemetry();
   const { deleteLookupTable, deletingLookupTable } = useDeleteLookupTable();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(lut);
-  const { setModal, setTitle, setEntity } = useModalContext();
+  const navigate = useNavigate();
 
   const handleEdit = React.useCallback(() => {
-    setModal('LUT-EDIT');
-    setTitle(lut.name);
-    setEntity(lut);
-  }, [lut, setModal, setTitle, setEntity]);
+    navigate(Routes.SYSTEM.LOOKUPTABLES.edit(lut.name));
+  }, [lut, navigate]);
 
   const handleDelete = React.useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DELETED, {
@@ -84,9 +83,11 @@ function Actions({ lut }: ActionsProps) {
   );
 }
 
+const renderActions = (lut: LookupTableEntity) => <Actions lut={lut} />;
+
 function useActions() {
   return {
-    renderActions: (lut: LookupTableEntity) => <Actions lut={lut} />,
+    renderActions,
   };
 }
 

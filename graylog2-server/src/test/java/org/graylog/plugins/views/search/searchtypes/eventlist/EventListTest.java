@@ -18,7 +18,7 @@ package org.graylog.plugins.views.search.searchtypes.eventlist;
 
 import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

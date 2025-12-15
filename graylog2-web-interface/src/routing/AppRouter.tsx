@@ -67,9 +67,15 @@ import {
   InputDiagnosisPage,
   KeyboardShortcutsPage,
   LoggersPage,
+  LUTCacheDetailsPage,
   LUTCachesPage,
+  LUTCachesFormPage,
   LUTDataAdaptersPage,
+  LUTDataAdaptersFormPage,
+  LUTDataAdapterDetailsPage,
   LUTTablesPage,
+  LUTFormPage,
+  LUTDetailsPage,
   NodeInputsPage,
   NotFoundPage,
   PipelineDetailsPage,
@@ -259,12 +265,26 @@ const AppRouter = () => {
             !isCloud && { path: RoutePaths.SYSTEM.INDICES.FAILURES, element: <IndexerFailuresPage /> },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.OVERVIEW, element: withLUTModalProvider(LUTTablesPage) },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.show(':lutIdOrName'), element: <LUTDetailsPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CREATE, element: <LUTFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.edit(':lutIdOrName'), element: <LUTFormPage /> },
 
             { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW, element: withLUTModalProvider(LUTCachesPage) },
-
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheIdOrName'), element: <LUTCacheDetailsPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.CREATE, element: <LUTCachesFormPage /> },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.CACHES.edit(':cacheIdOrName'), element: <LUTCachesFormPage /> },
             {
               path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW,
               element: withLUTModalProvider(LUTDataAdaptersPage),
+            },
+            { path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE, element: <LUTDataAdaptersFormPage /> },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterIdOrName'),
+              element: <LUTDataAdaptersFormPage />,
+            },
+            {
+              path: RoutePaths.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterIdOrName'),
+              element: <LUTDataAdapterDetailsPage />,
             },
 
             { path: RoutePaths.SYSTEM.PIPELINES.OVERVIEW, element: <PipelinesOverviewPage /> },

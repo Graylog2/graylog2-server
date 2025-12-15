@@ -85,11 +85,6 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava-testlib</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>
             <artifactId>caffeine</artifactId>
         </dependency>
@@ -137,6 +132,7 @@
         <dependency>
             <groupId>org.graylog</groupId>
             <artifactId>jadconfig</artifactId>
+            <version>${jadconfig.version}</version>
         </dependency>
 
         <dependency>
@@ -466,7 +462,7 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>elasticsearch</artifactId>
+            <artifactId>testcontainers-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -477,18 +473,18 @@
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>rabbitmq</artifactId>
+            <artifactId>testcontainers-rabbitmq</artifactId>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
+            <artifactId>testcontainers-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jukito</groupId>
-            <artifactId>jukito</artifactId>
+            <groupId>name.falgout.jeffrey.testing.junit5</groupId>
+            <artifactId>guice-extension</artifactId>
         </dependency>
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -703,7 +699,20 @@
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>sqs</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>apache-client</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!-- additional integrations dependencies -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -744,11 +753,6 @@
         <dependency>
             <groupId>nl.jqno.equalsverifier</groupId>
             <artifactId>equalsverifier</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.stefanbirkner</groupId>
-            <artifactId>system-rules</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -826,17 +830,8 @@
 
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -999,11 +994,6 @@
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>3.2.1</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.6.2</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -1134,20 +1124,51 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>generate-api-defs</id>
                         <phase>compile</phase>
                         <goals>
                             <goal>java</goal>
                         </goals>
+                        <configuration>
+                            <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
+                            <arguments>
+                                <argument>${project.build.directory}/swagger</argument>
+                                <argument>org.graylog</argument>
+                                <argument>org.graylog2</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-csv-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>csv</argument>
+                                <argument>${project.build.directory}/server-conf-docs.csv</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-conf-example</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>conf</argument>
+                                <argument>${project.build.directory}/server.conf.generated</argument>
+                                <!-- use the following line if you want to distribute the generated version instead of manually created -->
+                                <!-- <argument>${project.build.directory}/server.conf.example</argument> -->
+                            </arguments>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <mainClass>org.graylog.api.GenerateApiDefinition</mainClass>
-                    <arguments>
-                        <argument>${project.build.directory}/swagger</argument>
-                        <argument>org.graylog</argument>
-                        <argument>org.graylog2</argument>
-                    </arguments>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.cyclonedx</groupId>
