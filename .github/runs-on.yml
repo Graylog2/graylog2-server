@@ -1,0 +1,3 @@
+# See https://github.com/Graylog2/graylog-project-internal/blob/main/.github/runs-on.yml
+# for the shared configuration file.
+_extends: "graylog-project-internal"
