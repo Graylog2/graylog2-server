@@ -30,6 +30,7 @@ import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.net.HostAndPort;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -142,6 +143,9 @@ public class CustomModelConverter extends ModelResolver {
                 return super.resolve(replacementType(annotatedType, String.class), context, next);
             } else if (PeriodDuration.class.isAssignableFrom(rawClass)) {
                 // perioddurations are strings
+                return super.resolve(replacementType(annotatedType, String.class), context, next);
+            } else if (HostAndPort.class.isAssignableFrom(rawClass)) {
+                // HostAndPorts are strings
                 return super.resolve(replacementType(annotatedType, String.class), context, next);
             }
         }
