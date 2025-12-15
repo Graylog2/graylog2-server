@@ -26,7 +26,10 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.type.CollectionLikeType;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -48,6 +51,7 @@ import java.util.Map;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+import java.util.Set;
 
 /**
  * Custom implementation of {@link ModelResolver} for OpenAPI schema generation.
@@ -114,6 +118,24 @@ public class CustomModelConverter extends ModelResolver {
 
                     return super.resolve(replacementType, context, next);
                 }
+            } else if (ImmutableList.class.isAssignableFrom(javaType.getRawClass())) {
+                // ImmutableLists are just lists
+                final AnnotatedType replacementType = new AnnotatedType()
+                        .type(_mapper.getTypeFactory().constructCollectionLikeType(List.class, javaType.getContentType()))
+                        .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
+                        .ctxAnnotations(annotatedType.getCtxAnnotations())
+                        .resolveAsRef(annotatedType.isResolveAsRef())
+                        .schemaProperty(annotatedType.isSchemaProperty());
+                return super.resolve(replacementType, context, next);
+            } else if (ImmutableSet.class.isAssignableFrom(javaType.getRawClass())) {
+                // ImmutableSets are just sets
+                final AnnotatedType replacementType = new AnnotatedType()
+                        .type(_mapper.getTypeFactory().constructCollectionLikeType(Set.class, javaType.getContentType()))
+                        .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
+                        .ctxAnnotations(annotatedType.getCtxAnnotations())
+                        .resolveAsRef(annotatedType.isResolveAsRef())
+                        .schemaProperty(annotatedType.isSchemaProperty());
+                return super.resolve(replacementType, context, next);
             }
         }
 
