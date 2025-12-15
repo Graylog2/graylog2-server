@@ -15,16 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React, { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 
 import { EntityDataTable, NoSearchResult, Spinner } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 
-import {
-  createColumnDefinitions,
-  createColumnRenderers,
-} from './DataNodesColumnConfiguration';
+import { createColumnDefinitions, createColumnRenderers } from './DataNodesColumnConfiguration';
 import useClusterDataNodesTableLayout from './useClusterDataNodesTableLayout';
 import useClusterDataNodes, { type ClusterDataNode } from './useClusterDataNodes';
 
@@ -49,6 +46,7 @@ const DataNodesExpandable = ({
   pageSizeLimit = undefined,
   refetchInterval = undefined,
 }: Props) => {
+  const theme = useTheme();
   const {
     defaultDisplayedColumns,
     defaultColumnOrder,
@@ -57,6 +55,7 @@ const DataNodesExpandable = ({
     isLoadingLayout,
     handleLayoutPreferencesChange,
     handleSortChange,
+    resetLayoutPreferences,
   } = useClusterDataNodesTableLayout(searchQuery, pageSizeLimit);
   const {
     nodes: dataNodes,
@@ -105,6 +104,7 @@ const DataNodesExpandable = ({
             defaultDisplayedColumns={defaultDisplayedColumns}
             defaultColumnOrder={defaultColumnOrder}
             layoutPreferences={layoutPreferences}
+            onResetLayoutPreferences={resetLayoutPreferences}
             onLayoutPreferencesChange={handleLayoutPreferencesChange}
             onSortChange={handleSortChange}
             activeSort={searchParams.sort}
@@ -112,6 +112,7 @@ const DataNodesExpandable = ({
             entityActions={renderActions}
             columnSchemas={columnSchemas}
             columnRenderers={columnRenderers}
+            parentBgColor={theme.colors.section.filled.background}
           />
         );
       })()}

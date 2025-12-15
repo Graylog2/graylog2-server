@@ -100,7 +100,7 @@
         <opensearch.shaded.version>2.19.3-1</opensearch.shaded.version>
         <opensearch.client.version>3.2.0</opensearch.client.version>
         <airline.version>3.2.0</airline.version>
-        <amqp-client.version>5.27.1</amqp-client.version>
+        <amqp-client.version>5.28.0</amqp-client.version>
         <antlr.version>4.13.2</antlr.version>
         <apache-directory-version>2.1.7</apache-directory-version>
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
@@ -110,7 +110,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.39.0</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.40.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.2.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.5</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
@@ -121,7 +121,7 @@
         <commons-codec.version>1.20.0</commons-codec.version>
         <commons-csv.version>1.14.1</commons-csv.version>
         <commons-email.version>1.6.0</commons-email.version>
-        <commons-exec.version>1.5.0</commons-exec.version>
+        <commons-exec.version>1.6.0</commons-exec.version>
         <commons-lang3.version>3.20.0</commons-lang3.version>
         <commons-net.version>3.12.0</commons-net.version>
         <commons-validator.version>1.10.1</commons-validator.version>
@@ -142,7 +142,7 @@
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.20.1</jackson.version>
-        <jadconfig.version>0.15.0</jadconfig.version>
+        <jadconfig.version>1.0.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
@@ -164,14 +164,14 @@
         <log4j.version>2.25.2</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <metrics.version>4.2.37</metrics.version>
-        <mongodb-driver.version>5.6.1</mongodb-driver.version>
+        <mongodb-driver.version>5.6.2</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.7.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.56.0</opentelemetry.version>
+        <opentelemetry.version>1.57.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.22.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -191,7 +191,7 @@
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
-        <unboundid-ldap.version>7.0.3</unboundid-ldap.version>
+        <unboundid-ldap.version>7.0.4</unboundid-ldap.version>
         <uuid.version>3.2.1</uuid.version>
         <validation-api.version>3.1.1</validation-api.version>
         <zstd.version>1.5.7-6</zstd.version>
@@ -200,7 +200,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <mcp-bom.version>0.16.0</mcp-bom.version>
+        <mcp-bom.version>0.17.0</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -208,10 +208,10 @@
         <assertj-core.version>3.27.6</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.2.4</equalsverifier.version>
+        <equalsverifier.version>4.2.5</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.1</junit-jupiter.version>
-        <mockito.version>5.20.0</mockito.version>
+        <mockito.version>5.21.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
         <testcontainers.version>2.0.2</testcontainers.version>
         <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
@@ -642,7 +642,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>3.7.1</version>
+                    <version>3.8.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -672,7 +672,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -693,6 +693,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.5.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -747,7 +752,7 @@
                 <plugin>
                     <groupId>org.openrewrite.maven</groupId>
                     <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.24.0</version>
+                    <version>6.25.0</version>
                     <configuration>
                         <!-- do not set <configLocation> here, otherwise it cannot be overridden by a system property later -->
                         <exclusions>
@@ -764,27 +769,27 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.67.1</version>
+                            <version>8.68.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.22.0</version>
+                            <version>3.23.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.22.0</version>
+                            <version>3.23.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.22.0</version>
+                            <version>2.23.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-joda</artifactId>
-                            <version>0.4.0</version>
+                            <version>0.5.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>

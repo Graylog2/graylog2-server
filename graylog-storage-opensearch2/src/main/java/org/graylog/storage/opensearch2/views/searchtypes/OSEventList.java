@@ -21,7 +21,6 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import org.graylog.events.event.EventDto;
 import org.graylog.plugins.views.search.Query;
-import org.graylog.plugins.views.search.SearchJob;
 import org.graylog.plugins.views.search.SearchType;
 import org.graylog.plugins.views.search.searchtypes.events.CommonEventSummary;
 import org.graylog.plugins.views.search.searchtypes.events.EventList;
@@ -30,7 +29,6 @@ import org.graylog.shaded.opensearch2.org.opensearch.action.search.SearchRespons
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.BoolQueryBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBuilders;
 import org.graylog.shaded.opensearch2.org.opensearch.search.SearchHit;
-import org.graylog.shaded.opensearch2.org.opensearch.search.aggregations.Aggregations;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.FieldSortBuilder;
 import org.graylog.shaded.opensearch2.org.opensearch.search.sort.SortOrder;
 import org.graylog.storage.opensearch2.views.OSGeneratedQueryContext;
@@ -101,8 +99,8 @@ public class OSEventList implements EventListStrategy {
 
     @WithSpan
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, EventList searchType, SearchResponse result,
-                                             Aggregations aggregations, OSGeneratedQueryContext queryContext) {
+    public SearchType.Result doExtractResult(Query query, EventList searchType, SearchResponse result,
+                                             OSGeneratedQueryContext queryContext) {
         final List<CommonEventSummary> eventSummaries = extractResult(result).stream()
                 .map(rawEvent -> objectMapper.convertValue(rawEvent, EventDto.class))
                 .map(EventSummary::parse)

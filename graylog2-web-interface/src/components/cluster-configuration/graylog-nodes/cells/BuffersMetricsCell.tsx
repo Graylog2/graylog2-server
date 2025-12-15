@@ -33,11 +33,7 @@ const renderBufferRow = (
   warningThreshold: number,
   dangerThreshold: number,
 ) => {
-  const ratioIndicator = buildRatioIndicator(
-    computeRatio(usage, size),
-    warningThreshold,
-    dangerThreshold,
-  );
+  const ratioIndicator = buildRatioIndicator(computeRatio(usage, size), warningThreshold, dangerThreshold);
 
   return (
     <MetricsRow key={label}>

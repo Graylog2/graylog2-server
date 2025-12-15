@@ -26,6 +26,7 @@ type InternalState = {
   title: string;
   description: string;
   defaultRoles: Immutable.List<string>;
+  defaultUserTimezone: string;
   config: DirectoryServiceBackendConfig | OktaBackendConfig;
 };
 
@@ -38,6 +39,7 @@ export type AuthenticationBackendJSON = {
   title: string;
   description: string;
   default_roles: Array<string>;
+  default_user_timezone: string;
   config: DirectoryServiceBackendConfig | OktaBackendConfig;
 };
 
@@ -69,6 +71,7 @@ export default class AuthenticationBackend {
     title: InternalState['title'],
     description: InternalState['description'],
     defaultRoles: InternalState['defaultRoles'],
+    defaultUserTimezone: InternalState['defaultUserTimezone'],
     config: InternalState['config'],
   ) {
     this._value = {
@@ -76,6 +79,7 @@ export default class AuthenticationBackend {
       title,
       description,
       defaultRoles,
+      defaultUserTimezone,
       config,
     };
   }
@@ -96,12 +100,16 @@ export default class AuthenticationBackend {
     return this._value.defaultRoles;
   }
 
+  get defaultUserTimezone(): InternalState['defaultUserTimezone'] {
+    return this._value.defaultUserTimezone;
+  }
+
   get config(): InternalState['config'] {
     return this._value.config;
   }
 
   toBuilder(): Builder {
-    const { id, title, description, defaultRoles, config } = this._value;
+    const { id, title, description, defaultRoles, defaultUserTimezone, config } = this._value;
 
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return new Builder(
@@ -110,13 +118,14 @@ export default class AuthenticationBackend {
         title,
         description,
         defaultRoles,
+        defaultUserTimezone,
         config,
       }),
     );
   }
 
   toJSON() {
-    const { id, title, description, defaultRoles = Immutable.List(), config } = this._value;
+    const { id, title, description, defaultRoles = Immutable.List(), defaultUserTimezone, config } = this._value;
 
     const formattedConfig = configToJson(config);
 
@@ -125,16 +134,31 @@ export default class AuthenticationBackend {
       title,
       description,
       default_roles: defaultRoles.toJS(),
+      default_user_timezone: defaultUserTimezone,
       config: formattedConfig,
     };
   }
 
   static fromJSON(value: AuthenticationBackendJSON) {
-    const { id, title, description, default_roles: defaultRoles, config } = value;
+    const {
+      id,
+      title,
+      description,
+      default_roles: defaultRoles,
+      default_user_timezone: defaultUserTimezone,
+      config,
+    } = value;
 
     const formattedConfig = configFromJson(config);
 
-    return new AuthenticationBackend(id, title, description, Immutable.List(defaultRoles), formattedConfig);
+    return new AuthenticationBackend(
+      id,
+      title,
+      description,
+      Immutable.List(defaultRoles),
+      defaultUserTimezone,
+      formattedConfig,
+    );
   }
 
   static builder(): Builder {
@@ -173,8 +197,8 @@ class Builder {
   }
 
   build(): AuthenticationBackend {
-    const { id, title, description, defaultRoles, config } = this.value.toObject();
+    const { id, title, description, defaultRoles, defaultUserTimezone, config } = this.value.toObject();
 
-    return new AuthenticationBackend(id, title, description, defaultRoles, config);
+    return new AuthenticationBackend(id, title, description, defaultRoles, defaultUserTimezone, config);
   }
 }

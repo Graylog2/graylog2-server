@@ -63,14 +63,24 @@ const DEFAULT_SEARCH_PARAMS: SearchParams = {
   sort: undefined,
 };
 
-export const fetchGraylogNodes = async (params: SearchParams = DEFAULT_SEARCH_PARAMS): Promise<GraylogNodesResponse> => {
+export const fetchGraylogNodes = async (
+  params: SearchParams = DEFAULT_SEARCH_PARAMS,
+): Promise<GraylogNodesResponse> => {
   const url = PaginationURL('/system/cluster/nodes/paginated', params.page, params.pageSize, params.query, {
     sort: params.sort?.attributeId,
     order: params.sort?.direction,
   });
 
   return fetch('GET', qualifyUrl(url)).then(
-    ({ attributes, pagination, elements }: { attributes: Array<Attribute>; pagination: PaginatedResponseType; elements: GraylogNodes }) => ({
+    ({
+      attributes,
+      pagination,
+      elements,
+    }: {
+      attributes: Array<Attribute>;
+      pagination: PaginatedResponseType;
+      elements: GraylogNodes;
+    }) => ({
       attributes,
       list: elements,
       pagination,
@@ -99,18 +109,17 @@ const useGraylogNodes = (
   });
 
   return {
-    data:
-      data || {
-        attributes: [],
-        list: [],
-        pagination: {
-          query: '',
-          page: 1,
-          per_page: 0,
-          total: 0,
-          count: 0,
-        },
+    data: data || {
+      attributes: [],
+      list: [],
+      pagination: {
+        query: '',
+        page: 1,
+        per_page: 0,
+        total: 0,
+        count: 0,
       },
+    },
     refetch,
     isLoading,
     error,

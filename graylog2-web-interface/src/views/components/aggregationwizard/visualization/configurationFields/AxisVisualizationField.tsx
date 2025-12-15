@@ -24,24 +24,21 @@ import type { CustomFieldComponentProps } from 'views/types';
 import type { WidgetConfigFormValues } from 'views/components/aggregationwizard';
 import ColorConfigurationPopover from 'views/components/aggregationwizard/ColorConfigurationPopover';
 import { getDefaultLabelColor } from 'views/components/visualizations/utils/getDefaultPlotFontSettings';
-import type {ChartAxisConfig} from "views/logic/aggregationbuilder/visualizations/XYVisualization";
+import type { ChartAxisConfig } from 'views/logic/aggregationbuilder/visualizations/XYVisualization';
 
 const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldComponentProps) => {
   const theme = useTheme();
   const { values, setFieldValue } = useFormikContext<WidgetConfigFormValues>();
 
-  const curColor = useMemo(
-    () => {
-      const visualizationConfig = values.visualization.config;
-      const defaultColor = getDefaultLabelColor(theme);
-      if('axisConfig' in visualizationConfig) {
-        return visualizationConfig?.axisConfig?.[field.id]?.color ?? defaultColor
-      }
+  const curColor = useMemo(() => {
+    const visualizationConfig = values.visualization.config;
+    const defaultColor = getDefaultLabelColor(theme);
+    if ('axisConfig' in visualizationConfig) {
+      return visualizationConfig?.axisConfig?.[field.id]?.color ?? defaultColor;
+    }
 
-      return defaultColor;
-    },
-    [field.id, theme, values.visualization.config],
-  );
+    return defaultColor;
+  }, [field.id, theme, values.visualization.config]);
 
   const onColorSelect = useCallback(
     (color: string) => {
@@ -50,20 +47,22 @@ const AxisVisualizationField = ({ name, field, title, inputHelp }: CustomFieldCo
     [name, setFieldValue],
   );
 
-  const validateField = useCallback((value: string) => {
-    const axisConfig: ChartAxisConfig = ('axisConfig' in values.visualization.config) ? values.visualization.config.axisConfig : {};
-    const hasError =
-      'showAxisLabels' in values.visualization.config
-      && values.visualization.config.showAxisLabels
-      && !Object
-        .values(axisConfig)
-        .some(({ color, title: axisTitle }) => color ?? axisTitle)
-      && !value
+  const validateField = useCallback(
+    (value: string) => {
+      const axisConfig: ChartAxisConfig =
+        'axisConfig' in values.visualization.config ? values.visualization.config.axisConfig : {};
+      const hasError =
+        'showAxisLabels' in values.visualization.config &&
+        values.visualization.config.showAxisLabels &&
+        !Object.values(axisConfig).some(({ color, title: axisTitle }) => color ?? axisTitle) &&
+        !value;
 
-    if(hasError) return 'At least for one axis should be defined label or color.'
+      if (hasError) return 'At least for one axis should be defined label or color.';
 
-    return null;
-  }, [values.visualization.config])
+      return null;
+    },
+    [values.visualization.config],
+  );
 
   return (
     <>

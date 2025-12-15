@@ -14,9 +14,10 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import { Formik } from 'formik';
-import { render, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { render, waitFor } from 'wrappedTestingLibrary';
 
 import Autocomplete from './Autocomplete';
 
@@ -50,14 +51,18 @@ describe('Autocomplete component', () => {
 
   it('should let the user type', async () => {
     const { baseElement } = renderAutocomplete();
-    fireEvent.change(baseElement.querySelector('input'), { target: { value: 'Naranja' } });
+    const input = baseElement.querySelector('input');
+
+    await userEvent.type(input, 'Naranja');
 
     expect(baseElement).toHaveTextContent('Naranja');
   });
 
   it('should show a list with options', async () => {
     const { baseElement } = renderAutocomplete();
-    fireEvent.change(baseElement.querySelector('input'), { target: { value: 'ver' } });
+    const input = baseElement.querySelector('input');
+
+    await userEvent.type(input, 'ver');
     let list = null;
 
     await waitFor(() => {

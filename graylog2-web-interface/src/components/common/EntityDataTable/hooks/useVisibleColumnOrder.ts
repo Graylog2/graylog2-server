@@ -17,48 +17,39 @@
 
 import { useMemo } from 'react';
 
-import { BULK_SELECT_COL_ID, ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import { BULK_SELECT_COL_ID, ACTIONS_COL_ID, ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import type { ColumnPreferences } from 'components/common/EntityDataTable/types';
 
 const getVisibleAttributeColumns = (
   defaultDisplayedColumns: Array<string>,
   userColumnPreferences: ColumnPreferences | undefined = {},
 ) => {
-  const visible = new Set(
+  const userSelection = new Set(
     Object.entries(userColumnPreferences)
-      .filter(([, { status }]) => status === 'show')
+      .filter(([, { status }]) => status === ATTRIBUTE_STATUS.show)
       .map(([attr]) => attr),
   );
 
-  // Add default columns, which are not explicitly hidden
-  defaultDisplayedColumns.forEach((attr) => {
-    if (!userColumnPreferences[attr]) {
-      visible.add(attr);
-    }
-  });
+  if (userSelection.size > 0) {
+    return userSelection;
+  }
 
-  return visible;
+  return new Set(defaultDisplayedColumns);
 };
 const useVisibleColumnOrder = (
   columnPreferences: ColumnPreferences | undefined,
-  attributeColumnsOrder: Array<string>,
+  attributeColumnOrder: Array<string>,
   defaultDisplayedColumns: Array<string>,
-  displayActionsCol: boolean,
   displayBulkSelectCol: boolean,
 ) =>
   useMemo(() => {
     const visibleAttributeColumns = getVisibleAttributeColumns(defaultDisplayedColumns, columnPreferences);
-    // Core order: visible attributes in the order defined by attributeColumnsOrder
-    const coreOrder = attributeColumnsOrder.filter((id) => visibleAttributeColumns.has(id));
-    // Additional: visible attributes not in attributeColumnsOrder
-    const additionalVisible = [...visibleAttributeColumns].filter((id) => !attributeColumnsOrder.includes(id));
+    // Core order: visible attributes in the order defined by attributeColumnOrder
+    const coreOrder = attributeColumnOrder.filter((id) => visibleAttributeColumns.has(id));
+    // Additional: visible attributes not in attributeColumnOrder
+    const additionalVisible = [...visibleAttributeColumns].filter((id) => !attributeColumnOrder.includes(id));
 
-    return [
-      ...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []),
-      ...coreOrder,
-      ...additionalVisible,
-      ...(displayActionsCol ? [ACTIONS_COL_ID] : []),
-    ];
-  }, [columnPreferences, defaultDisplayedColumns, attributeColumnsOrder, displayBulkSelectCol, displayActionsCol]);
+    return [...(displayBulkSelectCol ? [BULK_SELECT_COL_ID] : []), ...coreOrder, ...additionalVisible, ACTIONS_COL_ID];
+  }, [columnPreferences, defaultDisplayedColumns, attributeColumnOrder, displayBulkSelectCol]);
 
 export default useVisibleColumnOrder;
