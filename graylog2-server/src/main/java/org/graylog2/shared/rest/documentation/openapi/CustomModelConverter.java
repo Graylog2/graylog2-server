@@ -44,15 +44,20 @@ import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.graylog.grn.GRN;
+import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.threeten.extra.PeriodDuration;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -67,6 +72,8 @@ import java.util.Set;
  * {@link OptionalLong}, {@link OptionalDouble}) during schema generation.
  */
 public class CustomModelConverter extends ModelResolver {
+    private static final Logger LOG = LoggerFactory.getLogger(CustomModelConverter.class);
+
     @Inject
     public CustomModelConverter(ObjectMapper applicationObjectMapper) {
         super(applicationObjectMapper.copy(), fqnTypeNameResolver());
@@ -109,8 +116,14 @@ public class CustomModelConverter extends ModelResolver {
                 final JavaType keyType = javaType.getKeyType();
                 final JavaType valueType = javaType.getContentType();
 
-                // OpenAPI maps must have string keys, so only support that case
-                if (keyType != null && keyType.getRawClass() == String.class && valueType != null) {
+                // OpenAPI maps must have string keys.
+                // we have three common cases: String keys, GRN keys, DateTime keys, so we support them directly,
+                // otherss will fail.
+                if (keyType != null &&
+                        (String.class.isAssignableFrom(keyType.getRawClass())
+                                || GRN.class.isAssignableFrom(keyType.getRawClass())
+                                || DateTime.class.isAssignableFrom(keyType.getRawClass()))
+                        &&  valueType != null) {
 
                     // Reconstruct an AnnotatedType for a Map<String, V> and forward to superclass
                     final JavaType mapType = _mapper.getTypeFactory().constructMapType(Map.class, String.class,
