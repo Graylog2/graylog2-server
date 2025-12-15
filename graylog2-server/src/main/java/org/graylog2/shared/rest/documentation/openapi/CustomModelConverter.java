@@ -43,6 +43,10 @@ import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.threeten.extra.PeriodDuration;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
@@ -97,8 +101,9 @@ public class CustomModelConverter extends ModelResolver {
         // Handle Guava ImmutableMap by treating it as a regular Map for schema generation
         if (annotatedType != null && annotatedType.getType() != null) {
             final JavaType javaType = _mapper.constructType(annotatedType.getType());
+            final Class<?> rawClass = javaType.getRawClass();
 
-            if (ImmutableMap.class.isAssignableFrom(javaType.getRawClass())) {
+            if (ImmutableMap.class.isAssignableFrom(rawClass)) {
 
                 final JavaType keyType = javaType.getKeyType();
                 final JavaType valueType = javaType.getContentType();
@@ -109,46 +114,49 @@ public class CustomModelConverter extends ModelResolver {
                     // Reconstruct an AnnotatedType for a Map<String, V> and forward to superclass
                     final JavaType mapType = _mapper.getTypeFactory().constructMapType(Map.class, String.class,
                             valueType.getRawClass());
-                    final AnnotatedType replacementType = new AnnotatedType()
-                            .type(mapType)
-                            .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
-                            .ctxAnnotations(annotatedType.getCtxAnnotations())
-                            .resolveAsRef(annotatedType.isResolveAsRef())
-                            .schemaProperty(annotatedType.isSchemaProperty());
-
-                    return super.resolve(replacementType, context, next);
+                    return super.resolve(replacementType(annotatedType, mapType), context, next);
                 }
-            } else if (ImmutableList.class.isAssignableFrom(javaType.getRawClass())) {
+            } else if (ImmutableList.class.isAssignableFrom(rawClass)) {
                 // ImmutableLists are just lists
-                final AnnotatedType replacementType = new AnnotatedType()
-                        .type(_mapper.getTypeFactory().constructCollectionLikeType(List.class, javaType.getContentType()))
-                        .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
-                        .ctxAnnotations(annotatedType.getCtxAnnotations())
-                        .resolveAsRef(annotatedType.isResolveAsRef())
-                        .schemaProperty(annotatedType.isSchemaProperty());
-                return super.resolve(replacementType, context, next);
-            } else if (ImmutableSet.class.isAssignableFrom(javaType.getRawClass())) {
+                return super.resolve(
+                        replacementType(annotatedType, _mapper.getTypeFactory().constructCollectionLikeType(List.class, javaType.getContentType())),
+                        context,
+                        next);
+            } else if (ImmutableSet.class.isAssignableFrom(rawClass)) {
                 // ImmutableSets are just sets
-                final AnnotatedType replacementType = new AnnotatedType()
-                        .type(_mapper.getTypeFactory().constructCollectionLikeType(Set.class, javaType.getContentType()))
-                        .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
-                        .ctxAnnotations(annotatedType.getCtxAnnotations())
-                        .resolveAsRef(annotatedType.isResolveAsRef())
-                        .schemaProperty(annotatedType.isSchemaProperty());
-                return super.resolve(replacementType, context, next);
-            } else if (com.github.zafarkhaja.semver.Version.class.isAssignableFrom(javaType.getRawClass())) {
+                return super.resolve(
+                        replacementType(annotatedType, _mapper.getTypeFactory().constructCollectionLikeType(Set.class, javaType.getContentType())),
+                        context,
+                        next);
+            } else if (com.github.zafarkhaja.semver.Version.class.isAssignableFrom(rawClass)) {
                 // versions are serialized as strings
-                return super.resolve(new AnnotatedType()
-                                .type(String.class)
-                                .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
-                                .ctxAnnotations(annotatedType.getCtxAnnotations())
-                                .resolveAsRef(annotatedType.isResolveAsRef())
-                                .schemaProperty(annotatedType.isSchemaProperty()),
-                        context, next);
+                return super.resolve(replacementType(annotatedType, String.class), context, next);
+            } else if (DateTimeZone.class.isAssignableFrom(rawClass)) {
+                // timezones are strings
+                return super.resolve(replacementType(annotatedType, String.class), context, next);
+            } else if (Duration.class.isAssignableFrom(rawClass)) {
+                // durations are longs (milliseconds)
+                return super.resolve(replacementType(annotatedType, Long.class), context, next);
+            } else if (Period.class.isAssignableFrom(rawClass)) {
+                // periods are strings
+                return super.resolve(replacementType(annotatedType, String.class), context, next);
+            } else if (PeriodDuration.class.isAssignableFrom(rawClass)) {
+                // perioddurations are strings
+                return super.resolve(replacementType(annotatedType, String.class), context, next);
             }
         }
 
         return super.resolve(annotatedType, new CustomConverterContext(context), next);
+    }
+
+    // helper to clone the given AnnotatedType with a replacement "inner" type
+    private AnnotatedType replacementType(AnnotatedType previousType, Type replacement) {
+        return new AnnotatedType()
+                .type(replacement)
+                .jsonViewAnnotation(previousType.getJsonViewAnnotation())
+                .ctxAnnotations(previousType.getCtxAnnotations())
+                .resolveAsRef(previousType.isResolveAsRef())
+                .schemaProperty(previousType.isSchemaProperty());
     }
 
     /**
