@@ -27,7 +27,7 @@ import org.apache.shiro.subject.Subject;
 import org.bson.types.ObjectId;
 import org.graylog.security.UserContext;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
-import org.graylog2.Configuration;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
@@ -130,18 +130,24 @@ public class UsersResourceTest {
     private GlobalAuthServiceConfig globalAuthServiceConfig;
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock
+    private UserContext userContext;
+    @Mock
+    private User user;
 
     UserImplFactory userImplFactory;
 
     @Before
     public void setUp() {
-        userImplFactory = new UserImplFactory(new Configuration(),
-                new Permissions(ImmutableSet.of(new RestPermissions())), clusterConfigService);
+        userImplFactory = new UserImplFactory(new Permissions(ImmutableSet.of(new RestPermissions())), clusterConfigService);
         usersResource = new TestUsersResource(userManagementService, paginatedUserService, accessTokenService,
                 roleService, sessionService, new HttpConfiguration(), subject,
                 sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, userService);
         lenient().when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(PasswordComplexityConfig.DEFAULT);
         lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+        lenient().when(userContext.getUser()).thenReturn(user);
+        lenient().when(user.getName()).thenReturn("username");
+        lenient().when(user.getId()).thenReturn("userId");
     }
 
     /**
@@ -162,7 +168,7 @@ public class UsersResourceTest {
         when(userService.loadById("creator")).thenReturn(creator);
         when(subject.getPrincipal()).thenReturn(creator.getName());
 
-        final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD));
+        final Response response = usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE), PASSWORD), userContext);
         Assert.assertEquals(201, response.getStatus());
         verify(userManagementService).create(isA(UserImpl.class), eq(creator));
     }
@@ -182,8 +188,8 @@ public class UsersResourceTest {
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
 
-        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD)));
-        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <admin>"));
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(TestUsersResource.ALLOWED_ROLE, forbiddenRole), PASSWORD), userContext));
+        assertThat(exception.getMessage()).contains("Not authorized to access resource id <admin>");
     }
 
     @Test
@@ -204,11 +210,11 @@ public class UsersResourceTest {
         when(userManagementService.create()).thenReturn(userImplFactory.create(Map.of(UserImpl.ROLES, List.of(readerRoleId, adminRoleId))));
 
         final var creator = userImplFactory.create(Map.of(UserImpl.USERNAME, "creator"));
-        when(userService.loadById("creator")).thenReturn(creator);
+        lenient().when(userService.loadById("creator")).thenReturn(creator);
         when(subject.getPrincipal()).thenReturn(creator.getName());
 
-        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD)));
-        Assert.assertTrue(exception.getMessage().contains("Not authorized to access resource id <ADMIN>"));
+        ForbiddenException exception = assertThrows(ForbiddenException.class, () -> usersResource.create(buildCreateUserRequest(List.of(), PASSWORD), userContext));
+        assertThat(exception.getMessage()).contains("Not authorized to access resource id <ADMIN>");
     }
 
     @Test
@@ -216,12 +222,12 @@ public class UsersResourceTest {
         String testRole = "forbiddenRole";
         when(userManagementService.create()).thenReturn(userImplFactory.create(new HashMap<>()));
         when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD)));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(List.of(testRole), PASSWORD), userContext));
     }
 
     @Test
     public void createFailurePasswordLength() {
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "pW1&")));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "pW1&"), userContext));
     }
 
     @Test
@@ -229,7 +235,7 @@ public class UsersResourceTest {
         when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
                 6, true, false, false, false
         ));
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "lowercase1&")));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "lowercase1&"), userContext));
     }
 
     @Test
@@ -237,7 +243,7 @@ public class UsersResourceTest {
         when(clusterConfigService.getOrDefault(PasswordComplexityConfig.class, PasswordComplexityConfig.DEFAULT)).thenReturn(new PasswordComplexityConfig(
                 6, false, false, false, true
         ));
-        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "passWORD123")));
+        assertThrows(BadRequestException.class, () -> usersResource.create(buildCreateUserRequest(Collections.emptyList(), "passWORD123"), userContext));
     }
 
     @Test
@@ -431,7 +437,7 @@ public class UsersResourceTest {
         when(userManagementService.loadById(USERNAME)).thenReturn(user);
         when(subject.isPermitted(USERS_TOKENCREATE + ":" + USERNAME)).thenReturn(allow);
         if (allow) {
-            when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
+            lenient().when(clusterConfigService.getOrDefault(UserConfiguration.class, UserConfiguration.DEFAULT_VALUES)).thenReturn(UserConfiguration.DEFAULT_VALUES);
         }
         if (accessToken != null) {
             when(accessTokenService.create(USERNAME, UsersResourceTest.TOKEN_NAME, PeriodDuration.of(Duration.ofDays(30)))).thenReturn(accessToken);
@@ -454,7 +460,7 @@ public class UsersResourceTest {
                                  DefaultSecurityManager securityManager, GlobalAuthServiceConfig globalAuthServiceConfig,
                                  ClusterConfigService clusterConfigService, UserService userService) {
             super(userManagementService, paginatedUserService, accessTokenService, roleService, sessionService,
-                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService);
+                    sessionTerminationService, securityManager, globalAuthServiceConfig, clusterConfigService, mock(AuditEventSender.class));
             this.subject = subject;
             super.configuration = configuration;
             super.userService = userService;
@@ -480,7 +486,7 @@ public class UsersResourceTest {
         private final ClusterConfigService configService;
         private final ObjectMapper objectMapper;
 
-        public UserImplFactory(Configuration configuration, Permissions permissions, ClusterConfigService configService) {
+        public UserImplFactory(Permissions permissions, ClusterConfigService configService) {
             this.permissions = permissions;
             this.configService = configService;
             this.passwordAlgorithmFactory = new PasswordAlgorithmFactory(Collections.emptyMap(),
