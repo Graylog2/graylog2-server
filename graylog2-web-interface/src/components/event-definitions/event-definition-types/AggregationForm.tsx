@@ -26,6 +26,7 @@ import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import useLocation from 'routing/useLocation';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import { defaultCompare } from 'logic/DefaultCompare';
 
 import AggregationConditionsForm from './AggregationConditionsForm';
 
@@ -43,6 +44,16 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
   const { data: allFieldTypes } = useFieldTypes(eventDefinition?.config?.streams ?? [], ALL_MESSAGES_TIMERANGE);
   // Memoize function to only format fields when they change. Use joined fieldNames as cache key.
   const formattedFields = useMemo(() => allFieldTypes ?? [], [allFieldTypes]);
+  const formattedFieldOptions = useMemo(
+    () =>
+      formattedFields
+        .sort((ftA, ftB) => defaultCompare(ftA.name, ftB.name))
+        .map((fieldType) => ({
+          label: `${fieldType.name} – ${fieldType.value.type.type}`,
+          value: fieldType.name,
+        })),
+    [formattedFields],
+  );
 
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
@@ -88,7 +99,7 @@ const AggregationForm = ({ aggregationFunctions, eventDefinition, validation, on
             <MultiSelect
               id="group-by"
               onChange={handleGroupByChange}
-              options={formattedFields}
+              options={formattedFieldOptions}
               ignoreAccents={false}
               value={(eventDefinition.config.group_by ?? []).join(',')}
               allowCreate
