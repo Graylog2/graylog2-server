@@ -20,7 +20,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import org.apache.commons.lang3.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.graylog.events.notifications.EventNotificationContext;
 import org.graylog.events.notifications.EventNotificationModelData;
 import org.graylog.events.notifications.EventNotificationService;
@@ -29,10 +29,12 @@ import org.graylog.integrations.pagerduty.PagerDutyNotificationConfig;
 import org.graylog.integrations.pagerduty.dto.Link;
 import org.graylog.integrations.pagerduty.dto.PagerDutyMessage;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.web.customization.CustomizationConfig;
 import org.joda.time.DateTimeZone;
 
 import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -52,14 +54,17 @@ public class MessageFactory {
     private static final List<String> PAGER_DUTY_PRIORITIES = Arrays.asList("info", "warning", "critical", "critical");
 
     private final EventNotificationService eventNotificationService;
+    private final CustomizationConfig customizationConfig;
     private final Engine templateEngine;
     private final TemplateModelProvider templateModelProvider;
 
     @Inject
     MessageFactory(EventNotificationService eventNotificationService,
+                   CustomizationConfig customizationConfig,
                    @Named("JsonSafe") Engine jsonTemplateEngine,
                    TemplateModelProvider templateModelProvider) {
         this.eventNotificationService = eventNotificationService;
+        this.customizationConfig = customizationConfig;
         this.templateEngine = jsonTemplateEngine;
         this.templateModelProvider = templateModelProvider;
     }
@@ -81,7 +86,7 @@ public class MessageFactory {
 
         final List<Link> replayLink;
         try {
-            final String replayUrl = Strings.CS.appendIfMissing(
+            final String replayUrl = StringUtils.appendIfMissing(
                     config.clientUrl(), "/") + "alerts/" + modelData.event().id() + "/replay-search";
             replayLink = List.of(new Link(new URI(replayUrl).toURL(), "Replay Event"));
         } catch (URISyntaxException | MalformedURLException e) {
@@ -103,7 +108,7 @@ public class MessageFactory {
         payload.put("summary", config.pagerDutyTitle()
                 .map(customTitle -> templateEngine.transform(customTitle, messageModel))
                 .orElse(modelData.event().message()));
-        payload.put("source", "Graylog:" + modelData.event().sourceStreams());
+        payload.put("source", customizationConfig.productName() + ":" + modelData.event().sourceStreams());
         payload.put("severity", eventPriority);
         payload.put("timestamp", modelData.event().eventTimestamp().toString());
         payload.put("component", "GraylogAlerts");
