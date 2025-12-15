@@ -136,6 +136,15 @@ public class CustomModelConverter extends ModelResolver {
                         .resolveAsRef(annotatedType.isResolveAsRef())
                         .schemaProperty(annotatedType.isSchemaProperty());
                 return super.resolve(replacementType, context, next);
+            } else if (com.github.zafarkhaja.semver.Version.class.isAssignableFrom(javaType.getRawClass())) {
+                // versions are serialized as strings
+                return super.resolve(new AnnotatedType()
+                                .type(String.class)
+                                .jsonViewAnnotation(annotatedType.getJsonViewAnnotation())
+                                .ctxAnnotations(annotatedType.getCtxAnnotations())
+                                .resolveAsRef(annotatedType.isResolveAsRef())
+                                .schemaProperty(annotatedType.isSchemaProperty()),
+                        context, next);
             }
         }
 
