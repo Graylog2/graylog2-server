@@ -31,7 +31,7 @@ const HelpMenu = () => {
   const availableMenuItems = menuItems.filter((item) => isPermitted(item.permissions));
 
   return (
-    <NavDropdown title={<NavIcon type="help" />} hoverTitle="Help" noCaret>
+    <NavDropdown title={<NavIcon type="help" defaultIcon="help" />} hoverTitle="Help" noCaret>
       {availableMenuItems.map((item) => {
         if ('externalLink' in item) {
           return (

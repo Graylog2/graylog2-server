@@ -30,6 +30,14 @@ export type BrandingResourceKey = 'stream_rule_matcher_code' | 'contact_support'
 export type BrandingResources = Record<BrandingResourceKey, BrandingResource>;
 type FeatureToggle = { enabled?: boolean };
 
+export interface NavigationItems {
+  home?: { icon: string };
+  user_menu?: { icon: string };
+  scratchpad?: { icon: string };
+  help?: { icon: string };
+  search?: { icon: string };
+}
+
 export type Branding = {
   product_name?: string;
   favicon?: string;
@@ -45,13 +53,7 @@ export type Branding = {
     news?: { enabled: boolean; feed?: string };
     releases?: { enabled: boolean };
   };
-  navigation?: {
-    home?: { icon: string };
-    user_menu?: { icon: string };
-    scratchpad?: { icon: string };
-    help?: { icon: string };
-    search?: { icon: string };
-  };
+  navigation?: NavigationItems;
   help_url?: string;
   help_pages?: { [key: string]: string };
   footer?: { enabled: boolean };

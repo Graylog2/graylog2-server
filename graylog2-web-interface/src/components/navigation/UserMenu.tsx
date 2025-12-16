@@ -41,7 +41,10 @@ const UserMenu = () => {
   const onLogoutClicked = useLogout();
 
   return (
-    <NavDropdown title={<NavIcon type="user_menu" />} hoverTitle={`User Menu for ${fullName}`} noCaret>
+    <NavDropdown
+      title={<NavIcon type="user_menu" defaultIcon="person" />}
+      hoverTitle={`User Menu for ${fullName}`}
+      noCaret>
       <Menu.Label>
         <FullName>{fullName}</FullName>
       </Menu.Label>

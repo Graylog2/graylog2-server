@@ -52,9 +52,6 @@ const Navigation = React.memo(({ pathname }: Props) => {
         </Navbar.Brand>
         <Navbar.Toggle />
         <DevelopmentHeaderBadge smallScreen />
-        {pluginItems.map(({ key, component: Item }) => (
-          <Item key={key} smallScreen />
-        ))}
       </Navbar.Header>
       <Navbar.Collapse>
         <MainNavbar pathname={pathname} />
@@ -74,10 +71,10 @@ const Navigation = React.memo(({ pathname }: Props) => {
 
           <InactiveNavItem className="dev-badge-wrap">
             <DevelopmentHeaderBadge />
-            {pluginItems.map(({ key, component: Item }) => (
-              <Item key={key} />
-            ))}
           </InactiveNavItem>
+          {pluginItems.map(({ key, component: Item }) => (
+            <Item key={key} />
+          ))}
           <ScratchpadToggle />
 
           <HelpMenu />

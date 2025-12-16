@@ -53,7 +53,7 @@ const ScratchpadToggle = () => {
         id="scratchpad-toggle"
         onClick={toggleScratchpadVisibility}>
         <NavItemStateIndicator>
-          <NavIcon type="scratchpad" title="Scratchpad" />
+          <NavIcon type="scratchpad" title="Scratchpad" defaultIcon="edit_square" />
         </NavItemStateIndicator>
       </Toggle>
     </li>

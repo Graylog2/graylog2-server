@@ -28,14 +28,6 @@ import { MAX_NAV_ICON_WIDTH } from 'theme/constants';
 
 type NavIconType = keyof Branding['navigation'];
 
-const DEFAULT_ICONS: Record<NavIconType, IconName> = {
-  'home': 'home',
-  'scratchpad': 'edit_square',
-  'user_menu': 'person',
-  'help': 'help',
-  'search': 'search',
-};
-
 const SvgContainer = styled.div`
   svg {
     width: 100%;
@@ -62,16 +54,17 @@ const useCustomIcon = (type: NavIconType) => {
 type Props = {
   type: NavIconType;
   title?: string;
+  defaultIcon: IconName;
 };
 
-const NavIcon = ({ type, title = undefined }: Props) => {
+const NavIcon = ({ type, title = undefined, defaultIcon }: Props) => {
   const customSvgIcon = useCustomIcon(type);
 
   if (customSvgIcon) {
     return <SvgContainer dangerouslySetInnerHTML={{ __html: customSvgIcon }} title={title} />;
   }
 
-  return <Icon name={DEFAULT_ICONS[type]} size="lg" title={title} />;
+  return <Icon name={defaultIcon} size="lg" title={title} />;
 };
 
 export default NavIcon;

@@ -36,7 +36,7 @@ const QuickJumpModalContainer = () => {
   return (
     <>
       <NavItem id="quickjump-search-nav" onClick={toggleModal}>
-        <NavIcon type="search" title="Search" />
+        <NavIcon type="search" title="Search" defaultIcon="search" />
       </NavItem>
       {showQuickJumpModal && <QuickJumpModal onToggle={() => toggleModal()} />}
     </>
