@@ -49,17 +49,14 @@ type MetricsSummaryResponse = {
 };
 
 const buildMetricsWithDefaults = (metrics: Partial<DataNodeMetrics> = {}): DataNodeMetrics =>
-  METRIC_SHORT_NAMES.reduce<DataNodeMetrics>((acc, key) => ({ ...acc, [key]: metrics[key] }), {} as DataNodeMetrics);
+  Object.fromEntries(METRIC_SHORT_NAMES.map((key) => [key, metrics[key]]));
 
 const toNodeMetric = (response?: MetricsSummaryResponse): NodeMetric | undefined => {
   if (!response?.metrics?.length) {
     return undefined;
   }
 
-  return response.metrics.reduce<NodeMetric>(
-    (acc, metric) => ({ ...acc, [metric.full_name]: metric }),
-    {} as NodeMetric,
-  );
+  return Object.fromEntries(response.metrics.map((metric) => [metric.full_name, metric]));
 };
 
 const extractMetrics = (response?: MetricsSummaryResponse): DataNodeMetrics => {
@@ -91,13 +88,7 @@ const fetchMetricsForHostnames = async (hostnames: string[]) => {
     hostnames.map(async (hostname) => ({ hostname, response: await fetchMetrics(hostname) })),
   );
 
-  return responses.reduce<Record<string, DataNodeMetrics>>(
-    (acc, { hostname, response }) => ({
-      ...acc,
-      [hostname]: extractMetrics(response),
-    }),
-    {},
-  );
+  return Object.fromEntries(responses.map(({ hostname, response }) => [hostname, extractMetrics(response)]));
 };
 
 type UseAddMetricsToDataNodesOptions = {

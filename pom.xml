@@ -110,7 +110,7 @@
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.39.0</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.40.3</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.2.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.5</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
@@ -129,7 +129,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.45.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.60.0</gcs.version>
+        <gcs.version>2.61.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.4.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -142,7 +142,7 @@
         <hibernate-validator.version>9.1.0.Final</hibernate-validator.version>
         <hk2.version>3.1.1</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
         <jackson.version>2.20.1</jackson.version>
-        <jadconfig.version>0.15.0</jadconfig.version>
+        <jadconfig.version>1.0.0</jadconfig.version>
         <java-semver.version>0.10.2</java-semver.version>
         <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
@@ -164,15 +164,15 @@
         <log4j.version>2.25.2</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <metrics.version>4.2.37</metrics.version>
-        <mongodb-driver.version>5.6.1</mongodb-driver.version>
+        <mongodb-driver.version>5.6.2</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>4.2.7.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.56.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.22.0</opentelemetry-instrumentation.version>
+        <opentelemetry.version>1.57.0</opentelemetry.version>
+        <opentelemetry-instrumentation.version>2.23.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -200,7 +200,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <mcp-bom.version>0.16.0</mcp-bom.version>
+        <mcp-bom.version>0.17.0</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -211,9 +211,9 @@
         <equalsverifier.version>4.2.5</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.1</junit-jupiter.version>
-        <mockito.version>5.20.0</mockito.version>
+        <mockito.version>5.21.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
-        <testcontainers.version>2.0.2</testcontainers.version>
+        <testcontainers.version>2.0.3</testcontainers.version>
         <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
         <graalvm.version>25.0.1</graalvm.version>
 
@@ -672,7 +672,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -693,6 +693,11 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
                     <version>3.5.4</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.6.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -747,7 +752,7 @@
                 <plugin>
                     <groupId>org.openrewrite.maven</groupId>
                     <artifactId>rewrite-maven-plugin</artifactId>
-                    <version>6.24.0</version>
+                    <version>6.25.0</version>
                     <configuration>
                         <!-- do not set <configLocation> here, otherwise it cannot be overridden by a system property later -->
                         <exclusions>
@@ -764,27 +769,27 @@
                         <dependency>
                             <groupId>org.openrewrite</groupId>
                             <artifactId>rewrite-java</artifactId>
-                            <version>8.67.1</version>
+                            <version>8.68.1</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.22.0</version>
+                            <version>3.23.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-migrate-java</artifactId>
-                            <version>3.22.0</version>
+                            <version>3.23.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-static-analysis</artifactId>
-                            <version>2.22.0</version>
+                            <version>2.23.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-joda</artifactId>
-                            <version>0.4.0</version>
+                            <version>0.5.0</version>
                         </dependency>
                     </dependencies>
                 </plugin>
