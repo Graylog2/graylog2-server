@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
@@ -55,9 +56,9 @@ type Props = {
 function TestLookup({ table }: Props) {
   const { errors } = useErrorsContext();
   const lutError = errors?.lutErrors[table.name];
-  const [lookupKey, setLookupKey] = React.useState<{ value: string; valid: boolean }>(INIT_INPUT);
-  const [lookupResult, setLookupResult] = React.useState<any>(null);
-  const [previewSize, setPreviewSize] = React.useState<number>(5);
+  const [lookupKey, setLookupKey] = useState<{ value: string; valid: boolean }>(INIT_INPUT);
+  const [lookupResult, setLookupResult] = useState<any>(null);
+  const [previewSize, setPreviewSize] = useState<number>(5);
   const productName = useProductName();
   const {
     lookupPreview: { results, total, supported },
