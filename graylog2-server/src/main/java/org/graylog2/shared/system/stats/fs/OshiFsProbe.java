@@ -17,9 +17,12 @@
 package org.graylog2.shared.system.stats.fs;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.primitives.Shorts;
+import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.KafkaJournalConfiguration;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.stats.OshiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +35,6 @@ import oshi.software.os.FileSystem;
 import oshi.software.os.OSFileStore;
 import oshi.software.os.OperatingSystem;
 import oshi.util.tuples.Pair;
-
-import jakarta.inject.Inject;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -120,9 +121,9 @@ public class OshiFsProbe implements FsProbe {
                             Optional.ofNullable(fileStore.getLogicalVolume()).orElse(fileStore.getVolume()),
                             fileStore.getDescription(), fileStore.getType(), fileStore.getTotalSpace(), fileStore.getUsableSpace(),
                             fileStore.getUsableSpace(), fileStore.getTotalSpace() - fileStore.getUsableSpace(),
-                            safePercentage(fileStore.getTotalSpace() - fileStore.getUsableSpace(), fileStore.getTotalSpace(), 0),
+                            Shorts.saturatedCast(Tools.percentageOfRounded(fileStore.getTotalSpace(), fileStore.getTotalSpace() - fileStore.getUsableSpace())),
                             fileStore.getTotalInodes(), fileStore.getFreeInodes(), fileStore.getTotalInodes() - fileStore.getFreeInodes(),
-                            safePercentage(fileStore.getTotalInodes() - fileStore.getFreeInodes(), fileStore.getTotalInodes(), 0),
+                            Shorts.saturatedCast(Tools.percentageOfRounded(fileStore.getTotalInodes(), fileStore.getTotalInodes() - fileStore.getFreeInodes())),
                             diskStore.getReads(),
                             diskStore.getWrites(),
                             diskStore.getReadBytes(),
@@ -132,10 +133,6 @@ public class OshiFsProbe implements FsProbe {
                 })
         );
         return FsStats.create(fsmap);
-    }
-
-    private short safePercentage(long nominator, long denominator, int override) {
-        return (denominator == 0) ? (short) override : (short) (nominator * 100 / denominator);
     }
 
     private HWDiskStore generateDummyDiskStore() {
