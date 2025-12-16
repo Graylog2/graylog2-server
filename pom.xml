@@ -1101,6 +1101,8 @@
                             @defaultMessage Use JUnit 6 APIs
                             org.junit.Assert
                             org.junit.Test
+
+                            io.swagger.annotations.** @ Use io.swagger.v3.oas.annotations.**
                         ]]>
 
                     </signatures>
