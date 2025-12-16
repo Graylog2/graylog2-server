@@ -678,5 +678,6 @@ declare module 'graylog-web-plugin/plugin' {
     'licenseCheck'?: Array<LicenseCheck>;
     entityPermissionsMapper?: EntityPermissionsMapper;
     'markdown.augment.components'?: Array<MarkdownAugmentation>;
+    'elements.aside'?: Array<React.ComponentType>;
   }
 }

@@ -32,6 +32,7 @@ import PerspectivesProvider from 'components/perspectives/contexts/PerspectivesP
 import PageContextProviders from 'components/page/contexts/PageContextProviders';
 import { singleton } from 'logic/singleton';
 import DefaultQueryParamProvider from 'routing/DefaultQueryParamProvider';
+import usePluginEntities from 'hooks/usePluginEntities';
 
 const AppLayout = styled.div`
   display: flex;
@@ -44,6 +45,25 @@ const PageContent = styled.div`
   overflow: auto;
   flex: 1;
 `;
+
+const PageContentContainer = styled.div`
+  height: 100%;
+  overflow: auto;
+  flex: 1;
+  display: flex;
+`;
+
+const AsideElements = () => {
+  const asideElements = usePluginEntities('elements.aside');
+
+  return (
+    <>
+      {asideElements.map((Element) => (
+        <Element key={Element.displayName} />
+      ))}
+    </>
+  );
+};
 
 const App = () => (
   <DefaultQueryParamProvider>
@@ -65,9 +85,12 @@ const App = () => (
                     <ReportedErrorBoundary>
                       <RuntimeErrorBoundary>
                         <PageContextProviders>
-                          <PageContent>
-                            <Outlet />
-                          </PageContent>
+                          <PageContentContainer>
+                            <PageContent>
+                              <Outlet />
+                            </PageContent>
+                            <AsideElements />
+                          </PageContentContainer>
                         </PageContextProviders>
                       </RuntimeErrorBoundary>
                     </ReportedErrorBoundary>
