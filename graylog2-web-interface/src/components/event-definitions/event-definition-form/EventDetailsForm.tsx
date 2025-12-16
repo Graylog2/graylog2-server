@@ -69,7 +69,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
     () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
     [canEdit, eventDefinition],
   );
-  const showEventProcedureSummar = React.useMemo(
+  const showEventProcedureSummary = React.useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],
   );
@@ -103,16 +103,14 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
       <Col md={7} lg={12}>
         <h2 className={commonStyles.title}>Event Details</h2>
         <fieldset>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', width: '100%' }}>
             <Input
               id="event-definition-title"
               name="title"
               label="Title"
               type="text"
               bsStyle={validation.errors.title ? 'error' : null}
-              help={
-                validation?.errors?.title?.[0] ?? 'Title for this Event Definition, Events and Alerts created from it.'
-              }
+              help={validation?.errors?.title?.[0] ?? 'Title for this Event Definition.'}
               value={eventDefinition.title}
               onChange={handleChange}
               readOnly={readOnly}
@@ -132,6 +130,18 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
             </FormGroup>
           </div>
+
+          <Input
+            id="event-definition-event-title"
+            name="event_title"
+            label="Event Title"
+            type="text"
+            help="Title for Events and Alerts created from this Definition."
+            value={eventDefinition.event_title}
+            onChange={handleChange}
+            readOnly={readOnly}
+            required
+          />
 
           <Input
             id="event-definition-description"
@@ -163,7 +173,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               }}
             />
           )}
-          {showEventProcedureSummar && (
+          {showEventProcedureSummary && (
             <Col>
               <ControlLabel>Event Procedure Summary</ControlLabel>
               <PluggableEventProcedureSummary

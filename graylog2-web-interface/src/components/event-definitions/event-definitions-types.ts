@@ -110,6 +110,7 @@ export type EventDefinition = {
   updated_at: string | null;
   matched_at: string;
   scheduler: Scheduler;
+  event_title?: string;
 };
 
 export type EventDefinitionFormControlsProps = {

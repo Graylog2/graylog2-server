@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor.aggregation;
 
+import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -80,6 +81,7 @@ public class AggregationEventProcessor implements EventProcessor {
     private final Messages messages;
     private final PermittedStreams permittedStreams;
     private final AggregationSearchUtils aggregationSearchUtils;
+    private final Engine templateEngine;
 
     @Inject
     public AggregationEventProcessor(@Assisted EventDefinition eventDefinition,
@@ -91,7 +93,8 @@ public class AggregationEventProcessor implements EventProcessor {
                                      Messages messages,
                                      PermittedStreams permittedStreams,
                                      Set<EventQuerySearchTypeSupplier> eventQueryModifiers,
-                                     MessageFactory messageFactory) {
+                                     MessageFactory messageFactory,
+                                     Engine templateEngine) {
         this.eventDefinition = eventDefinition;
         this.config = (AggregationEventProcessorConfig) eventDefinition.config();
         this.dependencyCheck = dependencyCheck;
@@ -100,6 +103,7 @@ public class AggregationEventProcessor implements EventProcessor {
         this.eventStreamService = eventStreamService;
         this.messages = messages;
         this.permittedStreams = permittedStreams;
+        this.templateEngine = templateEngine;
         // If this is a simple Filter search there is no need to initialize aggregationSearchUtils
         this.aggregationSearchUtils = config.series().isEmpty() ? null : new AggregationSearchUtils(
                 eventDefinition,
@@ -108,7 +112,8 @@ public class AggregationEventProcessor implements EventProcessor {
                 aggregationSearchFactory,
                 eventStreamService,
                 messageFactory,
-                permittedStreams
+                permittedStreams,
+                templateEngine
         );
     }
 
@@ -242,6 +247,9 @@ public class AggregationEventProcessor implements EventProcessor {
             for (final ResultMessage resultMessage : messages) {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
+                if (eventDefinition.eventTitle().isPresent()) {
+                    event.setMessage(templateEngine.transform(eventDefinition.eventTitle().get(), msg.getFields()));
+                }
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
 
                 // Ensure the event has values in the "source_streams" field for permission checks to work

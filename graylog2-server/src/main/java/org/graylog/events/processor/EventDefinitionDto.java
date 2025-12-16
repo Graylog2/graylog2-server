@@ -70,6 +70,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final String FIELD_STATE = "state";
     public static final String FIELD_UPDATED_AT = "updated_at";
     public static final String FIELD_MATCHED_AT = "matched_at";
+    public static final String FIELD_EVENT_TITLE = "event_title";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
@@ -156,6 +157,10 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(FIELD_EVENT_PROCEDURE)
     public abstract String eventProcedureId();
+
+    @Override
+    @JsonProperty(FIELD_EVENT_TITLE)
+    public abstract Optional<String> eventTitle();
 
     public static Builder builder() {
         return Builder.create();
@@ -270,6 +275,9 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_EVENT_PROCEDURE)
         public abstract Builder eventProcedureId(String eventProcedureId);
 
+        @JsonProperty(FIELD_EVENT_TITLE)
+        public abstract Builder eventTitle(@Nullable String eventTitle);
+
         abstract EventDefinitionDto autoBuild();
 
         public EventDefinitionDto build() {
@@ -328,6 +336,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .keySpec(keySpec())
                 .storage(storage())
                 .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
+                .eventTitle(ValueReference.ofNullable(eventTitle().orElse(null)))
                 .build();
     }
 

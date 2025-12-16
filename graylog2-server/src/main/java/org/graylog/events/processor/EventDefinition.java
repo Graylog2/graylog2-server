@@ -28,6 +28,7 @@ import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 import java.util.Set;
 
 @DbEntity(readPermission = RestPermissions.EVENT_DEFINITIONS_READ, collection = DBEventDefinitionService.COLLECTION_NAME)
@@ -78,5 +79,9 @@ public interface EventDefinition {
 
     default String eventProcedureId() {
         return null;
+    }
+
+    default Optional<String> eventTitle() {
+        return Optional.empty();
     }
 }

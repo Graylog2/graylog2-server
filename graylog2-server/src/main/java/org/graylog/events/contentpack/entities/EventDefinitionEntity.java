@@ -64,6 +64,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     private static final String UPDATED_AT = "updated_at";
     private static final String MATCHED_AT = "matched_at";
     private static final String FIELD_EVENT_PROCEDURE = "event_procedure";
+    private static final String FIELD_EVENT_TITLE = "event_title";
 
     @JsonProperty(FIELD_TITLE)
     public abstract ValueReference title();
@@ -113,6 +114,10 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
     @Nullable
     @JsonProperty(FIELD_EVENT_PROCEDURE)
     public abstract ValueReference eventProcedureId();
+
+    @Nullable
+    @JsonProperty(FIELD_EVENT_TITLE)
+    public abstract ValueReference eventTitle();
 
     public static Builder builder() {
         return Builder.create();
@@ -172,6 +177,9 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
         @JsonProperty(FIELD_EVENT_PROCEDURE)
         public abstract Builder eventProcedureId(ValueReference eventProcedureId);
 
+        @JsonProperty(FIELD_EVENT_TITLE)
+        public abstract Builder eventTitle(ValueReference eventTitle);
+
         public abstract EventDefinitionEntity build();
     }
 
@@ -210,6 +218,7 @@ public abstract class EventDefinitionEntity extends ScopedContentPackEntity impl
                 .notifications(notificationList)
                 .storage(storage())
                 .eventProcedureId(procedureId)
+                .eventTitle(eventTitle() != null ? eventTitle().asString(parameters) : null)
                 .build();
     }
 
