@@ -87,6 +87,8 @@ describe('DashboardActions', () => {
       selectEntity: () => {},
       deselectEntity: () => {},
       toggleEntitySelect: () => {},
+      isSomeRowsSelected: false,
+      isAllRowsSelected: false,
     });
   });
 

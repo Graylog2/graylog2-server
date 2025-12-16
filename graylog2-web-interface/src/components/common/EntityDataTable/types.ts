@@ -96,8 +96,9 @@ export type DefaultLayout = {
 
 export type ColumnMetaContext<Entity extends EntityBase> =
   | {
-      label?: string;
       columnRenderer?: ColumnRenderer<Entity>;
       enableColumnOrdering?: boolean;
+      hideCellPadding?: boolean;
+      label?: string;
     }
   | undefined;
