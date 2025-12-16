@@ -31,6 +31,7 @@ import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationBea
 import org.graylog.datanode.process.configuration.beans.DatanodeConfigurationPart;
 import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 import org.graylog2.bootstrap.preflight.PreflightCheckException;
+import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,7 +135,7 @@ public class SearchableSnapshotsConfigurationBean implements DatanodeConfigurati
     }
 
     private double percentageUsage(long usableSpace, long cacheSize) {
-        return 100.0 / usableSpace * cacheSize;
+        return Tools.percentageOf(usableSpace, cacheSize);
     }
 
     @Nonnull
