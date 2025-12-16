@@ -25,6 +25,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.LegacySystemJob;
@@ -71,8 +72,7 @@ public class RebuildIndexRangesJob extends LegacySystemJob {
             return 0;
         }
 
-        // lolwtfbbqcasting
-        return (int) Math.floor((indicesCalculated.floatValue() / (float) indicesToCalculate) * 100);
+        return Tools.percentageOfRounded(indicesToCalculate, indicesCalculated.intValue());
     }
 
     @Override

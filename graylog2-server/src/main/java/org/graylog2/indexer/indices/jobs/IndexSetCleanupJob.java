@@ -22,6 +22,7 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.MongoIndexRangeService;
+import org.graylog2.plugin.Tools;
 import org.graylog2.system.jobs.LegacySystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,7 +95,7 @@ public class IndexSetCleanupJob extends LegacySystemJob {
         if (total <= 0) {
             return 0;
         }
-        return (int) Math.floor((deleted.floatValue() / (float) total) * 100);
+        return Tools.percentageOfRounded(total, deleted.intValue());
     }
 
     @Override
