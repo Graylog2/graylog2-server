@@ -17,11 +17,11 @@
 package org.graylog2.shared.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.NotFoundException;
@@ -46,7 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiresAuthentication
-@Api(value = "System/Inputs/Types", description = "Message input types of this node")
+@Tag(name = "System/Inputs/Types", description = "Message input types of this node")
 @Path("/system/inputs/types")
 @Produces(MediaType.APPLICATION_JSON)
 public class InputTypesResource extends RestResource {
@@ -63,7 +63,7 @@ public class InputTypesResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get all available input types of this node")
+    @Operation(summary = "Get all available input types of this node")
     public InputTypesSummary types() {
         Map<String, String> types = new HashMap<>();
         for (Map.Entry<String, InputDescription> entry : messageInputFactory.getAvailableInputs().entrySet()) {
@@ -81,7 +81,7 @@ public class InputTypesResource extends RestResource {
     @GET
     @Timed
     @Path("/all")
-    @ApiOperation(value = "Get information about all input types")
+    @Operation(summary = "Get information about all input types")
     public Map<String, InputTypeInfo> all() {
         final Map<String, InputDescription> availableTypes = messageInputFactory.getAvailableInputs();
         Stream<Map.Entry<String, InputDescription>> inputStream = availableTypes
@@ -102,11 +102,12 @@ public class InputTypesResource extends RestResource {
     @GET
     @Timed
     @Path("{inputType}")
-    @ApiOperation(value = "Get information about a single input type")
+    @Operation(summary = "Get information about a single input type")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input type registered.")
+            @ApiResponse(responseCode = "200", description = "Returns type info", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No such input type registered.")
     })
-    public InputTypeInfo info(@ApiParam(name = "inputType", required = true) @PathParam("inputType") String inputType) {
+    public InputTypeInfo info(@Parameter(name = "inputType", required = true) @PathParam("inputType") String inputType) {
         final InputDescription description = messageInputFactory.getAvailableInputs().get(inputType);
         if (description == null) {
             throwInputTypeNotFound(inputType);
