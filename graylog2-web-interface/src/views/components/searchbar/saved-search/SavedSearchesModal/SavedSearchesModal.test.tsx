@@ -72,17 +72,13 @@ jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences');
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('routing/Routes', () => ({
-  getPluginRoute: (x) => () => x,
-}));
-
 describe('SavedSearchesModal', () => {
   useWindowConfirmMock();
   const defaultPaginatedSearches = createPaginatedSearches();
 
   beforeEach(() => {
     asMock(fetchSavedSearches).mockResolvedValue(defaultPaginatedSearches);
-    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
+    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutateAsync: () => Promise.resolve() });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
@@ -98,7 +94,7 @@ describe('SavedSearchesModal', () => {
         />,
       );
 
-      await screen.findByText('No saved searches have been found.');
+      await screen.findByText(/No saved searches have been found./i);
     });
 
     it('should render with views', async () => {
@@ -192,7 +188,7 @@ describe('SavedSearchesModal', () => {
       const updateTableLayout = jest.fn();
 
       asMock(useUpdateUserLayoutPreferences).mockReturnValue({
-        mutate: updateTableLayout,
+        mutateAsync: updateTableLayout,
       });
 
       render(

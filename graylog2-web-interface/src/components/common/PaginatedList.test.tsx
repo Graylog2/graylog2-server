@@ -15,8 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import { render, fireEvent, screen, waitFor } from 'wrappedTestingLibrary';
+import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import type { Location } from 'history';
+import userEvent from '@testing-library/user-event';
 
 import useLocation from 'routing/useLocation';
 import InteractiveContext from 'views/components/contexts/InteractiveContext';
@@ -69,13 +70,13 @@ describe('PaginatedList', () => {
       </PaginatedList>,
     );
 
-    fireEvent.click(
+    await userEvent.click(
       getByRole('button', {
         name: /configure page size/i,
       }),
     );
 
-    fireEvent.click(await screen.findByRole('menuitem', { name: /100/ }));
+    await userEvent.click(await screen.findByRole('menuitem', { name: /100/ }));
 
     expect(onChangeStub).toHaveBeenCalledWith(1, 100);
 

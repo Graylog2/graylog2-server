@@ -39,6 +39,7 @@ import type {
   WidgetConfigFormValues,
 } from 'views/components/aggregationwizard';
 import type VisualizationConfig from 'views/logic/aggregationbuilder/visualizations/VisualizationConfig';
+import type Query from 'views/logic/queries/Query';
 import type { TimeRange, NoTimeRangeOverride, AbsoluteTimeRange, QueryId } from 'views/logic/queries/Query';
 import type View from 'views/logic/views/View';
 import type User from 'logic/users/User';
@@ -47,7 +48,6 @@ import type { ValuePath } from 'views/logic/valueactions/ValueActionHandler';
 import type WidgetPosition from 'views/logic/widgets/WidgetPosition';
 import type MessagesWidgetConfig from 'views/logic/widgets/MessagesWidgetConfig';
 import type { ValidationExplanations } from 'views/components/searchbar/queryvalidation/types';
-import type Query from 'views/logic/queries/Query';
 import type { CustomCommand, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type SearchExecutionState from 'views/logic/search/SearchExecutionState';
 import type { ParameterBindings } from 'views/logic/search/SearchExecutionState';
@@ -66,6 +66,7 @@ import type { ValueRendererProps } from 'views/components/messagelist/decoration
 import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermissionsMapper';
 import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
+import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
 
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
@@ -132,8 +133,9 @@ type BaseField = {
   title: string;
   name: string;
   helpComponent?: React.ComponentType;
+  inputHelp?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues: WidgetConfigFormValues) => string;
   description?: string;
-  isShown?: (formValues: VisualizationConfigFormValues) => boolean;
+  isShown?: (formValues: VisualizationConfigFormValues, widgetConfigFormValues?: WidgetConfigFormValues) => boolean;
 };
 
 type BaseRequiredField = BaseField & {
@@ -159,7 +161,25 @@ export type NumericField = BaseRequiredField & {
   step?: string;
 };
 
-export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField;
+export type TextField = BaseField & {
+  type: 'text';
+};
+
+export type CustomField = BaseField & {
+  type: 'custom';
+  id: string;
+  component: React.ComponentType<CustomFieldComponentProps>;
+};
+
+export type CustomFieldComponentProps = {
+  field: CustomField;
+  name: string;
+  title: React.ReactElement;
+  id: string;
+  inputHelp?: string;
+};
+
+export type ConfigurationField = SelectField | BooleanField | NumericField | MultiSelectField | TextField | CustomField;
 
 export interface VisualizationCapabilities {
   'event-annotations': undefined;
@@ -542,6 +562,8 @@ export interface WidgetCreator {
 }
 
 export type FieldUnitType = 'size' | 'time' | 'percent';
+
+export type DefaultAxisKey = typeof DEFAULT_AXIS_KEY;
 
 export type FieldUnitsFormValues = Record<string, { abbrev: string; unitType: FieldUnitType }>;
 

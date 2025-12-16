@@ -19,6 +19,7 @@ package org.graylog2.events;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
 import com.mongodb.WriteConcern;
+import jakarta.inject.Named;
 import org.graylog2.database.MongoCollection;
 import com.mongodb.client.model.Filters;
 import jakarta.inject.Inject;
@@ -29,21 +30,21 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 public class ClusterEventCleanupPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterEventCleanupPeriodical.class);
     private static final String COLLECTION_NAME = ClusterEventPeriodical.COLLECTION_NAME;
 
-    @VisibleForTesting
-    static final long DEFAULT_MAX_EVENT_AGE = TimeUnit.DAYS.toMillis(1L);
-
     private final MongoCollection<ClusterEvent> collection;
+    private final Duration maxEventAge;
 
     @Inject
-    public ClusterEventCleanupPeriodical(MongoCollections mongoCollections) {
+    public ClusterEventCleanupPeriodical(MongoCollections mongoCollections, @Named("max_event_age") Duration maxEventAge) {
         this.collection = mongoCollections.collection(COLLECTION_NAME, ClusterEvent.class)
                 .withWriteConcern(WriteConcern.JOURNALED);
+        this.maxEventAge = maxEventAge;
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ClusterEventCleanupPeriodical extends Periodical {
         try {
             LOG.debug("Removing stale events from MongoDB collection \"{}\"", COLLECTION_NAME);
 
-            final long timestamp = DateTime.now(DateTimeZone.UTC).getMillis() - DEFAULT_MAX_EVENT_AGE;
+            final long timestamp = DateTime.now(DateTimeZone.UTC).getMillis() - maxEventAge.toMillis();
             final var deleted = collection.deleteMany(Filters.lt("timestamp", timestamp)).getDeletedCount();
 
             LOG.debug("Removed {} stale events from \"{}\"", deleted, COLLECTION_NAME);

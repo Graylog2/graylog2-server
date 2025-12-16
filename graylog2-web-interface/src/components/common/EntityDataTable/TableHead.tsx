@@ -16,12 +16,20 @@
  */
 import * as React from 'react';
 import styled, { css } from 'styled-components';
-import type { Table } from '@tanstack/react-table';
+import type { Header, HeaderGroup, ColumnPinningPosition } from '@tanstack/react-table';
 import { flexRender } from '@tanstack/react-table';
 
-import SortIcon from 'components/common/EntityDataTable/SortIcon';
+import {
+  columnTransformVar,
+  columnOpacityVar,
+  columnWidthVar,
+  columnTransition,
+  displayScrollRightIndicatorVar,
+} from 'components/common/EntityDataTable/CSSVariables';
+import { ACTIONS_COL_ID } from 'components/common/EntityDataTable/Constants';
+import ScrollShadow from 'theme/box-shadows/ScrollShadow';
 
-import type { EntityBase } from './types';
+import type { EntityBase, ColumnMetaContext } from './types';
 
 const Thead = styled.thead(
   ({ theme }) => css`
@@ -29,26 +37,72 @@ const Thead = styled.thead(
   `,
 );
 
-export const Th = styled.th<{ $width: number | undefined }>(
-  ({ $width, theme }) => css`
-    width: ${$width ? `${$width}px` : 'auto'};
+export const Th = styled.th<{
+  $colId: string;
+  $hidePadding: boolean;
+  $pinningPosition: ColumnPinningPosition;
+}>(
+  ({ $colId, $hidePadding, $pinningPosition, theme }) => css`
+    width: var(${columnWidthVar($colId)});
+    opacity: var(${columnOpacityVar($colId)}, 1);
+    transform: var(${columnTransformVar($colId)}, translate3d(0, 0, 0));
     background-color: ${theme.colors.table.head.background};
+    transition: var(${columnTransition()}, none);
+    height: 0; // required to be able to use height: 100% in child elements
+    ${$pinningPosition
+      ? css`
+          position: sticky;
+          ${$pinningPosition === 'left' ? 'left' : 'right'}: 0;
+        `
+      : ''}
+
+    ${$hidePadding &&
+    css`
+      && {
+        padding: 0;
+      }
+    `}
+
+    ${$colId === ACTIONS_COL_ID &&
+    css`
+      position: sticky;
+      ${ScrollShadow('left')}
+      &::before {
+        display: var(${displayScrollRightIndicatorVar}, none);
+      }
+    `}
   `,
 );
 
-const TableHead = <Entity extends EntityBase>({ table }: { table: Table<Entity> }) => (
+const TableHeaderCell = <Entity extends EntityBase>({ header }: { header: Header<Entity, unknown> }) => {
+  const columnMeta = header.column.columnDef.meta as ColumnMetaContext<Entity>;
+
+  return (
+    <Th
+      key={header.id}
+      colSpan={header.colSpan}
+      $colId={header.column.id}
+      $hidePadding={columnMeta?.hideCellPadding}
+      $pinningPosition={header.column.getIsPinned()}>
+      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+    </Th>
+  );
+};
+
+type Props<Entity extends EntityBase> = {
+  headerGroups: Array<HeaderGroup<Entity>>;
+};
+
+const TableHead = <Entity extends EntityBase>({ headerGroups }: Props<Entity>) => (
   <Thead>
-    {table.getHeaderGroups().map((headerGroup) => (
+    {headerGroups.map((headerGroup) => (
       <tr key={headerGroup.id}>
         {headerGroup.headers.map((header) => (
-          <Th $width={header.getSize()} colSpan={header.colSpan} key={header.id}>
-            {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-            {header.column.getCanSort() && <SortIcon<Entity> header={header} />}
-            {/*{header.column.getCanResize() && <div>Resize handle</div>}*/}
-          </Th>
+          <TableHeaderCell key={header.id} header={header} />
         ))}
       </tr>
     ))}
   </Thead>
 );
+
 export default TableHead;

@@ -18,7 +18,6 @@ package org.graylog.storage.elasticsearch7;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.datanode.RemoteReindexRequest;
 import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;

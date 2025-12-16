@@ -27,11 +27,13 @@ const preferencesToJSON = <T>({
   sort,
   perPage,
   customPreferences,
+  order,
 }: TableLayoutPreferences<T>): TableLayoutPreferencesJSON<T> => ({
   attributes,
   sort: sort ? { order: sort.direction, field: sort.attributeId } : undefined,
   per_page: perPage,
   custom_preferences: customPreferences,
+  order,
 });
 
 const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
@@ -42,7 +44,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
       qualifyUrl(`/entitylists/preferences/${entityTableId}`),
       preferencesToJSON({ ...userLayoutPreferences, ...newPreferences }),
     );
-  const { mutate } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn,
     onError: (error) => {
       UserNotification.error(`Updating table layout preferences failed with error: ${error}`);
@@ -50,7 +52,7 @@ const useUpdateUserLayoutPreferences = <T>(entityTableId: string) => {
     onSuccess: () => refetch(),
   });
 
-  return { mutate };
+  return { mutateAsync };
 };
 
 export default useUpdateUserLayoutPreferences;

@@ -15,15 +15,15 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import type * as Immutable from 'immutable';
 import { useContext } from 'react';
+import type * as Immutable from 'immutable';
 import type { FormikProps } from 'formik';
 import { Formik, Form, Field } from 'formik';
 import styled from 'styled-components';
 
 import type Role from 'logic/roles/Role';
 import { validateField, formHasErrors } from 'util/FormsUtils';
-import { FormikFormGroup, Select, InputList } from 'components/common';
+import { FormikFormGroup, Select, InputList, TimezoneSelect } from 'components/common';
 import { Alert, Button, ButtonToolbar, Row, Col, Panel, Input } from 'components/bootstrap';
 import { getPathnameWithoutId } from 'util/URLUtils';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
@@ -38,6 +38,7 @@ export const STEP_KEY = 'user-synchronization';
 // to be able to associate backend validation errors with the form
 export const FORM_VALIDATION = {
   defaultRoles: { required: true },
+  defaultUserTimezone: {},
   userFullNameAttribute: { required: true },
   userNameAttribute: { required: true },
   emailAttributes: {},
@@ -180,9 +181,8 @@ const UserSyncStep = ({
           <Row>
             <Col sm={9} smOffset={3}>
               <Panel bsStyle="info">
-                Changing the static role assignment will only affect new users created via{' '}
-                {stepsState.authBackendMeta.serviceTitle}! Existing user accounts will be updated on their next login,
-                or if you edit their roles manually.
+                Changing the default role and time zone assignments will only affect new users created via{' '}
+                {stepsState.authBackendMeta.serviceTitle}!
               </Panel>
             </Col>
           </Row>
@@ -204,6 +204,23 @@ const UserSyncStep = ({
                   options={rolesOptions}
                   placeholder="Search for roles"
                   value={value}
+                />
+              </Input>
+            )}
+          </Field>
+
+          <Field name="defaultUserTimezone">
+            {({ field: { name, value, onChange } }) => (
+              <Input
+                id="default-user-timezone-select"
+                help={help.defaultUserTimezone}
+                label="Default User Time Zone"
+                labelClassName="col-sm-3"
+                wrapperClassName="col-sm-9">
+                <TimezoneSelect
+                  value={value || "Browser's time zone"}
+                  name="timezone"
+                  onChange={(newValue) => onChange({ target: { name, value: newValue } })}
                 />
               </Input>
             )}

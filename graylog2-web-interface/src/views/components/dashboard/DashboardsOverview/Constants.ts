@@ -28,25 +28,23 @@ const getDashboardTableElements = (pluggableAttributes?: {
     defaultDisplayedAttributes: hideAdditionalColumns
       ? ['title', 'description', 'summary']
       : ['title', 'description', 'summary', 'favorite', ...(pluggableAttributes?.attributeNames || [])],
+    defaultColumnOrder: [
+      'title',
+      'summary',
+      'description',
+      'owner',
+      '_entity_source.source',
+      'created_at',
+      'last_updated_at',
+      ...(pluggableAttributes?.attributeNames || []),
+      'favorite',
+    ],
   });
-
-  const columnOrder = [
-    'title',
-    'summary',
-    'description',
-    'owner',
-    '_entity_source.source',
-    'created_at',
-    'last_updated_at',
-    'favorite',
-    ...(pluggableAttributes?.attributeNames || []),
-  ];
 
   const additionalAttributes = [...(pluggableAttributes?.attributes || [])];
 
   return {
     getDefaultLayout,
-    columnOrder,
     additionalAttributes,
   };
 };

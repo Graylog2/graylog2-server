@@ -154,7 +154,7 @@ public class AWSService {
             final Input input = this.inputService.create(messageInput.asMap());
             final String newInputId = inputService.save(input);
             LOG.debug("New AWS input created. id [{}] request [{}]", newInputId, request);
-            return input;
+            return inputService.find(newInputId);
         } catch (NoSuchInputTypeException e) {
             LOG.error("There is no such input type registered.", e);
             throw new NotFoundException("There is no such input type registered.", e);
