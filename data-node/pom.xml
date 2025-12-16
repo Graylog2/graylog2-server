@@ -768,6 +768,7 @@
                                 <argument>${project.build.directory}/opensearch/opensearch-${opensearch.version}-linux-aarch64</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-s3-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-gcs-${opensearch.version}.zip</argument>
+                                <argument>${project.build.directory}/opensearch-plugins/repository-hdfs-${opensearch.version}.zip</argument>
                                 <argument>${project.build.directory}/opensearch-plugins/repository-azure-${opensearch.version}.zip</argument>
                             </arguments>
                         </configuration>
