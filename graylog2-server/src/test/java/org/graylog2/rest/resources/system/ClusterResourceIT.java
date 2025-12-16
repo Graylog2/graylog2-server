@@ -28,6 +28,7 @@ import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.ServerNodeClusterService;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.cluster.nodes.ServerNodePaginatedService;
+import org.graylog2.configuration.ConfigurationHelper;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.lifecycles.Lifecycle;
@@ -36,8 +37,10 @@ import org.graylog2.rest.models.SortOrder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +50,9 @@ class ClusterResourceIT {
 
     private static final int STALE_LEADER_TIMEOUT_MS = 180_000;
     private ClusterResource clusterResource;
+
+    @TempDir
+    private Path tempDir;
 
     @BeforeEach
     void setUp(MongoCollections mongoCollections) throws ValidationException, RepositoryException {
@@ -100,14 +106,7 @@ class ClusterResourceIT {
     }
 
     private Configuration configuration(Map<String, String> properties) throws RepositoryException, ValidationException {
-        final Configuration configuration = new Configuration();
-        final InMemoryRepository mandatoryProps = new InMemoryRepository(Map.of(
-                "password_secret", "thisisverysecretpassword",
-                "root_password_sha2", "aaaaa",
-                "data_dir", "/tmp"
-        ));
-        new JadConfig(List.of(mandatoryProps, new InMemoryRepository(properties)), configuration).process();
-        return configuration;
+        return ConfigurationHelper.initConfig(new Configuration(), properties, tempDir);
     }
 
 }

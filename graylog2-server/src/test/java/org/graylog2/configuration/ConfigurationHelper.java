@@ -29,19 +29,21 @@ import java.util.Map;
 
 public class ConfigurationHelper {
     public final static Path DATA_DIR = Paths.get(System.getProperty("java.io.tmpdir"));
+    public final static Path NODE_ID_FILE = DATA_DIR.resolve("node-id-file");
 
     public static <T extends PathConfiguration> T initPathConfig(T config) throws ValidationException, RepositoryException {
         return initPathConfig(config, new HashMap<>());
     }
 
-    public static <T extends Configuration> T initConfig(T config) throws ValidationException, RepositoryException {
-        return initConfig(config, new HashMap<>());
+    public static <T extends Configuration> T initConfig(T config, Path tempDir) throws ValidationException, RepositoryException {
+        return initConfig(config, new HashMap<>(), tempDir);
     }
 
-    public static <T extends Configuration> T initConfig(T config, Map<String, String> properties) throws ValidationException, RepositoryException {
+    public static <T extends Configuration> T initConfig(T config, Map<String, String> properties, Path tempDir) throws ValidationException, RepositoryException {
         Map<String, String> props = new HashMap<>();
         props.put("password_secret", "ipNUnWxmBLCxTEzXcyamrdy0Q3G7HxdKsAvyg30R9SCof0JydiZFiA3dLSkRsbLF");
         props.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918");
+        props.put("node_id_file", tempDir.resolve("node_id_file").toAbsolutePath().toString());
         props.putAll(properties);
 
         return initPathConfig(config, props);
@@ -50,6 +52,7 @@ public class ConfigurationHelper {
     public static <T extends PathConfiguration> T initPathConfig(T config, Map<String, String> properties) throws RepositoryException, ValidationException {
         Map<String, String> props = new HashMap<>();
         props.put("data_dir", DATA_DIR.toString());
+        props.put("node_id_file", NODE_ID_FILE.toString());
         props.putAll(properties);
 
         final JadConfig jadConfig = new JadConfig(new InMemoryRepository(props), config);

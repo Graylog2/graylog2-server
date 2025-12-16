@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+import userEvent from '@testing-library/user-event';
 import * as React from 'react';
 import * as Immutable from 'immutable';
-import { render, waitFor, fireEvent, screen, within, act } from 'wrappedTestingLibrary';
+import { render, waitFor, screen, within, act } from 'wrappedTestingLibrary';
 import { applyTimeoutMultiplier } from 'jest-preset-graylog/lib/timeouts';
-import userEvent from '@testing-library/user-event';
 
 import { paginatedUsers, alice, bob, admin as adminOverview } from 'fixtures/userOverviews';
 import asMock from 'helpers/mocking/AsMock';
@@ -76,7 +76,7 @@ describe('UsersOverview', () => {
       render(<UsersOverview />);
       const searchInput = await screen.findByPlaceholderText('Enter search query...');
 
-      fireEvent.change(searchInput, { target: { value: 'username:bob' } });
+      await userEvent.type(searchInput, 'username:bob');
 
       await waitFor(() =>
         expect(UsersActions.loadUsersPaginated).toHaveBeenCalledWith({ page: 1, perPage: 10, query: 'username:bob' }),

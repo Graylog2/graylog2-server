@@ -63,6 +63,8 @@ import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -159,6 +161,7 @@ public class UsersResource extends RestResource {
     private final DefaultSecurityManager securityManager;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
+    private final AuditEventSender auditEventSender;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
@@ -176,7 +179,8 @@ public class UsersResource extends RestResource {
                          UserSessionTerminationService sessionTerminationService,
                          DefaultSecurityManager securityManager,
                          GlobalAuthServiceConfig globalAuthServiceConfig,
-                         ClusterConfigService clusterConfigService) {
+                         ClusterConfigService clusterConfigService,
+                         AuditEventSender auditEventSender) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -187,6 +191,7 @@ public class UsersResource extends RestResource {
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
         this.clusterConfigService = clusterConfigService;
+        this.auditEventSender = auditEventSender;
     }
 
     /**
@@ -383,7 +388,8 @@ public class UsersResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@RequestBody(description = "Must contain username, full_name, email, password and a list of permissions.", required = true)
-                           @Valid @NotNull CreateUserRequest cr) throws ValidationException {
+                               @Valid @NotNull CreateUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
         if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
@@ -401,7 +407,7 @@ public class UsersResource extends RestResource {
         user.setFirstLastFullNames(cr.firstName(), cr.lastName());
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
-        setUserRoles(cr.roles(), user);
+        setUserRoles(cr.roles(), user, userContext);
         user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
@@ -472,7 +478,7 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private void setUserRoles(@Nullable List<String> roles, User user) {
+    private void setUserRoles(@Nullable List<String> roles, User user, UserContext userContext) {
         if (roles == null) {
             return;
         }
@@ -511,6 +517,11 @@ public class UsersResource extends RestResource {
                     .collect(Collectors.toSet());
 
             user.setRoleIds(roleIds);
+            auditEventSender.success(AuditActor.user(userContext.getUser().getName()),
+                    AuditEventTypes.USER_ROLES_UPDATE,
+                    ImmutableMap.of("roles", String.join(",", normalizedRoles),
+                            "userName", user.getName(),
+                            "userId", user.getId()));
 
         } catch (org.graylog2.database.NotFoundException e) {
             throw new InternalServerErrorException(e);
@@ -529,7 +540,8 @@ public class UsersResource extends RestResource {
     public void changeUser(@Parameter(name = "userId", description = "The ID of the user to modify.", required = true)
                            @PathParam("userId") String userId,
                            @RequestBody(description = "Updated user information.", required = true)
-                           @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
+                           @Valid @NotNull ChangeUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
 
         final User user = loadUserById(userId);
         final String username = user.getName();
@@ -554,7 +566,7 @@ public class UsersResource extends RestResource {
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
             checkAdminRoleForServiceAccount(cr, user);
-            setUserRoles(cr.roles(), user);
+            setUserRoles(cr.roles(), user, userContext);
         }
 
         final String timezone = cr.timezone();

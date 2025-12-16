@@ -37,10 +37,15 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.security.UserContext;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -75,7 +80,7 @@ import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
 @Path("/authz/roles")
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthzRolesResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AuthzRolesResource.class);
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(AuthzRoleDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
@@ -94,9 +99,15 @@ public class AuthzRolesResource extends RestResource {
     private final UserService userService;
     private final SearchQueryParser searchQueryParser;
     private final SearchQueryParser userSearchQueryParser;
+    private final AuditEventSender auditEventSender;
 
     @Inject
-    public AuthzRolesResource(PaginatedAuthzRolesService authzRolesService, PaginatedUserService paginatedUserService, UserService userService) {
+    public AuthzRolesResource(
+            PaginatedAuthzRolesService authzRolesService,
+            PaginatedUserService paginatedUserService,
+            UserService userService,
+            AuditEventSender auditEventSender) {
+        this.auditEventSender = auditEventSender;
         this.authzRolesService = authzRolesService;
         this.paginatedUserService = paginatedUserService;
         this.userService = userService;
@@ -228,29 +239,31 @@ public class AuthzRolesResource extends RestResource {
     @PUT
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Add user to role")
-    @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_UPDATE)
     @Path("{roleId}/assignees")
+    @NoAuditEvent("Has custom audit events")
     public void addUser(
             @Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
-            @Parameter(name = "usernames") Set<String> usernames) throws ValidationException {
-        updateUserRole(roleId, usernames, Set::add);
+            @Parameter(name = "usernames") Set<String> usernames,
+            @Context UserContext userContext) {
+        updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_UPDATE, roleId, usernames, Set::add);
     }
 
     @DELETE
     @Operation(summary = "Remove user from role")
     @Path("{roleId}/assignee/{username}")
-    @AuditEvent(type = AuditEventTypes.ROLE_MEMBERSHIP_DELETE)
+    @NoAuditEvent("Has custom audit events")
     public void removeUser(
             @Parameter(name = "roleId") @PathParam("roleId") @NotBlank String roleId,
-            @Parameter(name = "username") @PathParam("username") @NotBlank String username) throws ValidationException {
-        updateUserRole(roleId, ImmutableSet.of(username), Set::remove);
+            @Parameter(name = "username") @PathParam("username") @NotBlank String username,
+            @Context UserContext userContext) {
+        updateUserRole(userContext, AuditEventTypes.ROLE_AUTHZ_DELETE, roleId, ImmutableSet.of(username), Set::remove);
     }
 
     interface UpdateRoles {
         boolean update(Set<String> roles, String roleId);
     }
 
-    private void updateUserRole(String roleId, Set<String> usernames, UpdateRoles rolesUpdater) {
+    private void updateUserRole(UserContext userContext, String auditEventType, String roleId, Set<String> usernames, UpdateRoles rolesUpdater) {
         usernames.forEach(username -> {
             checkPermission(USERS_ROLESEDIT, username);
 
@@ -258,12 +271,14 @@ public class AuthzRolesResource extends RestResource {
             if (user == null) {
                 throw new NotFoundException("Cannot find user with name: " + username);
             }
-            authzRolesService.get(roleId)
-                    .ifPresentOrElse(role -> {
-                        checkPermission(RestPermissions.ROLES_ASSIGN, role.name());
-                    }, () -> {
-                        throw new NotFoundException("Cannot find role with id: " + roleId);
-                    });
+            String roleName;
+            final Optional<AuthzRoleDTO> authzRoleDTO = authzRolesService.get(roleId);
+            if (authzRoleDTO.isEmpty()) {
+                throw new NotFoundException("Cannot find role with id: " + roleId);
+            } else {
+                roleName = authzRoleDTO.get().name();
+                checkPermission(RestPermissions.ROLES_ASSIGN, roleName);
+            }
             Set<String> roles = user.getRoleIds();
             rolesUpdater.update(roles, roleId);
             user.setRoleIds(roles);
@@ -272,6 +287,11 @@ public class AuthzRolesResource extends RestResource {
             } catch (ValidationException e) {
                 LOG.warn("Could not update user: {}", username);
             }
+
+            auditEventSender.success(AuditActor.user(userContext.getUser().getName()),
+                    auditEventType,
+                    ImmutableMap.of("roleName", roleName, "userName", username));
+
         });
     }
 

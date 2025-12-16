@@ -31,6 +31,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.BadRequestException;
@@ -705,7 +706,7 @@ public class StreamResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
     public Response assignToIndexSet(@Parameter(name = "indexSetId", required = true) @PathParam("indexSetId") String indexSetId,
-                                     @RequestBody(required = true) @Valid @NotNull List<String> streamIds) {
+                                     @RequestBody(required = true) @NotEmpty List<@NotBlank String> streamIds) {
         checkPermission(RestPermissions.INDEXSETS_READ, indexSetId);
         streamIds.forEach(streamId -> {
             checkPermission(RestPermissions.STREAMS_EDIT, streamId);

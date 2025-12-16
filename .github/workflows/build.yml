@@ -35,7 +35,7 @@ env:
 jobs:
   build-artifacts:
     name: "Artifacts"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-build-artifacts/runner=ubuntu-4-core"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -48,10 +48,12 @@ jobs:
 
       - name: "Build with Maven"
         run: "./mvnw -Pedantic clean -Dspotbugs.skip -DskipTests package javadoc:javadoc"
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
 
   frontend-tests:
     name: "Frontend Tests"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-frontend-tests/runner=ubuntu-4-core"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -64,10 +66,12 @@ jobs:
 
       - name: "Build with Maven"
         run: "./mvnw -Pedantic -Dspotbugs.skip -Dmaven.test.skip -Dskip.datanode -Dcyclonedx.skip clean test"
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
 
   backend-tests:
     name: "Backend Tests"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-backend-tests/runner=ubuntu-4-core"
 
     steps:
       - uses: "actions/checkout@v5"
@@ -83,7 +87,7 @@ jobs:
 
   full-backend-tests:
     name: "Full Backend Tests"
-    runs-on: "${{ vars.RUNNER_4_CORE }}"
+    runs-on: "runs-on=${{ github.run_id }}-full-backend-tests/runner=ubuntu-4-core"
 
     strategy:
       fail-fast: false
@@ -121,3 +125,5 @@ jobs:
           -Dtest.integration.search-server.distribution=${{ matrix.service.search-server-distribution || '' }}
           -Dtest.integration.search-server.version=${{ matrix.service.search-server-version || '' }}
           -Dtest.integration.mongodb.version=${{ matrix.service.mongodb-version || '' }}
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"

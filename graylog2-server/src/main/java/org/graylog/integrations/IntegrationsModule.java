@@ -156,6 +156,9 @@ public class IntegrationsModule extends PluginModule {
 
             // PagerDuty notification type fix
             addMigration(V20220622071600_MigratePagerDutyV1.class);
+
+            // CloudTrail input configuration migration
+            addMigration(V20251030000000_CloudTrailInputConfigMigration.class);
         }
     }
 
@@ -192,7 +195,6 @@ public class IntegrationsModule extends PluginModule {
         addMessageInput(CloudTrailInput.class);
         addRestResource(CloudTrailResource.class);
         bind(ObjectMapper.class).annotatedWith(AWSObjectMapper.class).toInstance(createObjectMapper());
-        addMigration(V20251030000000_CloudTrailInputConfigMigration.class);
 
         // AWS
         addCodec(AWSCodec.NAME, AWSCodec.class);

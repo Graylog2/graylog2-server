@@ -136,6 +136,7 @@
         <dependency>
             <groupId>org.graylog</groupId>
             <artifactId>jadconfig</artifactId>
+            <version>${jadconfig.version}</version>
         </dependency>
 
         <dependency>
@@ -1008,11 +1009,6 @@
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>3.2.1</version>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.6.2</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -1154,6 +1150,36 @@
                                 <argument>${project.build.directory}/swagger</argument>
                                 <argument>org.graylog</argument>
                                 <argument>org.graylog2</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-csv-docs</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>csv</argument>
+                                <argument>${project.build.directory}/server-conf-docs.csv</argument>
+                            </arguments>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-conf-example</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.github.joschi.jadconfig.documentation.ConfigurationDocsGenerator</mainClass>
+                            <arguments>
+                                <argument>conf</argument>
+                                <argument>${project.build.directory}/server.conf.generated</argument>
+                                <!-- use the following line if you want to distribute the generated version instead of manually created -->
+                                <!-- <argument>${project.build.directory}/server.conf.example</argument> -->
                             </arguments>
                         </configuration>
                     </execution>
