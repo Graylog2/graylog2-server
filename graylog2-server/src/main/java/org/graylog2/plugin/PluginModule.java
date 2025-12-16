@@ -334,7 +334,7 @@ public abstract class PluginModule extends Graylog2Module {
         }
     }
 
-    private MapBinder<String, SystemJob.Factory<? extends SystemJob<? extends SystemJobConfig>>> systemJobBinder() {
+    protected MapBinder<String, SystemJob.Factory<? extends SystemJob<? extends SystemJobConfig>>> systemJobBinder() {
         return MapBinder.newMapBinder(binder(), new TypeLiteral<>() {}, new TypeLiteral<>() {});
     }
 

@@ -17,11 +17,13 @@
 package org.graylog.scheduler.system;
 
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
 import org.graylog.scheduler.Job;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Singleton
 public class SystemJobFactories {
     private final Map<String, SystemJob.Factory<? extends SystemJob<? extends SystemJobConfig>>> factories;
 
