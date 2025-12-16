@@ -35,7 +35,7 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -95,7 +95,7 @@ public class MongoIndexSetTest {
     @Mock
     private IndexRangeService indexRangeService;
     @Mock
-    private SystemJobManager systemJobManager;
+    private LegacySystemJobManager systemJobManager;
     @Mock
     private SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     @Mock

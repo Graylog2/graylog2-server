@@ -16,12 +16,17 @@
  */
 package org.graylog2.system.jobs;
 
+import org.graylog.scheduler.system.SystemJob;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
 import static com.google.common.base.Preconditions.checkState;
 
-public abstract class SystemJob {
+/**
+ * Deprecated: Use {@link SystemJob} interface and related classes instead.
+ */
+@Deprecated(since = "7.1", forRemoval = true)
+public abstract class LegacySystemJob {
 
     // Known types that can be resolved in the SystemJobFactory.
     public enum Type {

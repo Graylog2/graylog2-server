@@ -21,9 +21,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.inject.Singleton;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.eventbus.JobCompletedEvent;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
@@ -33,18 +31,16 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.system.shutdown.GracefulShutdownHook;
 import org.graylog2.system.shutdown.GracefulShutdownService;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
-@Singleton
-public class JobSchedulerService extends AbstractExecutionThreadService implements GracefulShutdownHook {
-    private static final Logger LOG = LoggerFactory.getLogger(JobSchedulerService.class);
-
+public abstract class JobSchedulerService extends AbstractExecutionThreadService implements GracefulShutdownHook {
+    private final Logger log;
     private final JobExecutionEngine jobExecutionEngine;
     private final JobSchedulerConfig schedulerConfig;
     private final JobSchedulerClock clock;
@@ -58,9 +54,9 @@ public class JobSchedulerService extends AbstractExecutionThreadService implemen
     private final ScheduledExecutorService jobHeartbeatExecutor;
     private Thread executionThread;
 
-    @Inject
-    public JobSchedulerService(JobExecutionEngine.Factory engineFactory,
-                               JobWorkerPool.Factory workerPoolFactory,
+    public JobSchedulerService(Logger log,
+                               Function<JobWorkerPool, JobExecutionEngine> engineFunction,
+                               JobWorkerPool workerPool,
                                JobSchedulerConfig schedulerConfig,
                                JobSchedulerClock clock,
                                JobSchedulerEventBus schedulerEventBus,
@@ -68,9 +64,10 @@ public class JobSchedulerService extends AbstractExecutionThreadService implemen
                                GracefulShutdownService gracefulShutdownService,
                                @Named("shutdown_timeout") int shutdownTimeoutMs,
                                @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration) {
+        this.log = log;
         this.jobHeartbeatExecutor = createJobHeartbeatExecutor();
-        this.workerPool = workerPoolFactory.create("system", schedulerConfig.numberOfWorkerThreads());
-        this.jobExecutionEngine = engineFactory.create(workerPool);
+        this.workerPool = workerPool;
+        this.jobExecutionEngine = engineFunction.apply(workerPool);
         this.schedulerConfig = schedulerConfig;
         this.clock = clock;
         this.schedulerEventBus = schedulerEventBus;
@@ -84,7 +81,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService implemen
         return Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder()
                 .setNameFormat("job-heartbeat-%d")
                 .setDaemon(true)
-                .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG))
+                .setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(log))
                 .build());
     }
 
@@ -99,15 +96,15 @@ public class JobSchedulerService extends AbstractExecutionThreadService implemen
     @Override
     protected void run() throws Exception {
         // Safety measure to make sure everything is started before we start job scheduling.
-        LOG.debug("Waiting for server to enter RUNNING status before starting the scheduler loop");
+        log.debug("Waiting for server to enter RUNNING status before starting the scheduler loop");
         try {
             serverStatus.awaitRunning();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            LOG.debug("Was interrupted while waiting for server to enter RUNNING state. Aborting.");
+            log.debug("Was interrupted while waiting for server to enter RUNNING state. Aborting.");
             return;
         }
-        LOG.debug("Server entered RUNNING state, starting scheduler loop");
+        log.debug("Server entered RUNNING state, starting scheduler loop");
 
         boolean executionEnabled = true;
         while (isRunning()) {
@@ -118,23 +115,23 @@ public class JobSchedulerService extends AbstractExecutionThreadService implemen
             }
             executionEnabled = logExecutionConfigState(executionEnabled, true);
 
-            LOG.debug("Starting scheduler loop iteration");
+            log.debug("Starting scheduler loop iteration");
             try {
                 if (!jobExecutionEngine.execute() && isRunning()) {
                     // When the execution engine returned false, there are either no free worker threads or no
                     // runnable triggers. To avoid busy spinning we sleep for the configured duration or until
                     // we receive a job completion event via the scheduler event bus.
                     if (sleeper.sleep(loopSleepDuration.getQuantity(), loopSleepDuration.getUnit())) {
-                        LOG.debug("Waited for {} {} because there are either no free worker threads or no runnable triggers",
+                        log.debug("Waited for {} {} because there are either no free worker threads or no runnable triggers",
                                 loopSleepDuration.getQuantity(), loopSleepDuration.getUnit());
                     }
                 }
             } catch (InterruptedException e) {
-                LOG.debug("Received interrupted exception", e);
+                log.debug("Received interrupted exception", e);
             } catch (Exception e) {
-                LOG.error("Error running job execution engine", e);
+                log.error("Error running job execution engine", e);
             }
-            LOG.debug("Ending scheduler loop iteration");
+            log.debug("Ending scheduler loop iteration");
         }
     }
 
@@ -157,7 +154,7 @@ public class JobSchedulerService extends AbstractExecutionThreadService implemen
         try {
             workerPool.shutdown(shutdownTimeout);
         } catch (InterruptedException e) {
-            LOG.debug("Interrupted while waiting for worker pool shutdown");
+            log.debug("Interrupted while waiting for worker pool shutdown");
             Thread.currentThread().interrupt();
         }
         jobHeartbeatExecutor.shutdown();
@@ -223,9 +220,9 @@ public class JobSchedulerService extends AbstractExecutionThreadService implemen
      */
     private boolean logExecutionConfigState(boolean previouslyEnabled, boolean nowEnabled) {
         if (previouslyEnabled && !nowEnabled) {
-            LOG.info("Job scheduler execution is disabled. Waiting and trying again until enabled.");
+            log.info("Job scheduler execution is disabled. Waiting and trying again until enabled.");
         } else if (!previouslyEnabled && nowEnabled) {
-            LOG.info("Job scheduler execution is now enabled. Proceeding.");
+            log.info("Job scheduler execution is now enabled. Proceeding.");
         }
         return nowEnabled;
     }

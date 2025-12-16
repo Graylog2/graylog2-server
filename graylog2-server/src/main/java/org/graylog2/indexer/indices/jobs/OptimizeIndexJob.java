@@ -23,11 +23,11 @@ import jakarta.inject.Named;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OptimizeIndexJob extends SystemJob {
+public class OptimizeIndexJob extends LegacySystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
     private final Indices indices;
     private final ActivityWriter activityWriter;
@@ -35,6 +35,7 @@ public class OptimizeIndexJob extends SystemJob {
     private final int indexOptimizationJobs;
     private final String index;
     private final int maxNumSegments;
+
     @AssistedInject
     public OptimizeIndexJob(Indices indices,
                             ActivityWriter activityWriter,
