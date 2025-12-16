@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { useErrorsContext } from 'components/lookup-tables/contexts/ErrorsContext';
