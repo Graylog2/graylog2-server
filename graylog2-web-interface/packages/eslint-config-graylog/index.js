@@ -95,7 +95,15 @@ export default [
       'no-plusplus': 'error',
       'no-promise-executor-return': 'error',
       'no-restricted-globals': 'error',
-      'no-restricted-syntax': 'error',
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            'MemberExpression[object.name="React"][property.name=/^use(State|Effect|Context|Reducer|Callback|Memo|Ref|ImperativeHandle|LayoutEffect|DebugValue)$/]',
+          message:
+            'Import hooks directly from React instead of using React.useXxx (e.g., import { useState } from "react")',
+        },
+      ],
       'no-script-url': 'error',
       'no-template-curly-in-string': 'error',
       'no-throw-literal': 'error',
@@ -272,7 +280,8 @@ export default [
         {
           object: 'fireEvent',
           property: 'submit',
-          message: 'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
+          message:
+            'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
         },
       ],
       'testing-library/render-result-naming-convention': 'off',
