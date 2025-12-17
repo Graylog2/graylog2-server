@@ -16,6 +16,7 @@
  */
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
+import isEqual from 'lodash/isEqual';
 
 import { IfPermitted, Select, TimeUnitInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
@@ -23,32 +24,10 @@ import FormikInput from 'components/common/FormikInput';
 import { DocumentationLink } from 'components/support';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
-import GCSSetupInfo from 'components/gcs/GCSSetupInfo';
-
-export type GeoVendorType = 'MAXMIND' | 'IPINFO';
-export type TimeUnit = 'SECONDS' | 'MINUTES' | 'HOURS' | 'DAYS';
-
-const CLOUD_STORAGE_OPTION = {
-  GCS: 'gcs',
-  S3: 's3',
-} as const;
-
-export type GeoIpConfigType = {
-  enabled: boolean;
-  enforce_graylog_schema: boolean;
-  db_vendor_type: GeoVendorType;
-  city_db_path: string;
-  asn_db_path: string;
-  refresh_interval_unit: TimeUnit;
-  refresh_interval: number;
-  pull_from_cloud?: (typeof CLOUD_STORAGE_OPTION)[keyof typeof CLOUD_STORAGE_OPTION];
-  gcs_project_id?: string;
-};
-
-export type OptionType = {
-  value: string;
-  label: string;
-};
+import type { GeoVendorType, GeoIpConfigType, OptionType } from 'components/maps/configurations/types';
+import { CLOUD_STORAGE_OPTION } from 'components/maps/configurations/types';
+import GCSGeoIpFormGroup from 'components/maps/configurations/GCSGeoIpFormGroup';
+import ABSGeoIpFormGroup from 'components/maps/configurations/ABSGeoIpFormGroup';
 
 type Props = {
   config?: GeoIpConfigType;
@@ -74,8 +53,10 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   const sendTelemetry = useSendTelemetry();
 
   useEffect(() => {
-    setCurConfig({ ...config });
-  }, [config]);
+    if (!isEqual(curConfig, config)) {
+      setCurConfig({ ...config });
+    }
+  }, [config, curConfig]);
 
   const resetConfig = () => {
     setCurConfig(config);
@@ -103,6 +84,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
   const cloudStorageOptions: OptionType[] = [
     { value: CLOUD_STORAGE_OPTION.S3, label: 'S3' },
     { value: CLOUD_STORAGE_OPTION.GCS, label: 'Google Cloud Storage' },
+    { value: CLOUD_STORAGE_OPTION.ABS, label: 'Azure Blob Storage' },
   ];
 
   const activeVendorType = (type: GeoVendorType) => availableVendorTypes().filter((t) => t.value === type)[0].label;
@@ -256,20 +238,10 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
                 </Field>
 
                 {values.pull_from_cloud === CLOUD_STORAGE_OPTION.GCS && (
-                  <>
-                    <GCSSetupInfo />
-                    <FormikInput
-                      id="gcs_project_id"
-                      type="text"
-                      disabled={!values.enabled}
-                      label={
-                        <>
-                          Googe Cloud Storage Project ID <InputOptionalInfo />
-                        </>
-                      }
-                      name="gcs_project_id"
-                    />
-                  </>
+                  <GCSGeoIpFormGroup />
+                )}
+                {values.pull_from_cloud === CLOUD_STORAGE_OPTION.ABS && (
+                  <ABSGeoIpFormGroup />
                 )}
               </Modal.Body>
               <Modal.Footer>
