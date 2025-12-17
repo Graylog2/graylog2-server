@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
@@ -171,7 +172,7 @@ describe('SavedSearchesModal', () => {
     it('should not display delete action for saved search when user is missing required permissions', async () => {
       const currentUser = adminUser
         .toBuilder()
-        .permissions(Immutable.List([`view:read:${defaultPaginatedSearches.list[0].id}`]))
+        .permissions(Immutable.List<Permission>([`view:read:${defaultPaginatedSearches.list[0].id}`]))
         .build();
       asMock(useCurrentUser).mockReturnValue(currentUser);
 

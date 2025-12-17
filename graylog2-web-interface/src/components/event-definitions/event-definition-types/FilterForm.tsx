@@ -25,6 +25,7 @@ import merge from 'lodash/merge';
 import moment from 'moment';
 import { OrderedMap } from 'immutable';
 import type * as Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { describeExpression } from 'util/CronUtils';
 import { getPathnameWithoutId } from 'util/URLUtils';
@@ -68,8 +69,8 @@ export const TIME_UNITS = ['HOURS', 'MINUTES', 'SECONDS'];
 export type LookupTableParameterJsonEmbryonic = Partial<LookupTableParameterJson> & {
   embryonic?: boolean;
 };
-const LOOKUP_PERMISSIONS = ['lookuptables:read'];
-const STREAM_PERMISSIONS = ['streams:read'];
+const LOOKUP_PERMISSIONS: Permission[] = ['lookuptables:read'];
+const STREAM_PERMISSIONS: Permission[] = ['streams:read'];
 
 const buildNewParameter = (name: string): LookupTableParameterJsonEmbryonic => ({
   name: name,
