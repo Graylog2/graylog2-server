@@ -32,6 +32,7 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_FUNCTIONS = "functions";
     private static final String FIELD_DEPRECATED_FUNCTIONS = "deprecated_functions";
+    private static final String FIELD_ROUTED_STREAMS = "routed_streams";
     public static final String FIELD_HAS_INPUT_REFERENCES = "has_input_references";
 
     @JsonProperty(FIELD_PIPELINE_ID)
@@ -48,6 +49,9 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
     @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
     public abstract Set<String> deprecatedFunctions();
+
+    @JsonProperty(FIELD_ROUTED_STREAMS)
+    public abstract Set<String> routedStreams();
 
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
@@ -79,6 +83,9 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
         @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
         public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
+
+        @JsonProperty(FIELD_ROUTED_STREAMS)
+        public abstract Builder routedStreams(Set<String> routedStreams);
 
         @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
         public abstract Builder hasInputReferences(Boolean hasInputReferences);

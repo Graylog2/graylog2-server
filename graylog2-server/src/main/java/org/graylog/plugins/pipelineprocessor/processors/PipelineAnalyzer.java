@@ -33,6 +33,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
@@ -98,6 +99,7 @@ public class PipelineAnalyzer {
             Set<String> ruleSet = new HashSet<>();
             Set<String> functionSet = new HashSet<>();
             Set<String> deprecatedFunctionSet = new HashSet<>();
+            Set<String> routedStreamsSet = new HashSet<>();
             boolean hasInputReferences = false;
 
             Set<String> connectedStreams = connectionsService.loadByPipelineId(pipeline.id())
@@ -113,7 +115,8 @@ public class PipelineAnalyzer {
                     for (Rule rule : rules) {
                         if (rule == null) continue;
                         ruleSet.add(rule.id());
-                        boolean ruleHasReferences = analyzeRule(pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, inputMentions);
+                        boolean ruleHasReferences = analyzeRule(
+                                pipeline, connectedStreams, rule, functionSet, deprecatedFunctionSet, routedStreamsSet, inputMentions);
                         hasInputReferences = hasInputReferences || ruleHasReferences;
                     }
                 }
@@ -123,6 +126,7 @@ public class PipelineAnalyzer {
                     .streams(connectedStreams)
                     .functions(functionSet)
                     .deprecatedFunctions(deprecatedFunctionSet)
+                    .routedStreams(routedStreamsSet)
                     .hasInputReferences(hasInputReferences)
                     .build());
         });
@@ -136,17 +140,19 @@ public class PipelineAnalyzer {
      * @param connectedStreams       the streams connected to the pipeline
      * @param rule                   the rule to analyze
      * @param functions              return set of functions used in the rule
-     * @param deprecatedFunctionList return set of deprecated functions used in the rule
+     * @param deprecatedFunctions    return set of deprecated functions used in the rule
+     * @param routedStreams          return set of stream routing targets in the rule
      * @param inputMentions          map to collect input mentions
      * @return true if the rule references any inputs, false otherwise
      */
     private boolean analyzeRule(Pipeline pipeline, Set<String> connectedStreams, Rule rule,
-                             Set<String> functions, Set<String> deprecatedFunctionList,
+                                Set<String> functions, Set<String> deprecatedFunctions, Set<String> routedStreams,
                              Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
         MetaDataListener ruleListener = new MetaDataListener(pipeline, connectedStreams, rule, inputMentions);
         new RuleAstWalker().walk(ruleListener, rule);
         functions.addAll(ruleListener.getFunctions());
-        deprecatedFunctionList.addAll(ruleListener.getDeprecatedFunctions());
+        deprecatedFunctions.addAll(ruleListener.getDeprecatedFunctions());
+        routedStreams.addAll(ruleListener.getRoutedStreams());
         return ruleListener.hasInputReference();
     }
 
@@ -173,6 +179,7 @@ public class PipelineAnalyzer {
     class MetaDataListener extends RuleAstBaseListener {
         private final Set<String> functions = new HashSet<>();
         private final Set<String> deprecatedFunctions = new HashSet<>();
+        private final Set<String> routedStreams = new HashSet<>();
         private boolean hasInputReference = false;
         private final Pipeline pipeline;
         private final Set<String> connectedStreams;
@@ -219,6 +226,9 @@ public class PipelineAnalyzer {
             if (Boolean.TRUE.equals(descriptor.deprecated())) {
                 deprecatedFunctions.add(descriptor.name());
             }
+            if (descriptor.name().equals(RouteToStream.NAME)) {
+                routedStreams.add(descriptor.name());
+            }
         }
 
         private void analyzeInputs(FunctionDescriptor<?> descriptor, FunctionArgs args) {
@@ -264,6 +274,10 @@ public class PipelineAnalyzer {
 
         public Set<String> getDeprecatedFunctions() {
             return deprecatedFunctions;
+        }
+
+        public Set<String> getRoutedStreams() {
+            return routedStreams;
         }
 
         public boolean hasInputReference() {
