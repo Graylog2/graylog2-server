@@ -33,7 +33,7 @@ type Props = {
   searchQuery?: string;
   onSelectNodeType?: () => void;
   pageSizeLimit?: number;
-  refetchInterval?: number | false;
+  refetchInterval?: number;
 };
 
 const GraylogNodesExpandable = ({
@@ -61,7 +61,7 @@ const GraylogNodesExpandable = ({
     [pageSizeLimit],
   );
   const externalSearch = useMemo(() => ({ query: searchQuery }), [searchQuery]);
-  const fetchOptions = useMemo(() => ({ refetchInterval } as FetchOptions), [refetchInterval]);
+  const fetchOptions = useMemo<FetchOptions>(() => ({ refetchInterval }), [refetchInterval]);
 
   return (
     <ClusterNodesSectionWrapper

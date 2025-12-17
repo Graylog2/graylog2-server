@@ -50,11 +50,11 @@ const ClusterConfigurationNodes = () => {
   const productName = useProductName();
   const [activeNodeType, setActiveNodeType] = useState<NodeType>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const nodeTypeOptions = useMemo(
+  const nodeTypeOptions = useMemo<Array<{ label: string; value: NodeType }>>(
     () => [
-      { label: 'All Nodes', value: 'all' as NodeType },
-      { label: `${productName} Nodes`, value: 'graylog' as NodeType },
-      { label: 'Data Nodes', value: 'data' as NodeType },
+      { label: 'All Nodes', value: 'all' },
+      { label: `${productName} Nodes`, value: 'graylog' },
+      { label: 'Data Nodes', value: 'data' },
     ],
     [productName],
   );

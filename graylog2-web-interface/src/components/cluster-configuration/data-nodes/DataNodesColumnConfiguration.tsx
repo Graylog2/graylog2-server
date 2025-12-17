@@ -39,7 +39,7 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'jvm',
   'indexing',
   'storage',
-] as const;
+];
 
 const JVM_WARNING_THRESHOLD = 0.95;
 const MEMORY_WARNING_THRESHOLD = 0.95;

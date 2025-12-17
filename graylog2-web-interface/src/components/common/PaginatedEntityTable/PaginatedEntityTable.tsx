@@ -252,7 +252,7 @@ const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: Wr
       setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
-      onDataLoaded={props.onDataLoaded as ((data: PaginatedResponse<T, M>) => void) | undefined}
+      onDataLoaded={props.onDataLoaded}
     />
   );
 };
@@ -270,7 +270,7 @@ const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: Wra
       setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
-      onDataLoaded={props.onDataLoaded as ((data: PaginatedResponse<T, M>) => void) | undefined}
+      onDataLoaded={props.onDataLoaded}
     />
   );
 };

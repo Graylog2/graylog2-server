@@ -47,7 +47,7 @@ export const DEFAULT_VISIBLE_COLUMNS = [
   'throughput',
   'is_processing',
   'lb_status',
-] as const;
+];
 
 export const createColumnDefinitions = (): Array<ColumnSchema> => [
   { id: 'cpu', title: 'CPU', isDerived: true, sortable: false },
@@ -70,11 +70,11 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     is_processing: {
       renderCell: (_value, entity) => <ProcessingStateCell node={entity} />,
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 'matchHeader',
     },
     lb_status: {
       renderCell: (_value, entity) => <LoadBalancerStatusCell node={entity} />,
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 'matchHeader',
     },
     cpu: {
       renderCell: (_value, entity) => (
@@ -107,7 +107,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
           dangerThreshold={JOURNAL_DANGER_THRESHOLD}
         />
       ),
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 'matchHeader',
     },
     jvm: {
       renderCell: (_value, entity) => (
@@ -125,7 +125,7 @@ export const createColumnRenderers = (): ColumnRenderers<GraylogNode> => ({
     },
     throughput: {
       renderCell: (_value, entity) => <ThroughputMetricsCell node={entity} />,
-      staticWidth: 'matchHeader' as const,
+      staticWidth: 'matchHeader',
     },
   },
 });
