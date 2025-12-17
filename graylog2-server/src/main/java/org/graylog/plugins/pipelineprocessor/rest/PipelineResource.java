@@ -241,8 +241,8 @@ public class PipelineResource extends RestResource implements PluginRestResource
         );
         final List<PipelineSource> pipelineList = result.stream()
                 .map(dao -> PipelineSource.fromDao(
-                        pipelineRuleParser, dao, metadataDaos.get(dao.id()) != null ? metadataDaos.get(dao.id()).hasDeprecatedFunctions() : null))
-                .collect(Collectors.toList());
+                        pipelineRuleParser, dao, metadataDaos.get(dao.id()) != null && metadataDaos.get(dao.id()).hasDeprecatedFunctions()))
+                .toList();
         final PaginatedList<PipelineSource> pipelines = new PaginatedList<>(pipelineList,
                 result.pagination().total(), result.pagination().page(), result.pagination().perPage());
         return PaginatedResponse.create("pipelines", pipelines);
@@ -268,9 +268,10 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Get list of deprecated functions used in specified rule")
     @Path("/rule/{id}/deprecated_functions")
     @GET
-    public Set<String> getDeprecatedFunctionsForRule(@ApiParam(name = "id") @PathParam("id") String id) {
+    public Set<String> getDeprecatedFunctionsForRule(@ApiParam(name = "id") @PathParam("id") String id)
+            throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_READ, id);
-        return metadataService.deprecatedFunctionsRule(id);
+        return deprecatedFunctionsRule(id);
     }
 
     @ApiOperation(value = "Modify a processing pipeline", notes = "It can take up to a second until the change is applied")
@@ -383,5 +384,13 @@ public class PipelineResource extends RestResource implements PluginRestResource
             throw new BadRequestException("Pipeline cannot use system rules: " + usedSystemRules);
         }
 
+    }
+
+    private Set<String> deprecatedFunctionsRule(String ruleId) throws NotFoundException {
+        Set<String> superset = metadataService.getPipelinesByRule(ruleId).stream()
+                .flatMap(pipelineId -> metadataService.deprecatedFunctionsPipeline(pipelineId).stream())
+                .collect(Collectors.toSet());
+        final RuleDao rule = ruleService.load(ruleId);
+        return superset.stream().filter(func -> rule.source().contains(func)).collect(Collectors.toSet());
     }
 }

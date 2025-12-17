@@ -127,10 +127,4 @@ public class MongoDbPipelineMetadataService {
             return Set.of();
         }
     }
-
-    public Set<String> deprecatedFunctionsRule(String ruleId) {
-        return getPipelinesByRule(ruleId).stream()
-                .flatMap(pipelineId -> deprecatedFunctionsPipeline(pipelineId).stream())
-                .collect(Collectors.toSet());
-    }
 }
