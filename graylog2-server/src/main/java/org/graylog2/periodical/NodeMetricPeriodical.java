@@ -18,29 +18,26 @@
 package org.graylog2.periodical;
 
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.util.concurrent.AtomicDouble;
+import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import oshi.SystemInfo;
-import oshi.hardware.CentralProcessor;
 
 @Singleton
 public class NodeMetricPeriodical extends Periodical {
 
-    Logger LOG = LoggerFactory.getLogger(NodeMetricPeriodical.class);
+    private static final Logger LOG = LoggerFactory.getLogger(NodeMetricPeriodical.class);
 
-    private long[] lastTicks = null;
-    private AtomicDouble load = new AtomicDouble();
+    private final CpuLoadGauge cpuLoadGauge = new CpuLoadGauge();
+
     private final MetricRegistry metricRegistry;
 
     @Inject
     public NodeMetricPeriodical(MetricRegistry metricRegistry) {
         this.metricRegistry = metricRegistry;
     }
-
 
     @Override
     public boolean runsForever() {
@@ -72,6 +69,7 @@ public class NodeMetricPeriodical extends Periodical {
         return 5;
     }
 
+    @Nonnull
     @Override
     protected Logger getLogger() {
         return LOG;
@@ -82,15 +80,14 @@ public class NodeMetricPeriodical extends Periodical {
         return false;
     }
 
+
+    @Override
+    public void initialize() {
+        metricRegistry.registerGauge("org.graylog2.system.cpu.percent", cpuLoadGauge);
+    }
+
     @Override
     public void doRun() {
-        SystemInfo si = new SystemInfo();
-        CentralProcessor processor = si.getHardware().getProcessor();
-        if (lastTicks != null) {
-            load.set(processor.getSystemCpuLoadBetweenTicks(lastTicks) * (double) 100);
-        } else {
-            metricRegistry.registerGauge("org.graylog2.system.cpu.percent", () -> load.get());
-        }
-        lastTicks = processor.getSystemCpuLoadTicks();
+        cpuLoadGauge.update();
     }
 }
