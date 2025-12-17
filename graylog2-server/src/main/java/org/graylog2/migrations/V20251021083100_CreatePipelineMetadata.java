@@ -93,12 +93,7 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
         if (migrationAlreadyApplied()) {
             return;
         }
-
-        db.getCollection(RULES_COLLECTION_NAME).drop();
-        db.getCollection(INPUTS_COLLECTION_NAME).drop();
-        createMetadata();
-
-        markMigrationApplied();
+        doUpgrade();
     }
 
     private void createMetadata() {
@@ -111,12 +106,22 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
         inputsMetadataService.save(inputMentions, false);
     }
 
+    public void doUpgrade() {
+        db.getCollection(RULES_COLLECTION_NAME).drop();
+        db.getCollection(INPUTS_COLLECTION_NAME).drop();
+        createMetadata();
+
+        markMigrationApplied();
+    }
+
     private boolean migrationAlreadyApplied() {
         return Objects.nonNull(configService.get(V20251021083100_CreatePipelineMetadata.MigrationCompleted.class));
     }
 
+    // The second migration marker indicates that schema has been upgraded to include routed_streams field
     private void markMigrationApplied() {
         configService.write(new V20251021083100_CreatePipelineMetadata.MigrationCompleted());
+        configService.write(new V20251217103500_RoutedStreamsMetadata.MigrationCompleted());
     }
 
     public record MigrationCompleted() {}
