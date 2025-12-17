@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useContext, useMemo } from 'react';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { DEFAULT_PERSPECTIVE } from 'components/perspectives/contexts/PerspectivesProvider';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -165,7 +166,7 @@ const isFeatureEnabled = (featureFlag?: string) => {
 type BaseNavigationItem = {
   description: string;
   path: QualifiedUrl<string>;
-  permissions?: string | Array<string>;
+  permissions?: Permission | Array<Permission>;
   perspective?: string;
 };
 
