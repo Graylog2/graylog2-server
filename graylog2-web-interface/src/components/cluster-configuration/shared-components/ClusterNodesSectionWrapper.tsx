@@ -48,10 +48,6 @@ const TableWrapper = styled.div.withConfig({
   ({ maxHeight }) => css`
     margin-top: -12px;
 
-    div#scroll-container table thead {
-      background: inherit;
-    }
-
     ${maxHeight &&
     css`
       div#scroll-container {
@@ -60,6 +56,7 @@ const TableWrapper = styled.div.withConfig({
       }
 
       div#scroll-container table thead {
+        background-color: ${({ theme }) => theme.colors.global.contentBackground};
         position: sticky;
         top: 0;
         z-index: 1;
@@ -67,6 +64,10 @@ const TableWrapper = styled.div.withConfig({
     `}
   `,
 );
+
+const PaperSection = styled(Section)`
+  background-color: ${({ theme }) => theme.colors.global.contentBackground};
+`;
 
 const getMaxHeightValue = (maxContentHeight: number | string | null, collapsible: boolean) => {
   if (!collapsible || maxContentHeight === null || maxContentHeight === undefined) {
@@ -128,12 +129,12 @@ const ClusterNodesSectionWrapper = ({
   };
 
   return (
-    <Section
+    <PaperSection
       title={title}
       header={renderHeader()}
       collapsible={collapsible}>
       <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
-    </Section>
+    </PaperSection>
   );
 };
 

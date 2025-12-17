@@ -25,11 +25,13 @@ import GraylogNodesExpandable from './graylog-nodes/GraylogNodesExpandable';
 import DataNodesExpandable from './data-nodes/DataNodesExpandable';
 
 const SectionCol = styled(Col)`
-  margin-bottom: 12px;
+  margin-top: 12px;
+  padding-left: 0;
+  padding-right: 0;
+`;
 
-  &:last-child {
-    margin-bottom: 0;
-  }
+const ActionsCol = styled(Col)`
+  margin-top: 12px;
 `;
 
 const ControlsWrapper = styled.div`
@@ -69,8 +71,8 @@ const ClusterConfigurationNodes = () => {
   const refetchInterval = isAllNodesView ? ALL_NODES_REFETCH_INTERVAL : SINGLE_NODE_TYPE_REFETCH_INTERVAL;
 
   return (
-    <Row className="content">
-      <SectionCol md={12}>
+    <Row>
+      <ActionsCol md={12}>
         <ControlsWrapper>
           <SearchForm
             query={searchQuery}
@@ -87,7 +89,7 @@ const ClusterConfigurationNodes = () => {
             onChange={(value) => setActiveNodeType(value)}
           />
         </ControlsWrapper>
-      </SectionCol>
+      </ActionsCol>
       {showGraylogNodes && (
         <SectionCol md={12}>
           <GraylogNodesExpandable
