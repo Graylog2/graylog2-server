@@ -59,10 +59,16 @@ function TestLookup({ table }: Props) {
   const [lookupResult, setLookupResult] = React.useState<any>(null);
   const [previewSize, setPreviewSize] = React.useState<number>(5);
   const productName = useProductName();
+  const { testLookupTableKey } = useTestLookupTableKey();
   const {
     lookupPreview: { results, total, supported },
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
-  const { testLookupTableKey } = useTestLookupTableKey();
+
+  const dataPreview = React.useMemo(() => {
+    if (total === 0) return 'No results to show';
+
+    return JSON.stringify(results, null, 2);
+  }, [results, total]);
 
   const onChange = (event: React.BaseSyntheticEvent) => {
     const newValue = { ...lookupKey };
@@ -104,6 +110,11 @@ function TestLookup({ table }: Props) {
     }
   };
 
+  const showResults = React.useMemo(
+    () => !lutError && (lookupResult || supported),
+    [lutError, lookupResult, supported],
+  );
+
   return (
     <Col $gap="sm">
       <Col $gap="xs">
@@ -113,46 +124,44 @@ function TestLookup({ table }: Props) {
           {productName}.
         </Description>
       </Col>
+      <Col $gap="xs">
+        <form onSubmit={handleLookupKey} style={{ width: '100%' }}>
+          <fieldset>
+            <Input
+              type="text"
+              id="key"
+              name="lookupkey"
+              placeholder="Insert key that should be looked up"
+              label="Key"
+              required
+              onKeyDown={onKeyDown}
+              onChange={onChange}
+              help="Key to look up a value for."
+              value={lookupKey.value}
+            />
+            <Row $justify="flex-end">
+              <Button name="reset" disabled={!lookupResult} onClick={onReset}>
+                Reset
+              </Button>
+              <Button
+                type="submit"
+                name="lookupbutton"
+                bsStyle="primary"
+                data-testid="lookupbutton"
+                disabled={!lookupKey.valid}>
+                Look up
+              </Button>
+            </Row>
+          </fieldset>
+        </form>
+      </Col>
       {lutError && <StyledAlert bsStyle="danger">{lutError}</StyledAlert>}
-      {!supported && !lutError && (
-        <StyledAlert bsStyle="warning">This lookup table doesn&apos;t support keys preview</StyledAlert>
-      )}
-      {supported && !lutError && total < 1 && <StyledAlert>No result to show</StyledAlert>}
-      {supported && !lutError && total > 0 && (
-        <Col $gap="xs">
-          <form onSubmit={handleLookupKey} style={{ width: '100%' }}>
-            <fieldset>
-              <Input
-                type="text"
-                id="key"
-                name="lookupkey"
-                placeholder="Insert key that should be looked up"
-                label="Key"
-                required
-                onKeyDown={onKeyDown}
-                onChange={onChange}
-                help="Key to look up a value for."
-                value={lookupKey.value}
-              />
-              <Row $justify="flex-end">
-                <Button name="reset" disabled={!lookupResult} onClick={onReset}>
-                  Reset
-                </Button>
-                <Button
-                  type="submit"
-                  name="lookupbutton"
-                  bsStyle="primary"
-                  data-testid="lookupbutton"
-                  disabled={!lookupKey.valid}>
-                  Look up
-                </Button>
-              </Row>
-            </fieldset>
-          </form>
-          <Col $gap="xs" style={{ marginTop: 20 }}>
-            <h4 style={{ width: '100%' }}>
-              <Row $align="center" $justify="space-between">
-                <span>Lookup result</span>
+      {showResults && (
+        <Col $gap="xs" style={{ marginTop: 20 }}>
+          <h4 style={{ width: '100%' }}>
+            <Row $align="center" $justify="space-between">
+              <span>Lookup result</span>
+              {supported && total > 0 && !lookupResult && (
                 <Row $width="auto" $align="center">
                   <NoMarginInput>
                     <Input
@@ -168,10 +177,10 @@ function TestLookup({ table }: Props) {
                   <Description>of</Description>
                   <Description>{total}</Description>
                 </Row>
-              </Row>
-            </h4>
-            <StyledDataWell>{lookupResult ?? JSON.stringify(results, null, 2)}</StyledDataWell>
-          </Col>
+              )}
+            </Row>
+          </h4>
+          <StyledDataWell>{lookupResult ?? dataPreview}</StyledDataWell>
         </Col>
       )}
     </Col>
