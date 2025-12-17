@@ -14,9 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Field, Form, Formik } from 'formik';
-import isEqual from 'lodash/isEqual';
 
 import { IfPermitted, Select, TimeUnitInput, ModalSubmit, InputOptionalInfo } from 'components/common';
 import { Button, Col, Input, Modal, Row } from 'components/bootstrap';
@@ -48,18 +47,11 @@ const defaultConfig: GeoIpConfigType = {
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
   const [showModal, setShowModal] = useState(false);
-  const [curConfig, setCurConfig] = useState(config);
 
   const sendTelemetry = useSendTelemetry();
 
-  useEffect(() => {
-    if (!isEqual(curConfig, config)) {
-      setCurConfig({ ...config });
-    }
-  }, [config, curConfig]);
 
   const resetConfig = () => {
-    setCurConfig(config);
     setShowModal(false);
   };
 
@@ -139,7 +131,7 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
         </Button>
       </IfPermitted>
       <Modal show={showModal} onHide={resetConfig}>
-        <Formik onSubmit={handleSubmit} initialValues={curConfig}>
+        <Formik onSubmit={handleSubmit} initialValues={config}>
           {({ values, setFieldValue, isSubmitting }) => (
             <Form>
               <Modal.Header>
