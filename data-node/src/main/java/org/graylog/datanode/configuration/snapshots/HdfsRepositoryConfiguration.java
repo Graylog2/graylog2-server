@@ -14,18 +14,36 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.configuration.snapshots;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.documentation.Documentation;
+import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
 
-public class HdfsRepositoryConfiguration {
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+public class HdfsRepositoryConfiguration implements RepositoryConfiguration {
 
     @Documentation("Should HDFS repository be enabled? This will also add the search role and activate search cache.")
     @Parameter(value = "hdfs_repository_enabled")
     private boolean enabled = false;
 
+    @Override
     public boolean isRepositoryEnabled() {
         return enabled;
+    }
+
+    @Override
+    public Map<String, String> opensearchProperties() {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public Collection<OpensearchKeystoreItem> keystoreItems(DatanodeDirectories datanodeDirectories) {
+        return Collections.emptyList();
     }
 }
