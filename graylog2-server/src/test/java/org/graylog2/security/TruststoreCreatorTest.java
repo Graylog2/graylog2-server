@@ -27,6 +27,7 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
@@ -232,7 +233,7 @@ public class TruststoreCreatorTest {
     }
 
     private X509Certificate certWithValidity(String alias, Date notBefore, Date notAfter) throws Exception {
-        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(365)));
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(365)));
 
         X500Name rootSubject = new X500Name("CN=" + alias);
         ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(keyPair.privateKey());
@@ -269,7 +270,7 @@ public class TruststoreCreatorTest {
     }
 
     @SuppressWarnings("deprecation")
-    private KeystoreInformation createKeystore(String alias, final String cnName, final BigInteger serialNumber) throws GeneralSecurityException, OperatorCreationException, IOException {
+    private KeystoreInformation createKeystore(String alias, final String cnName, final BigInteger serialNumber) throws IOException, CertificateException, OperatorCreationException, KeyStoreException, NoSuchAlgorithmException {
         final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(90)));
 
         X500Name name = new X500Name(cnName);
