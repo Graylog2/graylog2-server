@@ -27,6 +27,7 @@ import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
@@ -66,6 +67,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TruststoreCreatorTest {
+
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
 
     @Test
     void testTrustStoreCreation(@TempDir Path tempDir) throws Exception {
@@ -124,9 +127,9 @@ public class TruststoreCreatorTest {
 
     @Test
     void testIntermediateCa() throws Exception {
-        final KeyPair ca = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(100)));
-        final KeyPair intermediateCa = CertificateGenerator.generate(CertRequest.signed("intermediate", ca).isCA(true).validity(Duration.ofDays(100)));
-        final KeyPair nodeKeys = CertificateGenerator.generate(CertRequest.signed("my-node", intermediateCa).isCA(false).validity(Duration.ofDays(100)));
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(100)));
+        final KeyPair intermediateCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediate", ca).isCA(true).validity(Duration.ofDays(100)));
+        final KeyPair nodeKeys = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("my-node", intermediateCa).isCA(false).validity(Duration.ofDays(100)));
 
 
         final InMemoryKeystoreInformation keystoreInformation = createInMemoryKeystore(nodeKeys, intermediateCa);
@@ -139,16 +142,16 @@ public class TruststoreCreatorTest {
 
         Assertions.assertThatNoException().isThrownBy(() -> defaultTrustManager.checkServerTrusted(new X509Certificate[]{nodeKeys.certificate()}, "RSA"));
 
-        final KeyPair fakeNodeKeys = CertificateGenerator.generate(CertRequest.selfSigned("my-fake-node").isCA(false).validity(Duration.ofDays(100)));
+        final KeyPair fakeNodeKeys = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-fake-node").isCA(false).validity(Duration.ofDays(100)));
         Assertions.assertThatThrownBy(() -> defaultTrustManager.checkServerTrusted(new X509Certificate[]{fakeNodeKeys.certificate()}, "RSA"))
                 .isInstanceOf(CertificateException.class);
     }
 
     @Test
     void testDuplicateCname() throws Exception {
-        final KeyPair ca1 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
-        final KeyPair ca2 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
-        final KeyPair ca3 = CertificateGenerator.generate(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca1 = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca2 = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
+        final KeyPair ca3 = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-ca").isCA(true).validity(Duration.ofDays(90)));
 
         final KeyStore truststore = TruststoreCreator.newEmpty()
                 .addCertificates(List.of(ca1.certificate()))
@@ -230,7 +233,7 @@ public class TruststoreCreatorTest {
     }
 
     private X509Certificate certWithValidity(String alias, Date notBefore, Date notAfter) throws Exception {
-        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(365)));
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(365)));
 
         X500Name rootSubject = new X500Name("CN=" + alias);
         ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(keyPair.privateKey());
@@ -267,8 +270,8 @@ public class TruststoreCreatorTest {
     }
 
     @SuppressWarnings("deprecation")
-    private KeystoreInformation createKeystore(String alias, final String cnName, final BigInteger serialNumber) throws Exception {
-        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(365)));
+    private KeystoreInformation createKeystore(String alias, final String cnName, final BigInteger serialNumber) throws IOException, CertificateException, OperatorCreationException, KeyStoreException, NoSuchAlgorithmException {
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(90)));
 
         X500Name name = new X500Name(cnName);
 
