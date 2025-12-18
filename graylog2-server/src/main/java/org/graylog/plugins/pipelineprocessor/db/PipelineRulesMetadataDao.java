@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
@@ -55,6 +56,11 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
+
+    @JsonIgnore
+    public boolean hasDeprecatedFunctions() {
+        return deprecatedFunctions() != null ? !deprecatedFunctions().isEmpty() : false;
+    }
 
     public static Builder builder() {
         return new AutoValue_PipelineRulesMetadataDao.Builder()
