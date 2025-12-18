@@ -60,7 +60,7 @@ export const simpleEventDefinition: EventDefinition = {
   state: 'ENABLED',
   remediation_steps: '',
   event_procedure: '',
-  event_title: null,
+  event_title: '',
   matched_at: '',
   scheduler: {
     data: {
