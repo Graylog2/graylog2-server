@@ -66,7 +66,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <NodeCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 130,
+      staticWidth: 150,
     },
     traffic: {
       renderCell: (_traffic: string, input: InputSummary) => (
@@ -74,7 +74,7 @@ const customColumnRenderers = ({ inputTypes, inputStates }: Props): ColumnRender
           <ThroughputCell input={input} />
         </ExpandedSectionToggleWrapper>
       ),
-      staticWidth: 130,
+      staticWidth: 180,
     },
     address: {
       renderCell: (_address: string, input: InputSummary) => (
