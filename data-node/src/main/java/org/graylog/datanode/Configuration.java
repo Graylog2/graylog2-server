@@ -25,6 +25,7 @@ import com.github.joschi.jadconfig.converters.IntegerConverter;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.converters.StringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.util.Size;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
@@ -368,7 +369,15 @@ public class Configuration implements CommonNodeConfiguration, NativeLibPathConf
         return opensearchAuditLog;
     }
 
-     /**
+    @Documentation("""
+            This parameter defines the maximum size in bytes of cluster events. When it is exceeded, oldest events will
+            be overwritten. This should be as small as possible (for performance), but large enough to hold events long
+            enough for all nodes to process them.
+            """)
+    @Parameter(value = "max_events_collection_size")
+    private Size maxEventsCollectionSize = Size.megabytes(100);
+
+    /**
      * The insecure flag causes problems on many places. We should replace it with autosecurity option, that would
      * configure all the CA and certs automatically.
      */
