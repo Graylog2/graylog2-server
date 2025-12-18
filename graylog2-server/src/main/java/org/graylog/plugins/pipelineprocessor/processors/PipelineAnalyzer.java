@@ -33,13 +33,17 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
+import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
+import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -48,8 +52,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.graylog.plugins.pipelineprocessor.functions.FromInput.ID_ARG;
-import static org.graylog.plugins.pipelineprocessor.functions.FromInput.NAME_ARG;
 import static org.graylog2.plugin.Message.FIELD_GL2_FORWARDER_INPUT;
 import static org.graylog2.plugin.Message.FIELD_GL2_SOURCE_INPUT;
 
@@ -68,16 +70,19 @@ public class PipelineAnalyzer {
     private final PipelineStreamConnectionsService connectionsService;
     private final InputService inputService;
     private final PipelineMetricRegistry pipelineMetricRegistry;
+    private final StreamCacheService streamCacheService;
 
     @Inject
     public PipelineAnalyzer(
             PipelineStreamConnectionsService connectionsService,
             InputService inputService,
-            MetricRegistry metricRegistry
+            MetricRegistry metricRegistry,
+            StreamCacheService streamCacheService
     ) {
         this.connectionsService = connectionsService;
         this.inputService = inputService;
         this.pipelineMetricRegistry = PipelineMetricRegistry.create(metricRegistry, Pipeline.class.getName(), Rule.class.getName());
+        this.streamCacheService = streamCacheService;
     }
 
     public Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> analyzePipelines(
@@ -164,18 +169,6 @@ public class PipelineAnalyzer {
         }
     }
 
-    protected String getInputId(String inputName) {
-        final List<String> inputIds = inputService.findIdsByTitle(inputName);
-        if (inputIds.isEmpty()) {
-            LOG.warn("Could not find input with name '{}'", inputName);
-            return null;
-        }
-        if (inputIds.size() > 1) {
-            LOG.warn("Multiple inputs found with name '{}', using the first one with id '{}'", inputName, inputIds.getFirst());
-        }
-        return inputIds.getFirst();
-    }
-
     class MetaDataListener extends RuleAstBaseListener {
         private final Set<String> functions = new HashSet<>();
         private final Set<String> deprecatedFunctions = new HashSet<>();
@@ -218,6 +211,7 @@ public class PipelineAnalyzer {
         public void enterFunctionCall(FunctionExpression expr) {
             final FunctionDescriptor<?> descriptor = expr.getFunction().descriptor();
             analyzeFunctions(descriptor);
+            analyzeRouting(descriptor, expr.getArgs());
             analyzeInputs(descriptor, expr.getArgs());
         }
 
@@ -226,23 +220,49 @@ public class PipelineAnalyzer {
             if (Boolean.TRUE.equals(descriptor.deprecated())) {
                 deprecatedFunctions.add(descriptor.name());
             }
+        }
+
+        private void analyzeRouting(FunctionDescriptor<?> descriptor, FunctionArgs args) {
             if (descriptor.name().equals(RouteToStream.NAME)) {
-                routedStreams.add(descriptor.name());
+                if (args.getPreComputedValue(RouteToStream.ID_ARG) != null) {
+                    routedStreams.add(args.getPreComputedValue(RouteToStream.ID_ARG).toString());
+                } else if (args.getPreComputedValue(RouteToStream.NAME_ARG) != null) {
+                    String streamName = args.getPreComputedValue(RouteToStream.NAME_ARG).toString();
+                    Collection<Stream> streamIds = streamCacheService.getByName(streamName);
+                    if (streamIds.isEmpty()) {
+                        LOG.warn("Could not find stream with name '{}'", streamName);
+                    } else {
+                        // Yes, route_to_stream will route to multiple streams with the same name
+                        streamIds.forEach(stream -> routedStreams.add(stream.getId()));
+                    }
+                }
             }
         }
 
         private void analyzeInputs(FunctionDescriptor<?> descriptor, FunctionArgs args) {
             if (REFERENCING_FUNCTIONS.contains(descriptor.name())) {
                 String inputId = null;
-                if (args.getPreComputedValue(ID_ARG) != null) {
-                    inputId = args.getPreComputedValue(ID_ARG).toString();
-                } else if (args.getPreComputedValue(NAME_ARG) != null) {
-                    inputId = getInputId(args.getPreComputedValue(NAME_ARG).toString());
+                if (args.getPreComputedValue(FromInput.ID_ARG) != null) {
+                    inputId = args.getPreComputedValue(FromInput.ID_ARG).toString();
+                } else if (args.getPreComputedValue(FromInput.NAME_ARG) != null) {
+                    inputId = getInputId(args.getPreComputedValue(FromInput.NAME_ARG).toString());
                 }
                 if (inputId != null) {
                     createOrUpdateMention(inputId);
                 }
             }
+        }
+
+        private String getInputId(String inputName) {
+            final List<String> inputIds = inputService.findIdsByTitle(inputName);
+            if (inputIds.isEmpty()) {
+                LOG.warn("Could not find input with name '{}'", inputName);
+                return null;
+            }
+            if (inputIds.size() > 1) {
+                LOG.warn("Multiple inputs found with name '{}', using the first one with id '{}'", inputName, inputIds.getFirst());
+            }
+            return inputIds.getFirst();
         }
 
         private void createOrUpdateMention(String inputId) {
