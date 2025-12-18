@@ -129,7 +129,7 @@
         <disruptor.version>4.0.0</disruptor.version>
         <error-prone.version>2.45.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
-        <gcs.version>2.60.0</gcs.version>
+        <gcs.version>2.61.0</gcs.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.4.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
@@ -167,12 +167,12 @@
         <mongodb-driver.version>5.6.2</mongodb-driver.version>
         <mongojack.version>5.0.3</mongojack.version>
         <natty.version>0.13</natty.version>
-        <netty.version>4.2.7.Final</netty.version>
+        <netty.version>4.2.9.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <opentelemetry.version>1.57.0</opentelemetry.version>
-        <opentelemetry-instrumentation.version>2.22.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.23.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
         <prometheus-client.version>0.16.0</prometheus-client.version>
@@ -213,7 +213,7 @@
         <junit-jupiter.version>6.0.1</junit-jupiter.version>
         <mockito.version>5.21.0</mockito.version>
         <restassured.version>5.5.6</restassured.version>
-        <testcontainers.version>2.0.2</testcontainers.version>
+        <testcontainers.version>2.0.3</testcontainers.version>
         <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
         <graalvm.version>25.0.1</graalvm.version>
 
@@ -672,7 +672,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

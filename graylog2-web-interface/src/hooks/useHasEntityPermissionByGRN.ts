@@ -16,6 +16,7 @@
  */
 
 import { useMemo } from 'react';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import getPermissionPrefixByType from 'util/getPermissionPrefixByType';
 import { getValuesFromGRN } from 'logic/permissions/GRN';
@@ -26,7 +27,7 @@ const useHasEntityPermissionByGRN = (grn: string, permissionType: string = 'read
   const { isPermitted } = usePermissions();
 
   return useMemo(
-    () => isPermitted(`${getPermissionPrefixByType(type, id)}${permissionType}:${id}`),
+    () => isPermitted(`${getPermissionPrefixByType(type, id)}${permissionType}:${id}` as Permission),
     [id, permissionType, isPermitted, type],
   );
 };

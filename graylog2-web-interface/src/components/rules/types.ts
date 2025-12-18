@@ -14,23 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
-
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.documentation.Documentation;
-
-import java.nio.file.Path;
-
-public class GCSRepositoryConfiguration {
-    @Documentation("Path to Google Cloud Storage credentials file in JSON format. May be absolute or relative to config_location directory.")
-    @Parameter(value = "gcs_credentials_file")
-    private Path gcsCredentialsFile;
-
-    public Path getGcsCredentialsFile() {
-        return gcsCredentialsFile;
-    }
-
-    public boolean isRepositoryEnabled() {
-        return gcsCredentialsFile != null;
-    }
-}
+export type PipelineRulesMetadata = {
+  functions: string[];
+  streams: string[];
+  pipeline_id?: string;
+  rules: string[];
+  id?: string;
+  deprecated_functions: string[];
+  has_input_references?: boolean;
+};

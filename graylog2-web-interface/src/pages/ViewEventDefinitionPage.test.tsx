@@ -19,6 +19,7 @@ import * as React from 'react';
 import * as Immutable from 'immutable';
 import { render, screen } from 'wrappedTestingLibrary';
 import { defaultUser } from 'defaultMockValues';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import Routes from 'routing/Routes';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -97,7 +98,7 @@ describe('<ViewEventDefinitionPage />', () => {
     asMock(useCurrentUser).mockReturnValue(
       adminUser
         .toBuilder()
-        .permissions(Immutable.List([`eventdefinitions:read:${mockEventDefinition.id}`]))
+        .permissions(Immutable.List<Permission>([`eventdefinitions:read:${mockEventDefinition.id}`]))
         .build(),
     );
 
@@ -111,7 +112,7 @@ describe('<ViewEventDefinitionPage />', () => {
       adminUser
         .toBuilder()
         .permissions(
-          Immutable.List([
+          Immutable.List<Permission>([
             `eventdefinitions:read:${mockEventDefinition.id}`,
             `eventdefinitions:edit:${mockEventDefinition.id}`,
           ]),
