@@ -23,10 +23,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.assertj.core.api.Assertions;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.X509v3CertificateBuilder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
-import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.graylog.security.certutil.CertConstants;
 import org.graylog.security.certutil.CertRequest;
@@ -45,8 +45,6 @@ import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Path;
-import java.security.GeneralSecurityException;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -63,7 +61,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORITHM;
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -111,7 +108,7 @@ public class TruststoreCreatorTest {
     }
 
     @Test
-    void testAdditionalCertificates(@TempDir Path tempDir) throws GeneralSecurityException, IOException, OperatorCreationException {
+    void testAdditionalCertificates(@TempDir Path tempDir) throws Exception {
         final KeystoreInformation root = createKeystore("something-unknown", "CN=ROOT", BigInteger.ONE);
         final X509Certificate cert = (X509Certificate) root.loadKeystore().getCertificate("something-unknown");
 
@@ -175,6 +172,82 @@ public class TruststoreCreatorTest {
         return (X509TrustManager) trustManagers[0];
     }
 
+    @Test
+    void testExpiredCertificates() throws Exception {
+
+        final KeyStore keystore = KeyStore.getInstance(CertConstants.PKCS12);
+        keystore.load(null, null);
+
+        keystore.setCertificateEntry("valid1", certWithValidity("valid1",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        ));
+        keystore.setCertificateEntry("valid2", certWithValidity("valid2",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        ));
+        keystore.setCertificateEntry("expired", certWithValidity("expired",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().minus(5, ChronoUnit.DAYS))
+        ));
+        keystore.setCertificateEntry("notyetvalid", certWithValidity("notyetvalid",
+                Date.from(Instant.now().plus(5, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        ));
+
+        final TruststoreCreator truststoreCreator = new TruststoreCreator(keystore);
+        Assertions.assertThat(Collections.list(truststoreCreator.getTruststore().aliases()))
+                .hasSize(2)
+                .contains("valid1", "valid2");
+    }
+
+    @Test
+    void testAddingExpiredCertificates() throws Exception {
+
+        final TruststoreCreator truststoreCreator = TruststoreCreator.newEmpty();
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("valid1",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        )));
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("valid2",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        )));
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("expired",
+                Date.from(Instant.now().minus(10, ChronoUnit.DAYS)),
+                Date.from(Instant.now().minus(5, ChronoUnit.DAYS))
+        )));
+
+        truststoreCreator.addCertificates(List.of(certWithValidity("notyetvalid",
+                Date.from(Instant.now().plus(5, ChronoUnit.DAYS)),
+                Date.from(Instant.now().plus(10, ChronoUnit.DAYS))
+        )));
+
+        Assertions.assertThat(Collections.list(truststoreCreator.getTruststore().aliases()))
+                .hasSize(2)
+                .contains("cn=valid1", "cn=valid2");
+    }
+
+    private X509Certificate certWithValidity(String alias, Date notBefore, Date notAfter) throws Exception {
+        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(365)));
+
+        X500Name rootSubject = new X500Name("CN=" + alias);
+        ContentSigner signer = new JcaContentSignerBuilder("SHA256WithRSA").build(keyPair.privateKey());
+        X509v3CertificateBuilder rootCertBuilder = new JcaX509v3CertificateBuilder(
+                rootSubject,
+                BigInteger.valueOf(1),
+                notBefore,
+                notAfter,
+                rootSubject,
+                keyPair.publicKey()
+        );
+        return new JcaX509CertificateConverter().getCertificate(rootCertBuilder.build(signer));
+    }
+
+
     @SuppressWarnings("deprecation")
     @Nonnull
     private static InMemoryKeystoreInformation createInMemoryKeystore(KeyPair nodeKeys, KeyPair intermediate) throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException {
@@ -198,6 +271,7 @@ public class TruststoreCreatorTest {
     @SuppressWarnings("deprecation")
     private KeystoreInformation createKeystore(String alias, final String cnName, final BigInteger serialNumber) throws GeneralSecurityException, OperatorCreationException, IOException {
         final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned(alias).isCA(true).validity(Duration.ofDays(90)));
+
         X500Name name = new X500Name(cnName);
 
         JcaX509v3CertificateBuilder builder = new JcaX509v3CertificateBuilder(
