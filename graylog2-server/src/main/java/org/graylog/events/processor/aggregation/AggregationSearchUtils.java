@@ -18,6 +18,7 @@ package org.graylog.events.processor.aggregation;
 
 import com.floreysoft.jmte.Engine;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -209,14 +210,15 @@ public class AggregationSearchUtils {
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
 
             // If the event definition has a custom event title, transform and apply it to the event.
-            if (eventDefinition.eventTitle().isPresent()) {
+            final String customEventTitle = eventDefinition.eventTitle();
+            if (!Strings.isNullOrEmpty(customEventTitle)) {
                 final Map<String, Object> templateFields = Maps.newHashMap(fields);
                 templateFields.put(FIELD_AGGREGATION_CONDITIONS, event.getAggregationConditions());
                 templateFields.put(FIELD_EVENT_DEFINITION_ID, eventDefinition.id());
                 templateFields.put(FIELD_EVENT_DEFINITION_TITLE, eventDefinition.title());
                 templateFields.put(FIELD_EVENT_DEFINITION_TYPE, eventDefinition.config().type());
                 templateFields.put(FIELD_EVENT_DEFINITION_DESCRIPTION, eventDefinition.description());
-                event.setMessage(templateEngine.transform(eventDefinition.eventTitle().get(), templateFields));
+                event.setMessage(templateEngine.transform(customEventTitle, templateFields));
             }
 
             // TODO: Can we find a useful source value?

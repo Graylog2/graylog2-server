@@ -17,6 +17,7 @@
 package org.graylog.events.processor.aggregation;
 
 import com.floreysoft.jmte.Engine;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -247,8 +248,9 @@ public class AggregationEventProcessor implements EventProcessor {
             for (final ResultMessage resultMessage : messages) {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
-                if (eventDefinition.eventTitle().isPresent()) {
-                    event.setMessage(templateEngine.transform(eventDefinition.eventTitle().get(), msg.getFields()));
+                final String customEventTitle = eventDefinition.eventTitle();
+                if (!Strings.isNullOrEmpty(customEventTitle)) {
+                    event.setMessage(templateEngine.transform(customEventTitle, msg.getFields()));
                 }
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
 

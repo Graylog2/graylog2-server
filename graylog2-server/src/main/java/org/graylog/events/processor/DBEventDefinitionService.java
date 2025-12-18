@@ -117,6 +117,7 @@ public class DBEventDefinitionService {
         EventDefinitionDto enrichedWithUpdateDate = entity
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
+                .eventTitle(cleanEventTitle(entity.eventTitle()))
                 .build();
         if (enrichedWithUpdateDate.id() == null) {
             final String id = scopedEntityMongoUtils.create(enrichedWithUpdateDate);
@@ -185,6 +186,11 @@ public class DBEventDefinitionService {
         }
         entityRegistrar.unregisterEventDefinition(id);
         return deleteSupplier.get();
+    }
+
+    private String cleanEventTitle(String title) {
+        final String trimmedTitle = title != null ? title.trim() : null;
+        return (trimmedTitle != null && !trimmedTitle.isEmpty()) ? trimmedTitle : null;
     }
 
     /**

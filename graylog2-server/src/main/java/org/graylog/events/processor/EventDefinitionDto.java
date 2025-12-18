@@ -159,8 +159,10 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public abstract String eventProcedureId();
 
     @Override
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @JsonProperty(FIELD_EVENT_TITLE)
-    public abstract Optional<String> eventTitle();
+    public abstract String eventTitle();
 
     public static Builder builder() {
         return Builder.create();
@@ -336,7 +338,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .keySpec(keySpec())
                 .storage(storage())
                 .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
-                .eventTitle(ValueReference.ofNullable(eventTitle().orElse(null)))
+                .eventTitle(ValueReference.ofNullable(eventTitle()))
                 .build();
     }
 
