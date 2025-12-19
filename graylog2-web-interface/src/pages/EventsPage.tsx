@@ -29,14 +29,15 @@ const AlertsPageComponent = () => {
   } = usePluggableLicenseCheck('/license/security');
   const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
 
-  if (!validSecurityLicense) {
+  // TODO: its for TMP
+  if (validSecurityLicense) {
     return <EventsEntityTable />;
   }
 
   return (
     <>
-      {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage }) => (
-        <PluggableSecurityEventsPage />
+      {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage, key }) => (
+        <PluggableSecurityEventsPage key={key} />
       ))}
     </>
   );
