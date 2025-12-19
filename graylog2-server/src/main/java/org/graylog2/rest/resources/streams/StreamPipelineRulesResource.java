@@ -28,7 +28,14 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
+import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+import org.graylog2.database.NotFoundException;
+import org.graylog2.database.PaginatedList;
 import org.graylog2.rest.models.SortOrder;
 import org.graylog2.rest.models.tools.responses.PageListResponse;
 import org.graylog2.rest.resources.entities.EntityAttribute;
@@ -39,6 +46,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Stream;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
@@ -61,10 +69,16 @@ public class StreamPipelineRulesResource extends RestResource {
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
 
     private final MongoDbPipelineMetadataService mongoDbPipelineMetadataService;
+    private final PipelineService pipelineService;
+    private final RuleService ruleService;
 
     @Inject
-    public StreamPipelineRulesResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService) {
+    public StreamPipelineRulesResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService,
+                                       PipelineService pipelineService,
+                                       RuleService ruleService) {
         this.mongoDbPipelineMetadataService = mongoDbPipelineMetadataService;
+        this.pipelineService = pipelineService;
+        this.ruleService = ruleService;
     }
 
     @GET
@@ -85,8 +99,37 @@ public class StreamPipelineRulesResource extends RestResource {
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
+        List<StreamPipelineRulesResponse> responseList =
+                mongoDbPipelineMetadataService.getRoutingPipelines().stream()
+                        .flatMap(dao -> buildResponse(dao))
+                        .toList();
+        final PaginatedList<StreamPipelineRulesResponse> paginatedList =
+                new PaginatedList<>(responseList, page, perPage, responseList.size());
 
-        //TODO
-        return null;
+        return PageListResponse.create(
+                query, paginatedList.pagination(),
+                paginatedList.grandTotal().orElse(0L), sort, order, paginatedList.delegate(), attributes, settings);
+        );
+    }
+
+    private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao) {
+        List<StreamPipelineRulesResponse> responseList = new java.util.ArrayList<>();
+        dao.routedStreams().forEach(
+            (streamId, streamName) -> {
+                try {
+                    PipelineDao pipelineDao = pipelineService.load(dao.pipelineId());
+
+                    responseList.add(
+                            new StreamPipelineRulesResponse(
+                                    dao.pipelineId(),
+                                    pipelineDao.title(),
+                                    streamId,
+                                    streamName,
+                                    dao.rules()));
+                } catch (NotFoundException e) {
+                    // Skip pipelines that no longer exist
+                }
+        });
+        return responseList.stream();
     }
 }

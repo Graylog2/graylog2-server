@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 @JsonDeserialize(builder = AutoValue_PipelineRulesMetadataDao.Builder.class)
@@ -52,14 +53,14 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     public abstract Set<String> deprecatedFunctions();
 
     @JsonProperty(FIELD_ROUTED_STREAMS)
-    public abstract Set<String> routedStreams();
+    public abstract Map<String, String> routedStreams();
 
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
 
     @JsonIgnore
     public boolean hasDeprecatedFunctions() {
-        return deprecatedFunctions() != null ? !deprecatedFunctions().isEmpty() : false;
+        return deprecatedFunctions() != null && !deprecatedFunctions().isEmpty();
     }
 
     public static Builder builder() {
@@ -91,7 +92,7 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
         public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
 
         @JsonProperty(FIELD_ROUTED_STREAMS)
-        public abstract Builder routedStreams(Set<String> routedStreams);
+        public abstract Builder routedStreams(Map<String, String> routedStreamsMap);
 
         @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
         public abstract Builder hasInputReferences(Boolean hasInputReferences);
