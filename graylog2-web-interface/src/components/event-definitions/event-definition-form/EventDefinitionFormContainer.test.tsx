@@ -245,7 +245,7 @@ describe('EventDefinitionFormContainer', () => {
     const titles = await screen.findAllByText(/event details/i);
     titles.forEach((title) => expect(title).toBeInTheDocument());
 
-    expect(screen.getByRole('textbox', { name: /title/i })).toBeEnabled();
+    expect(screen.getByRole('textbox', { name: /^title/i })).toBeEnabled();
     expect(screen.getByRole('textbox', { name: /description/i })).toBeEnabled();
   });
 
@@ -256,7 +256,7 @@ describe('EventDefinitionFormContainer', () => {
     const titles = await screen.findAllByText(/event details/i);
     titles.forEach((title) => expect(title).toBeInTheDocument());
 
-    expect(screen.getByRole('textbox', { name: /title/i })).toHaveAttribute('readonly');
+    expect(screen.getByRole('textbox', { name: /^title/i })).toHaveAttribute('readonly');
     expect(screen.getByRole('textbox', { name: /description/i })).toHaveAttribute('readonly');
   });
 

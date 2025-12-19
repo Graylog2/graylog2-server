@@ -86,6 +86,12 @@ const EventDefinitionSummary = ({
         <dd>{eventDefinition.description || 'No description given'}</dd>
         <dt>Priority</dt>
         <dd>{upperFirst(EventDefinitionPriorityEnum.properties[eventDefinition.priority].name)}</dd>
+        {eventDefinition.event_summary_template && (
+          <>
+            <dt>Event Summary Template</dt>
+            <dd>{eventDefinition.event_summary_template}</dd>
+          </>
+        )}
         {validSecurityLicense ? (
           <>
             {eventDefinition?.event_procedure ? (

@@ -69,7 +69,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
     () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
     [canEdit, eventDefinition],
   );
-  const showEventProcedureSummar = React.useMemo(
+  const showEventProcedureSummary = React.useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],
   );
@@ -110,9 +110,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               label="Title"
               type="text"
               bsStyle={validation.errors.title ? 'error' : null}
-              help={
-                validation?.errors?.title?.[0] ?? 'Title for this Event Definition, Events and Alerts created from it.'
-              }
+              help={validation?.errors?.title?.[0] ?? 'Title for this Event Definition.'}
               value={eventDefinition.title}
               onChange={handleChange}
               readOnly={readOnly}
@@ -132,6 +130,17 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
             </FormGroup>
           </div>
+
+          <Input
+            id="event-definition-event-summary-template"
+            name="event_summary_template"
+            label="Event Summary Template"
+            type="text"
+            help="Template used to generate the Event and Alert summaries."
+            value={eventDefinition.event_summary_template}
+            onChange={handleChange}
+            readOnly={readOnly}
+          />
 
           <Input
             id="event-definition-description"
@@ -163,7 +172,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               }}
             />
           )}
-          {showEventProcedureSummar && (
+          {showEventProcedureSummary && (
             <Col>
               <ControlLabel>Event Procedure Summary</ControlLabel>
               <PluggableEventProcedureSummary
