@@ -1,0 +1,5 @@
+type = "f"
+message = "Fix browser navigation not restoring the previous search"
+
+issues = ["22105", "18484"]
+pulls = ["24583"]

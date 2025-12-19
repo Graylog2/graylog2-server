@@ -109,6 +109,7 @@ export const useSearchURLQueryParams = () => {
       streams: filtersToStreamSet(streamsFilter).toArray(),
       streamCategories: filtersToStreamCategorySet(streamCategoriesFilter).toArray(),
     };
+    // eslint-disable-next-line @tanstack/query/no-unstable-deps
   }, [query]);
 };
 

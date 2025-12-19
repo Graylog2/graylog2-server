@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import * as Immutable from 'immutable';
 import URI from 'urijs';
 
@@ -58,14 +58,9 @@ const extractTimerangeParams = (timerange: TimeRange): [string, string | number]
   }
 };
 
-export const syncWithQueryParameters = (
-  viewType: ViewType,
-  query: string,
-  searchQuery: Query,
-  action: (to: string) => unknown,
-) => {
+const uriForView = (viewType: ViewType, query: string, searchQuery: Query) => {
   if (viewType !== View.Type.Search) {
-    return;
+    return undefined;
   }
 
   if (searchQuery) {
@@ -95,21 +90,66 @@ export const syncWithQueryParameters = (
       ? uriWithStreams.removeSearch('stream_categories')
       : uriWithStreams.setSearch('stream_categories', currentStreamCategories.join(','));
 
-    if (query !== uri.toString()) {
-      action(uri.toString());
-    }
+    return uri.toString();
   }
+
+  return undefined;
 };
 
-export const useSyncWithQueryParameters = (query: string) => {
+function canonicalizeUri(uri: string) {
+  const [path, queryString = ''] = uri.split('?', 2);
+  if (!queryString) return path;
+
+  const params = queryString
+    .split('&')
+    .filter(Boolean)
+    .map((part) => {
+      const [k, v = ''] = part.split('=', 2);
+
+      return [k, v];
+    })
+    .sort(([k1, v1], [k2, v2]) => (k1 === k2 ? v1.localeCompare(v2) : k1.localeCompare(k2)));
+
+  const canonicalQuery = params.map(([k, v]) => `${k}=${v}`).join('&');
+
+  return `${path}?${canonicalQuery}`;
+}
+
+function isSameUri(a: string, b: string) {
+  return canonicalizeUri(a) === canonicalizeUri(b);
+}
+
+// Update the URL query parameters when the current view changes.
+const useSyncWithQueryParameters = (currentUri: string) => {
   const viewType = useViewType();
   const currentQuery = useCurrentQuery();
   const history = useHistory();
+  const lastSyncedUriRef = useRef(currentUri);
+  const isFirstSyncRef = useRef(true);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => syncWithQueryParameters(viewType, query, currentQuery, history.replace), []);
-  useEffect(
-    () => syncWithQueryParameters(viewType, query, currentQuery, history.push),
-    [currentQuery, history.push, query, viewType],
-  );
+  useEffect(() => {
+    const uriForCurrentView = uriForView(viewType, currentUri, currentQuery);
+
+    if (!uriForCurrentView) {
+      return;
+    }
+
+    const currentUriMatchesCurrentView = isSameUri(currentUri, uriForCurrentView);
+    const currentUriMatchesLastSync = isSameUri(currentUri, lastSyncedUriRef.current);
+
+    // Don't update the URI if it was changed outside of this sync. For example when using the browser navigation.
+    if (!currentUriMatchesLastSync && !currentUriMatchesCurrentView) {
+      return;
+    }
+
+    if (!currentUriMatchesCurrentView) {
+      const updateHistory = isFirstSyncRef.current ? history.replace : history.push;
+      updateHistory(uriForCurrentView);
+    }
+
+    isFirstSyncRef.current = false;
+    lastSyncedUriRef.current = uriForCurrentView;
+  }, [currentQuery, history, currentUri, viewType]);
 };
+
+export default useSyncWithQueryParameters;
