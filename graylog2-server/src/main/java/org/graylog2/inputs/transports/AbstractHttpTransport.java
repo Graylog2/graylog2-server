@@ -64,7 +64,6 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     private static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
     static final String CK_ENABLE_BULK_RECEIVING = "enable_bulk_receiving";
-    static final String CK_ENABLE_JSON_ARRAY_PROCESSING = "enable_json_array_processing";
     static final String CK_ENABLE_CORS = "enable_cors";
     static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
     static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
@@ -78,7 +77,6 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
     static final String CK_ENABLE_REAL_IP_HEADER = "enable_real_ip_header";
 
     protected final boolean enableBulkReceiving;
-    protected final boolean enableJsonArrayProcessing;
     protected final boolean enableCors;
     protected final int maxChunkSize;
     private final int idleWriterTimeout;
@@ -108,7 +106,6 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
                 nettyTransportConfiguration,
                 tlsConfiguration);
         this.enableBulkReceiving = configuration.getBoolean(CK_ENABLE_BULK_RECEIVING);
-        this.enableJsonArrayProcessing = configuration.getBoolean(CK_ENABLE_JSON_ARRAY_PROCESSING);
         this.enableCors = configuration.getBoolean(CK_ENABLE_CORS);
         this.maxChunkSize = parseMaxChunkSize(configuration);
         this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT)
@@ -160,8 +157,6 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
             handlers.put("http-bulk-newline-decoder",
                     () -> new LenientDelimiterBasedFrameDecoder(maxChunkSize,
                             Delimiters.lineDelimiter()));
-        }
-        if (enableJsonArrayProcessing) {
             handlers.put("http-json-array-decoder",
                     () -> new JsonArrayFrameDecoder(maxChunkSize));
         }
@@ -196,11 +191,7 @@ abstract public class AbstractHttpTransport extends AbstractTcpTransport {
             r.addField(new BooleanField(CK_ENABLE_BULK_RECEIVING,
                     "Enable Bulk Receiving",
                     false,
-                    "Enables bulk receiving of messages separated by newlines (\\n or \\r\\n)"));
-            r.addField(new BooleanField(CK_ENABLE_JSON_ARRAY_PROCESSING,
-                    "Enable JSON Array Processing",
-                    false,
-                    "Enables processing of JSON arrays by extracting individual JSON objects from the array."));
+                    "Enables bulk receiving of messages separated by newlines (\\n or \\r\\n) or in JSON arrays"));
             r.addField(new BooleanField(CK_ENABLE_CORS,
                     "Enable CORS",
                     true,
