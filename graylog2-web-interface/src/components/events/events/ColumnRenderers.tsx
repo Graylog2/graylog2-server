@@ -128,6 +128,11 @@ const ValidSecurityLicense = () => {
   return validSecurityLicense;
 };
 
+export const eventTypeAttribute = {
+  renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
+  staticWidth: 100,
+};
+
 export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unknown>(): ColumnRenderersByAttribute<
   T,
   M
@@ -147,10 +152,7 @@ export const getGeneralEventAttributeRenderers = <T extends EntityBase, M = unkn
   id: {
     staticWidth: 300,
   },
-  alert: {
-    renderCell: (alert: boolean) => <EventTypeLabel isAlert={alert} />,
-    staticWidth: 100,
-  },
+  alert: eventTypeAttribute,
   priority: {
     renderCell: (priority: number) => <PriorityName priority={priority} />,
     staticWidth: 'matchHeader',

@@ -17,14 +17,14 @@
 
 import type { SyntheticEvent } from 'react';
 import React, { useCallback, useMemo, useState } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { FlatContentRow, Icon } from 'components/common';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
-import NoAttributeProvided from 'components/event-definitions/replay-search/NoAttributeProvided';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 import assertUnreachable from 'logic/assertUnreachable';
+import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
 
 const Header = styled.div`
   display: flex;
@@ -33,27 +33,20 @@ const Header = styled.div`
   gap: 5px;
 `;
 
-const Item = styled.div`
-  display: flex;
-  gap: 5px;
-  align-items: flex-end;
-`;
-
 const Container = styled.div`
   display: flex;
   flex-direction: column;
   gap: 5px;
 `;
 
-const Row = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
-
-const Value = styled.div`
-  display: flex;
-`;
+const Row = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    flex-wrap: wrap;
+    gap: ${theme.spacings.xs};
+    justify-content: stretch;
+  `,
+);
 
 const EventInfoBar = () => {
   const { type } = useReplaySearchContext();
@@ -94,10 +87,9 @@ const EventInfoBar = () => {
             {infoAttributes.map(
               ({ title, content, show }) =>
                 show !== false && (
-                  <Item key={title}>
-                    <b>{title}: </b>
-                    <Value title={title}>{content || <NoAttributeProvided name={title} />}</Value>
-                  </Item>
+                  <EventAttribute key={title} title={title}>
+                    {content}
+                  </EventAttribute>
                 ),
             )}
           </Row>

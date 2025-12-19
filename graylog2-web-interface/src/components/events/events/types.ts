@@ -27,6 +27,7 @@ export type Event = {
   id: string;
   event_definition_id: string;
   event_definition_type: string;
+  aggregation_conditions: { [s: string]: string };
   priority: number;
   timestamp: string;
   timerange_start: string;
