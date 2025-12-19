@@ -606,6 +606,13 @@ type MarkdownAugmentation = {
   component: React.ComponentType<{ value: string }>;
 };
 
+type AvailableSuggestedAction<Fn extends () => void> = { type: string; action: Fn };
+export type PageContext = {
+  type: string;
+  additional?: {};
+  actions?: Array<AvailableSuggestedAction<(...args: unknown[]) => void>>;
+};
+
 declare module 'graylog-web-plugin/plugin' {
   export interface PluginExports {
     creators?: Array<Creator>;
@@ -679,5 +686,6 @@ declare module 'graylog-web-plugin/plugin' {
     entityPermissionsMapper?: EntityPermissionsMapper;
     'markdown.augment.components'?: Array<MarkdownAugmentation>;
     'elements.aside'?: Array<React.ComponentType>;
+    'assistant.useContextExtension'?: Array<(context: PageContext) => void>;
   }
 }
