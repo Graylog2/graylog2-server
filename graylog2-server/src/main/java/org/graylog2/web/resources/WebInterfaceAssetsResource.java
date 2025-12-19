@@ -162,6 +162,9 @@ public class WebInterfaceAssetsResource {
     @Path("{filename:.*}")
     public Response getIndex(@Context ContainerRequest request,
                              @Context HttpHeaders headers) {
+        if (request.getAbsolutePath().getPath().startsWith("/api")) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         final URI originalLocation = request.getRequestUri();
         return get(request, headers, originalLocation.getPath());
     }
