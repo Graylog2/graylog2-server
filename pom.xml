@@ -315,6 +315,11 @@
                 <version>${gcs.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-storage-blob</artifactId>
+                <version>12.26.0</version>
+            </dependency>
+            <dependency>
                 <groupId>io.netty</groupId>
                 <artifactId>netty-tcnative-classes</artifactId>
                 <version>${netty-tcnative-boringssl-static.version}</version>
