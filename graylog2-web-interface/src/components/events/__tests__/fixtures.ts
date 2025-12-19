@@ -93,5 +93,5 @@ export const eventDefinition: EventDefinition = {
   state: 'ENABLED',
   remediation_steps: '',
   event_procedure: '',
-  event_title: null,
+  event_summary_template: null,
 };

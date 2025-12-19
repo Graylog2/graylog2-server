@@ -249,10 +249,10 @@ public class EventDefinitionHandlerTest {
     }
 
     @Test
-    public void testEventTitleHandling() {
+    public void testEventSummaryTemplateHandling() {
         EventDefinitionDto dtoToSave = EventDefinitionDto.builder()
                 .title("Test")
-                .eventTitle(" ")
+                .eventSummaryTemplate(" ")
                 .description("A test event definition")
                 .config(TestEventProcessorConfig.builder()
                         .message("This is a test event processor")
@@ -267,11 +267,11 @@ public class EventDefinitionHandlerTest {
                 .build();
 
         EventDefinitionDto savedDto = handler.create(dtoToSave, Optional.empty());
-        assertThat(savedDto.eventTitle()).isNull();
+        assertThat(savedDto.eventSummaryTemplate()).isNull();
 
-        dtoToSave = dtoToSave.toBuilder().eventTitle("\tTitle with whitespace   ").build();
+        dtoToSave = dtoToSave.toBuilder().eventSummaryTemplate("\tTitle with whitespace   ").build();
         savedDto = handler.create(dtoToSave, Optional.empty());
-        assertThat(savedDto.eventTitle()).isEqualTo("Title with whitespace");
+        assertThat(savedDto.eventSummaryTemplate()).isEqualTo("Title with whitespace");
     }
 
     @Test

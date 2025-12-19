@@ -70,7 +70,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     public static final String FIELD_STATE = "state";
     public static final String FIELD_UPDATED_AT = "updated_at";
     public static final String FIELD_MATCHED_AT = "matched_at";
-    public static final String FIELD_EVENT_TITLE = "event_title";
+    public static final String FIELD_EVENT_SUMMARY_TEMPLATE = "event_summary_template";
     private static final String FIELD_PRIORITY = "priority";
     private static final String FIELD_ALERT = "alert";
     public static final String FIELD_CONFIG = "config";
@@ -161,8 +161,8 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
     @Override
     @Nullable
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
-    @JsonProperty(FIELD_EVENT_TITLE)
-    public abstract String eventTitle();
+    @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
+    public abstract String eventSummaryTemplate();
 
     public static Builder builder() {
         return Builder.create();
@@ -277,8 +277,8 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
         @JsonProperty(FIELD_EVENT_PROCEDURE)
         public abstract Builder eventProcedureId(String eventProcedureId);
 
-        @JsonProperty(FIELD_EVENT_TITLE)
-        public abstract Builder eventTitle(@Nullable String eventTitle);
+        @JsonProperty(FIELD_EVENT_SUMMARY_TEMPLATE)
+        public abstract Builder eventSummaryTemplate(@Nullable String eventSummaryTemplate);
 
         abstract EventDefinitionDto autoBuild();
 
@@ -338,7 +338,7 @@ public abstract class EventDefinitionDto implements EventDefinition, ContentPack
                 .keySpec(keySpec())
                 .storage(storage())
                 .eventProcedureId(ValueReference.ofNullable(procedureDescriptorId))
-                .eventTitle(ValueReference.ofNullable(eventTitle()))
+                .eventSummaryTemplate(ValueReference.ofNullable(eventSummaryTemplate()))
                 .build();
     }
 

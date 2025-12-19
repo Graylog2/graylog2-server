@@ -132,12 +132,12 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
           </div>
 
           <Input
-            id="event-definition-event-title"
-            name="event_title"
-            label="Event Title"
+            id="event-definition-event-summary-template"
+            name="event_summary_template"
+            label="Event Summary Template"
             type="text"
-            help="Title for Events and Alerts created from this Definition."
-            value={eventDefinition.event_title}
+            help="Template used to generate the Event and Alert summaries."
+            value={eventDefinition.event_summary_template}
             onChange={handleChange}
             readOnly={readOnly}
             required

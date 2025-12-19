@@ -205,7 +205,7 @@ public class AggregationSearchUtilsTest {
     }
 
     @Test
-    public void testEventsFromAggregationResultUsesCustomEventTitle() throws EventProcessorException {
+    public void testEventsFromAggregationResultUsesCustomEventSummaryTemplate() throws EventProcessorException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
 
@@ -215,7 +215,7 @@ public class AggregationSearchUtilsTest {
 
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null, emptyList())
                 .toBuilder()
-                .eventTitle("Aggregation on ${group_field_one} and ${group_field_two} has source count of ${aggregation_conditions.count\\(source\\)}")
+                .eventSummaryTemplate("Aggregation on ${group_field_one} and ${group_field_two} has source count of ${aggregation_conditions.count\\(source\\)}")
                 .build();
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)

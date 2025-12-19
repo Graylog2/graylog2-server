@@ -209,16 +209,16 @@ public class AggregationSearchUtils {
 
             LOG.debug("Creating event {}/{} - {} {} ({})", eventDefinition.title(), eventDefinition.id(), keyResult.key(), seriesString(keyResult), fields);
 
-            // If the event definition has a custom event title, transform and apply it to the event.
-            final String customEventTitle = eventDefinition.eventTitle();
-            if (!Strings.isNullOrEmpty(customEventTitle)) {
+            // If the event definition has a custom event summary, transform and apply it to the event.
+            final String customEventSummary = eventDefinition.eventSummaryTemplate();
+            if (!Strings.isNullOrEmpty(customEventSummary)) {
                 final Map<String, Object> templateFields = Maps.newHashMap(fields);
                 templateFields.put(FIELD_AGGREGATION_CONDITIONS, event.getAggregationConditions());
                 templateFields.put(FIELD_EVENT_DEFINITION_ID, eventDefinition.id());
                 templateFields.put(FIELD_EVENT_DEFINITION_TITLE, eventDefinition.title());
                 templateFields.put(FIELD_EVENT_DEFINITION_TYPE, eventDefinition.config().type());
                 templateFields.put(FIELD_EVENT_DEFINITION_DESCRIPTION, eventDefinition.description());
-                event.setMessage(templateEngine.transform(customEventTitle, templateFields));
+                event.setMessage(templateEngine.transform(customEventSummary, templateFields));
             }
 
             // TODO: Can we find a useful source value?

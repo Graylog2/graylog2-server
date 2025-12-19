@@ -307,7 +307,7 @@ public class AggregationEventProcessorTest {
     }
 
     @Test
-    public void createEventsAppliesCustomEventTitle() throws Exception {
+    public void createEventsAppliesCustomEventSummaryTemplate() throws Exception {
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(TimeRange.class))).thenReturn(true);
         when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
 
@@ -326,7 +326,7 @@ public class AggregationEventProcessorTest {
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null, emptyList())
                 .toBuilder()
                 .config(config)
-                .eventTitle("${user_name} failed to log in on ${host_name}")
+                .eventSummaryTemplate("${user_name} failed to log in on ${host_name}")
                 .build();
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)

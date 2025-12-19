@@ -248,9 +248,9 @@ public class AggregationEventProcessor implements EventProcessor {
             for (final ResultMessage resultMessage : messages) {
                 final Message msg = resultMessage.getMessage();
                 final Event event = eventFactory.createEvent(eventDefinition, msg.getTimestamp(), eventDefinition.title());
-                final String customEventTitle = eventDefinition.eventTitle();
-                if (!Strings.isNullOrEmpty(customEventTitle)) {
-                    event.setMessage(templateEngine.transform(customEventTitle, msg.getFields()));
+                final String customEventSummary = eventDefinition.eventSummaryTemplate();
+                if (!Strings.isNullOrEmpty(customEventSummary)) {
+                    event.setMessage(templateEngine.transform(customEventSummary, msg.getFields()));
                 }
                 event.setOriginContext(EventOriginContext.elasticsearchMessage(resultMessage.getIndex(), msg.getId()));
 

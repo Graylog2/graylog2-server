@@ -81,7 +81,7 @@ public interface EventDefinition {
     }
 
     @Nullable
-    default String eventTitle() {
+    default String eventSummaryTemplate() {
         return null;
     }
 }
