@@ -103,7 +103,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
       <Col md={7} lg={12}>
         <h2 className={commonStyles.title}>Event Details</h2>
         <fieldset>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', width: '100%' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
             <Input
               id="event-definition-title"
               name="title"
@@ -140,7 +140,6 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
             value={eventDefinition.event_summary_template}
             onChange={handleChange}
             readOnly={readOnly}
-            required
           />
 
           <Input

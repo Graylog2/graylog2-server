@@ -21,6 +21,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.conversions.Bson;
 import org.graylog.events.notifications.EventNotificationConfig;
 import org.graylog.plugins.views.search.searchfilters.db.SearchFiltersReFetcher;
@@ -117,7 +118,7 @@ public class DBEventDefinitionService {
         EventDefinitionDto enrichedWithUpdateDate = entity
                 .toBuilder()
                 .updatedAt(DateTime.now(DateTimeZone.UTC))
-                .eventSummaryTemplate(cleanEventSummary(entity.eventSummaryTemplate()))
+                .eventSummaryTemplate(StringUtils.trimToNull(entity.eventSummaryTemplate()))
                 .build();
         if (enrichedWithUpdateDate.id() == null) {
             final String id = scopedEntityMongoUtils.create(enrichedWithUpdateDate);
@@ -186,11 +187,6 @@ public class DBEventDefinitionService {
         }
         entityRegistrar.unregisterEventDefinition(id);
         return deleteSupplier.get();
-    }
-
-    private String cleanEventSummary(String summary) {
-        final String trimmedSummary = summary != null ? summary.trim() : null;
-        return (trimmedSummary != null && !trimmedSummary.isEmpty()) ? trimmedSummary : null;
     }
 
     /**
