@@ -17,76 +17,36 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import asMock from 'helpers/mocking/AsMock';
+import type { PaginatedEntityTableProps } from 'components/common/PaginatedEntityTable/PaginatedEntityTable';
+
 import DataNodesExpandable from './DataNodesExpandable';
-import useClusterDataNodes from './useClusterDataNodes';
-import useClusterDataNodesTableLayout from './useClusterDataNodesTableLayout';
+import { clusterDataNodesKeyFn, fetchClusterDataNodesWithMetrics } from './fetchClusterDataNodes';
 
-jest.mock('./useClusterDataNodes');
-jest.mock('./useClusterDataNodesTableLayout');
-
-const defaultLayout = {
-  defaultDisplayedColumns: ['hostname'],
-  defaultColumnOrder: ['hostname'],
-  layoutPreferences: {
-    attributes: undefined,
-    order: undefined,
-    pageSize: 0,
-    sort: { attributeId: 'hostname', direction: 'asc' },
-  },
-  searchParams: { sort: { attributeId: 'hostname', direction: 'asc' }, query: '' },
-  isLoadingLayout: false,
-  handleLayoutPreferencesChange: jest.fn(),
-  handleSortChange: jest.fn(),
-};
+jest.mock('components/common/PaginatedEntityTable', () => ({
+  __esModule: true,
+  default: jest.fn(({ humanName }) => <div>Paginated {humanName}</div>),
+  useTableFetchContext: jest.fn(),
+}));
 
 describe('<DataNodesExpandable />', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('shows empty state when no data nodes are returned', () => {
-    (useClusterDataNodesTableLayout as jest.Mock).mockReturnValue(defaultLayout);
-    (useClusterDataNodes as jest.Mock).mockReturnValue({
-      nodes: [],
-      total: 0,
-      refetch: jest.fn(),
-      isLoading: false,
-      setPollingEnabled: jest.fn(),
-      pollingEnabled: true,
-    });
+  it('renders paginated entity table with proper props', () => {
+    const { default: PaginatedEntityTable } = jest.requireMock('components/common/PaginatedEntityTable');
+    const mockPaginatedEntityTable = asMock(PaginatedEntityTable);
 
-    render(<DataNodesExpandable />);
+    render(<DataNodesExpandable searchQuery="status:up" refetchInterval={10000} />);
 
-    expect(screen.getByText('No Data Nodes found.')).toBeInTheDocument();
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  });
-
-  it('renders entity table with provided nodes', () => {
-    (useClusterDataNodesTableLayout as jest.Mock).mockReturnValue(defaultLayout);
-    const nodes = [
-      {
-        id: 'node-1',
-        node_id: 'node-1',
-        hostname: 'host-1',
-        datanode_status: 'AVAILABLE',
-        datanode_version: '1.0',
-        opensearch_roles: ['data'],
-        metrics: {},
-      },
-    ];
-
-    (useClusterDataNodes as jest.Mock).mockReturnValue({
-      nodes,
-      total: nodes.length,
-      refetch: jest.fn(),
-      isLoading: false,
-      setPollingEnabled: jest.fn(),
-      pollingEnabled: true,
-    });
-
-    render(<DataNodesExpandable />);
-
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getByText('host-1')).toBeInTheDocument();
+    expect(screen.getByText('Paginated Data Nodes')).toBeInTheDocument();
+    expect(mockPaginatedEntityTable).toHaveBeenCalledTimes(1);
+    const callProps = mockPaginatedEntityTable.mock.calls[0][0] as PaginatedEntityTableProps<any, any>;
+    expect(callProps.humanName).toBe('Data Nodes');
+    expect(callProps.fetchEntities).toBe(fetchClusterDataNodesWithMetrics);
+    expect(callProps.keyFn).toBe(clusterDataNodesKeyFn);
+    expect(callProps.externalSearch.query).toBe('status:up');
+    expect(callProps.fetchOptions.refetchInterval).toBe(10000);
   });
 });

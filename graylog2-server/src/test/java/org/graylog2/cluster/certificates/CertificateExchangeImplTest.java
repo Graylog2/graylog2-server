@@ -47,6 +47,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @ExtendWith(MongoDBExtension.class)
 public class CertificateExchangeImplTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     public static final String FIRST_NODE_ID = "5ca1ab1e-0000-4000-a000-000000000000";
     public static final String SECOND_NODE_ID = "5ca1ab1e-0000-4000-a000-111111111111";
     private CertificateExchange certificateExchange;
@@ -165,7 +167,7 @@ public class CertificateExchangeImplTest {
                 .isCA(false)
                 .validity(Duration.ofDays(99 * 365));
 
-        return CertificateGenerator.generate(certRequest);
+        return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
     }
 
     private static KeyPair generateCa() throws Exception {
@@ -173,6 +175,6 @@ public class CertificateExchangeImplTest {
                 .isCA(true)
                 .validity(Duration.ofDays(99 * 365));
 
-        return CertificateGenerator.generate(certRequest);
+        return CERTIFICATE_GENERATOR.generateKeyPair(certRequest);
     }
 }

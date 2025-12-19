@@ -21,7 +21,7 @@ import { render, waitFor, screen, act } from 'wrappedTestingLibrary';
 
 import selectEvent from 'helpers/selectEvent';
 import { alice } from 'fixtures/users';
-import { manager as assignedRole1, reader as assignedRole2, reportCreator as notAssignedRole } from 'fixtures/roles';
+import { manager as assignedRole1, reader as assignedRole2, viewsManager as notAssignedRole } from 'fixtures/roles';
 import { AuthzRolesActions } from 'stores/roles/AuthzRolesStore';
 
 import RolesSection from './RolesSection';
