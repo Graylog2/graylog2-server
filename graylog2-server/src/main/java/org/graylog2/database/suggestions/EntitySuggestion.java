@@ -17,7 +17,9 @@
 package org.graylog2.database.suggestions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 
 public record EntitySuggestion(@JsonProperty("id") String id,
+                               @Nullable @JsonProperty("targetId") String targetId,
                                @JsonProperty("value") String value) {
 }
