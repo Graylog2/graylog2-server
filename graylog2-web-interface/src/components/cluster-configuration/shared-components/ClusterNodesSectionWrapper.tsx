@@ -129,10 +129,7 @@ const ClusterNodesSectionWrapper = ({
   };
 
   return (
-    <PaperSection
-      title={title}
-      header={renderHeader()}
-      collapsible={collapsible}>
+    <PaperSection title={title} header={renderHeader()} collapsible={collapsible}>
       <TableWrapper maxHeight={getMaxHeightValue(maxContentHeight, collapsible)}>{children}</TableWrapper>
     </PaperSection>
   );

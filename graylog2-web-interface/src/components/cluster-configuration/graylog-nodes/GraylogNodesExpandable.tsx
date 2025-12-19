@@ -24,7 +24,11 @@ import useProductName from 'brand-customization/useProductName';
 import type { ClusterGraylogNode } from './fetchClusterGraylogNodes';
 import { clusterGraylogNodesKeyFn, fetchClusterGraylogNodesWithMetrics } from './fetchClusterGraylogNodes';
 import GraylogNodeActions from './GraylogNodeActions';
-import { createColumnDefinitions, createColumnRenderers, DEFAULT_VISIBLE_COLUMNS } from './GraylogNodesColumnConfiguration';
+import {
+  createColumnDefinitions,
+  createColumnRenderers,
+  DEFAULT_VISIBLE_COLUMNS,
+} from './GraylogNodesColumnConfiguration';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
 
