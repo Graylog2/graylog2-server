@@ -56,11 +56,7 @@ const CpuMetricsCell = ({
 
   return (
     <MetricsColumn>
-      {(percentIndicator || percentLabel) && (
-        <MetricsRow>
-          {percentIndicator ?? <span>{percentLabel}</span>}
-        </MetricsRow>
-      )}
+      {(percentIndicator || percentLabel) && <MetricsRow>{percentIndicator ?? <span>{percentLabel}</span>}</MetricsRow>}
       {loadLabel && (
         <MetricsRow>
           <span>Load (1m)</span>

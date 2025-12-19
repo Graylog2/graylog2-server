@@ -156,11 +156,15 @@ const fetchGraylogNodeMetrics = async (nodeIds: Array<string>) => {
   return Object.fromEntries(
     results.map(({ nodeId, response }) => {
       const nodeMetric = toNodeMetric(response as MetricsSummaryResponse);
-      const extracted = nodeMetric ? MetricsExtractor.getValuesForNode(nodeMetric, GRAYLOG_NODE_METRIC_NAMES) : undefined;
+      const extracted = nodeMetric
+        ? MetricsExtractor.getValuesForNode(nodeMetric, GRAYLOG_NODE_METRIC_NAMES)
+        : undefined;
 
       return [
         nodeId,
-        extracted ? { ...EMPTY_GRAYLOG_NODE_METRICS, ...(extracted as GraylogNodeMetrics) } : EMPTY_GRAYLOG_NODE_METRICS,
+        extracted
+          ? { ...EMPTY_GRAYLOG_NODE_METRICS, ...(extracted as GraylogNodeMetrics) }
+          : EMPTY_GRAYLOG_NODE_METRICS,
       ];
     }),
   );
