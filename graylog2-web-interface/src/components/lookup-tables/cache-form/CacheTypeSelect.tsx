@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -33,7 +34,7 @@ function CacheTypeSelect({ cacheConfigType, onCacheChange }: Props) {
   const plugins = usePluginEntities('lookupTableCaches');
   const cachePlugins = Object.fromEntries(plugins.map((p) => [p.type, p]));
 
-  const sortedCaches = React.useMemo(() => {
+  const sortedCaches = useMemo(() => {
     if (!fetchingCacheTypes) {
       return Object.keys(types)
         .map((key) => {
@@ -61,7 +62,7 @@ function CacheTypeSelect({ cacheConfigType, onCacheChange }: Props) {
     return [];
   }, [fetchingCacheTypes, types, cachePlugins]);
 
-  const handleTypeSelect = React.useCallback(
+  const handleTypeSelect = useCallback(
     (cacheType: string) => {
       const defaultConfig = { ...types[cacheType].default_config };
 

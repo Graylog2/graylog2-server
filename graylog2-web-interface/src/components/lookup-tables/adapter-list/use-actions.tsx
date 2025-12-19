@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
@@ -31,17 +32,17 @@ type ActionsProps = {
 };
 
 function Actions({ adapter }: ActionsProps) {
-  const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
   const { deleteDataAdapter, deletingDataAdapter } = useDeleteDataAdapter();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(adapter);
   const navigate = useNavigate();
 
-  const handleEdit = React.useCallback(() => {
+  const handleEdit = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(adapter.name));
   }, [adapter, navigate]);
 
-  const handleDelete = React.useCallback(() => {
+  const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.DATA_ADAPTER_DELETED, {
       app_pathname: 'lut',
       app_section: 'lut_data_adapter',

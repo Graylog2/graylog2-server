@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { Field, useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 import moment from 'moment';
@@ -140,7 +141,7 @@ const RelativeRangeSelectInner = ({
   const availableRangeTypes = buildRangeTypes(limitDuration);
   const { isAllTime, value, unit } = classifiedRange;
 
-  const _onChange = React.useCallback(
+  const _onChange = useCallback(
     (newClassifiedRange) => {
       onChange({
         target: {
@@ -152,7 +153,7 @@ const RelativeRangeSelectInner = ({
     [name, onChange],
   );
 
-  const _onChangeTime = React.useCallback(
+  const _onChangeTime = useCallback(
     (event) => {
       const inputIsEmpty = event.target.value === '';
       const inputValue = inputIsEmpty ? null : event.target.value;

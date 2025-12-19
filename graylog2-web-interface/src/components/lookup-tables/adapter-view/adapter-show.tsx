@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 
 import { RowContainer } from 'components/lookup-tables/layout-componets';
 import usePluginEntities from 'hooks/usePluginEntities';
@@ -23,12 +24,12 @@ import type { LookupTableAdapter } from 'logic/lookup-tables/types';
 
 function AdapterShow({ dataAdapter }: { dataAdapter: LookupTableAdapter }) {
   const plugins = usePluginEntities('lookupTableAdapters');
-  const adapterPlugin = React.useMemo(
+  const adapterPlugin = useMemo(
     () => plugins.find((p: any) => p.type === dataAdapter?.config?.type),
     [dataAdapter?.config?.type, plugins],
   );
 
-  const DocComponent = React.useMemo(() => adapterPlugin?.documentationComponent, [adapterPlugin]);
+  const DocComponent = useMemo(() => adapterPlugin?.documentationComponent, [adapterPlugin]);
 
   return (
     <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">

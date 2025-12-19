@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useFormikContext } from 'formik';
 
 import { useValidateCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
@@ -26,12 +27,12 @@ import CacheConfigFormFields from './CacheConfigFormFields';
 function CacheFormFields() {
   const { errors, values, touched, setValues, setErrors } = useFormikContext<LookupTableCache>();
   const { validateCache } = useValidateCache();
-  const configRef = React.useRef(null);
-  const [generateName, setGenerateName] = React.useState<boolean>(!values.title);
+  const configRef = useRef(null);
+  const [generateName, setGenerateName] = useState<boolean>(!values.title);
 
   const _sanitizeName = (inName: string) => inName.trim().replace(/\W+/g, '-').toLocaleLowerCase();
 
-  const _runValidations = React.useCallback(() => {
+  const _runValidations = useCallback(() => {
     validateCache(values).then((resp: { errors: validationErrorsType }) => {
       const auxErrors = Object.keys(resp.errors).reduce((acc, key) => {
         // eslint-disable-next-line no-param-reassign
@@ -58,7 +59,7 @@ function CacheFormFields() {
     });
   };
 
-  React.useEffect(() => _runValidations(), [_runValidations, values]);
+  useEffect(() => _runValidations(), [_runValidations, values]);
 
   return (
     <fieldset>

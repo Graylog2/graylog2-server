@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import cloneDeep from 'lodash/cloneDeep';
 
 import { IfPermitted, MultiSelect, SourceCodeEditor, TimezoneSelect } from 'components/common';
@@ -70,12 +70,12 @@ const EmailTemplatesRunner = ({
   );
 
   const entities = usePluginEntities('customization.emailTemplates');
-  const providingEntity = React.useMemo(
+  const providingEntity = useMemo(
     () => (entities ?? []).find((e: any) => typeof e?.hooks?.useEmailTemplate === 'function'),
     [entities],
   );
 
-  const noopUseEmailTemplate = React.useCallback(() => ({ templateConfig: undefined }), []);
+  const noopUseEmailTemplate = useCallback(() => ({ templateConfig: undefined }), []);
   const useEmailTemplateHook = (providingEntity?.hooks?.useEmailTemplate ?? noopUseEmailTemplate) as () => {
     templateConfig?: {
       override_defaults?: boolean;
@@ -94,9 +94,9 @@ const EmailTemplatesRunner = ({
       ? `${key}|${templateConfig.override_defaults ? '1' : '0'}|${templateConfig.text_body ?? ''}|${templateConfig.html_body ?? ''}`
       : `${key}|no-license-or-config`;
 
-  const lastSigRef = React.useRef<string>('init');
+  const lastSigRef = useRef<string>('init');
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!validCustomizationLicense || !templateConfig) return;
 
     if (lastSigRef.current === sig) return;
