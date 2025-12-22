@@ -14,25 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.periodical;
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: string }) => {
-  const { permissions } = useCurrentUser();
-
-  if (!title) {
-    return <em>{id}</em>;
-  }
-
-  if (isPermitted(permissions, `eventdefinitions:read:${id}`)) {
-    return <Link to={Routes.ALERTS.DEFINITIONS.show(id)}>{title}</Link>;
-  }
-
-  return <>{title}</>;
-};
-
-export default EventDefinitionLink;
+class CpuLoadGaugeTest {
+    @Test
+    void testGauge() {
+        final CpuLoadGauge gauge = new CpuLoadGauge();
+        Assertions.assertThat(gauge.getValue()).isNull();
+        gauge.update();
+        Assertions.assertThat(gauge.getValue())
+                .isNotNull()
+                .isGreaterThan(0.0d);
+    }
+}

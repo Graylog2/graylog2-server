@@ -14,25 +14,12 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
-
-const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: string }) => {
-  const { permissions } = useCurrentUser();
-
-  if (!title) {
-    return <em>{id}</em>;
-  }
-
-  if (isPermitted(permissions, `eventdefinitions:read:${id}`)) {
-    return <Link to={Routes.ALERTS.DEFINITIONS.show(id)}>{title}</Link>;
-  }
-
-  return <>{title}</>;
+export type PipelineRulesMetadata = {
+  functions: string[];
+  streams: string[];
+  pipeline_id?: string;
+  rules: string[];
+  id?: string;
+  deprecated_functions: string[];
+  has_input_references?: boolean;
 };
-
-export default EventDefinitionLink;

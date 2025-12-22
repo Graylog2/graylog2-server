@@ -27,6 +27,7 @@ import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectio
 import type { Stream } from 'logic/streams/types';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
 import usePermissions from 'hooks/usePermissions';
 
 import ButtonToolbar from '../bootstrap/ButtonToolbar';
@@ -123,6 +124,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
             Managed by Application
           </DefaultLabel>
         )}
+        <RuleDeprecationInfo pipelineId={pipeline.id} showFor="pipeline" />
         <br />
         {description}
         <br />
