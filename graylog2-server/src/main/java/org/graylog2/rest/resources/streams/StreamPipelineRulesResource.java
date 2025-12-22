@@ -1,4 +1,4 @@
-/*
+    /*
  * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,43 +16,45 @@
  */
 package org.graylog2.rest.resources.streams;
 
-import com.codahale.metrics.annotation.Timed;
-import com.google.inject.Inject;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import jakarta.ws.rs.DefaultValue;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.MediaType;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
-import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PaginatedList;
-import org.graylog2.rest.models.SortOrder;
-import org.graylog2.rest.models.tools.responses.PageListResponse;
-import org.graylog2.rest.resources.entities.EntityAttribute;
-import org.graylog2.rest.resources.entities.EntityDefaults;
-import org.graylog2.rest.resources.entities.Sorting;
-import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
-import org.graylog2.shared.rest.resources.RestResource;
+    import com.codahale.metrics.annotation.Timed;
+    import io.swagger.annotations.Api;
+    import io.swagger.annotations.ApiOperation;
+    import io.swagger.annotations.ApiParam;
+    import jakarta.inject.Inject;
+    import jakarta.validation.constraints.NotBlank;
+    import jakarta.ws.rs.DefaultValue;
+    import jakarta.ws.rs.GET;
+    import jakarta.ws.rs.Path;
+    import jakarta.ws.rs.PathParam;
+    import jakarta.ws.rs.Produces;
+    import jakarta.ws.rs.QueryParam;
+    import jakarta.ws.rs.core.MediaType;
+    import org.apache.shiro.authz.annotation.RequiresAuthentication;
+    import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
+    import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
+    import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+    import org.graylog.plugins.pipelineprocessor.db.RuleDao;
+    import org.graylog.plugins.pipelineprocessor.db.RuleService;
+    import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+    import org.graylog2.database.NotFoundException;
+    import org.graylog2.database.PaginatedList;
+    import org.graylog2.rest.models.SortOrder;
+    import org.graylog2.rest.models.tools.responses.PageListResponse;
+    import org.graylog2.rest.resources.entities.EntityAttribute;
+    import org.graylog2.rest.resources.entities.EntityDefaults;
+    import org.graylog2.rest.resources.entities.Sorting;
+    import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
+    import org.graylog2.shared.rest.resources.RestResource;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.stream.Stream;
+    import java.util.List;
+    import java.util.Locale;
+    import java.util.stream.Stream;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+    import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Streams/Pipeline Rules", description = "Pipeline rules associated with a stream", tags = {CLOUD_VISIBLE})
-@Path("/streams/pipeline_rules")
+@Api(value = "Stream/RoutingRules", description = "Stream routing with pipeline rules", tags = {CLOUD_VISIBLE})
+@Path("/routing_rules")
 public class StreamPipelineRulesResource extends RestResource {
     private static final String ATTRIBUTE_PIPELINE_RULE = "pipeline_rule";
     private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
@@ -87,6 +89,7 @@ public class StreamPipelineRulesResource extends RestResource {
     @ApiOperation(value = "Get a paginated list of associated pipeline rules for the specified stream")
     @Produces(MediaType.APPLICATION_JSON)
     public PageListResponse<StreamPipelineRulesResponse> getPage(
+            @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
             @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
@@ -100,35 +103,37 @@ public class StreamPipelineRulesResource extends RestResource {
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         List<StreamPipelineRulesResponse> responseList =
-                mongoDbPipelineMetadataService.getRoutingPipelines().stream()
-                        .flatMap(dao -> buildResponse(dao))
+                mongoDbPipelineMetadataService.getRoutingPipelines(streamId).stream()
+                        .flatMap(dao -> buildResponse(dao, streamId))
                         .toList();
         final PaginatedList<StreamPipelineRulesResponse> paginatedList =
-                new PaginatedList<>(responseList, page, perPage, responseList.size());
+                new PaginatedList<>(responseList, responseList.size(), page, perPage);
 
         return PageListResponse.create(
                 query, paginatedList.pagination(),
                 paginatedList.grandTotal().orElse(0L), sort, order, paginatedList.delegate(), attributes, settings);
-        );
     }
 
-    private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao) {
+    private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao, String streamId) {
         List<StreamPipelineRulesResponse> responseList = new java.util.ArrayList<>();
-        dao.routedStreams().forEach(
-            (streamId, streamName) -> {
-                try {
-                    PipelineDao pipelineDao = pipelineService.load(dao.pipelineId());
+        final List<String> relevantRules = dao.routingRules().keySet().stream()
+                .filter(ruleId -> dao.routingRules().get(ruleId).contains(streamId)).toList();
 
-                    responseList.add(
-                            new StreamPipelineRulesResponse(
-                                    dao.pipelineId(),
-                                    pipelineDao.title(),
-                                    streamId,
-                                    streamName,
-                                    dao.rules()));
-                } catch (NotFoundException e) {
-                    // Skip pipelines that no longer exist
-                }
+        relevantRules.forEach(ruleId -> {
+            try {
+                RuleDao ruleDao = ruleService.load(ruleId);
+                PipelineDao pipelineDao = pipelineService.load(dao.pipelineId());
+                responseList.add(
+                        new StreamPipelineRulesResponse(
+                                dao.pipelineId(),
+                                pipelineDao.title(),
+                                ruleId,
+                                ruleDao.title(),
+                                streamId,
+                                dao.routedStreams().get(streamId)));
+            } catch (NotFoundException e) {
+                // Skip pipelines or rules that no longer exist
+            }
         });
         return responseList.stream();
     }

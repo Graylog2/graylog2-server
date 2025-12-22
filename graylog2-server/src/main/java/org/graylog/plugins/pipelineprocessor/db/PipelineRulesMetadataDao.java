@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog2.database.BuildableMongoEntity;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -34,7 +35,8 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     private static final String FIELD_STREAMS = "streams";
     private static final String FIELD_FUNCTIONS = "functions";
     private static final String FIELD_DEPRECATED_FUNCTIONS = "deprecated_functions";
-    private static final String FIELD_ROUTED_STREAMS = "routed_streams";
+    public static final String FIELD_ROUTING_RULES = "routing_rules";
+    public static final String FIELD_ROUTED_STREAMS = "routed_streams";
     public static final String FIELD_HAS_INPUT_REFERENCES = "has_input_references";
 
     @JsonProperty(FIELD_PIPELINE_ID)
@@ -52,7 +54,12 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
     @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
     public abstract Set<String> deprecatedFunctions();
 
+    @JsonProperty(FIELD_ROUTING_RULES)
+    // Maps rule ID to IDs of routed stream
+    public abstract Map<String, Set<String>> routingRules();
+
     @JsonProperty(FIELD_ROUTED_STREAMS)
+    // Maps stream ID to stream title
     public abstract Map<String, String> routedStreams();
 
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
@@ -70,7 +77,9 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
                 .streams(new HashSet<>())
                 .functions(new HashSet<>())
                 .deprecatedFunctions(new HashSet<>())
-                .hasInputReferences(false);
+                .hasInputReferences(false)
+                .routingRules(new HashMap<>())
+                .routedStreams(new HashMap<>());
     }
 
     @AutoValue.Builder
@@ -90,6 +99,9 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
         @JsonProperty(FIELD_DEPRECATED_FUNCTIONS)
         public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
+
+        @JsonProperty(FIELD_ROUTING_RULES)
+        public abstract Builder routingRules(Map<String, Set<String>> routingRules);
 
         @JsonProperty(FIELD_ROUTED_STREAMS)
         public abstract Builder routedStreams(Map<String, String> routedStreamsMap);

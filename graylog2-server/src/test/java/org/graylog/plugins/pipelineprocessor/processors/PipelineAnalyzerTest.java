@@ -22,8 +22,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -55,12 +55,12 @@ class PipelineAnalyzerTest {
     private InputService inputService;
 
     @Mock
-    private StreamCacheService streamCacheService;
+    private StreamService streamService;
 
     @BeforeEach
     void setUp() throws Exception {
         org.mockito.MockitoAnnotations.openMocks(this).close();
-        pipelineAnalyzer = new PipelineAnalyzer(connectionsService, inputService, new MetricRegistry(), streamCacheService);
+        pipelineAnalyzer = new PipelineAnalyzer(connectionsService, inputService, new MetricRegistry(), streamService);
         ruleRecords = new ArrayList<>();
         testUtil = new PipelineTestUtil(connectionsService, inputService);
 
