@@ -70,8 +70,8 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.filtering.DbQueryCreator;
 import org.graylog2.indexer.indexset.IndexSet;
-import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.Tools;
@@ -116,8 +116,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -285,9 +287,15 @@ public class StreamResource extends RestResource {
         final List<Stream> streams = streamService.loadAll()
                 .stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .sorted(Comparator.comparing(Stream::getTitle))
                 .toList();
 
-        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+        return StreamListResponse.create(
+                streams.size(),
+                streams.stream()
+                        .map(this::streamToResponse)
+                        .collect(Collectors.toCollection(LinkedHashSet::new))
+        );
     }
 
     //TODO: remove this method when https://github.com/Graylog2/graylog-plugin-enterprise/issues/8610 is resolved!
