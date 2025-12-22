@@ -1,0 +1,5 @@
+type = "fixed"
+message = "GET /streams endpoint returns streams sorted by their titles"
+
+issues = ["18694"]
+pulls = ["24603"]
