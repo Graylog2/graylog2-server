@@ -44,6 +44,7 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -107,6 +108,23 @@ class CsrSignerTest {
         var result = sign("P6M");
         assertThat(result).isNotNull();
         assertThat(result.getNotAfter()).isEqualTo(fixedInstant.plus(180, ChronoUnit.DAYS));
+    }
+
+    /**
+     * X509 certificates don't handle Y10K problem correctly, failing to parse
+     * any date after 9999-12-31. Let's make sure we limit cert validity in a way
+     * that prevents this.
+     */
+    @Test
+    void testSigningCertY10k() throws Exception {
+        var result = sign("P9999999D");
+        assertThat(result).isNotNull();
+
+        final Instant y10k = LocalDate.of(10000, 1, 1)
+                .atStartOfDay(UTC)
+                .toInstant();
+
+        assertThat(result.getNotAfter()).isBefore(y10k);
     }
 
     private PKCS10CertificationRequest createCSR(KeyPair keyPair) throws OperatorCreationException {
