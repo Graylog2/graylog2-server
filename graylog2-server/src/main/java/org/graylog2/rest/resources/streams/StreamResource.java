@@ -284,18 +284,14 @@ public class StreamResource extends RestResource {
     @Deprecated
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse get() {
-        final List<Stream> streams = streamService.loadAll()
+        final List<StreamResponse> streams = streamService.loadAll()
                 .stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                 .sorted(Comparator.comparing(Stream::getTitle))
+                .map(this::streamToResponse)
                 .toList();
 
-        return StreamListResponse.create(
-                streams.size(),
-                streams.stream()
-                        .map(this::streamToResponse)
-                        .collect(Collectors.toCollection(LinkedHashSet::new))
-        );
+        return StreamListResponse.create(streams.size(), streams);
     }
 
     //TODO: remove this method when https://github.com/Graylog2/graylog-plugin-enterprise/issues/8610 is resolved!
