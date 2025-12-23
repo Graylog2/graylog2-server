@@ -96,6 +96,7 @@ const IndexSetConfigurationForm = ({
   const [fieldTypeRefreshIntervalUnit, setFieldTypeRefreshIntervalUnit] = useState<Unit>('seconds');
   const { loadingIndexSetTemplateDefaults, indexSetTemplateDefaults } = useIndexSetTemplateDefaults();
   const [indexSet] = useIndexSet(initialIndexSet);
+  const [autoFillPrefix, setAutoFillPrefix] = useState<boolean>(true);
 
   const getFieldRestrictions = useCallback(() => parseFieldRestrictions(indexSet?.field_restrictions), [indexSet]);
 
@@ -187,6 +188,32 @@ const IndexSetConfigurationForm = ({
     setFieldTypeRefreshIntervalUnit(unit);
   };
 
+  const transformTitleToPrefix = (title: string): string => {
+    if (!title) return '';
+
+    return title
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9_+-]+/g, '-') // Replace invalid chars with hyphen
+      .replace(/^[_+-]+/, '') // Remove leading invalid chars
+      .replace(/-+$/, '') // Remove trailing hyphens
+      .replace(/-{2,}/g, '-'); // Collapse multiple hyphens
+  };
+
+  const handleTitleChange = useCallback(
+    (event: React.BaseSyntheticEvent, setFieldValue: (field: string, value: any) => void) => {
+      if (!create || !autoFillPrefix) return;
+
+      const transformedPrefix = transformTitleToPrefix(event.target.value);
+      setFieldValue('index_prefix', transformedPrefix);
+    },
+    [create, autoFillPrefix],
+  );
+
+  const handlePrefixChange = useCallback(() => {
+    setAutoFillPrefix(false);
+  }, []);
+
   const detailsSectionRenderable = (): boolean => {
     if (create) return true;
 
@@ -233,6 +260,7 @@ const IndexSetConfigurationForm = ({
                       id="title"
                       name="title"
                       help="Descriptive name of the index set."
+                      onChange={(event) => handleTitleChange(event, setFieldValue)}
                       required
                     />
                     <FormikInput
@@ -251,6 +279,7 @@ const IndexSetConfigurationForm = ({
                           hiddenFields={hiddenFields}
                           immutableFields={immutableFields}
                           ignoreFieldRestrictions={ignoreFieldRestrictions}
+                          onPrefixChange={handlePrefixChange}
                         />
                       )}
                       <HideOnCloud>
