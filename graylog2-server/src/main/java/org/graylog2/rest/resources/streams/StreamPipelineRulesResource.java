@@ -57,15 +57,17 @@ package org.graylog2.rest.resources.streams;
 @Path("/routing_rules")
 public class StreamPipelineRulesResource extends RestResource {
     private static final String ATTRIBUTE_PIPELINE_RULE = "pipeline_rule";
+    private static final String ATTRIBUTE_PIPELINE = "pipeline";
+    private static final String ATTRIBUTE_CONNECTED_STREAM = "connected_stream";
     private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("pipeline_rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id("pipeline").title("Pipeline").searchable(false).build(),
+            EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Pipeline").searchable(false).build(),
             EntityAttribute.builder().id("connected_stream_id").title("Connected Stream ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id("connected_stream").title("Connected Stream").searchable(false).build()
+            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Connected Stream").searchable(false).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
@@ -97,11 +99,12 @@ public class StreamPipelineRulesResource extends RestResource {
             @ApiParam(name = "sort",
                       value = "The field to sort the result on",
                       required = true,
-                      allowableValues = "title,description,created_at,updated_at,status")
+                      allowableValues = ATTRIBUTE_PIPELINE_RULE + "," + ATTRIBUTE_PIPELINE + "," + ATTRIBUTE_CONNECTED_STREAM)
             @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
             @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
+        // Pagination is primarily for UX purposes - OK to fetch all and then paginate in memory
         List<StreamPipelineRulesResponse> responseList =
                 mongoDbPipelineMetadataService.getRoutingPipelines(streamId).stream()
                         .flatMap(dao -> buildResponse(dao, streamId))
@@ -119,10 +122,16 @@ public class StreamPipelineRulesResource extends RestResource {
         final List<String> relevantRules = dao.routingRules().keySet().stream()
                 .filter(ruleId -> dao.routingRules().get(ruleId).contains(streamId)).toList();
 
+        PipelineDao pipelineDao;
+        try {
+            pipelineDao = pipelineService.load(dao.pipelineId());
+        } catch (NotFoundException e) {
+            return Stream.empty();
+        }
+
         relevantRules.forEach(ruleId -> {
             try {
                 RuleDao ruleDao = ruleService.load(ruleId);
-                PipelineDao pipelineDao = pipelineService.load(dao.pipelineId());
                 responseList.add(
                         new StreamPipelineRulesResponse(
                                 dao.pipelineId(),

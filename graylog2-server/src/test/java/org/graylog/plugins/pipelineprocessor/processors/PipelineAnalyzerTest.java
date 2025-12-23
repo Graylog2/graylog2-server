@@ -24,6 +24,7 @@ import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -155,11 +156,11 @@ class PipelineAnalyzerTest {
     @Test
     void routingRule() throws NotFoundException {
         Pipeline pipeline1 = testUtil.createPipelineWithRules("pipeline1", List.of(testUtil.ROUTING));
-        org.graylog2.plugin.streams.Stream stream2 = mock(org.graylog2.plugin.streams.Stream.class);
+        Stream stream2 = mock(Stream.class);
         when(stream2.getTitle()).thenReturn(STREAM2_TITLE);
         when(streamService.load(STREAM2_ID)).thenReturn(stream2);
 
-        org.graylog2.plugin.streams.Stream stream3 = mock(org.graylog2.plugin.streams.Stream.class);
+        Stream stream3 = mock(Stream.class);
         when(stream3.getId()).thenReturn(STREAM3_ID);
         when(stream3.getTitle()).thenReturn(STREAM3_TITLE);
         when(streamService.loadAllByTitle(STREAM3_TITLE)).thenReturn(List.of(stream3));
