@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import userEvent from '@testing-library/user-event';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
 import useSelectedIndexSetTemplate from 'components/indices/IndexSetTemplates/hooks/useSelectedTemplate';
@@ -287,5 +288,44 @@ describe('IndexSetConfigurationForm', () => {
     const indexAnalyzer = await screen.findByDisplayValue(/default_index_analyzer/i);
 
     expect(indexAnalyzer).toBeInTheDocument();
+  });
+
+  it('Should auto-fill index prefix from title when creating', async () => {
+    render(<SUT create />);
+
+    const titleInput = await screen.findByRole('textbox', { name: /title/i });
+    const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
+
+    // Test basic auto-fill
+    await userEvent.type(titleInput, 'My Test Index');
+
+    expect(prefixInput).toHaveValue('my-test-index');
+
+    // Test special character transformation
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, 'Test@Index#Set 123!');
+
+    expect(prefixInput).toHaveValue('test-index-set-123');
+
+    // Test auto-fill stops after manual edit
+    await userEvent.clear(prefixInput);
+    await userEvent.type(prefixInput, 'custom-prefix');
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, 'Another Title');
+
+    expect(prefixInput).toHaveValue('custom-prefix');
+  });
+
+  it('Should not auto-fill index prefix when editing existing index set', async () => {
+    render(<SUT indexSet={indexSet} />);
+
+    const titleInput = await screen.findByRole('textbox', { name: /title/i });
+
+    // Clear existing title and type new one
+    await userEvent.clear(titleInput);
+    await userEvent.type(titleInput, 'New Title');
+
+    // Prefix field should not exist in edit mode (it's read-only after creation)
+    expect(screen.queryByRole('textbox', { name: /index prefix/i })).not.toBeInTheDocument();
   });
 });
