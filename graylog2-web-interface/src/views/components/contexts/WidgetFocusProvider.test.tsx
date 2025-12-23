@@ -90,7 +90,7 @@ describe('WidgetFocusProvider', () => {
     );
   });
 
-  const renderSUT = (consume: (value: WidgetFocusContextType) => JSX.Element) => {
+  const renderSUT = (consume: (value: WidgetFocusContextType) => React.JSX.Element) => {
     const widget = allMessagesTable('widget-id');
     const view = createViewWithWidgets([widget], {});
 
