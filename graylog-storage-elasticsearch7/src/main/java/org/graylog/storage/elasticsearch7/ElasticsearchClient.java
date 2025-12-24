@@ -235,8 +235,8 @@ public class ElasticsearchClient {
         return elasticsearchException.getMessage().contains("index_not_found_exception");
     }
 
-    private static boolean isMapperParsingExceptionException(ElasticsearchException openSearchException) {
-        return openSearchException.getMessage().contains("mapper_parsing_exception");
+    private static boolean isMapperParsingExceptionException(ElasticsearchException elasticSearchException) {
+        return elasticSearchException.getMessage().contains("mapper_parsing_exception");
     }
 
     private static boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
