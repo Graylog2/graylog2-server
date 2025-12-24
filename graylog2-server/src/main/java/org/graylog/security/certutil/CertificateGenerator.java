@@ -23,15 +23,19 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.Extension;
 import org.bouncycastle.asn1.x509.GeneralName;
 import org.bouncycastle.asn1.x509.GeneralNames;
+import org.bouncycastle.cert.CertIOException;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
 import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 import java.math.BigInteger;
 import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
@@ -41,11 +45,24 @@ import static org.graylog.security.certutil.CertConstants.KEY_GENERATION_ALGORIT
 import static org.graylog.security.certutil.CertConstants.SIGNING_ALGORITHM;
 
 public class CertificateGenerator {
-    public static KeyPair generate(CertRequest request) throws Exception {
-        KeyPairGenerator keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
-        keyGen.initialize(4096);
-        java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
 
+    private final KeyPairGenerator keyGen;
+
+    public CertificateGenerator(int keySize) {
+        try {
+            keyGen = KeyPairGenerator.getInstance(KEY_GENERATION_ALGORITHM);
+            keyGen.initialize(keySize);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static KeyPair generate(CertRequest request) throws Exception {
+        return new CertificateGenerator(4096).generateKeyPair(request);
+    }
+
+    public KeyPair generateKeyPair(CertRequest request) throws CertIOException, CertificateException, OperatorCreationException {
+        java.security.KeyPair certKeyPair = keyGen.generateKeyPair();
         final X500Name name = getX500Name(request.cnName());
 
         BigInteger serialNumber = new BigInteger(UUID.randomUUID().toString().replace("-", ""), 16);

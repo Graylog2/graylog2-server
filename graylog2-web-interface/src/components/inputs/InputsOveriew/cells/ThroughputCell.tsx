@@ -52,7 +52,7 @@ const ThroughputCell = ({ input }: Props) => {
   }, [metricName]);
 
   if (!metrics) {
-    return <Spinner />;
+    return <Spinner size="xs" />;
   }
 
   const incomingMessages =
@@ -77,7 +77,7 @@ const ThroughputCell = ({ input }: Props) => {
       ref={spanRef}
       title={`${throughputSectionIsOpen ? 'Hide' : 'Show'} metrics`}
       onClick={toggleTrafficSection}>
-      {!isNaN(incomingMessages) ? formatCount(incomingMessages) : 0} msg/s Last Minute
+      {!isNaN(incomingMessages) ? formatCount(incomingMessages) : 0} msg/s
     </StyledSpan>
   );
 };
