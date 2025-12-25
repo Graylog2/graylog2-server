@@ -144,7 +144,7 @@
     "file-loader": "^6.0.0",
     "fork-ts-checker-webpack-plugin": "^9.0.0",
     "form-data": "^4.0.0",
-    "glob": "^10.3.4",
+    "glob": "^13.0.0",
     "globals": "^16.4.0",
     "html-webpack-plugin": "^5.6.4",
     "jiti": "^2.6.0",
