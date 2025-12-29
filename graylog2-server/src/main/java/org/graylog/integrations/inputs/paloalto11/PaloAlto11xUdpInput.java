@@ -34,13 +34,13 @@ public class PaloAlto11xUdpInput extends MessageInput {
 
     @AssistedInject
     public PaloAlto11xUdpInput(MetricRegistry metricRegistry,
-            @Assisted Configuration configuration,
-            UdpTransport.Factory udpTransportFactory,
-            PaloAlto11xCodec.Factory codecFactory,
-            LocalMetricRegistry localRegistry,
-            Config config,
-            Descriptor descriptor,
-            ServerStatus serverStatus) {
+                               @Assisted Configuration configuration,
+                               UdpTransport.Factory udpTransportFactory,
+                               PaloAlto11xCodec.Factory codecFactory,
+                               LocalMetricRegistry localRegistry,
+                               Config config,
+                               Descriptor descriptor,
+                               ServerStatus serverStatus) {
         super(
                 metricRegistry,
                 configuration,

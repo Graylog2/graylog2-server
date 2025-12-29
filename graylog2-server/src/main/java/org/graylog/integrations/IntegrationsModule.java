@@ -82,8 +82,7 @@ public class IntegrationsModule extends PluginModule {
     /**
      * Returns all configuration beans required by this plugin.
      * <p>
-     * Implementing this method is optional. The default method returns an empty
-     * {@link Set}.
+     * Implementing this method is optional. The default method returns an empty {@link Set}.
      */
     @Override
     public Set<? extends PluginConfigBean> getConfigBeans() {
@@ -166,10 +165,8 @@ public class IntegrationsModule extends PluginModule {
 
     /**
      * Place bindings here that need to run in the Graylog Server and the Forwarder.
-     * Please do not add any bindings here that use MongoDB since the Forwarder does
-     * not have access to MongoDB.
-     * In general, this should only contain input/codec/transport bindings that are
-     * supported in the Forwarder
+     * Please do not add any bindings here that use MongoDB since the Forwarder does not have access to MongoDB.
+     * In general, this should only contain input/codec/transport bindings that are supported in the Forwarder
      * and do not use MongoDB.
      */
     private void configureUniversalBindings() {
@@ -218,14 +215,11 @@ public class IntegrationsModule extends PluginModule {
     }
 
     /**
-     * @return A boolean indicating if the plugin is being loaded within the Graylog
-     *         Forwarder.
-     *         The graylog.forwarder system property is set in the startup sequence
-     *         of the Graylog Cloud Forwarder.
-     *         <p>
-     *         The Cloud Forwarder only supports inputs. This allows other bindings
-     *         to be skipped when this plugin is
-     *         loaded within the Cloud Forwarder.
+     * @return A boolean indicating if the plugin is being loaded within the Graylog Forwarder.
+     * The graylog.forwarder system property is set in the startup sequence of the Graylog Cloud Forwarder.
+     * <p>
+     * The Cloud Forwarder only supports inputs. This allows other bindings to be skipped when this plugin is
+     * loaded within the Cloud Forwarder.
      */
     boolean isForwarder() {
         return Boolean.parseBoolean(System.getProperty("graylog.forwarder"));

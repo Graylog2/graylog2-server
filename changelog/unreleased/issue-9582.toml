@@ -1,4 +1,5 @@
 type = "a"
 message = "Added new input Palo Alto Networks UDP (PAN-OS v11+)."
 
+pulls=["24617"]
 issues = ["graylog-plugin-enterprise#9582"]
