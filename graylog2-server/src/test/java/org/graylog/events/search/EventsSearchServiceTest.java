@@ -179,10 +179,29 @@ class EventsSearchServiceTest {
     }
 
     private static EventDto eventDto(String eventDefinitionId) {
-        final EventDto event = mock(EventDto.class);
-        when(event.id()).thenReturn(eventDefinitionId + "-event");
-        when(event.eventDefinitionId()).thenReturn(eventDefinitionId);
-        when(event.eventDefinitionType()).thenReturn("type");
-        return event;
+        return EventDto.builder()
+                .id(eventDefinitionId + "-event")
+                .eventDefinitionType("type")
+                .eventDefinitionId(eventDefinitionId)
+                .originContext(null)
+                .eventTimestamp(NOW)
+                .processingTimestamp(NOW)
+                .timerangeStart(NOW)
+                .timerangeEnd(NOW)
+                .streams(Set.of())
+                .sourceStreams(Set.of())
+                .message("message")
+                .source("source")
+                .keyTuple(List.of())
+                .key(null)
+                .priority(1)
+                .scores(Map.of())
+                .associatedAssets(Set.of())
+                .alert(false)
+                .fields(Map.of())
+                .groupByFields(Map.of())
+                .aggregationConditions(Map.of())
+                .replayInfo(null)
+                .build();
     }
 }
