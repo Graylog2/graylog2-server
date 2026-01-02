@@ -64,6 +64,8 @@ import static org.graylog.datanode.configuration.DatanodeKeystore.DATANODE_KEY_A
 @ExtendWith(MongoDBExtension.class)
 class LegacyDatanodeKeystoreProviderTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     @Test
     void testReadLegacyKeystore(MongoConnection mongoConnection) throws Exception {
 
@@ -119,7 +121,7 @@ class LegacyDatanodeKeystoreProviderTest {
     private static CertificateChain singCertChain(KeyStore keystore, String passwordSecret) throws Exception {
         final PKCS10CertificationRequest csr = csr(keystore, passwordSecret);
         final CsrSigner signer = new CsrSigner();
-        final KeyPair ca = CertificateGenerator.generate(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
+        final KeyPair ca = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("Graylog CA").isCA(true).validity(Duration.ofDays(365)));
         final X509Certificate datanodeCert = signer.sign(ca.privateKey(), ca.certificate(), csr, 30);
         final CertificateChain certChain = new CertificateChain(datanodeCert, List.of(ca.certificate()));
         return certChain;

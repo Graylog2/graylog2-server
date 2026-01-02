@@ -46,6 +46,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.graylog2.indexer.ParentCircuitBreakingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,6 +205,9 @@ public class OpenSearchClient {
             if (isMapperParsingExceptionException(openSearchException)) {
                 return new MapperParsingException(openSearchException.getMessage());
             }
+            if (isParentCircuitBreakingException(openSearchException)) {
+                return new ParentCircuitBreakingException(openSearchException.getMessage());
+            }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             return new BatchSizeTooLargeException(e.getMessage());
         }
@@ -249,6 +253,19 @@ public class OpenSearchClient {
             if (parsedException.type().equals("search_phase_execution_exception")) {
                 ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getRootCause().getMessage());
                 return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isParentCircuitBreakingException(OpenSearchException openSearchException) {
+        try {
+            final ParsedOpenSearchException parsedException = ParsedOpenSearchException.from(openSearchException.getMessage());
+            if (parsedException.type().equals("circuit_breaking_exception")) {
+                ParsedOpenSearchException parsedCause = ParsedOpenSearchException.from(openSearchException.getRootCause().getMessage());
+                return parsedCause.reason().contains("[parent] Data too large");
             }
         } catch (Exception e) {
             return false;

@@ -18,6 +18,7 @@ import React from 'react';
 import * as Immutable from 'immutable';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import { adminUser } from 'fixtures/users';
 import MockStore from 'helpers/mocking/StoreMock';
@@ -98,7 +99,7 @@ describe('GraylogClusterOverview', () => {
   beforeEach(() => {
     const currentUserWithPermissions = adminUser
       .toBuilder()
-      .permissions(Immutable.List(['licenses:read']))
+      .permissions(Immutable.List<Permission>(['licenses:read']))
       .build();
 
     asMock(useCurrentUser).mockReturnValue(currentUserWithPermissions);

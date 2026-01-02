@@ -14,17 +14,24 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog.datanode.configuration.snapshots;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.converters.BooleanConverter;
 import com.github.joschi.jadconfig.documentation.Documentation;
-import org.apache.commons.lang3.StringUtils;
+import org.graylog.datanode.configuration.DatanodeDirectories;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreItem;
+import org.graylog.datanode.process.configuration.beans.OpensearchKeystoreStringItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
-public class S3RepositoryConfiguration {
+public class S3RepositoryConfiguration implements RepositoryConfiguration {
+
+    private static final Logger LOG = LoggerFactory.getLogger(S3RepositoryConfiguration.class);
 
     @Documentation("S3 repository access key for searchable snapshots")
     @Parameter(value = "s3_client_default_access_key")
@@ -52,27 +59,6 @@ public class S3RepositoryConfiguration {
 
 
     /**
-     * access and secret keys are handled separately and stored in an opensearch keystore.
-     * See usages of {@link #getS3ClientDefaultAccessKey()} and {@link #getS3ClientDefaultSecretKey()}
-     */
-    public Map<String, String> toOpensearchProperties() {
-        return Map.of(
-                "s3.client.default.protocol", s3ClientDefaultProtocol,
-                "s3.client.default.endpoint", s3ClientDefaultEndpoint,
-                "s3.client.default.region", s3ClientDefaultRegion,
-                "s3.client.default.path_style_access", String.valueOf(s3ClientDefaultPathStyleAccess)
-        );
-    }
-
-    public String getS3ClientDefaultAccessKey() {
-        return s3ClientDefaultAccessKey;
-    }
-
-    public String getS3ClientDefaultSecretKey() {
-        return s3ClientDefaultSecretKey;
-    }
-
-    /**
      * Verify that either both access and secret keys and the endpoint are configured or none of them. Partial configuration
      * will lead to an IllegalStateException.
      */
@@ -92,11 +78,25 @@ public class S3RepositoryConfiguration {
         }
     }
 
-    private boolean noneBlank(String... properties) {
-        return Arrays.stream(properties).noneMatch(StringUtils::isBlank);
+    /**
+     * access and secret keys are handled separately and stored in an opensearch keystore.
+     */
+    @Override
+    public Map<String, String> opensearchProperties() {
+        return Map.of(
+                "s3.client.default.protocol", s3ClientDefaultProtocol,
+                "s3.client.default.endpoint", s3ClientDefaultEndpoint,
+                "s3.client.default.region", s3ClientDefaultRegion,
+                "s3.client.default.path_style_access", String.valueOf(s3ClientDefaultPathStyleAccess)
+        );
     }
 
-    private boolean allBlank(String... properties) {
-        return Arrays.stream(properties).allMatch(StringUtils::isBlank);
+    @Override
+    public Collection<OpensearchKeystoreItem> keystoreItems(DatanodeDirectories datanodeDirectories) {
+        LOG.info("S3 repository configured, adding access and secret key to opensearch keystore");
+        return List.of(
+                new OpensearchKeystoreStringItem("s3.client.default.access_key", s3ClientDefaultAccessKey),
+                new OpensearchKeystoreStringItem("s3.client.default.secret_key", s3ClientDefaultSecretKey)
+        );
     }
 }
