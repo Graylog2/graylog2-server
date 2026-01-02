@@ -93,7 +93,7 @@ const ABSGeoIpFormGroup = () => {
           data-testid="azure-account-key-input"
           type="password"
           label="Azure account key"
-          onChange={({ target: { value } }) => setAccessKey(value)}
+          onChange={({ target: { value } }) => setAccessKey({ set_value: value })}
           buttonAfter={
             !isCreate ? (
               <Button type="button" onClick={toggleAccountKeyReset}>

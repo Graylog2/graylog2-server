@@ -43,6 +43,10 @@ const defaultConfig: GeoIpConfigType = {
   refresh_interval: 10,
   pull_from_cloud: undefined,
   gcs_project_id: undefined,
+  azure_endpoint: undefined,
+  azure_account_key: undefined,
+  azure_account: undefined,
+  azure_container: undefined,
 };
 
 const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) => {
