@@ -159,7 +159,7 @@
         <jool.version>0.9.15</jool.version>
         <json-org.version>20250517</json-org.version>
         <json-path.version>2.10.0</json-path.version>
-        <jsoup.version>1.21.2</jsoup.version>
+        <jsoup.version>1.22.1</jsoup.version>
         <kafka.version>4.1.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
         <log4j.version>2.25.2</log4j.version>
