@@ -106,11 +106,11 @@
         <apache-httpclient.version>4.5.14</apache-httpclient.version>
         <apache-httpclient5.version>5.5.1</apache-httpclient5.version>
         <apache-httpcore.version>4.4.16</apache-httpcore.version>
-        <asm.version>9.9</asm.version>
+        <asm.version>9.9.1</asm.version>
         <auto-service.version>1.1.1</auto-service.version>
         <auto-value.version>1.11.1</auto-value.version>
         <aws-java-sdk-1.version>1.12.675</aws-java-sdk-1.version>
-        <aws-java-sdk-2.version>2.40.3</aws-java-sdk-2.version>
+        <aws-java-sdk-2.version>2.41.0</aws-java-sdk-2.version>
         <aws-kinesis-client.version>3.2.1</aws-kinesis-client.version>
         <aws-msk-iam-auth.version>2.3.5</aws-msk-iam-auth.version>
         <!-- When bumping bouncycastle.version, check if the explicit management for bcutil-jdk18on can/must be removed. -->
@@ -130,10 +130,11 @@
         <error-prone.version>2.45.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.61.0</gcs.version>
+        <azure-blob-storage.version>12.32.0</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
         <geoip2.version>4.4.0</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
-        <grpc.version>1.77.0</grpc.version>
+        <grpc.version>1.78.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>33.5.0-jre</guava.version>
         <guice.version>7.0.0</guice.version>
@@ -157,12 +158,12 @@
         <jmte.version>7.0.3</jmte.version>
         <joda-time.version>2.14.0</joda-time.version>
         <jool.version>0.9.15</jool.version>
-        <json-org.version>20250517</json-org.version>
+        <json-org.version>20251224</json-org.version>
         <json-path.version>2.10.0</json-path.version>
-        <jsoup.version>1.21.2</jsoup.version>
+        <jsoup.version>1.22.1</jsoup.version>
         <kafka.version>4.1.1</kafka.version>
         <kafka09.version>0.9.0.1-7</kafka09.version>
-        <log4j.version>2.25.2</log4j.version>
+        <log4j.version>2.25.3</log4j.version>
         <lucene.version>9.12.3</lucene.version>
         <metrics.version>4.2.37</metrics.version>
         <mongodb-driver.version>5.6.2</mongodb-driver.version>
@@ -184,7 +185,7 @@
         <shiro.version>2.0.6</shiro.version>
         <snakeyaml.version>2.5</snakeyaml.version>
         <snappy-java.version>1.1.10.8</snappy-java.version>
-        <oshi.version>6.9.1</oshi.version>
+        <oshi.version>6.9.2</oshi.version>
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
@@ -210,13 +211,13 @@
         <assertj-core.version>3.27.6</assertj-core.version>
         <assertj-joda-time.version>2.2.0</assertj-joda-time.version>
         <awaitility.version>4.3.0</awaitility.version>
-        <equalsverifier.version>4.2.5</equalsverifier.version>
+        <equalsverifier.version>4.3</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
         <junit-jupiter.version>6.0.1</junit-jupiter.version>
         <mockito.version>5.21.0</mockito.version>
-        <restassured.version>5.5.6</restassured.version>
+        <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.3</testcontainers.version>
-        <testcontainers.opensearch.version>4.0.0</testcontainers.opensearch.version>
+        <testcontainers.opensearch.version>4.1.0</testcontainers.opensearch.version>
         <graalvm.version>25.0.1</graalvm.version>
 
         <!-- Nodejs dependencies -->
@@ -315,6 +316,11 @@
                 <groupId>com.google.cloud</groupId>
                 <artifactId>google-cloud-storage</artifactId>
                 <version>${gcs.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.azure</groupId>
+                <artifactId>azure-storage-blob</artifactId>
+                <version>${azure-blob-storage.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.netty</groupId>
@@ -699,7 +705,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>exec-maven-plugin</artifactId>
-                    <version>3.6.2</version>
+                    <version>3.6.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -719,7 +725,7 @@
                 <plugin>
                     <groupId>com.github.eirslett</groupId>
                     <artifactId>frontend-maven-plugin</artifactId>
-                    <version>1.15.4</version>
+                    <version>2.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.antlr</groupId>

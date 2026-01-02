@@ -30,6 +30,12 @@ import EntityDataTable from './EntityDataTable';
 
 jest.mock('hooks/useCurrentUser');
 
+declare module 'graylog-web-plugin/plugin' {
+  interface EntityActions {
+    status: 'read';
+  }
+}
+
 describe('<EntityDataTable />', () => {
   beforeEach(() => {
     asMock(useCurrentUser).mockReturnValue(defaultUser);

@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog2.periodical;
 
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.documentation.Documentation;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import java.nio.file.Path;
-
-public class GCSRepositoryConfiguration {
-    @Documentation("Path to Google Cloud Storage credentials file in JSON format. May be absolute or relative to config_location directory.")
-    @Parameter(value = "gcs_credentials_file")
-    private Path gcsCredentialsFile;
-
-    public Path getGcsCredentialsFile() {
-        return gcsCredentialsFile;
-    }
-
-    public boolean isRepositoryEnabled() {
-        return gcsCredentialsFile != null;
+class CpuLoadGaugeTest {
+    @Test
+    void testGauge() {
+        final CpuLoadGauge gauge = new CpuLoadGauge();
+        Assertions.assertThat(gauge.getValue()).isNull();
+        gauge.update();
+        Assertions.assertThat(gauge.getValue())
+                .isNotNull()
+                .isGreaterThanOrEqualTo(0.0d);
     }
 }

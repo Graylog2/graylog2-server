@@ -69,11 +69,12 @@ public class DatanodeResource extends RestResource {
     private static final String DEFAULT_SORT_FIELD = DataNodeDto.FIELD_HOSTNAME;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
-            EntityAttribute.builder().id(DataNodeDto.FIELD_HOSTNAME).title("Hostname").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
+            EntityAttribute.builder().id(DataNodeDto.FIELD_HOSTNAME).title("Node").type(SearchQueryField.Type.STRING).sortable(true).searchable(true).build(),
             EntityAttribute.builder().id(DataNodeDto.FIELD_DATANODE_STATUS).sortable(true).filterable(true).filterOptions(danodeStatusOptions()).title("Status").build(),
             EntityAttribute.builder().id(DataNodeDto.FIELD_CLUSTER_ADDRESS).title("Transport address").type(SearchQueryField.Type.STRING).searchable(true).sortable(true).build(),
             EntityAttribute.builder().id(DataNodeDto.FIELD_CERT_VALID_UNTIL).title("Certificate valid until").type(SearchQueryField.Type.DATE).sortable(true).build(),
-            EntityAttribute.builder().id(DataNodeDto.FIELD_DATANODE_VERSION).title("Datanode version").type(SearchQueryField.Type.STRING).sortable(true).build()
+            EntityAttribute.builder().id(DataNodeDto.FIELD_DATANODE_VERSION).title("Version").type(SearchQueryField.Type.STRING).sortable(true).build(),
+            EntityAttribute.builder().id(DataNodeDto.FIELD_OPENSEARCH_ROLES).title("Roles").type(SearchQueryField.Type.STRING).sortable(true).build()
     );
 
     private static Set<FilterOption> danodeStatusOptions() {

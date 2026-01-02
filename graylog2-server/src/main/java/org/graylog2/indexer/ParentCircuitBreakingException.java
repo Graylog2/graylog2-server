@@ -14,18 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+package org.graylog2.indexer;
 
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.documentation.Documentation;
+public class ParentCircuitBreakingException extends ElasticsearchException {
+    public static final String HELP_TEXT = "This error typically indicates that the Opensearch cluster is short on " +
+            "JVM Heap, decrease load or increase the JVM Heap provision to resolve.";
 
-public class HdfsRepositoryConfiguration {
-
-    @Documentation("Should HDFS repository be enabled? This will also add the search role and activate search cache.")
-    @Parameter(value = "hdfs_repository_enabled")
-    private boolean enabled = false;
-
-    public boolean isRepositoryEnabled() {
-        return enabled;
+    public ParentCircuitBreakingException(String errorMessage) {
+        super(("%s " + HELP_TEXT).formatted(errorMessage));
     }
 }
