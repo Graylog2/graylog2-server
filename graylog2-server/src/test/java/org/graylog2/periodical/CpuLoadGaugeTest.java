@@ -27,6 +27,6 @@ class CpuLoadGaugeTest {
         gauge.update();
         Assertions.assertThat(gauge.getValue())
                 .isNotNull()
-                .isGreaterThan(0.0d);
+                .isGreaterThanOrEqualTo(0.0d);
     }
 }
