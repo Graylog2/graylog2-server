@@ -24,6 +24,10 @@ import type { GeoIpConfigType } from 'components/maps/configurations/types';
 import ABSGeoIpFormGroup from './ABSGeoIpFormGroup';
 
 describe('ABSGeoIpFormGroup', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   const defaultInitialValues = {
     container: '',
     account_name: '',
