@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.introspect.NopAnnotationIntrospector;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.type.CollectionLikeType;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -44,20 +43,15 @@ import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
-import org.graylog.grn.GRN;
-import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Period;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.threeten.extra.PeriodDuration;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
@@ -72,7 +66,6 @@ import java.util.Set;
  * {@link OptionalLong}, {@link OptionalDouble}) during schema generation.
  */
 public class CustomModelConverter extends ModelResolver {
-    private static final Logger LOG = LoggerFactory.getLogger(CustomModelConverter.class);
 
     @Inject
     public CustomModelConverter(ObjectMapper applicationObjectMapper) {
@@ -111,35 +104,26 @@ public class CustomModelConverter extends ModelResolver {
             final JavaType javaType = _mapper.constructType(annotatedType.getType());
             final Class<?> rawClass = javaType.getRawClass();
 
+            final var typeFactory = _mapper.getTypeFactory();
             if (ImmutableMap.class.isAssignableFrom(rawClass)) {
-
-                final JavaType keyType = javaType.getKeyType();
                 final JavaType valueType = javaType.getContentType();
-
-                // OpenAPI maps must have string keys.
-                // we have three common cases: String keys, GRN keys, DateTime keys, so we support them directly,
-                // otherss will fail.
-                if (keyType != null &&
-                        (String.class.isAssignableFrom(keyType.getRawClass())
-                                || GRN.class.isAssignableFrom(keyType.getRawClass())
-                                || DateTime.class.isAssignableFrom(keyType.getRawClass()))
-                        &&  valueType != null) {
-
-                    // Reconstruct an AnnotatedType for a Map<String, V> and forward to superclass
-                    final JavaType mapType = _mapper.getTypeFactory().constructMapType(Map.class, String.class,
-                            valueType.getRawClass());
+                if (valueType != null) {
+                    // OpenAPI maps must have string keys, so we ignore the key type of the ImmutableMap and reconstruct
+                    // an AnnotatedType for a Map<String, V> and forward to superclass
+                    final JavaType mapType = typeFactory.constructMapType(Map.class,
+                            typeFactory.constructType(String.class), valueType);
                     return super.resolve(replacementType(annotatedType, mapType), context, next);
                 }
             } else if (ImmutableList.class.isAssignableFrom(rawClass)) {
                 // ImmutableLists are just lists
                 return super.resolve(
-                        replacementType(annotatedType, _mapper.getTypeFactory().constructCollectionLikeType(List.class, javaType.getContentType())),
+                        replacementType(annotatedType, typeFactory.constructCollectionLikeType(List.class, javaType.getContentType())),
                         context,
                         next);
             } else if (ImmutableSet.class.isAssignableFrom(rawClass)) {
                 // ImmutableSets are just sets
                 return super.resolve(
-                        replacementType(annotatedType, _mapper.getTypeFactory().constructCollectionLikeType(Set.class, javaType.getContentType())),
+                        replacementType(annotatedType, typeFactory.constructCollectionLikeType(Set.class, javaType.getContentType())),
                         context,
                         next);
             } else if (com.github.zafarkhaja.semver.Version.class.isAssignableFrom(rawClass)) {
@@ -183,8 +167,7 @@ public class CustomModelConverter extends ModelResolver {
      * corresponding schema references from the Jackson annotations and the subtypes registered with the Object mapper.
      * <p>
      * Without this custom implementation, the discriminator mapping would remain empty unless an explicit
-     *
-     * @{@link io.swagger.v3.oas.annotations.media.Schema} annotation was provided.
+     * {@link io.swagger.v3.oas.annotations.media.Schema} annotation was provided.
      */
     @Override
     protected Discriminator resolveDiscriminator(JavaType type, ModelConverterContext context) {
