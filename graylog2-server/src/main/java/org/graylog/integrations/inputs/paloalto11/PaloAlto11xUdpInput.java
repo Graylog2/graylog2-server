@@ -41,15 +41,8 @@ public class PaloAlto11xUdpInput extends MessageInput {
                                Config config,
                                Descriptor descriptor,
                                ServerStatus serverStatus) {
-        super(
-                metricRegistry,
-                configuration,
-                udpTransportFactory.create(configuration),
-                localRegistry,
-                codecFactory.create(configuration),
-                config,
-                descriptor,
-                serverStatus);
+        super(metricRegistry, configuration, udpTransportFactory.create(configuration), localRegistry,
+                codecFactory.create(configuration), config, descriptor, serverStatus);
     }
 
     @FactoryClass
