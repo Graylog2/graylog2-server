@@ -24,61 +24,55 @@ import type { GeoIpConfigType } from 'components/maps/configurations/types';
 import ABSGeoIpFormGroup from './ABSGeoIpFormGroup';
 
 describe('ABSGeoIpFormGroup', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  const defaultInitialValues = {
-    container: '',
-    account_name: '',
-    key: { set_value: '' },
+  const newConfig = {
+    azure_container: '',
+    azure_account: '',
+    azure_endpoint: '',
+    azure_account_key: { set_value: '' },
   } as Partial<GeoIpConfigType>;
 
   const existingConfig = {
-    container: 'my-container',
-    account_name: 'my-account',
-    key: { is_set: true },
+    azure_container: 'my-container',
+    azure_account: 'my-account',
+    azure_endpoint: 'https://myaccount.blob.core.windows.net',
+    azure_account_key: { is_set: true },
   } as Partial<GeoIpConfigType>;
 
-  const SUT = (initialValues: Partial<GeoIpConfigType> = defaultInitialValues) => {
-    const onSubmit = jest.fn();
+  const renderComponent = (initialValues: Partial<GeoIpConfigType> = newConfig) => render(
+    <Formik initialValues={initialValues as GeoIpConfigType} onSubmit={jest.fn()}>
+      <ABSGeoIpFormGroup />
+    </Formik>,
+  );
 
-    return render(
-      <Formik initialValues={initialValues as GeoIpConfigType} onSubmit={onSubmit}>
-        <ABSGeoIpFormGroup />
-      </Formik>,
-    );
-  };
-
-  it('should render all required form fields for new configuration', async () => {
-    SUT();
+  it('renders all form fields for new configuration', async () => {
+    renderComponent();
 
     expect(await screen.findByLabelText(/azure blob container name/i)).toBeInTheDocument();
-    expect(await screen.findByPlaceholderText(/your-account-name/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/azure blob endpoint url/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/azure account name/i)).toBeInTheDocument();
     expect(screen.getByTestId('azure-account-key-input')).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /reset password/i })).not.toBeInTheDocument();
   });
 
-  it('should show reset password button for existing configuration', async () => {
-    SUT(existingConfig);
+  it('shows reset password button for existing configuration', async () => {
+    renderComponent(existingConfig);
 
     expect(await screen.findByRole('button', { name: /reset password/i })).toBeInTheDocument();
     expect(screen.queryByTestId('azure-account-key-input')).not.toBeInTheDocument();
   });
 
-  it('should toggle between reset and undo password states', async () => {
-    SUT(existingConfig);
+  it('toggles password reset state', async () => {
+    renderComponent(existingConfig);
 
-    const resetButton = await screen.findByRole('button', { name: /reset password/i });
-    userEvent.click(resetButton);
+    // Click reset
+    await userEvent.click(await screen.findByRole('button', { name: /reset password/i }));
 
     await waitFor(() => {
       expect(screen.getByTestId('azure-account-key-input')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /undo reset/i })).toBeInTheDocument();
     });
 
-    const undoButton = screen.getByRole('button', { name: /undo reset/i });
-    userEvent.click(undoButton);
+    // Click undo
+    await userEvent.click(screen.getByRole('button', { name: /undo reset/i }));
 
     await waitFor(() => {
       expect(screen.queryByTestId('azure-account-key-input')).not.toBeInTheDocument();
@@ -86,21 +80,35 @@ describe('ABSGeoIpFormGroup', () => {
     });
   });
 
-  it('should allow input in all form fields', async () => {
-    SUT();
+  it('updates formik values correctly', async () => {
+    render(
+      <Formik initialValues={existingConfig as GeoIpConfigType} onSubmit={jest.fn()}>
+        {({ values }) => (
+          <>
+            <ABSGeoIpFormGroup />
+            <div data-testid="key-value">{JSON.stringify(values.azure_account_key)}</div>
+          </>
+        )}
+      </Formik>,
+    );
 
-    const containerInput = await screen.findByLabelText(/azure blob container name/i) as HTMLInputElement;
-    const accountInput = await screen.findByPlaceholderText(/your-account-name/i) as HTMLInputElement;
-    const keyInput = screen.getByTestId('azure-account-key-input') as HTMLInputElement;
+    // Initial state: keep_value
+    await waitFor(() => {
+      expect(screen.getByTestId('key-value').textContent).toContain('keep_value');
+    });
 
-    await userEvent.type(containerInput, 'test-container');
-    await userEvent.type(accountInput, 'test-account');
-    await userEvent.type(keyInput, 'secret-key');
+    // After reset: delete_value
+    await userEvent.click(await screen.findByRole('button', { name: /reset password/i }));
 
     await waitFor(() => {
-      expect(containerInput.value).toBe('test-container');
-      expect(accountInput.value).toBe('test-account');
-      expect(keyInput.value).toBe('secret-key');
+      expect(screen.getByTestId('key-value').textContent).toContain('delete_value');
+    });
+
+    // After undo: keep_value
+    await userEvent.click(screen.getByRole('button', { name: /undo reset/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('key-value').textContent).toContain('keep_value');
     });
   });
 });

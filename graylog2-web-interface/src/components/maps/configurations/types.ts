@@ -39,9 +39,10 @@ export type GeoIpConfigType = {
   refresh_interval: number;
   pull_from_cloud?: (typeof CLOUD_STORAGE_OPTION)[keyof typeof CLOUD_STORAGE_OPTION];
   gcs_project_id?: string;
-  key?: EncryptedValue;
-  account_name?: string;
-  container?: string;
+  azure_endpoint?: string;
+  azure_account_key?: EncryptedValue;
+  azure_account?: string;
+  azure_container?: string;
 };
 
 export type OptionType = {

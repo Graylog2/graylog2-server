@@ -24,13 +24,13 @@ import { Button, Input } from 'components/bootstrap';
 
 const ABSGeoIpFormGroup = () => {
   const { values, setFieldValue } = useFormikContext<GeoIpConfigType>();
-  const isKeySet = values.key && 'is_set' in values.key;
+  const isKeySet = values.azure_account_key && 'is_set' in values.azure_account_key;
   const [isCreate] = useState(() => !isKeySet);
   const [showResetPasswordButton, setShowResetPasswordButton] = useState(isKeySet);
 
   const setAccessKey = useCallback(
     (nextAccessKey) => {
-      setFieldValue('key', { set_value: nextAccessKey });
+      setFieldValue('azure_account_key', { set_value: nextAccessKey });
     },
     [setFieldValue],
   );
@@ -56,7 +56,7 @@ const ABSGeoIpFormGroup = () => {
   return (
     <>
       <FormikFormGroup
-        name="container"
+        name="azure_container"
         type="text"
         label="Azure Blob Container Name"
         help="Your Azure Blob Container name."
@@ -65,9 +65,17 @@ const ABSGeoIpFormGroup = () => {
         wrapperClassName=""
       />
       <FormikFormGroup
-        name="account_name"
+        name="azure_endpoint"
         type="text"
-        label="Azure account"
+        label="Azure Blob Endpoint URL"
+        help="Your Azure Blob Endpoint URL, only required if you want to override the default endpoint."
+        labelClassName=""
+        wrapperClassName=""
+      />
+      <FormikFormGroup
+        name="azure_account"
+        type="text"
+        label="Azure account name"
         placeholder="your-account-name"
         help="The name of your Azure storage account."
         required
@@ -80,8 +88,8 @@ const ABSGeoIpFormGroup = () => {
         </Input>
       ) : (
         <Input
-          name="key"
-          id="key"
+          name="azure_account_key"
+          id="azure_account_key"
           data-testid="azure-account-key-input"
           type="password"
           label="Azure account key"
