@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
@@ -35,7 +35,7 @@ import jakarta.ws.rs.core.MediaType;
 
 import static java.util.Objects.requireNonNull;
 
-@Api(value = "Hello World", description = "A friendly hello world message")
+@Tag(name = "Hello World", description = "A friendly hello world message")
 @Path("/")
 public class HelloWorldResource extends RestResource {
     private final NodeId nodeId;
@@ -50,7 +50,7 @@ public class HelloWorldResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "A few details about the Graylog node.")
+    @Operation(summary = "A few details about the Graylog node.")
     @Produces(MediaType.APPLICATION_JSON)
     public HelloWorldResponse helloWorld() {
         final ClusterId clusterId = clusterConfigService.getOrDefault(ClusterId.class, ClusterId.create("UNKNOWN"));

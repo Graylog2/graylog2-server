@@ -18,11 +18,11 @@ package org.graylog2.rest.resources.system.field_types;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +40,7 @@ import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetFieldType;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -51,10 +52,10 @@ import java.util.stream.Collectors;
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_CREATE;
 import static org.graylog2.audit.AuditEventTypes.FIELD_TYPE_MAPPING_DELETE;
 import static org.graylog2.audit.AuditEventTypes.INDEX_SET_UPDATE;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/FieldTypes", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/FieldTypes")
 @Path("/system/indices/mappings")
 @Produces(MediaType.APPLICATION_JSON)
 public class FieldTypeMappingsResource extends RestResource {
@@ -71,7 +72,7 @@ public class FieldTypeMappingsResource extends RestResource {
     @GET
     @Path("/types")
     @Timed
-    @ApiOperation(value = "Get list of all types valid inside the indexer")
+    @Operation(summary = "Get list of all types valid inside the indexer")
     public Map<String, String> getAllFieldTypes() {
         return CustomFieldMappings.AVAILABLE_TYPES.entrySet()
                 .stream()
@@ -80,12 +81,13 @@ public class FieldTypeMappingsResource extends RestResource {
 
     @PUT
     @Timed
-    @ApiOperation(value = "Change field type for certain index sets")
+    @Operation(summary = "Change field type for certain index sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_CREATE)
-    public Map<String, IndexSetFieldType> changeFieldType(@ApiParam(name = "request")
+    public Map<String, IndexSetFieldType> changeFieldType(@Parameter(name = "request")
                                     @Valid
                                     @NotNull(message = "Request body is mandatory") final FieldTypeChangeRequest request) {
         checkPermissions(request.indexSetsIds(), RestPermissions.TYPE_MAPPINGS_CREATE);
@@ -112,12 +114,13 @@ public class FieldTypeMappingsResource extends RestResource {
     @PUT
     @Path("/set_profile")
     @Timed
-    @ApiOperation(value = "Set field type profile for certain index sets")
+    @Operation(summary = "Set field type profile for certain index sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = INDEX_SET_UPDATE)
-    public Response setProfile(@ApiParam(name = "request")
+    public Response setProfile(@Parameter(name = "request")
                                @Valid
                                @NotNull(message = "Request body is mandatory") final FieldTypeProfileChangeRequest request) {
         checkPermissions(request.indexSetsIds(), RestPermissions.INDEXSETS_EDIT);
@@ -129,12 +132,13 @@ public class FieldTypeMappingsResource extends RestResource {
     @PUT
     @Path("/remove_profile_from")
     @Timed
-    @ApiOperation(value = "Remove field type profile from certain index sets")
+    @Operation(summary = "Remove field type profile from certain index sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Success"),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = INDEX_SET_UPDATE)
-    public Response removeProfileFromIndexSets(@ApiParam(name = "request")
+    public Response removeProfileFromIndexSets(@Parameter(name = "request")
                                                @Valid
                                                @NotNull(message = "Request body is mandatory") final FieldTypeProfileUnsetRequest request) {
         checkPermissions(request.indexSetsIds(), RestPermissions.INDEXSETS_EDIT);
@@ -146,12 +150,13 @@ public class FieldTypeMappingsResource extends RestResource {
     @PUT
     @Path("/remove_mapping")
     @Timed
-    @ApiOperation(value = "Remove custom field mapping for certain index sets")
+    @Operation(summary = "Remove custom field mapping for certain index sets")
     @ApiResponses(value = {
-            @ApiResponse(code = 403, message = "Unauthorized")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "403", description = "Unauthorized")
     })
     @AuditEvent(type = FIELD_TYPE_MAPPING_DELETE)
-    public Map<String, MappingRemovalResult> removeCustomMapping(@ApiParam(name = "request")
+    public Map<String, MappingRemovalResult> removeCustomMapping(@Parameter(name = "request")
                                                                   @Valid
                                                                   @NotNull(message = "Request body is mandatory") final CustomFieldMappingRemovalRequest request) {
         checkPermissions(request.indexSetsIds(), RestPermissions.TYPE_MAPPINGS_DELETE);

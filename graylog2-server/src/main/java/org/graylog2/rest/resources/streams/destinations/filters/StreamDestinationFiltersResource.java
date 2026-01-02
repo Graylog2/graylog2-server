@@ -17,9 +17,10 @@
 package org.graylog2.rest.resources.streams.destinations.filters;
 
 import com.mongodb.client.model.Sorts;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -43,6 +44,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.rest.PaginationParameters;
 import org.graylog2.rest.models.PaginatedResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -52,10 +54,10 @@ import org.graylog2.streams.filters.StreamDestinationFilterService;
 import java.util.List;
 import java.util.Map;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
-@Api(value = "Stream/Destinations/Filters", description = "Manage stream destination filter rules", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Stream/Destinations/Filters", description = "Manage stream destination filter rules")
 @Path("/streams/{streamId}/destinations")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -76,10 +78,10 @@ public class StreamDestinationFiltersResource extends RestResource {
 
     @GET
     @Path("/filters")
-    @ApiOperation("Get available filter rules for stream")
+    @Operation(summary = "Get available filter rules for stream")
     public PaginatedResponse<StreamDestinationFilterRuleDTO> getPaginatedFiltersForStream(
-            @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-            @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
+            @Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+            @Parameter(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
     ) {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
         checkStream(streamId);
@@ -98,11 +100,11 @@ public class StreamDestinationFiltersResource extends RestResource {
 
     @GET
     @Path("/target/{targetId}/filters")
-    @ApiOperation("Get available filter rules for stream and target")
+    @Operation(summary = "Get available filter rules for stream and target")
     public PaginatedResponse<StreamDestinationFilterRuleDTO> getPaginatedFiltersForStreamAndTarget(
-            @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-            @ApiParam(name = "targetId", required = true) @PathParam("targetId") @NotBlank String targetId,
-            @ApiParam(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
+            @Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+            @Parameter(name = "targetId", required = true) @PathParam("targetId") @NotBlank String targetId,
+            @Parameter(name = "pagination parameters") @BeanParam PaginationParameters paginationParams
     ) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkStream(streamId);
@@ -122,9 +124,9 @@ public class StreamDestinationFiltersResource extends RestResource {
 
     @GET
     @Path("/filters/{filterId}")
-    @ApiOperation("Get filter rule for given ID")
-    public Response getFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                              @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
+    @Operation(summary = "Get filter rule for given ID")
+    public Response getFilter(@Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+                              @Parameter(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_READ, filterId);
         checkStream(streamId);
@@ -137,10 +139,10 @@ public class StreamDestinationFiltersResource extends RestResource {
 
     @POST
     @Path("/filters")
-    @ApiOperation("Create new filter rule")
+    @Operation(summary = "Create new filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_CREATE)
-    public Response createFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamDestinationFilterRuleDTO dto) {
+    public Response createFilter(@Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+                                 @RequestBody(required = true) @Valid StreamDestinationFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_CREATE);
         checkStream(streamId);
@@ -155,11 +157,11 @@ public class StreamDestinationFiltersResource extends RestResource {
 
     @PUT
     @Path("/filters/{filterId}")
-    @ApiOperation(value = "Update filter rule")
+    @Operation(summary = "Update filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_UPDATE)
-    public Response updateFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId,
-                                 @ApiParam(name = "JSON Body", required = true) @Valid StreamDestinationFilterRuleDTO dto) {
+    public Response updateFilter(@Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+                                 @Parameter(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId,
+                                 @RequestBody(required = true) @Valid StreamDestinationFilterRuleDTO dto) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_EDIT, filterId);
         checkStream(streamId);
@@ -179,10 +181,10 @@ public class StreamDestinationFiltersResource extends RestResource {
 
     @DELETE
     @Path("/filters/{filterId}")
-    @ApiOperation("Delete filter rule")
+    @Operation(summary = "Delete filter rule")
     @AuditEvent(type = AuditEventTypes.STREAM_DESTINATION_FILTER_DELETE)
-    public Response deleteFilter(@ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-                                 @ApiParam(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
+    public Response deleteFilter(@Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+                                 @Parameter(name = "filterId", required = true) @PathParam("filterId") @NotBlank String filterId) {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkPermission(RestPermissions.STREAM_DESTINATION_FILTERS_DELETE, filterId);
         checkStream(streamId);

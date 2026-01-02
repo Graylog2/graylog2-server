@@ -51,7 +51,6 @@ describe('GraylogNodeActions', () => {
     await userEvent.click(button);
 
     await screen.findByRole('menuitem', { name: /Metrics/i });
-    await screen.findByRole('menuitem', { name: /API Browser/i });
   });
 
   it('shows pause message processing menu item when is_processing true', async () => {

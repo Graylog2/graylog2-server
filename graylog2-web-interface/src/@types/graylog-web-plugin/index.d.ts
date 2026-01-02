@@ -334,7 +334,7 @@ declare module 'graylog-web-plugin/plugin' {
   type HelpMenuItem = {
     description: string;
     permissions?: Permission | Array<Permission>;
-  } & ({ externalLink?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
+  } & ({ externalLink?: string } | { path?: string } | { action?: (args: { showHotkeysModal: () => void }) => void });
 
   interface PageNavigation {
     description: string;

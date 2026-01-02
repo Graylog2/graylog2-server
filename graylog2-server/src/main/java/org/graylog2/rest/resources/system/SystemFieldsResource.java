@@ -19,9 +19,9 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.Sets;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
@@ -32,21 +32,21 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Message;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/Fields", description = "Get list of message fields that exist.", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Fields", description = "Get list of message fields that exist.")
 @Path("/system/fields")
 public class SystemFieldsResource extends RestResource {
     private final Indices indices;
@@ -71,11 +71,11 @@ public class SystemFieldsResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get list of message fields that exist",
-                  notes = "This operation is comparatively fast because it reads directly from the indexer mapping.")
+    @Operation(summary = "Get list of message fields that exist",
+                  description = "This operation is comparatively fast because it reads directly from the indexer mapping.")
     @RequiresPermissions(RestPermissions.FIELDNAMES_READ)
     @Produces(APPLICATION_JSON)
-    public MessageFieldsDTO fields(@ApiParam(name = "limit", value = "Maximum number of fields to return. Set to 0 for all fields.")
+    public MessageFieldsDTO fields(@Parameter(name = "limit", description = "Maximum number of fields to return. Set to 0 for all fields.")
                                    @QueryParam("limit") int limit) {
         boolean unlimited = limit <= 0;
 
