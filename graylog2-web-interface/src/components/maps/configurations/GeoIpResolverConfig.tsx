@@ -60,8 +60,15 @@ const GeoIpResolverConfig = ({ config = defaultConfig, updateConfig }: Props) =>
       app_pathname: 'configurations',
       app_section: 'geolocation-processor',
     });
+    const normalizedValues = {
+      ...values,
+      azure_endpoint:
+      values.azure_endpoint && values.azure_endpoint.trim() !== ''
+        ? values.azure_endpoint.trim()
+        : null,
+    };
 
-    return updateConfig(values).then((value: GeoIpConfigType) => {
+    return updateConfig(normalizedValues).then((value: GeoIpConfigType) => {
       if ('enabled' in value) {
         setShowModal(false);
       }
