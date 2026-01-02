@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Fix deprecated pipeline functions seems to generate errors."
+
+issues = ["graylog-plugin-enterprise#12886"]
+pulls = ["24685"]
