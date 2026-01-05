@@ -40,8 +40,7 @@ export const ThInner = styled.div`
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  min-height: 100%;
-  height: auto;
+  height: 100%;
 `;
 
 export const LeftCol = styled.div`
