@@ -69,6 +69,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     public static final String SAFE_CLASSES = "safe_classes";
 
     public static final String CONTENT_PACKS_DIR = "content_packs_dir";
+    private static final String NODE_ID_FILE = "node_id_file";
     /**
      * Deprecated! Use isLeader() instead.
      */
@@ -146,8 +147,8 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
             The auto-generated node ID will be stored in this file and read after restarts. It is a good idea
             to use an absolute file path here if you are starting Graylog server from init scripts or similar.
             """)
-    @Parameter(value = "node_id_file", validators = NodeIdFileValidator.class)
-    private String nodeIdFile = "/etc/graylog/server/node-id";
+    @Parameter(value = NODE_ID_FILE, validators = NodeIdFileValidator.class)
+    private String nodeIdFile;
 
     @Documentation("The default root user is named 'admin'")
     @Parameter(value = "root_username")
@@ -512,6 +513,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
+    @Parameter(value = "max_event_age", converter = JavaDurationConverter.class)
+    private java.time.Duration maxEventAge = java.time.Duration.ofDays(1L);
+
     public boolean maintainsStreamAwareFieldTypes() {
         return streamAwareFieldTypes;
     }
@@ -605,8 +609,9 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
         return skipPreflightChecks;
     }
 
+    @NamedBindingOverride(value = NODE_ID_FILE)
     public String getNodeIdFile() {
-        return nodeIdFile;
+        return Optional.ofNullable(nodeIdFile).orElse(getDataDir().resolve("node_id").toString());
     }
 
     public String getRootUsername() {

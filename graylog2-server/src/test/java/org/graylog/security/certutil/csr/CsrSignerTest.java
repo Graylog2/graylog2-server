@@ -51,6 +51,9 @@ import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CsrSignerTest {
+
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     private static final X500Name subjectName = new X500Name("CN=Example Request");
     private static final Instant fixedInstant = Instant.parse("2023-09-28T12:50:00Z");
     private static final Clock fixedClock = Clock.fixed(fixedInstant, UTC);
@@ -73,8 +76,8 @@ class CsrSignerTest {
 
     @Test
     void testMismatchIntermediateCA() throws Exception {
-        final org.graylog.security.certutil.KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("rootCA").validity(Duration.ofDays(30)));
-        final org.graylog.security.certutil.KeyPair intermediateCa = CertificateGenerator.generate(CertRequest.signed("intermediateCa", rootCa).validity(Duration.ofDays(30)));
+        final org.graylog.security.certutil.KeyPair rootCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("rootCA").validity(Duration.ofDays(30)));
+        final org.graylog.security.certutil.KeyPair intermediateCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediateCa", rootCa).validity(Duration.ofDays(30)));
 
         final KeyPair nodeKeyPair = createPrivateKey();
         var csr = createCSR(nodeKeyPair);

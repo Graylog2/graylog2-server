@@ -17,15 +17,15 @@
 package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
+import jakarta.inject.Inject;
 import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.MongoIndexRangeService;
+import org.graylog2.plugin.Tools;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -95,7 +95,7 @@ public class IndexSetCleanupJob extends SystemJob {
         if (total <= 0) {
             return 0;
         }
-        return (int) Math.floor((deleted.floatValue() / (float) total) * 100);
+        return Tools.percentageOfRounded(total, deleted.intValue());
     }
 
     @Override

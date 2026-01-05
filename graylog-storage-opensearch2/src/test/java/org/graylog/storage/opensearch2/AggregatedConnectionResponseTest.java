@@ -33,6 +33,8 @@ import java.util.Map;
 
 class AggregatedConnectionResponseTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     @Test
     void testAggregateIndices() {
         final AggregatedConnectionResponse aggregatedResponse = new AggregatedConnectionResponse(Map.of(
@@ -73,7 +75,7 @@ class AggregatedConnectionResponseTest {
 
     @Test
     void testAggregateCertificates() throws Exception {
-        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned("my-host").validity(Duration.ofDays(30)));
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-host").validity(Duration.ofDays(30)));
         final X509Certificate certificate = keyPair.certificate();
         final String pemCert = serializeAsPEM(certificate);
 
@@ -92,7 +94,7 @@ class AggregatedConnectionResponseTest {
 
     @Test
     void testAggregateCertificatesWithError() throws Exception {
-        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned("my-host").validity(Duration.ofDays(30)));
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-host").validity(Duration.ofDays(30)));
         final X509Certificate certificate = keyPair.certificate();
         final String pemCert = serializeAsPEM(certificate);
 

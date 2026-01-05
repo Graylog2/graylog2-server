@@ -151,6 +151,7 @@ describe('MainNavbar', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
+          // @ts-expect-error
           .permissions(Immutable.List(['archive:read']))
           .build(),
       );
@@ -172,6 +173,7 @@ describe('MainNavbar', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
+          // @ts-expect-error
           .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
           .build(),
       );
@@ -198,6 +200,7 @@ describe('MainNavbar', () => {
       asMock(useCurrentUser).mockReturnValue(
         adminUser
           .toBuilder()
+          // @ts-expect-error
           .permissions(Immutable.List(['somethingelse', 'completelydifferent']))
           .build(),
       );

@@ -36,6 +36,7 @@ export type PipelineType = {
   modified_at: string;
   stages: Array<StageType>;
   errors: Array<ParseError> | null;
+  has_deprecated_functions: boolean;
   _scope: string;
 };
 
@@ -52,4 +53,5 @@ export const DEFAULT_PIPELINE = {
   created_at: '',
   modified_at: '',
   _scope: 'DEFAULT',
+  has_deprecated_functions: false,
 };

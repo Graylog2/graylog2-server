@@ -45,6 +45,7 @@ type Props = {
   closeOnSelect?: boolean;
   dropdownZIndex?: number;
   menuContainer?: HTMLElement;
+  onClose: () => void;
   onToggle: () => void;
   placement?: Placement;
   show: boolean;
@@ -57,6 +58,7 @@ const OverlayDropdown = ({
   closeOnSelect = true,
   dropdownZIndex = undefined,
   menuContainer = document.body,
+  onClose,
   onToggle,
   placement = 'bottom',
   show,
@@ -70,7 +72,7 @@ const OverlayDropdown = ({
       withinPortal
       position={placement}
       closeOnItemClick={closeOnSelect}
-      onClose={onToggle}
+      onClose={onClose}
       portalProps={{ target: menuContainer }}
       zIndex={dropdownZIndex}>
       <Menu.Target>
