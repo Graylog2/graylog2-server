@@ -40,7 +40,6 @@ const InputsPage = () => {
 
   return (
     <DocumentTitle title="Inputs">
-      <InputsNotifications />
       <PageHeader
         title="Inputs"
         documentationLink={{
@@ -63,6 +62,7 @@ const InputsPage = () => {
           <span>{productName} nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
         )}
       </PageHeader>
+      <InputsNotifications />
       <Row className="content">
         <Col md={12}>
           <InputsOverview inputTypeDescriptions={inputTypeDescriptions} inputTypes={inputTypes} />

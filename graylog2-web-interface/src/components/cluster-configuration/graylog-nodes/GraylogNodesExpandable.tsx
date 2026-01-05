@@ -14,30 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useCallback, useMemo } from 'react';
-import styled, { useTheme } from 'styled-components';
+import React, { useCallback, useMemo, useState } from 'react';
 
-import { EntityDataTable, NoSearchResult, Spinner } from 'components/common';
+import { PaginatedEntityTable } from 'components/common';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
+import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
+import useProductName from 'brand-customization/useProductName';
 
-import useClusterGraylogNodes from './useClusterGraylogNodes';
-import type { GraylogNode } from './useClusterGraylogNodes';
+import type { ClusterGraylogNode } from './fetchClusterGraylogNodes';
+import { clusterGraylogNodesKeyFn, fetchClusterGraylogNodesWithMetrics } from './fetchClusterGraylogNodes';
 import GraylogNodeActions from './GraylogNodeActions';
-import { createColumnDefinitions, createColumnRenderers } from './GraylogNodesColumnConfiguration';
-import useClusterGraylogNodesTableLayout from './useClusterGraylogNodesTableLayout';
+import {
+  createColumnDefinitions,
+  createColumnRenderers,
+  DEFAULT_VISIBLE_COLUMNS,
+} from './GraylogNodesColumnConfiguration';
 
 import ClusterNodesSectionWrapper from '../shared-components/ClusterNodesSectionWrapper';
-
-const EmptyState = styled(NoSearchResult)`
-  margin-top: ${({ theme }) => theme.spacings.xl};
-`;
 
 type Props = {
   collapsible?: boolean;
   searchQuery?: string;
   onSelectNodeType?: () => void;
   pageSizeLimit?: number;
-  refetchInterval?: number | false;
+  refetchInterval?: number;
 };
 
 const GraylogNodesExpandable = ({
@@ -47,61 +47,46 @@ const GraylogNodesExpandable = ({
   pageSizeLimit = undefined,
   refetchInterval = undefined,
 }: Props) => {
-  const theme = useTheme();
-  const {
-    defaultDisplayedColumns,
-    defaultColumnOrder,
-    layoutPreferences,
-    searchParams,
-    isLoadingLayout,
-    handleLayoutPreferencesChange,
-    resetLayoutPreferences,
-    handleSortChange,
-  } = useClusterGraylogNodesTableLayout(searchQuery, pageSizeLimit);
-  const {
-    nodes: graylogNodes,
-    total: totalGraylogNodes,
-    isLoading,
-  } = useClusterGraylogNodes(searchParams, { refetchInterval });
+  const productName = useProductName();
+  const [totalGraylogNodes, setTotalGraylogNodes] = useState<number | undefined>(undefined);
 
   const columnSchemas = useMemo<Array<ColumnSchema>>(() => createColumnDefinitions(), []);
   const columnRenderers = useMemo(() => createColumnRenderers(), []);
 
-  const renderActions = useCallback((entity: GraylogNode) => <GraylogNodeActions node={entity} />, []);
+  const renderActions = useCallback((entity: ClusterGraylogNode) => <GraylogNodeActions node={entity} />, []);
+  const tableLayout = useMemo(
+    () => ({
+      entityTableId: 'cluster-graylog-nodes',
+      defaultSort: { attributeId: 'hostname', direction: 'asc' as const },
+      defaultDisplayedAttributes: [...DEFAULT_VISIBLE_COLUMNS],
+      defaultPageSize: pageSizeLimit ?? 0,
+      defaultColumnOrder: [...DEFAULT_VISIBLE_COLUMNS],
+    }),
+    [pageSizeLimit],
+  );
+  const externalSearch = useMemo(() => ({ query: searchQuery }), [searchQuery]);
+  const fetchOptions = useMemo<FetchOptions>(() => ({ refetchInterval }), [refetchInterval]);
 
   return (
     <ClusterNodesSectionWrapper
-      title="Graylog Nodes"
+      title={`${productName} Nodes`}
       titleCount={totalGraylogNodes}
       onTitleCountClick={onSelectNodeType ?? null}
-      headerLeftSection={(isLoading || isLoadingLayout) && <Spinner />}
       collapsible={collapsible}>
-      {(() => {
-        if (isLoading || isLoadingLayout) {
-          return <Spinner />;
-        }
-        if (graylogNodes.length === 0) {
-          return <EmptyState>No Graylog Nodes found.</EmptyState>;
-        }
-
-        return (
-          <EntityDataTable<GraylogNode>
-            parentBgColor={theme.colors.section.filled.background}
-            entities={graylogNodes}
-            defaultDisplayedColumns={defaultDisplayedColumns}
-            defaultColumnOrder={defaultColumnOrder}
-            layoutPreferences={layoutPreferences}
-            onLayoutPreferencesChange={handleLayoutPreferencesChange}
-            onSortChange={handleSortChange}
-            activeSort={searchParams.sort}
-            entityAttributesAreCamelCase={false}
-            entityActions={renderActions}
-            columnSchemas={columnSchemas}
-            columnRenderers={columnRenderers}
-            onResetLayoutPreferences={resetLayoutPreferences}
-          />
-        );
-      })()}
+      <PaginatedEntityTable<ClusterGraylogNode>
+        tableLayout={tableLayout}
+        fetchEntities={fetchClusterGraylogNodesWithMetrics}
+        keyFn={clusterGraylogNodesKeyFn}
+        additionalAttributes={columnSchemas}
+        columnRenderers={columnRenderers}
+        entityActions={renderActions}
+        entityAttributesAreCamelCase={false}
+        humanName={`${productName} Nodes`}
+        externalSearch={externalSearch}
+        fetchOptions={fetchOptions}
+        onDataLoaded={(data) => setTotalGraylogNodes(data.pagination?.total ?? data.list.length)}
+        withoutURLParams
+      />
     </ClusterNodesSectionWrapper>
   );
 };
