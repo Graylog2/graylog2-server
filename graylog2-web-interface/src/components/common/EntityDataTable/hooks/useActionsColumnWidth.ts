@@ -15,21 +15,32 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase } from '../types';
 
+const setsAreEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((id) => b.has(id));
+
 const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArray<Entity>, hasRowActions: boolean) => {
   const [rowWidths, setRowWidths] = useState<{ [rowId: string]: number }>({});
-  const visibleRowIdsSet = useMemo(() => new Set(entities.map(({ id }) => id)), [entities]);
+  const currentRowIdsRef = useRef<Set<string>>(new Set());
+  const previousRowIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    const nextRowIds = new Set(entities.map(({ id }) => id));
+
+    if (setsAreEqual(nextRowIds, previousRowIdsRef.current)) {
+      return;
+    }
+
+    previousRowIdsRef.current = nextRowIds;
+    currentRowIdsRef.current = nextRowIds;
+
     setRowWidths((cur) => {
       const curEntries = Object.entries(cur);
-      const filteredEntries = curEntries.filter(([rowId]) => visibleRowIdsSet.has(rowId));
+      const filteredEntries = curEntries.filter(([rowId]) => currentRowIdsRef.current.has(rowId));
 
       if (filteredEntries.length === curEntries.length) {
         return cur;
@@ -37,35 +48,34 @@ const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArra
 
       return Object.fromEntries(filteredEntries);
     });
-  }, [visibleRowIdsSet]);
+  }, [entities]);
 
-  const handleWidthChange = useCallback(
-    (rowId: string, width: number) => {
-      const rounded = Math.round(width);
+  const handleWidthChange = useCallback((rowId: string, width: number) => {
+    const rounded = Math.round(width);
 
-      if (rounded <= 0 || !visibleRowIdsSet.has(rowId)) {
-        return;
-      }
+    if (rounded <= 0 || !currentRowIdsRef.current.has(rowId)) {
+      return;
+    }
 
-      setRowWidths((cur) => (cur[rowId] === rounded ? cur : { ...cur, [rowId]: rounded }));
-    },
-    [visibleRowIdsSet],
-  );
+    setRowWidths((cur) => (cur[rowId] === rounded ? cur : { ...cur, [rowId]: rounded }));
+  }, []);
 
   const colMinWidth = useMemo(() => {
-    if (!visibleRowIdsSet.size) {
+    // eslint-disable-next-line react-hooks/refs
+    if (!currentRowIdsRef.current.size) {
       return CELL_PADDING * 2;
     }
 
     const maxWidth = Math.max(
       0,
-      ...Array.from(visibleRowIdsSet)
+      // eslint-disable-next-line react-hooks/refs
+      ...Array.from(currentRowIdsRef.current)
         .map((rowId) => rowWidths[rowId])
         .filter((width) => !!width),
     );
 
     return hasRowActions ? maxWidth + CELL_PADDING * 2 : 0;
-  }, [hasRowActions, rowWidths, visibleRowIdsSet]);
+  }, [hasRowActions, rowWidths]);
 
   return { colMinWidth, handleWidthChange };
 };
