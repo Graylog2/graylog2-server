@@ -50,12 +50,18 @@ public class ContentPackAuditLogger {
         final Collection<NativeEntityDescriptor> createdEntities = installation.entities().stream()
                 .filter(descriptor -> !descriptor.foundOnSystem())
                 .collect(Collectors.toList());
+        auditEventSender.success(actor,
+                AuditEventTypes.CONTENT_PACK_INSTALL,
+                buildInstallContext(installation, createdEntities.size()));
         logEntityEvents(actor, createdEntities, installation, AuditEventTypes.CONTENT_PACK_ENTITY_CREATE);
     }
 
     public void logUninstallation(ContentPackInstallation installation,
                                   ContentPackUninstallation uninstallation) {
         final AuditActor actor = resolveCurrentActor().orElseGet(() -> AuditActor.user(AuditActor.UNKNOWN_USERNAME));
+        auditEventSender.success(actor,
+                AuditEventTypes.CONTENT_PACK_UNINSTALL,
+                buildUninstallContext(installation, uninstallation));
         logEntityEvents(actor, uninstallation.entities(), installation, AuditEventTypes.CONTENT_PACK_ENTITY_DELETE);
     }
 
@@ -67,6 +73,25 @@ public class ContentPackAuditLogger {
                 actor,
                 eventType,
                 buildEntityContext(installation, descriptor)));
+    }
+
+    private Map<String, Object> buildInstallContext(ContentPackInstallation installation, int createdEntitiesCount) {
+        final ImmutableMap.Builder<String, Object> builder = baseContext(installation)
+                .put("created_entities", createdEntitiesCount)
+                .put("installed_by", installation.createdBy());
+        if (installation.comment() != null && !installation.comment().isBlank()) {
+            builder.put("comment", installation.comment());
+        }
+        return builder.build();
+    }
+
+    private Map<String, Object> buildUninstallContext(ContentPackInstallation installation,
+                                                      ContentPackUninstallation uninstallation) {
+        return baseContext(installation)
+                .put("removed_entities", uninstallation.entities().size())
+                .put("skipped_entities", uninstallation.skippedEntities().size())
+                .put("failed_entities", uninstallation.failedEntities().size())
+                .build();
     }
 
     private Map<String, Object> buildEntityContext(ContentPackInstallation installation,

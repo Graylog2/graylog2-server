@@ -6,7 +6,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
-import org.graylog2.audit.AuditEventType;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ModelId;
@@ -68,18 +68,21 @@ class ContentPackAuditLoggerTest {
         auditLogger.logInstallation(installation);
 
         ArgumentCaptor<AuditActor> actorCaptor = ArgumentCaptor.forClass(AuditActor.class);
+        ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
         verify(auditEventSender, times(2)).success(
                 actorCaptor.capture(),
-                any(AuditEventType.class),
+                typeCaptor.capture(),
                 contextCaptor.capture());
 
         assertThat(actorCaptor.getAllValues())
                 .allSatisfy(actor -> assertThat(actor.urn()).isEqualTo(AuditActor.user("installer").urn()));
 
+        final List<String> types = typeCaptor.getAllValues();
         final List<Map<String, Object>> contexts = contextCaptor.getAllValues();
-        final Map<String, Object> installContext = contexts.get(0);
+
+        final Map<String, Object> installContext = contexts.get(types.indexOf(AuditEventTypes.CONTENT_PACK_INSTALL));
         assertThat(installContext)
                 .containsEntry("content_pack_id", "content-pack-1")
                 .containsEntry("contentPackId", "content-pack-1")
@@ -91,7 +94,7 @@ class ContentPackAuditLoggerTest {
                 .containsEntry("installed_by", "installer")
                 .containsEntry("comment", "Install via API");
 
-        final Map<String, Object> entityContext = contexts.get(1);
+        final Map<String, Object> entityContext = contexts.get(types.indexOf(AuditEventTypes.CONTENT_PACK_ENTITY_CREATE));
         assertThat(entityContext)
                 .containsEntry("content_pack_entity_id", "entity-1")
                 .containsEntry("contentPackEntityId", "entity-1")
@@ -130,7 +133,7 @@ class ContentPackAuditLoggerTest {
         auditLogger.logUninstallation(installation, uninstallation);
 
         ArgumentCaptor<AuditActor> actorCaptor = ArgumentCaptor.forClass(AuditActor.class);
-        ArgumentCaptor<AuditEventType> typeCaptor = ArgumentCaptor.forClass(AuditEventType.class);
+        ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
         verify(auditEventSender, times(2)).success(
@@ -142,7 +145,7 @@ class ContentPackAuditLoggerTest {
                 .allSatisfy(actor -> assertThat(actor.urn()).isEqualTo(AuditActor.user(AuditActor.UNKNOWN_USERNAME).urn()));
 
         final Map<String, Object> uninstallContext = contextCaptor.getAllValues()
-                .get(typeCaptor.getAllValues().indexOf(AuditEventType.create(org.graylog2.audit.AuditEventTypes.CONTENT_PACK_UNINSTALL)));
+                .get(typeCaptor.getAllValues().indexOf(org.graylog2.audit.AuditEventTypes.CONTENT_PACK_UNINSTALL));
         assertThat(uninstallContext)
                 .containsEntry("removed_entities", 1)
                 .containsEntry("skipped_entities", 0)
