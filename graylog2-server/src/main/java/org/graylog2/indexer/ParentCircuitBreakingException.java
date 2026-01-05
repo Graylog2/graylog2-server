@@ -14,25 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+package org.graylog2.indexer;
 
-import useCurrentUser from 'hooks/useCurrentUser';
-import { isPermitted } from 'util/PermissionsMixin';
-import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
+public class ParentCircuitBreakingException extends ElasticsearchException {
+    public static final String HELP_TEXT = "This error typically indicates that the Opensearch cluster is short on " +
+            "JVM Heap, decrease load or increase the JVM Heap provision to resolve.";
 
-const EventDefinitionLink = ({ title, id }: { title: string | undefined; id: string }) => {
-  const { permissions } = useCurrentUser();
-
-  if (!title) {
-    return <em>{id}</em>;
-  }
-
-  if (isPermitted(permissions, `eventdefinitions:read:${id}`)) {
-    return <Link to={Routes.ALERTS.DEFINITIONS.show(id)}>{title}</Link>;
-  }
-
-  return <>{title}</>;
-};
-
-export default EventDefinitionLink;
+    public ParentCircuitBreakingException(String errorMessage) {
+        super(("%s " + HELP_TEXT).formatted(errorMessage));
+    }
+}
