@@ -14,19 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.periodical;
+package org.graylog2.indexer;
 
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Test;
+public class ParentCircuitBreakingException extends ElasticsearchException {
+    public static final String HELP_TEXT = "This error typically indicates that the Opensearch cluster is short on " +
+            "JVM Heap, decrease load or increase the JVM Heap provision to resolve.";
 
-class CpuLoadGaugeTest {
-    @Test
-    void testGauge() {
-        final CpuLoadGauge gauge = new CpuLoadGauge();
-        Assertions.assertThat(gauge.getValue()).isNull();
-        gauge.update();
-        Assertions.assertThat(gauge.getValue())
-                .isNotNull()
-                .isGreaterThanOrEqualTo(0.0d);
+    public ParentCircuitBreakingException(String errorMessage) {
+        super(("%s " + HELP_TEXT).formatted(errorMessage));
     }
 }

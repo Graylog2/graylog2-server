@@ -45,6 +45,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.InvalidWriteTargetException;
 import org.graylog2.indexer.MapperParsingException;
 import org.graylog2.indexer.MasterNotDiscoveredException;
+import org.graylog2.indexer.ParentCircuitBreakingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,6 +203,9 @@ public class ElasticsearchClient {
             if (isMapperParsingExceptionException(elasticsearchException)) {
                 return new MapperParsingException(elasticsearchException.getMessage());
             }
+            if (isParentCircuitBreakingException(elasticsearchException)) {
+                return new ParentCircuitBreakingException(elasticsearchException.getMessage());
+            }
         } else if (e instanceof IOException && e.getCause() instanceof ContentTooLongException) {
             return new BatchSizeTooLargeException(e.getMessage());
         }
@@ -231,8 +235,8 @@ public class ElasticsearchClient {
         return elasticsearchException.getMessage().contains("index_not_found_exception");
     }
 
-    private static boolean isMapperParsingExceptionException(ElasticsearchException openSearchException) {
-        return openSearchException.getMessage().contains("mapper_parsing_exception");
+    private static boolean isMapperParsingExceptionException(ElasticsearchException elasticSearchException) {
+        return elasticSearchException.getMessage().contains("mapper_parsing_exception");
     }
 
     private static boolean isBatchSizeTooLargeException(ElasticsearchException elasticsearchException) {
@@ -247,6 +251,19 @@ public class ElasticsearchClient {
             if (parsedException.type().equals("search_phase_execution_exception")) {
                 ParsedElasticsearchException parsedCause = ParsedElasticsearchException.from(elasticsearchException.getRootCause().getMessage());
                 return parsedCause.reason().contains("Batch size is too large");
+            }
+        } catch (Exception e) {
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isParentCircuitBreakingException(ElasticsearchException elasticsearchException) {
+        try {
+            final ParsedElasticsearchException parsedException = ParsedElasticsearchException.from(elasticsearchException.getMessage());
+            if (parsedException.type().equals("circuit_breaking_exception")) {
+                ParsedElasticsearchException parsedCause = ParsedElasticsearchException.from(elasticsearchException.getRootCause().getMessage());
+                return parsedCause.reason().contains("[parent] Data too large");
             }
         } catch (Exception e) {
             return false;
