@@ -210,6 +210,8 @@ public class ContentPackServiceTest {
     private EntitySharesService entitySharesService;
     @Mock
     private FavoriteFieldsService favoriteFieldsService;
+    @Mock
+    private ContentPackAuditLogger contentPackAuditLogger;
 
     private ContentPackService contentPackService;
 
@@ -237,7 +239,7 @@ public class ContentPackServiceTest {
                         extractorFactory, converterFactory, serverStatus, pluginMetaData, new HashMap<>())
         );
         contentPackService = new ContentPackService(contentPackInstallationPersistenceService, constraintCheckers, entityFacades,
-                new ObjectMapper(), configuration, userService, streamService, new GRNRegistry(Set.of(new BultinGRNTypeProvider())), entitySharesService);
+                new ObjectMapper(), configuration, userService, streamService, new GRNRegistry(Set.of(new BultinGRNTypeProvider())), entitySharesService, contentPackAuditLogger);
 
         Map<String, String> entityData = new HashMap<>(2);
         entityData.put("name", "NAME");
