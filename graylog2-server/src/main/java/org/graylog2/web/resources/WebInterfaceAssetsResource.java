@@ -162,6 +162,10 @@ public class WebInterfaceAssetsResource {
     @Path("{filename:.*}")
     public Response getIndex(@Context ContainerRequest request,
                              @Context HttpHeaders headers) {
+        // If we end up here, the request should go to the API, but no resource class matched it, so we return a 404.
+        if (request.getAbsolutePath().getPath().startsWith("/" + HttpConfiguration.API_PREFIX)) {
+            return Response.status(Response.Status.NOT_FOUND).build();
+        }
         final URI originalLocation = request.getRequestUri();
         return get(request, headers, originalLocation.getPath());
     }
