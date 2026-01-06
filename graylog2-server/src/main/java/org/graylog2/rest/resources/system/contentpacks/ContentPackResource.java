@@ -301,16 +301,16 @@ public class ContentPackResource extends RestResource {
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
-        final ContentPackInstallation savedInstallation = contentPackService.installContentPack(
+        final ContentPackInstallation installation = contentPackService.installContentPack(
                 contentPack,
                 request.parameters(),
                 request.comment(),
                 userContext,
                 contentPackInstallationRequest.shareRequest().orElse(EntityShareRequest.EMPTY));
 
-        contentPackAuditLogger.logInstallation(savedInstallation);
+        contentPackAuditLogger.logInstallation(installation);
 
-        return savedInstallation;
+        return installation;
     }
 
     @GET
