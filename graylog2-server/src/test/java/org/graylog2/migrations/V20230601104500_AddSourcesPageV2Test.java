@@ -27,7 +27,6 @@ import org.graylog.testing.mongodb.MongoDBFixtures;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog2.Configuration;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.contentpacks.ContentPackAuditLogger;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
@@ -82,7 +81,7 @@ class V20230601104500_AddSourcesPageV2Test {
 
     static class TestContentPackService extends ContentPackService {
         public TestContentPackService() {
-            super(null, null, Map.of(), null, null, null, null, mock(GRNRegistry.class), mock(EntitySharesService.class), mock(ContentPackAuditLogger.class));
+            super(null, null, Map.of(), null, null, null, null, mock(GRNRegistry.class), mock(EntitySharesService.class));
         }
 
         @Override

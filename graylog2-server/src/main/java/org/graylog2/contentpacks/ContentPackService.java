@@ -104,7 +104,6 @@ public class ContentPackService {
     private final StreamService streamService;
     private final GRNRegistry grnRegistry;
     private final EntitySharesService entitySharesService;
-    private final ContentPackAuditLogger contentPackAuditLogger;
 
     @Inject
     public ContentPackService(ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
@@ -115,8 +114,7 @@ public class ContentPackService {
                               UserService userService,
                               StreamService streamService,
                               GRNRegistry grnRegistry,
-                              EntitySharesService entitySharesService,
-                              ContentPackAuditLogger contentPackAuditLogger) {
+                              EntitySharesService entitySharesService) {
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
         this.constraintCheckers = constraintCheckers;
         this.entityFacades = entityFacades;
@@ -126,7 +124,6 @@ public class ContentPackService {
         this.streamService = streamService;
         this.grnRegistry = grnRegistry;
         this.entitySharesService = entitySharesService;
-        this.contentPackAuditLogger = contentPackAuditLogger;
     }
 
     public ContentPackInstallation installContentPack(ContentPack contentPack,
@@ -239,9 +236,7 @@ public class ContentPackService {
 
         shareEntities(installation, shareRequest, userContext);
 
-        final ContentPackInstallation savedInstallation = contentPackInstallationPersistenceService.insert(installation);
-        contentPackAuditLogger.logInstallation(savedInstallation);
-        return savedInstallation;
+        return contentPackInstallationPersistenceService.insert(installation);
     }
 
     public void shareEntities(ContentPackInstallation installation, EntityShareRequest shareRequest, UserContext userContext) {
@@ -335,9 +330,7 @@ public class ContentPackService {
          * - Remove content pack snapshot
          */
         if (contentPack instanceof ContentPackV1) {
-            final ContentPackUninstallation uninstallation = uninstallContentPack(installation, (ContentPackV1) contentPack);
-            contentPackAuditLogger.logUninstallation(installation, uninstallation);
-            return uninstallation;
+            return uninstallContentPack(installation, (ContentPackV1) contentPack);
         } else {
             throw new IllegalArgumentException("Unsupported content pack version: " + contentPack.version());
         }

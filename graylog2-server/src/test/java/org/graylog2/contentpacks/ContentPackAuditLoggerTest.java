@@ -5,13 +5,11 @@ import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.contentpacks.model.ContentPackInstallation;
 import org.graylog2.contentpacks.model.ContentPackUninstallation;
 import org.graylog2.contentpacks.model.ModelId;
 import org.graylog2.contentpacks.model.entities.NativeEntityDescriptor;
-import org.graylog2.shared.users.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,24 +23,22 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog2.contentpacks.model.ModelTypes.STREAM_V1;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class ContentPackAuditLoggerTest {
 
-    @Mock
-    private AuditEventSender auditEventSender;
+    private static final String USER = "user";
 
     @Mock
-    private UserService userService;
+    private AuditEventSender auditEventSender;
 
     private ContentPackAuditLogger auditLogger;
 
     @BeforeEach
     void setUp() {
-        auditLogger = new ContentPackAuditLogger(auditEventSender, userService);
+        auditLogger = new ContentPackAuditLogger(auditEventSender);
     }
 
     @Test
@@ -62,7 +58,7 @@ class ContentPackAuditLoggerTest {
                 .entities(ImmutableSet.of(createdDescriptor, existingDescriptor))
                 .parameters(ImmutableMap.of())
                 .createdAt(Instant.parse("2024-07-15T10:15:30Z"))
-                .createdBy("installer")
+                .createdBy(USER)
                 .build();
 
         auditLogger.logInstallation(installation);
@@ -71,40 +67,23 @@ class ContentPackAuditLoggerTest {
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
-        verify(auditEventSender, times(2)).success(
+        verify(auditEventSender, times(1)).success(
                 actorCaptor.capture(),
                 typeCaptor.capture(),
                 contextCaptor.capture());
 
         assertThat(actorCaptor.getAllValues())
-                .allSatisfy(actor -> assertThat(actor.urn()).isEqualTo(AuditActor.user("installer").urn()));
+                .allSatisfy(actor -> assertThat(actor.urn()).isEqualTo(AuditActor.user(USER).urn()));
 
         final List<String> types = typeCaptor.getAllValues();
         final List<Map<String, Object>> contexts = contextCaptor.getAllValues();
 
-        final Map<String, Object> installContext = contexts.get(types.indexOf(AuditEventTypes.CONTENT_PACK_INSTALL));
-        assertThat(installContext)
-                .containsEntry("content_pack_id", "content-pack-1")
-                .containsEntry("contentPackId", "content-pack-1")
-                .containsEntry("content_pack_revision", 7)
-                .containsEntry("contentPackRev", 7)
-                .containsEntry("installation_id", "6695a5e4e1382319d60d4f11")
-                .containsEntry("installationId", "6695a5e4e1382319d60d4f11")
-                .containsEntry("created_entities", 1)
-                .containsEntry("installed_by", "installer")
-                .containsEntry("comment", "Install via API");
-
         final Map<String, Object> entityContext = contexts.get(types.indexOf(AuditEventTypes.CONTENT_PACK_ENTITY_CREATE));
         assertThat(entityContext)
-                .containsEntry("content_pack_entity_id", "entity-1")
                 .containsEntry("contentPackEntityId", "entity-1")
-                .containsEntry("entity_id", "native-1")
                 .containsEntry("entityId", "native-1")
-                .containsEntry("entity_type", STREAM_V1.name())
                 .containsEntry("entityType", STREAM_V1.name())
-                .containsEntry("entity_title", "Stream Title")
-                .containsEntry("entityTitle", "Stream Title")
-                .containsEntry("found_on_system", false);
+                .containsEntry("entityTitle", "Stream Title");
     }
 
     @Test
@@ -118,7 +97,7 @@ class ContentPackAuditLoggerTest {
                 .entities(ImmutableSet.of(descriptor))
                 .parameters(ImmutableMap.of())
                 .createdAt(Instant.now())
-                .createdBy("admin")
+                .createdBy(USER)
                 .comment("")
                 .build();
 
@@ -130,27 +109,18 @@ class ContentPackAuditLoggerTest {
                 .entityGrants(ImmutableMap.of())
                 .build();
 
-        auditLogger.logUninstallation(installation, uninstallation);
+        auditLogger.logUninstallation(installation.contentPackId().id(), uninstallation, USER);
 
         ArgumentCaptor<AuditActor> actorCaptor = ArgumentCaptor.forClass(AuditActor.class);
         ArgumentCaptor<String> typeCaptor = ArgumentCaptor.forClass(String.class);
         ArgumentCaptor<Map<String, Object>> contextCaptor = ArgumentCaptor.forClass(Map.class);
 
-        verify(auditEventSender, times(2)).success(
+        verify(auditEventSender, times(1)).success(
                 actorCaptor.capture(),
                 typeCaptor.capture(),
                 contextCaptor.capture());
 
         assertThat(actorCaptor.getAllValues())
-                .allSatisfy(actor -> assertThat(actor.urn()).isEqualTo(AuditActor.user(AuditActor.UNKNOWN_USERNAME).urn()));
-
-        final Map<String, Object> uninstallContext = contextCaptor.getAllValues()
-                .get(typeCaptor.getAllValues().indexOf(org.graylog2.audit.AuditEventTypes.CONTENT_PACK_UNINSTALL));
-        assertThat(uninstallContext)
-                .containsEntry("removed_entities", 1)
-                .containsEntry("skipped_entities", 0)
-                .containsEntry("failed_entities", 0)
-                .containsEntry("contentPackId", "content-pack-1")
-                .containsEntry("contentPackRev", 3);
+                .allSatisfy(actor -> assertThat(actor.urn()).isEqualTo(AuditActor.user(USER).urn()));
     }
 }
