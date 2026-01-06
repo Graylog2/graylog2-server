@@ -79,4 +79,9 @@ public interface EventDefinition {
     default String eventProcedureId() {
         return null;
     }
+
+    @Nullable
+    default String eventSummaryTemplate() {
+        return null;
+    }
 }

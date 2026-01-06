@@ -38,6 +38,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class KeystoreUtilsTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     @Test
     void testThrowsExceptionIfNewPasswordIsNull() throws Exception {
         KeyStore originalKeyStore = KeyStore.getInstance(PKCS12);
@@ -58,11 +60,11 @@ public class KeystoreUtilsTest {
         originalKeyStore.setEntry("secretEntry", secret, new KeyStore.PasswordProtection(oldPassword));
         CertRequest req = CertRequest.selfSigned("darknet.net")
                 .validity(Duration.ZERO);
-        final X509Certificate trustedCA = CertificateGenerator.generate(req).certificate();
+        final X509Certificate trustedCA = CERTIFICATE_GENERATOR.generateKeyPair(req).certificate();
         originalKeyStore.setCertificateEntry("trusted-certificate", trustedCA);
         req = CertRequest.selfSigned("localhost")
                 .validity(Duration.ZERO);
-        final KeyPair keyPair = CertificateGenerator.generate(req);
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(req);
         originalKeyStore.setKeyEntry("privkey", keyPair.privateKey(), oldPassword, new Certificate[]{keyPair.certificate()});
 
         final KeyStore newKeyStore = KeystoreUtils.newStoreCopyContent(originalKeyStore, oldPassword, newPassword);
@@ -86,11 +88,11 @@ public class KeystoreUtilsTest {
 
         CertRequest req = CertRequest.selfSigned("localhost")
                 .validity(Duration.ZERO);
-        final KeyPair keyPair1 = CertificateGenerator.generate(req);
+        final KeyPair keyPair1 = CERTIFICATE_GENERATOR.generateKeyPair(req);
         originalKeyStore.setKeyEntry("privkey1", keyPair1.privateKey(), oldPassword, new Certificate[]{keyPair1.certificate()});
-        final KeyPair keyPair2 = CertificateGenerator.generate(req);
+        final KeyPair keyPair2 = CERTIFICATE_GENERATOR.generateKeyPair(req);
         originalKeyStore.setKeyEntry("privkey2", keyPair2.privateKey(), oldPassword, new Certificate[]{keyPair2.certificate()});
-        final KeyPair keyPair3 = CertificateGenerator.generate(req);
+        final KeyPair keyPair3 = CERTIFICATE_GENERATOR.generateKeyPair(req);
         originalKeyStore.setKeyEntry("privkey3", keyPair3.privateKey(), oldPassword, new Certificate[]{keyPair3.certificate()});
 
         final KeyStore newKeyStore = KeystoreUtils.newStoreCopyContent(originalKeyStore, oldPassword, newPassword);
