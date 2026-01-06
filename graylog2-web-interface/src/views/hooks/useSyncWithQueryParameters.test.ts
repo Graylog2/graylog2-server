@@ -15,7 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as Immutable from 'immutable';
-import { renderHook, waitFor } from 'wrappedTestingLibrary/hooks';
+import { renderHook } from 'wrappedTestingLibrary/hooks';
+import { waitFor } from 'wrappedTestingLibrary';
 
 import View from 'views/logic/views/View';
 import Query, { createElasticsearchQueryString, filtersForQuery } from 'views/logic/queries/Query';
