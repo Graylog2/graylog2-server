@@ -25,6 +25,7 @@ import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hook
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
+import { waitFor } from 'wrappedTestingLibrary/hooks';
 
 const indexSet = {
   id: '62665eb0526719678ed3719f',
@@ -297,23 +298,29 @@ describe('IndexSetConfigurationForm', () => {
     const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
 
     // Test basic auto-fill
-    await userEvent.type(titleInput, 'My Test Index');
+    userEvent.type(titleInput, 'My Test Index');
 
-    expect(prefixInput).toHaveValue('my-test-index');
+    await waitFor(() => {
+      expect(prefixInput).toHaveValue('my-test-index');
+    });
 
     // Test special character transformation
-    await userEvent.clear(titleInput);
-    await userEvent.type(titleInput, 'Test@Index#Set 123!');
+    userEvent.clear(titleInput);
+    userEvent.type(titleInput, 'Test@Index#Set 123!');
 
-    expect(prefixInput).toHaveValue('test-index-set-123');
+    await waitFor(() => {
+      expect(prefixInput).toHaveValue('test-index-set-123');
+    });
 
     // Test auto-fill stops after manual edit
-    await userEvent.clear(prefixInput);
-    await userEvent.type(prefixInput, 'custom-prefix');
-    await userEvent.clear(titleInput);
-    await userEvent.type(titleInput, 'Another Title');
+    userEvent.clear(prefixInput);
+    userEvent.type(prefixInput, 'custom-prefix');
+    userEvent.clear(titleInput);
+    userEvent.type(titleInput, 'Another Title');
 
-    expect(prefixInput).toHaveValue('custom-prefix');
+    await waitFor(() => {
+      expect(prefixInput).toHaveValue('custom-prefix');
+    });
   });
 
   it('Should not auto-fill index prefix when editing existing index set', async () => {
@@ -322,10 +329,12 @@ describe('IndexSetConfigurationForm', () => {
     const titleInput = await screen.findByRole('textbox', { name: /title/i });
 
     // Clear existing title and type new one
-    await userEvent.clear(titleInput);
-    await userEvent.type(titleInput, 'New Title');
+    userEvent.clear(titleInput);
+    userEvent.type(titleInput, 'New Title');
 
     // Prefix field should not exist in edit mode (it's read-only after creation)
-    expect(screen.queryByRole('textbox', { name: /index prefix/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('textbox', { name: /index prefix/i })).not.toBeInTheDocument();
+    });
   });
 });
