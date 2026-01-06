@@ -32,6 +32,7 @@ type ConfigurationsActionsType = {
   listAllowListConfig: (configType: any) => Promise<unknown>;
   listPermissionsConfig: (configType: string) => Promise<unknown>;
   listUserConfig: (configType: string) => Promise<unknown>;
+  listPasswordComplexityConfig: (configType: string) => Promise<unknown>;
   update: (configType: any, config: any) => Promise<void>;
   updateAllowlist: (configType: any, config: any) => Promise<void>;
   updateIndexSetDefaults: (configType: any, config: any) => Promise<void>;
@@ -47,6 +48,7 @@ export const ConfigurationsActions = singletonActions('core.Configuration', () =
     listAllowListConfig: { asyncResult: true },
     listPermissionsConfig: { asyncResult: true },
     listUserConfig: { asyncResult: true },
+    listPasswordComplexityConfig: { asyncResult: true },
     update: { asyncResult: true },
     updateAllowlist: { asyncResult: true },
     updateIndexSetDefaults: { asyncResult: true },
@@ -69,6 +71,13 @@ export type AllowListConfig = {
 export type PermissionsConfigType = {
   allow_sharing_with_everyone: boolean;
   allow_sharing_with_users: boolean;
+};
+export type PasswordComplexityConfigType = {
+  min_length: number;
+  require_uppercase: boolean;
+  require_lowercase: boolean;
+  require_numbers: boolean;
+  require_special_chars: boolean;
 };
 export type UserConfigType = {
   enable_global_session_timeout: boolean;
@@ -197,6 +206,27 @@ export const ConfigurationsStore = singletonStore('core.Configuration', () =>
       });
 
       ConfigurationsActions.listUserConfig.promise(promise);
+    },
+
+    listPasswordComplexityConfig(configType) {
+      const promise = fetch('GET', this._url(`/${configType}`)).then((response: PasswordComplexityConfigType) => {
+        this.configuration = {
+          ...this.configuration,
+          [configType]: response || {
+            min_length: 6,
+            require_uppercase: false,
+            require_lowercase: false,
+            require_numbers: false,
+            require_special_chars: false,
+          },
+        };
+
+        this.propagateChanges();
+
+        return response;
+      });
+
+      ConfigurationsActions.listPasswordComplexityConfig.promise(promise);
     },
 
     listEventsClusterConfig() {
