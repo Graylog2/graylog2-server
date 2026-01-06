@@ -1,0 +1,4 @@
+type = "a"
+message = "When creating an Alert definition, show the fields compatible to an aggregation like we do in the Search aggregation wizard (grey for incompatible)."
+
+pulls = ["23778"]

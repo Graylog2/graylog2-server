@@ -164,7 +164,9 @@ public class McpService {
                             .title(tool.title())
                             .description(tool.description());
                     tool.inputSchema().ifPresent(builder::inputSchema);
-                    tool.outputSchema().ifPresent(builder::outputSchema);
+                    if (tool.isOutputSchemaEnabled()) {
+                        tool.outputSchema().ifPresent(builder::outputSchema);
+                    }
                     return builder.build();
                 }).toList();
                 auditEventSender.success(auditActor, AuditEventType.create(MCP_TOOL_LIST), auditContext);
