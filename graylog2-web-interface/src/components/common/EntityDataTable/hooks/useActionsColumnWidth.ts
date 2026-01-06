@@ -21,39 +21,19 @@ import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
 import type { EntityBase } from '../types';
 
-const setsAreEqual = (a: Set<string>, b: Set<string>) => a.size === b.size && [...a].every((id) => b.has(id));
-
 const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArray<Entity>, hasRowActions: boolean) => {
   const [rowWidths, setRowWidths] = useState<{ [rowId: string]: number }>({});
-  const currentRowIdsRef = useRef<Set<string>>(new Set());
-  const previousRowIdsRef = useRef<Set<string>>(new Set());
+  const visibleRowIds = useMemo(() => new Set(entities.map(({ id }) => id)), [entities]);
+  const visibleRowIdsRef = useRef<Set<string>>(visibleRowIds);
 
   useEffect(() => {
-    const nextRowIds = new Set(entities.map(({ id }) => id));
-
-    if (setsAreEqual(nextRowIds, previousRowIdsRef.current)) {
-      return;
-    }
-
-    previousRowIdsRef.current = nextRowIds;
-    currentRowIdsRef.current = nextRowIds;
-
-    setRowWidths((cur) => {
-      const curEntries = Object.entries(cur);
-      const filteredEntries = curEntries.filter(([rowId]) => currentRowIdsRef.current.has(rowId));
-
-      if (filteredEntries.length === curEntries.length) {
-        return cur;
-      }
-
-      return Object.fromEntries(filteredEntries);
-    });
-  }, [entities]);
+    visibleRowIdsRef.current = visibleRowIds;
+  }, [visibleRowIds]);
 
   const handleWidthChange = useCallback((rowId: string, width: number) => {
     const rounded = Math.round(width);
 
-    if (rounded <= 0 || !currentRowIdsRef.current.has(rowId)) {
+    if (rounded <= 0 || !visibleRowIdsRef.current.has(rowId)) {
       return;
     }
 
@@ -61,21 +41,19 @@ const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArra
   }, []);
 
   const colMinWidth = useMemo(() => {
-    // eslint-disable-next-line react-hooks/refs
-    if (!currentRowIdsRef.current.size) {
+    if (!visibleRowIds.size) {
       return CELL_PADDING * 2;
     }
 
     const maxWidth = Math.max(
       0,
-      // eslint-disable-next-line react-hooks/refs
-      ...Array.from(currentRowIdsRef.current)
+      ...Array.from(visibleRowIds)
         .map((rowId) => rowWidths[rowId])
         .filter((width) => !!width),
     );
 
     return hasRowActions ? maxWidth + CELL_PADDING * 2 : 0;
-  }, [hasRowActions, rowWidths]);
+  }, [hasRowActions, rowWidths, visibleRowIds]);
 
   return { colMinWidth, handleWidthChange };
 };
