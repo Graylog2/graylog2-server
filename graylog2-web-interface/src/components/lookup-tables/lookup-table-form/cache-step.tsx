@@ -20,29 +20,11 @@ import { useFormikContext } from 'formik';
 import { Spinner } from 'components/common';
 import { RowContainer, ColContainer } from 'components/lookup-tables/layout-componets';
 import useScopePermissions from 'hooks/useScopePermissions';
-import usePluginEntities from 'hooks/usePluginEntities';
 import { useFetchCache, useFetchAllCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import Cache from 'components/lookup-tables/Cache';
 import CachePicker from 'components/lookup-tables/cache-form/CachePicker';
 import CacheFormView from 'components/lookup-tables/cache-form/CacheFormView';
 import type { LookupTable, LookupTableCache } from 'logic/lookup-tables/types';
-
-function CacheReadOnly({ cache }: { cache: LookupTableCache }) {
-  const plugins = usePluginEntities('lookupTableCaches');
-  const cachePlugin = React.useMemo(
-    () => plugins.find((p: any) => p.type === cache?.config?.type),
-    [cache?.config?.type, plugins],
-  );
-
-  const DocComponent = React.useMemo(() => cachePlugin?.documentationComponent, [cachePlugin]);
-
-  return (
-    <RowContainer $gap="xl" $withDocs={!!DocComponent} $justify="center">
-      <Cache cache={cache} noEdit />
-      {DocComponent && <DocComponent cacheId={cache?.id} />}
-    </RowContainer>
-  );
-}
+import CacheShow from 'components/lookup-tables/cache-view/cache-show';
 
 function CacheFormStep() {
   const { values, setFieldValue } = useFormikContext<LookupTable>();
@@ -50,7 +32,7 @@ function CacheFormStep() {
   const { allCaches, loadingAllCaches } = useFetchAllCaches();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
   const [showForm, setShowForm] = React.useState<boolean>(false);
-  const showCache = React.useMemo(() => values.cache_id, [values.cache_id]);
+  const showCache = React.useMemo(() => !!cache, [cache]);
 
   const canModify = React.useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
@@ -85,7 +67,7 @@ function CacheFormStep() {
               <CachePicker onCreateClick={onCreateClick} caches={allCaches} />
             </RowContainer>
           )}
-          {showCache && !loadingCache && <CacheReadOnly cache={cache} />}
+          {showCache && !loadingCache && <CacheShow cache={cache} />}
           {showForm && !showCache && <CacheFormView onCancel={onCancel} saved={onSaved} isStep />}
         </>
       )}

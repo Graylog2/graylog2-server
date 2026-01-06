@@ -16,6 +16,10 @@
  */
 package org.graylog2.shared.system.stats.os;
 
+import com.google.common.primitives.Shorts;
+import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.stats.OshiService;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.CentralProcessor.TickType;
@@ -23,9 +27,6 @@ import oshi.hardware.GlobalMemory;
 import oshi.hardware.HardwareAbstractionLayer;
 import oshi.hardware.VirtualMemory;
 import oshi.util.Util;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Singleton;
 
 @Singleton
 public class OshiOsProbe implements OsProbe {
@@ -47,9 +48,9 @@ public class OshiOsProbe implements OsProbe {
         final Memory mem = Memory.create(
                 globalMemory.getTotal(),
                 globalMemory.getAvailable(),
-                safePercentage(globalMemory.getAvailable(), globalMemory.getTotal(), 0),
+                Shorts.saturatedCast(Tools.percentageOfRounded(globalMemory.getTotal(), globalMemory.getAvailable())),
                 globalMemory.getTotal() - globalMemory.getAvailable(),
-                safePercentage(globalMemory.getTotal() - globalMemory.getAvailable(), globalMemory.getTotal(), 0),
+                Shorts.saturatedCast(Tools.percentageOfRounded(globalMemory.getTotal(), globalMemory.getTotal() - globalMemory.getAvailable())),
                 globalMemory.getAvailable(),
                 globalMemory.getTotal() - globalMemory.getAvailable());
 
@@ -106,7 +107,4 @@ public class OshiOsProbe implements OsProbe {
                 swap);
     }
 
-    private short safePercentage(long nominator, long denominator, int override) {
-        return (denominator == 0) ? (short) override : (short) (nominator * 100 / denominator);
-    }
 }

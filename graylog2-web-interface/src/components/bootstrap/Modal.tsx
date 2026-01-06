@@ -33,6 +33,16 @@ const ModalContent = styled(MantineModal.Content)`
   border-radius: 10px;
 `;
 
+const StyledModalFooter = styled(MantineModal.Body)(
+  ({ theme }) => css`
+    position: sticky;
+    bottom: 0;
+    background-color: ${theme.colors.global.contentBackground};
+    padding: ${theme.spacings.md};
+    z-index: ${zIndices.modalBody};
+  `,
+);
+
 const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>(
   ({ theme, $scrollInContent }) => css`
     --mantine-color-body: ${theme.colors.global.contentBackground};
@@ -115,6 +125,6 @@ Modal.Title = styled(MantineModal.Title)`
 `;
 
 Modal.Body = MantineModal.Body;
-Modal.Footer = MantineModal.Body;
+Modal.Footer = StyledModalFooter;
 
 export default Modal;

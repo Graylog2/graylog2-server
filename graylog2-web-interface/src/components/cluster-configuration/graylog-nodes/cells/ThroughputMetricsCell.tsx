@@ -18,11 +18,11 @@ import React from 'react';
 
 import NumberUtils from 'util/NumberUtils';
 
-import type { GraylogNode } from '../useClusterGraylogNodes';
+import type { ClusterGraylogNode } from '../fetchClusterGraylogNodes';
 import { MetricPlaceholder, MetricsColumn, MetricsRow, SecondaryText } from '../../shared-components/NodeMetricsLayout';
 
 type Props = {
-  node: GraylogNode;
+  node: ClusterGraylogNode;
 };
 
 const formatThroughput = (value: number | undefined | null) => {
