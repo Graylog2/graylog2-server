@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useFormikContext } from 'formik';
@@ -42,8 +43,8 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
   const { values, submitForm, resetForm, isValid } = useFormikContext<LookupTableType>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const navigate = useNavigate();
-  const onFirstStep = React.useMemo(() => stepIds.indexOf(activeStepId) === 0, [stepIds, activeStepId]);
-  const onLastStep = React.useMemo(() => stepIds.indexOf(activeStepId) === stepIds.length - 1, [stepIds, activeStepId]);
+  const onFirstStep = useMemo(() => stepIds.indexOf(activeStepId) === 0, [stepIds, activeStepId]);
+  const onLastStep = useMemo(() => stepIds.indexOf(activeStepId) === stepIds.length - 1, [stepIds, activeStepId]);
 
   const onPrev = () => {
     if (onFirstStep) return;
@@ -66,7 +67,7 @@ function WizardButtons({ isCreate, stepIds, activeStepId, onStepChange, isLoadin
     navigate(Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   };
 
-  const canModify = React.useMemo(
+  const canModify = useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
   );
