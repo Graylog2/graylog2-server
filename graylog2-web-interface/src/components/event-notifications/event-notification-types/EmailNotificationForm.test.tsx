@@ -43,6 +43,21 @@ jest.mock('components/bootstrap', () => {
   return {
     ...Actual,
     Input: (props) => <input {...props} />,
+    FormGroup: ({ children, ...rest }) => (
+      <div {...rest} data-testid="form-group-mock">
+        {children}
+      </div>
+    ),
+    ControlLabel: ({ children, ...rest }) => (
+      <label {...rest} data-testid="control-label-mock">
+        {children}
+      </label>
+    ),
+    HelpBlock: ({ children, ...rest }) => (
+      <div {...rest} data-testid="help-block-mock">
+        {children}
+      </div>
+    ),
   };
 });
 
