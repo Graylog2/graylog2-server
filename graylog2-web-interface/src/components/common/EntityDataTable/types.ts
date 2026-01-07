@@ -27,7 +27,7 @@ export type ColumnSchema = {
   anyPermissions?: boolean;
   // Indicates that a column does not exist as an attribute in table data
   isDerived?: boolean;
-} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions'>;
+} & Pick<Attribute, 'id' | 'title' | 'type' | 'sortable' | 'hidden' | 'permissions' | 'sliceable'>;
 
 // A column render should have either a `width` and optionally a `minWidth` or only a `staticWidth`.
 export type ColumnRenderer<Entity extends EntityBase, Meta = unknown> = {
@@ -98,6 +98,7 @@ export type ColumnMetaContext<Entity extends EntityBase> =
   | {
       columnRenderer?: ColumnRenderer<Entity>;
       enableColumnOrdering?: boolean;
+      enableSlicing?: boolean;
       hideCellPadding?: boolean;
       label?: string;
     }

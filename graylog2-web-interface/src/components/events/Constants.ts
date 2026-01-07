@@ -22,13 +22,14 @@ export const EVENTS_ENTITY_TABLE_ID = 'events';
 
 export const commonEventAttributes: Array<Attribute> = [
   {
+    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
+    filterable: true,
     id: 'priority',
+    searchable: false,
+    sliceable: true,
+    sortable: true,
     title: 'Priority',
     type: 'STRING',
-    sortable: true,
-    searchable: false,
-    filterable: true,
-    filter_options: Object.keys(EventDefinitionPriorityEnum.properties).map((num) => ({ value: num, title: num })),
   },
   {
     id: 'timestamp',
@@ -107,6 +108,7 @@ export const eventsTableSpecificAttributes: Array<Attribute> = [
     id: 'alert',
     title: 'Type',
     type: 'BOOLEAN',
+    sliceable: true,
     sortable: true,
     filterable: true,
     filter_options: [

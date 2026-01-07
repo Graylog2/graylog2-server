@@ -32,6 +32,7 @@ import DragHandle from 'components/common/SortableList/DragHandle';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
+import SliceIcon from 'components/common/EntityDataTable/SliceIcon';
 
 import SortIcon from '../SortIcon';
 
@@ -106,6 +107,7 @@ const AttributeHeader = <Entity extends EntityBase>({
           />
         )}
         {columnMeta?.columnRenderer?.renderHeader?.(columnMeta.label) ?? columnMeta.label}
+        {columnMeta?.enableSlicing && <SliceIcon onClick={() => {}} />}
         {ctx.header.column.getCanSort() && <SortIcon<Entity> column={ctx.header.column} />}
       </LeftCol>
       <RightCol ref={rightRef}>
@@ -172,6 +174,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
           meta: {
             label: col.title,
+            enableSlicing: col.sliceable,
             columnRenderer: columnRenderersByAttribute[col.id],
             enableColumnOrdering: true,
           },
