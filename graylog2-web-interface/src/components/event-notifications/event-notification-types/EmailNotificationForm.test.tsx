@@ -68,7 +68,11 @@ const buildConfig = (overrides = {}) => ({
 
 describe('EmailNotificationForm', () => {
   beforeEach(() => {
-    asMock(usePluggableLicenseCheck).mockReturnValue({ data: { valid: true, expired: false, violated: false } });
+    asMock(usePluggableLicenseCheck).mockReturnValue({
+      data: { valid: true, expired: false, violated: false },
+      isInitialLoading: false,
+      refetch: jest.fn(),
+    });
     asMock(usePluginEntities).mockReturnValue([
       {
         hooks: {
