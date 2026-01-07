@@ -18,6 +18,7 @@ package org.graylog2.shared.rest.documentation.openapi;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.swagger.v3.core.util.Json31;
+import io.swagger.v3.core.util.PrimitiveType;
 import io.swagger.v3.core.util.Yaml31;
 import io.swagger.v3.jaxrs2.integration.JaxrsOpenApiContextBuilder;
 import io.swagger.v3.oas.integration.OpenApiConfigurationException;
@@ -43,6 +44,17 @@ import java.util.Set;
  */
 @Singleton
 public class OpenAPIContextFactory {
+
+    static {
+        // Register custom class mappings for simple types that should be treated as primitives.
+        PrimitiveType.customClasses().put("com.github.zafarkhaja.semver.Version", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("org.joda.time.DateTimeZone", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("org.joda.time.Duration", PrimitiveType.LONG);
+        PrimitiveType.customClasses().put("java.time.Duration", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("org.joda.time.Period", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("org.threeten.extra.PeriodDuration", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("com.google.common.net.HostAndPort", PrimitiveType.STRING);
+    }
 
     private final Version version;
     private final CustomOpenAPIScanner scanner;

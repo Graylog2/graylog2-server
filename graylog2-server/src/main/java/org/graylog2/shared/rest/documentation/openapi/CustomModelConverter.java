@@ -29,7 +29,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.net.HostAndPort;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -43,10 +42,6 @@ import io.swagger.v3.oas.models.media.NumberSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
-import org.joda.time.Period;
-import org.threeten.extra.PeriodDuration;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
@@ -99,7 +94,8 @@ public class CustomModelConverter extends ModelResolver {
     @Override
     public Schema<?> resolve(AnnotatedType annotatedType, ModelConverterContext context, Iterator<ModelConverter> next) {
 
-        // Handle Guava ImmutableMap by treating it as a regular Map for schema generation
+        // Handle Guava immutable collections that need generic type preservation.
+        // Simple scalar types are handled via PrimitiveType.customClasses() in OpenAPIContextFactory.
         if (annotatedType != null && annotatedType.getType() != null) {
             final JavaType javaType = _mapper.constructType(annotatedType.getType());
             final Class<?> rawClass = javaType.getRawClass();
@@ -126,24 +122,6 @@ public class CustomModelConverter extends ModelResolver {
                         replacementType(annotatedType, typeFactory.constructCollectionLikeType(Set.class, javaType.getContentType())),
                         context,
                         next);
-            } else if (com.github.zafarkhaja.semver.Version.class.isAssignableFrom(rawClass)) {
-                // versions are serialized as strings
-                return super.resolve(replacementType(annotatedType, String.class), context, next);
-            } else if (DateTimeZone.class.isAssignableFrom(rawClass)) {
-                // timezones are strings
-                return super.resolve(replacementType(annotatedType, String.class), context, next);
-            } else if (Duration.class.isAssignableFrom(rawClass)) {
-                // durations are longs (milliseconds)
-                return super.resolve(replacementType(annotatedType, Long.class), context, next);
-            } else if (Period.class.isAssignableFrom(rawClass)) {
-                // periods are strings
-                return super.resolve(replacementType(annotatedType, String.class), context, next);
-            } else if (PeriodDuration.class.isAssignableFrom(rawClass)) {
-                // perioddurations are strings
-                return super.resolve(replacementType(annotatedType, String.class), context, next);
-            } else if (HostAndPort.class.isAssignableFrom(rawClass)) {
-                // HostAndPorts are strings
-                return super.resolve(replacementType(annotatedType, String.class), context, next);
             }
         }
 
