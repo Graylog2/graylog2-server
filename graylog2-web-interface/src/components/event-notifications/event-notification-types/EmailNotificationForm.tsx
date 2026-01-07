@@ -142,6 +142,7 @@ const EmailTemplatesRunner = ({
 
       if (hasCustomBody || hasCustomHtml) {
         lastSigRef.current = sig;
+        
         return;
       }
 
