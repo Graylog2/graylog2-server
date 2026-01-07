@@ -16,7 +16,6 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import get from 'lodash/get';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import { FormSubmit, Select, Spinner } from 'components/common';
@@ -155,7 +154,7 @@ const EventNotificationForm = ({
             label="Title"
             type="text"
             bsStyle={validation.errors.title ? 'error' : null}
-            help={get(validation, 'errors.title[0]', 'Title to identify this Notification.')}
+            help={validation?.errors?.title?.[0] ?? 'Title to identify this Notification.'}
             value={notification.title}
             onChange={handleChange}
             required
@@ -187,7 +186,7 @@ const EventNotificationForm = ({
               clearable={false}
               required
             />
-            <HelpBlock>{get(validation, 'errors.config[0]', 'Choose the type of Notification to create.')}</HelpBlock>
+            <HelpBlock>{validation?.errors?.config?.[0] ?? 'Choose the type of Notification to create.'}</HelpBlock>
           </FormGroup>
 
           {notificationFormComponent}
