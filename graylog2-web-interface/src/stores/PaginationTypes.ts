@@ -92,6 +92,7 @@ export type Attribute = {
   filter_component?: React.ComponentType<FilterComponentProps>;
   related_collection?: string;
   related_property?: string;
+  sliceable?: boolean;
   permissions?: Array<Permission>;
 };
 
