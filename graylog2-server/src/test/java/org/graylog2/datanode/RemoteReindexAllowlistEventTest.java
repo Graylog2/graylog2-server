@@ -31,9 +31,11 @@ import java.util.List;
 
 class RemoteReindexAllowlistEventTest {
 
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     @Test
     void testEncodeDecodeCertificate() throws Exception {
-        final KeyPair keyPair = CertificateGenerator.generate(CertRequest.selfSigned("my-server").validity(Duration.ofDays(31)));
+        final KeyPair keyPair = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("my-server").validity(Duration.ofDays(31)));
         final X509Certificate certificate = keyPair.certificate();
         final RemoteReindexAllowlistEvent event = RemoteReindexAllowlistEvent.add(List.of("localhost:9200"), List.of(encodeAsPem(certificate)));
 

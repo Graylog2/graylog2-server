@@ -14,53 +14,60 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useEffect } from 'react';
+import React from 'react';
 
-import { InputStatesStore } from 'stores/inputs/InputStatesStore';
-import { DocumentTitle, PageHeader } from 'components/common';
-import { InputsList } from 'components/inputs';
+import { Row, Col } from 'components/bootstrap';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import AppConfig from 'util/AppConfig';
 import { Link } from 'components/common/router';
-import Routes from 'routing/Routes';
+import DocsHelper from 'util/DocsHelper';
 import useProductName from 'brand-customization/useProductName';
+import { InputsOverview } from 'components/inputs/InputsOveriew';
+import useInputTypes from 'hooks/useInputTypes';
+import useInputTypesDescriptions from 'hooks/useInputTypesDescriptions';
+import InputsNotifications from 'components/inputs/InputsNotifications';
 
 const isCloud = AppConfig.isCloud();
 
 const InputsPage = () => {
   const productName = useProductName();
+  const { data: inputTypes, isLoading: isLoadingInputTypes } = useInputTypes();
+  const { data: inputTypeDescriptions, isLoading: isLoadingInputTypesDescriptions } = useInputTypesDescriptions();
 
-  useEffect(() => {
-    const listInputsInterval = setInterval(InputStatesStore.list, 2000);
-
-    return () => {
-      clearInterval(listInputsInterval);
-    };
-  }, []);
+  if (isLoadingInputTypes || isLoadingInputTypesDescriptions) {
+    return <Spinner />;
+  }
 
   return (
     <DocumentTitle title="Inputs">
-      <div>
-        <PageHeader title="Inputs">
-          {isCloud ? (
-            <>
-              <p>
-                {' '}
-                {productName} cloud accepts data via inputs. There are many types of inputs to choose from, but only
-                some can run directly in the cloud. You can launch and terminate them on this page.
-              </p>
-              <p>
-                If you are missing an input type on this page&apos;s list of available inputs, you can start the input
-                on a <Link to={Routes.pluginRoute('SYSTEM_FORWARDERS')}>Forwarder</Link>.
-              </p>
-            </>
-          ) : (
-            <span>
-              {productName} nodes accept data via inputs. Launch or terminate as many inputs as you want here.
-            </span>
-          )}
-        </PageHeader>
-        <InputsList />
-      </div>
+      <PageHeader
+        title="Inputs"
+        documentationLink={{
+          title: 'Inputs documentation',
+          path: DocsHelper.PAGES.INPUTS,
+        }}>
+        {isCloud ? (
+          <>
+            <p>
+              {' '}
+              {productName} cloud accepts data via inputs. There are many types of inputs to choose from, but only some
+              can run directly in the cloud. You can launch and terminate them on this page.
+            </p>
+            <p>
+              If you are missing an input type on this page&apos;s list of available inputs, you can start the input on
+              a <Link to="/system/forwarders">Forwarder</Link>.
+            </p>
+          </>
+        ) : (
+          <span>{productName} nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
+        )}
+      </PageHeader>
+      <InputsNotifications />
+      <Row className="content">
+        <Col md={12}>
+          <InputsOverview inputTypeDescriptions={inputTypeDescriptions} inputTypes={inputTypes} />
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

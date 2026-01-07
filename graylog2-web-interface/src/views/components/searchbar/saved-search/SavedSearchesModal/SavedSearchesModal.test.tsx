@@ -18,6 +18,7 @@ import React from 'react';
 import { render, screen, waitFor } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 import Immutable from 'immutable';
+import type { Permission } from 'graylog-web-plugin/plugin';
 
 import asMock from 'helpers/mocking/AsMock';
 import View from 'views/logic/views/View';
@@ -72,17 +73,13 @@ jest.mock('components/common/EntityDataTable/hooks/useUserLayoutPreferences');
 jest.mock('components/common/EntityDataTable/hooks/useUpdateUserLayoutPreferences');
 jest.mock('hooks/useCurrentUser');
 
-jest.mock('routing/Routes', () => ({
-  getPluginRoute: (x) => () => x,
-}));
-
 describe('SavedSearchesModal', () => {
   useWindowConfirmMock();
   const defaultPaginatedSearches = createPaginatedSearches();
 
   beforeEach(() => {
     asMock(fetchSavedSearches).mockResolvedValue(defaultPaginatedSearches);
-    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutate: () => {} });
+    asMock(useUpdateUserLayoutPreferences).mockReturnValue({ mutateAsync: () => Promise.resolve() });
     asMock(useCurrentUser).mockReturnValue(adminUser);
   });
 
@@ -98,7 +95,7 @@ describe('SavedSearchesModal', () => {
         />,
       );
 
-      await screen.findByText('No saved searches have been found.');
+      await screen.findByText(/No saved searches have been found./i);
     });
 
     it('should render with views', async () => {
@@ -175,7 +172,7 @@ describe('SavedSearchesModal', () => {
     it('should not display delete action for saved search when user is missing required permissions', async () => {
       const currentUser = adminUser
         .toBuilder()
-        .permissions(Immutable.List([`view:read:${defaultPaginatedSearches.list[0].id}`]))
+        .permissions(Immutable.List<Permission>([`view:read:${defaultPaginatedSearches.list[0].id}`]))
         .build();
       asMock(useCurrentUser).mockReturnValue(currentUser);
 
@@ -192,7 +189,7 @@ describe('SavedSearchesModal', () => {
       const updateTableLayout = jest.fn();
 
       asMock(useUpdateUserLayoutPreferences).mockReturnValue({
-        mutate: updateTableLayout,
+        mutateAsync: updateTableLayout,
       });
 
       render(

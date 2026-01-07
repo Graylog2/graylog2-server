@@ -23,15 +23,27 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import jakarta.inject.Inject;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.ForbiddenException;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.NodeInfoCache;
+import org.graylog2.indexer.indexset.index.IndexPattern;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
@@ -46,21 +58,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.NotFoundException;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -135,7 +132,7 @@ public class IndicesResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -150,7 +147,7 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices closed() {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -167,7 +164,7 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices reopened() {
-        final Set<IndexSet> indexSets = indexSetRegistry.getAll();
+        final Set<IndexSet> indexSets = indexSetRegistry.getAllIndexSets();
         final Set<String> indexWildcards = indexSets.stream()
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
@@ -318,7 +315,7 @@ public class IndicesResource extends RestResource {
         final Map<String, Boolean> areReopened = this.indices.areReopened(indices);
 
         final List<IndexStatistics> sortedIndexStatistics = indicesStatistics.stream()
-                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(MongoIndexSet.SEPARATOR)))
+                .sorted(Comparator.comparing(IndexStatistics::index, new NumberBasedIndexNameComparator(IndexPattern.SEPARATOR)))
                 .toList();
 
         for (IndexStatistics indexStatistics : sortedIndexStatistics) {

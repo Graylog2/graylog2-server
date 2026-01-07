@@ -21,8 +21,6 @@ import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchCaches } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
-import LUTModals from 'components/lookup-tables/LUTModals';
 import type { CacheEntity } from 'components/lookup-tables/types';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 
@@ -91,27 +89,22 @@ function CacheList() {
   );
 
   return (
-    <ModalProvider>
-      <ErrorsProvider>
-        <Row className="content">
-          <Col md={12}>
-            <PaginatedEntityTable<CacheEntity>
-              humanName="caches"
-              entityActions={renderActions}
-              columnsOrder={cacheListElements.columnOrder}
-              queryHelpComponent={queryHelpComponent}
-              tableLayout={cacheListElements.defaultLayout}
-              fetchEntities={handleFetchCaches}
-              keyFn={cachesKeyFn}
-              actionsCellWidth={100}
-              entityAttributesAreCamelCase={false}
-              columnRenderers={columnRenderers}
-            />
-          </Col>
-        </Row>
-        <LUTModals />
-      </ErrorsProvider>
-    </ModalProvider>
+    <ErrorsProvider>
+      <Row className="content">
+        <Col md={12}>
+          <PaginatedEntityTable<CacheEntity>
+            humanName="caches"
+            entityActions={renderActions}
+            queryHelpComponent={queryHelpComponent}
+            tableLayout={cacheListElements.defaultLayout}
+            fetchEntities={handleFetchCaches}
+            keyFn={cachesKeyFn}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+          />
+        </Col>
+      </Row>
+    </ErrorsProvider>
   );
 }
 

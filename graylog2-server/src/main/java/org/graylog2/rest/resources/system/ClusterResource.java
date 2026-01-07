@@ -37,6 +37,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.cluster.nodes.NodeDto;
 import org.graylog2.cluster.nodes.ServerNodeDto;
 import org.graylog2.cluster.nodes.ServerNodePaginatedService;
 import org.graylog2.database.PaginatedList;
@@ -83,7 +84,10 @@ public class ClusterResource extends RestResource {
 
     public static final ImmutableMap<String, SearchQueryField> SERVER_NODE_ENTITY_SEARCH_MAPPINGS = ImmutableMap.<String, SearchQueryField>builder()
             .put("id", SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
-            .put("hostname", SearchQueryField.create("hostname"))
+            .put(ServerNodeDto.FIELD_HOSTNAME, SearchQueryField.create(ServerNodeDto.FIELD_HOSTNAME, SearchQueryField.Type.STRING))
+            .put(ServerNodeDto.FIELD_NODE_ID, SearchQueryField.create(ServerNodeDto.FIELD_NODE_ID, SearchQueryField.Type.STRING))
+            .put("short_node_id", SearchQueryField.create("short_node_id", SearchQueryField.Type.STRING))
+            .put("transport_address", SearchQueryField.create("transport_address", SearchQueryField.Type.STRING))
             .build();
 
     private static final String DEFAULT_SORT_FIELD = "hostname";
@@ -92,10 +96,11 @@ public class ClusterResource extends RestResource {
             EntityAttribute.builder().id("is_leader").title("Leader").filterable(true).sortable(true).build(),
             EntityAttribute.builder().id("transport_address").title("Transport address").searchable(true).sortable(true).build(),
             EntityAttribute.builder().id("last_seen").title("Last seen").sortable(true).build(),
-            EntityAttribute.builder().id("hostname").title("Hostname").searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id("hostname").title("Node").searchable(true).sortable(true).build(),
+            EntityAttribute.builder().id("node_id").title("Node ID").searchable(true).sortable(true).type(SearchQueryField.Type.STRING).build(),
             EntityAttribute.builder().id("short_node_id").title("Short node ID").sortable(true).build(),
-            EntityAttribute.builder().id(ServerNodeDto.FIELD_LOAD_BALANCER_STATUS).title("Load balancer status").sortable(true).filterable(true).filterOptions(loadBalancerOptions()).build(),
-            EntityAttribute.builder().id(ServerNodeDto.FIELD_LIFECYCLE).title("Lifecycle").sortable(true).filterable(true).filterOptions(lifecycleOptions()).build(),
+            EntityAttribute.builder().id(ServerNodeDto.FIELD_LOAD_BALANCER_STATUS).title("Load balancer").sortable(true).filterable(true).filterOptions(loadBalancerOptions()).build(),
+            EntityAttribute.builder().id(ServerNodeDto.FIELD_LIFECYCLE).title("Status").sortable(true).filterable(true).filterOptions(lifecycleOptions()).build(),
             EntityAttribute.builder().id(ServerNodeDto.FIELD_IS_PROCESSING).title("Processing").sortable(true).filterable(true).build()
     );
 
@@ -145,15 +150,15 @@ public class ClusterResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a paginated list of all server nodes in this cluster")
     public PageListResponse<ServerNodeDto> nodes(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                           @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                           @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                           @ApiParam(name = "sort",
-                                                     value = "The field to sort the result on",
-                                                     required = true,
-                                                     allowableValues = "title,description,type")
-                                           @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-                                           @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
-                                           @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
+                                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                                 @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                                 @ApiParam(name = "sort",
+                                                           value = "The field to sort the result on",
+                                                           required = true,
+                                                           allowableValues = "title,description,type")
+                                                 @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
+                                                 @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                                 @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order
 
     ) {
         final SearchQuery searchQuery = searchQueryParser.parse(query);

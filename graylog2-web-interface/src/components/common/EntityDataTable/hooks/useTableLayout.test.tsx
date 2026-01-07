@@ -43,6 +43,7 @@ describe('useTableLayout hook', () => {
     defaultSort: { attributeId: 'description', direction: 'asc' } as const,
     defaultPageSize: 20,
     defaultDisplayedAttributes: ['title'],
+    defaultColumnOrder: ['title'],
   };
 
   afterEach(() => {
@@ -60,8 +61,8 @@ describe('useTableLayout hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      columnPreferences: layoutPreferences.attributes,
-      defaultDisplayedColumns: ['title'],
+      attributes: layoutPreferences.attributes,
+      order: undefined,
       sort: layoutPreferences.sort,
       pageSize: layoutPreferences.perPage,
     });
@@ -80,8 +81,8 @@ describe('useTableLayout hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      columnPreferences: undefined,
-      defaultDisplayedColumns: ['title'],
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: defaultLayout.defaultPageSize,
     });
@@ -103,8 +104,8 @@ describe('useTableLayout hook', () => {
     );
 
     expect(result.current.layoutConfig).toEqual({
-      columnPreferences: undefined,
-      defaultDisplayedColumns: ['title'],
+      attributes: undefined,
+      order: undefined,
       sort: defaultLayout.defaultSort,
       pageSize: layoutPreferences.perPage,
     });

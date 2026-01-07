@@ -19,13 +19,18 @@ package org.graylog.datanode.filesystem.index.dto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import org.apache.lucene.util.Version;
 import org.graylog.datanode.filesystem.index.statefile.StateFile;
 
 import java.util.Optional;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record ShardInformation(@JsonIgnore java.nio.file.Path path, int documentsCount, @JsonIgnore StateFile stateFile,
+public record ShardInformation(@JsonIgnore java.nio.file.Path path, int documentsCount,
+                               @Nullable @JsonIgnore StateFile stateFile,
                                @JsonIgnore Version minSegmentLuceneVersion) {
+
+    private static final String PRIMARY_DOC_KEY = "primary";
 
     @JsonProperty
     public String name() {
@@ -39,7 +44,11 @@ public record ShardInformation(@JsonIgnore java.nio.file.Path path, int document
 
     @JsonProperty
     public boolean primary() {
-        return (boolean) stateFile.document().get("primary");
+        return Optional.ofNullable(stateFile)
+                .map(StateFile::document)
+                .filter(doc -> doc.containsKey(PRIMARY_DOC_KEY))
+                .map(doc -> (boolean) doc.get("primary"))
+                .orElse(false);
     }
 
     @Override

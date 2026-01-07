@@ -22,8 +22,10 @@ import com.google.common.collect.MultimapBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -36,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class RebuildIndexRangesJob extends SystemJob {
     public interface Factory {
-        RebuildIndexRangesJob create(Set<IndexSet> indexSets);
+        RebuildIndexRangesJob create(Set<BasicIndexSet> indexSets);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RebuildIndexRangesJob.class);
@@ -46,12 +48,12 @@ public class RebuildIndexRangesJob extends SystemJob {
     private volatile int indicesToCalculate = 0;
     private final AtomicInteger indicesCalculated = new AtomicInteger(0);
 
-    protected final Set<IndexSet> indexSets;
+    protected final Set<BasicIndexSet> indexSets;
     private final ActivityWriter activityWriter;
     protected final IndexRangeService indexRangeService;
 
     @AssistedInject
-    public RebuildIndexRangesJob(@Assisted Set<IndexSet> indexSets,
+    public RebuildIndexRangesJob(@Assisted Set<BasicIndexSet> indexSets,
                                  ActivityWriter activityWriter,
                                  IndexRangeService indexRangeService) {
         this.indexSets = indexSets;
@@ -70,8 +72,7 @@ public class RebuildIndexRangesJob extends SystemJob {
             return 0;
         }
 
-        // lolwtfbbqcasting
-        return (int) Math.floor((indicesCalculated.floatValue() / (float) indicesToCalculate) * 100);
+        return Tools.percentageOfRounded(indicesToCalculate, indicesCalculated.intValue());
     }
 
     @Override
@@ -84,29 +85,29 @@ public class RebuildIndexRangesJob extends SystemJob {
         info("Recalculating index ranges.");
 
         // for each index set we know about
-        final ListMultimap<IndexSet, String> indexSets = MultimapBuilder.hashKeys().arrayListValues().build();
-        for (IndexSet indexSet : this.indexSets) {
+        final ListMultimap<BasicIndexSet, String> indexSets = MultimapBuilder.hashKeys().arrayListValues().build();
+        for (BasicIndexSet indexSet : this.indexSets) {
             final String[] managedIndicesNames = indexSet.getManagedIndices();
             for (String name : managedIndicesNames) {
                 indexSets.put(indexSet, name);
             }
         }
 
-        if (indexSets.size() == 0) {
+        if (indexSets.isEmpty()) {
             info("No indices, nothing to calculate.");
             return;
         }
         indicesToCalculate = indexSets.values().size();
 
         Stopwatch sw = Stopwatch.createStarted();
-        for (IndexSet indexSet : indexSets.keySet()) {
+        for (BasicIndexSet basicIndexSet : indexSets.keySet()) {
             LOG.info("Recalculating index ranges for index set {} ({}): {} indices affected.",
-                    indexSet.getConfig().title(),
-                    indexSet.getIndexWildcard(),
-                    indexSets.get(indexSet).size());
-            for (String index : indexSets.get(indexSet)) {
+                    basicIndexSet.title(),
+                    basicIndexSet.getIndexWildcard(),
+                    indexSets.get(basicIndexSet).size());
+            for (String index : indexSets.get(basicIndexSet)) {
                 try {
-                    if (index.equals(indexSet.getActiveWriteIndex())) {
+                    if (basicIndexSet instanceof IndexSet indexSet && index.equals(indexSet.getActiveWriteIndex())) {
                         LOG.debug("{} is current write target, do not calculate index range for it", index);
                         final IndexRange emptyRange = indexRangeService.createUnknownRange(index);
                         try {

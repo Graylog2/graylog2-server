@@ -53,6 +53,7 @@ export type DirectoryServiceBackendConfigJson = {
 export type DirectoryServiceBackend = {
   id: AuthenticationBackend['id'];
   defaultRoles: AuthenticationBackend['defaultRoles'];
+  defaultUserTimezone: AuthenticationBackend['defaultUserTimezone'];
   title: AuthenticationBackend['title'];
   description: AuthenticationBackend['description'];
   config: DirectoryServiceBackendConfig;
@@ -62,6 +63,7 @@ export type WizardSubmitPayload = {
   title: AuthenticationBackendJSON['title'];
   description: AuthenticationBackendJSON['description'];
   default_roles: AuthenticationBackendJSON['default_roles'];
+  default_user_timezone: AuthenticationBackendJSON['default_user_timezone'];
   config: DirectoryServiceBackendConfigJson & {
     system_user_password:
       | (string | { keep_value: true } | { delete_value: true } | { set_value: string | undefined })
