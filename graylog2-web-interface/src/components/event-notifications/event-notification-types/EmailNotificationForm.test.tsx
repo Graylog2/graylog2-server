@@ -68,14 +68,14 @@ const buildConfig = (overrides = {}) => ({
 
 describe('EmailNotificationForm', () => {
   beforeEach(() => {
-    asMock(usePluggableLicenseCheck).mockReturnValue({ data: { valid: true } });
+    asMock(usePluggableLicenseCheck).mockReturnValue({ data: { valid: true, expired: false, violated: false } });
     asMock(usePluginEntities).mockReturnValue([
       {
         hooks: {
           useEmailTemplate: templateHook,
         },
       },
-    ]);
+    ] as unknown as ReturnType<typeof usePluginEntities>);
   });
 
   afterEach(() => {
