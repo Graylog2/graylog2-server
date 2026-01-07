@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 
 import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTableLayout';
@@ -44,6 +44,11 @@ const SearchRow = styled.div`
 `;
 
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
+type ExternalSearch = {
+  query: string;
+  onSearch?: (query: string) => void;
+  onReset?: () => void;
+};
 export type MiddleSectionProps = {
   searchParams: SearchParams;
   setFilters: (newFilters: UrlQueryFilters) => void;
@@ -60,6 +65,7 @@ type InnerProps = {
   fetchOptions: SearchParams;
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
+  onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
   onChangeFilters: (newFilters: UrlQueryFilters) => void;
   paginationState: PaginationQueryParameterResult;
   reactQueryOptions: FetchOptions;
@@ -67,7 +73,6 @@ type InnerProps = {
 };
 
 const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
-  actionsCellWidth = 160,
   additionalAttributes = [],
   bulkSelection = undefined,
   columnRenderers,
@@ -83,7 +88,9 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   keyFn,
   layoutConfig,
   middleSection: MiddleSection = undefined,
+  externalSearch = undefined,
   onChangeFilters,
+  onDataLoaded = undefined,
   paginationState,
   queryHelpComponent = undefined,
   reactQueryOptions,
@@ -92,7 +99,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   tableLayout,
   topRightCol = undefined,
   withoutURLParams = false,
-}: Props<T, M> & InnerProps) => {
+}: PaginatedEntityTableProps<T, M> & InnerProps) => {
   const { mutateAsync: updateTableLayout } = useUpdateUserLayoutPreferences(tableLayout.entityTableId);
   const fetchKey = useMemo(() => keyFn(fetchOptions), [fetchOptions, keyFn]);
 
@@ -110,6 +117,14 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   });
 
   useOnRefresh(refetch);
+
+  useEffect(() => {
+    if (!onDataLoaded || isLoadingEntities) {
+      return;
+    }
+
+    onDataLoaded(paginatedEntities);
+  }, [isLoadingEntities, onDataLoaded, paginatedEntities]);
 
   const appSection = `${tableLayout.entityTableId}-list`;
 
@@ -162,26 +177,28 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
             : undefined
         }>
-        <SearchRow>
-          <SearchForm
-            focusAfterMount={focusSearchAfterMount}
-            onSearch={onSearch}
-            onReset={onSearchReset}
-            query={fetchOptions.query}
-            placeholder={searchPlaceholder ?? `Search for ${humanName}`}
-            queryHelpComponent={queryHelpComponent}>
-            <div style={{ marginBottom: 5 }}>
-              <EntityFilters
-                attributes={attributes}
-                urlQueryFilters={fetchOptions.filters}
-                setUrlQueryFilters={onChangeFilters}
-                filterValueRenderers={filterValueRenderers}
-                appSection={appSection}
-              />
-            </div>
-          </SearchForm>
-          {topRightCol}
-        </SearchRow>
+        {!externalSearch && (
+          <SearchRow>
+            <SearchForm
+              focusAfterMount={focusSearchAfterMount}
+              onSearch={onSearch}
+              onReset={onSearchReset}
+              query={fetchOptions.query}
+              placeholder={searchPlaceholder ?? `Search for ${humanName}`}
+              queryHelpComponent={queryHelpComponent}>
+              <div style={{ marginBottom: 5 }}>
+                <EntityFilters
+                  attributes={attributes}
+                  urlQueryFilters={fetchOptions.filters}
+                  setUrlQueryFilters={onChangeFilters}
+                  filterValueRenderers={filterValueRenderers}
+                  appSection={appSection}
+                />
+              </div>
+            </SearchForm>
+            {topRightCol}
+          </SearchRow>
+        )}
         {MiddleSection ? <MiddleSection searchParams={fetchOptions} setFilters={onChangeFilters} /> : null}
 
         {list?.length === 0 ? (
@@ -204,7 +221,6 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
             pageSize={layoutConfig.pageSize}
             activeSort={layoutConfig.sort}
             entityActions={entityActions}
-            minActionsCellWidth={actionsCellWidth}
             columnRenderers={columnRenderers}
             columnSchemas={columnSchemas}
             entityAttributesAreCamelCase={entityAttributesAreCamelCase}
@@ -216,48 +232,58 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   );
 };
 
-type WrapperProps<T, M> = Props<T, M> & {
+type WrapperProps<T, M> = PaginatedEntityTableProps<T, M> & {
   isLoadingLayoutPreferences: boolean;
   layoutConfig: LayoutConfig;
   reactQueryOptions: FetchOptions;
+  onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
 };
 
 const TableWithLocalState = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, paginationState } = useWithLocalState(props.layoutConfig);
+  const effectiveFetchOptions = props.externalSearch
+    ? { ...fetchOptions, query: props.externalSearch.query }
+    : fetchOptions;
 
   return (
     <PaginatedEntityTableInner<T, M>
       {...props}
-      fetchOptions={fetchOptions}
-      setQuery={setQuery}
+      fetchOptions={effectiveFetchOptions}
+      setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
+      onDataLoaded={props.onDataLoaded}
     />
   );
 };
 
 const TableWithURLParams = <T extends EntityBase, M = unknown>({ ...props }: WrapperProps<T, M>) => {
   const { fetchOptions, setQuery, onChangeFilters, paginationState } = useWithURLParams(props.layoutConfig);
+  const effectiveFetchOptions = props.externalSearch
+    ? { ...fetchOptions, query: props.externalSearch.query }
+    : fetchOptions;
 
   return (
     <PaginatedEntityTableInner<T, M>
       {...props}
-      fetchOptions={fetchOptions}
-      setQuery={setQuery}
+      fetchOptions={effectiveFetchOptions}
+      setQuery={props.externalSearch ? () => {} : setQuery}
       onChangeFilters={onChangeFilters}
       paginationState={paginationState}
+      onDataLoaded={props.onDataLoaded}
     />
   );
 };
 
-type Props<T, M> = {
-  actionsCellWidth?: EntityDataTableProps['minActionsCellWidth'];
+export type PaginatedEntityTableProps<T, M> = {
   additionalAttributes?: Array<Attribute>;
   bulkSelection?: EntityDataTableProps['bulkSelection'];
   columnRenderers: EntityDataTableProps['columnRenderers'];
   entityActions: EntityDataTableProps['entityActions'];
   entityAttributesAreCamelCase: boolean;
   expandedSectionRenderers?: ExpandedSectionRenderers<T>;
+  externalSearch?: ExternalSearch;
+  onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
   fetchEntities: (options: SearchParams) => Promise<PaginatedResponse<T, M>>;
   fetchOptions?: FetchOptions;
   filterValueRenderers?: React.ComponentProps<typeof EntityFilters>['filterValueRenderers'];
@@ -280,7 +306,7 @@ type Props<T, M> = {
 const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
   fetchOptions: reactQueryOptions = undefined,
   ...props
-}: Props<T, M>) => {
+}: PaginatedEntityTableProps<T, M>) => {
   const { layoutConfig, isInitialLoading: isLoadingLayoutPreferences } = useTableLayout(props.tableLayout);
 
   const Wrapper = props.withoutURLParams ? TableWithLocalState : TableWithURLParams;
@@ -291,6 +317,7 @@ const PaginatedEntityTable = <T extends EntityBase, M = unknown>({
       layoutConfig={layoutConfig}
       isLoadingLayoutPreferences={isLoadingLayoutPreferences}
       reactQueryOptions={reactQueryOptions}
+      onDataLoaded={props.onDataLoaded}
     />
   );
 };

@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled from 'styled-components';
 import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
@@ -35,6 +36,16 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
+
+const StyledRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacings.lg};
+
+  & .form-group {
+    width: 100%;
+  }
+`;
 
 const priorityOptions = Object.entries(EventDefinitionPriorityEnum.properties)
   .map(([key, value]) => ({
@@ -69,7 +80,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
     () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
     [canEdit, eventDefinition],
   );
-  const showEventProcedureSummar = React.useMemo(
+  const showEventProcedureSummary = React.useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],
   );
@@ -100,19 +111,17 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
 
   return (
     <Row>
-      <Col md={7} lg={12}>
+      <Col md={12} lg={6}>
         <h2 className={commonStyles.title}>Event Details</h2>
         <fieldset>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
+          <StyledRow>
             <Input
               id="event-definition-title"
               name="title"
               label="Title"
               type="text"
               bsStyle={validation.errors.title ? 'error' : null}
-              help={
-                validation?.errors?.title?.[0] ?? 'Title for this Event Definition, Events and Alerts created from it.'
-              }
+              help={validation?.errors?.title?.[0] ?? 'Title for this Event Definition.'}
               value={eventDefinition.title}
               onChange={handleChange}
               readOnly={readOnly}
@@ -131,7 +140,18 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               />
               <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
             </FormGroup>
-          </div>
+          </StyledRow>
+
+          <Input
+            id="event-definition-event-summary-template"
+            name="event_summary_template"
+            label="Event Summary Template"
+            type="text"
+            help="Template used to generate the Event and Alert summaries."
+            value={eventDefinition.event_summary_template}
+            onChange={handleChange}
+            readOnly={readOnly}
+          />
 
           <Input
             id="event-definition-description"
@@ -163,7 +183,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               }}
             />
           )}
-          {showEventProcedureSummar && (
+          {showEventProcedureSummary && (
             <Col>
               <ControlLabel>Event Procedure Summary</ControlLabel>
               <PluggableEventProcedureSummary

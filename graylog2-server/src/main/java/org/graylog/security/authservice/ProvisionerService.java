@@ -16,6 +16,7 @@
  */
 package org.graylog.security.authservice;
 
+import jakarta.inject.Inject;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
@@ -25,9 +26,6 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-
 import java.util.Collections;
 import java.util.Map;
 
@@ -35,15 +33,12 @@ public class ProvisionerService {
     private static final Logger LOG = LoggerFactory.getLogger(ProvisionerService.class);
 
     private final UserService userService;
-    private final DateTimeZone rootTimeZone;
     private final Map<String, ProvisionerAction.Factory<? extends ProvisionerAction>> provisionerActionFactories;
 
     @Inject
     public ProvisionerService(UserService userService,
-                              @Named("root_timezone") DateTimeZone rootTimeZone,
                               Map<String, ProvisionerAction.Factory<? extends ProvisionerAction>> provisionerActionFactories) {
         this.userService = userService;
-        this.rootTimeZone = rootTimeZone;
         this.provisionerActionFactories = provisionerActionFactories;
     }
 
@@ -142,8 +137,10 @@ public class ProvisionerService {
         // Set fields there that should not be overridden by the authentication service provisioning
         user.setRoleIds(userDetails.defaultRoles());
         user.setPermissions(Collections.emptyList());
-        // TODO: Does the timezone need to be configurable per auth service backend?
-        user.setTimeZone(rootTimeZone);
+        // Default to null for the user's time zone so the UI will use the browser's time zone by default.
+        user.setTimeZone(userDetails.timezone()
+                .map(zoneId -> DateTimeZone.forID(zoneId.getId()))
+                .orElse(null));
         // TODO: Does the session timeout need to be configurable per auth service backend?
         user.setSessionTimeoutMs(UserConfiguration.DEFAULT_VALUES.globalSessionTimeoutInterval().toMillis());
 
