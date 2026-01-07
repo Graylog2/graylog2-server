@@ -1244,6 +1244,8 @@
     </build>
     <profiles>
         <profile>
+            <!-- Generate OpenAPI description using exec:exec (forked JVM) instead of exec:java
+                 to avoid BouncyCastle classloader conflicts in multi-module builds -->
             <id>generate-openapi</id>
             <build>
                 <plugins>
@@ -1255,31 +1257,23 @@
                                 <id>generate-openapi-description</id>
                                 <phase>compile</phase>
                                 <goals>
-                                    <goal>java</goal>
+                                    <goal>exec</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>org.graylog2.bootstrap.Main</mainClass>
+                                    <executable>java</executable>
                                     <arguments>
+                                        <argument>-classpath</argument>
+                                        <classpath/>
+                                        <argument>-Dgraylog.password_secret=dummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummy</argument>
+                                        <argument>-Dgraylog.data_dir=${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-data-${maven.build.timestamp}</argument>
+                                        <argument>-Dgraylog.node_id_file=${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-node-id-${maven.build.timestamp}</argument>
+                                        <argument>org.graylog2.bootstrap.Main</argument>
                                         <argument>openapi-description</argument>
                                         <argument>-np</argument>
                                         <argument>-f</argument>
                                         <argument>${openapi.server.config.file}</argument>
                                         <argument>${openapi.server.output.file}</argument>
                                     </arguments>
-                                    <systemProperties>
-                                        <systemProperty>
-                                            <key>graylog.password_secret</key>
-                                            <value>dummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummypasswordsecretformavenbuildonlydummy</value>
-                                        </systemProperty>
-                                        <systemProperty>
-                                            <key>graylog.data_dir</key>
-                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-data-${maven.build.timestamp}</value>
-                                        </systemProperty>
-                                        <systemProperty>
-                                            <key>graylog.node_id_file</key>
-                                            <value>${java.io.tmpdir}/${project.artifactId}-openapi-description-generation-node-id-${maven.build.timestamp}</value>
-                                        </systemProperty>
-                                    </systemProperties>
                                 </configuration>
                             </execution>
                         </executions>
