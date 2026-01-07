@@ -18,6 +18,8 @@ package org.graylog.security.rest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -88,7 +90,10 @@ public class CAResource extends RestResource {
     @Operation(summary = "Upload a CA")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CREATE)
-    public Response uploadCA(@Parameter(name = "password") @FormDataParam("password") String password, @Parameter(name = "files") @FormDataParam("files") List<FormDataBodyPart> files) {
+    public Response uploadCA(
+            @Parameter(name = "password") @FormDataParam("password") String password,
+            @Parameter(name = "files", array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))
+            @FormDataParam("files") List<FormDataBodyPart> files) {
         try {
             caKeystore.createFromUpload(password, files);
             return Response.ok().build();

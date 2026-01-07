@@ -19,7 +19,10 @@ package org.graylog.plugins.views.search.rest;
 import com.google.common.eventbus.EventBus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -122,6 +125,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
             summary = "Export messages as CSV",
             description = "Use this endpoint, if you want to configure export parameters freely instead of relying on an existing Search"
     )
+    @ApiResponse(description = "CSV export", content = @Content(schema = @Schema(hidden = true)))
     @POST
     @Produces(MoreMediaTypes.TEXT_CSV)
     @NoAuditEvent("Has custom audit events")
@@ -169,6 +173,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     @Operation(summary = "Export a search result as CSV")
+    @ApiResponse(description = "CSV export", content = @Content(schema = @Schema(hidden = true)))
     @POST
     @Path("{searchId}")
     @Produces(MoreMediaTypes.TEXT_CSV)
@@ -187,6 +192,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     @Operation(summary = "Export a message table as CSV")
+    @ApiResponse(description = "CSV export", content = @Content(schema = @Schema(hidden = true)))
     @POST
     @Path("{searchId}/{searchTypeId}")
     @NoAuditEvent("Has custom audit events")
@@ -205,6 +211,7 @@ public class MessagesResource extends RestResource implements PluginRestResource
     }
 
     @Operation(summary = "Retrieve results for export job")
+    @ApiResponse(description = "Results", content = @Content(schema = @Schema(hidden = true)))
     @GET
     @Path("job/{exportJobId}/{filename}")
     public ChunkedOutput<SimpleMessageChunk> retrieveForExportJob(@Parameter(description = "ID of an existing export job", name = "exportJobId")

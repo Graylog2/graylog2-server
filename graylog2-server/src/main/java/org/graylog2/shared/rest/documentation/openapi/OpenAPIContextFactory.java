@@ -47,13 +47,25 @@ public class OpenAPIContextFactory {
 
     static {
         // Register custom class mappings for simple types that should be treated as primitives.
-        PrimitiveType.customClasses().put("com.github.zafarkhaja.semver.Version", PrimitiveType.STRING);
+        // Joda-Time types
         PrimitiveType.customClasses().put("org.joda.time.DateTimeZone", PrimitiveType.STRING);
         PrimitiveType.customClasses().put("org.joda.time.Duration", PrimitiveType.LONG);
-        PrimitiveType.customClasses().put("java.time.Duration", PrimitiveType.STRING);
         PrimitiveType.customClasses().put("org.joda.time.Period", PrimitiveType.STRING);
+        // java.time types (serialized as ISO-8601 strings by JavaTimeModule)
+        PrimitiveType.customClasses().put("java.time.Duration", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("java.time.ZoneId", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("java.time.ZoneOffset", PrimitiveType.STRING);
+        // Third-party types (with custom Jackson serializers)
         PrimitiveType.customClasses().put("org.threeten.extra.PeriodDuration", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("com.github.zafarkhaja.semver.Version", PrimitiveType.STRING);
         PrimitiveType.customClasses().put("com.google.common.net.HostAndPort", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("com.github.joschi.jadconfig.util.Size", PrimitiveType.LONG);
+        PrimitiveType.customClasses().put("org.bson.types.ObjectId", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("org.apache.shiro.authz.permission.WildcardPermission", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("com.vdurmont.semver4j.Semver", PrimitiveType.STRING);
+        PrimitiveType.customClasses().put("com.vdurmont.semver4j.Requirement", PrimitiveType.STRING);
+        // Graylog internal types (with custom Jackson serializers)
+        PrimitiveType.customClasses().put("org.graylog.grn.GRN", PrimitiveType.STRING);
     }
 
     private final Version version;

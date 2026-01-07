@@ -29,6 +29,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Range;
 import io.swagger.v3.core.converter.AnnotatedType;
 import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.converter.ModelConverterContext;
@@ -39,6 +41,7 @@ import io.swagger.v3.core.util.RefUtils;
 import io.swagger.v3.oas.models.media.Discriminator;
 import io.swagger.v3.oas.models.media.IntegerSchema;
 import io.swagger.v3.oas.models.media.NumberSchema;
+import io.swagger.v3.oas.models.media.ObjectSchema;
 import io.swagger.v3.oas.models.media.Schema;
 import jakarta.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
@@ -122,6 +125,20 @@ public class CustomModelConverter extends ModelResolver {
                         replacementType(annotatedType, typeFactory.constructCollectionLikeType(Set.class, javaType.getContentType())),
                         context,
                         next);
+            } else if (Multimap.class.isAssignableFrom(rawClass)) {
+                // Multimap<K, V> serializes as Map<K, Collection<V>> via GuavaModule
+                final JavaType valueType = javaType.getBindings().getBoundType(1);
+                if (valueType != null) {
+                    final JavaType listType = typeFactory.constructCollectionLikeType(List.class, valueType);
+                    final JavaType mapType = typeFactory.constructMapType(Map.class,
+                            typeFactory.constructType(String.class), listType);
+                    return super.resolve(replacementType(annotatedType, mapType), context, next);
+                }
+            } else if (Range.class.isAssignableFrom(rawClass)) {
+                // Range is serialized by RangeJsonSerializer as {"start": N, "length": M}
+                return new ObjectSchema()
+                        .addProperty("start", new IntegerSchema())
+                        .addProperty("length", new IntegerSchema());
             }
         }
 

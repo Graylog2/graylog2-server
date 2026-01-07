@@ -118,7 +118,7 @@ public class AbsoluteSearchResource extends SearchResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success",
                     content = @Content(mediaType = MoreMediaTypes.TEXT_CSV,
-                            schema = @Schema(type = "string", format = "binary"))),
+                            schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "400", description = "Invalid timerange parameters provided.")
     })
     public ChunkedOutput<ResultChunk> searchAbsoluteChunked(
@@ -156,7 +156,7 @@ public class AbsoluteSearchResource extends SearchResource {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Success",
                     content = @Content(mediaType = MoreMediaTypes.TEXT_CSV,
-                            schema = @Schema(type = "string", format = "binary"))),
+                            schema = @Schema(hidden = true))),
             @ApiResponse(responseCode = "400", description = "Invalid timerange parameters provided.")
     })
     public Response exportSearchAbsoluteChunked(

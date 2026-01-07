@@ -89,7 +89,7 @@ public class MonitoringResource extends RestResource {
                             @Content(mediaType = MediaType.APPLICATION_JSON,
                                     schema = @Schema(implementation = Histogram.class)),
                             @Content(mediaType = MoreMediaTypes.TEXT_CSV,
-                                    schema = @Schema(type = "string", format = "binary"))
+                                    schema = @Schema(hidden = true))
                     })
     })
     @Path("query_duration_histogram")
