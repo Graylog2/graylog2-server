@@ -37,29 +37,30 @@ jest.mock('components/lookup-tables', () => ({
 
 jest.mock('components/users/UsersSelectField', () => () => null);
 
-jest.mock('components/bootstrap', () => {
-  const Actual = jest.requireActual('components/bootstrap');
-
-  return {
-    ...Actual,
-    Input: (props) => <input {...props} />,
-    FormGroup: ({ children, ...rest }) => (
-      <div {...rest} data-testid="form-group-mock">
-        {children}
-      </div>
-    ),
-    ControlLabel: ({ children, ...rest }) => (
-      <label {...rest} data-testid="control-label-mock">
-        {children}
-      </label>
-    ),
-    HelpBlock: ({ children, ...rest }) => (
-      <div {...rest} data-testid="help-block-mock">
-        {children}
-      </div>
-    ),
-  };
-});
+jest.mock('components/bootstrap', () => ({
+  Input: ({ children, bsStyle: _ignored, help, ...rest }) => (
+    <div>
+      <input {...rest} />
+      {help && <span>{help}</span>}
+      {children}
+    </div>
+  ),
+  FormGroup: ({ children, controlId: _ignored, validationState: __ignored, ...rest }) => (
+    <div {...rest} data-testid="form-group-mock">
+      {children}
+    </div>
+  ),
+  ControlLabel: ({ children, ...rest }) => (
+    <label {...rest} data-testid="control-label-mock">
+      {children}
+    </label>
+  ),
+  HelpBlock: ({ children, ...rest }) => (
+    <div {...rest} data-testid="help-block-mock">
+      {children}
+    </div>
+  ),
+}));
 
 jest.mock('util/conditional/HideOnCloud', () => ({ children }) => <>{children}</>);
 
