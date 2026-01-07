@@ -108,14 +108,7 @@ describe('EmailNotificationForm', () => {
       html_body_template: 'EXISTING_HTML',
     });
 
-    render(
-      <EmailNotificationForm
-        config={config}
-        validation={defaultValidation}
-        onChange={onChange}
-        notificationId="123"
-      />,
-    );
+    render(<EmailNotificationForm config={config} validation={defaultValidation} onChange={onChange} />);
 
     await waitFor(() => {
       expect(onChange).not.toHaveBeenCalled();

@@ -60,12 +60,10 @@ const EmailTemplatesRunner = ({
   config,
   onChange,
   resetKey = undefined,
-  isPersisted = false,
 }: {
   config: any;
   onChange: (next: any) => void;
   resetKey?: string | number | undefined;
-  isPersisted?: boolean;
 }) => {
   const { data: { valid: validCustomizationLicense } = { valid: false } } = usePluggableLicenseCheck(
     '/license/enterprise/customization',
@@ -99,7 +97,6 @@ const EmailTemplatesRunner = ({
   const lastSigRef = useRef<string>('init');
 
   useEffect(() => {
-    if (isPersisted) return;
     if (!validCustomizationLicense || !templateConfig) return;
 
     if (lastSigRef.current === sig) return;
@@ -111,25 +108,50 @@ const EmailTemplatesRunner = ({
 
     if (override_defaults === true) {
       const nextCfg = { ...config };
+      const trimmedBody = (config.body_template ?? '').trim();
+      const trimmedHtml = (config.html_body_template ?? '').trim();
 
-      if (typeof text_body === 'string' && text_body !== config.body_template) {
+      const shouldOverrideBody =
+        typeof text_body === 'string' &&
+        (trimmedBody === '' || (config.body_template ?? '') === DEFAULT_BODY_TEMPLATE) &&
+        text_body !== config.body_template;
+      const shouldOverrideHtml =
+        typeof html_body === 'string' &&
+        (trimmedHtml === '' || (config.html_body_template ?? '') === DEFAULT_HTML_BODY_TEMPLATE) &&
+        html_body !== config.html_body_template;
+
+      if (shouldOverrideBody) {
         nextCfg.body_template = text_body;
         changed = true;
       }
-      if (typeof html_body === 'string' && html_body !== config.html_body_template) {
+      if (shouldOverrideHtml) {
         nextCfg.html_body_template = html_body;
         changed = true;
       }
 
       if (changed) next = nextCfg;
     } else {
+      const trimmedBody = (config.body_template ?? '').trim();
+      const trimmedHtml = (config.html_body_template ?? '').trim();
+      const hasCustomBody =
+        trimmedBody !== '' && (config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE && trimmedBody !== DEFAULT_BODY_TEMPLATE;
+      const hasCustomHtml =
+        trimmedHtml !== '' &&
+        (config.html_body_template ?? '') !== DEFAULT_HTML_BODY_TEMPLATE &&
+        trimmedHtml !== DEFAULT_HTML_BODY_TEMPLATE;
+
+      if (hasCustomBody || hasCustomHtml) {
+        lastSigRef.current = sig;
+        return;
+      }
+
       const nextCfg = { ...config };
 
-      if ((config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE) {
+      if (trimmedBody === '') {
         nextCfg.body_template = DEFAULT_BODY_TEMPLATE;
         changed = true;
       }
-      if ((config.html_body_template ?? '') !== DEFAULT_HTML_BODY_TEMPLATE) {
+      if (trimmedHtml === '') {
         nextCfg.html_body_template = DEFAULT_HTML_BODY_TEMPLATE;
         changed = true;
       }
@@ -140,7 +162,7 @@ const EmailTemplatesRunner = ({
     if (changed) onChange(next);
 
     lastSigRef.current = sig;
-  }, [sig, validCustomizationLicense, templateConfig, config, onChange, isPersisted]);
+  }, [sig, validCustomizationLicense, templateConfig, config, onChange]);
 
   return null;
 };
@@ -149,7 +171,6 @@ type EmailNotificationFormProps = {
   config: any;
   validation: any;
   onChange: (...args: any[]) => void;
-  notificationId?: string;
 };
 
 class EmailNotificationForm extends React.Component<
@@ -594,16 +615,11 @@ class EmailNotificationForm extends React.Component<
   };
 
   render() {
-    const { config, validation, onChange, notificationId } = this.props;
+    const { config, validation, onChange } = this.props;
 
     return (
       <>
-        <EmailTemplatesRunner
-          config={config}
-          onChange={onChange}
-          resetKey={config?.type || config?.id}
-          isPersisted={Boolean(notificationId)}
-        />
+        <EmailTemplatesRunner config={config} onChange={onChange} resetKey={config?.type || config?.id} />
         <Input
           id="notification-subject"
           name="subject"
