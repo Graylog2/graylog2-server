@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Icon, DatePicker, Switch } from 'components/common';
@@ -59,8 +60,8 @@ type Props = {
 };
 
 const DateFilter = ({ values: valuesProps, onChange }: Props) => {
-  const [currentDate, setCurrentDate] = React.useState<string>(null);
-  const [dateRange, setDateRange] = React.useState<boolean>(false);
+  const [currentDate, setCurrentDate] = useState<string>(null);
+  const [dateRange, setDateRange] = useState<boolean>(false);
 
   const values = valuesProps ?? [];
 

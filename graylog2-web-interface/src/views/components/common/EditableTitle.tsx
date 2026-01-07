@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import useDisclosure from 'util/hooks/useDisclosure';
@@ -55,7 +55,7 @@ type Props = {
 };
 
 const EditableTitle = ({ disabled = false, value: propsValue, onChange }: Props) => {
-  const [value, setValue] = React.useState(propsValue);
+  const [value, setValue] = useState(propsValue);
   const [editing, { toggle }] = useDisclosure(false);
 
   const _toggleEditing = useCallback(() => {
