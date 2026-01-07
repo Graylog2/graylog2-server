@@ -60,10 +60,12 @@ const EmailTemplatesRunner = ({
   config,
   onChange,
   resetKey = undefined,
+  isPersisted = false,
 }: {
   config: any;
   onChange: (next: any) => void;
   resetKey?: string | number | undefined;
+  isPersisted?: boolean;
 }) => {
   const { data: { valid: validCustomizationLicense } = { valid: false } } = usePluggableLicenseCheck(
     '/license/enterprise/customization',
@@ -146,6 +148,7 @@ type EmailNotificationFormProps = {
   config: any;
   validation: any;
   onChange: (...args: any[]) => void;
+  notificationId?: string;
 };
 
 class EmailNotificationForm extends React.Component<
@@ -590,11 +593,16 @@ class EmailNotificationForm extends React.Component<
   };
 
   render() {
-    const { config, validation, onChange } = this.props;
+    const { config, validation, onChange, notificationId } = this.props;
 
     return (
       <>
-        <EmailTemplatesRunner config={config} onChange={onChange} resetKey={config?.type || config?.id} />
+        <EmailTemplatesRunner
+          config={config}
+          onChange={onChange}
+          resetKey={config?.type || config?.id}
+          isPersisted={Boolean(notificationId)}
+        />
         <Input
           id="notification-subject"
           name="subject"

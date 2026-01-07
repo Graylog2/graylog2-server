@@ -92,6 +92,19 @@ class EventNotificationFormContainer extends React.Component<
     }
   }
 
+  componentDidUpdate(prevProps: Readonly<EventNotificationFormContainerProps>) {
+    const { notification } = this.props;
+
+    if (notification !== prevProps.notification) {
+      this.setState({
+        notification: cloneDeep(notification),
+        validation: initialValidation,
+        testResult: initialTestResult,
+        isDirty: false,
+      });
+    }
+  }
+
   handleChange = (key, value) => {
     const { notification } = this.state;
     const nextNotification = cloneDeep(notification);
