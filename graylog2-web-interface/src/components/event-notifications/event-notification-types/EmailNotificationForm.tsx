@@ -99,6 +99,7 @@ const EmailTemplatesRunner = ({
   const lastSigRef = useRef<string>('init');
 
   useEffect(() => {
+    if (isPersisted) return;
     if (!validCustomizationLicense || !templateConfig) return;
 
     if (lastSigRef.current === sig) return;
@@ -139,7 +140,7 @@ const EmailTemplatesRunner = ({
     if (changed) onChange(next);
 
     lastSigRef.current = sig;
-  }, [sig, validCustomizationLicense, templateConfig, config, onChange]);
+  }, [sig, validCustomizationLicense, templateConfig, config, onChange, isPersisted]);
 
   return null;
 };

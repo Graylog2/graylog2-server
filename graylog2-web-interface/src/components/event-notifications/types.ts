@@ -57,6 +57,7 @@ export interface EventNotificationTypes {
     validation: { errors: { [key: string]: Array<string> } };
     onChange: (newConfig: EventNotification['config']) => void;
     setIsSubmitEnabled: (enabled: boolean) => void;
+    notificationId?: string;
   }>;
   summaryComponent: React.ComponentType<{
     type: string;
