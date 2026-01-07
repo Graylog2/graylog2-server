@@ -132,7 +132,7 @@
         <gcs.version>2.61.0</gcs.version>
         <azure-blob-storage.version>12.32.0</azure-blob-storage.version>
         <gelfclient.version>1.5.1</gelfclient.version>
-        <geoip2.version>4.4.0</geoip2.version>
+        <geoip2.version>5.0.2</geoip2.version>
         <grok.version>0.1.9-graylog-3</grok.version>
         <grpc.version>1.78.0</grpc.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
@@ -211,7 +211,7 @@
         <awaitility.version>4.3.0</awaitility.version>
         <equalsverifier.version>4.3</equalsverifier.version>
         <guice-extension.version>1.2.1</guice-extension.version>
-        <junit-jupiter.version>6.0.1</junit-jupiter.version>
+        <junit-jupiter.version>6.0.2</junit-jupiter.version>
         <mockito.version>5.21.0</mockito.version>
         <restassured.version>6.0.0</restassured.version>
         <testcontainers.version>2.0.3</testcontainers.version>

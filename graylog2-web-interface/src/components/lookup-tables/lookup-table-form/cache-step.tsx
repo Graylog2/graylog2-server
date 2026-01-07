@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useState } from 'react';
 import { useFormikContext } from 'formik';
 
 import { Spinner } from 'components/common';
@@ -31,10 +32,10 @@ function CacheFormStep() {
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
   const { allCaches, loadingAllCaches } = useFetchAllCaches();
   const { cache, loadingCache } = useFetchCache(values.cache_id);
-  const [showForm, setShowForm] = React.useState<boolean>(false);
-  const showCache = React.useMemo(() => !!cache, [cache]);
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const showCache = useMemo(() => !!cache, [cache]);
 
-  const canModify = React.useMemo(
+  const canModify = useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
   );
