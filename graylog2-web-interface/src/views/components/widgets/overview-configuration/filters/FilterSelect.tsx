@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo, useState, useRef } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { Select } from 'components/common';
@@ -48,7 +48,7 @@ const FilterSelect = ({ filterComponents, columnTitle, onCreate, selectedFilters
   const container = useRef(null);
   const [open, setOpen] = useState(false);
   const [selectedColumn, setSelectedColumn] = useState<string>(null);
-  const [createValue, setCreateValue] = React.useState<string>();
+  const [createValue, setCreateValue] = useState<string>();
   const filterComponent = selectedColumn
     ? filterComponents.find(({ attribute }) => attribute === selectedColumn)
     : undefined;
