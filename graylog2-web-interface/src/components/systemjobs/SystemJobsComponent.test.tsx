@@ -47,7 +47,7 @@ describe('SystemJobsComponent', () => {
     render(<SystemJobsComponent />);
     await screen.findByText('Optimized data for Data Lake archives');
   });
-  it('handles `useSystemJobs` returning `undefined``', async () => {
+  it('handles `useSystemJobs` returning `undefined`', async () => {
     asMock(useSystemJobs).mockReturnValue(undefined);
 
     render(<SystemJobsComponent />);
