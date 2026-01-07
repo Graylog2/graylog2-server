@@ -272,7 +272,8 @@ export default [
         {
           object: 'fireEvent',
           property: 'submit',
-          message: 'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
+          message:
+            'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
         },
       ],
       'testing-library/render-result-naming-convention': 'off',
