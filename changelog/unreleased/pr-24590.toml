@@ -1,0 +1,4 @@
+type = "f"
+message = "Return 404 instead of HTML for non-existent API methods."
+
+pulls = ["24590"]
