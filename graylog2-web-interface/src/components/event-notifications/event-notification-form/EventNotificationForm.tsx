@@ -138,7 +138,6 @@ const EventNotificationForm = ({
         onChange: handleConfigChange,
         validation: validation,
         setIsSubmitEnabled: setIsSubmitEnabled,
-        notificationId: notification.id,
       })
     : null;
 
