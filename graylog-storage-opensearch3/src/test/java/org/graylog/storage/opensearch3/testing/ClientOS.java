@@ -27,6 +27,7 @@ import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.IndexState;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.utilities.IpSubnet;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;
@@ -53,6 +54,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -62,6 +64,12 @@ import static org.graylog2.indexer.Constants.COMPOSABLE_INDEX_TEMPLATES_FEATURE;
 
 public class ClientOS implements Client {
     private static final Logger LOG = LoggerFactory.getLogger(ClientOS.class);
+
+    private static final Set<String> PROTECTED_INDICES = Set.of(
+            ".opensearch-observability",
+            ".opendistro_security"
+    );
+
     private final OfficialOpensearchClient opensearchClient;
     private final List<String> featureFlags;
     private final ObjectMapper objectMapper;
@@ -80,8 +88,9 @@ public class ClientOS implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        if (indices.length > 0) {
-            opensearchClient.sync(c -> c.indices().delete(r -> r.index(List.of(indices)).ignoreUnavailable(true)), "Failed to delete indices");
+        final List<String> toDelete = Arrays.stream(indices).filter(i -> !PROTECTED_INDICES.contains(i)).toList();
+        if (!toDelete.isEmpty()) {
+            opensearchClient.sync(c -> c.indices().delete(r -> r.index(toDelete).ignoreUnavailable(true)), "Failed to delete indices");
         }
     }
 
