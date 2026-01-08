@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import { useMemo } from 'react';
+import { useFormikContext } from 'formik';
 
 import type { Usage, CustomCommandContext } from 'views/components/searchbar/queryinput/types';
 import type { Command, Editor } from 'views/components/searchbar/queryinput/ace-types';
@@ -22,8 +23,9 @@ import usePluginEntities from 'hooks/usePluginEntities';
 
 const useCommandsContext = (usage: Usage): CustomCommandContext => {
   const contextProviders = usePluginEntities('views.queryInput.commandContextProviders');
+  const formikContext = useFormikContext();
 
-  const context = Object.fromEntries(contextProviders.map(({ key, provider }) => [key, provider()]));
+  const context = Object.fromEntries(contextProviders.map(({ key, provider }) => [key, provider(formikContext)]));
 
   return { ...context, usage };
 };
