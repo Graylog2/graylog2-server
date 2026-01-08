@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -48,7 +49,7 @@ const queryHelpComponent = (
 );
 
 function LookupTableList() {
-  const [{ lutNames, cacheNames, adapterNames }, setNames] = React.useState<{
+  const [{ lutNames, cacheNames, adapterNames }, setNames] = useState<{
     lutNames?: Array<string>;
     cacheNames?: Array<string>;
     adapterNames?: Array<string>;
@@ -56,7 +57,7 @@ function LookupTableList() {
   const { fetchPaginatedLookupTables, lookupTablesKeyFn } = useFetchLookupTables();
   const { renderActions } = useActions();
 
-  const handleFetchTables = React.useCallback(
+  const handleFetchTables = useCallback(
     async (searchParams: SearchParams) => {
       const resp = await fetchPaginatedLookupTables(searchParams);
 
