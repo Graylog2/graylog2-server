@@ -14,23 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.indexer;
 
-import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { LinkContainer } from 'components/common/router';
-import { Button } from 'components/bootstrap';
-import Routes from 'routing/Routes';
+public class ParentCircuitBreakingException extends ElasticsearchException {
+    public static final String HELP_TEXT = "This error typically indicates that the Opensearch cluster is short on " +
+            "JVM Heap, decrease load or increase the JVM Heap provision to resolve.";
 
-type Props = {
-  input: InputSummary;
-};
-
-const TitleCell = ({ input }: Props) => (
-  <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
-    <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
-      {input.title}
-    </Button>
-  </LinkContainer>
-);
-
-export default TitleCell;
+    public ParentCircuitBreakingException(String errorMessage) {
+        super(("%s " + HELP_TEXT).formatted(errorMessage));
+    }
+}

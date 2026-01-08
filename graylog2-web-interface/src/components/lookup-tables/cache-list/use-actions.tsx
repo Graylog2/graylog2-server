@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
@@ -31,17 +32,17 @@ type ActionsProps = {
 };
 
 function Actions({ cache }: ActionsProps) {
-  const [showDeleteModal, setShowDeleteModal] = React.useState<boolean>(false);
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
   const sendTelemetry = useSendTelemetry();
   const { deleteCache, deletingCache } = useDeleteCache();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(cache);
   const navigate = useNavigate();
 
-  const handleEdit = React.useCallback(() => {
+  const handleEdit = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name));
   }, [navigate, cache.name]);
 
-  const handleDelete = React.useCallback(() => {
+  const handleDelete = useCallback(() => {
     sendTelemetry(TELEMETRY_EVENT_TYPE.LUT.CACHE_DELETED, {
       app_pathname: 'lut',
       app_section: 'lut_cache',
