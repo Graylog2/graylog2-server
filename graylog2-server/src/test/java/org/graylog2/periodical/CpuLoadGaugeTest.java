@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.periodical;
 
-import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { LinkContainer } from 'components/common/router';
-import { Button } from 'components/bootstrap';
-import Routes from 'routing/Routes';
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-type Props = {
-  input: InputSummary;
-};
-
-const TitleCell = ({ input }: Props) => (
-  <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
-    <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
-      {input.title}
-    </Button>
-  </LinkContainer>
-);
-
-export default TitleCell;
+class CpuLoadGaugeTest {
+    @Test
+    void testGauge() {
+        final CpuLoadGauge gauge = new CpuLoadGauge();
+        Assertions.assertThat(gauge.getValue()).isNull();
+        gauge.update();
+        Assertions.assertThat(gauge.getValue())
+                .isNotNull()
+                .isGreaterThanOrEqualTo(0.0d);
+    }
+}

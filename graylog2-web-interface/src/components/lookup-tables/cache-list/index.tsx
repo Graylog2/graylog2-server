@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -49,7 +50,7 @@ function CacheList() {
   const { fetchPaginatedCaches, cachesKeyFn } = useFetchCaches();
   const { renderActions } = useActions();
 
-  const handleFetchCaches = React.useCallback(
+  const handleFetchCaches = useCallback(
     async (searchParams: SearchParams) => {
       const resp = await fetchPaginatedCaches(searchParams);
 
@@ -99,7 +100,6 @@ function CacheList() {
             tableLayout={cacheListElements.defaultLayout}
             fetchEntities={handleFetchCaches}
             keyFn={cachesKeyFn}
-            actionsCellWidth={100}
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
           />

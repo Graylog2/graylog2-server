@@ -14,23 +14,22 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.datanode.configuration;
+export type PagerDutyConfig = {
+  routing_key: string;
+  pager_duty_title?: string;
+  custom_incident?: boolean;
+  key_prefix?: string;
+  incident_key?: string;
+  client_name: string;
+  client_url: string;
+};
 
-import com.github.joschi.jadconfig.Parameter;
-import com.github.joschi.jadconfig.documentation.Documentation;
-
-import java.nio.file.Path;
-
-public class GCSRepositoryConfiguration {
-    @Documentation("Path to Google Cloud Storage credentials file in JSON format. May be absolute or relative to config_location directory.")
-    @Parameter(value = "gcs_credentials_file")
-    private Path gcsCredentialsFile;
-
-    public Path getGcsCredentialsFile() {
-        return gcsCredentialsFile;
-    }
-
-    public boolean isRepositoryEnabled() {
-        return gcsCredentialsFile != null;
-    }
-}
+export const defaultConfig = {
+  client_name: '',
+  client_url: '',
+  custom_incident: false,
+  key_prefix: '',
+  routing_key: '',
+  pager_duty_title: null,
+  incident_key: null,
+};

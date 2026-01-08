@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
@@ -47,13 +48,13 @@ const queryHelpComponent = (
 );
 
 function DataAdapterList() {
-  const [{ adapterNames }, setNames] = React.useState<{
+  const [{ adapterNames }, setNames] = useState<{
     adapterNames?: Array<string>;
   }>({ adapterNames: undefined });
   const { fetchPaginatedDataAdapters, dataAdaptersKeyFn } = useFetchDataAdapters();
   const { renderActions } = useActions();
 
-  const handleFetchAdapters = React.useCallback(
+  const handleFetchAdapters = useCallback(
     async (searchParams: SearchParams) => {
       const resp = await fetchPaginatedDataAdapters(searchParams);
 
@@ -108,7 +109,6 @@ function DataAdapterList() {
             tableLayout={adapterListElements.defaultLayout}
             fetchEntities={handleFetchAdapters}
             keyFn={dataAdaptersKeyFn}
-            actionsCellWidth={100}
             entityAttributesAreCamelCase={false}
             columnRenderers={columnRenderers}
           />
