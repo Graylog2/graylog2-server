@@ -40,6 +40,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
   const { pathname } = useLocation();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const inputSetupFeatureFlagIsEnabled = useFeature(INPUT_SETUP_MODE_FEATURE_FLAG);
+  const hasKnownState = !!inputStates?.[input.id];
   const startInput = () => {
     setIsLoading(true);
 
@@ -75,7 +76,7 @@ const InputStateControl = ({ input, openWizard, inputStates }: Props) => {
     openWizard();
   };
 
-  if (inputSetupFeatureFlagIsEnabled && isInputInSetupMode(inputStates, input.id)) {
+  if (inputSetupFeatureFlagIsEnabled && (!hasKnownState || isInputInSetupMode(inputStates, input.id))) {
     return (
       <Button bsStyle="warning" bsSize="xsmall" onClick={setupInput}>
         Set-up Input
