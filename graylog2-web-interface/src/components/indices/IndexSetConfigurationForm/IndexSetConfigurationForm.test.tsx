@@ -291,7 +291,7 @@ describe('IndexSetConfigurationForm', () => {
     expect(indexAnalyzer).toBeInTheDocument();
   });
 
-  it('Should auto-fill index prefix from title when creating', async () => {
+  it('Should autofill index prefix from title when creating', async () => {
     render(<SUT create />);
 
     const titleInput = await screen.findByRole('textbox', { name: /title/i });
@@ -323,7 +323,7 @@ describe('IndexSetConfigurationForm', () => {
     });
   });
 
-  it('Should not auto-fill index prefix when editing existing index set', async () => {
+  it('Should not autofill index prefix when editing existing index set', async () => {
     render(<SUT indexSet={indexSet} />);
 
     const titleInput = await screen.findByRole('textbox', { name: /title/i });
