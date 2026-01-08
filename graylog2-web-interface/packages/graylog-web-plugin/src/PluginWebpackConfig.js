@@ -35,11 +35,11 @@ function PluginWebpackConfig(defaultRootPath, fqcn, _options, additionalConfig) 
   };
 
   const options = merge(defaultOptions, _options);
-  /* eslint-disable global-require,import/no-dynamic-require */
+  /* eslint-disable global-require */
   const VENDOR_MANIFEST = require(path.resolve(options.web_src_path, 'manifests', 'vendor-manifest.json'));
   const core = require(path.resolve(options.web_src_path, 'webpack/core'));
-  const supportedBrowsers = require(path.resolve(options.web_src_path, 'supportedBrowsers'));
-  /* eslint-enable global-require,import/no-dynamic-require */
+  const supportedBrowsers = require(path.resolve(options.web_src_path, 'supportedBrowsers')).default;
+  /* eslint-enable global-require */
 
   const plugins = [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),

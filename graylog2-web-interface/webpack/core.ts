@@ -14,15 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-const path = require('path');
+import * as path from 'path';
 
-const webpack = require('webpack');
-const { merge } = require('webpack-merge');
-const { EsbuildPlugin } = require('esbuild-loader');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
+import { CycloneDxWebpackPlugin } from '@cyclonedx/webpack-plugin';
+import * as webpack from 'webpack';
+import { merge } from 'webpack-merge';
+import { EsbuildPlugin } from 'esbuild-loader';
+import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
+import { defineReactCompilerLoaderOption, reactCompilerLoader } from 'react-compiler-webpack';
 
-const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
+import UniqueChunkIdPlugin from './UniqueChunkIdPlugin';
 
 const disableTsc = process.env.disable_tsc === 'true';
 
@@ -44,7 +45,7 @@ const getCssLoaderOptions = (target) => {
   };
 };
 
-const sortChunks = (c1, c2) => {
+export const sortChunks = (c1, c2) => {
   // Render the polyfill chunk first
   if (c1 === 'polyfill') {
     return -1;
@@ -65,15 +66,24 @@ const sortChunks = (c1, c2) => {
   return 0;
 };
 
-const rules = (target, supportedBrowsers) => [
+const esbuildLoader = (supportedBrowsers) => ({
+  loader: 'esbuild-loader',
+  options: {
+    target: supportedBrowsers,
+  },
+});
+
+const reactCompiler = {
+  loader: reactCompilerLoader,
+  options: defineReactCompilerLoaderOption({
+    target: '18',
+  }),
+};
+
+export const rules = (target, supportedBrowsers) => [
   {
     test: /\.[jt]s(x)?$/,
-    use: {
-      loader: 'esbuild-loader',
-      options: {
-        target: supportedBrowsers,
-      },
-    },
+    use: [reactCompiler, esbuildLoader(supportedBrowsers)],
     exclude: /node_modules\/(?!(@react-hook|uuid|@?react-leaflet|graylog-web-plugin))|\.node_cache/,
   },
   {
@@ -111,12 +121,12 @@ const rules = (target, supportedBrowsers) => [
   },
 ];
 
-const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) => {
+export const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) => {
   const MANIFESTS_PATH = path.resolve(webInterfaceRoot, 'manifests');
   const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
   const BUILD_PATH = path.resolve(rootPath, 'target/web/build');
 
-  const baseConfig = {
+  const baseConfig: webpack.Configuration = {
     output: {
       path: BUILD_PATH,
       filename: '[name].[chunkhash].js',
@@ -214,8 +224,10 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         }),
         // Create SBOM files for graylog-server frontend dependencies.
         new CycloneDxWebpackPlugin({
+          // @ts-expect-error Raising a TS error at the moment, for unknown reasons
           specVersion: '1.5',
           rootComponentAutodetect: false,
+          // @ts-expect-error Raising a TS error at the moment, for unknown reasons
           rootComponentType: 'application',
           rootComponentName: 'graylog-server',
           outputLocation: '../cyclonedx-core',
@@ -227,5 +239,3 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
 
   return baseConfig;
 };
-
-module.exports = { rules, config, sortChunks };
