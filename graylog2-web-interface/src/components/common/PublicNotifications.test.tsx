@@ -20,8 +20,9 @@ import type { PluginExports } from 'graylog-web-plugin/plugin';
 import userEvent from '@testing-library/user-event';
 
 import type { Notifications } from 'theme/types';
-import { asMock } from 'helpers/mocking';
-import usePluginEntities from 'hooks/usePluginEntities';
+import { usePluginExports } from 'views/test/testPlugins';
+import asMock from 'helpers/mocking/AsMock';
+import AppConfig from 'util/AppConfig';
 
 import PublicNotifications from './PublicNotifications';
 
@@ -74,73 +75,78 @@ const mockedConfigNotifications: Notifications = {
   },
 };
 
-jest.mock('hooks/usePluginEntities');
-
 jest.mock('util/AppConfig', () => ({
   publicNotifications: jest.fn(() => mockedConfigNotifications),
 }));
 
 const onDismissPublicNotification = jest.fn();
 
-const mockedUsePublicNotifications = () => ({
-  hooks: {
-    usePublicNotifications: () => ({
-      notifications: mockedNotifications,
-      dismissedNotifications: new Set(),
-      onDismissPublicNotification,
-    }),
-  },
-});
-
-const beforeMock = () => {
-  const mockedFn = mockedUsePublicNotifications();
-
-  return asMock(usePluginEntities).mockImplementation((entityKey) => {
-    if (entityKey === 'customization.publicNotifications') {
-      return [mockedFn] as PluginExports['customization.publicNotifications'];
-    }
-
-    return [];
-  });
+const testPlugin: PluginExports = {
+  'customization.publicNotifications': [
+    {
+      hooks: {
+        usePublicNotifications: () => ({
+          notifications: mockedNotifications,
+          dismissedNotifications: new Set(),
+          onDismissPublicNotification,
+        }),
+      },
+    },
+  ],
 };
 
 describe('PublicNotifications', () => {
-  beforeEach(beforeMock);
+  describe('with loaded plugin', () => {
+    usePluginExports(testPlugin);
 
-  it('should render all active notifications', () => {
-    render(<PublicNotifications />);
+    it('should render all active notifications', () => {
+      render(<PublicNotifications />);
 
-    const alerts = screen.getAllByRole('alert');
+      const alerts = screen.getAllByRole('alert');
 
-    expect(alerts).toHaveLength(1);
-  });
-
-  it('should dismiss notification', async () => {
-    render(<PublicNotifications />);
-    const dismissedId = Object.keys(mockedNotifications)[1];
-
-    const alert = screen.getByRole('alert', { name: /Danger Alert/i });
-
-    const dismissBtn = within(alert).getByRole('button', {
-      name: /close alert/i,
+      expect(alerts).toHaveLength(1);
     });
 
-    await userEvent.click(dismissBtn);
+    it('should dismiss notification', async () => {
+      render(<PublicNotifications />);
+      const dismissedId = Object.keys(mockedNotifications)[1];
 
-    expect(onDismissPublicNotification).toHaveBeenCalledWith(dismissedId);
-  });
+      const alert = screen.getByRole('alert', { name: /Danger Alert/i });
 
-  it('should render from AppConfig', () => {
-    render(<PublicNotifications login />);
+      const dismissBtn = within(alert).getByRole('button', {
+        name: /close alert/i,
+      });
 
-    const alerts = screen.getAllByRole('alert');
+      await userEvent.click(dismissBtn);
 
-    expect(alerts).toHaveLength(1);
+      expect(onDismissPublicNotification).toHaveBeenCalledWith(dismissedId);
+    });
+
+    it('should render from AppConfig', async () => {
+      render(<PublicNotifications login />);
+
+      const alerts = screen.getAllByRole('alert');
+      expect(alerts).toHaveLength(1);
+
+      await screen.findByText('zxcvzxcvzxcvzxcvzxcvzxcv');
+    });
+
+    it('should render legacy notifications from AppConfig', async () => {
+      const { variant: _variant, ...notificationWithoutVariant } =
+        mockedConfigNotifications['607468afaaa2380afe0757f1'];
+      asMock(AppConfig.publicNotifications).mockReturnValue({
+        '607468afaaa2380afe0757f1': { ...notificationWithoutVariant, variant: null },
+      });
+      render(<PublicNotifications login />);
+
+      const alerts = await screen.findAllByRole('alert');
+      expect(alerts).toHaveLength(1);
+
+      await screen.findByText('zxcvzxcvzxcvzxcvzxcvzxcv');
+    });
   });
 
   it('should render from AppConfig when no plugins are configured', () => {
-    asMock(usePluginEntities).mockImplementation(() => []);
-
     render(<PublicNotifications login />);
 
     const alerts = screen.getAllByRole('alert');
