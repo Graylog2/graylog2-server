@@ -16,6 +16,7 @@
  */
 package org.graylog.datanode.commands;
 
+import com.github.joschi.jadconfig.documentation.DocumentedBeansService;
 import com.github.rvesse.airline.annotations.Command;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
@@ -30,13 +31,16 @@ import org.graylog.datanode.Configuration;
 import org.graylog.datanode.bindings.ConfigurationModule;
 import org.graylog.datanode.bindings.DatanodeServerBindings;
 import org.graylog.datanode.bindings.PeriodicalBindings;
+import org.graylog.datanode.bindings.SearchableSnapshotsBindings;
 import org.graylog.datanode.bootstrap.DatanodeBootstrap;
 import org.graylog.datanode.bootstrap.Main;
+import org.graylog.datanode.configuration.snapshots.AzureRepositoryConfiguration;
 import org.graylog.datanode.configuration.DatanodeProvisioningBindings;
-import org.graylog.datanode.configuration.GCSRepositoryConfiguration;
-import org.graylog.datanode.configuration.HdfsRepositoryConfiguration;
-import org.graylog.datanode.configuration.S3RepositoryConfiguration;
-import org.graylog.datanode.docs.DocumentedBeansService;
+import org.graylog.datanode.configuration.snapshots.FsRepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.GCSRepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.HdfsRepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.RepositoryConfiguration;
+import org.graylog.datanode.configuration.snapshots.S3RepositoryConfiguration;
 import org.graylog.datanode.rest.RestBindings;
 import org.graylog.datanode.shutdown.GracefulShutdown;
 import org.graylog2.cluster.nodes.DataNodeDto;
@@ -52,19 +56,25 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 
 @Command(name = "datanode", description = "Start Graylog Data Node")
 public class Datanode extends DatanodeBootstrap implements DocumentedBeansService {
     private static final Logger LOG = LoggerFactory.getLogger(Datanode.class);
 
-    private final S3RepositoryConfiguration s3RepositoryConfiguration = new S3RepositoryConfiguration();
     private final TLSProtocolsConfiguration tlsConfiguration = new TLSProtocolsConfiguration();
-    private final GCSRepositoryConfiguration gcsRepositoryConfiguration = new GCSRepositoryConfiguration();
-    private final HdfsRepositoryConfiguration hdfsRepositoryConfiguration = new HdfsRepositoryConfiguration();
+
+    private final Set<RepositoryConfiguration> snapshotRepositories = Set.of(
+            new FsRepositoryConfiguration(),
+            new S3RepositoryConfiguration(),
+            new GCSRepositoryConfiguration(),
+            new HdfsRepositoryConfiguration(),
+            new AzureRepositoryConfiguration()
+    );
 
     public Datanode() {
         super("datanode", new Configuration());
@@ -78,18 +88,17 @@ public class Datanode extends DatanodeBootstrap implements DocumentedBeansServic
                 new DatanodeServerBindings(),
                 new RestBindings(),
                 new DatanodeProvisioningBindings(),
-                new PeriodicalBindings()
+                new PeriodicalBindings(),
+                new SearchableSnapshotsBindings(snapshotRepositories)
         );
         return modules.build();
     }
 
     @Override
     public @Nonnull List<Object> getNodeCommandConfigurationBeans() {
-        return Arrays.asList(
-                tlsConfiguration,
-                s3RepositoryConfiguration,
-                gcsRepositoryConfiguration,
-                hdfsRepositoryConfiguration);
+        final ArrayList<Object> configurationBeans = new ArrayList<>(snapshotRepositories);
+        configurationBeans.add(tlsConfiguration);
+        return configurationBeans;
     }
 
     @Override

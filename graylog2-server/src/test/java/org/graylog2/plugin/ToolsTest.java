@@ -21,7 +21,7 @@ import com.google.common.io.Resources;
 import com.google.common.net.InetAddresses;
 import org.graylog2.inputs.TestHelper;
 import org.joda.time.DateTime;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -37,10 +37,11 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ToolsTest {
 
@@ -143,14 +144,15 @@ public class ToolsTest {
         assertThat(Tools.decompressGzip(testData, 1024)).hasSize(1024);
     }
 
-    @Test(expected = EOFException.class)
+    @Test
     public void testDecompressGzipEmptyInput() throws IOException {
-        Tools.decompressGzip(new byte[0]);
+        assertThrows(EOFException.class, () ->
+                Tools.decompressGzip(new byte[0]));
     }
 
     /**
      * ruby-1.9.2-p136 :001 > [Time.now.to_i, 2.days.ago.to_i]
-     *  => [1322063329, 1321890529]
+     * => [1322063329, 1321890529]
      */
     @Test
     public void testGetTimestampDaysAgo() {
@@ -334,5 +336,117 @@ public class ToolsTest {
         assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("::1")));
         assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("198.51.100.23")));
         assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("2001:DB8::42")));
+    }
+
+    @Test
+    public void percentageOfRoundedNormalCases() {
+        assertEquals(0, Tools.percentageOfRounded(100, 0));
+        assertEquals(1, Tools.percentageOfRounded(100, 1));
+        assertEquals(50, Tools.percentageOfRounded(100, 50));
+        assertEquals(99, Tools.percentageOfRounded(100, 99));
+        assertEquals(100, Tools.percentageOfRounded(100, 100));
+        assertEquals(25, Tools.percentageOfRounded(200, 50));
+        assertEquals(33, Tools.percentageOfRounded(300, 100));
+    }
+
+    @Test
+    public void percentageOfRoundedWithZeroTotal() {
+        assertEquals(0, Tools.percentageOfRounded(0, 0));
+        assertEquals(0, Tools.percentageOfRounded(0, 50));
+    }
+
+    @Test
+    public void percentageOfRoundedWithNegativeValues() {
+        assertEquals(0, Tools.percentageOfRounded(-100, 50));
+        assertEquals(0, Tools.percentageOfRounded(100, -50));
+        assertEquals(0, Tools.percentageOfRounded(-100, -50));
+    }
+
+    @Test
+    public void percentageOfRoundedWhenValueExceedsTotal() {
+        assertEquals(100, Tools.percentageOfRounded(100, 150));
+        assertEquals(100, Tools.percentageOfRounded(50, 100));
+    }
+
+    @Test
+    public void percentageOfRoundedWithLargeValues() {
+        // Test with large long values to ensure no overflow
+        assertEquals(50, Tools.percentageOfRounded(Long.MAX_VALUE, Long.MAX_VALUE / 2));
+        assertEquals(75, Tools.percentageOfRounded(1000000000000L, 750000000000L));
+    }
+
+    @Test
+    public void percentageOfRoundedRoundingBehavior() {
+        // Test rounding behavior (Math.round)
+        assertEquals(33, Tools.percentageOfRounded(3, 1)); // 33.33... -> 33
+        assertEquals(67, Tools.percentageOfRounded(3, 2)); // 66.66... -> 67
+        assertEquals(100, Tools.percentageOfRounded(1000, 999)); // 99.9 -> 100
+    }
+
+    @Test
+    public void percentageOfNormalCases() {
+        assertEquals(0.0, Tools.percentageOf(100, 0), 0.0);
+        assertEquals(1.0, Tools.percentageOf(100, 1), 0.0);
+        assertEquals(50.0, Tools.percentageOf(100, 50), 0.0);
+        assertEquals(99.0, Tools.percentageOf(100, 99), 0.0);
+        assertEquals(100.0, Tools.percentageOf(100, 100), 0.0);
+        assertEquals(25.0, Tools.percentageOf(200, 50), 0.0);
+        assertEquals(33.333333333333336, Tools.percentageOf(300, 100), 0.000001);
+    }
+
+    @Test
+    public void percentageOfWithZeroTotal() {
+        assertEquals(0.0, Tools.percentageOf(0, 0), 0.0);
+        assertEquals(0.0, Tools.percentageOf(0, 50), 0.0);
+    }
+
+    @Test
+    public void percentageOfWithNegativeValues() {
+        assertEquals(0.0, Tools.percentageOf(-100, 50), 0.0);
+        assertEquals(0.0, Tools.percentageOf(100, -50), 0.0);
+        assertEquals(0.0, Tools.percentageOf(-100, -50), 0.0);
+    }
+
+    @Test
+    public void percentageOfWhenValueExceedsTotal() {
+        assertEquals(100.0, Tools.percentageOf(100, 150), 0.0);
+        assertEquals(100.0, Tools.percentageOf(50, 100), 0.0);
+    }
+
+    @Test
+    public void percentageOfWithLargeValues() {
+        // Test with large long values to ensure no overflow
+        assertEquals(50.0, Tools.percentageOf(Long.MAX_VALUE, Long.MAX_VALUE / 2), 0.1);
+        assertEquals(75.0, Tools.percentageOf(1000000000000L, 750000000000L), 0.0);
+    }
+
+    @Test
+    public void percentageOfPrecision() {
+        // Test that double precision is maintained
+        assertEquals(33.333333333333336, Tools.percentageOf(3, 1), 0.000001);
+        assertEquals(66.66666666666667, Tools.percentageOf(3, 2), 0.000001);
+        assertEquals(99.9, Tools.percentageOf(1000, 999), 0.0);
+        assertEquals(12.5, Tools.percentageOf(8, 1), 0.0);
+        assertEquals(0.1, Tools.percentageOf(1000, 1), 0.0);
+    }
+
+    @Test
+    public void percentageOfComparedToRounded() {
+        // Verify that percentageOf returns precise values while percentageOfRounded rounds
+        double precise = Tools.percentageOf(3, 1);
+        int rounded = Tools.percentageOfRounded(3, 1);
+        assertThat(precise).isEqualTo(33.333333333333336);
+        assertThat(rounded).isEqualTo(33);
+
+        precise = Tools.percentageOf(3, 2);
+        rounded = Tools.percentageOfRounded(3, 2);
+        assertThat(precise).isEqualTo(66.66666666666667);
+        assertThat(rounded).isEqualTo(67);
+
+        // Test edge case near 0.5 boundary
+        precise = Tools.percentageOf(1000, 995);
+        rounded = Tools.percentageOfRounded(1000, 995);
+        assertThat(precise).isEqualTo(99.5);
+        assertThat(rounded).isEqualTo(100);
     }
 }

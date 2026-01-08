@@ -17,7 +17,6 @@
 import React from 'react';
 import styled, { css } from 'styled-components';
 
-import { isPermitted } from 'util/PermissionsMixin';
 import { Link, LinkContainer } from 'components/common/router';
 import Routes from 'routing/Routes';
 import { CounterRate, MetricContainer } from 'components/metrics';
@@ -27,8 +26,9 @@ import type { PipelineType } from 'components/pipelines/types';
 import type { PipelineConnectionsType } from 'stores/pipelines/PipelineConnectionsStore';
 import type { Stream } from 'logic/streams/types';
 import { defaultCompare as naturalSort } from 'logic/DefaultCompare';
-import useCurrentUser from 'hooks/useCurrentUser';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
+import RuleDeprecationInfo from 'components/rules/RuleDeprecationInfo';
+import usePermissions from 'hooks/usePermissions';
 
 import ButtonToolbar from '../bootstrap/ButtonToolbar';
 import { Spinner } from '../common';
@@ -79,7 +79,7 @@ const getStagesWithoutDuplicates = (pipelineStages: Array<number>, usedStagesAcc
   Array.from(new Set([...usedStagesAcc, ...pipelineStages]));
 
 const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeletePipeline }: Props) => {
-  const currentUser = useCurrentUser();
+  const { isPermitted } = usePermissions();
   const { loadingScopePermissions, scopePermissions } = useGetPermissionsByScope(pipeline);
   const { id, title, description, stages } = pipeline;
   const isManaged = scopePermissions && !scopePermissions?.is_mutable;
@@ -124,6 +124,7 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
             Managed by Application
           </DefaultLabel>
         )}
+        <RuleDeprecationInfo pipelineId={pipeline.id} showFor="pipeline" />
         <br />
         {description}
         <br />
@@ -144,12 +145,12 @@ const PipelineListItem = ({ pipeline, pipelines, connections, streams, onDeleteP
       <td>
         <ButtonToolbar>
           <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(id)}>
-            <Button disabled={!isPermitted(currentUser.permissions, 'pipeline:edit')} bsSize="xsmall">
+            <Button disabled={!isPermitted('pipeline:edit')} bsSize="xsmall">
               Edit
             </Button>
           </LinkContainer>
           <Button
-            disabled={!isPermitted(currentUser.permissions, 'pipeline:delete') || isNotDeletable}
+            disabled={!isPermitted('pipeline:delete') || isNotDeletable}
             bsStyle="danger"
             bsSize="xsmall"
             onClick={() => onDeletePipeline()}>

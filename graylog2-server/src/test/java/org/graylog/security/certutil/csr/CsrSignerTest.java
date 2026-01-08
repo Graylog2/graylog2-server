@@ -44,6 +44,7 @@ import java.security.cert.X509Certificate;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -51,6 +52,9 @@ import static java.time.ZoneOffset.UTC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CsrSignerTest {
+
+    private static final CertificateGenerator CERTIFICATE_GENERATOR = new CertificateGenerator(1024);
+
     private static final X500Name subjectName = new X500Name("CN=Example Request");
     private static final Instant fixedInstant = Instant.parse("2023-09-28T12:50:00Z");
     private static final Clock fixedClock = Clock.fixed(fixedInstant, UTC);
@@ -73,8 +77,8 @@ class CsrSignerTest {
 
     @Test
     void testMismatchIntermediateCA() throws Exception {
-        final org.graylog.security.certutil.KeyPair rootCa = CertificateGenerator.generate(CertRequest.selfSigned("rootCA").validity(Duration.ofDays(30)));
-        final org.graylog.security.certutil.KeyPair intermediateCa = CertificateGenerator.generate(CertRequest.signed("intermediateCa", rootCa).validity(Duration.ofDays(30)));
+        final org.graylog.security.certutil.KeyPair rootCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.selfSigned("rootCA").validity(Duration.ofDays(30)));
+        final org.graylog.security.certutil.KeyPair intermediateCa = CERTIFICATE_GENERATOR.generateKeyPair(CertRequest.signed("intermediateCa", rootCa).validity(Duration.ofDays(30)));
 
         final KeyPair nodeKeyPair = createPrivateKey();
         var csr = createCSR(nodeKeyPair);
@@ -104,6 +108,23 @@ class CsrSignerTest {
         var result = sign("P6M");
         assertThat(result).isNotNull();
         assertThat(result.getNotAfter()).isEqualTo(fixedInstant.plus(180, ChronoUnit.DAYS));
+    }
+
+    /**
+     * X509 certificates don't handle Y10K problem correctly, failing to parse
+     * any date after 9999-12-31. Let's make sure we limit cert validity in a way
+     * that prevents this.
+     */
+    @Test
+    void testSigningCertY10k() throws Exception {
+        var result = sign("P9999999D");
+        assertThat(result).isNotNull();
+
+        final Instant y10k = LocalDate.of(10000, 1, 1)
+                .atStartOfDay(UTC)
+                .toInstant();
+
+        assertThat(result.getNotAfter()).isBefore(y10k);
     }
 
     private PKCS10CertificationRequest createCSR(KeyPair keyPair) throws OperatorCreationException {

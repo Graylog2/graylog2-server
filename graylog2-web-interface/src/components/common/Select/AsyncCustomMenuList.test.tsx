@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { render, screen, fireEvent, waitFor } from 'wrappedTestingLibrary';
+import { fireEvent, render, screen, waitFor } from 'wrappedTestingLibrary';
 
 import AsyncCustomMenuList from './AsyncCustomMenuList';
 
@@ -50,7 +50,7 @@ describe('CustomMenuList', () => {
 
     expect(list).toBeInTheDocument();
 
-    fireEvent.scroll(list);
+    await fireEvent.scroll(list);
 
     await waitFor(() => expect(loadOptions).toHaveBeenCalled());
   });

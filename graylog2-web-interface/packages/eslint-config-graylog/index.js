@@ -153,6 +153,7 @@ export default [
       ],
       'sort-imports': 'off', // disabled in favor of 'import/order'
       'jsx-a11y/label-has-associated-control': ['error', { assert: 'either' }],
+      'jsx-a11y/no-autofocus': 'off',
       'max-classes-per-file': 'off',
       'max-len': 'off',
       'new-cap': 'off',
@@ -265,6 +266,16 @@ export default [
       'testing-library/await-async-events': 'off',
       'testing-library/no-debugging-utils': 'warn',
       'testing-library/prefer-screen-queries': 'off',
+      'testing-library/prefer-user-event': 'error',
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'fireEvent',
+          property: 'submit',
+          message:
+            'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
+        },
+      ],
       'testing-library/render-result-naming-convention': 'off',
     },
   },

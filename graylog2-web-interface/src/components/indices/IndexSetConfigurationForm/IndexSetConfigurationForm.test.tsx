@@ -52,7 +52,7 @@ const indexSet = {
   index_template_type: null,
   writable: true,
   default: false,
-  field_restrictions: [],
+  field_restrictions: {},
 };
 
 const retentionStrategies = [
@@ -237,7 +237,7 @@ const indexSetTemplateDefaults = {
     index_lifetime_min: '10',
     index_lifetime_max: '30',
   },
-  field_restrictions: [],
+  field_restrictions: {},
 };
 
 jest.mock('components/indices/IndexSetFieldTypeProfiles/hooks/useProfileOptions', () => jest.fn());

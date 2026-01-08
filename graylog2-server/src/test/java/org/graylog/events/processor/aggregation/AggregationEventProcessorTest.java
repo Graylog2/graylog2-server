@@ -16,13 +16,17 @@
  */
 package org.graylog.events.processor.aggregation;
 
+import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.events.event.Event;
 import org.graylog.events.event.EventFactory;
+import org.graylog.events.event.EventWithContext;
 import org.graylog.events.event.TestEvent;
 import org.graylog.events.notifications.EventNotificationSettings;
 import org.graylog.events.processor.DBEventProcessorStateService;
+import org.graylog.events.processor.EventDefinition;
 import org.graylog.events.processor.EventDefinitionDto;
 import org.graylog.events.processor.EventProcessorDependencyCheck;
 import org.graylog.events.processor.EventProcessorException;
@@ -35,7 +39,10 @@ import org.graylog.plugins.views.search.searchfilters.model.UsedSearchFilter;
 import org.graylog.plugins.views.search.searchtypes.pivot.SeriesSpec;
 import org.graylog.plugins.views.search.searchtypes.pivot.series.Count;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.TestResultMessageFactory;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageFactory;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.TestMessageFactory;
@@ -45,36 +52,41 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.graylog2.plugin.streams.Stream.NON_MESSAGE_STREAM_IDS;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.WARN)
 public class AggregationEventProcessorTest {
     public static final int SEARCH_WINDOW_MS = 30000;
     private static final String QUERY_STRING = "aQueryString";
-    @Rule
-    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private AggregationSearch.Factory searchFactory;
@@ -98,8 +110,9 @@ public class AggregationEventProcessorTest {
     private PermittedStreams permittedStreams;
     private EventStreamService eventStreamService;
     private final MessageFactory messageFactory = new TestMessageFactory();
+    private final Engine templateEngine = new Engine();
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         when(streamService.streamAllIds()).thenAnswer(inv -> java.util.stream.Stream.of(
                 "stream-1",
@@ -137,7 +150,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
-                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory);
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory, templateEngine);
 
         assertThatCode(() -> eventProcessor.createEvents(eventFactory, parameters, (events) -> {})).doesNotThrowAnyException();
 
@@ -173,7 +186,7 @@ public class AggregationEventProcessorTest {
                 .build();
 
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
-                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory);
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory, templateEngine);
 
         // If the dependency check returns true, there should be no exception raised and the state service should be called
         when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(timerange)).thenReturn(true);
@@ -288,9 +301,66 @@ public class AggregationEventProcessorTest {
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(series), null, filters);
         final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(
                 eventDefinitionDto, searchFactory, eventProcessorDependencyCheck, stateService, moreSearch,
-                eventStreamService, messages, permittedStreams, Set.of(), messageFactory);
+                eventStreamService, messages, permittedStreams, Set.of(), messageFactory, templateEngine);
 
         eventProcessor.sourceMessagesForEvent(event, messageConsumer, batchLimit);
+    }
+
+    @Test
+    public void createEventsAppliesCustomEventSummaryTemplate() throws Exception {
+        when(eventProcessorDependencyCheck.hasMessagesIndexedUpTo(any(TimeRange.class))).thenReturn(true);
+        when(streamService.getSystemStreamIds(false)).thenReturn(NON_MESSAGE_STREAM_IDS);
+
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final AbsoluteRange timerange = AbsoluteRange.create(now.minusHours(1), now.minusHours(1).plusMillis(SEARCH_WINDOW_MS));
+
+        final AggregationEventProcessorConfig config = AggregationEventProcessorConfig.builder()
+                .query(QUERY_STRING)
+                .streams(ImmutableSet.of())
+                .groupBy(ImmutableList.of())
+                .series(ImmutableList.of())
+                .conditions(null)
+                .searchWithinMs(SEARCH_WINDOW_MS)
+                .executeEveryMs(SEARCH_WINDOW_MS)
+                .build();
+        final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of(), ImmutableList.of(), null, emptyList())
+                .toBuilder()
+                .config(config)
+                .eventSummaryTemplate("${user_name} failed to log in on ${host_name}")
+                .build();
+        final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
+                .timerange(timerange)
+                .build();
+
+        final AggregationEventProcessor eventProcessor = new AggregationEventProcessor(eventDefinitionDto, searchFactory,
+                eventProcessorDependencyCheck, stateService, moreSearch, eventStreamService, messages, permittedStreams, Set.of(), messageFactory, templateEngine);
+
+        final TestEvent createdEvent = new TestEvent(now);
+        when(eventFactory.createEvent(any(EventDefinition.class), any(DateTime.class), anyString()))
+                .thenReturn(createdEvent);
+
+        final Message message = messageFactory.createMessage("message", "src", now);
+        message.addField("user_name", "test_user");
+        message.addField("host_name", "host0001");
+        message.addField("message", "message");
+        final ResultMessage resultMessage = new TestResultMessageFactory().createFromMessage(message);
+        resultMessage.setIndex("index-0");
+
+        doAnswer(invocation -> {
+            final MoreSearch.ScrollCallback callback = invocation.getArgument(6);
+            callback.call(List.of(resultMessage), new AtomicBoolean(true));
+            return null;
+        }).when(moreSearch).scrollQuery(eq(config.query()), any(), eq(config.filters()), eq(config.queryParameters()),
+                eq(parameters.timerange()), eq(parameters.batchSize()), any(MoreSearch.ScrollCallback.class));
+
+        final List<List<EventWithContext>> capturedEvents = new ArrayList<>();
+        eventProcessor.createEvents(eventFactory, parameters, capturedEvents::add);
+
+        assertThat(capturedEvents).hasSize(1);
+        assertThat(capturedEvents.getFirst()).hasSize(1);
+        final Event event = capturedEvents.getFirst().getFirst().event();
+        assertThat(event.getMessage()).isEqualTo("test_user failed to log in on host0001");
+        assertThat(createdEvent.getMessage()).isEqualTo("test_user failed to log in on host0001");
     }
 
     // Helper method to build test EventDefinitionDto, since we only care about a few of the values

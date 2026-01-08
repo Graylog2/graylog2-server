@@ -62,6 +62,23 @@
       "timezone": "UTC",
       "permissions": [],
       "external": true
+    },
+    {
+      "_id": {
+        "$oid": "54e3deadbeefdeadbeef0006"
+      },
+      "roles": [
+        {
+          "$oid": "deadbeefdeadbeefdeadbeef"
+        }
+      ],
+      "username": "admin-user",
+      "email": "admin-user@example.com",
+      "full_name": "Admin user",
+      "password": "NO LOGIN",
+      "session_timeout_ms": -1,
+      "timezone": "UTC",
+      "permissions": []
     }
   ]
 }

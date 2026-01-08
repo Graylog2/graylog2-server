@@ -20,7 +20,7 @@ export const DEFAULT_JSON_TEMPLATE: string =
   '{\n' +
   '  "event_definition_id": "${event_definition_id}",\n' +
   '  "event_definition_type": "${event_definition_type}",\n' +
-  '  "event_title": "${event_definition_title}",\n' +
+  '  "event_summary_template": "${event_definition_title}",\n' +
   '  "event_definition_description": "${event_definition_description}",\n' +
   '  "job_definition_id": "${job_definition_id}",\n' +
   '  "event_id": "${event.id}",\n' +
@@ -44,7 +44,7 @@ export const DEFAULT_JSON_TEMPLATE: string =
 
 export const DEFAULT_FORM_PARAM_TEMPLATE: string =
   'event_definition_id=${event_definition_id}&event_definition_type=${event_definition_type}' +
-  '&event_title=${event_definition_title}&event_definition_description=${event_definition_description}&job_definition_id=${job_definition_id}' +
+  '&event_summary_template=${event_definition_title}&event_definition_description=${event_definition_description}&job_definition_id=${job_definition_id}' +
   '&event_id=${event.id}&event_origin_context=${event.origin_context}&event_timestamp_processing=${event.timestamp_processing}' +
   '&event_timerange_start=${event.timerange_start}&event_timerange_end=${event.timerange_end}&event_streams=${event.streams}' +
   '&event_source_streams=${event.source_streams}&event_alert=${event.alert}&event_message=${event.message}&event_source=${event.source}' +
@@ -53,7 +53,7 @@ export const DEFAULT_FORM_PARAM_TEMPLATE: string =
 export const DEFAULT_PLAIN_TEXT_TEMPLATE: string =
   'event_definition_id=${event_definition_id}\n' +
   'event_definition_type=${event_definition_type}\n' +
-  'event_title=${event_definition_title}\n' +
+  'event_summary_template=${event_definition_title}\n' +
   'event_definition_description=${event_definition_description}\n' +
   'job_definition_id=${job_definition_id}\n' +
   'event_id=${event.id}\n' +

@@ -18,7 +18,6 @@ package org.graylog2.indexer.datanode;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.migration.IndexerConnectionCheckResult;
 import org.graylog2.indexer.migration.RemoteReindexMigration;
 
@@ -28,7 +27,6 @@ import java.util.Optional;
 public interface RemoteReindexingMigrationAdapter {
 
     String EXISTING_INDEX_SET_WRITE_INDICES = "indexSetWriteIndices";
-    boolean isMigrationRunning(IndexSet indexSet);
 
     enum Status {
         NOT_STARTED, RUNNING, ERROR, FINISHED

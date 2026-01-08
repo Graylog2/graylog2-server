@@ -18,6 +18,9 @@ import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
+import FieldTypeMapping from 'views/logic/fieldtypes/FieldTypeMapping';
+import { FieldTypes } from 'views/logic/fieldtypes/FieldType';
+
 import NumberRefExpression from './NumberRefExpression';
 
 describe('NumberRefExpression', () => {
@@ -28,9 +31,9 @@ describe('NumberRefExpression', () => {
   });
 
   const aggregationFunctions = ['avg', 'card'];
-  const formattedFields = [
-    { label: 'source - string', value: 'source' },
-    { label: 'took_ms - long', value: 'took_ms' },
+  const formattedFields: FieldTypeMapping[] = [
+    new FieldTypeMapping('source', FieldTypes.STRING()),
+    new FieldTypeMapping('took_ms', FieldTypes.LONG()),
   ];
 
   it('should have no selected function and field with an undefined ref', async () => {
@@ -75,7 +78,7 @@ describe('NumberRefExpression', () => {
     );
 
     await screen.findByText(/avg\(\)/i);
-    await screen.findByText(/took_ms - long/i);
+    await screen.findByText(/took_ms/i);
   });
 
   it('should update ref and add series when function changes', async () => {
@@ -173,6 +176,40 @@ describe('NumberRefExpression', () => {
       series: [
         { field: 'took_ms', id: 'avg-took_ms', type: 'avg' },
         { field: 'source', id: 'avg-source', type: 'avg' },
+      ],
+    });
+  });
+
+  it('should send null when aggregation field is cleared', async () => {
+    const expression = {
+      expr: 'number-ref',
+      ref: 'avg-took_ms',
+    };
+    const initialSeries = { id: 'avg-took_ms', type: 'avg', field: 'took_ms' };
+    const definition = eventDefinition([initialSeries]);
+    const handleChange = jest.fn();
+
+    render(
+      <NumberRefExpression
+        eventDefinition={definition}
+        aggregationFunctions={aggregationFunctions}
+        expression={expression}
+        formattedFields={formattedFields}
+        onChange={handleChange}
+        renderLabel={false}
+        validation={{ errors: {} }}
+      />,
+    );
+
+    const fieldSelect = await screen.findByRole('combobox', { name: /select field/i });
+    await userEvent.click(fieldSelect);
+    await userEvent.keyboard('{Backspace}');
+
+    expect(handleChange).toHaveBeenCalledWith({
+      conditions: { expr: 'number-ref', ref: 'avg-' },
+      series: [
+        { field: 'took_ms', id: 'avg-took_ms', type: 'avg' },
+        { field: null, id: 'avg-', type: 'avg' },
       ],
     });
   });

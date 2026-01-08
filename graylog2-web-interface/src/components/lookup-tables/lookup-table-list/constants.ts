@@ -53,6 +53,6 @@ export const lutListElements = {
     defaultPageSize: 20,
     defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
     defaultDisplayedAttributes: ['title', 'description', 'name', 'cache_id', 'data_adapter_id'],
+    defaultColumnOrder: ['title', 'description', 'name', 'cache_id', 'data_adapter_id'],
   },
-  columnOrder: ['title', 'description', 'name', 'cache_id', 'data_adapter_id'],
 };

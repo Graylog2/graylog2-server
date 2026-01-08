@@ -76,6 +76,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String EXTRACTOR_CREATE = PREFIX + "extractor:create";
     public static final String EXTRACTOR_DELETE = PREFIX + "extractor:delete";
     public static final String EXTRACTOR_ORDER_UPDATE = PREFIX + "extractor_order:update";
+    public static final String FAVORITE_FIELDS_UPDATE = PREFIX + "favorite_fields:update";
     public static final String FIELD_TYPE_MAPPING_CREATE = PREFIX + "field_type_mapping:create";
     public static final String FIELD_TYPE_MAPPING_DELETE = PREFIX + "field_type_mapping:delete";
     public static final String FIELD_TYPE_POLLING_TRIGGERED = PREFIX + "field_type_polling:trigger";
@@ -132,6 +133,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String NODE_SHUTDOWN_INITIATE = PREFIX + "node_shutdown:initiate";
     public static final String NODE_STARTUP_COMPLETE = PREFIX + "node_startup:complete";
     public static final String NODE_STARTUP_INITIATE = PREFIX + "node_startup:initiate";
+    public static final String ROLE_AUTHZ_DELETE = PREFIX + "role_authz_membership:delete";
+    public static final String ROLE_AUTHZ_UPDATE = PREFIX + "role_authz_membership:update";
     public static final String ROLE_CREATE = PREFIX + "role:create";
     public static final String ROLE_DELETE = PREFIX + "role:delete";
     public static final String ROLE_MEMBERSHIP_DELETE = PREFIX + "role_membership:delete";
@@ -176,6 +179,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String USER_PERMISSIONS_DELETE = PREFIX + "user_permissions:delete";
     public static final String USER_PREFERENCES_UPDATE = PREFIX + "user_preferences:update";
     public static final String USER_UPDATE = PREFIX + "user:update";
+    public static final String USER_ROLES_UPDATE = PREFIX + "user_roles:update";
     public static final String TELEMETRY_USER_SETTINGS_UPDATE = PREFIX + "telemetry_user_settings:update";
     public static final String CONTENT_STREAM_USER_SETTINGS_UPDATE = PREFIX + "content_stream_user_settings:update";
 
@@ -244,6 +248,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(EXTRACTOR_DELETE)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
+            .add(FAVORITE_FIELDS_UPDATE)
             .add(FIELD_TYPE_MAPPING_CREATE)
             .add(FIELD_TYPE_MAPPING_DELETE)
             .add(FIELD_TYPE_POLLING_TRIGGERED)
@@ -298,6 +303,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(NODE_SHUTDOWN_INITIATE)
             .add(NODE_STARTUP_COMPLETE)
             .add(NODE_STARTUP_INITIATE)
+            .add(ROLE_AUTHZ_DELETE)
+            .add(ROLE_AUTHZ_UPDATE)
             .add(ROLE_CREATE)
             .add(ROLE_DELETE)
             .add(ROLE_MEMBERSHIP_DELETE)
@@ -341,6 +348,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(USER_PERMISSIONS_DELETE)
             .add(USER_PREFERENCES_UPDATE)
             .add(USER_UPDATE)
+            .add(USER_ROLES_UPDATE)
             .add(TELEMETRY_USER_SETTINGS_UPDATE)
             .add(CONTENT_STREAM_USER_SETTINGS_UPDATE)
             .add(CERTIFICATE_RENEWAL_MANUALLY_INITIATED)

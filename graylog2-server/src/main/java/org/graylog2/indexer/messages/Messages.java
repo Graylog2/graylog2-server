@@ -123,7 +123,7 @@ public class Messages {
         }
 
         final List<IndexingRequest> indexingRequestList = messageList.stream()
-                .map(entry -> IndexingRequest.create(entry.indexSet(), entry.message()))
+                .map(entry -> IndexingRequest.create(entry.writeIndex(), entry.message()))
                 .collect(Collectors.toList());
 
         return bulkIndexRequests(indexingRequestList, isSystemTraffic, indexingListener);

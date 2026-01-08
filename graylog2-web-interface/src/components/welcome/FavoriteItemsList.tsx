@@ -45,8 +45,8 @@ const FavoriteItemsList = () => {
       <NoSearchResult>
         You do not have any favorite items yet.
         <br />
-        Make any <Link to={Routes.SEARCH}>Search</Link> or{' '}
-        <Link to={Routes.pluginRoute('DASHBOARDS_NEW')}>Dashboard</Link> favorite to show up here.
+        Make any <Link to={Routes.SEARCH}>Search</Link> or <Link to={Routes.DASHBOARD.NEW}>Dashboard</Link> favorite to
+        show up here.
       </NoSearchResult>
     );
   }

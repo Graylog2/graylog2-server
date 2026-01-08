@@ -18,14 +18,14 @@ package org.graylog2.inputs.converters;
 
 import com.google.common.collect.Maps;
 import org.graylog2.ConfigurationException;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class CsvConverterTest {
     @Test
@@ -68,15 +68,15 @@ public class CsvConverterTest {
 
         // too few fields
         Map<String, String> result = (Map<String, String>) csvConverter.convert("field1");
-        assertNull("Too few fields in data doesn't work", result);
+        assertNull(result, "Too few fields in data doesn't work");
 
         // too many fields
         result = (Map<String, String>) csvConverter.convert("field1,field2,field3");
-        assertNull("Too many fields in data doesn't work", result);
+        assertNull(result, "Too many fields in data doesn't work");
 
         // unclosed quote level
         result = (Map<String, String>) csvConverter.convert("field1,field2,\"field3");
-        assertNull("Unbalanced quoting does not work", result);
+        assertNull(result, "Unbalanced quoting does not work");
     }
 
     private void assertConfigException(Map<String, Object> configMap) {

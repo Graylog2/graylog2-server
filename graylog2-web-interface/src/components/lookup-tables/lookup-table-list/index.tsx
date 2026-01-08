@@ -15,14 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useState } from 'react';
 
 import { Row, Col } from 'components/bootstrap';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import QueryHelper from 'components/common/QueryHelper';
 import { ErrorsProvider } from 'components/lookup-tables/contexts/ErrorsContext';
 import { useFetchLookupTables } from 'components/lookup-tables/hooks/useLookupTablesAPI';
-import { ModalProvider } from 'components/lookup-tables/contexts/ModalContext';
-import LUTModals from 'components/lookup-tables/LUTModals';
 import type { SearchParams, Attribute } from 'stores/PaginationTypes';
 import type { LookupTableCache, LookupTableAdapter } from 'logic/lookup-tables/types';
 import type { LookupTableEntity } from 'components/lookup-tables/types';
@@ -50,7 +49,7 @@ const queryHelpComponent = (
 );
 
 function LookupTableList() {
-  const [{ lutNames, cacheNames, adapterNames }, setNames] = React.useState<{
+  const [{ lutNames, cacheNames, adapterNames }, setNames] = useState<{
     lutNames?: Array<string>;
     cacheNames?: Array<string>;
     adapterNames?: Array<string>;
@@ -58,7 +57,7 @@ function LookupTableList() {
   const { fetchPaginatedLookupTables, lookupTablesKeyFn } = useFetchLookupTables();
   const { renderActions } = useActions();
 
-  const handleFetchTables = React.useCallback(
+  const handleFetchTables = useCallback(
     async (searchParams: SearchParams) => {
       const resp = await fetchPaginatedLookupTables(searchParams);
 
@@ -110,28 +109,23 @@ function LookupTableList() {
   );
 
   return (
-    <ModalProvider>
-      <ErrorsProvider>
-        <ErrorsConsumer lutNames={lutNames} cacheNames={cacheNames} adapterNames={adapterNames} />
-        <Row className="content">
-          <Col md={12}>
-            <PaginatedEntityTable<LookupTableEntity>
-              humanName="lookup tables"
-              entityActions={renderActions}
-              columnsOrder={lutListElements.columnOrder}
-              queryHelpComponent={queryHelpComponent}
-              tableLayout={lutListElements.defaultLayout}
-              fetchEntities={handleFetchTables}
-              keyFn={lookupTablesKeyFn}
-              actionsCellWidth={100}
-              entityAttributesAreCamelCase={false}
-              columnRenderers={columnRenderers}
-            />
-          </Col>
-        </Row>
-        <LUTModals />
-      </ErrorsProvider>
-    </ModalProvider>
+    <ErrorsProvider>
+      <ErrorsConsumer lutNames={lutNames} cacheNames={cacheNames} adapterNames={adapterNames} />
+      <Row className="content">
+        <Col md={12}>
+          <PaginatedEntityTable<LookupTableEntity>
+            humanName="lookup tables"
+            entityActions={renderActions}
+            queryHelpComponent={queryHelpComponent}
+            tableLayout={lutListElements.defaultLayout}
+            fetchEntities={handleFetchTables}
+            keyFn={lookupTablesKeyFn}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+          />
+        </Col>
+      </Row>
+    </ErrorsProvider>
   );
 }
 

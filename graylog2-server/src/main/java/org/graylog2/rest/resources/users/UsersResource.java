@@ -61,6 +61,8 @@ import org.graylog.security.authservice.AuthServiceBackendDTO;
 import org.graylog.security.authservice.GlobalAuthServiceConfig;
 import org.graylog.security.permissions.CaseSensitiveWildcardPermission;
 import org.graylog.security.permissions.GRNPermission;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.PaginatedList;
@@ -86,9 +88,9 @@ import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
-import org.graylog2.security.MongoDBSessionService;
-import org.graylog2.security.MongoDbSession;
 import org.graylog2.security.UserSessionTerminationService;
+import org.graylog2.security.sessions.SessionDTO;
+import org.graylog2.security.sessions.SessionService;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.ChangeUserRequest;
@@ -150,12 +152,13 @@ public class UsersResource extends RestResource {
     private final PaginatedUserService paginatedUserService;
     private final AccessTokenService accessTokenService;
     private final RoleService roleService;
-    private final MongoDBSessionService sessionService;
+    private final SessionService sessionService;
     private final SearchQueryParser searchQueryParser;
     private final UserSessionTerminationService sessionTerminationService;
     private final DefaultSecurityManager securityManager;
     private final GlobalAuthServiceConfig globalAuthServiceConfig;
     private final ClusterConfigService clusterConfigService;
+    private final AuditEventSender auditEventSender;
 
     protected static final ImmutableMap<String, SearchQueryField> SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
             .put(UserOverviewDTO.FIELD_ID, SearchQueryField.create("_id", SearchQueryField.Type.OBJECT_ID))
@@ -169,11 +172,12 @@ public class UsersResource extends RestResource {
                          PaginatedUserService paginatedUserService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
-                         MongoDBSessionService sessionService,
+                         SessionService sessionService,
                          UserSessionTerminationService sessionTerminationService,
                          DefaultSecurityManager securityManager,
                          GlobalAuthServiceConfig globalAuthServiceConfig,
-                         ClusterConfigService clusterConfigService) {
+                         ClusterConfigService clusterConfigService,
+                         AuditEventSender auditEventSender) {
         this.userManagementService = userManagementService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
@@ -184,6 +188,7 @@ public class UsersResource extends RestResource {
         this.searchQueryParser = new SearchQueryParser(UserOverviewDTO.FIELD_FULL_NAME, SEARCH_FIELD_MAPPING);
         this.globalAuthServiceConfig = globalAuthServiceConfig;
         this.clusterConfigService = clusterConfigService;
+        this.auditEventSender = auditEventSender;
     }
 
     /**
@@ -375,7 +380,8 @@ public class UsersResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
-                           @Valid @NotNull CreateUserRequest cr) throws ValidationException {
+                               @Valid @NotNull CreateUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
         if (isUserNameInUse(cr.username())) {
             final String msg = "Cannot create user " + cr.username() + ". Username is already taken.";
             LOG.error(msg);
@@ -393,7 +399,7 @@ public class UsersResource extends RestResource {
         user.setFirstLastFullNames(cr.firstName(), cr.lastName());
         user.setEmail(cr.email());
         user.setPermissions(cr.permissions());
-        setUserRoles(cr.roles(), user);
+        setUserRoles(cr.roles(), user, userContext);
         user.setServiceAccount(cr.isServiceAccount());
 
         if (cr.timezone() != null) {
@@ -464,7 +470,7 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private void setUserRoles(@Nullable List<String> roles, User user) {
+    private void setUserRoles(@Nullable List<String> roles, User user, UserContext userContext) {
         if (roles == null) {
             return;
         }
@@ -503,6 +509,11 @@ public class UsersResource extends RestResource {
                     .collect(Collectors.toSet());
 
             user.setRoleIds(roleIds);
+            auditEventSender.success(AuditActor.user(userContext.getUser().getName()),
+                    AuditEventTypes.USER_ROLES_UPDATE,
+                    ImmutableMap.of("roles", String.join(",", normalizedRoles),
+                            "userName", user.getName(),
+                            "userId", user.getId()));
 
         } catch (org.graylog2.database.NotFoundException e) {
             throw new InternalServerErrorException(e);
@@ -520,7 +531,8 @@ public class UsersResource extends RestResource {
     public void changeUser(@ApiParam(name = "userId", value = "The ID of the user to modify.", required = true)
                            @PathParam("userId") String userId,
                            @ApiParam(name = "JSON body", value = "Updated user information.", required = true)
-                           @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
+                           @Valid @NotNull ChangeUserRequest cr,
+                           @Context UserContext userContext) throws ValidationException {
 
         final User user = loadUserById(userId);
         final String username = user.getName();
@@ -545,7 +557,7 @@ public class UsersResource extends RestResource {
 
         if (isPermitted(USERS_ROLESEDIT, user.getName())) {
             checkAdminRoleForServiceAccount(cr, user);
-            setUserRoles(cr.roles(), user);
+            setUserRoles(cr.roles(), user, userContext);
         }
 
         final String timezone = cr.timezone();
@@ -889,12 +901,12 @@ public class UsersResource extends RestResource {
         String clientAddress = null;
         if (optSessions.isPresent()) {
             final AllUserSessions sessions = optSessions.get();
-            final Optional<MongoDbSession> mongoDbSession = sessions.forUser(user);
+            final Optional<SessionDTO> mongoDbSession = sessions.forUser(user);
             if (mongoDbSession.isPresent()) {
-                final MongoDbSession session = mongoDbSession.get();
+                final SessionDTO session = mongoDbSession.get();
                 sessionActive = true;
-                lastActivity = session.getLastAccessTime();
-                clientAddress = session.getHost();
+                lastActivity = Date.from(session.lastAccessTime());
+                clientAddress = session.host().orElse(null);
             }
         }
         List<WildcardPermission> wildcardPermissions;
@@ -958,7 +970,7 @@ public class UsersResource extends RestResource {
                 .filter(rootUser -> isPermitted(USERS_READ, rootUser.getName()))
                 .map(rootUser -> {
                     final Set<String> adminRoles = userManagementService.getRoleNames(rootUser);
-                    final Optional<MongoDbSession> lastSession = sessions.forUser(rootUser);
+                    final Optional<SessionDTO> lastSession = sessions.forUser(rootUser);
                     return UserOverviewDTO.builder()
                             .username(rootUser.getName())
                             .fullName(rootUser.getFullName())
@@ -1010,31 +1022,32 @@ public class UsersResource extends RestResource {
     }
 
     private static class AllUserSessions {
-        private final Map<String, Optional<MongoDbSession>> sessions;
+        private final Map<String, Optional<SessionDTO>> sessions;
 
-        private AllUserSessions(Collection<MongoDbSession> sessions) {
+        public static AllUserSessions create(SessionService sessionService) {
+            try (var sessionDTOStream = sessionService.streamAll()) {
+                return new AllUserSessions(sessionDTOStream.toList());
+            }
+        }
+
+        private AllUserSessions(Collection<SessionDTO> sessions) {
             this.sessions = getLastSessionForUser(sessions);
         }
 
-        public static AllUserSessions create(MongoDBSessionService sessionService) {
-            return new AllUserSessions(sessionService.loadAll());
-        }
-
-        public Optional<MongoDbSession> forUser(User user) {
+        public Optional<SessionDTO> forUser(User user) {
             return sessions.getOrDefault(user.getId(), Optional.empty());
         }
 
-        public Optional<MongoDbSession> forUser(UserOverviewDTO user) {
+        public Optional<SessionDTO> forUser(UserOverviewDTO user) {
             return sessions.getOrDefault(user.id(), Optional.empty());
         }
 
         // Among all active sessions, find the last recently used for each user
-        private Map<String, Optional<MongoDbSession>> getLastSessionForUser(Collection<MongoDbSession> sessions) {
-            //noinspection OptionalGetWithoutIsPresent
+        private Map<String, Optional<SessionDTO>> getLastSessionForUser(Collection<SessionDTO> sessions) {
             return sessions.stream()
-                    .filter(s -> s.getUserIdAttribute().isPresent())
-                    .collect(groupingBy(s -> s.getUserIdAttribute().get(),
-                            maxBy(Comparator.comparing(MongoDbSession::getLastAccessTime))));
+                    .filter(s -> s.userId().isPresent())
+                    .collect(groupingBy(s -> s.userId().get(),
+                            maxBy(Comparator.comparing(SessionDTO::lastAccessTime))));
         }
     }
 }

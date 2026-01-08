@@ -22,21 +22,19 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.codec.binary.Base64;
-import org.graylog.testing.completebackend.Lifecycle;
+import org.assertj.core.api.Assertions;
 import org.graylog.testing.completebackend.FullBackendTest;
 import org.graylog.testing.completebackend.GraylogBackendConfiguration;
+import org.graylog.testing.completebackend.Lifecycle;
 import org.graylog.testing.elasticsearch.SearchServerBaseTest;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.indexer.IgnoreIndexTemplate;
-import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetStatsCreator;
-import org.graylog2.indexer.IndexTemplateNotFoundException;
-import org.graylog2.indexer.MessageIndexTemplateProvider;
-import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.Node;
+import org.graylog2.indexer.counts.CountsAdapter;
+import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetStatsCreator;
+import org.graylog2.indexer.indexset.TestIndexSet;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.indexer.indices.blocks.IndicesBlockStatus;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
@@ -48,6 +46,10 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.indexer.template.IgnoreIndexTemplate;
+import org.graylog2.indexer.template.IndexMappingFactory;
+import org.graylog2.indexer.template.IndexTemplateNotFoundException;
+import org.graylog2.indexer.template.MessageIndexTemplateProvider;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
@@ -71,9 +73,9 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -104,6 +106,7 @@ public class IndicesIT extends SearchServerBaseTest {
     protected Indices indices;
     private EventBus eventBus;
     private final NodeId nodeId = new SimpleNodeId("5ca1ab1e-0000-4000-a000-000000000000");
+    private IndexTemplateAdapter indexTemplateAdapter;
 
     @BeforeEach
     public void setUp() {
@@ -117,8 +120,10 @@ public class IndicesIT extends SearchServerBaseTest {
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter(),
-                mock(IndexFieldTypeProfileService.class)
+                mock(IndexFieldTypeProfileService.class),
+                searchServer().adapters().countsAdapter()
         );
+        indexTemplateAdapter = searchServer().adapters().indexTemplateAdapter();
     }
 
     @AfterEach
@@ -270,11 +275,11 @@ public class IndicesIT extends SearchServerBaseTest {
 
         final String templateName = indexSetConfig.indexTemplateName();
 
-        assertThat(client().templateExists(templateName)).isFalse();
+        assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isFalse();
 
-        indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet.basicIndexSetConfig());
 
-        assertThat(client().templateExists(templateName)).isTrue();
+        assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isTrue();
         assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
     }
 
@@ -292,9 +297,9 @@ public class IndicesIT extends SearchServerBaseTest {
 
         var templateSource = Template.create(indexSet.getIndexWildcard(), new Template.Mappings(beforeMapping), 1L, new Template.Settings(Map.of()));
 
-        client().putTemplate(templateName, templateSource);
+        indexTemplateAdapter.ensureIndexTemplate(templateName, templateSource);
 
-        indices.create(indexName, indexSet);
+        indices.create(indexName, indexSet.basicIndexSetConfig());
 
         assertThat(client().fieldType(indexName, "message")).isEqualTo("text");
     }
@@ -362,9 +367,9 @@ public class IndicesIT extends SearchServerBaseTest {
     public void ensureIndexTemplateDoesntThrowOnIgnoreIndexTemplateAndExistingTemplate() {
         final String templateName = indexSetConfig.indexTemplateName();
 
-        indices.ensureIndexTemplate(indexSet);
+        indices.ensureIndexTemplate(indexSet.indexTemplateConfig());
 
-        assertThat(client().templateExists(templateName)).isTrue();
+        assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isTrue();
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
@@ -372,11 +377,12 @@ public class IndicesIT extends SearchServerBaseTest {
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter(),
-                mock(IndexFieldTypeProfileService.class));
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet)).doesNotThrowAnyException();
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.indexTemplateConfig())).doesNotThrowAnyException();
 
-        assertThat(client().templateExists(templateName)).isTrue();
+        assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isTrue();
     }
 
     private IndexMappingFactory createThrowingIndexMappingFactory(IndexSetConfig indexSetConfig) {
@@ -397,7 +403,7 @@ public class IndicesIT extends SearchServerBaseTest {
         } catch (Exception ignored) {
         }
 
-        assertThat(client().templateExists(templateName)).isFalse();
+        assertThat(indexTemplateAdapter.indexTemplateExists(templateName)).isFalse();
 
         indices = new Indices(
                 createThrowingIndexMappingFactory(indexSetConfig),
@@ -405,9 +411,10 @@ public class IndicesIT extends SearchServerBaseTest {
                 new NullAuditEventSender(),
                 eventBus,
                 searchServer().adapters().indicesAdapter(),
-                mock(IndexFieldTypeProfileService.class));
+                mock(IndexFieldTypeProfileService.class),
+                mock(CountsAdapter.class));
 
-        assertThatCode(() -> indices.ensureIndexTemplate(indexSet))
+        assertThatCode(() -> indices.ensureIndexTemplate(indexSet.indexTemplateConfig()))
                 .isExactlyInstanceOf(IndexTemplateNotFoundException.class)
                 .hasMessage("No index template with name 'template-1' (type - 'null') found in Elasticsearch");
     }
@@ -475,16 +482,13 @@ public class IndicesIT extends SearchServerBaseTest {
     @FullBackendTest
     public void setClosingDateMergesExistingMetaDataEntries() {
         final String index = createRandomIndex("foo");
-        client().updateMapping(index, Map.of("_meta", Map.of("existing", "should be kept")));
+        client().updateMappingMeta(index, "existing", "should be kept");
 
         indices.setClosingDate(index, Tools.nowUTC());
 
-        final Map<String, Object> mapping = client().getMapping(index);
-        assertThat(mapping.get("_meta")).satisfies(v -> {
-            assertThat(v).isNotNull();
-            //noinspection unchecked
-            assertThat(((Map<String, Object>) v).get("existing")).isEqualTo("should be kept");
-        });
+        final String existingValue = client().getMappingMetaValue(index, "existing", String.class);
+        Assertions.assertThat(existingValue).isEqualTo("should be kept");
+
         final Optional<DateTime> closingDate = indices.indexClosingDate(index);
         assertThat(closingDate).isNotEmpty();
     }
