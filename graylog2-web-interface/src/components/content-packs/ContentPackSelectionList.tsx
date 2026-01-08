@@ -73,9 +73,7 @@ const ContentPackSelectionList = ({
   updateSelectionGroup: (group: unknown) => void;
   updateSelectionEntity: (entity: unknown) => void;
 }) => {
-  const [expandedSections, setExpandedSections] = useState<Array<string>>(
-    isFiltered ? Object.keys(entities) : [],
-  );
+  const [expandedSections, setExpandedSections] = useState<Array<string>>(isFiltered ? Object.keys(entities) : []);
 
   useEffect(() => {
     setExpandedSections(isFiltered ? Object.keys(entities) : []);
