@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 
@@ -23,49 +23,37 @@ import type { EntityBase } from '../types';
 
 const useActionsColumnWidth = <Entity extends EntityBase>(entities: ReadonlyArray<Entity>, hasRowActions: boolean) => {
   const [rowWidths, setRowWidths] = useState<{ [rowId: string]: number }>({});
-  const visibleRowIdsSet = useMemo(() => new Set(entities.map(({ id }) => id)), [entities]);
+  const visibleRowIds = useMemo(() => new Set(entities.map(({ id }) => id)), [entities]);
+  const visibleRowIdsRef = useRef<Set<string>>(visibleRowIds);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setRowWidths((cur) => {
-      const curEntries = Object.entries(cur);
-      const filteredEntries = curEntries.filter(([rowId]) => visibleRowIdsSet.has(rowId));
+    visibleRowIdsRef.current = visibleRowIds;
+  }, [visibleRowIds]);
 
-      if (filteredEntries.length === curEntries.length) {
-        return cur;
-      }
+  const handleWidthChange = useCallback((rowId: string, width: number) => {
+    const rounded = Math.round(width);
 
-      return Object.fromEntries(filteredEntries);
-    });
-  }, [visibleRowIdsSet]);
+    if (rounded <= 0 || !visibleRowIdsRef.current.has(rowId)) {
+      return;
+    }
 
-  const handleWidthChange = useCallback(
-    (rowId: string, width: number) => {
-      const rounded = Math.round(width);
-
-      if (rounded <= 0 || !visibleRowIdsSet.has(rowId)) {
-        return;
-      }
-
-      setRowWidths((cur) => (cur[rowId] === rounded ? cur : { ...cur, [rowId]: rounded }));
-    },
-    [visibleRowIdsSet],
-  );
+    setRowWidths((cur) => (cur[rowId] === rounded ? cur : { ...cur, [rowId]: rounded }));
+  }, []);
 
   const colMinWidth = useMemo(() => {
-    if (!visibleRowIdsSet.size) {
+    if (!visibleRowIds.size) {
       return CELL_PADDING * 2;
     }
 
     const maxWidth = Math.max(
       0,
-      ...Array.from(visibleRowIdsSet)
+      ...Array.from(visibleRowIds)
         .map((rowId) => rowWidths[rowId])
         .filter((width) => !!width),
     );
 
     return hasRowActions ? maxWidth + CELL_PADDING * 2 : 0;
-  }, [hasRowActions, rowWidths, visibleRowIdsSet]);
+  }, [hasRowActions, rowWidths, visibleRowIds]);
 
   return { colMinWidth, handleWidthChange };
 };
