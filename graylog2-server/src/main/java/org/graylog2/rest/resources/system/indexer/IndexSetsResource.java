@@ -392,8 +392,10 @@ public class IndexSetsResource extends RestResource {
                 }
             } else {
                 final String[] managedIndices = indexSet.getManagedIndices();
-                for (String indexName : managedIndices) {
-                    eventBus.post(IndicesDeletedEvent.create(indexName));
+                if (managedIndices != null) {
+                    for (String indexName : managedIndices) {
+                        eventBus.post(IndicesDeletedEvent.create(indexName));
+                    }
                 }
             }
         }
