@@ -14,16 +14,16 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as path from 'path';
+const path = require('path');
 
-import * as webpack from 'webpack';
-import { merge } from 'webpack-merge';
-import { EsbuildPlugin } from 'esbuild-loader';
-import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
-import { CycloneDxWebpackPlugin } from '@cyclonedx/webpack-plugin';
-import { defineReactCompilerLoaderOption, reactCompilerLoader } from 'react-compiler-webpack';
+const webpack = require('webpack');
+const { merge } = require('webpack-merge');
+const { EsbuildPlugin } = require('esbuild-loader');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const { CycloneDxWebpackPlugin } = require('@cyclonedx/webpack-plugin');
+const { defineReactCompilerLoaderOption, reactCompilerLoader } = require('react-compiler-webpack');
 
-import UniqueChunkIdPlugin from './UniqueChunkIdPlugin';
+const UniqueChunkIdPlugin = require('./UniqueChunkIdPlugin');
 
 const disableTsc = process.env.disable_tsc === 'true';
 
@@ -126,7 +126,7 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
   const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
   const BUILD_PATH = path.resolve(rootPath, 'target/web/build');
 
-  const baseConfig: webpack.Configuration = {
+  const baseConfig = {
     output: {
       path: BUILD_PATH,
       filename: '[name].[chunkhash].js',
@@ -224,10 +224,8 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
         }),
         // Create SBOM files for graylog-server frontend dependencies.
         new CycloneDxWebpackPlugin({
-          // @ts-expect-error
           specVersion: '1.5',
           rootComponentAutodetect: false,
-          // @ts-expect-error
           rootComponentType: 'application',
           rootComponentName: 'graylog-server',
           outputLocation: '../cyclonedx-core',
@@ -240,4 +238,4 @@ const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) 
   return baseConfig;
 };
 
-export { rules, config, sortChunks };
+module.exports = { rules, config, sortChunks };
