@@ -98,9 +98,9 @@ class TypeAheadDataFilter extends React.Component<
     }
   }
 
-  _onSearchTextChanged = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
+  _onSearchTextChanged = (event?: React.SyntheticEvent) => {
+    event?.preventDefault();
+    event?.stopPropagation();
     this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
   };
 
@@ -170,7 +170,9 @@ class TypeAheadDataFilter extends React.Component<
             formGroupClassName=""
             label={label}
           />
-          <StyledButton type="submit">Filter</StyledButton>
+          <StyledButton type="button" onClick={this._onSearchTextChanged}>
+            Filter
+          </StyledButton>
           <StyledButton type="button" onClick={this._resetFilters} disabled={filterText === ''}>
             Reset
           </StyledButton>
