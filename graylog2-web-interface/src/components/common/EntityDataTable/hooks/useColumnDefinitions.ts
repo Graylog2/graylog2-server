@@ -37,6 +37,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   hasRowActions,
   meta,
   onActionsWidthChange,
+  onChangeSlicing,
   onHeaderSectionResize,
   parentBgColor,
 }: {
@@ -50,6 +51,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   hasRowActions: boolean;
   meta: Meta;
   onActionsWidthChange: (colId: string, width: number) => void;
+  onChangeSlicing: (sliceCol: string, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
   parentBgColor: string | undefined;
 }) => {
@@ -64,12 +66,13 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     parentBgColor,
   });
   const attributeCols = useAttributeColumnDefinitions<Entity, Meta>({
-    columnSchemas,
+    columnHelper,
     columnRenderersByAttribute,
+    columnSchemas,
     columnWidths,
     entityAttributesAreCamelCase,
     meta,
-    columnHelper,
+    onChangeSlicing: onChangeSlicing,
     onHeaderSectionResize,
   });
 
