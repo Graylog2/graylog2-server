@@ -503,7 +503,7 @@ export type SaveViewControls = {
 export type CustomCommandArgument<T> = {
   values: T;
   submitForm: () => void;
-  setFieldValue: (field: string, newValue: any) => void;
+  setFieldValue: <F extends keyof T>(field: F, newValue: T[F]) => void;
 };
 
 export type CustomCommandContextProvider<T extends keyof CustomCommandContext, S> = {
