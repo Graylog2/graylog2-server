@@ -297,22 +297,22 @@ describe('IndexSetConfigurationForm', () => {
     const titleInput = await screen.findByRole('textbox', { name: /title/i });
     const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
 
-    // Test basic auto-fill
+    // Test basic autofill
     userEvent.type(titleInput, 'My Test Index');
 
     await waitFor(() => {
       expect(prefixInput).toHaveValue('my-test-index');
     });
 
-    // Test special character transformation
+    // Test trimming and character transformation
     userEvent.clear(titleInput);
-    userEvent.type(titleInput, 'Test@Index#Set 123!');
+    userEvent.type(titleInput, '  _+-Test@Index#Set 123! déjà--vu---  ');
 
     await waitFor(() => {
-      expect(prefixInput).toHaveValue('test-index-set-123');
+      expect(prefixInput).toHaveValue('test-index-set-123-deja-vu');
     });
 
-    // Test auto-fill stops after manual edit
+    // Test autofill stops after manual edit
     userEvent.clear(prefixInput);
     userEvent.type(prefixInput, 'custom-prefix');
     userEvent.clear(titleInput);

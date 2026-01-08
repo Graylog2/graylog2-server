@@ -48,6 +48,7 @@ import IndexSetRotationRetentionConfigurationSection from 'components/indices/In
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import { parseFieldRestrictions } from 'components/indices/helpers/fieldRestrictions';
+import deburr from 'lodash/deburr';
 
 type Props = {
   cancelLink: string;
@@ -191,7 +192,7 @@ const IndexSetConfigurationForm = ({
   const transformTitleToPrefix = (title: string): string => {
     if (!title) return '';
 
-    return title
+    return deburr(title) // Replace extended letters with basic Latin letters
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9_+-]+/g, '-') // Replace invalid chars with hyphen
