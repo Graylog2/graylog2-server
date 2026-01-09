@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo } from 'react';
 import { useFormikContext } from 'formik';
 import type { FormikErrors } from 'formik';
 
@@ -47,7 +48,7 @@ const CacheConfigFormFields = React.forwardRef(({ validationErrors }: Props, con
   const cachePlugins = usePluginEntities('lookupTableCaches');
   const plugin = cachePlugins.find((p) => p.type === config?.type);
 
-  const ConfigForm = React.useMemo(() => plugin?.formComponent, [plugin]);
+  const ConfigForm = useMemo(() => plugin?.formComponent, [plugin]);
 
   if (!plugin) return null;
 

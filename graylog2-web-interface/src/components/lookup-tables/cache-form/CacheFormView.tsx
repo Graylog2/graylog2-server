@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
@@ -36,8 +37,8 @@ type Props = {
 };
 
 function CacheFormView({ saved = undefined, onCancel, cache = undefined, isStep = false }: Props) {
-  const [lutCache, setLutCache] = React.useState<LookupTableCache>(cache);
-  const isCreate = React.useMemo(() => !lutCache?.id, [lutCache]);
+  const [lutCache, setLutCache] = useState<LookupTableCache>(cache);
+  const isCreate = useMemo(() => !lutCache?.id, [lutCache]);
 
   return (
     <>
