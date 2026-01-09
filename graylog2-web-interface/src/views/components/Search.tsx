@@ -47,12 +47,12 @@ import SynchronizeUrl from 'views/components/SynchronizeUrl';
 import useView from 'views/hooks/useView';
 import useViewsDispatch from 'views/stores/useViewsDispatch';
 import { cancelExecutedJob } from 'views/logic/slices/searchExecutionSlice';
-import { selectCurrentQueryResults } from 'views/logic/slices/viewSelectors';
+import { selectCurrentQueryResults, selectActiveQuery } from 'views/logic/slices/viewSelectors';
 import useViewsSelector from 'views/stores/useViewsSelector';
 import useParameters from 'views/hooks/useParameters';
 import useSearchConfiguration from 'hooks/useSearchConfiguration';
 import useViewTitle from 'views/hooks/useViewTitle';
-import { executeActiveQuery } from 'views/logic/slices/viewSlice';
+import { executeActiveQuery, updateQueryString } from 'views/logic/slices/viewSlice';
 import AsideElements from 'views/components/AsideElements';
 import usePageContext from 'hooks/usePageContext';
 
@@ -141,7 +141,27 @@ type Props = {
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useViewsDispatch();
-  usePageContext({ type: 'search', additional: { foo: 42 } });
+  usePageContext({
+    type: 'search',
+    additional: { foo: 42 },
+    actions: [
+      {
+        type: 'createWidget',
+        description: 'Creates widget with specified parameters',
+        action: () => {},
+      },
+      {
+        type: 'updateSearchQuery',
+        description: 'Updates current search query',
+        action: (query: string) =>
+          dispatch((_dispatch, getState) => {
+            const activeQuery = selectActiveQuery(getState());
+
+            return _dispatch(updateQueryString(activeQuery, query));
+          }),
+      },
+    ],
+  });
   const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
   const {
     sidebar: { isShown: showSidebar },

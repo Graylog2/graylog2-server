@@ -607,7 +607,7 @@ type MarkdownAugmentation = {
   component: React.ComponentType<{ value: string }>;
 };
 
-type AvailableSuggestedAction<Fn extends () => void> = { type: string; action: Fn };
+type AvailableSuggestedAction<Fn extends () => void> = { type: string; description: string; action: Fn };
 export type PageContext = {
   type: string;
   additional?: {};
