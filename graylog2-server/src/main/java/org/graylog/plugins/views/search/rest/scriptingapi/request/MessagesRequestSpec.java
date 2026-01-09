@@ -68,10 +68,9 @@ public record MessagesRequestSpec(@JsonProperty("query") String queryString,
         if (size <= 0) {
             size = DEFAULT_SIZE;
         }
-        if (fields == null || fields.isEmpty()) {
-            fields = DEFAULT_FIELDS;
+        if (fields == null) {
+            fields = List.of();
         }
-
     }
 
     @Deprecated
