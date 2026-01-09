@@ -147,7 +147,7 @@ public class PipelineAnalyzer {
         try {
             new RuleAstWalker().walk(ruleListener, rule);
         } catch (Exception e) {
-            LOG.warn("Pipeline metadata analysis failed for rule '{}' in pipeline '{}', likely due to invalid rule syntax. Skipping...",
+            LOG.warn("Pipeline metadata analysis failed for rule [{}] in pipeline [{}], likely due to invalid rule syntax. Skipping rule...",
                     rule.name(), pipeline.name(), e);
             return false;
         }
