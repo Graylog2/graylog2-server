@@ -19,9 +19,12 @@ package org.graylog.plugins.pipelineprocessor.processors;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog2.inputs.InputService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,11 +41,14 @@ import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.INPUT_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.REMOVE_FIELD_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM_ID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class PipelineAnalyzerTest {
+    protected static final String BROKEN_RULE_ID = "broken_rule_id";
+    protected static final String BROKEN_RULE_NAME = "broken_rule";
     private PipelineAnalyzer pipelineAnalyzer;
     private List<PipelineRulesMetadataDao> ruleRecords;
     private PipelineTestUtil testUtil;
@@ -117,7 +123,7 @@ class PipelineAnalyzerTest {
         assertTrue(ruleRecords.stream().anyMatch(dao ->
                 dao.pipelineId().equals(pipeline1.id())
                         && dao.rules().contains(FROM_INPUT_ID)
-                        && dao.functions().contains("from_input")));
+                        && dao.functions().contains(FromInput.NAME)));
     }
 
     @Test
@@ -141,5 +147,36 @@ class PipelineAnalyzerTest {
                         && dao.functions().contains("to_string")
         ));
     }
-}
 
+    @Test
+    void skipsRuleWhenWalkerFailsButProcessesHealthyRules() {
+        Pipeline pipeline = createPipelineWithFailingRule();
+
+        Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> result = pipelineAnalyzer.analyzePipelines(
+                ImmutableMap.of(pipeline.id(), pipeline), ImmutableMap.of(pipeline.id(), pipeline), ruleRecords);
+
+        Set<PipelineInputsMetadataDao.MentionedInEntry> mentions = result.get(INPUT_ID);
+        assertTrue(mentions.stream().anyMatch(entry -> entry.ruleId().equals(FROM_INPUT_ID)));
+        assertTrue(mentions.stream().noneMatch(entry -> entry.ruleId().equals(BROKEN_RULE_ID)));
+
+        PipelineRulesMetadataDao metadataDao = ruleRecords.stream()
+                .filter(dao -> dao.pipelineId().equals(pipeline.id()))
+                .findFirst()
+                .orElseThrow();
+
+        assertEquals(Set.of(FromInput.NAME), metadataDao.functions());
+    }
+
+    private Pipeline createPipelineWithFailingRule() {
+        Rule brokenRule = mock(Rule.class);
+        when(brokenRule.id()).thenReturn(BROKEN_RULE_ID);
+        when(brokenRule.name()).thenReturn(BROKEN_RULE_NAME);
+        LogicalExpression brokenExpression = mock(LogicalExpression.class);
+        when(brokenExpression.nodeType()).thenThrow(new RuntimeException("boom"));
+        when(brokenRule.when()).thenReturn(brokenExpression);
+        when(brokenRule.then()).thenReturn(List.of());
+
+        return testUtil.createPipelineWithRules("pipeline_with_broken_rule",
+                List.of(testUtil.FROM_INPUT, brokenRule));
+    }
+}

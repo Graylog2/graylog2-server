@@ -144,7 +144,13 @@ public class PipelineAnalyzer {
                              Set<String> functions, Set<String> deprecatedFunctionList,
                              Map<String, Set<PipelineInputsMetadataDao.MentionedInEntry>> inputMentions) {
         MetaDataListener ruleListener = new MetaDataListener(pipeline, connectedStreams, rule, inputMentions);
-        new RuleAstWalker().walk(ruleListener, rule);
+        try {
+            new RuleAstWalker().walk(ruleListener, rule);
+        } catch (Exception e) {
+            LOG.warn("Pipeline metadata analysis failed for rule '{}' in pipeline '{}', likely due to invalid rule syntax. Skipping...",
+                    rule.name(), pipeline.name(), e);
+            return false;
+        }
         functions.addAll(ruleListener.getFunctions());
         deprecatedFunctionList.addAll(ruleListener.getDeprecatedFunctions());
         return ruleListener.hasInputReference();
