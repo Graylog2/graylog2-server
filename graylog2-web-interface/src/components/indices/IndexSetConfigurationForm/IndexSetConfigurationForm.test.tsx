@@ -291,41 +291,86 @@ describe('IndexSetConfigurationForm', () => {
     expect(indexAnalyzer).toBeInTheDocument();
   });
 
-  it('Should autofill index prefix from title when creating', async () => {
-    render(<SUT create />);
+  describe('Autofill index prefix', () => {
+    it('Should autofill index prefix from title when creating', async () => {
+      render(<SUT create />);
 
-    const titleInput = await screen.findByRole('textbox', { name: /title/i });
-    const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
+      const titleInput = await screen.findByRole('textbox', { name: /title/i });
+      const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
 
-    userEvent.type(titleInput, 'My Test Index');
+      userEvent.type(titleInput, 'My Index');
 
-    await waitFor(() => {
-      expect(prefixInput).toHaveValue('my-test-index');
+      await waitFor(() => {
+        expect(prefixInput).toHaveValue('my-index');
+      });
     });
 
-    // Test autofill stops after manual edit
-    userEvent.clear(prefixInput);
-    userEvent.type(prefixInput, 'custom-prefix');
-    userEvent.clear(titleInput);
-    userEvent.type(titleInput, 'Another Title');
+    it('Should stop autofill when user clears the prefix and enters a custom one', async () => {
+      render(<SUT create />);
 
-    await waitFor(() => {
-      expect(prefixInput).toHaveValue('custom-prefix');
+      const titleInput = await screen.findByRole('textbox', { name: /title/i });
+      const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
+
+      userEvent.type(titleInput, 'My Index');
+
+      await waitFor(() => {
+        expect(prefixInput).toHaveValue('my-index');
+      });
+
+      userEvent.clear(prefixInput);
+      userEvent.type(prefixInput, 'custom-prefix');
+
+      // Change the title again - autofill should be disabled now
+      userEvent.type(titleInput, ' Updated');
+
+      // Prefix should remain as the manually modified value
+      await waitFor(() => {
+        expect(prefixInput).toHaveValue('custom-prefix');
+      });
     });
-  });
 
-  it('Should not autofill index prefix when editing existing index set', async () => {
-    render(<SUT indexSet={indexSet} />);
+    it('Should stop autofill when user appends to the prefix without clearing', async () => {
+      render(<SUT create />);
 
-    const titleInput = await screen.findByRole('textbox', { name: /title/i });
+      const titleInput = await screen.findByRole('textbox', { name: /title/i });
+      const prefixInput = await screen.findByRole('textbox', { name: /index prefix/i });
 
-    // Clear existing title and type new one
-    userEvent.clear(titleInput);
-    userEvent.type(titleInput, 'New Title');
+      // Type title which autofills the prefix
+      userEvent.type(titleInput, 'My Index');
 
-    // Prefix field should not exist in edit mode (it's read-only after creation)
-    await waitFor(() => {
-      expect(screen.queryByRole('textbox', { name: /index prefix/i })).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(prefixInput).toHaveValue('my-index');
+      });
+
+      // Now append to the autofilled prefix without clearing
+      userEvent.type(prefixInput, '-suffix');
+
+      await waitFor(() => {
+        expect(prefixInput).toHaveValue('my-index-suffix');
+      });
+
+      // Change the title again - autofill should be disabled now
+      userEvent.type(titleInput, ' Updated');
+
+      // Prefix should remain as the manually modified value
+      await waitFor(() => {
+        expect(prefixInput).toHaveValue('my-index-suffix');
+      });
+    });
+
+    it('Should not autofill when editing existing index set', async () => {
+      render(<SUT indexSet={indexSet} />);
+
+      const titleInput = await screen.findByRole('textbox', { name: /title/i });
+
+      // Clear existing title and type new one
+      userEvent.clear(titleInput);
+      userEvent.type(titleInput, 'New Title');
+
+      // Prefix field should not exist in edit mode (it's read-only after creation)
+      await waitFor(() => {
+        expect(screen.queryByRole('textbox', { name: /index prefix/i })).not.toBeInTheDocument();
+      });
     });
   });
 });
