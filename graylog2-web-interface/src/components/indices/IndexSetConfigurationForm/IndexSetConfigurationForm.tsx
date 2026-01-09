@@ -18,6 +18,7 @@ import React, { useMemo, useState, useCallback } from 'react';
 import moment from 'moment';
 import { Formik, Form, Field } from 'formik';
 import styled, { css } from 'styled-components';
+import deburr from 'lodash/deburr';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
@@ -48,7 +49,6 @@ import IndexSetRotationRetentionConfigurationSection from 'components/indices/In
 import useCurrentUser from 'hooks/useCurrentUser';
 import { isPermitted } from 'util/PermissionsMixin';
 import { parseFieldRestrictions } from 'components/indices/helpers/fieldRestrictions';
-import deburr from 'lodash/deburr';
 
 type Props = {
   cancelLink: string;
@@ -78,6 +78,18 @@ const SubmitWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
 `;
+
+export const transformTitleToPrefix = (title: string): string => {
+  if (!title) return '';
+
+  return deburr(title) // Replace extended letters with basic Latin letters
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_+-]+/g, '-') // Replace invalid chars with hyphen
+    .replace(/^[_+-]+/, '') // Remove leading invalid chars
+    .replace(/-+$/, '') // Remove trailing hyphens
+    .replace(/-{2,}/g, '-'); // Collapse multiple hyphens
+};
 
 const IndexSetConfigurationForm = ({
   indexSet: initialIndexSet = undefined,
@@ -187,18 +199,6 @@ const IndexSetConfigurationForm = ({
     onChange(name, moment.duration(intervalValue, unit).asMilliseconds());
     setFieldValue(name, moment.duration(intervalValue, unit).asMilliseconds());
     setFieldTypeRefreshIntervalUnit(unit);
-  };
-
-  const transformTitleToPrefix = (title: string): string => {
-    if (!title) return '';
-
-    return deburr(title) // Replace extended letters with basic Latin letters
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9_+-]+/g, '-') // Replace invalid chars with hyphen
-      .replace(/^[_+-]+/, '') // Remove leading invalid chars
-      .replace(/-+$/, '') // Remove trailing hyphens
-      .replace(/-{2,}/g, '-'); // Collapse multiple hyphens
   };
 
   const handleTitleChange = useCallback(
