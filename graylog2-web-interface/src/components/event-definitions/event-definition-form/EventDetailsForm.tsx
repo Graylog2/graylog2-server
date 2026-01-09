@@ -15,6 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useState } from 'react';
+import styled from 'styled-components';
 import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
 import toString from 'lodash/toString';
@@ -35,6 +37,16 @@ import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import type { EventDefinition } from '../event-definitions-types';
 import { isSystemEventDefinition } from '../event-definitions-types';
 import commonStyles from '../common/commonStyles.css';
+
+const StyledRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ theme }) => theme.spacings.lg};
+
+  & .form-group {
+    width: 100%;
+  }
+`;
 
 const priorityOptions = Object.entries(EventDefinitionPriorityEnum.properties)
   .map(([key, value]) => ({
@@ -60,20 +72,20 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const ltXl = useMediaQuery(`(min-width: ${theme.breakpoints.xl}`);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState<boolean>(false);
+  const [showAddEventProcedureForm, setShowAddEventProcedureForm] = useState<boolean>(false);
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
 
-  const readOnly = React.useMemo(
+  const readOnly = useMemo(
     () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
     [canEdit, eventDefinition],
   );
-  const showEventProcedureSummary = React.useMemo(
+  const showEventProcedureSummary = useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],
   );
-  const showAddNewEventProcedure = React.useMemo(
+  const showAddNewEventProcedure = useMemo(
     () => !eventDefinitionEventProcedure && !showAddEventProcedureForm && !readOnly && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, readOnly, validSecurityLicense],
   );
@@ -100,10 +112,10 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
 
   return (
     <Row>
-      <Col md={7} lg={12}>
+      <Col md={12} lg={6}>
         <h2 className={commonStyles.title}>Event Details</h2>
         <fieldset>
-          <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem' }}>
+          <StyledRow>
             <Input
               id="event-definition-title"
               name="title"
@@ -129,7 +141,7 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
               />
               <HelpBlock>Choose the priority for Events created from this Definition.</HelpBlock>
             </FormGroup>
-          </div>
+          </StyledRow>
 
           <Input
             id="event-definition-event-summary-template"
