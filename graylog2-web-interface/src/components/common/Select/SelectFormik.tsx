@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import { useField } from 'formik';
 import styled from 'styled-components';
 
@@ -57,7 +58,7 @@ function SelectFormik<T>({
 }: Props<T>) {
   const [{ name, value }, { touched, error }, { setValue, setTouched }] = useField({ name: field.name });
 
-  const handleChange = React.useCallback(
+  const handleChange = useCallback(
     (newValue: string) => {
       setValue(multi ? newValue.split(',') : newValue);
       onChange?.(newValue);
