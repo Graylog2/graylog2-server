@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
+import { waitFor } from 'wrappedTestingLibrary/hooks';
 import userEvent from '@testing-library/user-event';
 
 import useIndexSetTemplateDefaults from 'components/indices/IndexSetTemplates/hooks/useIndexSetTemplateDefaults';
@@ -25,7 +26,6 @@ import useProfileOptions from 'components/indices/IndexSetFieldTypeProfiles/hook
 import { DATA_TIERING_TYPE } from 'components/indices/data-tiering';
 
 import IndexSetConfigurationForm from './IndexSetConfigurationForm';
-import { waitFor } from 'wrappedTestingLibrary/hooks';
 
 const indexSet = {
   id: '62665eb0526719678ed3719f',
