@@ -137,4 +137,20 @@ describe('Input Diagnosis Page', () => {
 
     expect(nodeStateIndicator).toHaveClass('success');
   });
+
+  it('shows gRPC traffic for OpenTelemetry inputs without tcp_keepalive', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      input: {
+        ...input,
+        name: 'OpenTelemetry (gRPC)',
+        type: 'org.graylog.inputs.otel.OTelGrpcInput',
+        attributes: { bind_address: '0.0.0.0', port: 4317 },
+      },
+    });
+
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/TCP Traffic\./i)).toBeInTheDocument();
+  });
 });
