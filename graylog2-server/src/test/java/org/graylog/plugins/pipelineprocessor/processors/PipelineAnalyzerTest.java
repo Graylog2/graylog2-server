@@ -123,7 +123,7 @@ class PipelineAnalyzerTest {
         assertTrue(ruleRecords.stream().anyMatch(dao ->
                 dao.pipelineId().equals(pipeline1.id())
                         && dao.rules().contains(FROM_INPUT_ID)
-                        && dao.functions().contains(FromInput.NAME)));
+                        && dao.functions().contains("from_input")));
     }
 
     @Test
