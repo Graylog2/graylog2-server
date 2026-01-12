@@ -179,23 +179,24 @@ public class AggregationSearchUtils {
             // value.
             //
             // Examples:
-            //   count_source=42
-            //   card_anonid=23
-            final Map<String, Double> aggregationConditions = new HashMap<>();
+            //   aggregation_value_count_source=42
+            //   aggregation_value_card_anonid=23
+            final Map<String, Double> simplifiedAggConditions = new HashMap<>();
             for (AggregationSeriesValue seriesValue : keyResult.seriesValues()) {
                 final String function = seriesValue.series().type().toLowerCase(Locale.ROOT);
                 final Optional<String> field = fieldFromSeries(seriesValue.series());
 
-                final String fieldName = field.map(f -> String.format(Locale.ROOT, "%s_%s", function, f))
-                        .orElse(function);
+                final String fieldName = field.map(f -> String.format(Locale.ROOT, "aggregation_value_%s_%s", function, f))
+                        .orElseGet(() -> String.format(Locale.ROOT, "aggregation_value_%s", function));
 
-                aggregationConditions.put(fieldName, seriesValue.value());
+                fields.put(fieldName, seriesValue.value());
+                simplifiedAggConditions.put(fieldName.replace("aggregation_value_", ""), seriesValue.value());
             }
 
             // This is the concatenated key value
             fields.put("aggregation_key", keyString);
 
-            event.setAggregationConditions(aggregationConditions);
+            event.setAggregationConditions(simplifiedAggConditions);
 
             // Ask any event query modifier for its state and collect it into the event modifier state
             final Map<String, Object> eventModifierState = eventQueryModifiers.stream()
