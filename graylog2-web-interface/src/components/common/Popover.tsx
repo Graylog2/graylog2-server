@@ -18,6 +18,8 @@ import * as React from 'react';
 import { Popover as MantinePopover } from '@mantine/core';
 import styled, { css, useTheme } from 'styled-components';
 
+import { borderColor } from 'theme/utils/borderStyles';
+
 const Popover = ({ ...props }: React.ComponentProps<typeof MantinePopover>) => {
   const theme = useTheme();
 
@@ -29,17 +31,11 @@ const Popover = ({ ...props }: React.ComponentProps<typeof MantinePopover>) => {
   const styles = () => ({
     dropdown: {
       backgroundColor: theme.colors.global.contentBackground,
-      borderTopColor: theme.colors.variant.light.default,
-      borderRightColor: theme.colors.variant.light.default,
-      borderBottomColor: theme.colors.variant.light.default,
-      borderLeftColor: theme.colors.variant.light.default,
+      ...borderColor(theme.colors.variant.light.default),
       padding: 0,
     },
     arrow: {
-      borderTopColor: theme.colors.variant.light.default,
-      borderRightColor: theme.colors.variant.light.default,
-      borderBottomColor: theme.colors.variant.light.default,
-      borderLeftColor: theme.colors.variant.light.default,
+      ...borderColor(theme.colors.variant.light.default),
       backgroundColor: arrowBackground,
     },
   });

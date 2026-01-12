@@ -19,16 +19,15 @@ import type { SelectProps } from '@mantine/core';
 import { Select as MantineSelect } from '@mantine/core';
 import { useTheme } from 'styled-components';
 
+import { borderColor } from 'theme/utils/borderStyles';
+
 const Select = ({ children, ...otherProps }: SelectProps) => {
   const theme = useTheme();
   const SelectStyles = () => ({
     input: {
       color: theme.colors.input.color,
       backgroundColor: theme.colors.input.background,
-      borderTopColor: theme.colors.input.border,
-      borderRightColor: theme.colors.input.border,
-      borderBottomColor: theme.colors.input.border,
-      borderLeftColor: theme.colors.input.border,
+      ...borderColor(theme.colors.input.border),
     },
     dropdown: {
       color: theme.colors.input.color,
