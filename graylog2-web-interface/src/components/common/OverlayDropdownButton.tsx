@@ -55,7 +55,7 @@ type Props = {
 
 /**
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
- * You can set the trigger variant to icon, to display an icon button instead of a button.
+ * You can set the trigger variant to icon_horizontal or icon_vertical, to display an icon button instead of a button.
  */
 const OverlayDropdownButton = ({
   alwaysShowCaret = false,

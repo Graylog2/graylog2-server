@@ -18,33 +18,37 @@
 import * as React from 'react';
 import styled, { css } from 'styled-components';
 
+import { DeleteMenuItem } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import { defaultCompare } from 'logic/DefaultCompare';
 
-const Container = styled.div(
-  ({ theme }) => css`
-    min-width: 300px;
-  `,
-);
+const Container = styled.div`
+  min-width: 300px;
+`;
 
 const Header = styled.div(
   ({ theme }) => css`
     display: flex;
-    gap: 5px;
+    gap: ${theme.spacings.xxs};
     align-items: center;
   `,
 );
 
+const Headline = styled.h2`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
 type Props = {
   sliceCol: string;
-  slice: string;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string, slice?: string) => void;
 };
 
-const Slicing = ({ sliceCol, slice, columnSchemas, onChangeSlicing }: Props) => {
+const Slicing = ({ sliceCol, columnSchemas, onChangeSlicing }: Props) => {
   const sliceableColumns = columnSchemas
     .filter((schema) => schema.sliceable)
     .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
@@ -53,13 +57,16 @@ const Slicing = ({ sliceCol, slice, columnSchemas, onChangeSlicing }: Props) => 
   return (
     <Container>
       <Header>
-        <h2>Slice By</h2>
-        <OverlayDropdownButton title={activeColumn.title}>
+        <Headline>{activeColumn.title ?? 'Slice By'}</Headline>
+        <OverlayDropdownButton title="Slice by column" buttonTitle="Slice by column" triggerVariant="icon_vertical">
+          <MenuItem header>Slice by</MenuItem>
           {sliceableColumns.map((schema) => (
             <MenuItem key={schema.id} onClick={() => onChangeSlicing(schema.id)}>
               {schema.title}
             </MenuItem>
           ))}
+          <MenuItem divider />
+          <DeleteMenuItem onClick={() => onChangeSlicing(undefined, undefined)}>Remove slicing</DeleteMenuItem>
         </OverlayDropdownButton>
       </Header>
     </Container>

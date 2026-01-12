@@ -69,8 +69,8 @@ export type SearchParams<T = string> = {
   pageSize: number;
   query: string;
   sort: Sort<T>;
-  sliceCol: string | undefined;
-  slice: string;
+  sliceCol?: string | undefined;
+  slice?: string;
   filters?: UrlQueryFilters;
 };
 
