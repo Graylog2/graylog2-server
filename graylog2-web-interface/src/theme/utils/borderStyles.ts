@@ -14,21 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
-import { render, screen } from 'wrappedTestingLibrary';
 
-import { alice } from 'fixtures/users';
-
-import DatePicker from './DatePicker';
-
-const mockCurrentUser = alice.toBuilder().timezone('Europe/Berlin').build();
-
-jest.mock('hooks/useCurrentUser', () => () => mockCurrentUser);
-
-describe('DatePicker', () => {
-  it('should highlight selected day', async () => {
-    render(<DatePicker date="2023-10-19" onChange={() => {}} />);
-
-    expect(await screen.findByRole('gridcell', { name: '19' })).toHaveAttribute('aria-selected', 'true');
-  });
+/**
+ * Helper function to set all four border-side colors to the same value.
+ * This is needed to avoid conflicts with Mantine 8.3.0+ which internally
+ * uses specific border-side properties. Using the shorthand `borderColor`
+ * can cause React warnings about mixing shorthand and non-shorthand properties.
+ *
+ * @param color - The color to apply to all four border sides
+ * @returns An object with all four border-side color properties set
+ */
+export const borderColor = (color: string) => ({
+  borderTopColor: color,
+  borderRightColor: color,
+  borderBottomColor: color,
+  borderLeftColor: color,
 });
