@@ -141,27 +141,31 @@ type Props = {
 
 const Search = ({ forceSideBarPinned = false }: Props) => {
   const dispatch = useViewsDispatch();
-  usePageContext({
-    type: 'search',
-    additional: { foo: 42 },
-    actions: [
-      {
-        type: 'createWidget',
-        description: 'Creates widget with specified parameters',
-        action: () => {},
-      },
-      {
-        type: 'updateSearchQuery',
-        description: 'Updates current search query',
-        action: (query: string) =>
-          dispatch((_dispatch, getState) => {
-            const activeQuery = selectActiveQuery(getState());
+  const context = useMemo(
+    () => ({
+      type: 'search',
+      additional: { foo: 42 },
+      actions: [
+        {
+          type: 'createWidget',
+          description: 'Creates widget with specified parameters',
+          action: () => {},
+        },
+        {
+          type: 'updateSearchQuery',
+          description: 'Updates current search query',
+          action: (query: string) =>
+            dispatch((_dispatch, getState) => {
+              const activeQuery = selectActiveQuery(getState());
 
-            return _dispatch(updateQueryString(activeQuery, query));
-          }),
-      },
-    ],
-  });
+              return _dispatch(updateQueryString(activeQuery, query));
+            }),
+        },
+      ],
+    }),
+    [dispatch],
+  );
+  usePageContext(context);
   const refreshSearch = useCallback(() => dispatch(executeActiveQuery()), [dispatch]);
   const {
     sidebar: { isShown: showSidebar },

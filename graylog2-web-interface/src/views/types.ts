@@ -608,10 +608,10 @@ type MarkdownAugmentation = {
 };
 
 type AvailableSuggestedAction<Fn extends () => void> = { type: string; description: string; action: Fn };
-export type PageContext = {
+export type PageContext<T = AvailableSuggestedAction<(...args: unknown[]) => void>> = {
   type: string;
   additional?: {};
-  actions?: Array<AvailableSuggestedAction<(...args: unknown[]) => void>>;
+  actions?: Array<T>;
 };
 
 declare module 'graylog-web-plugin/plugin' {
