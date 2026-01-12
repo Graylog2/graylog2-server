@@ -29,11 +29,17 @@ const Popover = ({ ...props }: React.ComponentProps<typeof MantinePopover>) => {
   const styles = () => ({
     dropdown: {
       backgroundColor: theme.colors.global.contentBackground,
-      borderColor: theme.colors.variant.light.default,
+      borderTopColor: theme.colors.variant.light.default,
+      borderRightColor: theme.colors.variant.light.default,
+      borderBottomColor: theme.colors.variant.light.default,
+      borderLeftColor: theme.colors.variant.light.default,
       padding: 0,
     },
     arrow: {
-      borderColor: theme.colors.variant.light.default,
+      borderTopColor: theme.colors.variant.light.default,
+      borderRightColor: theme.colors.variant.light.default,
+      borderBottomColor: theme.colors.variant.light.default,
+      borderLeftColor: theme.colors.variant.light.default,
       backgroundColor: arrowBackground,
     },
   });

@@ -25,7 +25,10 @@ const Select = ({ children, ...otherProps }: SelectProps) => {
     input: {
       color: theme.colors.input.color,
       backgroundColor: theme.colors.input.background,
-      borderColor: theme.colors.input.border,
+      borderTopColor: theme.colors.input.border,
+      borderRightColor: theme.colors.input.border,
+      borderBottomColor: theme.colors.input.border,
+      borderLeftColor: theme.colors.input.border,
     },
     dropdown: {
       color: theme.colors.input.color,
