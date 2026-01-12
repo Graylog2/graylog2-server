@@ -24,8 +24,8 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.db.PipelineInputsMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog2.database.NotFoundException;
 import org.graylog.plugins.pipelineprocessor.functions.FromInput;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
@@ -49,6 +49,7 @@ import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM2_TITLE;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM3_ID;
 import static org.graylog.plugins.pipelineprocessor.processors.PipelineTestUtil.STREAM3_TITLE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -183,7 +184,6 @@ class PipelineAnalyzerTest {
                         && dao.routingRules().get(ROUTING_ID).contains(STREAM3_ID)
         ));
     }
-}
 
     @Test
     void skipsRuleWhenWalkerFailsButProcessesHealthyRules() {
