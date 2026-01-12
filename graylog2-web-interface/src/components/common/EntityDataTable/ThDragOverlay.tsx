@@ -27,6 +27,7 @@ import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import { ThInner, LeftCol } from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
+import HeaderActionsDropdownButton from 'components/common/EntityDataTable/HeaderActionsDropdownButton';
 
 const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
@@ -77,6 +78,7 @@ const ThGhostInner = <Entity extends EntityBase>(
             <DragIcon name="drag_indicator" />
           </DragHandle>
           {columnMeta.label}
+          {columnMeta?.enableSlicing && <HeaderActionsDropdownButton onChangeSlicing={() => {}} />}
           {column.getCanSort() && <SortIcon<Entity> column={column} />}
         </LeftCol>
         {column.getCanResize() && <ResizeHandle colTitle={columnMeta.label} />}

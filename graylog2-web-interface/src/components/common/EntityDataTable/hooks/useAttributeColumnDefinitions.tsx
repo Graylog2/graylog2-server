@@ -32,10 +32,7 @@ import DragHandle from 'components/common/SortableList/DragHandle';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
-import SliceIcon from 'components/common/EntityDataTable/SliceIcon';
-import { MORE_ACTIONS_TITLE, MORE_ACTIONS_HOVER_TITLE } from 'components/common/EntityDataTable/Constants';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
-import { MenuItem } from 'components/bootstrap';
+import HeaderActionsDropdownButton from 'components/common/EntityDataTable/HeaderActionsDropdownButton';
 
 import SortIcon from '../SortIcon';
 
@@ -114,15 +111,7 @@ const AttributeHeader = <Entity extends EntityBase>({
           />
         )}
         {columnMeta?.columnRenderer?.renderHeader?.(columnMeta.label) ?? columnMeta.label}
-        {columnMeta?.enableSlicing && (
-          <OverlayDropdownButton
-            title="Toggle column actions"
-            buttonTitle="Toggle column actions"
-            bsSize="xsmall"
-            triggerVariant="icon_horizontal">
-            <MenuItem onClick={_onChangeSlicing}>Slice by values</MenuItem>
-          </OverlayDropdownButton>
-        )}
+        {columnMeta?.enableSlicing && <HeaderActionsDropdownButton onChangeSlicing={_onChangeSlicing} />}
         {ctx.header.column.getCanSort() && <SortIcon<Entity> column={ctx.header.column} />}
       </LeftCol>
       <RightCol ref={rightRef}>
