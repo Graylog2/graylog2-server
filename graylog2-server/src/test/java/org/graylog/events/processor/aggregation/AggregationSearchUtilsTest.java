@@ -215,7 +215,7 @@ public class AggregationSearchUtilsTest {
 
         final EventDefinitionDto eventDefinitionDto = buildEventDefinitionDto(ImmutableSet.of("stream-2"), ImmutableList.of(), null, emptyList())
                 .toBuilder()
-                .eventSummaryTemplate("Aggregation on ${group_field_one} and ${group_field_two} has source count of ${aggregation_conditions.count\\(source\\)}")
+                .eventSummaryTemplate("Aggregation on ${group_field_one} and ${group_field_two} has source count of ${aggregation_conditions.count_source}")
                 .build();
         final AggregationEventProcessorParameters parameters = AggregationEventProcessorParameters.builder()
                 .timerange(timerange)
