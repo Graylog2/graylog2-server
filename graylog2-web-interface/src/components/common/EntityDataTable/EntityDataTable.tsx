@@ -147,7 +147,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
     attributes?: ColumnPreferences;
     order?: Array<string>;
   }) => Promise<void>;
-  onChangeSlicing: (sliceCol: string, slice?: string) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   /** Function to handle sort changes */
   onSortChange: (newSort: Sort) => void;
   /** Function to handle page size changes */

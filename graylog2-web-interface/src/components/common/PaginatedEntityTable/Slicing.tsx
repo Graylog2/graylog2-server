@@ -45,7 +45,7 @@ const Headline = styled.h2`
 type Props = {
   sliceCol: string;
   columnSchemas: Array<ColumnSchema>;
-  onChangeSlicing: (sliceCol: string, slice?: string) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
 };
 
 const Slicing = ({ sliceCol, columnSchemas, onChangeSlicing }: Props) => {

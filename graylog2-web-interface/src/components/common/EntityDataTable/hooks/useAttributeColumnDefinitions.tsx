@@ -86,7 +86,7 @@ const AttributeHeader = <Entity extends EntityBase>({
 }: {
   ctx: HeaderContext<Entity, unknown>;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
-  onChangeSlicing: (sliceCol: string, slice?: string) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
 }) => {
   const colId = ctx.header.column.id;
   const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
@@ -143,7 +143,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   columnWidths: { [attributeId: string]: number };
   entityAttributesAreCamelCase: boolean;
   meta: Meta;
-  onChangeSlicing: (sliceCol: string, slice?: string) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 }) => {
   const cell = useCallback(
