@@ -23,6 +23,8 @@ import com.google.common.annotations.VisibleForTesting;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.ws.rs.BadRequestException;
+import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.shaded.elasticsearch7.org.apache.http.ContentTooLongException;
 import org.graylog.shaded.elasticsearch7.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.elasticsearch7.org.elasticsearch.ElasticsearchException;
@@ -167,6 +169,10 @@ public class ElasticsearchClient {
 
     public static RuntimeException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof ElasticsearchException elasticsearchException) {
+            final Integer resultWindowLimitFromError = SearchTypeErrorParser.getResultWindowLimitFromError(elasticsearchException);
+            if (resultWindowLimitFromError != null) {
+                throw new BadRequestException("Result window is too large, from + size must be less than or equal to: " + resultWindowLimitFromError);
+            }
             if (isIndexNotFoundException(elasticsearchException)) {
                 return IndexNotFoundException.create(errorMessage + elasticsearchException.getResourceId(), elasticsearchException.getIndex().getName());
             }

@@ -23,6 +23,8 @@ import com.google.common.annotations.VisibleForTesting;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import jakarta.ws.rs.BadRequestException;
+import org.graylog.plugins.views.search.errors.SearchTypeErrorParser;
 import org.graylog.shaded.opensearch2.org.apache.http.ContentTooLongException;
 import org.graylog.shaded.opensearch2.org.apache.http.client.config.RequestConfig;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
@@ -169,6 +171,10 @@ public class OpenSearchClient {
 
     public static RuntimeException exceptionFrom(Exception e, String errorMessage) {
         if (e instanceof OpenSearchException openSearchException) {
+            final Integer resultWindowLimitFromError = SearchTypeErrorParser.getResultWindowLimitFromError(openSearchException);
+            if (resultWindowLimitFromError != null) {
+                throw new BadRequestException("Result window is too large, from + size must be less than or equal to: " + resultWindowLimitFromError);
+            }
             if (isIndexNotFoundException(openSearchException)) {
                 return IndexNotFoundException.create(errorMessage + openSearchException.getResourceId(), openSearchException.getIndex().getName());
             }
