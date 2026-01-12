@@ -51,7 +51,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   hasRowActions: boolean;
   meta: Meta;
   onActionsWidthChange: (colId: string, width: number) => void;
-  onChangeSlicing: (sliceCol: string, slice?: string) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
   parentBgColor: string | undefined;
 }) => {

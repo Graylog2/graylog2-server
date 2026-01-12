@@ -56,7 +56,7 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
     fetchOptions,
     setQuery: setUrlQuery,
     onChangeFilters,
-    onChangeSlicing: (newSliceCol: string, newSlice?: string) => {
+    onChangeSlicing: (newSliceCol: string | undefined, newSlice?: string) => {
       setSliceCol(newSliceCol);
       setSlice(newSlice);
     },

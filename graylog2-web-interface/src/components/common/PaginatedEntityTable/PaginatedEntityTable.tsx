@@ -84,7 +84,7 @@ type InnerProps = {
   layoutConfig: LayoutConfig;
   onDataLoaded?: (data: PaginatedResponse<unknown, unknown>) => void;
   onChangeFilters: (newFilters: UrlQueryFilters) => void;
-  onChangeSlicing: (sliceCol: string, slice?: string) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   paginationState: PaginationQueryParameterResult;
   reactQueryOptions: FetchOptions;
   setQuery: (newQuery: string) => void;
