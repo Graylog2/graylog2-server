@@ -38,10 +38,12 @@ const IndexSetReadOnlyConfiguration = ({
   hiddenFields,
   immutableFields,
   ignoreFieldRestrictions,
+  onPrefixChange,
 }: {
   hiddenFields: string[];
   immutableFields: string[];
   ignoreFieldRestrictions: boolean;
+  onPrefixChange: () => void;
 }) => {
   const indexPrefixHelp = (
     <span>
@@ -59,6 +61,7 @@ const IndexSetReadOnlyConfiguration = ({
         name="index_prefix"
         help={indexPrefixHelp}
         validate={_validateIndexPrefix}
+        onChange={onPrefixChange}
         required
       />
       {(!hiddenFields.includes('index_analyzer') || ignoreFieldRestrictions) && (
