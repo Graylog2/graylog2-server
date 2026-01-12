@@ -31,35 +31,24 @@ const StyledIconButton = styled(IconButton)(
     cursor: pointer;
   `,
 );
+
 type Props = {
   onClick: (event: React.MouseEvent<HTMLDivElement>) => void;
 };
 
-const SliceIcon = ({ onClick }: Props) => {
-  const [show, setShowDropdown] = useState(false);
-
-  const _onToggle = () => {
-    setShowDropdown((cur) => !cur);
-  };
-
-  const onClose = () => {
-    setShowDropdown(false);
-  };
-
-  return (
-    <OverlayDropdown
-      show={show}
-      onClose={onClose}
-      toggleChild={
-        <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
-          <StyledIconButton name="more_horiz" title="Toggle column actions" />
-        </div>
-      }
-      placement="bottom-start"
-      onToggle={_onToggle}>
-      <MenuItem onClick={onClick}>Slice by values</MenuItem>
-    </OverlayDropdown>
-  );
-};
+const SliceIcon = ({ onClick }: Props) => (
+  <OverlayDropdown
+    show={show}
+    onClose={onClose}
+    toggleChild={
+      <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
+        <StyledIconButton name="more_horiz" title="Toggle column actions" />
+      </div>
+    }
+    placement="bottom-start"
+    onToggle={_onToggle}>
+    <MenuItem onClick={onClick}>Slice by values</MenuItem>
+  </OverlayDropdown>
+);
 
 export default SliceIcon;
