@@ -132,7 +132,7 @@
     "assets-webpack-plugin": "^7.1.1",
     "copy-webpack-plugin": "^13.0.1",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.2",
+    "cross-env": "^10.1.0",
     "css-loader": "^6.5.1",
     "esbuild-loader": "4.3.0",
     "eslint": "^9.36.0",
