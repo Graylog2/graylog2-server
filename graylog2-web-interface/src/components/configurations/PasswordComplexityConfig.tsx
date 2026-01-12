@@ -33,6 +33,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useLocation from 'routing/useLocation';
 import { getPathnameWithoutId } from 'util/URLUtils';
+import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG, PASSWORD_SPECIAL_CHARACTERS } from 'logic/users/passwordComplexity';
 
 const StyledDefList = styled.dl.attrs({ className: 'deflist' })(
   ({ theme }) => css`
@@ -52,15 +53,7 @@ const LabelSpan = styled.span(
   `,
 );
 
-const SPECIAL_CHARACTERS = '!@#$%^&*()-_=+[]{}|;:,.<>?/';
 const configType = ConfigurationType.PASSWORD_COMPLEXITY_CONFIG;
-const defaultConfig: PasswordComplexityConfigType = {
-  min_length: 6,
-  require_uppercase: false,
-  require_lowercase: false,
-  require_numbers: false,
-  require_special_chars: false,
-};
 
 const PasswordComplexityConfig = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -73,7 +66,7 @@ const PasswordComplexityConfig = () => {
 
   useEffect(() => {
     ConfigurationsActions.listPasswordComplexityConfig(configType).then(() => {
-      const config = getConfig(configType, configuration) ?? defaultConfig;
+      const config = getConfig(configType, configuration) ?? DEFAULT_PASSWORD_COMPLEXITY_CONFIG;
 
       setViewConfig(config);
       setFormConfig(config);
@@ -203,7 +196,9 @@ const PasswordComplexityConfig = () => {
                           name="require_special_chars"
                           id="require_special_chars"
                           label={<LabelSpan>Require special characters</LabelSpan>}
-                          help={<>Password must include at least one of the following characters:<br />{SPECIAL_CHARACTERS}</>}
+                          help={
+                            <>Password must include at least one of the following characters:<br />{PASSWORD_SPECIAL_CHARACTERS}</>
+                          }
                         />
                       </Col>
                     </Row>
