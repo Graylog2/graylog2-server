@@ -89,7 +89,10 @@ const PublicNotification = ({ notificationId, notification, onDismissPublicNotif
 
   return (
     <AlertContainer key={title}>
-      <StyledAlert bsStyle={variant} onDismiss={isDismissible ? _dismiss : undefined} title={!hiddenTitle && title}>
+      <StyledAlert
+        bsStyle={variant ?? 'default'}
+        onDismiss={isDismissible ? _dismiss : undefined}
+        title={!hiddenTitle && title}>
         <FlexWrap>
           <ShortContent>{shortMessage}</ShortContent>
           {longMessage && (
