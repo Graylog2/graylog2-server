@@ -49,6 +49,7 @@ const Container = styled.div(
     display: flex;
     flex-direction: row;
     gap: ${theme.spacings.xs};
+    width: 100%;
   `,
 );
 
@@ -56,6 +57,7 @@ const TableWrapper = styled.div`
   display: flex;
   flex-direction: column;
   overflow-x: auto;
+  width: 100%;
 `;
 
 type EntityDataTableProps = React.ComponentProps<typeof EntityDataTable>;
@@ -186,12 +188,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       entityTableId={tableLayout.entityTableId}>
       <Container>
         {fetchOptions.sliceCol && (
-          <Slicing
-            sliceCol={fetchOptions.sliceCol}
-            slice={fetchOptions.slice}
-            columnSchemas={columnSchemas}
-            onChangeSlicing={onChangeSlicing}
-          />
+          <Slicing sliceCol={fetchOptions.sliceCol} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />
         )}
         <TableWrapper>
           {!externalSearch && (
