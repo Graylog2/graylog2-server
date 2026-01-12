@@ -20,7 +20,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Streams;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
@@ -56,7 +55,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -97,21 +95,6 @@ public class OpenSearchClient {
         final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
 
         return firstResponseFrom(result, errorMessage);
-    }
-
-    public List<MultiSearchResponse.Item> msearch(List<SearchRequest> searchRequests, String errorMessage) {
-        var multiSearchRequest = new MultiSearchRequest();
-
-        indexerMaxConcurrentSearches.ifPresent(multiSearchRequest::maxConcurrentSearchRequests);
-        indexerMaxConcurrentShardRequests.ifPresent(maxShardRequests -> searchRequests
-                .forEach(request -> request.setMaxConcurrentShardRequests(maxShardRequests)));
-
-        searchRequests.forEach(multiSearchRequest::add);
-
-        final MultiSearchResponse result = this.execute((c, requestOptions) -> c.msearch(multiSearchRequest, requestOptions), errorMessage);
-
-        return Streams.stream(result)
-                .collect(Collectors.toList());
     }
 
     private SearchResponse firstResponseFrom(MultiSearchResponse result, String errorMessage) {
