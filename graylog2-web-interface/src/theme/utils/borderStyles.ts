@@ -14,18 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.shared.buffers.processors;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.time.Duration;
-
-public record TimeStampConfig(@JsonProperty("grace_period") Duration gracePeriod) {
-    public static final TimeStampConfig THRESHOLD_2DAYS = new TimeStampConfig(Duration.ofDays(2));
-    private static final TimeStampConfig DISABLED_CONFIG = new TimeStampConfig(null);
-
-    public static TimeStampConfig getDefault() {
-        // Off by default
-        return DISABLED_CONFIG;
-    }
-}
+/**
+ * Helper function to set all four border-side colors to the same value.
+ * This is needed to avoid conflicts with Mantine 8.3.0+ which internally
+ * uses specific border-side properties. Using the shorthand `borderColor`
+ * can cause React warnings about mixing shorthand and non-shorthand properties.
+ *
+ * @param color - The color to apply to all four border sides
+ * @returns An object with all four border-side color properties set
+ */
+export const borderColor = (color: string) => ({
+  borderTopColor: color,
+  borderRightColor: color,
+  borderBottomColor: color,
+  borderLeftColor: color,
+});
