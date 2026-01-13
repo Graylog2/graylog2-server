@@ -165,7 +165,7 @@ const textColor = (style: StyleProps, colors: DefaultTheme['colors']) => {
   }
 };
 
-const StyledButton = styled(MantineButton)<{
+const StyledButtonWrapper = styled.div<{
   $bsStyle: StyleProps;
   $bsSize: BsSize;
   $active: boolean;
@@ -175,26 +175,30 @@ const StyledButton = styled(MantineButton)<{
   const color = textColor($bsStyle, theme.colors);
 
   return css`
-    color: ${color};
-    font-weight: 400;
-    overflow: visible;
+    display: inline-block;
 
-    ${disabledStyles(theme.colors, $bsStyle)}
-    ${stylesForSize($bsSize, $bsStyle)}
-
-    &:hover {
-      color: ${isLink ? theme.colors.global.linkHover : color};
-      text-decoration: none;
-    }
-
-    &:focus {
+    .mantine-Button-root {
       color: ${color};
-      text-decoration: none;
-    }
+      font-weight: 400;
+      overflow: visible;
 
-    ${$active && activeStyles(theme.colors, $bsStyle)}
-    ${isLink && linkStyles}
-    ${isTransparent && transparentStyles}
+      ${disabledStyles(theme.colors, $bsStyle)}
+      ${stylesForSize($bsSize, $bsStyle)}
+
+      &:hover {
+        color: ${isLink ? theme.colors.global.linkHover : color};
+        text-decoration: none;
+      }
+
+      &:focus {
+        color: ${color};
+        text-decoration: none;
+      }
+
+      ${$active && activeStyles(theme.colors, $bsStyle)}
+      ${isLink && linkStyles}
+      ${isTransparent && transparentStyles}
+    }
 
     .mantine-Button-label {
       gap: 0.25em;
@@ -222,7 +226,7 @@ type Props = React.PropsWithChildren<{
   onClick?: ((e: React.MouseEvent<HTMLButtonElement>) => void) | ((e: boolean) => void) | (() => void);
   rel?: 'noopener noreferrer';
   role?: string;
-  style?: React.ComponentProps<typeof StyledButton>['style'];
+  style?: React.CSSProperties;
   tabIndex?: number;
   target?: '_blank';
   title?: string;
@@ -250,21 +254,18 @@ const Button = (
     tabIndex = undefined,
     children = undefined,
     active = undefined,
+    style = undefined,
   }: Props,
   ref: React.ForwardedRef<HTMLButtonElement>,
 ) => {
   const theme = useTheme();
-  const style = mapStyle(bsStyle);
-  const color = isLinkStyle(style) || isTransparentStyle(style) ? 'transparent' : theme.colors.button[style].background;
+  const mappedStyle = mapStyle(bsStyle);
+  const color = isLinkStyle(mappedStyle) || isTransparentStyle(mappedStyle) ? 'transparent' : theme.colors.button[mappedStyle].background;
 
-  const sharedProps = {
+  const buttonProps = {
     id,
     'aria-label': ariaLabel,
-    className,
-    ...stylesProps(style),
-    $active: active,
-    $bsStyle: style,
-    $bsSize: bsSize,
+    ...stylesProps(mappedStyle),
     variant: active ? 'outline' : 'filled',
     color,
     'data-testid': dataTestId,
@@ -278,27 +279,41 @@ const Button = (
 
   if (href) {
     return (
-      <StyledButton
-        component={Link}
-        to={href}
-        target={target}
-        rel={rel}
-        onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
-        {...sharedProps}>
-        {children}
-      </StyledButton>
+      <StyledButtonWrapper
+        $active={active}
+        $bsStyle={mappedStyle}
+        $bsSize={bsSize}
+        className={className}
+        style={style}>
+        <MantineButton
+          component={Link}
+          to={href}
+          target={target}
+          rel={rel}
+          onClick={onClick as (e: React.MouseEvent<HTMLAnchorElement>) => void}
+          {...buttonProps}>
+          {children}
+        </MantineButton>
+      </StyledButtonWrapper>
     );
   }
 
   return (
-    <StyledButton
-      ref={ref}
-      form={form}
-      onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
-      name={name}
-      {...sharedProps}>
-      {children}
-    </StyledButton>
+    <StyledButtonWrapper
+      $active={active}
+      $bsStyle={mappedStyle}
+      $bsSize={bsSize}
+      className={className}
+      style={style}>
+      <MantineButton
+        ref={ref}
+        form={form}
+        onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
+        name={name}
+        {...buttonProps}>
+        {children}
+      </MantineButton>
+    </StyledButtonWrapper>
   );
 };
 
