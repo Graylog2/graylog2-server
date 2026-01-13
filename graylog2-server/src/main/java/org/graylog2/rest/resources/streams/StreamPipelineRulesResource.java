@@ -44,6 +44,7 @@ package org.graylog2.rest.resources.streams;
     import org.graylog2.rest.resources.entities.EntityDefaults;
     import org.graylog2.rest.resources.entities.Sorting;
     import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
+    import org.graylog2.search.SearchQueryField;
     import org.graylog2.shared.rest.resources.RestResource;
 
     import java.util.List;
@@ -62,6 +63,7 @@ public class StreamPipelineRulesResource extends RestResource {
     private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
+            EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
             EntityAttribute.builder().id("pipeline_rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
@@ -95,7 +97,7 @@ public class StreamPipelineRulesResource extends RestResource {
             @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
             @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
             @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
+            @ApiParam(name = "filters") @QueryParam("filters") List<String> filters, // currently unused
             @ApiParam(name = "sort",
                       value = "The field to sort the result on",
                       required = true,
@@ -134,6 +136,7 @@ public class StreamPipelineRulesResource extends RestResource {
                 RuleDao ruleDao = ruleService.load(ruleId);
                 responseList.add(
                         new StreamPipelineRulesResponse(
+                                ruleId,
                                 dao.pipelineId(),
                                 pipelineDao.title(),
                                 ruleId,

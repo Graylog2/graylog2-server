@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.streams.responses;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record StreamPipelineRulesResponse(
+        @JsonProperty("id") String id,
         @JsonProperty("pipeline_id") String pipelineId,
         @JsonProperty("pipeline") String pipeline,
         @JsonProperty("rule_id") String ruleId,
