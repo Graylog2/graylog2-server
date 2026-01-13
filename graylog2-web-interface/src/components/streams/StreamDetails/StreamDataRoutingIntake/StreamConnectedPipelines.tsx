@@ -25,6 +25,8 @@ import {
 } from 'components/streams/StreamDetails/StreamDataRoutingIntake/hooks/useStreamConnectedPipelines';
 import type { StreamConnectedPipeline } from 'components/streams/StreamDetails/StreamDataRoutingIntake/types';
 
+import customColumnRenderers from './customColumnRenderers';
+
 type Props = {
   stream: Stream;
 };
@@ -32,13 +34,13 @@ type Props = {
 export const DEFAULT_LAYOUT = {
   entityTableId: 'pipelines',
   defaultPageSize: 20,
-  defaultSort: { attributeId: 'title', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['title', 'pipeline_rule', 'pipeline', 'connected_stream'],
-  defaultColumnOrder: ['title', 'pipeline_rule', 'pipeline', 'connected_stream'],
+  defaultSort: { attributeId: 'rule', direction: 'asc' } as Sort,
+  defaultDisplayedAttributes: ['rule', 'pipeline', 'connected_stream'],
+  defaultColumnOrder: ['rule', 'pipeline', 'connected_stream'],
 };
 
 const StreamConnectedPipelines = ({ stream }: Props) => (
-  <Section title="Pipelines" collapsible defaultClosed>
+  <Section title="Connected Pipelines" collapsible defaultClosed>
     <PaginatedEntityTable<StreamConnectedPipeline>
       humanName="pipelines"
       tableLayout={DEFAULT_LAYOUT}
@@ -46,7 +48,7 @@ const StreamConnectedPipelines = ({ stream }: Props) => (
       keyFn={(searchParams) => keyFn(stream.id, searchParams)}
       entityAttributesAreCamelCase={false}
       searchPlaceholder="Search for pipeline"
-      columnRenderers={{}}
+      columnRenderers={customColumnRenderers}
       entityActions={() => null}
     />
   </Section>

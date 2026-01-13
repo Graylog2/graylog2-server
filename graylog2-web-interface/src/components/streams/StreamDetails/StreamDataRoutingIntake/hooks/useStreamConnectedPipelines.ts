@@ -16,6 +16,9 @@
  */
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 
+import { StreamRoutingRules } from '@graylog/server-api';
+
+import FiltersForQueryParams from 'components/common/EntityFilters/FiltersForQueryParams';
 import type { Attribute, SearchParams } from 'stores/PaginationTypes';
 import type { PaginatedResponse } from 'components/common/PaginatedEntityTable/useFetchEntities';
 import { defaultOnError } from 'util/conditional/onError';
@@ -26,6 +29,8 @@ const INITIAL_DATA = {
   list: [],
   attributes: [],
 };
+
+type SortType = 'pipeline_rule' | 'pipeline' | 'connected_stream';
 
 export const STREAM_PIPELINES_QUERY_KEY = 'stream_pipelines';
 
@@ -40,46 +45,20 @@ export type PaginatedStreamConnectedPipelinesResponse = {
   pagination: { total: number };
   attributes: Array<Attribute>;
 };
+
 export const fetchStreamConnectedPipelines = async (
   streamId: string,
   searchParams: SearchParams,
-): Promise<PaginatedResponse<StreamConnectedPipeline>> => {
-  const response = new Promise((resolve) => {
-    resolve({
-      query: '',
-      pagination: {
-        total: 3,
-        count: 3,
-        page: 1,
-        per_page: 20,
-      },
-      total: 3,
-      sort: 'pipeline_rule',
-      order: 'asc',
-      elements: [
-        {
-          id: '123',
-          pipeline_rule: 'Route to Windows Stream',
-          pipeline: 'Winlog Parsing',
-          connected_stream: 'Windows Security Logs',
-        },
-        {
-          id: '124',
-          pipeline_rule: 'Route to Windows Stream',
-          pipeline: 'Winlog Parsing',
-          connected_stream: 'Windows Event Logs',
-        },
-        {
-          id: '125',
-          pipeline_rule: 'Send to Windows',
-          pipeline: 'All messages pipeline',
-          connected_stream: 'Default Stream',
-        },
-      ],
-    });
-  });
-
-  return response.then(({ elements, query, attributes, pagination: { count, total, page, per_page: perPage } }) => ({
+): Promise<PaginatedResponse<StreamConnectedPipeline>> =>
+  StreamRoutingRules.getPage(
+    streamId,
+    searchParams.sort.attributeId as SortType,
+    searchParams.page,
+    searchParams.pageSize,
+    searchParams.query,
+    FiltersForQueryParams(searchParams.filters),
+    searchParams.sort.direction,
+  ).then(({ elements, query, attributes, pagination: { count, total, page, per_page: perPage } }) => ({
     list: elements,
     attributes: attributes,
     pagination: {
@@ -90,7 +69,6 @@ export const fetchStreamConnectedPipelines = async (
       query,
     },
   }));
-};
 
 const useStreamConnectedPipelines = (
   streamId: string,
