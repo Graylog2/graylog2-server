@@ -57,6 +57,7 @@ const Badge = (
   return (
     <StyledBadge
       $color={color}
+      color={color}
       className={className}
       title={title}
       data-testid={dataTestid}
