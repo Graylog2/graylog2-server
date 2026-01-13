@@ -18,15 +18,13 @@ package org.graylog.plugins.pipelineprocessor.functions.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.MissingNode;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-
-import jakarta.inject.Inject;
 
 import java.io.IOException;
 
@@ -62,9 +60,8 @@ public class JsonParse extends AbstractFunction<JsonNode> {
             }
             return node;
         } catch (IOException e) {
-            log.warn(context.pipelineErrorMessage("Unable to parse JSON"), e);
+            throw new IllegalArgumentException(context.pipelineErrorMessage("Unable to parse JSON"), e);
         }
-        return MissingNode.getInstance();
     }
 
     @Override
