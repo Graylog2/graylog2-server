@@ -280,7 +280,7 @@ const Button = (
   if (href) {
     return (
       <StyledButtonWrapper
-        $active={active}
+        $active={active ?? false}
         $bsStyle={mappedStyle}
         $bsSize={bsSize}
         className={className}
@@ -301,7 +301,7 @@ const Button = (
 
   return (
     <StyledButtonWrapper
-      $active={active}
+      $active={active ?? false}
       $bsStyle={mappedStyle}
       $bsSize={bsSize}
       className={className}
