@@ -85,14 +85,12 @@ const StyledMenuItemWrapper = styled.div(
   `,
 );
 
-const StyledMenuItem = React.forwardRef<HTMLButtonElement, React.ComponentProps<typeof MantineMenu.Item>>(
-  ({ children, ...props }, ref) => (
-    <StyledMenuItemWrapper>
-      <MantineMenu.Item ref={ref} {...props}>
-        {children}
-      </MantineMenu.Item>
-    </StyledMenuItemWrapper>
-  ),
+const StyledMenuItem: React.FC<React.ComponentProps<typeof MantineMenu.Item>> = ({ children, ...props }) => (
+  <StyledMenuItemWrapper>
+    <MantineMenu.Item {...props}>
+      {children}
+    </MantineMenu.Item>
+  </StyledMenuItemWrapper>
 );
 
 const StyledMenuDivider = styled(MantineMenu.Divider)(
