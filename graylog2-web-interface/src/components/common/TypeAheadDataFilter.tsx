@@ -80,8 +80,6 @@ class TypeAheadDataFilter extends React.Component<
     searchInKeys: [],
   };
 
-  private typeAheadInput: TypeAheadInputRef;
-
   constructor(props: TypeAheadDataFilterProps) {
     super(props);
 
@@ -97,6 +95,8 @@ class TypeAheadDataFilter extends React.Component<
       this.filterData();
     }
   }
+
+  private typeAheadInput: TypeAheadInputRef;
 
   _onSearchTextChanged = (event?: React.SyntheticEvent) => {
     event?.preventDefault();
