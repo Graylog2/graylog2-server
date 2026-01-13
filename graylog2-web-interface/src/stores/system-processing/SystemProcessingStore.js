@@ -22,7 +22,6 @@ import fetch from 'logic/rest/FetchProvider';
 
 import { singletonStore } from '../../logic/singleton';
 
-// eslint-disable-next-line import/prefer-default-export
 export const SystemProcessingStore = singletonStore('core.SystemProcessing', () =>
   Reflux.createStore({
     sourceUrl: (nodeId) => `/cluster/${nodeId}/processing`,
