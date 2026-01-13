@@ -134,7 +134,9 @@ const EmailTemplatesRunner = ({
       const trimmedBody = (config.body_template ?? '').trim();
       const trimmedHtml = (config.html_body_template ?? '').trim();
       const hasCustomBody =
-        trimmedBody !== '' && (config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE && trimmedBody !== DEFAULT_BODY_TEMPLATE;
+        trimmedBody !== '' &&
+        (config.body_template ?? '') !== DEFAULT_BODY_TEMPLATE &&
+        trimmedBody !== DEFAULT_BODY_TEMPLATE;
       const hasCustomHtml =
         trimmedHtml !== '' &&
         (config.html_body_template ?? '') !== DEFAULT_HTML_BODY_TEMPLATE &&
@@ -142,7 +144,7 @@ const EmailTemplatesRunner = ({
 
       if (hasCustomBody || hasCustomHtml) {
         lastSigRef.current = sig;
-        
+
         return;
       }
 

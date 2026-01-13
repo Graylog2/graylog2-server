@@ -25,6 +25,7 @@ import { isValidDate, toDateObject, adjustFormat } from 'util/DateTime';
 const StyledDayPicker = styled(DayPicker)(
   ({ theme }) => css`
     width: 100%;
+
     --rdp-accent-color: ${theme.colors.variant.primary};
     --rdp-disabled-opacity: 0.4;
 

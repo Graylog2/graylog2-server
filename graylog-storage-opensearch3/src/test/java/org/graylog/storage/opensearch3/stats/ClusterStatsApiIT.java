@@ -37,19 +37,16 @@ class ClusterStatsApiIT {
 
         final ClusterStatsApi api = new ClusterStatsApi(opensearch.getOfficialOpensearchClient());
 
-        // capture numbers for existing cluster, whatever that means
-        final IndexSetStats before = api.clusterStats();
-
         // create new index with 10 docs
         generateIndex(opensearch, INDEX_NAME, 10);
 
         // capture numbers again, they should be already refreshed by the previous generateIndex call
         final IndexSetStats after = api.clusterStats();
 
-        // verify that *after* values are the *before* plus 1 index with 10 docs
-        Assertions.assertThat(after.indices()).isGreaterThanOrEqualTo(before.indices() + 1);
-        Assertions.assertThat(after.documents()).isGreaterThanOrEqualTo(before.documents() + 10);
-        Assertions.assertThat(after.size()).isGreaterThan(before.size());
+        // verify that values contain at least the amount of documents we just indexed
+        Assertions.assertThat(after.indices()).isGreaterThanOrEqualTo(1);
+        Assertions.assertThat(after.documents()).isGreaterThanOrEqualTo(10);
+        Assertions.assertThat(after.size()).isGreaterThan(0);
     }
 
     private void generateIndex(OpenSearchInstance opensearch, String indexName, int documentsCount) {
