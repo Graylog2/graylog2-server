@@ -1,0 +1,5 @@
+type = "fixed"
+message = "Generate a processing failure (if that is enabled) when pipeline function `parse_json` encounters invalid json."
+
+pulls = ["24714"]
+issues = ["Graylog2/graylog-plugin-enterprise#12460"]
