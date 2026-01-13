@@ -22,6 +22,7 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventsEntityTable from 'components/events/EventsEntityTable';
+import { Row, Col } from 'components/bootstrap';
 
 const AlertsPageComponent = () => {
   const {
@@ -30,13 +31,19 @@ const AlertsPageComponent = () => {
   const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
 
   if (!validSecurityLicense) {
-    return <EventsEntityTable />;
+    return (
+      <Row className="content">
+        <Col xs={12}>
+          <EventsEntityTable />
+        </Col>
+      </Row>
+    );
   }
 
   return (
     <>
-      {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage }) => (
-        <PluggableSecurityEventsPage />
+      {pluggableSecurityEventsPage.map(({ component: PluggableSecurityEventsPage, key }) => (
+        <PluggableSecurityEventsPage key={key} />
       ))}
     </>
   );
