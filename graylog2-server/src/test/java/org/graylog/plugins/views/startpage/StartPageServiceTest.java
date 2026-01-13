@@ -107,7 +107,7 @@ public class StartPageServiceTest {
                 new DBGrantService(mongoCollections), mock(GranteeService.class), new PluggableEntityService(Set.of()), mock(CapabilityRegistry.class));
         catalog = mock(Catalog.class);
         doReturn(Optional.of(new Catalog.Entry("", ""))).when(catalog).getEntry(any());
-        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, eventbus, new StartPageItemTitleRetriever(catalog, Map.of()));
+        startPageService = new StartPageService(grnRegistry, lastOpenedService, recentActivityService, new StartPageItemTitleRetriever(catalog, Map.of()));
     }
 
     @Test
