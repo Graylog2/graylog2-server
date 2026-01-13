@@ -27,7 +27,6 @@ import org.graylog.testing.elasticsearch.BulkIndexRequest;
 import org.graylog.testing.elasticsearch.Client;
 import org.graylog.testing.elasticsearch.IndexState;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.graylog2.utilities.IpSubnet;
 import org.opensearch.client.json.JsonData;
 import org.opensearch.client.json.JsonpMapper;
 import org.opensearch.client.json.jackson.JacksonJsonpMapper;

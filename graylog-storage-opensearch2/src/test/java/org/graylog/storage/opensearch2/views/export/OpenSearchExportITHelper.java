@@ -16,28 +16,28 @@
  */
 package org.graylog.storage.opensearch2.views.export;
 
-import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.storage.opensearch2.OpenSearchClient;
 import org.graylog.storage.views.export.ExportITHelper;
 
 import java.util.LinkedHashSet;
 
 public class OpenSearchExportITHelper extends ExportITHelper {
 
-    private final OpenSearchExportBackend backend;
-
-    public OpenSearchExportITHelper(final IndexLookup indexLookup,
-                                    final OpenSearchExportBackend backend) {
-        super(indexLookup);
-        this.backend = backend;
+    public OpenSearchExportITHelper(OpenSearchClient openSearchClient, UsedSearchFiltersToQueryStringsMapper filters, String... indices) {
+        super(new OpenSearchExportBackend(mockIndexLookup(indices), requestStrategy(openSearchClient), false, filters));
     }
 
     public LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command) {
         LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
-        backend.run(command, allChunks::add);
+        exportBackend.run(command, allChunks::add);
         return allChunks;
     }
 
-
+    private static RequestStrategy requestStrategy(OpenSearchClient client) {
+        final ExportClient exportClient = new ExportClient(client);
+        return new SearchAfter(exportClient);
+    }
 }

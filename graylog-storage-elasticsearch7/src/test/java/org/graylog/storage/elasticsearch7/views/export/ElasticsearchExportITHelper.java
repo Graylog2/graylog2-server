@@ -16,27 +16,29 @@
  */
 package org.graylog.storage.elasticsearch7.views.export;
 
-import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.storage.elasticsearch7.ElasticsearchClient;
 import org.graylog.storage.views.export.ExportITHelper;
 
 import java.util.LinkedHashSet;
 
 public class ElasticsearchExportITHelper extends ExportITHelper {
 
-    private final ElasticsearchExportBackend backend;
+    public ElasticsearchExportITHelper(ElasticsearchClient client, UsedSearchFiltersToQueryStringsMapper filters, String... indices) {
+        super(new ElasticsearchExportBackend(mockIndexLookup(indices), requestStrategy(client), false, filters));
+    }
 
-    public ElasticsearchExportITHelper(final IndexLookup indexLookup,
-                                       final ElasticsearchExportBackend backend) {
-        super(indexLookup);
-        this.backend = backend;
+    private static RequestStrategy requestStrategy(ElasticsearchClient client) {
+        final ExportClient exportClient = new ExportClient(client);
+        return new SearchAfter(exportClient);
     }
 
     @Override
     public LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command) {
         LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
-        backend.run(command, allChunks::add);
+        exportBackend.run(command, allChunks::add);
         return allChunks;
     }
 
