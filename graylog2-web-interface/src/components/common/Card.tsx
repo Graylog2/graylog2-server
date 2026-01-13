@@ -19,14 +19,16 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { Card as MantineCard } from '@mantine/core';
 
-const Container = styled(MantineCard)(
+const ContainerWrapper = styled.div(
   ({ theme }) => css`
-    background-color: ${theme.colors.cards.background};
-    border-color: ${theme.colors.cards.border};
+    .mantine-Card-root {
+      background-color: ${theme.colors.cards.background};
+      border-color: ${theme.colors.cards.border};
 
-    &:focus {
-      outline: 5px auto Highlight;
-      outline: 5px auto -webkit-focus-ring-color;
+      &:focus {
+        outline: 5px auto Highlight;
+        outline: 5px auto -webkit-focus-ring-color;
+      }
     }
   `,
 );
@@ -48,9 +50,11 @@ const Card = ({
   id = undefined,
   tabIndex = undefined,
 }: Props) => (
-  <Container className={className} shadow="sm" padding={padding} radius="md" withBorder tabIndex={tabIndex} id={id}>
-    {children}
-  </Container>
+  <ContainerWrapper className={className}>
+    <MantineCard shadow="sm" padding={padding} radius="md" withBorder tabIndex={tabIndex} id={id}>
+      {children}
+    </MantineCard>
+  </ContainerWrapper>
 );
 
 export default Card;
