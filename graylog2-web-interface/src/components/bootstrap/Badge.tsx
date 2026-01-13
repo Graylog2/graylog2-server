@@ -21,11 +21,15 @@ import styled, { css } from 'styled-components';
 
 const mapStyle = (style: ColorVariant) => (style === 'default' ? 'gray' : style);
 
-const StyledBadge = styled(MantineBadge)<{ $color: ColorVariant }>(
+const StyledBadgeWrapper = styled.div<{ $color: ColorVariant }>(
   ({ theme, $color }) => css`
-    text-transform: none;
-    background: ${theme.colors.button[$color].background};
-    color: ${theme.colors.button[$color].color};
+    display: inline-block;
+
+    .mantine-Badge-root {
+      text-transform: none;
+      background: ${theme.colors.button[$color].background};
+      color: ${theme.colors.button[$color].color};
+    }
 
     .mantine-Badge-label {
       font-size: ${theme.fonts.size.small};
@@ -55,17 +59,17 @@ const Badge = (
   const color = mapStyle(bsStyle);
 
   return (
-    <StyledBadge
-      $color={color}
-      color={color}
-      className={className}
-      title={title}
-      data-testid={dataTestid}
-      ref={ref}
-      variant="filled"
-      onClick={onClick}>
-      {children}
-    </StyledBadge>
+    <StyledBadgeWrapper $color={color} className={className}>
+      <MantineBadge
+        color={color}
+        title={title}
+        data-testid={dataTestid}
+        ref={ref}
+        variant="filled"
+        onClick={onClick}>
+        {children}
+      </MantineBadge>
+    </StyledBadgeWrapper>
   );
 };
 
