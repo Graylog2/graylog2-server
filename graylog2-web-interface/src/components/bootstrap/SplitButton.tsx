@@ -42,7 +42,7 @@ const SplitButton = (
     dataTestId = undefined,
     ...props
   }: Props,
-  ref: React.ForwardedRef<HTMLButtonElement>,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) => (
   <Menu opened={open} onChange={onMenuChange} width={width}>
     <ButtonGroup data-testid={dataTestId}>

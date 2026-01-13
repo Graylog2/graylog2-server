@@ -68,19 +68,29 @@ const Menu = ({
   </MantineMenu>
 );
 
-const StyledMenuItem = styled(MantineMenu.Item)(
+const StyledMenuItemWrapper = styled.div(
   ({ theme }) => css`
-    color: ${theme.colors.text.primary};
-    font-size: ${theme.fonts.size.body};
-    white-space: nowrap;
+    .mantine-Menu-item {
+      color: ${theme.colors.text.primary};
+      font-size: ${theme.fonts.size.body};
+      white-space: nowrap;
 
-    &:hover,
-    &:focus {
-      text-decoration: none;
-      color: inherit;
-      background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+      &:hover,
+      &:focus {
+        text-decoration: none;
+        color: inherit;
+        background-color: ${theme.utils.colorLevel(theme.colors.global.contentBackground, 10)};
+      }
     }
   `,
+);
+
+const StyledMenuItem = React.forwardRef<HTMLDivElement, React.ComponentProps<typeof MantineMenu.Item>>(
+  (props, ref) => (
+    <StyledMenuItemWrapper ref={ref}>
+      <MantineMenu.Item {...props} />
+    </StyledMenuItemWrapper>
+  ),
 );
 
 const StyledMenuDivider = styled(MantineMenu.Divider)(
