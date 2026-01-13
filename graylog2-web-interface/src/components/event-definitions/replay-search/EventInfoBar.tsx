@@ -16,14 +16,12 @@
  */
 
 import type { SyntheticEvent } from 'react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 import { Button } from 'components/bootstrap';
 import { FlatContentRow, Icon } from 'components/common';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
-import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
-import assertUnreachable from 'logic/assertUnreachable';
 import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
 
 const Header = styled.div`
@@ -49,7 +47,6 @@ const Row = styled.div(
 );
 
 const EventInfoBar = () => {
-  const { type } = useReplaySearchContext();
   const [open, setOpen] = useState<boolean>(true);
 
   const toggleOpen = useCallback((e: SyntheticEvent) => {
@@ -59,26 +56,13 @@ const EventInfoBar = () => {
 
   const infoAttributes = useAttributeComponents();
 
-  const currentTypeText = useMemo(() => {
-    switch (type) {
-      case 'alert':
-        return 'alert';
-      case 'event':
-        return 'event';
-      case 'event_definition':
-        return 'event definition';
-      default:
-        return assertUnreachable(type, `Invalid replay type: ${type}`);
-    }
-  }, [type]);
-
   return (
     <FlatContentRow>
       <Header>
         <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
           <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
           &nbsp;
-          {open ? `Hide ${currentTypeText} details` : `Show ${currentTypeText} details`}
+          {open ? `Hide event definition details` : `Show event definition details`}
         </Button>
       </Header>
       {open && (
