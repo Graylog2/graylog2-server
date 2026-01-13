@@ -1,0 +1,4 @@
+type = "fixed"
+message = "Add graceful handling for invalid pipeline rules in the CreatePipelineMetadata migration."
+
+pulls = ["24692"]
