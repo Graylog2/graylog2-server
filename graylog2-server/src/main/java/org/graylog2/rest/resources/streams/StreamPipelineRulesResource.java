@@ -57,14 +57,14 @@ package org.graylog2.rest.resources.streams;
 @Api(value = "Stream/RoutingRules", description = "Stream routing with pipeline rules", tags = {CLOUD_VISIBLE})
 @Path("/routing_rules")
 public class StreamPipelineRulesResource extends RestResource {
-    private static final String ATTRIBUTE_PIPELINE_RULE = "pipeline_rule";
+    private static final String ATTRIBUTE_PIPELINE_RULE = "rule";
     private static final String ATTRIBUTE_PIPELINE = "pipeline";
     private static final String ATTRIBUTE_CONNECTED_STREAM = "connected_stream";
     private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
             EntityAttribute.builder().id("id").title("id").type(SearchQueryField.Type.OBJECT_ID).hidden(true).searchable(true).build(),
-            EntityAttribute.builder().id("pipeline_rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
+            EntityAttribute.builder().id("rule_id").title("Pipeline Rule ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Pipeline").searchable(false).build(),
