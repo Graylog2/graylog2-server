@@ -42,6 +42,7 @@ type Props = {
   searchPreferencesLayout?: SearchPreferencesLayout;
   sections?: Array<SidebarSection>;
   title: string;
+  contentColumnWidth?: number;
 };
 
 const Container = styled.div`
@@ -92,6 +93,7 @@ const Sidebar = ({
   actions = sidebarActions,
   forceSideBarPinned = false,
   enableSidebarPinning = true,
+  contentColumnWidth = 275,
 }: Props) => {
   const sendTelemetry = useSendTelemetry();
   const sidebarIsPinned = searchPreferencesLayout?.config.sidebar.isPinned || forceSideBarPinned;
@@ -131,7 +133,8 @@ const Sidebar = ({
           enableSidebarPinning={enableSidebarPinning}
           searchPreferencesLayout={searchPreferencesLayout}
           sectionTitle={activeSection.title}
-          forceSideBarPinned={forceSideBarPinned}>
+          forceSideBarPinned={forceSideBarPinned}
+          width={contentColumnWidth}>
           <SectionContent
             results={results}
             sidebarChildren={children}

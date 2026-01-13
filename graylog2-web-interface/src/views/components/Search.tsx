@@ -98,7 +98,15 @@ const ConnectedSidebar = (props: Omit<React.ComponentProps<typeof Sidebar>, 'res
   const viewTitle = useViewTitle();
   const title = searchPageLayout?.sidebar?.title ?? viewTitle;
 
-  return <Sidebar results={results} title={title} sections={searchPageLayout?.sidebar?.sections} {...props} />;
+  return (
+    <Sidebar
+      results={results}
+      title={title}
+      sections={searchPageLayout?.sidebar?.sections}
+      contentColumnWidth={searchPageLayout?.sidebar?.contentColumnWidth}
+      {...props}
+    />
+  );
 };
 
 const ViewAdditionalContextProvider = ({ children }: { children: React.ReactNode }) => {

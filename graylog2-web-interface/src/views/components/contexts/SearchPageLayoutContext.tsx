@@ -36,7 +36,7 @@ export const BLANK = {
 };
 
 export type LayoutState = {
-  sidebar: { isShown: boolean; sections?: Array<SidebarSection>; title?: string };
+  sidebar: { isShown: boolean; sections?: Array<SidebarSection>; title?: string; contentColumnWidth?: number };
   viewActions: {
     save: { isShown: boolean };
     saveAs: { isShown: boolean };

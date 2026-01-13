@@ -33,7 +33,7 @@ import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import Center from 'components/common/Center';
 import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
 import sidebarSections from 'views/components/sidebar/sidebarSections';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar';
+import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
 
 type ReplaySearchProps = {
   alertId: string;
@@ -64,7 +64,7 @@ const ReplaySearch = ({
   const _searchPageLayout = useMemo(() => {
     const replaySection: SidebarSection = {
       key: 'eventDescription',
-      title: 'Event Details',
+      title: null,
       icon: 'play_arrow',
       content: ReplaySearchSidebar,
     };
@@ -76,6 +76,7 @@ const ReplaySearch = ({
         isShown: true,
         title: 'Replayed Search',
         sections: [replaySection, ...sidebarSections],
+        contentColumnWidth: 350,
       },
     };
   }, [searchPageLayout]);

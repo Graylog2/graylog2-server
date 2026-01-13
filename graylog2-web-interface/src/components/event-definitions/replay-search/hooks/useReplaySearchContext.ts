@@ -16,7 +16,7 @@
  */
 import { useContext } from 'react';
 
-import ReplaySearchContext from '../ReplaySearchContext';
+import ReplaySearchContext from 'components/event-definitions/replay-search/ReplaySearchContext';
 
 const useReplaySearchContext = () => useContext(ReplaySearchContext);
 export default useReplaySearchContext;
