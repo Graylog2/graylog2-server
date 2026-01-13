@@ -101,7 +101,7 @@
     "react-window": "^1.8.2",
     "react-window-infinite-loader": "^1.0.8",
     "urijs": "^1.19.6",
-    "uuid": "11.1.0",
+    "uuid": "13.0.0",
     "wicg-inert": "^3.1.2"
   },
   "devDependencies": {
@@ -132,7 +132,7 @@
     "assets-webpack-plugin": "^7.1.1",
     "copy-webpack-plugin": "^13.0.1",
     "cors": "^2.8.5",
-    "cross-env": "^7.0.2",
+    "cross-env": "^10.1.0",
     "css-loader": "^6.5.1",
     "esbuild-loader": "4.3.0",
     "eslint": "^9.36.0",
@@ -145,7 +145,7 @@
     "fork-ts-checker-webpack-plugin": "^9.0.0",
     "form-data": "^4.0.0",
     "glob": "^13.0.0",
-    "globals": "^16.4.0",
+    "globals": "^17.0.0",
     "html-webpack-plugin": "^5.6.4",
     "jiti": "^2.6.0",
     "json-loader": "^0.5.3",
