@@ -256,7 +256,7 @@ const Button = (
     active = undefined,
     style = undefined,
   }: Props,
-  ref: React.ForwardedRef<HTMLButtonElement>,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const theme = useTheme();
   const mappedStyle = mapStyle(bsStyle);
@@ -284,7 +284,8 @@ const Button = (
         $bsStyle={mappedStyle}
         $bsSize={bsSize}
         className={className}
-        style={style}>
+        style={style}
+        ref={ref}>
         <MantineButton
           component={Link}
           to={href}
@@ -304,9 +305,9 @@ const Button = (
       $bsStyle={mappedStyle}
       $bsSize={bsSize}
       className={className}
-      style={style}>
+      style={style}
+      ref={ref}>
       <MantineButton
-        ref={ref}
         form={form}
         onClick={onClick as (e: React.MouseEvent<HTMLButtonElement>) => void}
         name={name}
