@@ -35,12 +35,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static org.graylog2.plugin.Message.FIELDS_UNCHANGEABLE_BY_CUSTOM_MAPPINGS;
@@ -73,18 +75,34 @@ public class FieldTypeMappingsService {
         checkType(customMapping);
         checkAllIndicesSupportFieldTypeChange(customMapping.fieldName(), indexSetsIds);
 
+        final Set<String> indexSetIdsWithError = new HashSet<>();
+
         for (String indexSetId : indexSetsIds) {
-            try {
                 indexSetService.get(indexSetId).ifPresent(indexSetConfig -> {
-                    var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
-                    if (rotateImmediately) {
-                        updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                    final var rollbackMappings = new CustomFieldMappings(indexSetConfig.customFieldMappings());
+                    try {
+                        var updatedIndexSetConfig = storeMapping(customMapping, indexSetConfig);
+                        if (rotateImmediately) {
+                            updatedIndexSetConfig.ifPresent(this::cycleIndexSet);
+                        }
+                    } catch (Exception ex) {
+                        LOG.error("Failed to update field type in index set: " + indexSetId, ex);
+                        indexSetIdsWithError.add(indexSetId);
+                        try {
+                            // rolling back changes in MongoDB
+                            mongoIndexSetService.save(
+                                    indexSetConfig.toBuilder()
+                                            .customFieldMappings(rollbackMappings)
+                                            .build()
+                            );
+                        } catch (Exception e) {
+                            LOG.error("Failed to roll back field types for index set: " + indexSetId, e);
+                        }
                     }
                 });
-            } catch (Exception ex) {
-                LOG.error("Failed to update field type in index set : " + indexSetId, ex);
-                throw ex;
-            }
+        }
+        if(!indexSetIdsWithError.isEmpty()) {
+            throw new RuntimeException("Failed to update field types in index set(s): " + String.join(",", indexSetIdsWithError) + ". Please check logs for details.");
         }
     }
 
