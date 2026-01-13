@@ -59,12 +59,11 @@ const Badge = (
   const color = mapStyle(bsStyle);
 
   return (
-    <StyledBadgeWrapper $color={color} className={className}>
+    <StyledBadgeWrapper $color={color} className={className} ref={ref}>
       <MantineBadge
         color={color}
         title={title}
         data-testid={dataTestid}
-        ref={ref}
         variant="filled"
         onClick={onClick}>
         {children}
