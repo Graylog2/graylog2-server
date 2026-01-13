@@ -130,9 +130,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         DEFAULT_SORT_ORDER,
                         0,
                         10,
-                        DEFAULT_FIELDS
-
-
+                        List.of()
                 )
         );
     }
@@ -154,7 +152,6 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method"), new Grouping("controller")),
                         List.of(new Metric("avg", "took_ms"))
-
                 )
         );
     }
