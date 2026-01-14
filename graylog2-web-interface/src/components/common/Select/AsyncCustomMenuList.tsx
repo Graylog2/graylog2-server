@@ -16,7 +16,7 @@
  */
 import * as React from 'react';
 import { useRef } from 'react';
-import { InfiniteLoader } from 'react-window-infinite-loader';
+import { useInfiniteLoader } from 'react-window-infinite-loader';
 import styled from 'styled-components';
 
 import { WindowList } from 'components/common/Select/CustomMenuList';
@@ -45,19 +45,18 @@ const AsyncCustomMenuList = ({
   const items = children?.length ? children : [getNoOptionMessage()];
   const listRef = useRef(null);
 
+  const onRowsRendered = useInfiniteLoader({
+    isRowLoaded: (index: number) => index < children.length,
+    rowCount: total,
+    threshold: 30,
+    minimumBatchSize: 50,
+    loadMoreRows: loadOptions,
+  });
+
   return (
-    <InfiniteLoader
-      isRowLoaded={(index: number) => index < children.length}
-      rowCount={total}
-      threshold={30}
-      minimumBatchSize={50}
-      loadMoreRows={loadOptions}>
-      {({ onRowsRendered }) => (
-        <WindowList listRef={listRef} onRowsRendered={onRowsRendered}>
-          {items}
-        </WindowList>
-      )}
-    </InfiniteLoader>
+    <WindowList listRef={listRef} onRowsRendered={onRowsRendered}>
+      {items}
+    </WindowList>
   );
 };
 
