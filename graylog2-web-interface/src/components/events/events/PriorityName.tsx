@@ -23,7 +23,7 @@ type Props = {
   priority: number | string;
 };
 const PriorityName = ({ priority }: Props) => (
-  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority].name)}</>
+  <>{StringUtils.capitalizeFirstLetter(EventDefinitionPriorityEnum.properties[priority]?.name ?? '')}</>
 );
 
 export default PriorityName;

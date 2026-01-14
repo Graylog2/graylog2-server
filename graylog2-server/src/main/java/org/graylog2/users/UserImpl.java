@@ -66,10 +66,10 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.nullToEmpty;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 import static org.graylog2.users.UserImpl.COLLECTION_NAME;
-import static org.graylog2.users.UserImpl.USERNAME;
+import static org.graylog2.users.UserImpl.FULL_NAME;
 
 @DbEntity(collection = COLLECTION_NAME,
-          titleField = USERNAME,
+          titleField = FULL_NAME,
           readPermission = USERS_READ)
 public class UserImpl extends PersistedImpl implements User {
 

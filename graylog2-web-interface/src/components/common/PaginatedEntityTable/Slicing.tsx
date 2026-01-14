@@ -17,16 +17,24 @@
 
 import * as React from 'react';
 import styled, { css } from 'styled-components';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
-import { DeleteMenuItem } from 'components/bootstrap';
+import { DeleteMenuItem, ListGroup, ListGroupItem, Badge } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import { defaultCompare } from 'logic/DefaultCompare';
+import { defaultOnError } from 'util/conditional/onError';
+import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
+import { Spinner } from 'components/common';
 
-const Container = styled.div`
-  min-width: 300px;
-`;
+const Container = styled.div(
+  ({ theme }) => css`
+    min-width: 300px;
+    border-right: 1px solid ${theme.colors.gray[90]};
+    padding-right: ${theme.spacings.sm};
+  `,
+);
 
 const Header = styled.div(
   ({ theme }) => css`
@@ -42,17 +50,69 @@ const Headline = styled.h2`
   white-space: nowrap;
 `;
 
+const SlicesOverview = styled.div`
+  margin-top: 10px;
+`;
+
+const SliceInner = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const StyledListGroupItem = styled(ListGroupItem)<{ $active: boolean }>(
+  ({ $active }) => css`
+    font-weight: ${$active ? 'bold' : 'normal'};
+  `,
+);
+
+const useSlices = ({
+  column,
+  query = undefined,
+  filters = undefined,
+  tmpFetchSlices,
+}: {
+  column: string;
+  query: string;
+  filters: UrlQueryFilters;
+  tmpFetchSlices: any;
+}) => {
+  const { data, isLoading } = useQuery<Array<{ value: unknown; count: number }>>({
+    queryKey: ['slices', column, query, filters],
+    queryFn: () => defaultOnError(tmpFetchSlices(column, query, filters), 'Error fetching security events'),
+  });
+
+  return { data, isLoading };
+};
+
+const Slice = styled.li``;
+
 type Props = {
+  filters: UrlQueryFilters;
+  query: string;
   sliceCol: string;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
+  sliceRenderers: { [col: string]: (value: unknown) => React.ReactNode } | undefined;
+  tmpFetchSlices: any;
+  activeSlice: string | undefined;
 };
 
-const Slicing = ({ sliceCol, columnSchemas, onChangeSlicing }: Props) => {
+const Slicing = ({
+  sliceCol,
+  activeSlice,
+  columnSchemas,
+  onChangeSlicing,
+  query,
+  filters,
+  sliceRenderers,
+  tmpFetchSlices,
+}: Props) => {
   const sliceableColumns = columnSchemas
     .filter((schema) => schema.sliceable)
     .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
   const activeColumn = sliceableColumns.find(({ id }) => id === sliceCol);
+
+  const { data: slices, isLoading } = useSlices({ column: sliceCol, query, filters, tmpFetchSlices });
 
   return (
     <Container>
@@ -66,9 +126,27 @@ const Slicing = ({ sliceCol, columnSchemas, onChangeSlicing }: Props) => {
             </MenuItem>
           ))}
           <MenuItem divider />
-          <DeleteMenuItem onClick={() => onChangeSlicing(undefined, undefined)}>Remove slicing</DeleteMenuItem>
+          <MenuItem onClick={() => onChangeSlicing(undefined, undefined)}>No slicing</MenuItem>
         </OverlayDropdownButton>
       </Header>
+      <SlicesOverview>
+        {isLoading && <Spinner />}
+        {!isLoading && (
+          <ListGroup>
+            {slices?.map((slice) => (
+              <StyledListGroupItem
+                key={String(slice.value)}
+                onClick={() => onChangeSlicing(sliceCol, slice.value)}
+                $active={activeSlice === slice.value}>
+                <SliceInner>
+                  {sliceRenderers?.[sliceCol]?.(slice.value) ?? String(slice.value)}
+                  <Badge>{slice.count}</Badge>
+                </SliceInner>
+              </StyledListGroupItem>
+            ))}
+          </ListGroup>
+        )}
+      </SlicesOverview>
     </Container>
   );
 };

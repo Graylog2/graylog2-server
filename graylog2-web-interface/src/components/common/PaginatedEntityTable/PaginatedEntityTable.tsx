@@ -48,7 +48,7 @@ const Container = styled.div(
   ({ theme }) => css`
     display: flex;
     flex-direction: row;
-    gap: ${theme.spacings.xs};
+    gap: ${theme.spacings.sm};
     width: 100%;
   `,
 );
@@ -115,6 +115,8 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
   reactQueryOptions,
   searchPlaceholder = undefined,
   setQuery,
+  sliceRenderers,
+  tmpFetchSlices,
   tableLayout,
   topRightCol = undefined,
   withoutURLParams = false,
@@ -188,7 +190,16 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       entityTableId={tableLayout.entityTableId}>
       <Container>
         {fetchOptions.sliceCol && (
-          <Slicing sliceCol={fetchOptions.sliceCol} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />
+          <Slicing
+            sliceCol={fetchOptions.sliceCol}
+            activeSlice={fetchOptions.slice}
+            tmpFetchSlices={tmpFetchSlices}
+            sliceRenderers={sliceRenderers}
+            columnSchemas={columnSchemas}
+            onChangeSlicing={onChangeSlicing}
+            query={fetchOptions.query}
+            filters={fetchOptions.filters}
+          />
         )}
         <TableWrapper>
           {!externalSearch && (
@@ -327,6 +338,8 @@ export type PaginatedEntityTableProps<T, M> = {
   onDataLoaded?: (data: PaginatedResponse<T, M>) => void;
   queryHelpComponent?: React.ReactNode;
   searchPlaceholder?: string;
+  sliceRenderers?: { [col: string]: (value: unknown) => React.ReactNode };
+  tmpFetchSlices?: any;
   tableLayout: DefaultLayout;
   topRightCol?: React.ReactNode;
   withoutURLParams?: boolean;
