@@ -18,26 +18,34 @@ package org.graylog.storage.views.export;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import jakarta.annotation.Nonnull;
 import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
+import org.graylog.plugins.views.search.export.ExportBackend;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessage;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.export.TestData;
+import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-public abstract class ExportITHelper {
+public abstract class ExportBackendITHelper {
 
-    protected final IndexLookup indexLookup;
+    protected final ExportBackend exportBackend;
 
-    public ExportITHelper(final IndexLookup indexLookup) {
-        this.indexLookup = indexLookup;
+    protected ExportBackendITHelper(ExportBackend exportBackend) {
+        this.exportBackend = exportBackend;
+    }
+
+    public ExportBackend getBackend() {
+        return exportBackend;
     }
 
     public abstract LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command);
@@ -63,11 +71,6 @@ public abstract class ExportITHelper {
 
     public Object[] toObjectArray(String s) {
         return Arrays.stream(s.split(",")).map(String::trim).toArray();
-    }
-
-    public void mockIndexLookupFor(ExportMessagesCommand command, String... indexNames) {
-        when(indexLookup.indexNamesForStreamsInTimeRange(command.streams(), command.timeRange()))
-                .thenReturn(ImmutableSet.copyOf(indexNames));
     }
 
     public void keepOnlyRelevantFields(SimpleMessageChunk chunk, LinkedHashSet<String> relevantFields) {
@@ -117,4 +120,22 @@ public abstract class ExportITHelper {
 
         return SimpleMessageChunk.from(command.fieldsInOrder(), allMessages);
     }
+
+
+    @Nonnull
+    protected static IndexLookup mockIndexLookup(String[] indices) {
+        return new IndexLookup() {
+
+            @Override
+            public Set<String> indexNamesForStreamsInTimeRange(Collection<String> streamIds, TimeRange timeRange) {
+                return Set.of(indices);
+            }
+
+            @Override
+            public Set<IndexRange> indexRangesForStreamsInTimeRange(Collection<String> streamIds, TimeRange timeRange) {
+                return Set.of();
+            }
+        };
+    }
+
 }
