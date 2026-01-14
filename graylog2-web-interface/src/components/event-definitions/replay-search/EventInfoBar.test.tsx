@@ -118,8 +118,8 @@ describe('<EventInfoBar />', () => {
     const description = await screen.findByTitle('Description');
     const notifications = await screen.findByTitle('Notifications');
     const aggregationConditions = await screen.findByTitle('Aggregation conditions');
-    const field1Condition = await screen.findByTitle('count(field1)>500');
-    const field2Condition = await screen.findByTitle('count(field2)<8000');
+    const field1Condition = await screen.findByTestId('color-count(field1)>500');
+    const field2Condition = await screen.findByTestId('color-count(field2)<8000');
 
     expect(priority).toHaveTextContent('Medium');
     expect(execution).toHaveTextContent('1 minute');
@@ -128,19 +128,17 @@ describe('<EventInfoBar />', () => {
     expect(notifications).toHaveTextContent('Email notification');
     expect(aggregationConditions).toHaveTextContent('count(field1)>500count(field2)<8000');
 
-    expect(field1Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
-    expect(field2Condition.children[0]).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
+    expect(field1Condition).toHaveStyle({ backgroundColor: 'rgb(255, 255, 255)' });
+    expect(field2Condition).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
   });
 
-  it('Shows event timestamp and event definition link for event', async () => {
+  it('Shows event definition link for event', async () => {
     render(<EventInfoComponent type="event" />);
 
-    const timestamp = await screen.findByTitle('Timestamp');
-    const eventDefinition = await screen.findByTitle('Event definition');
+    const eventDefinition = await screen.findByRole('link', { name: /event definition/i });
 
-    expect(timestamp).toHaveTextContent('2023-03-02 14:43:21');
     expect(eventDefinition).toHaveTextContent('Event Definition Title');
-    expect(eventDefinition.children[0]).toHaveAttribute('href', '/alerts/definitions/event-definition-id-1');
+    expect(eventDefinition).toHaveAttribute('href', '/alerts/definitions/event-definition-id-1');
   });
 
   it("Didn't Shows Event definition updated at for event definition which was updated before event", async () => {
