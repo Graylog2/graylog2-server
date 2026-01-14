@@ -70,16 +70,23 @@ export const WindowList = ({ children, listRef = undefined, onRowsRendered = und
   );
 
   const totalHeight = useMemo(() => {
-    const sizes = Object.values(sizeMap);
+    // Calculate total height based on measured sizes
+    // Only sum heights for items that have been measured
+    let sum = 0;
     
-    return sizes.reduce((sum, size) => {
-      if (size && sum < MAX_CONTAINER_SIZE) {
-        return parseInt(String(size), 10) + sum;
+    for (let i = 0; i < children.length && sum < MAX_CONTAINER_SIZE; i += 1) {
+      const size = sizeMap[i];
+      
+      if (size) {
+        sum += parseInt(String(size), 10);
+      } else {
+        // Use default size for unmeasured items
+        sum += 36;
       }
+    }
 
-      return sum;
-    }, 0);
-  }, [sizeMap]);
+    return Math.min(sum, MAX_CONTAINER_SIZE);
+  }, [sizeMap, children.length]);
 
   const getSize = useCallback((index: number) => sizeMap[index] || 36, [sizeMap]);
 
