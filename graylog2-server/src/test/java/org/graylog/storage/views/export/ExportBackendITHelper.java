@@ -35,13 +35,12 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 
-public abstract class ExportITHelper {
+public abstract class ExportBackendITHelper {
 
     protected final ExportBackend exportBackend;
 
-    protected ExportITHelper(ExportBackend exportBackend) {
+    protected ExportBackendITHelper(ExportBackend exportBackend) {
         this.exportBackend = exportBackend;
     }
 

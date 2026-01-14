@@ -72,7 +72,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesCorrectIndicesAndStreams() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .streams(ImmutableSet.of("stream-01", "stream-02"))
@@ -89,7 +89,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesQueryString() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .queryString(ElasticsearchQueryString.of("Ha Ho"))
@@ -105,7 +105,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesTimeRange() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .timeRange(AbsoluteRange.create("2015-01-01T00:00:00.000Z", "2015-01-01T02:00:00.000Z"))
@@ -121,7 +121,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesFieldsInOrder() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .fieldsInOrder("timestamp", "message")
@@ -138,7 +138,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void marksFirstChunk() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
 
@@ -151,7 +151,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void failsWithLeadingHighlightQueryIfDisallowed() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().queryString(ElasticsearchQueryString.of("*a")).build();
 
@@ -164,7 +164,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void respectsResultLimitIfSet() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().chunkSize(1).limit(3).build();
 
@@ -177,7 +177,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void deliversCompleteLastChunkIfLimitIsReached() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().chunkSize(2).limit(3).build();
 
@@ -190,7 +190,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void resultsHaveAllMessageFieldsIfFieldsHaveNotBeenExplicitlyChosen() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .fieldsInOrder(ExportMessagesCommand.ALL_FIELDS)
@@ -214,7 +214,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void sortsByTimestampAscending() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
 
@@ -229,7 +229,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     public void usesProvidedTimeZone() {
         importFixture("messages.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams()
                 .timeZone(DateTimeZone.forID("Australia/Adelaide")) // UTC+9:30
@@ -246,7 +246,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
     @SkipDefaultIndexTemplate
     public void canExportWithMissingFieldOnSort() {
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1");
 
         createIndicesWithMapping(mappingWithOutAlias(), "graylog_0");
         createIndicesWithMapping(mappingWithAlias(), "graylog_1");
@@ -270,7 +270,7 @@ public class OpenSearchExportBackendIT extends ElasticsearchBaseTest {
 
         importFixture("messages-with-old-field-types.json");
 
-        final OpenSearchExportITHelper helper = new OpenSearchExportITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1", "graylog_2");
+        final OpenSearchExportBackendITHelper helper = new OpenSearchExportBackendITHelper(openSearchInstance.getOfficialOpensearchClient(), new IgnoreSearchFilters(), "graylog_0", "graylog_1", "graylog_2");
 
         ExportMessagesCommand command = helper.commandBuilderWithAllTestDefaultStreams().build();
 

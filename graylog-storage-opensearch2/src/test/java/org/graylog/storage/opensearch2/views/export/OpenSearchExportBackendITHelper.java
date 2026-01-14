@@ -20,13 +20,13 @@ import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
 import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
 import org.graylog.storage.opensearch2.OpenSearchClient;
-import org.graylog.storage.views.export.ExportITHelper;
+import org.graylog.storage.views.export.ExportBackendITHelper;
 
 import java.util.LinkedHashSet;
 
-public class OpenSearchExportITHelper extends ExportITHelper {
+public class OpenSearchExportBackendITHelper extends ExportBackendITHelper {
 
-    public OpenSearchExportITHelper(OpenSearchClient openSearchClient, UsedSearchFiltersToQueryStringsMapper filters, String... indices) {
+    public OpenSearchExportBackendITHelper(OpenSearchClient openSearchClient, UsedSearchFiltersToQueryStringsMapper filters, String... indices) {
         super(new OpenSearchExportBackend(mockIndexLookup(indices), requestStrategy(openSearchClient), false, filters));
     }
 

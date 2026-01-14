@@ -42,7 +42,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class IndexLookupTest {
+class IndexLookupImplTest {
 
     private final TimeRange timeRangeWithNoIndexRanges = KeywordRange.create("42 years ago", TimeZone.getDefault().getID());
     private final TimeRange timeRangeWithMatchingIndexRange = KeywordRange.create("1 years ago", TimeZone.getDefault().getID());
