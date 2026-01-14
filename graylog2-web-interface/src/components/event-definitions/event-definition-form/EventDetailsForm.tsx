@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import upperFirst from 'lodash/upperFirst';
 import toNumber from 'lodash/toNumber';
@@ -71,20 +72,20 @@ const EventDetailsForm = ({ eventDefinition, eventDefinitionEventProcedure, vali
   const ltXl = useMediaQuery(`(min-width: ${theme.breakpoints.xl}`);
   const { pathname } = useLocation();
   const sendTelemetry = useSendTelemetry();
-  const [showAddEventProcedureForm, setShowAddEventProcedureForm] = React.useState<boolean>(false);
+  const [showAddEventProcedureForm, setShowAddEventProcedureForm] = useState<boolean>(false);
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
 
-  const readOnly = React.useMemo(
+  const readOnly = useMemo(
     () => !canEdit || isSystemEventDefinition(eventDefinition) || eventDefinition.config.type === 'sigma-v1',
     [canEdit, eventDefinition],
   );
-  const showEventProcedureSummary = React.useMemo(
+  const showEventProcedureSummary = useMemo(
     () => !!eventDefinitionEventProcedure && !showAddEventProcedureForm && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, validSecurityLicense],
   );
-  const showAddNewEventProcedure = React.useMemo(
+  const showAddNewEventProcedure = useMemo(
     () => !eventDefinitionEventProcedure && !showAddEventProcedureForm && !readOnly && validSecurityLicense,
     [eventDefinitionEventProcedure, showAddEventProcedureForm, readOnly, validSecurityLicense],
   );

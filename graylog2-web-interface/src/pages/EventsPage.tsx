@@ -22,16 +22,22 @@ import usePluginEntities from 'hooks/usePluginEntities';
 import usePluggableLicenseCheck from 'hooks/usePluggableLicenseCheck';
 import EventsPageNavigation from 'components/events/EventsPageNavigation';
 import EventsEntityTable from 'components/events/EventsEntityTable';
+import { Row, Col } from 'components/bootstrap';
 
 const AlertsPageComponent = () => {
   const {
     data: { valid: validSecurityLicense },
   } = usePluggableLicenseCheck('/license/security');
   const pluggableSecurityEventsPage = usePluginEntities('views.components.securityEventsPage');
-
   // TODO: its for TMP
   if (validSecurityLicense) {
-    return <EventsEntityTable />;
+    return (
+      <Row className="content">
+        <Col xs={12}>
+          <EventsEntityTable />
+        </Col>
+      </Row>
+    );
   }
 
   return (

@@ -16,21 +16,19 @@
  */
 import * as React from 'react';
 
-import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { LinkContainer } from 'components/common/router';
-import { Button } from 'components/bootstrap';
-import Routes from 'routing/Routes';
-
 type Props = {
-  input: InputSummary;
+  lines: string[];
 };
 
-const TitleCell = ({ input }: Props) => (
-  <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
-    <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
-      {input.title}
-    </Button>
-  </LinkContainer>
+const PasswordRules = ({ lines }: Props) => (
+  <>
+    {lines.map((line, index) => (
+      <React.Fragment key={line}>
+        {line}
+        {index < lines.length - 1 && <br />}
+      </React.Fragment>
+    ))}
+  </>
 );
 
-export default TitleCell;
+export default PasswordRules;

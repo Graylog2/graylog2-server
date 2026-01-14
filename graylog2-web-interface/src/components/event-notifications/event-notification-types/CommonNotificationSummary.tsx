@@ -14,7 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Table, Button } from 'components/bootstrap';
 import { Icon } from 'components/common';
@@ -34,7 +34,7 @@ const CommonNotificationSummary = ({
   notification,
   children = undefined,
 }: Props) => {
-  const [displayDetails, setDisplayDetails] = React.useState(false);
+  const [displayDetails, setDisplayDetails] = useState(false);
 
   const toggleDisplayDetails = () => {
     setDisplayDetails((prevDisplayDetails) => !prevDisplayDetails);
