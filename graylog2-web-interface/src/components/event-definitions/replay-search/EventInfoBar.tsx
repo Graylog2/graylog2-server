@@ -23,6 +23,7 @@ import { Button } from 'components/bootstrap';
 import { FlatContentRow, Icon } from 'components/common';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
 import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
+import InfoBarBulkEventReplay from 'components/events/bulk-replay/NewBulkEventReplay';
 
 const Header = styled.div`
   display: flex;
@@ -33,7 +34,7 @@ const Header = styled.div`
 
 const Container = styled.div`
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 5px;
 `;
 
@@ -43,6 +44,13 @@ const Row = styled.div(
     flex-wrap: wrap;
     gap: ${theme.spacings.xs};
     justify-content: stretch;
+  `,
+);
+
+const MainContainer = styled.div(
+  ({ theme }) => css`
+    display: flex;
+    gap: ${theme.spacings.xs};
   `,
 );
 
@@ -57,29 +65,34 @@ const EventInfoBar = () => {
   const infoAttributes = useAttributeComponents();
 
   return (
-    <FlatContentRow>
-      <Header>
-        <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
-          <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
-          &nbsp;
-          {open ? `Hide event definition details` : `Show event definition details`}
-        </Button>
-      </Header>
-      {open && (
-        <Container data-testid="info-container">
-          <Row>
-            {infoAttributes.map(
-              ({ title, content, show }) =>
-                show !== false && (
-                  <EventAttribute key={title} title={title}>
-                    {content}
-                  </EventAttribute>
-                ),
-            )}
-          </Row>
-        </Container>
-      )}
-    </FlatContentRow>
+    <MainContainer>
+      <FlatContentRow>
+        <Header>
+          <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
+            <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
+            &nbsp;
+            {open ? `Hide event definition details` : `Show event definition details`}
+          </Button>
+        </Header>
+        {open && (
+          <Container data-testid="info-container">
+            <Row>
+              <InfoBarBulkEventReplay />
+            </Row>
+            <Row>
+              {infoAttributes.map(
+                ({ title, content, show }) =>
+                  show !== false && (
+                    <EventAttribute key={title} title={title}>
+                      {content}
+                    </EventAttribute>
+                  ),
+              )}
+            </Row>
+          </Container>
+        )}
+      </FlatContentRow>
+    </MainContainer>
   );
 };
 
