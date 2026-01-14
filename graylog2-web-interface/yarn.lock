@@ -13216,10 +13216,10 @@ react-ultimate-pagination@^1.2.0:
     prop-types "^15.0.0"
     ultimate-pagination "1.0.0"
 
-react-window-infinite-loader@^1.0.8:
-  version "1.0.10"
-  resolved "https://registry.yarnpkg.com/react-window-infinite-loader/-/react-window-infinite-loader-1.0.10.tgz#30aa264c6b2cc6d41153a65377e337cb83c9bdca"
-  integrity sha512-NO/csdHlxjWqA2RJZfzQgagAjGHspbO2ik9GtWZb0BY1Nnapq0auG8ErI+OhGCzpjYJsCYerqUlK6hkq9dfAAA==
+react-window-infinite-loader@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-window-infinite-loader/-/react-window-infinite-loader-2.0.0.tgz#7655f3f8051176700c8ff7e7a2f85813479d0587"
+  integrity sha512-dioOyvShGheEqqFHcPNKCixCOc2evwb2VEt9sitfJfTZ1hir8m6b8W0CNBvcUj+8Y8IeWu4yb88DI7k88aYTQQ==
 
 react-window@^1.8.2:
   version "1.8.11"
