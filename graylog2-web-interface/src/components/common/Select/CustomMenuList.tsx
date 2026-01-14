@@ -54,7 +54,7 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowProps) => {
 type WindowListProps = Partial<MenuListProps> & {
   listRef?: any;
   children: Array<React.ReactNode>;
-  onItemsRendered?: () => void;
+  onRowsRendered?: () => void;
 };
 
 export const WindowList = ({ children, listRef = undefined, ...rest }: WindowListProps) => {

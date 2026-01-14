@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import InfiniteLoader from 'react-window-infinite-loader';
+import { InfiniteLoader } from 'react-window-infinite-loader';
 import styled from 'styled-components';
 
 import { WindowList } from 'components/common/Select/CustomMenuList';
@@ -43,15 +43,22 @@ const AsyncCustomMenuList = ({
 }) => {
   const items = children?.length ? children : [getNoOptionMessage()];
 
+  // Wrap loadOptions to match the v2 API signature (startIndex, stopIndex) => Promise<void>
+  const loadMoreRows = async () => {
+    if (loadOptions) {
+      await Promise.resolve(loadOptions());
+    }
+  };
+
   return (
     <InfiniteLoader
-      isItemLoaded={(index: number) => index < children.length}
-      itemCount={total}
+      isRowLoaded={(index: number) => index < children.length}
+      rowCount={total}
       threshold={30}
       minimumBatchSize={50}
-      loadMoreItems={loadOptions}>
-      {({ onItemsRendered, ref }) => (
-        <WindowList listRef={ref} onItemsRendered={onItemsRendered}>
+      loadMoreRows={loadMoreRows}>
+      {({ onRowsRendered }) => (
+        <WindowList onRowsRendered={onRowsRendered}>
           {items}
         </WindowList>
       )}
