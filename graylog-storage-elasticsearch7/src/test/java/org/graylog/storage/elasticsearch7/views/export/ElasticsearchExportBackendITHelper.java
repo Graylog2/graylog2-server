@@ -14,30 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch2.views.export;
+package org.graylog.storage.elasticsearch7.views.export;
 
-import org.graylog.plugins.views.search.elasticsearch.IndexLookup;
 import org.graylog.plugins.views.search.export.ExportMessagesCommand;
 import org.graylog.plugins.views.search.export.SimpleMessageChunk;
-import org.graylog.storage.views.export.ExportITHelper;
+import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
+import org.graylog.storage.elasticsearch7.ElasticsearchClient;
+import org.graylog.storage.views.export.ExportBackendITHelper;
 
 import java.util.LinkedHashSet;
 
-public class OpenSearchExportITHelper extends ExportITHelper {
+public class ElasticsearchExportBackendITHelper extends ExportBackendITHelper {
 
-    private final OpenSearchExportBackend backend;
-
-    public OpenSearchExportITHelper(final IndexLookup indexLookup,
-                                    final OpenSearchExportBackend backend) {
-        super(indexLookup);
-        this.backend = backend;
+    public ElasticsearchExportBackendITHelper(ElasticsearchClient client, UsedSearchFiltersToQueryStringsMapper filters, String... indices) {
+        super(new ElasticsearchExportBackend(mockIndexLookup(indices), requestStrategy(client), false, filters));
     }
 
+    private static RequestStrategy requestStrategy(ElasticsearchClient client) {
+        final ExportClient exportClient = new ExportClient(client);
+        return new SearchAfter(exportClient);
+    }
+
+    @Override
     public LinkedHashSet<SimpleMessageChunk> collectChunksFor(final ExportMessagesCommand command) {
         LinkedHashSet<SimpleMessageChunk> allChunks = new LinkedHashSet<>();
-        backend.run(command, allChunks::add);
+        exportBackend.run(command, allChunks::add);
         return allChunks;
     }
-
 
 }
