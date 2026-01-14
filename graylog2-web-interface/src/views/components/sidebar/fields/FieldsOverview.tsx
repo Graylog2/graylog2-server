@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import styled from 'styled-components';
 import type { List as ImmutableList } from 'immutable';
 
@@ -128,15 +128,13 @@ const FieldsOverview = ({ allFields, activeQueryFields }: Props) => {
   );
 };
 
-const FieldsOverviewWithContext = (props: Omit<Props, 'allFields' | 'activeQueryFields'>) => (
-  <FieldTypesContext.Consumer>
-    {(fieldTypes) => {
-      const allFields = fieldTypes?.all;
-      const activeQueryFields = fieldTypes?.currentQuery;
+const FieldsOverviewWithContext = (props: Omit<Props, 'allFields' | 'activeQueryFields'>) => {
+  const fieldTypes = useContext(FieldTypesContext);
 
-      return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
-    }}
-  </FieldTypesContext.Consumer>
-);
+  const allFields = fieldTypes?.all;
+  const activeQueryFields = fieldTypes?.currentQuery;
+
+  return <FieldsOverview {...props} allFields={allFields} activeQueryFields={activeQueryFields} />;
+};
 
 export default FieldsOverviewWithContext;
