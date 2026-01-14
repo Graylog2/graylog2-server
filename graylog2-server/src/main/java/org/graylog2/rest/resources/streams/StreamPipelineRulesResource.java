@@ -33,9 +33,11 @@ package org.graylog2.rest.resources.streams;
     import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
     import org.graylog.plugins.pipelineprocessor.db.PipelineRulesMetadataDao;
     import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+    import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
     import org.graylog.plugins.pipelineprocessor.db.RuleDao;
     import org.graylog.plugins.pipelineprocessor.db.RuleService;
     import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMetadataService;
+    import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
     import org.graylog2.database.NotFoundException;
     import org.graylog2.database.PaginatedList;
     import org.graylog2.rest.models.SortOrder;
@@ -44,11 +46,14 @@ package org.graylog2.rest.resources.streams;
     import org.graylog2.rest.resources.entities.EntityDefaults;
     import org.graylog2.rest.resources.entities.Sorting;
     import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
+    import org.graylog2.rest.resources.streams.responses.StreamReference;
     import org.graylog2.search.SearchQueryField;
     import org.graylog2.shared.rest.resources.RestResource;
+    import org.graylog2.streams.StreamService;
 
     import java.util.List;
     import java.util.Locale;
+    import java.util.Objects;
     import java.util.stream.Stream;
 
     import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
@@ -59,7 +64,7 @@ package org.graylog2.rest.resources.streams;
 public class StreamPipelineRulesResource extends RestResource {
     private static final String ATTRIBUTE_PIPELINE_RULE = "rule";
     private static final String ATTRIBUTE_PIPELINE = "pipeline";
-    private static final String ATTRIBUTE_CONNECTED_STREAM = "connected_stream";
+    private static final String ATTRIBUTE_CONNECTED_STREAM = "connected_streams";
     private static final String DEFAULT_SORT_FIELD = ATTRIBUTE_PIPELINE_RULE;
     private static final String DEFAULT_SORT_DIRECTION = "asc";
     private static final List<EntityAttribute> attributes = List.of(
@@ -68,8 +73,7 @@ public class StreamPipelineRulesResource extends RestResource {
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE_RULE).title("Pipeline Rule").searchable(false).build(),
             EntityAttribute.builder().id("pipeline_id").title("Pipeline ID").searchable(false).hidden(true).build(),
             EntityAttribute.builder().id(ATTRIBUTE_PIPELINE).title("Pipeline").searchable(false).build(),
-            EntityAttribute.builder().id("connected_stream_id").title("Connected Stream ID").searchable(false).hidden(true).build(),
-            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Connected Stream").searchable(false).build()
+            EntityAttribute.builder().id(ATTRIBUTE_CONNECTED_STREAM).title("Connected Streams").searchable(false).build()
     );
     private static final EntityDefaults settings = EntityDefaults.builder()
             .sort(Sorting.create(DEFAULT_SORT_FIELD, Sorting.Direction.valueOf(DEFAULT_SORT_DIRECTION.toUpperCase(Locale.ROOT)))).build();
@@ -77,14 +81,20 @@ public class StreamPipelineRulesResource extends RestResource {
     private final MongoDbPipelineMetadataService mongoDbPipelineMetadataService;
     private final PipelineService pipelineService;
     private final RuleService ruleService;
+    private final PipelineStreamConnectionsService connectionsService;
+    private final StreamService streamService;
 
     @Inject
     public StreamPipelineRulesResource(MongoDbPipelineMetadataService mongoDbPipelineMetadataService,
                                        PipelineService pipelineService,
-                                       RuleService ruleService) {
+                                       RuleService ruleService,
+                                       PipelineStreamConnectionsService connectionsService,
+                                       StreamService streamService) {
         this.mongoDbPipelineMetadataService = mongoDbPipelineMetadataService;
         this.pipelineService = pipelineService;
         this.ruleService = ruleService;
+        this.connectionsService = connectionsService;
+        this.streamService = streamService;
     }
 
     @GET
@@ -131,6 +141,18 @@ public class StreamPipelineRulesResource extends RestResource {
             return Stream.empty();
         }
 
+        List<StreamReference> connectedStreams = connectionsService.loadByPipelineId(pipelineDao.id()).stream()
+                .map(PipelineConnections::streamId)
+                .map(id -> {
+                    try {
+                        return new StreamReference(id, streamService.load(id).getTitle());
+                    } catch (NotFoundException e) {
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
         relevantRules.forEach(ruleId -> {
             try {
                 RuleDao ruleDao = ruleService.load(ruleId);
@@ -141,8 +163,7 @@ public class StreamPipelineRulesResource extends RestResource {
                                 pipelineDao.title(),
                                 ruleId,
                                 ruleDao.title(),
-                                streamId,
-                                dao.routedStreams().get(streamId)));
+                                connectedStreams));
             } catch (NotFoundException e) {
                 // Skip pipelines or rules that no longer exist
             }
