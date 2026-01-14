@@ -20,6 +20,8 @@ export type StreamConnectedPipeline = {
   pipeline_id: string;
   rule: string;
   rule_id: string;
-  connected_stream: string;
-  connected_stream_id: string;
+  connected_streams: Array<{
+    id: string;
+    title: string;
+  }>;
 };

@@ -18,28 +18,26 @@ import React from 'react';
 
 import { Link } from 'components/common/router';
 import Routes from 'routing/Routes';
+import type { StreamConnectedPipeline } from 'components/streams/StreamDetails/StreamDataRoutingIntake/types';
+
 type Props = {
-  id: string;
-  title: string;
-  type: 'pipeline' | 'rule';
+  streams: StreamConnectedPipeline['connected_streams'];
 };
 
-const ConnectedPipelineLinkedCell = ({ id, title, type }: Props) => {
-  const getRoute = () => {
-    switch (type) {
-      case 'pipeline':
-        return Routes.SYSTEM.PIPELINES.PIPELINE(id);
-      case 'rule':
-        return Routes.SYSTEM.PIPELINES.RULE(id);
-      default:
-        return undefined;
-    }
-  };
+const ConnectedPipelineStreamsCell = ({ streams }: Props) => {
+  if (!streams || streams.length < 1) return null;
 
-  const route = getRoute();
-
-  if (!route) return <>{title}</>;
-
-  return <Link to={route}>{title}</Link>;
+  return (
+    <>
+      {streams.map((stream, index) => (
+        <>
+          <Link key={stream.id} to={Routes.stream_view(stream.id)}>
+            {stream.title}
+          </Link>
+          {index !== streams.length - 1 && ', '}
+        </>
+      ))}
+    </>
+  );
 };
-export default ConnectedPipelineLinkedCell;
+export default ConnectedPipelineStreamsCell;

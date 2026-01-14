@@ -37,8 +37,8 @@ export const DEFAULT_LAYOUT = {
   entityTableId: 'pipelines',
   defaultPageSize: 20,
   defaultSort: { attributeId: 'rule', direction: 'asc' } as Sort,
-  defaultDisplayedAttributes: ['rule', 'pipeline', 'connected_stream'],
-  defaultColumnOrder: ['rule', 'pipeline', 'connected_stream'],
+  defaultDisplayedAttributes: ['rule', 'pipeline', 'connected_streams'],
+  defaultColumnOrder: ['rule', 'pipeline', 'connected_streams'],
 };
 
 const ListCol = styled(Col)(

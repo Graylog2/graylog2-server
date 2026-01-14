@@ -20,6 +20,7 @@ import type { ColumnRenderers } from 'components/common/EntityDataTable';
 import type { StreamConnectedPipeline } from 'components/streams/StreamDetails/StreamDataRoutingIntake/types';
 
 import ConnectedPipelineLinkedCell from './cells/ConnectedPipelineLinkedCell';
+import ConnectedPipelineStreamsCell from './cells/ConnectedPipelineStreamsCell';
 
 const customColumnRenderers: ColumnRenderers<StreamConnectedPipeline> = {
   attributes: {
@@ -33,13 +34,9 @@ const customColumnRenderers: ColumnRenderers<StreamConnectedPipeline> = {
         <ConnectedPipelineLinkedCell title={rule} id={connectedPipeline.rule_id} type="rule" />
       ),
     },
-    connected_stream: {
-      renderCell: (connected_stream: StreamConnectedPipeline['rule'], connectedPipeline: StreamConnectedPipeline) => (
-        <ConnectedPipelineLinkedCell
-          title={connected_stream}
-          id={connectedPipeline.connected_stream_id}
-          type="stream"
-        />
+    connected_streams: {
+      renderCell: (connected_streams: StreamConnectedPipeline['connected_streams']) => (
+        <ConnectedPipelineStreamsCell streams={connected_streams} />
       ),
     },
   },
