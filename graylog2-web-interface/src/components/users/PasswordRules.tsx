@@ -14,8 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import { createSelector } from '@reduxjs/toolkit';
+import * as React from 'react';
 
-import { selectActiveViewState } from 'views/logic/slices/viewSelectors';
+type Props = {
+  lines: string[];
+};
 
-export const selectWidgetPositions = createSelector(selectActiveViewState, (viewState) => viewState.widgetPositions);
+const PasswordRules = ({ lines }: Props) => (
+  <>
+    {lines.map((line, index) => (
+      <React.Fragment key={line}>
+        {line}
+        {index < lines.length - 1 && <br />}
+      </React.Fragment>
+    ))}
+  </>
+);
+
+export default PasswordRules;
