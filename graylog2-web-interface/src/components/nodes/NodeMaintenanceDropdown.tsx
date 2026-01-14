@@ -27,33 +27,33 @@ type Props = {
 };
 
 const NodeMaintenanceDropdown = ({ node }: Props) => (
-    <ButtonGroup>
-      <DropdownButton bsStyle="info" bsSize="lg" title="Actions" id="node-maintenance-actions" pullRight>
-        <IfPermitted permissions="threads:dump">
-          <LinkContainer to={Routes.SYSTEM.THREADDUMP(node.node_id)}>
-            <MenuItem>Get thread dump</MenuItem>
-          </LinkContainer>
-        </IfPermitted>
-
-        <IfPermitted permissions="processbuffer:dump">
-          <LinkContainer to={Routes.SYSTEM.PROCESSBUFFERDUMP(node.node_id)}>
-            <MenuItem>Get process-buffer dump</MenuItem>
-          </LinkContainer>
-        </IfPermitted>
-
-        <LinkContainer to={Routes.SYSTEM.METRICS(node.node_id)}>
-          <MenuItem>Metrics</MenuItem>
+  <ButtonGroup>
+    <DropdownButton bsStyle="info" bsSize="lg" title="Actions" id="node-maintenance-actions" pullRight>
+      <IfPermitted permissions="threads:dump">
+        <LinkContainer to={Routes.SYSTEM.THREADDUMP(node.node_id)}>
+          <MenuItem>Get thread dump</MenuItem>
         </LinkContainer>
+      </IfPermitted>
 
-        <HideOnCloud>
-          <IfPermitted permissions="loggers:read">
-            <LinkContainer to={Routes.SYSTEM.LOGGING}>
-              <MenuItem>Configure internal logging</MenuItem>
-            </LinkContainer>
-          </IfPermitted>
-        </HideOnCloud>
-      </DropdownButton>
-    </ButtonGroup>
+      <IfPermitted permissions="processbuffer:dump">
+        <LinkContainer to={Routes.SYSTEM.PROCESSBUFFERDUMP(node.node_id)}>
+          <MenuItem>Get process-buffer dump</MenuItem>
+        </LinkContainer>
+      </IfPermitted>
+
+      <LinkContainer to={Routes.SYSTEM.METRICS(node.node_id)}>
+        <MenuItem>Metrics</MenuItem>
+      </LinkContainer>
+
+      <HideOnCloud>
+        <IfPermitted permissions="loggers:read">
+          <LinkContainer to={Routes.SYSTEM.LOGGING}>
+            <MenuItem>Configure internal logging</MenuItem>
+          </LinkContainer>
+        </IfPermitted>
+      </HideOnCloud>
+    </DropdownButton>
+  </ButtonGroup>
 );
 
 export default NodeMaintenanceDropdown;

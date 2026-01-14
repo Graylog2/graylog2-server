@@ -49,10 +49,7 @@ const HelpMenu = () => {
 
         if ('path' in item) {
           return (
-            <Menu.Item
-              key={item.description}
-              component={Link}
-              to={item.path}>
+            <Menu.Item key={item.description} component={Link} to={item.path}>
               {item.description}
             </Menu.Item>
           );
