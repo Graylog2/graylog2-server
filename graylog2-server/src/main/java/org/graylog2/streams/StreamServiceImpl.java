@@ -23,6 +23,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.errorprone.annotations.MustBeClosed;
+import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.UpdateResult;
 import jakarta.annotation.Nonnull;
 import jakarta.inject.Inject;
@@ -34,6 +35,7 @@ import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.MongoEntity;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.database.entities.DefaultEntityScope;
 import org.graylog2.database.entities.EntityScopeService;
 import org.graylog2.database.entities.ImmutableSystemScope;
 import org.graylog2.database.utils.MongoUtils;
@@ -78,6 +80,7 @@ import static com.mongodb.client.model.Filters.in;
 import static com.mongodb.client.model.Updates.addEachToSet;
 import static com.mongodb.client.model.Updates.pull;
 import static com.mongodb.client.model.Updates.set;
+import static org.graylog2.database.entities.ScopedEntity.FIELD_SCOPE;
 import static org.graylog2.database.utils.MongoUtils.idEq;
 import static org.graylog2.database.utils.MongoUtils.idsIn;
 import static org.graylog2.database.utils.MongoUtils.stream;
@@ -378,6 +381,25 @@ public class StreamServiceImpl implements StreamService {
     @Override
     public long count() {
         return collection.countDocuments();
+    }
+
+    @Override
+    public Map<String, Long> countBySource() {
+        long illuminateStreamCount = collection.countDocuments(
+                Filters.and(
+                        Filters.regex(FIELD_TITLE, "^Illuminate:"),
+                        Filters.eq(FIELD_SCOPE, DefaultEntityScope.NAME)
+                )
+        );
+
+        long userStreamCount = collection.countDocuments(
+                Filters.eq(FIELD_SCOPE, DefaultEntityScope.NAME)
+        ) - illuminateStreamCount;
+
+        return Map.of(
+                "illuminate_streams", illuminateStreamCount,
+                "user_streams", userStreamCount
+        );
     }
 
     @Override
