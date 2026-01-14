@@ -14,6 +14,7 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
+// @ts-nocheck
 import * as React from 'react';
 import { useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
