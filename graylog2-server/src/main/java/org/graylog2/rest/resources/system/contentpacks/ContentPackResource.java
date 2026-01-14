@@ -47,6 +47,7 @@ import org.graylog.security.shares.CreateEntityRequest;
 import org.graylog.security.shares.EntityShareRequest;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.contentpacks.ContentPackAuditLogger;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
@@ -88,14 +89,17 @@ public class ContentPackResource extends RestResource {
     private final ContentPackService contentPackService;
     private final ContentPackPersistenceService contentPackPersistenceService;
     private final ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
+    private final ContentPackAuditLogger contentPackAuditLogger;
 
     @Inject
     public ContentPackResource(ContentPackService contentPackService,
                                ContentPackPersistenceService contentPackPersistenceService,
-                               ContentPackInstallationPersistenceService contentPackInstallationPersistenceService) {
+                               ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
+                               ContentPackAuditLogger contentPackAuditLogger) {
         this.contentPackService = contentPackService;
         this.contentPackPersistenceService = contentPackPersistenceService;
         this.contentPackInstallationPersistenceService = contentPackInstallationPersistenceService;
+        this.contentPackAuditLogger = contentPackAuditLogger;
     }
 
     @GET
@@ -306,12 +310,16 @@ public class ContentPackResource extends RestResource {
 
         final ContentPack contentPack = contentPackPersistenceService.findByIdAndRevision(id, revision)
                 .orElseThrow(() -> new NotFoundException("Content pack " + id + " with revision " + revision + " not found!"));
-        return contentPackService.installContentPack(
+        final ContentPackInstallation installation = contentPackService.installContentPack(
                 contentPack,
                 request.parameters(),
                 request.comment(),
                 userContext,
                 contentPackInstallationRequest.shareRequest().orElse(EntityShareRequest.EMPTY));
+
+        contentPackAuditLogger.logInstallation(installation);
+
+        return installation;
     }
 
     @GET
@@ -381,6 +389,8 @@ public class ContentPackResource extends RestResource {
                 .orElseThrow(() -> new NotFoundException("Couldn't find content pack " + installation.contentPackId() + " rev " + installation.contentPackRevision()));
 
         final ContentPackUninstallation removedInstallation = contentPackService.uninstallContentPack(contentPack, installation);
+
+        contentPackAuditLogger.logUninstallation(contentPackId.id(), removedInstallation, getCurrentUser().getName());
 
         return new ContentPackUninstallResponse(contentPack, removedInstallation);
     }

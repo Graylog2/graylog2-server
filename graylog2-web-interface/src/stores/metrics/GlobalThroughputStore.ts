@@ -26,7 +26,7 @@ type StoreState = {
     loading: boolean;
   };
 };
-// eslint-disable-next-line import/prefer-default-export
+
 export const GlobalThroughputStore = singletonStore('core.GlobalThroughput', () =>
   Reflux.createStore<StoreState>({
     listenables: [],
