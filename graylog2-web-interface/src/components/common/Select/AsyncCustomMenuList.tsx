@@ -43,20 +43,13 @@ const AsyncCustomMenuList = ({
 }) => {
   const items = children?.length ? children : [getNoOptionMessage()];
 
-  // Wrap loadOptions to match the v2 API signature (startIndex, stopIndex) => Promise<void>
-  const loadMoreRows = async () => {
-    if (loadOptions) {
-      await Promise.resolve(loadOptions());
-    }
-  };
-
   return (
     <InfiniteLoader
       isRowLoaded={(index: number) => index < children.length}
       rowCount={total}
       threshold={30}
       minimumBatchSize={50}
-      loadMoreRows={loadMoreRows}>
+      loadMoreRows={loadOptions}>
       {({ onRowsRendered }) => (
         <WindowList onRowsRendered={onRowsRendered}>
           {items}
