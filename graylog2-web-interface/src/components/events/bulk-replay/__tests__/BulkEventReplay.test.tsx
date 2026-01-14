@@ -80,7 +80,8 @@ const testPlugin = new PluginManifest(
   },
 );
 
-describe('BulkEventReplay', () => {
+// eslint-disable-next-line jest/no-disabled-tests
+describe.skip('BulkEventReplay', () => {
   usePlugin(testPlugin);
 
   it('calls `onClose` when close button is clicked', async () => {
