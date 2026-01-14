@@ -14,18 +14,21 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.plugins.views.search.elasticsearch;
+import * as React from 'react';
 
-import org.graylog2.indexer.ranges.IndexRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+type Props = {
+  lines: string[];
+};
 
-import java.util.Collection;
-import java.util.Set;
+const PasswordRules = ({ lines }: Props) => (
+  <>
+    {lines.map((line, index) => (
+      <React.Fragment key={line}>
+        {line}
+        {index < lines.length - 1 && <br />}
+      </React.Fragment>
+    ))}
+  </>
+);
 
-public interface IndexLookup {
-    Set<String> indexNamesForStreamsInTimeRange(Collection<String> streamIds,
-                                                TimeRange timeRange);
-
-    Set<IndexRange> indexRangesForStreamsInTimeRange(Collection<String> streamIds,
-                                                     TimeRange timeRange);
-}
+export default PasswordRules;
