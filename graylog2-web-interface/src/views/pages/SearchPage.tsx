@@ -34,6 +34,7 @@ import type { HistoryFunction } from 'routing/useHistory';
 import useHistory from 'routing/useHistory';
 import type { SearchExecutionResult } from 'views/types';
 import SearchPageAutoRefreshProvider from 'views/components/contexts/SearchPageAutoRefreshProvider';
+import SearchPageContext from 'views/components/SearchPageContext';
 
 type Props = React.PropsWithChildren<{
   isNew: boolean;
@@ -93,6 +94,7 @@ const SearchPage = ({
             <ViewLoaderContext.Provider value={loadView}>
               <SearchPageAutoRefreshProvider>
                 {children}
+                <SearchPageContext />
                 <IfUserHasAccessToAnyStream skipNoStreamsCheck={skipNoStreamsCheck}>
                   <Search forceSideBarPinned={forceSideBarPinned} />
                 </IfUserHasAccessToAnyStream>
