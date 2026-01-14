@@ -15,7 +15,9 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
+import { Col, Row } from 'components/bootstrap';
 import type { Sort } from 'stores/PaginationTypes';
 import type { Stream } from 'stores/streams/StreamsStore';
 import { Section, PaginatedEntityTable } from 'components/common';
@@ -39,18 +41,28 @@ export const DEFAULT_LAYOUT = {
   defaultColumnOrder: ['rule', 'pipeline', 'connected_stream'],
 };
 
+const ListCol = styled(Col)(
+  ({ theme }) => css`
+    padding-top: ${theme.spacings.lg};
+  `,
+);
+
 const StreamConnectedPipelines = ({ stream }: Props) => (
   <Section title="Connected Pipelines" collapsible defaultClosed>
-    <PaginatedEntityTable<StreamConnectedPipeline>
-      humanName="pipelines"
-      tableLayout={DEFAULT_LAYOUT}
-      fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
-      keyFn={(searchParams) => keyFn(stream.id, searchParams)}
-      entityAttributesAreCamelCase={false}
-      searchPlaceholder="Search for pipeline"
-      columnRenderers={customColumnRenderers}
-      entityActions={() => null}
-    />
+    <Row>
+      <ListCol md={12}>
+        <PaginatedEntityTable<StreamConnectedPipeline>
+          humanName="pipelines"
+          tableLayout={DEFAULT_LAYOUT}
+          fetchEntities={(searchParams) => fetchStreamConnectedPipelines(stream.id, searchParams)}
+          keyFn={(searchParams) => keyFn(stream.id, searchParams)}
+          entityAttributesAreCamelCase={false}
+          searchPlaceholder="Search for pipeline"
+          columnRenderers={customColumnRenderers}
+          entityActions={() => null}
+        />
+      </ListCol>
+    </Row>
   </Section>
 );
 
