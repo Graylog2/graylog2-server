@@ -46,7 +46,7 @@
     "@mantine/dropzone": "^8.2.8",
     "@mantine/hooks": "^8.2.8",
     "@mantine/notifications": "^8.2.8",
-    "@material-symbols/font-700": "^0.39.0",
+    "@material-symbols/font-700": "^0.40.2",
     "@openfonts/dm-sans_latin": "^1.0.2",
     "@openfonts/source-sans-pro_latin": "^1.44.2",
     "@openfonts/ubuntu-mono_latin": "^1.44.1",

@@ -2751,10 +2751,10 @@
     sort-object "^3.0.3"
     tinyqueue "^3.0.0"
 
-"@material-symbols/font-700@^0.39.0":
-  version "0.39.0"
-  resolved "https://registry.yarnpkg.com/@material-symbols/font-700/-/font-700-0.39.0.tgz#28f45a6a9d0672cae88a3e74cd022dd3f583ccf6"
-  integrity sha512-3VvpRdWVLEcU7LYFXRW91co0nq4aLGfM5Lqw2BTJww47VsrZ/JOGauQdFGJWbsnq35R55gQQ/1xi2N7AIg+7YA==
+"@material-symbols/font-700@^0.40.2":
+  version "0.40.2"
+  resolved "https://registry.yarnpkg.com/@material-symbols/font-700/-/font-700-0.40.2.tgz#625dc5fa37c2d86c69aecc262499cd0c928b21c7"
+  integrity sha512-DrIjtjwq+XwKg6yCgKhoYqhhsRXlTdjnXrEGNwSvnncGSyKA/je8EkrFu+Bz1GuS+bE3jEfk8DwNOJ8MLGg8iA==
 
 "@mdn/browser-compat-data@^5.5.35", "@mdn/browser-compat-data@^5.6.19":
   version "5.6.37"
