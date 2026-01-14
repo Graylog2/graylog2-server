@@ -23,6 +23,7 @@ enum ConfigurationType {
   URL_ALLOWLIST_CONFIG = 'org.graylog2.system.urlallowlist.UrlAllowlist',
   PERMISSIONS_CONFIG = 'org.graylog2.users.UserAndTeamsConfig',
   USER_CONFIG = 'org.graylog2.users.UserConfiguration',
+  PASSWORD_COMPLEXITY_CONFIG = 'org.graylog2.users.PasswordComplexityConfig',
   CERTIFICATE_RENEWAL_POLICY_CONFIG = 'org.graylog2.plugin.certificates.RenewalPolicy',
   GLOBAL_PROCESSING_RULE_CONFIG = 'org.graylog2.shared.buffers.processors.TimeStampConfig',
   MCP_CONFIG = 'org.graylog.mcp.config.McpConfiguration',
