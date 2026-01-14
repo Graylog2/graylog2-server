@@ -45,13 +45,13 @@ const AsyncCustomMenuList = ({
 
   return (
     <InfiniteLoader
-      isRowLoaded={(index: number) => index < children.length}
-      rowCount={total}
+      isItemLoaded={(index: number) => index < children.length}
+      itemCount={total}
       threshold={30}
       minimumBatchSize={50}
-      loadMoreRows={loadOptions}>
-      {({ onRowsRendered }) => (
-        <WindowList onRowsRendered={onRowsRendered}>
+      loadMoreItems={loadOptions}>
+      {({ onRowsRendered, ref }) => (
+        <WindowList listRef={ref} onRowsRendered={onRowsRendered}>
           {items}
         </WindowList>
       )}
