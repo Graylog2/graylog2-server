@@ -39,11 +39,10 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
     }
 
     private String createConnectionString() {
-        String endpoint = String.format("http://%s:%d/devstoreaccount1", getHost(), getMappedPort(PORT));
         return "DefaultEndpointsProtocol=http;"
                 + "AccountName=devstoreaccount1;"
                 + "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-                + "BlobEndpoint=" + endpoint + ";";
+                + "BlobEndpoint=http://%s:%d/devstoreaccount1;".formatted(getHost(), getMappedPort(PORT));
     }
 
     public BlobServiceClient createBlobServiceClient() {
