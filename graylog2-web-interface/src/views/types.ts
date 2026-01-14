@@ -19,6 +19,7 @@ import type React from 'react';
 import type * as Immutable from 'immutable';
 import type { FormikErrors } from 'formik';
 import type { Permission } from 'graylog-web-plugin/plugin';
+import type { JSONSchema } from 'json-schema-typed';
 
 import type { ExportPayload } from 'util/MessagesExportUtils';
 import type { IconName } from 'components/common/Icon';
@@ -68,7 +69,6 @@ import type { EntityPermissionsMapper } from 'logic/permissions/EntityPermission
 import type { WidgetsState } from 'views/logic/slices/widgetsSlice';
 import type { FieldTypeMappingsList } from 'views/logic/fieldtypes/types';
 import type { DEFAULT_AXIS_KEY } from 'views/components/visualizations/Constants';
-
 export type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[]
   ? ElementType
   : never;
@@ -607,7 +607,12 @@ type MarkdownAugmentation = {
   component: React.ComponentType<{ value: string }>;
 };
 
-type AvailableSuggestedAction<Fn extends () => void> = { type: string; description: string; action: Fn };
+type AvailableSuggestedAction<Fn extends () => void> = {
+  type: string;
+  description: string;
+  parameters: JSONSchema;
+  action: Fn;
+};
 export type PageContext<T = AvailableSuggestedAction<(...args: unknown[]) => void>> = {
   type: string;
   additional?: {};
