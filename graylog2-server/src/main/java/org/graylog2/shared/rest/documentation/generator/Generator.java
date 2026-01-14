@@ -55,6 +55,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
 import org.glassfish.jersey.media.multipart.FormDataBodyPart;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.graylog2.shared.ServerVersion;
 import org.graylog2.shared.rest.PublicCloudAPI;
@@ -430,7 +431,7 @@ public class Generator {
             return createPrimitiveSchema("string");
         }
 
-        if (returnType.isAssignableFrom(FormDataBodyPart.class)) {
+        if (returnType.isAssignableFrom(FormDataBodyPart.class) || returnType.isAssignableFrom(FormDataContentDisposition.class)) {
             return createPrimitiveSchema("File");
         }
 
