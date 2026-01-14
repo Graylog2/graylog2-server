@@ -49,7 +49,6 @@ const SearchPageContext = () => {
     [dispatch, currentQuery, fieldTypes],
   );
 
-  console.log({ context });
   usePageContext(context);
 
   return null;
