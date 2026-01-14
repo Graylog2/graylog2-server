@@ -21,6 +21,7 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
+import org.graylog2.contentpacks.ContentPackAuditLogger;
 import org.graylog2.contentpacks.ContentPackInstallationPersistenceService;
 import org.graylog2.contentpacks.ContentPackPersistenceService;
 import org.graylog2.contentpacks.ContentPackService;
@@ -79,6 +80,8 @@ public class ContentPackResourceTest {
     private ContentPackPersistenceService contentPackPersistenceService;
     @Mock
     private ContentPackInstallationPersistenceService contentPackInstallationPersistenceService;
+    @Mock
+    private ContentPackAuditLogger contentPackAuditLogger;
 
     @Mock
     private Set<ContentPackInstallation> contentPackInstallations;
@@ -97,7 +100,8 @@ public class ContentPackResourceTest {
         contentPackResource = new PermittedTestResource(
                 contentPackService,
                 contentPackPersistenceService,
-                contentPackInstallationPersistenceService);
+                contentPackInstallationPersistenceService,
+                contentPackAuditLogger);
     }
 
     @Test
@@ -204,8 +208,9 @@ public class ContentPackResourceTest {
     static class PermittedTestResource extends ContentPackResource {
         PermittedTestResource(ContentPackService contentPackService,
                               ContentPackPersistenceService contentPackPersistenceService,
-                              ContentPackInstallationPersistenceService contentPackInstallationPersistenceService) {
-            super(contentPackService, contentPackPersistenceService, contentPackInstallationPersistenceService);
+                              ContentPackInstallationPersistenceService contentPackInstallationPersistenceService,
+                              ContentPackAuditLogger contentPackAuditLogger) {
+            super(contentPackService, contentPackPersistenceService, contentPackInstallationPersistenceService, contentPackAuditLogger);
         }
 
         @Override
