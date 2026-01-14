@@ -14,23 +14,19 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
 
-import type { InputSummary } from 'hooks/usePaginatedInputs';
-import { LinkContainer } from 'components/common/router';
-import { Button } from 'components/bootstrap';
-import Routes from 'routing/Routes';
-
-type Props = {
-  input: InputSummary;
-};
-
-const TitleCell = ({ input }: Props) => (
-  <LinkContainer to={Routes.SYSTEM.INPUT_DIAGNOSIS(input.id)}>
-    <Button bsStyle="link" title={`show input diagnosis for ${input.title}`}>
-      {input.title}
-    </Button>
-  </LinkContainer>
-);
-
-export default TitleCell;
+/**
+ * Helper function to set all four border-side colors to the same value.
+ * This is needed to avoid conflicts with Mantine 8.3.0+ which internally
+ * uses specific border-side properties. Using the shorthand `borderColor`
+ * can cause React warnings about mixing shorthand and non-shorthand properties.
+ *
+ * @param color - The color to apply to all four border sides
+ * @returns An object with all four border-side color properties set
+ */
+export const borderColor = (color: string) => ({
+  borderTopColor: color,
+  borderRightColor: color,
+  borderBottomColor: color,
+  borderLeftColor: color,
+});

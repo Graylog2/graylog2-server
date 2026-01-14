@@ -56,7 +56,7 @@ public class UI {
         sb.append("* Community support: ").append(HELP_COMMUNITY).append("\n");
         sb.append("* Commercial support: ").append(HELP_COMMERCIAL).append("\n");
 
-        sb.append("\n").append("Terminating. :(").append("\n\n");
+        sb.append("\n").append("Terminating the server :(").append("\n\n");
         sb.append(wall("#"));
 
         return sb.toString();
