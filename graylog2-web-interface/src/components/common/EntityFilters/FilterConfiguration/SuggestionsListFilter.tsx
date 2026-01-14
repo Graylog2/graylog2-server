@@ -42,7 +42,7 @@ const SuggestionsListFilter = ({ attribute, filterValueRenderer, onSubmit, allAc
   const {
     data: { pagination, suggestions },
     isInitialLoading,
-  } = useFilterValueSuggestions(attribute.id, attribute.related_collection, searchParams, attribute.related_property);
+  } = useFilterValueSuggestions(attribute.id, attribute.related_collection, attribute.related_identifier, searchParams, attribute.related_property);
 
   return (
     <SuggestionsList

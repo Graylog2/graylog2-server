@@ -35,6 +35,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 
 import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
+import static org.graylog2.shared.security.EntityPermissionsUtils.ID_FIELD;
 
 @RequiresAuthentication
 @Api(value = "EntitySuggestions", tags = {CLOUD_VISIBLE})
@@ -54,6 +55,9 @@ public class EntitySuggestionResource extends RestResource {
     @ApiOperation(value = "Get a paginated list of suggested entities")
     public EntitySuggestionResponse getPage(@ApiParam(name = "collection")
                                             @QueryParam("collection") String collection,
+                                            @ApiParam(name ="identifier")
+                                            @QueryParam("identifier") @DefaultValue(ID_FIELD)
+                                            String identifier,
                                             @ApiParam(name = "column")
                                             @QueryParam("column") @DefaultValue("title") String column,
                                             @ApiParam(name = "page")
@@ -63,6 +67,6 @@ public class EntitySuggestionResource extends RestResource {
                                             @ApiParam(name = "query")
                                             @QueryParam("query") @DefaultValue("") String query) {
 
-        return entitySuggestionService.suggest(collection, column, query, page, perPage, getSubject());
+        return entitySuggestionService.suggest(collection, identifier, column, query, page, perPage, getSubject());
     }
 }

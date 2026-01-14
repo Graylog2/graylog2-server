@@ -55,6 +55,7 @@ type SearchParams = {
 
 type Suggestion = {
   id: string;
+  targetId?: string;
   value: string;
 };
 
@@ -134,7 +135,7 @@ const SuggestionsList = ({
 
                 onSubmit(
                   {
-                    value: suggestion.id,
+                    value: suggestion.targetId || suggestion.id,
                     title: suggestion.value,
                   },
                   !isShiftHeld,
