@@ -47,7 +47,6 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.scheduler.rest.JobResourceHandlerService;
-import org.graylog.scheduler.system.SystemJob;
 import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
@@ -102,7 +101,7 @@ public class SystemJobResource extends RestResource {
     public Map<String, List<SystemJobSummary>> list() {
         final List<SystemJobSummary> jobs = Lists.newArrayListWithCapacity(systemJobManager.getRunningJobs().size());
 
-        for (Map.Entry<String, SystemJob> entry : legacySystemJobManager.getRunningJobs().entrySet()) {
+        for (Map.Entry<String, LegacySystemJob> entry : legacySystemJobManager.getRunningJobs().entrySet()) {
             // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
                 final LegacySystemJob systemJob = entry.getValue();
