@@ -101,7 +101,7 @@ describe('CreateInputControl', () => {
     await userEvent.click(screen.getByRole('button', { name: /launch new input/i }));
 
     const title = await screen.findByRole('textbox', {
-      name: /title/i
+      name: /title/i,
     });
     await userEvent.type(title, 'Test');
 
