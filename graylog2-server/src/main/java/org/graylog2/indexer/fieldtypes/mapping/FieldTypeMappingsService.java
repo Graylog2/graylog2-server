@@ -228,7 +228,7 @@ public class FieldTypeMappingsService {
         ));
     }
 
-    private void cycleIndexSet(final IndexSetConfig indexSetConfig) {
+    void cycleIndexSet(final IndexSetConfig indexSetConfig) {
         final IndexSet mongoIndexSet = mongoIndexSetFactory.create(indexSetConfig);
         mongoIndexSet.cycle();
     }
