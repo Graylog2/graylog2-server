@@ -17,13 +17,13 @@
 package org.graylog2.rest.resources.system.contentpacks;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -66,6 +66,7 @@ import org.graylog2.rest.models.system.contentpacks.responses.ContentPackList;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackMetadata;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackResponse;
 import org.graylog2.rest.models.system.contentpacks.responses.ContentPackRevisions;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -77,10 +78,9 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "System/ContentPacks", description = "Content Packs", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/ContentPacks", description = "Content Packs")
 @Path("/system/content_packs")
 @Produces(MediaType.APPLICATION_JSON)
 public class ContentPackResource extends RestResource {
@@ -104,9 +104,10 @@ public class ContentPackResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List available content packs")
+    @Operation(summary = "List available content packs")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
     @RequiresPermissions(RestPermissions.CONTENT_PACK_READ)
@@ -122,9 +123,10 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("latest")
     @Timed
-    @ApiOperation(value = "List latest available content packs")
+    @Operation(summary = "List latest available content packs")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackList listLatestContentPacks() {
@@ -140,13 +142,14 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("{contentPackId}")
     @Timed
-    @ApiOperation(value = "List all revisions of a content pack")
+    @Operation(summary = "List all revisions of a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackRevisions listContentPackRevisions(
-            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id) {
         checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
@@ -165,15 +168,16 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("{contentPackId}/{revision}")
     @Timed
-    @ApiOperation(value = "Get a revision of a content pack")
+    @Operation(summary = "Get a revision of a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackResponse getContentPackRevisions(
-            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id,
-            @ApiParam(name = "revision", value = "Content pack revision", required = true)
+            @Parameter(name = "revision", description = "Content pack revision", required = true)
             @PathParam("revision") int revision
     ) {
         checkPermission(RestPermissions.CONTENT_PACK_READ);
@@ -187,15 +191,16 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("{contentPackId}/{revision}/download")
     @Timed
-    @ApiOperation(value = "Download a revision of a content pack")
+    @Operation(summary = "Download a revision of a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPack downloadContentPackRevisions(
-            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id,
-            @ApiParam(name = "revision", value = "Content pack revision", required = true)
+            @Parameter(name = "revision", description = "Content pack revision", required = true)
             @PathParam("revision") int revision
     ) {
         checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
@@ -208,15 +213,16 @@ public class ContentPackResource extends RestResource {
     @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Upload a content pack")
+    @Operation(summary = "Upload a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Missing or invalid content pack"),
-            @ApiResponse(code = 500, message = "Error while saving content pack")
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid content pack"),
+            @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_CREATE)
     @JsonView(ContentPackView.HttpView.class)
     public Response createContentPack(
-            @ApiParam(name = "Request body", value = "Content pack", required = true)
+            @Parameter(name = "Request body", description = "Content pack", required = true)
             @NotNull @Valid final ContentPack contentPack) {
         checkPermission(RestPermissions.CONTENT_PACK_CREATE);
         final ContentPack pack = contentPackPersistenceService.filterMissingResourcesAndInsert(contentPack)
@@ -231,16 +237,17 @@ public class ContentPackResource extends RestResource {
 
     @DELETE
     @Timed
-    @ApiOperation(value = "Delete all revisions of a content pack")
+    @Operation(summary = "Delete all revisions of a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Missing or invalid content pack"),
-            @ApiResponse(code = 500, message = "Error while saving content pack")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid content pack"),
+            @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_DELETE)
     @Path("{contentPackId}")
     @JsonView(ContentPackView.HttpView.class)
     public void deleteContentPack(
-            @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content Pack ID", required = true)
             @PathParam("contentPackId") final ModelId contentPackId) {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
         if (!contentPackInstallationPersistenceService.findByContentPackId(contentPackId).isEmpty()) {
@@ -254,18 +261,19 @@ public class ContentPackResource extends RestResource {
 
     @DELETE
     @Timed
-    @ApiOperation(value = "Delete one revision of a content pack")
+    @Operation(summary = "Delete one revision of a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Missing or invalid content pack"),
-            @ApiResponse(code = 500, message = "Error while saving content pack")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid content pack"),
+            @ApiResponse(responseCode = "500", description = "Error while saving content pack")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_DELETE_REV)
     @Path("{contentPackId}/{revision}")
     @JsonView(ContentPackView.HttpView.class)
     public void deleteContentPack(
-            @ApiParam(name = "contentPackId", value = "Content Pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content Pack ID", required = true)
             @PathParam("contentPackId") final ModelId contentPackId,
-            @ApiParam(name = "revision", value = "Content Pack revision", required = true)
+            @Parameter(name = "revision", description = "Content Pack revision", required = true)
             @PathParam("revision") final int revision) {
         checkPermission(RestPermissions.CONTENT_PACK_DELETE, contentPackId.toString());
 
@@ -282,18 +290,19 @@ public class ContentPackResource extends RestResource {
     @POST
     @Path("{contentPackId}/{revision}/installations")
     @Timed
-    @ApiOperation(value = "Install a revision of a content pack")
+    @Operation(summary = "Install a revision of a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_INSTALL)
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackInstallation installContentPack(
-            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id,
-            @ApiParam(name = "revision", value = "Content pack revision", required = true)
+            @Parameter(name = "revision", description = "Content pack revision", required = true)
             @PathParam("revision") int revision,
-            @ApiParam(name = "installation request", value = "Content pack installation request", required = true)
+            @Parameter(name = "installation request", description = "Content pack installation request", required = true)
             @Valid @NotNull CreateEntityRequest<ContentPackInstallationRequest> contentPackInstallationRequest,
             @Context UserContext userContext) {
         checkPermission(RestPermissions.CONTENT_PACK_INSTALL, id.toString());
@@ -316,13 +325,14 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("{contentPackId}/installations")
     @Timed
-    @ApiOperation(value = "Get details about the installations of a content pack")
+    @Operation(summary = "Get details about the installations of a content pack")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackInstallationsResponse listContentPackInstallationsById(
-            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id) {
         checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
@@ -333,15 +343,16 @@ public class ContentPackResource extends RestResource {
     @GET
     @Path("{contentPackId}/installations/{installationId}/uninstall_details")
     @Timed
-    @ApiOperation(value = "Get details about which entities will actually be uninstalled")
+    @Operation(summary = "Get details about which entities will actually be uninstalled")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @JsonView(ContentPackView.HttpView.class)
     public ContentPackUninstallDetails uninstallDetails(
-            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+            @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId id,
-            @ApiParam(name = "installationId", value = "Installation ID", required = true)
+            @Parameter(name = "installationId", description = "Installation ID", required = true)
             @PathParam("installationId") String installationId) {
         checkPermission(RestPermissions.CONTENT_PACK_READ, id.toString());
 
@@ -357,16 +368,17 @@ public class ContentPackResource extends RestResource {
     @DELETE
     @Path("{contentPackId}/installations/{installationId}")
     @Timed
-    @ApiOperation(value = "Uninstall a content pack installation")
+    @Operation(summary = "Uninstall a content pack installation")
     @ApiResponses(value = {
-            @ApiResponse(code = 500, message = "Error loading content packs")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "500", description = "Error loading content packs")
     })
     @AuditEvent(type = AuditEventTypes.CONTENT_PACK_UNINSTALL)
     @JsonView(ContentPackView.HttpView.class)
-    public Response deleteContentPackInstallationById(
-            @ApiParam(name = "contentPackId", value = "Content pack ID", required = true)
+    public ContentPackUninstallResponse deleteContentPackInstallationById(
+            @Parameter(name = "contentPackId", description = "Content pack ID", required = true)
             @PathParam("contentPackId") ModelId contentPackId,
-            @ApiParam(name = "installationId", value = "Installation ID", required = true)
+            @Parameter(name = "installationId", description = "Installation ID", required = true)
             @PathParam("installationId") String installationId) {
         checkPermission(RestPermissions.CONTENT_PACK_UNINSTALL, contentPackId.toString());
 
@@ -380,9 +392,10 @@ public class ContentPackResource extends RestResource {
 
         contentPackAuditLogger.logUninstallation(contentPackId.id(), removedInstallation, getCurrentUser().getName());
 
-        return Response.ok(ImmutableMap.of(
-                "content_pack", contentPack,
-                "uninstalled", removedInstallation
-        )).build();
+        return new ContentPackUninstallResponse(contentPack, removedInstallation);
     }
+
+    private record ContentPackUninstallResponse(
+            @JsonProperty("content_pack") ContentPack contentPack,
+            @JsonProperty("uninstalled") ContentPackUninstallation uninstalled) {}
 }

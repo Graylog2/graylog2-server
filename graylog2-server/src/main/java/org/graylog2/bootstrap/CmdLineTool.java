@@ -580,17 +580,21 @@ public abstract class CmdLineTool<NodeConfiguration extends GraylogNodeConfigura
     }
 
     protected Injector setupInjector(Module... modules) {
+        final ImmutableList.Builder<Module> builder = ImmutableList.builder();
+        builder.addAll(getSharedBindingsModules());
+        builder.addAll(getCommandBindings(featureFlags));
+        builder.addAll(Arrays.asList(modules));
+        builder.add(binder -> {
+            binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
+            featureFlagsBinding(binder);
+            binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
+        });
+        return doCreateInjector(builder.build());
+    }
+
+    protected Injector doCreateInjector(List<Module> modules) {
         try {
-            final ImmutableList.Builder<Module> builder = ImmutableList.builder();
-            builder.addAll(getSharedBindingsModules());
-            builder.addAll(getCommandBindings(featureFlags));
-            builder.addAll(Arrays.asList(modules));
-            builder.add(binder -> {
-                binder.bind(ChainingClassLoader.class).toInstance(chainingClassLoader);
-                featureFlagsBinding(binder);
-                binder.bind(String.class).annotatedWith(Names.named("BootstrapCommand")).toInstance(commandName);
-            });
-            return GuiceInjectorHolder.createInjector(builder.build());
+            return GuiceInjectorHolder.createInjector(modules);
         } catch (CreationException e) {
             annotateInjectorCreationException(e);
             return null;

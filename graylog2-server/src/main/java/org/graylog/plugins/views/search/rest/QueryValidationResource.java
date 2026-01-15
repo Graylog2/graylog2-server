@@ -17,9 +17,8 @@
 package org.graylog.plugins.views.search.rest;
 
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -45,6 +44,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.streams.StreamService;
 
@@ -61,10 +61,10 @@ import static com.google.common.collect.ImmutableSet.toImmutableSet;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsLast;
 import static org.graylog.plugins.views.search.ExplainResults.IndexRangeResult.fromIndexRange;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "Search/Validation", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Search/Validation")
 @Path("/search/validate")
 public class QueryValidationResource extends RestResource implements PluginRestResource {
 
@@ -86,10 +86,10 @@ public class QueryValidationResource extends RestResource implements PluginRestR
 
     @POST
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation("Validate a search query")
+    @Operation(summary = "Validate a search query")
     @NoAuditEvent("Only validating query structure, not changing any data")
     public ValidationResponseDTO validateQuery(
-            @ApiParam(name = "validationRequest") final ValidationRequestDTO validationRequest,
+            @io.swagger.v3.oas.annotations.Parameter(name = "validationRequest") final ValidationRequestDTO validationRequest,
             @Context final SearchUser searchUser
     ) {
         ValidationRequest request = prepareRequest(validationRequest, searchUser);
