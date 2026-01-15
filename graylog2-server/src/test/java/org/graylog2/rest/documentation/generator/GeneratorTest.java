@@ -23,8 +23,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.jayway.jsonpath.ReadContext;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
@@ -55,12 +55,12 @@ public class GeneratorTest {
                                  @JsonProperty("entity") SampleEntity entity,
                                  @JsonProperty("another_entity") SampleEntity anotherEntity) {}
 
-    @Api(value = "Sample", description = "An example REST resource")
+    @Tag(name = "Sample", description = "An example REST resource")
     @Path("/sample")
     public class SampleResource {
         @GET
         @Timed
-        @ApiOperation(value = "A few details about the Graylog node.")
+        @Operation(summary = "A few details about the Graylog node.")
         @Produces(MediaType.APPLICATION_JSON)
         public SampleResponse sample() {
             return null;
