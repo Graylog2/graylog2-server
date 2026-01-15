@@ -16,44 +16,21 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import EventListItem from 'components/events/bulk-replay/EventListItem';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import ReplaySearch from 'components/events/ReplaySearch';
 import type { Event } from 'components/events/events/types';
-import Button from 'components/bootstrap/Button';
 import Center from 'components/common/Center';
-import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
-import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
+import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
+import { Alert } from 'components/bootstrap';
+import type { ResolutionState } from 'contexts/EventReplaySelectedContext';
 
 const Container = styled.div`
   display: flex;
   height: 100%;
 `;
-
-const EventsListSidebar = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    flex-direction: column;
-
-    flex-shrink: 0;
-    position: relative;
-    width: 20vw;
-    height: 100%;
-    top: 0;
-    left: 0;
-    overflow: auto;
-    padding: 5px 10px;
-
-    background: ${theme.colors.global.contentBackground};
-    border-right: none;
-    box-shadow: 3px 3px 3px ${theme.colors.global.navigationBoxShadow};
-
-    z-index: 1030;
-  `,
-);
 
 const ReplayedSearchContainer = styled.div`
   width: 100%;
@@ -61,25 +38,9 @@ const ReplayedSearchContainer = styled.div`
   padding: 5px;
 `;
 
-const StyledList = styled.ul`
-  flex-grow: 1;
-  padding-inline-start: 0;
-  margin-top: 20px;
-`;
-
-const ActionsBar = styled(ButtonToolbar)`
-  align-self: flex-end;
-  display: flex;
-  justify-content: flex-end;
-  align-items: end;
-  gap: 0.25em;
-`;
-
 type Props = {
   initialEventIds: Array<string>;
   events: { [eventId: string]: { event: Event } };
-  onClose: () => void;
-  BulkActions: React.ComponentType<RemainingBulkActionsProps>;
 };
 
 const searchPageLayout: Partial<LayoutState> = {
@@ -89,92 +50,80 @@ const searchPageLayout: Partial<LayoutState> = {
   synchronizeUrl: false,
 } as const;
 
-const ReplayedSearch = ({
-  total,
-  completed,
+const AlertWrapper = ({ children = null }: React.PropsWithChildren) => (
+  <Alert bsStyle="info">
+    <Center>{children}</Center>
+  </Alert>
+);
+
+const InfoAlert = ({
+  eventIds,
   selectedEvent,
-}: React.PropsWithChildren<{
-  total: number;
-  completed: number;
-  selectedEvent: { event: Event } | undefined;
-}>) => {
+}: {
+  eventIds: Array<ResolutionState>;
+  selectedEvent: { event: Event };
+}) => {
+  const total = eventIds.length;
+  const completed = eventIds.filter((event) => event.status === 'DONE').length;
+
   if (total === 0) {
     return (
-      <Center>
+      <AlertWrapper>
         You have removed all events from the list. You can now return back by clicking the &ldquo;Close&rdquo; button.
-      </Center>
+      </AlertWrapper>
     );
   }
 
   if (!selectedEvent && total === completed) {
     return (
-      <Center>
+      <AlertWrapper>
         You are done reviewing all events. You can now select a bulk action to apply to all remaining events, or close
         the page to return to the events list.
-      </Center>
+      </AlertWrapper>
     );
   }
 
   if (!selectedEvent) {
-    return <Center>You have no event selected. Please select an event from the list to replay its search.</Center>;
+    return (
+      <AlertWrapper>
+        You have no event selected. Please select an event from the list to replay its search.
+      </AlertWrapper>
+    );
   }
 
+  return null;
+};
+
+const ReplayedSearch = ({
+  events: _events,
+}: React.PropsWithChildren<{
+  events: Props['events'];
+}>) => {
+  const [events] = useState<Props['events']>(_events);
+  const { eventIds, selectedId } = useSelectedEvents();
+  const selectedEvent = events?.[selectedId];
+
   return (
-    <ReplaySearch
-      key={`replaying-search-for-event-${selectedEvent.event.id}`}
-      alertId={selectedEvent.event.id}
-      definitionId={selectedEvent.event.event_definition_id}
-      searchPageLayout={searchPageLayout}
-    />
+    <>
+      <InfoAlert eventIds={eventIds} selectedEvent={selectedEvent} />
+      <ReplaySearch
+        key={`replaying-search-for-event-${selectedEvent?.event?.id}`}
+        alertId={selectedEvent?.event?.id}
+        definitionId={selectedEvent?.event?.event_definition_id}
+        searchPageLayout={searchPageLayout}
+      />
+    </>
   );
 };
 
-const Headline = styled.h2`
-  margin-bottom: 10px;
-`;
-
-const BulkEventReplay = ({ initialEventIds, events: _events, onClose, BulkActions }: Props) => {
-  const [events] = useState<Props['events']>(_events);
-  const { eventIds, selectedId, removeItem, selectItem, markItemAsDone } = useSelectedEvents(initialEventIds);
-  const selectedEvent = events?.[selectedId];
-  const total = eventIds.length;
-  const completed = eventIds.filter((event) => event.status === 'DONE').length;
-  const remainingEvents = eventIds.map((eventId) => events[eventId.id]?.event);
-
-  return (
+const BulkEventReplay = ({ initialEventIds, events }: Props) => (
+  <EventReplaySelectedProvider initialEventIds={initialEventIds}>
     <Container>
-      <EventsListSidebar>
-        <Headline>Replay Search</Headline>
-        <p>
-          The following list contains all of the events/alerts you selected in the previous step, allowing you to review
-          the replayed search for each of them.
-        </p>
-        <i>
-          Review of {completed}/{total} events completed.
-        </i>
-        <StyledList>
-          {eventIds.map(({ id: eventId, status }) => (
-            <EventListItem
-              key={`bulk-replay-search-item-${eventId}`}
-              event={events?.[eventId]?.event}
-              selected={eventId === selectedId}
-              done={status === 'DONE'}
-              removeItem={removeItem}
-              onClick={() => selectItem(eventId)}
-              markItemAsDone={markItemAsDone}
-            />
-          ))}
-        </StyledList>
-        <ActionsBar>
-          <BulkActions events={remainingEvents} completed={total > 0 && total === completed} />
-          <Button onClick={onClose}>Close</Button>
-        </ActionsBar>
-      </EventsListSidebar>
       <ReplayedSearchContainer>
-        <ReplayedSearch total={total} completed={completed} selectedEvent={selectedEvent} />
+        <ReplayedSearch events={events} />
       </ReplayedSearchContainer>
     </Container>
-  );
-};
+  </EventReplaySelectedProvider>
+);
 
 export default BulkEventReplay;

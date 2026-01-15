@@ -33,7 +33,7 @@ type EventListItemProps = {
 type StyledItemProps = {
   $selected: boolean;
 };
-const StyledItem = styled.li<StyledItemProps>(
+const StyledItem = styled.div<StyledItemProps>(
   ({ theme, $selected }) => css`
     display: flex;
     align-items: center;
@@ -41,6 +41,8 @@ const StyledItem = styled.li<StyledItemProps>(
     height: 30px;
     background-color: ${$selected ? theme.colors.background.secondaryNav : 'transparent'};
     cursor: pointer;
+    max-width: 400px;
+    position: relative;
 
     &:hover {
       background-color: ${theme.colors.background.body};
