@@ -17,9 +17,10 @@
 package org.graylog2.rest.resources.streams;
 
     import com.codahale.metrics.annotation.Timed;
-    import io.swagger.annotations.Api;
-    import io.swagger.annotations.ApiOperation;
-    import io.swagger.annotations.ApiParam;
+    import io.swagger.v3.oas.annotations.Operation;
+    import io.swagger.v3.oas.annotations.Parameter;
+    import io.swagger.v3.oas.annotations.media.Schema;
+    import io.swagger.v3.oas.annotations.tags.Tag;
     import jakarta.inject.Inject;
     import jakarta.validation.constraints.NotBlank;
     import jakarta.ws.rs.DefaultValue;
@@ -48,6 +49,7 @@ package org.graylog2.rest.resources.streams;
     import org.graylog2.rest.resources.streams.responses.StreamPipelineRulesResponse;
     import org.graylog2.rest.resources.streams.responses.StreamReference;
     import org.graylog2.search.SearchQueryField;
+    import org.graylog2.shared.rest.PublicCloudAPI;
     import org.graylog2.shared.rest.resources.RestResource;
     import org.graylog2.streams.StreamService;
 
@@ -56,10 +58,9 @@ package org.graylog2.rest.resources.streams;
     import java.util.Objects;
     import java.util.stream.Stream;
 
-    import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @RequiresAuthentication
-@Api(value = "Stream/RoutingRules", description = "Stream routing with pipeline rules", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Stream/RoutingRules", description = "Stream routing with pipeline rules")
 @Path("/routing_rules")
 public class StreamPipelineRulesResource extends RestResource {
     private static final String ATTRIBUTE_PIPELINE_RULE = "rule";
@@ -100,20 +101,21 @@ public class StreamPipelineRulesResource extends RestResource {
     @GET
     @Timed
     @Path("/paginated/{streamId}")
-    @ApiOperation(value = "Get a paginated list of associated pipeline rules for the specified stream")
+    @Operation(summary = "Get a paginated list of associated pipeline rules for the specified stream")
     @Produces(MediaType.APPLICATION_JSON)
     public PageListResponse<StreamPipelineRulesResponse> getPage(
-            @ApiParam(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
-            @ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-            @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-            @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-            @ApiParam(name = "filters") @QueryParam("filters") List<String> filters, // currently unused
-            @ApiParam(name = "sort",
-                      value = "The field to sort the result on",
-                      required = true,
-                      allowableValues = ATTRIBUTE_PIPELINE_RULE + "," + ATTRIBUTE_PIPELINE + "," + ATTRIBUTE_CONNECTED_STREAM)
+            @Parameter(name = "streamId", required = true) @PathParam("streamId") @NotBlank String streamId,
+            @Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+            @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+            @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+            @Parameter(name = "filters") @QueryParam("filters") List<String> filters, // currently unused
+            @Parameter(name = "sort",
+                       description = "The field to sort the result on",
+                       required = true,
+                       schema = @Schema(allowableValues = {ATTRIBUTE_PIPELINE_RULE + "," + ATTRIBUTE_PIPELINE + "," + ATTRIBUTE_CONNECTED_STREAM}))
             @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
-            @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+            @Parameter(name = "order", description = "The sort direction",
+                       schema = @Schema(allowableValues = {"asc", "desc"}))
             @DefaultValue(DEFAULT_SORT_DIRECTION) @QueryParam("order") SortOrder order) {
 
         // Pagination is primarily for UX purposes - OK to fetch all and then paginate in memory
