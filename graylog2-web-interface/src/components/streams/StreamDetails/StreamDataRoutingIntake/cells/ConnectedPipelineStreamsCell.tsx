@@ -30,12 +30,10 @@ const ConnectedPipelineStreamsCell = ({ streams }: Props) => {
   return (
     <>
       {streams.map((stream, index) => (
-        <>
-          <Link key={stream.id} to={Routes.stream_view(stream.id)}>
-            {stream.title}
-          </Link>
+        <span key={stream.id}>
+          <Link to={Routes.stream_view(stream.id)}>{stream.title}</Link>
           {index !== streams.length - 1 && ', '}
-        </>
+        </span>
       ))}
     </>
   );
