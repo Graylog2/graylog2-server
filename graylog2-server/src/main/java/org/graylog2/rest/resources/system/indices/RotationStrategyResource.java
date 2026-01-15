@@ -20,9 +20,11 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -38,19 +40,17 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.rest.models.system.indices.RotationStrategies;
 import org.graylog2.rest.models.system.indices.RotationStrategyDescription;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "System/Indices/Rotation", description = "Index rotation strategy settings", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Indices/Rotation", description = "Index rotation strategy settings")
 @Path("/system/indices/rotation")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -74,8 +74,8 @@ public class RotationStrategyResource extends RestResource {
     @GET
     @Path("strategies")
     @Timed
-    @ApiOperation(value = "List available rotation strategies",
-                  notes = "This resource returns a list of all available rotation strategies on this Graylog node.")
+    @Operation(summary = "List available rotation strategies",
+                  description = "This resource returns a list of all available rotation strategies on this Graylog node.")
     public RotationStrategies list() {
         final List<RotationStrategyDescription> strategies = rotationStrategies.keySet()
                 .stream()
@@ -92,9 +92,9 @@ public class RotationStrategyResource extends RestResource {
     @GET
     @Path("strategies/{strategy}")
     @Timed
-    @ApiOperation(value = "Show JSON schema for configuration of given rotation strategies",
-                  notes = "This resource returns a JSON schema for the configuration of the given rotation strategy.")
-    public RotationStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the rotation strategy", required = true)
+    @Operation(summary = "Show JSON schema for configuration of given rotation strategies",
+                  description = "This resource returns a JSON schema for the configuration of the given rotation strategy.")
+    public RotationStrategyDescription configSchema(@Parameter(name = "strategy", description = "The name of the rotation strategy", required = true)
                                                     @PathParam("strategy") @NotEmpty String strategyName) {
         return getRotationStrategyDescription(strategyName);
     }

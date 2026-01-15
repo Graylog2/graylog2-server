@@ -21,8 +21,8 @@ import com.codahale.metrics.jvm.ThreadDump;
 import com.eaio.uuid.UUID;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.plugin.ServerStatus;
@@ -54,7 +54,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @RequiresAuthentication
-@Api(value = "System", description = "System information of this node.")
+@Tag(name = "System", description = "System information of this node.")
 @Path("/system")
 @Produces(MediaType.APPLICATION_JSON)
 public class SystemResource extends RestResource {
@@ -73,7 +73,7 @@ public class SystemResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get system overview")
+    @Operation(summary = "Get system overview")
     public SystemOverviewResponse system() {
         checkPermission(RestPermissions.SYSTEM_READ, serverStatus.getNodeId().toString());
 
@@ -94,7 +94,7 @@ public class SystemResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Get JVM information")
+    @Operation(summary = "Get JVM information")
     @Path("/jvm")
     @Timed
     public SystemJVMResponse jvm() {
@@ -113,7 +113,7 @@ public class SystemResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get a thread dump")
+    @Operation(summary = "Get a thread dump")
     @Path("/threaddump")
     public SystemThreadDumpResponse threaddump() {
         checkPermission(RestPermissions.THREADS_DUMP, serverStatus.getNodeId().toString());
@@ -129,7 +129,7 @@ public class SystemResource extends RestResource {
     @GET
     @Path("/processbufferdump")
     @Timed
-    @ApiOperation(value = "Get a process buffer dump")
+    @Operation(summary = "Get a process buffer dump")
     public SystemProcessBufferDumpResponse processBufferDump() {
         checkPermission(RestPermissions.PROCESSBUFFER_DUMP, serverStatus.getNodeId().toString());
         return SystemProcessBufferDumpResponse.create(processBuffer.getDump());
@@ -139,14 +139,14 @@ public class SystemResource extends RestResource {
     @Path("/threaddump")
     @Produces(MediaType.TEXT_PLAIN)
     @Timed
-    @ApiOperation(value = "Get a thread dump as plain text")
+    @Operation(summary = "Get a thread dump as plain text")
     public StreamingOutput threadDumpAsText() {
         checkPermission(RestPermissions.THREADS_DUMP, serverStatus.getNodeId().toString());
         return output -> new ThreadDump(ManagementFactory.getThreadMXBean()).dump(output);
     }
 
     @GET
-    @ApiOperation(value = "Get supported locales")
+    @Operation(summary = "Get supported locales")
     @Path("/locales")
     @Timed
     public LocalesResponse locales() {

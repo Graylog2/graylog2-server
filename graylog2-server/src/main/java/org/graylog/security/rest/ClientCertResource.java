@@ -16,9 +16,9 @@
  */
 package org.graylog.security.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -38,18 +38,18 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.bootstrap.preflight.web.resources.model.CreateClientCertRequest;
 import org.graylog2.plugin.certificates.RenewalPolicy;
 import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import java.io.IOException;
 import java.time.Duration;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
-
 @Path("/ca/clientcert")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
-@Api(value = "Client Certificates", description = "Certificate Authority Client Certificates", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Client Certificates", description = "Certificate Authority Client Certificates")
 public class ClientCertResource extends RestResource {
     private final ClientCertGenerator clientCertGenerator;
 
@@ -60,10 +60,10 @@ public class ClientCertResource extends RestResource {
 
     @POST
     @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_CREATE)
-    @ApiOperation("Creates a client certificate")
+    @Operation(summary = "Creates a client certificate")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_CREATE)
-    public Response createClientCert(@ApiParam(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
+    public Response createClientCert(@Parameter(name = "request", required = true) @NotNull @Valid CreateClientCertRequest request) {
         try {
             final Duration certificateLifetime = certificateLifetime(request);
             var cert = clientCertGenerator.generateClientCert(request.principal(), request.roles(), request.password(), certificateLifetime);
@@ -81,10 +81,10 @@ public class ClientCertResource extends RestResource {
     @DELETE
     @Path("{role}/{principal}")
     @AuditEvent(type = CaAuditEventTypes.CLIENTCERT_DELETE)
-    @ApiOperation("removes the cert and the user from the role")
+    @Operation(summary = "removes the cert and the user from the role")
     @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.GRAYLOG_CA_CLIENTCERT_DELETE)
-    public Response deleteClientCert(@ApiParam(name = "role", required = true) @PathParam("role") String role, @ApiParam(name = "principal", required = true) @PathParam("principal") String principal) {
+    public Response deleteClientCert(@Parameter(name = "role", required = true) @PathParam("role") String role, @Parameter(name = "principal", required = true) @PathParam("principal") String principal) {
         try {
             clientCertGenerator.removeCertFor(role, principal);
             return Response.ok().build();
