@@ -108,7 +108,7 @@ export const getEntityRoute = (
     return pluginRoute(id);
   }
 
-  return assertUnreachable((type as never) ?? '(undefined)', "Can't find route for type");
+  return assertUnreachable(type as never, "Can't find route for type");
 };
 
 export const usePluginEntityTypeGenerators = () => {
@@ -124,7 +124,13 @@ const useShowRouteForEntity = (id: string, type: string) => {
   const pluginEntityRoutesResolver = usePluginEntities('entityRoutes');
   const entityTypeGenerators = usePluginEntityTypeGenerators();
 
-  return getEntityRoute(id, type, pluginEntityRoutesResolver, entityTypeGenerators);
+  try {
+    return getEntityRoute(id, type, pluginEntityRoutesResolver, entityTypeGenerators);
+  } catch (e) {
+    console.warn(e);
+
+    return null;
+  }
 };
 
 export default useShowRouteForEntity;
