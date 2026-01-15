@@ -105,4 +105,37 @@ describe('InputStateControl', () => {
 
     expect(await screen.findByRole('button', { name: /stop input/i })).toBeInTheDocument();
   });
+
+  it('shows start after stopping an input instead of setup', async () => {
+    const runningStates: InputStates = {
+      [baseInput.id]: {
+        node1: {
+          id: baseInput.id,
+          state: 'RUNNING',
+          detailed_message: null,
+          message_input: {
+            title: baseInput.title,
+            global: baseInput.global,
+            name: baseInput.name,
+            content_pack: '',
+            id: baseInput.id,
+            created_at: baseInput.created_at,
+            type: baseInput.type,
+            creator_user_id: baseInput.creator_user_id,
+            attributes: baseInput.attributes,
+            static_fields: baseInput.static_fields,
+            node: baseInput.node,
+          },
+        },
+      },
+    };
+
+    const { rerender } = renderSUT(runningStates);
+
+    expect(await screen.findByRole('button', { name: /stop input/i })).toBeInTheDocument();
+
+    rerender(<InputStateControl input={baseInput} inputStates={{}} openWizard={jest.fn()} />);
+
+    expect(await screen.findByRole('button', { name: /start input/i })).toBeInTheDocument();
+  });
 });
