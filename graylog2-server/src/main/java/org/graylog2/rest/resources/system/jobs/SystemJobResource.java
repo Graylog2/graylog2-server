@@ -47,6 +47,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.scheduler.rest.JobResourceHandlerService;
+import org.graylog.scheduler.system.SystemJob;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog.security.UserContext;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -55,11 +57,11 @@ import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.models.system.jobs.requests.TriggerRequest;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.jobs.LegacySystemJob;
+import org.graylog2.system.jobs.LegacySystemJobFactory;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.graylog2.system.jobs.NoSuchJobException;
-import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobFactory;
-import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,10 +102,10 @@ public class SystemJobResource extends RestResource {
     public Map<String, List<SystemJobSummary>> list() {
         final List<SystemJobSummary> jobs = Lists.newArrayListWithCapacity(systemJobManager.getRunningJobs().size());
 
-        for (Map.Entry<String, SystemJob> entry : systemJobManager.getRunningJobs().entrySet()) {
+        for (Map.Entry<String, SystemJob> entry : legacySystemJobManager.getRunningJobs().entrySet()) {
             // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, entry.getKey())) {
-                final SystemJob systemJob = entry.getValue();
+                final LegacySystemJob systemJob = entry.getValue();
                 jobs.add(SystemJobSummary.create(
                         systemJob.getId(),
                         systemJob.getDescription(),
