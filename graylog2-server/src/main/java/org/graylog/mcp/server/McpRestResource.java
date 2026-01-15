@@ -19,9 +19,9 @@ package org.graylog.mcp.server;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.modelcontextprotocol.spec.McpSchema;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
@@ -41,6 +41,7 @@ import org.graylog.mcp.tools.PermissionHelper;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.SkipCSRFProtection;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -52,11 +53,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
 @Path("/mcp")
-@Api(value = "MCP", description = "Endpoints allowing MCP clients to connect to", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "MCP", description = "Endpoints allowing MCP clients to connect to")
 public class McpRestResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(McpRestResource.class);
     private static final String HEADER_MCP_SESSION_ID = "Mcp-Session-Id";
@@ -84,12 +85,12 @@ public class McpRestResource extends RestResource {
     @SkipCSRFProtection("server-to-server")
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("Has custom audit events")
-    @ApiOperation("JSON-RPC endpoint for MCP clients to connect to")
+    @Operation(summary = "JSON-RPC endpoint for MCP clients to connect to")
     public Response post(@HeaderParam(HttpHeaders.ACCEPT) String acceptHeader,
                          @HeaderParam(HEADER_MCP_PROTOCOL_VERSION) String protocolVersionHeader,
                          @HeaderParam(HEADER_MCP_SESSION_ID) String mcpSessionIdHeader,
                          @Context SearchUser searchUser,
-                         @ApiParam(value = "jsonrpc_message", required = true) JsonNode payload) throws IOException {
+                         @Parameter(name = "jsonrpc_message", required = true) JsonNode payload) throws IOException {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
                 McpConfiguration.DEFAULT_VALUES);
         if (!mcpConfig.enableRemoteAccess()) {
@@ -172,7 +173,7 @@ public class McpRestResource extends RestResource {
     @SkipCSRFProtection("server-to-server")
     @RequiresPermissions(RestPermissions.MCP_SERVER_ACCESS)
     @NoAuditEvent("prototype")
-    @ApiOperation("Unused endpoint for MCP protocol compatibility")
+    @Operation(summary = "Unused endpoint for MCP protocol compatibility")
     public Response get() {
         final McpConfiguration mcpConfig = clusterConfig.getOrDefault(McpConfiguration.class,
                 McpConfiguration.DEFAULT_VALUES);
