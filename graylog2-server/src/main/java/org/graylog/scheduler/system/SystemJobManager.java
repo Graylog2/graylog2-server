@@ -86,7 +86,7 @@ public class SystemJobManager {
     private SystemJobSummary toSystemJobInfo(JobTriggerDto trigger) {
         final var data = trigger.data()
                 .map(SystemJobConfig.class::cast)
-                // This must not be any system job without data.
+                // System jobs must always have data.
                 .orElseThrow(() -> new IllegalStateException("System job trigger " + trigger.id() + " has no associated config"));
         final var info = data.toInfo();
 
