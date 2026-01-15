@@ -17,9 +17,10 @@
 package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -40,16 +41,17 @@ import org.graylog2.rest.models.system.urlallowlist.AllowlistCheckRequest;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistCheckResponse;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationRequest;
 import org.graylog2.rest.models.system.urlallowlist.AllowlistRegexGenerationResponse;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.urlallowlist.RegexHelper;
 import org.graylog2.system.urlallowlist.UrlAllowlist;
 import org.graylog2.system.urlallowlist.UrlAllowlistService;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
 @RequiresAuthentication
-@Api(value = "System/UrlAllowlist", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/UrlAllowlist")
 @Path("/system/urlallowlist")
 @Produces(MediaType.APPLICATION_JSON)
 public class UrlAllowlistResource extends RestResource {
@@ -65,7 +67,7 @@ public class UrlAllowlistResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get url allowlist.")
+    @Operation(summary = "Get url allowlist.")
     @RequiresPermissions(RestPermissions.URL_ALLOWLIST_READ)
     public UrlAllowlist get() {
         checkPermission(RestPermissions.URL_ALLOWLIST_READ);
@@ -74,11 +76,11 @@ public class UrlAllowlistResource extends RestResource {
 
     @PUT
     @Timed
-    @ApiOperation(value = "Update url allowlist.")
+    @Operation(summary = "Update url allowlist.")
     @AuditEvent(type = AuditEventTypes.URL_ALLOWLIST_UPDATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.URL_ALLOWLIST_WRITE)
-    public Response put(@ApiParam(name = "allowlist", required = true) @NotNull final UrlAllowlist allowlist) {
+    public Response put(@Parameter(name = "allowlist", required = true) @NotNull final UrlAllowlist allowlist) {
         urlAllowlistService.saveAllowlist(allowlist);
         return Response.noContent().build();
     }
@@ -86,11 +88,11 @@ public class UrlAllowlistResource extends RestResource {
     @POST
     @Path("/check")
     @Timed
-    @ApiOperation(value = "Check if a url is allowlisted.")
+    @Operation(summary = "Check if a url is allowlisted.")
     @NoAuditEvent("Validation only")
     @Consumes(MediaType.APPLICATION_JSON)
     // Checking can be done without any special permission.
-    public AllowlistCheckResponse check(@ApiParam(name = "JSON body", required = true)
+    public AllowlistCheckResponse check(@RequestBody(required = true)
                                         @Valid @NotNull final AllowlistCheckRequest checkRequest) {
         final boolean isAllowlisted = urlAllowlistService.isAllowlisted(checkRequest.url());
         return AllowlistCheckResponse.create(checkRequest.url(), isAllowlisted);
@@ -99,10 +101,10 @@ public class UrlAllowlistResource extends RestResource {
     @POST
     @Path("/generate_regex")
     @Timed
-    @ApiOperation(value = "Generates a regex that can be used as a value for a allowlist entry.")
+    @Operation(summary = "Generates a regex that can be used as a value for a allowlist entry.")
     @NoAuditEvent("Utility function only.")
     @Consumes(MediaType.APPLICATION_JSON)
-    public AllowlistRegexGenerationResponse generateRegex(@ApiParam(name = "JSON body", required = true)
+    public AllowlistRegexGenerationResponse generateRegex(@RequestBody(required = true)
                                                           @Valid @NotNull final AllowlistRegexGenerationRequest generationRequest) {
         final String regex;
         if (generationRequest.placeholder() == null) {
