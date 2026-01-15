@@ -17,8 +17,8 @@
 import * as React from 'react';
 import { render, screen, act } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
-import type { InputTypeDescriptionsResponse } from 'src/hooks/useInputTypesDescriptions';
 
+import type { InputTypeDescriptionsResponse } from 'hooks/useInputTypesDescriptions';
 import mockComponent from 'helpers/mocking/MockComponent';
 import useInputsStates from 'hooks/useInputsStates';
 import { mockInputStates } from 'fixtures/inputs';

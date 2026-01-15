@@ -17,7 +17,11 @@
 import { useEffect, useMemo } from 'react';
 
 import { ConfigurationType } from 'components/configurations/ConfigurationTypes';
-import { ConfigurationsActions, ConfigurationsStore, type PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
+import {
+  ConfigurationsActions,
+  ConfigurationsStore,
+  type PasswordComplexityConfigType,
+} from 'stores/configurations/ConfigurationsStore';
 import { getConfig } from 'components/configurations/helpers';
 import { useStore } from 'stores/connect';
 import type { Store } from 'stores/StoreTypes';
