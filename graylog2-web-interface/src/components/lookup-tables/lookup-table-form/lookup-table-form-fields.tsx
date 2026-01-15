@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useEffect, useMemo } from 'react';
 import { useFormikContext } from 'formik';
 import styled, { css } from 'styled-components';
 
@@ -42,12 +43,12 @@ function LookupTableFormFields() {
   const { setFieldValue, setFieldTouched, touched, values, errors } = useFormikContext<LookupTableType>();
   const { loadingScopePermissions, scopePermissions } = useScopePermissions(values);
 
-  const canModify = React.useMemo(
+  const canModify = useMemo(
     () => !values.id || (!loadingScopePermissions && scopePermissions?.is_mutable),
     [values.id, loadingScopePermissions, scopePermissions?.is_mutable],
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setFieldValue('enable_single_value', !!values.default_single_value);
     setFieldValue('enable_multi_value', !!values.default_multi_value);
   }, [values.default_single_value, values.default_multi_value, setFieldValue]);

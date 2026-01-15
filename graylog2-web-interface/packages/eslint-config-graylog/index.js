@@ -109,7 +109,7 @@ export default [
       'no-await-in-loop': 'error',
       'no-loop-func': 'error',
 
-      'import/prefer-default-export': 'error',
+      'import/prefer-default-export': 'off',
       'jsx-a11y/control-has-associated-label': 'error',
       'react/no-array-index-key': 'error',
       'react/no-danger': 'error',
@@ -272,7 +272,8 @@ export default [
         {
           object: 'fireEvent',
           property: 'submit',
-          message: 'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
+          message:
+            'Submit the form through user interactions (e.g. userEvent.click on the submit button) instead of fireEvent.submit.',
         },
       ],
       'testing-library/render-result-naming-convention': 'off',

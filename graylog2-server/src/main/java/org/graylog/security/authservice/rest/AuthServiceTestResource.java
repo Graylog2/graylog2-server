@@ -16,9 +16,17 @@
  */
 package org.graylog.security.authservice.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.security.authservice.AuthServiceBackendDTO;
@@ -30,21 +38,10 @@ import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
-import jakarta.inject.Inject;
-
-import jakarta.validation.constraints.NotNull;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-
 @Path("/system/authentication/services/test")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "System/Authentication/Services/Test", description = "Test authentication services")
+@Tag(name = "System/Authentication/Services/Test", description = "Test authentication services")
 @RequiresAuthentication
 public class AuthServiceTestResource extends RestResource {
     private final AuthServiceBackendTestService testService;
@@ -56,10 +53,10 @@ public class AuthServiceTestResource extends RestResource {
 
     @POST
     @Path("backend/connection")
-    @ApiOperation("Test authentication service backend connection")
+    @Operation(summary = "Test authentication service backend connection")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_TEST_BACKEND_EXECUTE)
     @NoAuditEvent("Test resource - doesn't change any data")
-    public Response backendConnection(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendTestRequest request) {
+    public Response backendConnection(@RequestBody(required = true) @NotNull AuthServiceBackendTestRequest request) {
         // We do NOT validate the backend configuration in the request here to make it possible to execute the
         // connection test with partial configuration data. This is needed in the UI when using a step-based wizard
         // and already wants to test the connection before having the user enter the complete configuration.
@@ -68,10 +65,10 @@ public class AuthServiceTestResource extends RestResource {
 
     @POST
     @Path("backend/login")
-    @ApiOperation("Test authentication service backend login")
+    @Operation(summary = "Test authentication service backend login")
     @RequiresPermissions(RestPermissions.AUTH_SERVICE_TEST_BACKEND_EXECUTE)
     @NoAuditEvent("Test resource - doesn't change any data")
-    public Response backendLogin(@ApiParam(name = "JSON body", required = true) @NotNull AuthServiceBackendTestRequest request) {
+    public Response backendLogin(@RequestBody(required = true) @NotNull AuthServiceBackendTestRequest request) {
         validateConfig(request.backendConfiguration());
 
         return Response.ok(testService.testLogin(request)).build();

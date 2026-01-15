@@ -15,5 +15,4 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 
-// eslint-disable-next-line import/prefer-default-export
 export const isMacOS = () => /Macintosh|MacIntel/.test(navigator.userAgent);

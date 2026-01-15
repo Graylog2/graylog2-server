@@ -23,9 +23,11 @@ import com.fasterxml.jackson.module.jsonSchema.jakarta.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.factories.SchemaFactoryWrapper;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.types.ObjectSchema;
 import com.fasterxml.jackson.module.jsonSchema.jakarta.types.StringSchema;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.inject.Provider;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -40,12 +42,10 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.rest.models.system.indices.RetentionStrategies;
 import org.graylog2.rest.models.system.indices.RetentionStrategyDescription;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 
 import java.util.Locale;
 import java.util.Map;
@@ -54,9 +54,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 
-@Api(value = "System/Indices/Retention", description = "Index retention strategy settings", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "System/Indices/Retention", description = "Index retention strategy settings")
 @Path("/system/indices/retention")
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
@@ -79,8 +79,8 @@ public class RetentionStrategyResource extends RestResource {
     @GET
     @Path("strategies")
     @Timed
-    @ApiOperation(value = "List available retention strategies",
-                  notes = "This resource returns a list of all available retention strategies on this Graylog node.")
+    @Operation(summary = "List available retention strategies",
+                  description = "This resource returns a list of all available retention strategies on this Graylog node.")
     public RetentionStrategies list() {
         final Set<RetentionStrategyDescription> strategies = retentionStrategies.keySet()
                 .stream()
@@ -96,14 +96,14 @@ public class RetentionStrategyResource extends RestResource {
     @GET
     @Path("strategies/{strategy}")
     @Timed
-    @ApiOperation(value = "Show JSON schema for configuration of given retention strategies",
-                  notes = "This resource returns a JSON schema for the configuration of the given retention strategy.")
-    public RetentionStrategyDescription configSchema(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true)
+    @Operation(summary = "Show JSON schema for configuration of given retention strategies",
+                  description = "This resource returns a JSON schema for the configuration of the given retention strategy.")
+    public RetentionStrategyDescription configSchema(@Parameter(name = "strategy", description = "The name of the retention strategy", required = true)
                                                      @PathParam("strategy") @NotEmpty String strategyName) {
         return getRetentionStrategyDescription(strategyName);
     }
 
-    private RetentionStrategyDescription getRetentionStrategyDescription(@ApiParam(name = "strategy", value = "The name of the retention strategy", required = true) @PathParam("strategy") @NotEmpty String strategyName) {
+    private RetentionStrategyDescription getRetentionStrategyDescription(@Parameter(name = "strategy", description = "The name of the retention strategy", required = true) @PathParam("strategy") @NotEmpty String strategyName) {
         final Provider<RetentionStrategy> provider = retentionStrategies.get(strategyName);
         if (provider == null) {
             throw new NotFoundException("Couldn't find retention strategy for given type " + strategyName);
