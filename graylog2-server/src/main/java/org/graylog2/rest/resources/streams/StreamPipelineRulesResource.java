@@ -112,7 +112,7 @@ public class StreamPipelineRulesResource extends RestResource {
             @Parameter(name = "sort",
                        description = "The field to sort the result on",
                        required = true,
-                       schema = @Schema(allowableValues = {ATTRIBUTE_PIPELINE_RULE + "," + ATTRIBUTE_PIPELINE + "," + ATTRIBUTE_CONNECTED_STREAM}))
+                       schema = @Schema(allowableValues = {"rule", "pipeline", "connected_streams"}))
             @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sort,
             @Parameter(name = "order", description = "The sort direction",
                        schema = @Schema(allowableValues = {"asc", "desc"}))
