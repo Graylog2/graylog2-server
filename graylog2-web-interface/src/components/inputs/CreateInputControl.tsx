@@ -155,7 +155,7 @@ const CreateInputControl = () => {
     return {
       id: createdInputId,
       title: createdInputData.title,
-      type: selectedInput,
+      type: createdInputData.type,
       attributes: createdInputData.configuration,
       global: createdInputData.global || false,
       node: createdInputData.node || null,
