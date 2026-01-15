@@ -203,7 +203,7 @@ public class SystemJobResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.SYSTEM_JOB_STOP)
     public SystemJobSummary cancel(@Parameter(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) {
-        SystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
+        LegacySystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
         if (systemJob == null) {
             throw new NotFoundException("No system job with ID <" + jobId + "> found");
         }
