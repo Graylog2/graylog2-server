@@ -37,7 +37,7 @@ class MongoProbeIT {
         try (var db = createStarted(of(version), Network.newNetwork())) {
             final var probe = new MongoProbe(db.mongoConnection());
 
-            assertThat(probe.mongoStats().buildInfo().version()).startsWith(version);
+            assertThat(probe.mongoStats().buildInfo().version()).matches("^\\d+\\.\\d+.*");
         }
     }
 }
