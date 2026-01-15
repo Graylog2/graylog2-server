@@ -71,7 +71,7 @@ public class SystemJobManager {
     public List<SystemJobSummary> getRunningJobs(NodeId nodeId) {
         return getJobsByQuery(
                 Filters.and(
-                        Filters.eq(JobTriggerDto.lockOwnerField(), nodeId.getNodeId()),
+                        Filters.eq(JobTriggerDto.FIELD_LOCK_OWNER, nodeId.getNodeId()),
                         Filters.eq(JobTriggerDto.FIELD_STATUS, JobTriggerStatus.RUNNING)
                 )
         );
