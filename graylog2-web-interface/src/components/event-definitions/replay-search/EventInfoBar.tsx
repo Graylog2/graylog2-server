@@ -29,6 +29,7 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   user-select: none;
+  justify-content: space-between;
   gap: 5px;
 `;
 
@@ -68,6 +69,7 @@ const EventInfoBar = () => {
     <MainContainer>
       <FlatContentRow>
         <Header>
+          <InfoBarBulkEventReplay />
           <Button bsStyle="link" className="btn-text" bsSize="xsmall" onClick={toggleOpen}>
             <Icon name={`arrow_${open ? 'drop_down' : 'right'}`} />
             &nbsp;
@@ -76,9 +78,6 @@ const EventInfoBar = () => {
         </Header>
         {open && (
           <Container data-testid="info-container">
-            <Row>
-              <InfoBarBulkEventReplay />
-            </Row>
             <Row>
               {infoAttributes.map(
                 ({ title, content, show }) =>
