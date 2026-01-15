@@ -32,7 +32,7 @@ import static org.graylog.testing.mongodb.MongoDBVersion.of;
  */
 class MongoProbeIT {
     @ParameterizedTest
-    @ValueSource(strings = {"7.0", "8.0", "8.2"})
+    @ValueSource(strings = {"7.0", "8.0", "8.2", "latest"})
     void testVersion(String version) {
         try (var db = createStarted(of(version), Network.newNetwork())) {
             final var probe = new MongoProbe(db.mongoConnection());
