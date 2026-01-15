@@ -18,10 +18,7 @@ import * as React from 'react';
 
 import { FormikInput } from 'components/common';
 import { Row, Col, Input } from 'components/bootstrap';
-import {
-  DEFAULT_PASSWORD_COMPLEXITY_CONFIG,
-  passwordComplexityErrors,
-} from 'logic/users/passwordComplexity';
+import { DEFAULT_PASSWORD_COMPLEXITY_CONFIG, passwordComplexityErrors } from 'logic/users/passwordComplexity';
 import type { PasswordComplexityConfigType } from 'stores/configurations/ConfigurationsStore';
 import PasswordRules from 'components/users/PasswordRules';
 import usePasswordHelpText from 'components/users/usePasswordHelpText';
