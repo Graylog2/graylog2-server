@@ -89,7 +89,7 @@ const List = ({ filter, activeQueryFields, allFields, currentGroup }: Props) => 
     ? (field: { name: string }) => field.name.toLocaleUpperCase().includes(filter.toLocaleUpperCase())
     : () => true;
   const fieldsToShow = _fieldsToShow(activeQueryFields, allFields, currentGroup);
-  const fieldList = fieldsToShow.filter(fieldFilter).sortBy((field) => field.name.toLocaleUpperCase());
+  const fieldList = fieldsToShow.filter(fieldFilter).sortBy((field) => field.name.toLocaleUpperCase()).toList();
 
   if (fieldList.isEmpty()) {
     return <i>No fields to show. Try changing your filter term or select a different field set above.</i>;
