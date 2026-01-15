@@ -14,7 +14,8 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState, useCallback } from 'react';
 
 import UsersDomain from 'domainActions/users/UsersDomain';
 import useCurrentUser from 'hooks/useCurrentUser';
@@ -24,6 +25,7 @@ import SectionComponent from 'components/common/Section/SectionComponent';
 import type User from 'logic/users/User';
 import { CurrentUserStore } from 'stores/users/CurrentUserStore';
 import TelemetrySettingsConfig from 'logic/telemetry/TelemetrySettingsConfig';
+import type { UserUpdate } from 'stores/users/UsersStore';
 
 import ReadOnlyWarning from './ReadOnlyWarning';
 import SettingsSection from './SettingsSection';
@@ -41,16 +43,18 @@ type Props = {
   user: User;
 };
 
-const _updateUser = (data, currentUser, userId, fullName) =>
-  UsersDomain.update(userId, data, fullName).then(() => {
-    if (userId === currentUser?.id) {
-      CurrentUserStore.reload();
-    }
-  });
-
 const UserEdit = ({ user }: Props) => {
   const currentUser = useCurrentUser();
-  const [selectedSegment, useSelectedSegment] = useState<UserSegment>('profile');
+  const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
+  const updateUser = useCallback(
+    (data: UserUpdate) => UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName)
+        .then(() => {
+          if (user.id === currentUser?.id) {
+            CurrentUserStore.reload();
+          }
+        }),
+    [user, currentUser?.id]
+  );
 
   if (!user) {
     return <Spinner />;
@@ -66,7 +70,7 @@ const UserEdit = ({ user }: Props) => {
         <SegmentedControl<UserSegment>
           data={editableUserSegments}
           value={selectedSegment}
-          onChange={useSelectedSegment}
+          onChange={setSelectedSegment}
         />
       </Col>
       <Col md={12}>
@@ -84,7 +88,7 @@ const UserEdit = ({ user }: Props) => {
               {!user.external && (
                 <ProfileSection
                   user={user}
-                  onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)}
+                  onSubmit={(data) => updateUser(data)}
                 />
               )}
               <IfPermitted permissions={`users:passwordchange:${user.username}`}>
@@ -96,13 +100,11 @@ const UserEdit = ({ user }: Props) => {
             <>
               <SettingsSection
                 user={user}
-                onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)}
+                onSubmit={(data) => updateUser(data)}
               />
               <PreferencesSection user={user} />
               {currentUser.id === user.id && (
-                <IfPermitted permissions={`users:edit:${user.username}`}>
-                  <TelemetrySettingsConfig />
-                </IfPermitted>
+                <TelemetrySettingsConfig />
               )}
             </>
           )}
@@ -112,7 +114,7 @@ const UserEdit = ({ user }: Props) => {
           <>
             <PermissionsUpdateInfo />
             <IfPermitted permissions={`users:rolesedit:${user.username}`}>
-              <RolesSection user={user} onSubmit={(data) => _updateUser(data, currentUser, user.id, user.fullName)} />
+              <RolesSection user={user} onSubmit={(data) => updateUser(data)} />
             </IfPermitted>
             <IfPermitted permissions="team:edit">
               <TeamsSection user={user} />

@@ -42,7 +42,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class IndexLookupTest {
+class IndexLookupImplTest {
 
     private final TimeRange timeRangeWithNoIndexRanges = KeywordRange.create("42 years ago", TimeZone.getDefault().getID());
     private final TimeRange timeRangeWithMatchingIndexRange = KeywordRange.create("1 years ago", TimeZone.getDefault().getID());
@@ -54,7 +54,7 @@ class IndexLookupTest {
         final IndexRange indexRange2 = mockIndexRange("index2");
         final SortedSet<IndexRange> indexRanges = sortedSetOf(indexRange1, indexRange2);
 
-        final IndexLookup sut = new IndexLookup(
+        final IndexLookup sut = new IndexLookupImpl(
                 mockIndexRangeService(indexRanges, timeRangeWithMatchingIndexRange),
                 mockStreamService(streamIds),
                 mockIndexRangeContains(indexRange1));
@@ -65,14 +65,14 @@ class IndexLookupTest {
 
     @Test
     void returnsEmptySetForEmptyStreamIds() {
-        final IndexLookup sut = new IndexLookup(mock(IndexRangeService.class), mockStreamService(Collections.emptySet()), mock(IndexRangeContainsOneOfStreams.class));
+        final IndexLookup sut = new IndexLookupImpl(mock(IndexRangeService.class), mockStreamService(Collections.emptySet()), mock(IndexRangeContainsOneOfStreams.class));
         Set<String> result = sut.indexNamesForStreamsInTimeRange(emptySet(), timeRangeWithNoIndexRanges);
         assertThat(result).isEmpty();
     }
 
     @Test
     void returnsEmptySetIfNoIndicesFound() {
-        final IndexLookup sut = new IndexLookup(mock(IndexRangeService.class), mockStreamService(streamIds), mock(IndexRangeContainsOneOfStreams.class));
+        final IndexLookup sut = new IndexLookupImpl(mock(IndexRangeService.class), mockStreamService(streamIds), mock(IndexRangeContainsOneOfStreams.class));
         Set<String> result = sut.indexNamesForStreamsInTimeRange(streamIds, timeRangeWithNoIndexRanges);
         assertThat(result).isEmpty();
     }
