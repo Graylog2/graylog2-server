@@ -47,13 +47,13 @@ const UserEdit = ({ user }: Props) => {
   const currentUser = useCurrentUser();
   const [selectedSegment, setSelectedSegment] = useState<UserSegment>('profile');
   const updateUser = useCallback(
-    (data: UserUpdate) => UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName)
-        .then(() => {
-          if (user.id === currentUser?.id) {
-            CurrentUserStore.reload();
-          }
-        }),
-    [user, currentUser?.id]
+    (data: UserUpdate) =>
+      UsersDomain.update(user.id, { ...user.toJSON(), ...data }, user.fullName).then(() => {
+        if (user.id === currentUser?.id) {
+          CurrentUserStore.reload();
+        }
+      }),
+    [user, currentUser?.id],
   );
 
   if (!user) {
@@ -85,12 +85,7 @@ const UserEdit = ({ user }: Props) => {
                   </Alert>
                 </SectionComponent>
               )}
-              {!user.external && (
-                <ProfileSection
-                  user={user}
-                  onSubmit={(data) => updateUser(data)}
-                />
-              )}
+              {!user.external && <ProfileSection user={user} onSubmit={(data) => updateUser(data)} />}
               <IfPermitted permissions={`users:passwordchange:${user.username}`}>
                 {!user.external && <PasswordSection user={user} />}
               </IfPermitted>
@@ -98,14 +93,9 @@ const UserEdit = ({ user }: Props) => {
           )}
           {selectedSegment === 'settings_preferences' && (
             <>
-              <SettingsSection
-                user={user}
-                onSubmit={(data) => updateUser(data)}
-              />
+              <SettingsSection user={user} onSubmit={(data) => updateUser(data)} />
               <PreferencesSection user={user} />
-              {currentUser.id === user.id && (
-                <TelemetrySettingsConfig />
-              )}
+              {currentUser.id === user.id && <TelemetrySettingsConfig />}
             </>
           )}
         </IfPermitted>

@@ -17,9 +17,9 @@
 package org.graylog2.rest.resources.system.debug.bundle;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 import jakarta.ws.rs.DELETE;
@@ -57,7 +57,7 @@ import static org.graylog2.shared.security.RestPermissions.SUPPORTBUNDLE_READ;
 import static org.graylog2.shared.utilities.StringUtils.f;
 
 @RequiresAuthentication
-@Api(value = "Cluster/Debug/SupportBundle", description = "For collecting cluster wide debugging information, e.g. server logs")
+@Tag(name = "Cluster/Debug/SupportBundle", description = "For collecting cluster wide debugging information, e.g. server logs")
 @Path("/cluster/debug/support")
 @Produces(MediaType.APPLICATION_JSON)
 @HideOnCloud
@@ -73,7 +73,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
 
     @GET
     @Path("/manifest")
-    @ApiOperation(value = "Get the Support Bundle Manifest from all nodes in the cluster")
+    @Operation(summary = "Get the Support Bundle Manifest from all nodes in the cluster")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     public Map<String, CallResult<SupportBundleNodeManifest>> getClusterManifest() {
         return requestOnAllNodes(RemoteSupportBundleInterface.class, RemoteSupportBundleInterface::getNodeManifest);
@@ -82,7 +82,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
     @POST
     @Path("/bundle/build")
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
-    @ApiOperation(value = "Build a new Support Bundle")
+    @Operation(summary = "Build a new Support Bundle")
     @Timed
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
     public void buildBundle(@Suspended AsyncResponse asyncResponse) {
@@ -101,7 +101,7 @@ public class SupportBundleClusterResource extends ProxiedResource {
 
     @GET
     @Path("/bundle/list")
-    @ApiOperation(value = "Returns the list of downloadable support bundles")
+    @Operation(summary = "Returns the list of downloadable support bundles")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     public List<BundleFile> listBundles() throws IOException {
         final NodeResponse<List<BundleFile>> listNodeResponse = requestOnLeader(RemoteSupportBundleInterface::listBundles, RemoteSupportBundleInterface.class);
@@ -114,10 +114,10 @@ public class SupportBundleClusterResource extends ProxiedResource {
 
     @GET
     @Path("/bundle/download/{filename}")
-    @ApiOperation(value = "Downloads the requested bundle")
+    @Operation(summary = "Downloads the requested bundle")
     @RequiresPermissions(SUPPORTBUNDLE_READ)
     @Produces(MediaType.APPLICATION_OCTET_STREAM)
-    public Response download(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
+    public Response download(@PathParam("filename") @Parameter(name = "filename") String filename) throws IOException {
         final NodeResponse<ResponseBody> nodeResponse = requestOnLeader(c -> c.downloadBundle(filename), RemoteSupportBundleInterface.class);
         if (nodeResponse.isSuccess()) {
             // we cannot use try-with because the ResponseBody needs to stream the output
@@ -143,10 +143,10 @@ public class SupportBundleClusterResource extends ProxiedResource {
 
     @DELETE
     @Path("/bundle/{filename}")
-    @ApiOperation(value = "Delete a certain support bundle")
+    @Operation(summary = "Delete a certain support bundle")
     @RequiresPermissions(SUPPORTBUNDLE_CREATE)
     @NoAuditEvent("this is a proxy resource, the event will be triggered on the individual nodes")
-    public Response delete(@PathParam("filename") @ApiParam("filename") String filename) throws IOException {
+    public Response delete(@PathParam("filename") @Parameter(name = "filename") String filename) throws IOException {
         final NodeResponse<Void> nodeResponse = requestOnLeader(c -> c.deleteBundle(filename), RemoteSupportBundleInterface.class);
         return Response.status(nodeResponse.code()).entity(nodeResponse.body()).build();
     }
