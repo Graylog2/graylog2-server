@@ -151,20 +151,38 @@ const TypeAheadDataFilter = ({
   const onFilterTextChanged = useCallback(
     (value: string) => {
       setFilterTextValue(value);
-      debouncedFilterDataRef.current?.();
+      const debounced = debouncedFilterDataRef.current;
+      if (debounced) {
+        debounced();
+
+        return;
+      }
+
+      filterDataRef.current();
     },
     [setFilterTextValue],
   );
+
+  const applyFilters = useCallback(() => {
+    const debounced = debouncedFilterDataRef.current;
+    if (debounced) {
+      debounced.flush();
+      
+      return;
+    }
+
+    filterDataRef.current();
+  }, []);
 
   const onFilterKeyDown: TypeAheadInputOnKeyDown = useCallback(
     (event) => {
       if (event.key === 'Enter') {
         event.preventDefault();
         event.stopPropagation();
-        debouncedFilterDataRef.current?.flush();
+        applyFilters();
       }
     },
-    [],
+    [applyFilters],
   );
 
   const resetFilters = useCallback(() => {
@@ -185,6 +203,9 @@ const TypeAheadDataFilter = ({
           onChange={onFilterTextChanged}
           onKeyDown={onFilterKeyDown}
         />
+        <StyledButton type="button" onClick={applyFilters}>
+          Filter
+        </StyledButton>
         <StyledButton type="button" onClick={resetFilters} disabled={filterText === ''}>
           Reset
         </StyledButton>
