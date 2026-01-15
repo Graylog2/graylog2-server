@@ -17,8 +17,8 @@
 package org.graylog2.shared.rest.resources.system.codecs;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.inputs.codecs.CodecFactory;
 import org.graylog2.plugin.inputs.codecs.Codec;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiresAuthentication
-@Api(value = "System/Codecs/Types", description = "Message codec types of this node")
+@Tag(name = "System/Codecs/Types", description = "Message codec types of this node")
 @Path("/system/codecs/types")
 @Produces(MediaType.APPLICATION_JSON)
 public class CodecTypesResource extends RestResource {
@@ -52,7 +52,7 @@ public class CodecTypesResource extends RestResource {
     @Timed
     @Path("/all")
     @Consumes(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get all codec types")
+    @Operation(summary = "Get all codec types")
     public Map<String, CodecTypeInfo> getAll() {
         final Map<String, Codec.Factory<? extends Codec>> factories = codecFactory.getFactory();
 

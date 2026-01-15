@@ -60,9 +60,9 @@ describe('PasswordComplexityConfig', () => {
   it('renders current password requirements', async () => {
     render(<PasswordComplexityConfig />);
 
-    expect(
-      await screen.findByRole('definition', { name: /require lowercase letters:/i }),
-    ).toHaveTextContent(/Required/i);
+    expect(await screen.findByRole('definition', { name: /require lowercase letters:/i })).toHaveTextContent(
+      /Required/i,
+    );
   });
 
   it('saves updated configuration', async () => {

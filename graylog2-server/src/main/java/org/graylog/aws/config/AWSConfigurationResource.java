@@ -16,8 +16,8 @@
  */
 package org.graylog.aws.config;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
@@ -39,7 +39,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Api(value = "AWS/Config", description = "Manage AWS Config settings")
+@Tag(name = "AWS/Config", description = "Manage AWS Config settings")
 @Path("/config")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -56,7 +56,7 @@ public class AWSConfigurationResource extends RestResource implements PluginRest
     }
 
     @PUT
-    @ApiOperation(value = "Updates the AWS default configuration.")
+    @Operation(summary = "Updates the AWS default configuration.")
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
     @AuditEvent(type = AuditEventTypes.CLUSTER_CONFIGURATION_UPDATE)
     public Response updateConfig(@Valid AWSPluginConfigurationUpdate update) {

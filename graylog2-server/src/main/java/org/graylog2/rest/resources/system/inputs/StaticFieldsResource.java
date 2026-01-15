@@ -17,11 +17,12 @@
 package org.graylog2.rest.resources.system.inputs;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -55,7 +56,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 
 @RequiresAuthentication
-@Api(value = "StaticFields", description = "Static fields of an input")
+@Tag(name = "StaticFields", description = "Static fields of an input")
 @Path("/system/inputs/{inputId}/staticfields")
 public class StaticFieldsResource extends RestResource {
 
@@ -72,16 +73,17 @@ public class StaticFieldsResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Add a static field to an input")
+    @Operation(summary = "Add a static field to an input")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 400, message = "Field/Key is reserved."),
-            @ApiResponse(code = 400, message = "Missing or invalid configuration.")
+            @ApiResponse(responseCode = "201", description = "Created"),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
+            @ApiResponse(responseCode = "400", description = "Field/Key is reserved."),
+            @ApiResponse(responseCode = "400", description = "Missing or invalid configuration.")
     })
     @AuditEvent(type = AuditEventTypes.STATIC_FIELD_CREATE)
-    public Response create(@ApiParam(name = "inputId", required = true)
+    public Response create(@Parameter(name = "inputId", required = true)
                            @PathParam("inputId") String inputId,
-                           @ApiParam(name = "JSON body", required = true)
+                           @RequestBody(required = true)
                            @Valid @NotNull CreateStaticFieldRequest csfr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
@@ -127,16 +129,17 @@ public class StaticFieldsResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Remove static field of an input")
+    @Operation(summary = "Remove static field of an input")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No such input on this node."),
-            @ApiResponse(code = 404, message = "No such static field.")
+            @ApiResponse(responseCode = "204", description = "Success"),
+            @ApiResponse(responseCode = "404", description = "No such input on this node."),
+            @ApiResponse(responseCode = "404", description = "No such static field.")
     })
     @Path("/{key}")
     @AuditEvent(type = AuditEventTypes.STATIC_FIELD_DELETE)
-    public void delete(@ApiParam(name = "Key", required = true)
+    public void delete(@Parameter(name = "Key", required = true)
                        @PathParam("key") String key,
-                       @ApiParam(name = "inputId", required = true)
+                       @Parameter(name = "inputId", required = true)
                        @PathParam("inputId") String inputId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 

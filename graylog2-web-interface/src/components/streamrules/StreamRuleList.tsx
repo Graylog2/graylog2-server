@@ -15,8 +15,8 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import React from 'react';
-import type { Stream, MatchData } from 'src/stores/streams/StreamsStore';
 
+import type { Stream, MatchData } from 'stores/streams/StreamsStore';
 import StreamRule from 'components/streamrules/StreamRule';
 import { Spinner } from 'components/common';
 import { ListGroup, ListGroupItem } from 'components/bootstrap';
