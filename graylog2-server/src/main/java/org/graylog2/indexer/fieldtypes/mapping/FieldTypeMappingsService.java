@@ -25,7 +25,6 @@ import org.graylog2.indexer.indexset.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSet;
-import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
 import org.graylog2.rest.bulk.model.BulkOperationFailure;
@@ -52,18 +51,15 @@ public class FieldTypeMappingsService {
 
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
-    private final MongoIndexSetService mongoIndexSetService;
 
     private final IndexFieldTypeProfileService profileService;
 
     @Inject
     public FieldTypeMappingsService(final IndexSetService indexSetService,
                                     final MongoIndexSet.Factory mongoIndexSetFactory,
-                                    final MongoIndexSetService mongoIndexSetService,
                                     final IndexFieldTypeProfileService profileService) {
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
-        this.mongoIndexSetService = mongoIndexSetService;
         this.profileService = profileService;
     }
 
@@ -89,7 +85,7 @@ public class FieldTypeMappingsService {
                         indexSetIdsWithError.add(indexSetId);
                         try {
                             // rolling back changes in MongoDB
-                            mongoIndexSetService.save(
+                            indexSetService.save(
                                     indexSetConfig.toBuilder()
                                             .customFieldMappings(rollbackMappings)
                                             .build()
@@ -175,7 +171,7 @@ public class FieldTypeMappingsService {
                 .collect(Collectors.toCollection(ArrayList::new));
         final List<String> errors = new LinkedList<>();
         if (removedSmth) {
-            var updatedIndexSetConfig = Optional.of(mongoIndexSetService.save(
+            var updatedIndexSetConfig = Optional.of(indexSetService.save(
                     indexSetConfig.toBuilder()
                             .customFieldMappings(previousCustomFieldMappings)
                             .build()
@@ -202,7 +198,7 @@ public class FieldTypeMappingsService {
         if (previousCustomFieldMappings.contains(customMapping)) {
             return Optional.empty();
         }
-        return Optional.of(mongoIndexSetService.save(
+        return Optional.of(indexSetService.save(
                 indexSetConfig.toBuilder()
                         .customFieldMappings(previousCustomFieldMappings.mergeWith(customMapping))
                         .build()
@@ -214,7 +210,7 @@ public class FieldTypeMappingsService {
         if (Objects.equals(indexSetConfig.fieldTypeProfile(), profileId)) {
             return Optional.empty();
         }
-        return Optional.of(mongoIndexSetService.save(
+        return Optional.of(indexSetService.save(
                 indexSetConfig.toBuilder()
                         .fieldTypeProfile(profileId)
                         .build()
@@ -225,7 +221,7 @@ public class FieldTypeMappingsService {
         if (indexSetConfig.fieldTypeProfile() == null) {
             return Optional.empty();
         }
-        return Optional.of(mongoIndexSetService.save(
+        return Optional.of(indexSetService.save(
                 indexSetConfig.toBuilder()
                         .fieldTypeProfile(null)
                         .build()
