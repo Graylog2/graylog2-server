@@ -81,7 +81,7 @@ const StageRules = ({ pipeline, stage, rules = [] }: Props) => {
           );
         }
 
-        const queryParam = ('rule_builder' in rule && rule.rule_builder) ? '?rule_builder=true' : '';
+        const queryParam = 'rule_builder' in rule && rule.rule_builder ? '?rule_builder=true' : '';
 
         return <Link to={`${Routes.SYSTEM.PIPELINES.RULE(rule.id)}${queryParam}`}>{rule.title}</Link>;
       })();

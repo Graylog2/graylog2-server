@@ -22,9 +22,7 @@ import type { PipelineType, StageType } from 'components/pipelines/types';
 import type { RuleType } from 'stores/rules/RulesStore';
 
 jest.mock('components/common/router', () => ({
-  Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
-    <a href={to}>{children}</a>
-  ),
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
 
 jest.mock('components/metrics', () => ({
@@ -33,16 +31,24 @@ jest.mock('components/metrics', () => ({
       {children}
     </div>
   ),
-  CounterRate: ({ suffix = "", showTotal = undefined }: { suffix?: string; showTotal?: boolean }) => (
+  CounterRate: ({ suffix = '', showTotal = undefined }: { suffix?: string; showTotal?: boolean }) => (
     <span data-testid="counter-rate" data-suffix={suffix} data-show-total={showTotal}>
       Counter
     </span>
   ),
 }));
 
-jest.mock('components/rules/RuleDeprecationInfo', () => function RuleDeprecationInfo({ ruleId }: { ruleId: string }) {
-    return <span data-testid="deprecation-info" data-rule-id={ruleId}>Deprecation Info</span>;
-  });
+jest.mock(
+  'components/rules/RuleDeprecationInfo',
+  () =>
+    function RuleDeprecationInfo({ ruleId }: { ruleId: string }) {
+      return (
+        <span data-testid="deprecation-info" data-rule-id={ruleId}>
+          Deprecation Info
+        </span>
+      );
+    },
+);
 
 jest.mock('routing/Routes', () => ({
   SYSTEM: {
@@ -122,11 +128,11 @@ describe('StageRules', () => {
 
     expect(metricContainers[0]).toHaveAttribute(
       'data-metric-name',
-      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-123.0.executed'
+      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-123.0.executed',
     );
     expect(metricContainers[1]).toHaveAttribute(
       'data-metric-name',
-      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-123.0.failed'
+      'org.graylog.plugins.pipelineprocessor.ast.Rule.rule-1.pipeline-123.0.failed',
     );
   });
 
@@ -161,18 +167,10 @@ describe('StageRules', () => {
 
     const rulesWithGap = [mockRules[0], undefined];
 
-    render(
-      <StageRules
-        pipeline={mockPipeline}
-        stage={stageWithInvalidRule}
-        rules={rulesWithGap as any}
-      />
-    );
+    render(<StageRules pipeline={mockPipeline} stage={stageWithInvalidRule} rules={rulesWithGap as any} />);
 
     expect(screen.getByText('deleted-rule')).toBeInTheDocument();
-    expect(
-      screen.getByText(/Rule deleted-rule has been renamed or removed/)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Rule deleted-rule has been renamed or removed/)).toBeInTheDocument();
 
     // Only valid rule should have deprecation info
     const deprecationInfos = screen.getAllByTestId('deprecation-info');
@@ -183,16 +181,12 @@ describe('StageRules', () => {
   it('displays no data message when rules array is empty', () => {
     render(<StageRules pipeline={mockPipeline} stage={mockStage} rules={[]} />);
 
-    expect(
-      screen.getByText('This stage has no rules yet. Click on edit to add some.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('This stage has no rules yet. Click on edit to add some.')).toBeInTheDocument();
   });
 
   it('handles undefined rules prop', () => {
     render(<StageRules pipeline={mockPipeline} stage={mockStage} />);
 
-    expect(
-      screen.getByText('This stage has no rules yet. Click on edit to add some.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('This stage has no rules yet. Click on edit to add some.')).toBeInTheDocument();
   });
 });
