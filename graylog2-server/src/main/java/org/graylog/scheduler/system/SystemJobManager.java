@@ -54,11 +54,13 @@ public class SystemJobManager {
 
     public void submitWithDelay(SystemJobConfig config, Duration delay) {
         final var now = DateTime.now(DateTimeZone.UTC);
+        final var startTime = now.plusMillis(Ints.saturatedCast(delay.toMillis()));
         final var trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionType(SystemJobDefinitionConfig.TYPE_NAME)
                 .jobDefinitionId(config.type())
                 .data(config)
-                .nextTime(now.plusMillis(Ints.saturatedCast(delay.toMillis())))
+                .startTime(startTime)
+                .nextTime(startTime)
                 .schedule(OnceJobSchedule.create())
                 .build();
 
