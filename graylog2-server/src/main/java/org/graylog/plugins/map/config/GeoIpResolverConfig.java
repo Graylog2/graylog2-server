@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.security.encryption.EncryptedValue;
 
 import javax.annotation.Nullable;
 import java.time.Duration;
@@ -73,6 +74,17 @@ public abstract class GeoIpResolverConfig {
 
     @JsonProperty(FIELD_REFRESH_INTERVAL)
     public abstract Long refreshInterval();
+
+    @JsonProperty("azure_account")
+    @Nullable
+    public abstract String azureAccountName();
+
+    @JsonProperty("azure_account_key")
+    @Nullable
+    public abstract EncryptedValue azureAccountKey();
+
+    @JsonProperty("azure_endpoint")
+    public abstract Optional<String> azureEndpoint();
 
     public Duration refreshIntervalAsDuration() {
         if (refreshIntervalUnit() == null) {
@@ -161,6 +173,12 @@ public abstract class GeoIpResolverConfig {
         public abstract Builder pullFromCloud(Optional<CloudStorageType> pullFromCloud);
 
         public abstract Builder gcsProjectId(String gcsProjectId);
+
+        public abstract Builder azureAccountName(String accountName);
+
+        public abstract Builder azureAccountKey(EncryptedValue accountKey);
+
+        public abstract Builder azureEndpoint(Optional<String> endpoint);
 
         public abstract GeoIpResolverConfig build();
     }
