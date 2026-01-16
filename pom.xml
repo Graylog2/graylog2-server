@@ -127,7 +127,7 @@
         <commons-validator.version>1.10.1</commons-validator.version>
         <commons-io.version>2.21.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.45.0</error-prone.version>
+        <error-prone.version>2.46.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.61.0</gcs.version>
         <azure-blob-storage.version>12.32.0</azure-blob-storage.version>
@@ -1156,6 +1156,7 @@
                           See available bug patterns: https://errorprone.info/bugpatterns
                         -->
                         <arg>
+                            -XDaddTypeAnnotationsToSymbol=true
                             -Xplugin:ErrorProne
                             -Xep:DoNotMock:WARN
                             -XepDisableWarningsInGeneratedCode
