@@ -20,12 +20,13 @@ import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
 import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
-import { Icon, Spinner } from 'components/common';
+import { Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { CacheEntity } from 'components/lookup-tables/types';
+import { MoreActionsIcon } from 'components/common/MoreActions';
 
 type ActionsProps = {
   cache: CacheEntity;
@@ -59,7 +60,7 @@ function Actions({ cache }: ActionsProps) {
     <>
       <DropdownButton
         bsStyle="transparent"
-        title={<Icon name="more_horiz" size="lg" />}
+        title={<MoreActionsIcon size="lg" />}
         id={cache.id}
         buttonTitle={cache.id}
         noCaret
