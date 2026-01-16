@@ -16,6 +16,7 @@
  */
 package org.graylog.testing.completebackend;
 
+import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceAsyncClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
@@ -40,9 +41,21 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
 
     private String createConnectionString() {
         return "DefaultEndpointsProtocol=http;"
-                + "AccountName=devstoreaccount1;"
-                + "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-                + "BlobEndpoint=http://%s:%d/devstoreaccount1;".formatted(getHost(), getMappedPort(PORT));
+                + "AccountName=" + getAccountName() + ";"
+                + "AccountKey=" + getAccountKey() + ";"
+                + "BlobEndpoint=" + getEndPoint() + ";";
+    }
+
+    public String getAccountKey() {
+        return "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==";
+    }
+
+    public String getAccountName() {
+        return "devstoreaccount1";
+    }
+
+    public String getEndPoint() {
+        return "http://%s:%d/devstoreaccount1".formatted(getHost(), getMappedPort(PORT));
     }
 
     public BlobServiceClient createBlobServiceClient() {
@@ -55,6 +68,12 @@ public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
         return new BlobServiceClientBuilder()
                 .connectionString(createConnectionString())
                 .buildAsyncClient();
+    }
+
+    public BlobContainerClient createBlobContainer(String containerName) {
+        BlobServiceClient client = createBlobServiceClient();
+        client.createBlobContainer(containerName);
+        return client.getBlobContainerClient(containerName);
     }
 
     @Override
