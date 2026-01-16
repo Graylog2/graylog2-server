@@ -17,6 +17,7 @@
 package org.graylog.plugins.sidecar.common;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -26,12 +27,15 @@ import org.graylog2.plugin.PluginConfigBean;
 public class SidecarPluginConfiguration implements PluginConfigBean {
     private static final String PREFIX = "sidecar_";
 
+    @Documentation("tbd")
     @Parameter(value = PREFIX + "user", validator = StringNotEmptyValidator.class)
     private String user = "graylog-sidecar";
 
+    @Documentation("tbd")
     @Parameter(value = PREFIX + "cache_time", validator = PositiveDurationValidator.class)
     private Duration cacheTime = Duration.hours(1L);
 
+    @Documentation("tbd")
     @Parameter(value = PREFIX + "cache_max_size", validator = PositiveIntegerValidator.class)
     private int cacheMaxSize = 5000;
 

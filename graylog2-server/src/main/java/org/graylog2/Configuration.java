@@ -513,6 +513,7 @@ public class Configuration extends CaConfiguration implements CommonNodeConfigur
     @Parameter(value = "global_inputs_only")
     private boolean globalInputsOnly = false;
 
+    @Documentation("tbd")
     @Parameter(value = "max_event_age", converter = JavaDurationConverter.class)
     private java.time.Duration maxEventAge = java.time.Duration.ofDays(1L);
 
