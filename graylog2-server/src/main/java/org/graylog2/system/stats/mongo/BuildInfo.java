@@ -38,6 +38,7 @@ public abstract class BuildInfo {
     public abstract String gitVersion();
 
     @JsonProperty
+    @Nullable
     public abstract String sysInfo();
 
     @JsonProperty
