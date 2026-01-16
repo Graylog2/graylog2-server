@@ -32,6 +32,7 @@ import DragHandle from 'components/common/SortableList/DragHandle';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
+import HeaderActionsDropdownButton from 'components/common/EntityDataTable/HeaderActionsDropdownButton';
 
 import SortIcon from '../SortIcon';
 
@@ -81,17 +82,21 @@ const useSortableCol = (colId: string, disabled: boolean) => {
 const AttributeHeader = <Entity extends EntityBase>({
   ctx,
   onHeaderSectionResize,
+  onChangeSlicing,
 }: {
   ctx: HeaderContext<Entity, unknown>;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
 }) => {
+  const colId = ctx.header.column.id;
   const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
   const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
-    ctx.header.column.id,
+    colId,
     !columnMeta?.enableColumnOrdering,
   );
-  const leftRef = useHeaderSectionObserver(ctx.header.column.id, 'left', onHeaderSectionResize);
-  const rightRef = useHeaderSectionObserver(ctx.header.column.id, 'right', onHeaderSectionResize);
+  const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
+  const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
+  const _onChangeSlicing = () => onChangeSlicing(colId);
 
   return (
     <ThInner ref={setNodeRef}>
@@ -106,6 +111,7 @@ const AttributeHeader = <Entity extends EntityBase>({
           />
         )}
         {columnMeta?.columnRenderer?.renderHeader?.(columnMeta.label) ?? columnMeta.label}
+        {columnMeta?.enableSlicing && <HeaderActionsDropdownButton onChangeSlicing={_onChangeSlicing} />}
         {ctx.header.column.getCanSort() && <SortIcon<Entity> column={ctx.header.column} />}
       </LeftCol>
       <RightCol ref={rightRef}>
@@ -122,20 +128,22 @@ const AttributeHeader = <Entity extends EntityBase>({
 };
 
 const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
-  columnSchemas,
+  columnHelper,
   columnRenderersByAttribute,
+  columnSchemas,
   columnWidths,
   entityAttributesAreCamelCase,
   meta,
-  columnHelper,
+  onChangeSlicing,
   onHeaderSectionResize,
 }: {
-  columnSchemas: Array<ColumnSchema>;
+  columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
+  columnSchemas: Array<ColumnSchema>;
   columnWidths: { [attributeId: string]: number };
   entityAttributesAreCamelCase: boolean;
   meta: Meta;
-  columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
 }) => {
   const cell = useCallback(
@@ -156,8 +164,14 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   );
 
   const header = useCallback(
-    (ctx) => <AttributeHeader<Entity> ctx={ctx} onHeaderSectionResize={onHeaderSectionResize} />,
-    [onHeaderSectionResize],
+    (ctx) => (
+      <AttributeHeader<Entity>
+        ctx={ctx}
+        onHeaderSectionResize={onHeaderSectionResize}
+        onChangeSlicing={onChangeSlicing}
+      />
+    ),
+    [onChangeSlicing, onHeaderSectionResize],
   );
 
   return useMemo(
@@ -172,6 +186,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
           enableResizing: !columnRenderersByAttribute[col.id].staticWidth,
           meta: {
             label: col.title,
+            enableSlicing: col.sliceable,
             columnRenderer: columnRenderersByAttribute[col.id],
             enableColumnOrdering: true,
           },

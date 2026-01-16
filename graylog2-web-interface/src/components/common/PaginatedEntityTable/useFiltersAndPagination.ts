@@ -27,17 +27,21 @@ import type { LayoutConfig } from 'components/common/EntityDataTable/hooks/useTa
 export const useWithURLParams = (layoutConfig: LayoutConfig) => {
   const [urlQueryFilters, setUrlQueryFilters] = useUrlQueryFilters();
   const [query, setUrlQuery] = useQueryParam('query', StringParam);
+  const [sliceCol, setSliceCol] = useQueryParam('sliceCol', StringParam);
+  const [slice, setSlice] = useQueryParam('slice', StringParam);
   const urlPagination = usePaginationQueryParameter(undefined, layoutConfig.pageSize, false);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
       query,
+      slice,
+      sliceCol,
       page: urlPagination.page,
       pageSize: layoutConfig.pageSize,
       sort: layoutConfig.sort,
       filters: urlQueryFilters,
     }),
-    [layoutConfig.pageSize, layoutConfig.sort, urlPagination.page, query, urlQueryFilters],
+    [query, slice, sliceCol, urlPagination.page, layoutConfig.pageSize, layoutConfig.sort, urlQueryFilters],
   );
 
   const onChangeFilters = useCallback(
@@ -52,6 +56,10 @@ export const useWithURLParams = (layoutConfig: LayoutConfig) => {
     fetchOptions,
     setQuery: setUrlQuery,
     onChangeFilters,
+    onChangeSlicing: (newSliceCol: string | undefined, newSlice?: string) => {
+      setSliceCol(newSliceCol);
+      setSlice(newSlice);
+    },
     paginationState: urlPagination,
   };
 };
@@ -61,48 +69,49 @@ export const useWithLocalState = (layoutConfig: LayoutConfig) => {
     query: '',
     page: DEFAULT_PAGE,
     filters: OrderedMap<string, Array<string>>(),
+    slice: undefined,
+    sliceCol: undefined,
   });
 
-  const setPagination = useCallback(
-    ({ page, pageSize }: { page?: number; pageSize?: number }) => {
-      setTransientFetchOptions({
-        ...transientFetchOptions,
-        page,
-        pageSize,
-      });
-    },
-    [transientFetchOptions],
-  );
+  const setPagination = useCallback(({ page, pageSize }: { page?: number; pageSize?: number }) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page,
+      pageSize,
+    }));
+  }, []);
 
   const resetPage = useCallback(() => {
-    setTransientFetchOptions({
-      ...transientFetchOptions,
+    setTransientFetchOptions((cur) => ({
+      ...cur,
       page: DEFAULT_PAGE,
       sort: layoutConfig.sort,
-    });
-  }, [transientFetchOptions, layoutConfig.sort]);
+    }));
+  }, [layoutConfig.sort]);
 
-  const onChangeFilters = useCallback(
-    (newFilters: UrlQueryFilters) => {
-      setTransientFetchOptions({
-        ...transientFetchOptions,
-        page: DEFAULT_PAGE,
-        filters: newFilters,
-      });
-    },
-    [transientFetchOptions],
-  );
+  const onChangeFilters = useCallback((newFilters: UrlQueryFilters) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      page: DEFAULT_PAGE,
+      filters: newFilters,
+    }));
+  }, []);
 
-  const setQuery = useCallback(
-    (newQuery: string) => {
-      setTransientFetchOptions({
-        ...transientFetchOptions,
-        query: newQuery,
-        page: DEFAULT_PAGE,
-      });
-    },
-    [transientFetchOptions],
-  );
+  const onChangeSlicing = useCallback((sliceCol: string, slice?: string | undefined) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      sliceCol,
+      slice,
+    }));
+  }, []);
+
+  const setQuery = useCallback((newQuery: string) => {
+    setTransientFetchOptions((cur) => ({
+      ...cur,
+      query: newQuery,
+      page: DEFAULT_PAGE,
+    }));
+  }, []);
 
   const fetchOptions: SearchParams = useMemo(
     () => ({
@@ -118,6 +127,7 @@ export const useWithLocalState = (layoutConfig: LayoutConfig) => {
       fetchOptions,
       setQuery,
       onChangeFilters,
+      onChangeSlicing,
       paginationState: {
         page: fetchOptions.page,
         pageSize: fetchOptions.pageSize,
@@ -125,6 +135,6 @@ export const useWithLocalState = (layoutConfig: LayoutConfig) => {
         setPagination,
       },
     }),
-    [fetchOptions, onChangeFilters, resetPage, setPagination, setQuery],
+    [fetchOptions, onChangeFilters, onChangeSlicing, resetPage, setPagination, setQuery],
   );
 };

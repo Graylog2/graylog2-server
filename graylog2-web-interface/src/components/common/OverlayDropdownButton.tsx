@@ -16,11 +16,26 @@
  */
 import * as React from 'react';
 import { useState } from 'react';
+import styled, { css } from 'styled-components';
 
 import Button from 'components/bootstrap/Button';
 import OverlayDropdown from 'components/common/OverlayDropdown';
 import type { BsSize } from 'components/bootstrap/types';
 import { Icon } from 'components/common/index';
+import IconButton from 'components/common/IconButton';
+
+const TRIGGER_VARIANT_BUTTON = 'button';
+const TRIGGER_VARIANT_ICON_HORIZONTAL = 'icon_horizontal'; // for e.g. headers
+const TRIGGER_VARIANT_ICON_VERTICAL = 'icon_vertical'; // for e.g. row actions
+
+const StyledIconButton = styled(IconButton)(
+  ({ theme }) => css`
+    display: inline-block;
+    margin-left: ${theme.spacings.xs};
+    padding: 0;
+    cursor: pointer;
+  `,
+);
 
 type Props = {
   alwaysShowCaret?: boolean;
@@ -32,10 +47,15 @@ type Props = {
   dropdownZIndex?: number;
   onToggle?: (isOpen: boolean) => void;
   title: React.ReactNode;
+  triggerVariant?:
+    | typeof TRIGGER_VARIANT_ICON_VERTICAL
+    | typeof TRIGGER_VARIANT_ICON_HORIZONTAL
+    | typeof TRIGGER_VARIANT_BUTTON;
 };
 
 /**
  * This component is an alternative to the `DropdownButton` component and displays the dropdown in a portal.
+ * You can set the trigger variant to icon_horizontal or icon_vertical, to display an icon button instead of a button.
  */
 const OverlayDropdownButton = ({
   alwaysShowCaret = false,
@@ -47,6 +67,7 @@ const OverlayDropdownButton = ({
   dropdownZIndex = undefined,
   onToggle: onToggleProp = undefined,
   title,
+  triggerVariant = TRIGGER_VARIANT_BUTTON,
 }: Props) => {
   const [show, setShowDropdown] = useState(false);
 
@@ -74,14 +95,22 @@ const OverlayDropdownButton = ({
       alwaysShowCaret={alwaysShowCaret}
       toggleChild={
         <div className={`dropdown btn-group ${show ? 'open' : ''}`}>
-          <Button
-            bsSize={bsSize}
-            className="dropdown-toggle"
-            aria-label={buttonTitle}
-            title={buttonTitle}
-            disabled={disabled}>
-            {title} <Icon name="arrow_drop_down" />
-          </Button>
+          {triggerVariant === TRIGGER_VARIANT_BUTTON && (
+            <Button
+              bsSize={bsSize}
+              className="dropdown-toggle"
+              aria-label={buttonTitle}
+              title={buttonTitle}
+              disabled={disabled}>
+              {title} <Icon name="arrow_drop_down" />
+            </Button>
+          )}
+          {(triggerVariant === TRIGGER_VARIANT_ICON_VERTICAL || triggerVariant === TRIGGER_VARIANT_ICON_HORIZONTAL) && (
+            <StyledIconButton
+              name={triggerVariant === TRIGGER_VARIANT_ICON_VERTICAL ? 'more_vert' : 'more_horiz'}
+              title={buttonTitle}
+            />
+          )}
         </div>
       }
       placement="bottom"
