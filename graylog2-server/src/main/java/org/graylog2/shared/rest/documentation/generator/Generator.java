@@ -102,7 +102,6 @@ public class Generator {
     private static final Logger LOG = LoggerFactory.getLogger(Generator.class);
 
     public static final String EMULATED_SWAGGER_VERSION = "1.2";
-    public static final String CLOUD_VISIBLE = "cloud";
 
     private static final Map<String, Object> overviewResult = Maps.newHashMap();
     private static final String PROPERTIES = "properties";
