@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.storage.migration.state.rest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotNull;
 import jakarta.ws.rs.Consumes;
@@ -45,7 +45,7 @@ import org.graylog2.shared.security.RestPermissions;
 @RequiresAuthentication
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "Migration", description = "Resource for managing migration to datanode from open/elasticsearch")
+@Tag(name = "Migration", description = "Resource for managing migration to datanode from open/elasticsearch")
 public class MigrationStateResource {
 
     private final MigrationStateMachine stateMachine;
@@ -62,8 +62,8 @@ public class MigrationStateResource {
     @Path("/trigger")
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @ApiOperation(value = "trigger migration step")
-    public Response trigger(@ApiParam(name = "request") @NotNull MigrationStepRequest request) {
+    @Operation(summary = "trigger migration step")
+    public Response trigger(@Parameter(name = "request") @NotNull MigrationStepRequest request) {
         final CurrentStateInformation newState = stateMachine.trigger(request.step(), request.args());
         Response.ResponseBuilder response = newState.hasErrors() ? Response.serverError() : Response.ok();
         return response.entity(newState)
@@ -74,7 +74,7 @@ public class MigrationStateResource {
     @Path("/state")
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @ApiOperation(value = "Migration status", notes = "Current status of the datanode migration")
+    @Operation(summary = "Migration status", description = "Current status of the datanode migration")
     public CurrentStateInformation status() {
         return new CurrentStateInformation(stateMachine.getState(), stateMachine.nextSteps());
     }
@@ -84,7 +84,7 @@ public class MigrationStateResource {
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
     @Produces(MediaType.TEXT_PLAIN)
-    @ApiOperation(value = "Serialize", notes = "Serialize migration graph as graphviz source")
+    @Operation(summary = "Serialize", description = "Serialize migration graph as graphviz source")
     public String serialize() {
         // you can use https://dreampuf.github.io/GraphvizOnline/ to visualize the result
         return stateMachine.serialize();
@@ -94,7 +94,7 @@ public class MigrationStateResource {
     @Path("/state")
     @NoAuditEvent("No Audit Event needed") // TODO: do we need audit log here?
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @ApiOperation(value = "Reset the whole migration to the first step, start over")
+    @Operation(summary = "Reset the whole migration to the first step, start over")
     public CurrentStateInformation resetState() {
         stateMachine.reset();
         return new CurrentStateInformation(stateMachine.getState(), stateMachine.nextSteps());
@@ -104,7 +104,7 @@ public class MigrationStateResource {
     @Path("/journalestimate")
     @NoAuditEvent("No audit event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @ApiOperation(value = "Get journal size estimate (bytes/minute)")
+    @Operation(summary = "Get journal size estimate (bytes/minute)")
     public JournalEstimate getJournalEstimate() {
         long bytesPerMinute = stateMachine.getContext()
                 .getExtendedState(TrafficSnapshot.ESTIMATED_TRAFFIC_PER_MINUTE, Long.class)

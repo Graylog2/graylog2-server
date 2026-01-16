@@ -15,7 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import styled from 'styled-components';
 
 import useProductName from 'brand-customization/useProductName';
@@ -65,7 +65,7 @@ function TestLookup({ table }: Props) {
     lookupPreview: { results, total, supported },
   } = useFetchLookupPreview(table.id, !lutError, previewSize);
 
-  const dataPreview = React.useMemo(() => {
+  const dataPreview = useMemo(() => {
     if (total === 0) return 'No results to show';
 
     return JSON.stringify(results, null, 2);
@@ -111,10 +111,7 @@ function TestLookup({ table }: Props) {
     }
   };
 
-  const showResults = React.useMemo(
-    () => !lutError && (lookupResult || supported),
-    [lutError, lookupResult, supported],
-  );
+  const showResults = useMemo(() => !lutError && (lookupResult || supported), [lutError, lookupResult, supported]);
 
   return (
     <Col $gap="sm">

@@ -16,9 +16,19 @@
  */
 package org.graylog.events.processor.systemnotification;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.notifications.Notification;
@@ -27,20 +37,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import jakarta.inject.Inject;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-
 import java.util.HashMap;
 import java.util.Map;
 
-@Api(value = "System/Notification/Message", description = "Render system notification messages")
+@Tag(name = "System/Notification/Message", description = "Render system notification messages")
 @Path("/system/notification/message")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces({MediaType.TEXT_HTML, MediaType.TEXT_PLAIN})
@@ -58,11 +58,12 @@ public class SystemNotificationRenderResource extends RestResource {
     @POST
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/html/{type}")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get HTML formatted message")
-    public TemplateRenderResponse renderHtml(@ApiParam(name = "type", required = true)
+    @Operation(summary = "Get HTML formatted message")
+    public TemplateRenderResponse renderHtml(@Parameter(name = "type", required = true)
                                              @PathParam("type") Notification.Type type,
-                                             @ApiParam(name = "JSON body", required = false)
+                                             @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                              TemplateRenderRequest request) {
         return render(type, null, SystemNotificationRenderService.Format.HTML, request);
     }
@@ -71,10 +72,10 @@ public class SystemNotificationRenderResource extends RestResource {
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/html/{type}/{key}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get HTML formatted message")
-    public TemplateRenderResponse renderHtmlWithKey(@ApiParam(name = "type", required = true) @PathParam("type") Notification.Type type,
-                                                    @ApiParam(name = "key", required = true) @PathParam("key") String key,
-                                                    @ApiParam(name = "JSON body", required = false)
+    @Operation(summary = "Get HTML formatted message")
+    public TemplateRenderResponse renderHtmlWithKey(@Parameter(name = "type", required = true) @PathParam("type") Notification.Type type,
+                                                    @Parameter(name = "key", required = true) @PathParam("key") String key,
+                                                    @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                                     TemplateRenderRequest request) {
         return render(type, key, SystemNotificationRenderService.Format.HTML, request);
     }
@@ -83,10 +84,10 @@ public class SystemNotificationRenderResource extends RestResource {
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/plaintext/{type}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get plaintext formatted message")
-    public TemplateRenderResponse renderPlainText(@ApiParam(name = "type", required = true)
+    @Operation(summary = "Get plaintext formatted message")
+    public TemplateRenderResponse renderPlainText(@Parameter(name = "type", required = true)
                                                   @PathParam("type") Notification.Type type,
-                                                  @ApiParam(name = "JSON body", required = false)
+                                                  @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                                   TemplateRenderRequest request) {
         return render(type, null, SystemNotificationRenderService.Format.PLAINTEXT, request);
     }
@@ -95,10 +96,10 @@ public class SystemNotificationRenderResource extends RestResource {
     @NoAuditEvent("Doesn't change any data, only renders a notification message")
     @Path("/plaintext/{type}/{key}")
     @Produces(MediaType.APPLICATION_JSON)
-    @ApiOperation(value = "Get plaintext formatted message")
-    public TemplateRenderResponse renderPlainTextWithKey(@ApiParam(name = "type", required = true) @PathParam("type") Notification.Type type,
-                                                         @ApiParam(name = "key", required = true) @PathParam("key") String key,
-                                                         @ApiParam(name = "JSON body", required = false)
+    @Operation(summary = "Get plaintext formatted message")
+    public TemplateRenderResponse renderPlainTextWithKey(@Parameter(name = "type", required = true) @PathParam("type") Notification.Type type,
+                                                         @Parameter(name = "key", required = true) @PathParam("key") String key,
+                                                         @RequestBody(content = @Content(mediaType = MediaType.APPLICATION_JSON, schema = @Schema(implementation = TemplateRenderRequest.class)))
                                                          TemplateRenderRequest request) {
         return render(type, key, SystemNotificationRenderService.Format.PLAINTEXT, request);
     }
