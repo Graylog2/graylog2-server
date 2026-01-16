@@ -14,26 +14,30 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.scheduler.eventbus;
+package org.graylog2.bindings.providers;
 
 import com.codahale.metrics.MetricRegistry;
-
 import jakarta.inject.Inject;
 import jakarta.inject.Provider;
+import org.graylog.scheduler.system.SystemJobManager;
+import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 
 /**
- * Creates a {@link JobSchedulerEventBus} instance.
+ * Deprecated: Use {@link SystemJobManager} instead.
  */
-public class JobSchedulerEventBusProvider implements Provider<JobSchedulerEventBus> {
-    private final MetricRegistry metricRegistry;
+@Deprecated(since = "7.1", forRemoval = true)
+public class LegacySystemJobManagerProvider implements Provider<LegacySystemJobManager> {
+    private static LegacySystemJobManager systemJobManager = null;
 
     @Inject
-    public JobSchedulerEventBusProvider(MetricRegistry metricRegistry) {
-        this.metricRegistry = metricRegistry;
+    public LegacySystemJobManagerProvider(ActivityWriter activityWriter, MetricRegistry metricRegistry) {
+        if (systemJobManager == null)
+            systemJobManager = new LegacySystemJobManager(activityWriter, metricRegistry);
     }
 
     @Override
-    public JobSchedulerEventBus get() {
-        return new JobSchedulerEventBus("system", metricRegistry);
+    public LegacySystemJobManager get() {
+        return systemJobManager;
     }
 }
