@@ -23,6 +23,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.graylog.plugins.sidecar.audit.SidecarAuditEventTypes;
 import org.graylog.plugins.sidecar.common.SidecarPluginConfiguration;
+import org.graylog.plugins.sidecar.opamp.server.OpAMPService;
 import org.graylog.plugins.sidecar.filter.AdministrationFilter;
 import org.graylog.plugins.sidecar.filter.CollectorAdministrationFilter;
 import org.graylog.plugins.sidecar.filter.ConfigurationAdministrationFilter;
@@ -92,5 +93,8 @@ public class SidecarModule extends PluginModule {
         binder.addBinding().to(V20230502164900_AddSidecarManagerAndReaderRole.class);
 
         serviceBinder().addBinding().to(EtagService.class).in(Scopes.SINGLETON);
+
+        // OpAMP WebSocket server
+        serviceBinder().addBinding().to(OpAMPService.class).in(Scopes.SINGLETON);
     }
 }
