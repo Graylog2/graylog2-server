@@ -16,6 +16,11 @@
             <useTransitiveDependencies>true</useTransitiveDependencies>
             <includes>
                 <include>org.graylog:graylog-storage-opensearch3</include>
+                <include>org.opensearch.client:opensearch-java</include>
+                <include>org.apache.httpcomponents.client5:httpclient5</include>
+                <include>org.apache.httpcomponents.core5:httpcore5</include>
+                <include>org.apache.httpcomponents.core5:httpcore5-h2</include>
+                <include>jakarta.json:jakarta.json-api</include>
             </includes>
         </dependencySet>
     </dependencySets>
