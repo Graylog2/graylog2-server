@@ -19,14 +19,14 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
-import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
+import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteDataAdapter } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { DataAdapterEntity } from 'components/lookup-tables/types';
-import { MoreActionsIcon } from 'components/common/MoreActions';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 type ActionsProps = {
   adapter: DataAdapterEntity;
@@ -58,17 +58,11 @@ function Actions({ adapter }: ActionsProps) {
 
   return (
     <>
-      <DropdownButton
-        bsStyle="transparent"
-        title={<MoreActionsIcon size="lg" />}
-        id={adapter.id}
-        buttonTitle={adapter.id}
-        noCaret
-        pullRight>
+      <MoreActionsMenu id={adapter.id} size="lg" pullRight>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
-      </DropdownButton>
+      </MoreActionsMenu>
       {showDeleteModal && (
         <BootstrapModalConfirm
           showModal
