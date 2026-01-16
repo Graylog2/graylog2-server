@@ -34,6 +34,7 @@ import org.joda.time.DateTimeZone;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 @Singleton
 public class SystemJobManager {
@@ -62,6 +63,19 @@ public class SystemJobManager {
                 .build();
 
         triggerService.create(trigger);
+    }
+
+    public List<SystemJobConfig> getRunningJobConfigs(String type) {
+        // The trigger's job definition ID is the type name for system jobs
+        final var query = Filters.eq(JobTriggerDto.FIELD_JOB_DEFINITION_ID, type);
+
+        try (var stream = triggerService.streamByQuery(query)) {
+            return stream.map(JobTriggerDto::data)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(config -> (SystemJobConfig) config)
+                    .toList();
+        }
     }
 
     public List<SystemJobSummary> getRunningJobs() {
