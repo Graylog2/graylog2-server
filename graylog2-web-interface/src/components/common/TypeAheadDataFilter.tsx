@@ -167,7 +167,7 @@ const TypeAheadDataFilter = ({
     const debounced = debouncedFilterDataRef.current;
     if (debounced) {
       debounced.flush();
-      
+
       return;
     }
 
