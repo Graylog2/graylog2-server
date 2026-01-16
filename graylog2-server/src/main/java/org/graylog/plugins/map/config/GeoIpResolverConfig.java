@@ -75,7 +75,7 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty(FIELD_REFRESH_INTERVAL)
     public abstract Long refreshInterval();
 
-    @JsonProperty("azure_account")
+    @JsonProperty("azure_account_name")
     @Nullable
     public abstract String azureAccountName();
 
