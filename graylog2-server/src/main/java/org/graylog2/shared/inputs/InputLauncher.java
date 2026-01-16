@@ -23,6 +23,7 @@ import jakarta.inject.Inject;
 import org.graylog2.Configuration;
 import org.graylog2.cluster.leader.LeaderElectionService;
 import org.graylog2.featureflag.FeatureFlags;
+import org.graylog2.inputs.Input;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.buffers.InputBuffer;
@@ -40,6 +41,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class InputLauncher {
     private static final Logger LOG = LoggerFactory.getLogger(InputLauncher.class);
+    public static final String FAILED_STARTS_METRIC = "failed_starts";
+
     private final IOState.Factory<MessageInput> inputStateFactory;
     private final InputBuffer inputBuffer;
     private final PersistedInputs persistedInputs;
@@ -48,6 +51,7 @@ public class InputLauncher {
     private final Configuration configuration;
     private final LeaderElectionService leaderElectionService;
     private final FeatureFlags featureFlags;
+    private final MetricRegistry metricRegistry;
 
     @Inject
     public InputLauncher(IOState.Factory<MessageInput> inputStateFactory, InputBuffer inputBuffer, PersistedInputs persistedInputs,
@@ -61,6 +65,7 @@ public class InputLauncher {
         this.configuration = configuration;
         this.leaderElectionService = leaderElectionService;
         this.featureFlags = featureFlags;
+        this.metricRegistry = metricRegistry;
     }
 
     private ExecutorService executorService(final MetricRegistry metricRegistry) {
@@ -119,6 +124,7 @@ public class InputLauncher {
 
     protected void handleLaunchException(Throwable e, IOState<MessageInput> inputState) {
         final MessageInput input = inputState.getStoppable();
+        metricRegistry.meter(name(Input.class, FAILED_STARTS_METRIC, input.getId())).mark();
         StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier() + " misfired. Reason: ");
 
         String causeMsg = ExceptionUtils.getRootCauseMessage(e);
