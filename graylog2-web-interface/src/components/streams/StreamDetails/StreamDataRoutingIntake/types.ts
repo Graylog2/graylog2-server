@@ -14,21 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import StreamRules from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamRules';
-import StreamConnectedPipelines from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamConnectedPipelines';
-import type { Stream } from 'stores/streams/StreamsStore';
-
-type Props = {
-  stream: Stream;
+export type StreamConnectedPipeline = {
+  id: string;
+  pipeline: string;
+  pipeline_id: string;
+  rule: string;
+  rule_id: string;
+  connected_streams: Array<{
+    id: string;
+    title: string;
+  }>;
 };
-
-const StreamDataRoutingIntake = ({ stream }: Props) => (
-  <>
-    <StreamRules stream={stream} />
-    <StreamConnectedPipelines stream={stream} />
-  </>
-);
-
-export default StreamDataRoutingIntake;

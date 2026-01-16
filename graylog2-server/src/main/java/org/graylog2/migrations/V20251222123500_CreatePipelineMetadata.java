@@ -46,9 +46,10 @@ import static org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineMe
 
 /**
  * Migration to create the pipeline metadata collections, if any of them do not exist yet.
+ * Updated to include information routing rules and routed streams.
  */
-public class V20251021083100_CreatePipelineMetadata extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20251021083100_CreatePipelineMetadata.class);
+public class V20251222123500_CreatePipelineMetadata extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20251222123500_CreatePipelineMetadata.class);
 
     private final ClusterConfigService configService;
     private final MongoDatabase db;
@@ -58,7 +59,7 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
     private final MongoDbInputsMetadataService inputsMetadataService;
 
     @Inject
-    public V20251021083100_CreatePipelineMetadata(ClusterConfigService configService,
+    public V20251222123500_CreatePipelineMetadata(ClusterConfigService configService,
                                                   MongoConnection mongoConnection,
                                                   MongoDbRuleService ruleService,
                                                   MongoDbPipelineMetadataService pipelineMetadataService,
@@ -85,7 +86,7 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2025-10-21T08:31:00Z");
+        return ZonedDateTime.parse("2025-12-22T12:35:00Z");
     }
 
     @Override
@@ -93,12 +94,7 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
         if (migrationAlreadyApplied()) {
             return;
         }
-
-        db.getCollection(RULES_COLLECTION_NAME).drop();
-        db.getCollection(INPUTS_COLLECTION_NAME).drop();
-        createMetadata();
-
-        markMigrationApplied();
+        doUpgrade();
     }
 
     private void createMetadata() {
@@ -111,12 +107,21 @@ public class V20251021083100_CreatePipelineMetadata extends Migration {
         inputsMetadataService.save(inputMentions, false);
     }
 
-    private boolean migrationAlreadyApplied() {
-        return Objects.nonNull(configService.get(V20251021083100_CreatePipelineMetadata.MigrationCompleted.class));
+    public void doUpgrade() {
+        db.getCollection(RULES_COLLECTION_NAME).drop();
+        db.getCollection(INPUTS_COLLECTION_NAME).drop();
+        createMetadata();
+
+        markMigrationApplied();
     }
 
+    private boolean migrationAlreadyApplied() {
+        return Objects.nonNull(configService.get(V20251222123500_CreatePipelineMetadata.MigrationCompleted.class));
+    }
+
+    // The second migration marker indicates that schema has been upgraded to include routed_streams field
     private void markMigrationApplied() {
-        configService.write(new V20251021083100_CreatePipelineMetadata.MigrationCompleted());
+        configService.write(new V20251222123500_CreatePipelineMetadata.MigrationCompleted());
     }
 
     public record MigrationCompleted() {}
