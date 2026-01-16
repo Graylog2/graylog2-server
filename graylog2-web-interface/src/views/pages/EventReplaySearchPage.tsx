@@ -25,11 +25,29 @@ import { EventNotificationsActions } from 'stores/event-notifications/EventNotif
 import { createFromFetchError } from 'logic/errors/ReportedErrors';
 import ErrorsActions from 'actions/errors/ErrorsActions';
 import ReplaySearch from 'components/events/ReplaySearch';
+import sidebarSections, { type SidebarSection } from 'views/components/sidebar/sidebarSections';
+import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
 
 export const onErrorHandler = (error) => {
   if (error.status === 404) {
     ErrorsActions.report(createFromFetchError(error));
   }
+};
+
+const replaySection: SidebarSection = {
+  key: 'eventDescription',
+  title: null,
+  icon: 'play_arrow',
+  content: ReplaySearchSidebar,
+};
+
+const searchPageLayout = {
+  sidebar: {
+    isShown: true,
+    title: 'Replayed Search',
+    sections: [replaySection, ...sidebarSections],
+    contentColumnWidth: 350,
+  },
 };
 
 const EventReplaySearchPage = () => {
@@ -48,7 +66,11 @@ const EventReplaySearchPage = () => {
 
   const isLoading = eventIsLoading || EDIsLoading || !eventIsFetched || !EDIsFetched || !isNotificationLoaded;
 
-  return isLoading ? <Spinner /> : <ReplaySearch alertId={alertId} definitionId={definitionId} />;
+  return isLoading ? (
+    <Spinner />
+  ) : (
+    <ReplaySearch alertId={alertId} definitionId={definitionId} searchPageLayout={searchPageLayout} />
+  );
 };
 
 export default EventReplaySearchPage;

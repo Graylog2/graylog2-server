@@ -14,20 +14,23 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 
-import type { AlertType } from 'components/event-definitions/types';
-import { singleton } from 'logic/singleton';
+import type { Event, EventsAdditionalData } from 'components/events/events/types';
+import CustomColumnRenderers from 'components/events/events/ColumnRenderers';
 
-type ReplaySearchContextType = {
-  alertId: string;
-  definitionId: string;
-  type: AlertType;
-};
-const ReplaySearchContext = React.createContext<ReplaySearchContextType>({
-  alertId: undefined,
-  definitionId: undefined,
-  type: undefined,
-});
+type Props<M = EventsAdditionalData> = { event: Event; meta: M; eventDefinitionEventProcedureId: string };
 
-export default singleton('contexts.ReplaySearchContext', () => ReplaySearchContext);
+const RemediationSteps = ({ event, meta, eventDefinitionEventProcedureId }: Props) => (
+  <>
+    <h2>Event Procedure Summary</h2>
+    {CustomColumnRenderers.attributes.remediation_steps.renderCell(
+      undefined,
+      event,
+      meta,
+      eventDefinitionEventProcedureId,
+    )}
+  </>
+);
+
+export default RemediationSteps;

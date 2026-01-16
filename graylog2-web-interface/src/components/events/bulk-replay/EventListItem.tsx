@@ -75,6 +75,7 @@ const CompletedButton = styled(IconButton)<{ $done: boolean }>(
 
 const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsDone }: EventListItemProps) => {
   const _removeItem = useCallback(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
 
@@ -83,6 +84,7 @@ const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsD
     [event?.id, removeItem],
   );
   const _markItemAsDone = useCallback(
+    // eslint-disable-next-line react-hooks/preserve-manual-memoization
     (e: React.MouseEvent<HTMLButtonElement>) => {
       e.stopPropagation();
 
