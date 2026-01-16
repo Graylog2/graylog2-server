@@ -191,7 +191,7 @@
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
         <swagger.version>2.2.37</swagger.version>
-        <swagger-parser.version>2.1.36</swagger-parser.version>
+        <swagger-parser.version>2.1.37</swagger-parser.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
@@ -204,7 +204,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <mcp-bom.version>0.17.0</mcp-bom.version>
+        <mcp-bom.version>0.17.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
