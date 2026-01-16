@@ -23,7 +23,6 @@ import { Button } from 'components/bootstrap';
 import { FlatContentRow, Icon } from 'components/common';
 import useAttributeComponents from 'components/event-definitions/replay-search/hooks/useAttributeComponents';
 import EventAttribute from 'components/event-definitions/replay-search/EventAttribute';
-import InfoBarBulkEventReplay from 'components/events/bulk-replay/NewBulkEventReplay';
 
 const Header = styled.div`
   display: flex;
@@ -34,7 +33,7 @@ const Header = styled.div`
 
 const Container = styled.div`
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   gap: 5px;
 `;
 
@@ -76,9 +75,6 @@ const EventInfoBar = () => {
         </Header>
         {open && (
           <Container data-testid="info-container">
-            <Row>
-              <InfoBarBulkEventReplay />
-            </Row>
             <Row>
               {infoAttributes.map(
                 ({ title, content, show }) =>

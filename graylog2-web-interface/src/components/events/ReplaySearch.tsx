@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 import { useMemo } from 'react';
+import merge from 'lodash/merge';
 
 import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useCreateSearch from 'views/hooks/useCreateSearch';
@@ -31,9 +32,6 @@ import type { Event } from 'components/events/events/types';
 import type { EventDefinitionAggregation } from 'hooks/useEventDefinition';
 import useCreateViewForEvent from 'views/logic/views/UseCreateViewForEvent';
 import Center from 'components/common/Center';
-import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
-import sidebarSections from 'views/components/sidebar/sidebarSections';
-import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
 
 type ReplaySearchProps = {
   alertId: string;
@@ -61,25 +59,21 @@ const ReplaySearch = ({
   const _view = useCreateViewForEvent({ eventData, eventDefinition, aggregations });
   const view = useCreateSearch(_view);
 
-  const _searchPageLayout = useMemo(() => {
-    const replaySection: SidebarSection = {
-      key: 'eventDescription',
-      title: null,
-      icon: 'play_arrow',
-      content: ReplaySearchSidebar,
-    };
-
-    return {
-      ...searchPageLayout,
-      infoBar: { component: EventInfoBar },
-      sidebar: {
-        isShown: true,
-        title: 'Replayed Search',
-        sections: [replaySection, ...sidebarSections],
-        contentColumnWidth: 350,
-      },
-    };
-  }, [searchPageLayout]);
+  const _searchPageLayout = useMemo(
+    () =>
+      merge(
+        {
+          infoBar: { component: EventInfoBar },
+          sidebar: {
+            isShown: true,
+            title: 'Replayed Search',
+            contentColumnWidth: 350,
+          },
+        },
+        searchPageLayout,
+      ),
+    [searchPageLayout],
+  );
   const replaySearchContext = useMemo(
     () =>
       ({

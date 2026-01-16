@@ -35,7 +35,7 @@ const Container = styled.div`
 
 const EventsListSidebar = styled.div(
   ({ theme }) => css`
-    display: none;
+    display: flex;
     flex-direction: column;
 
     flex-shrink: 0;
