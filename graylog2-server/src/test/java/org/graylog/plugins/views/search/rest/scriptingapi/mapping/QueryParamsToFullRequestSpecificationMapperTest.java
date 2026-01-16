@@ -33,7 +33,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.AggregationRequestSpec.DEFAULT_TIMERANGE;
-import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_FIELDS;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT;
 import static org.graylog.plugins.views.search.rest.scriptingapi.request.MessagesRequestSpec.DEFAULT_SORT_ORDER;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -130,9 +129,7 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         DEFAULT_SORT_ORDER,
                         0,
                         10,
-                        DEFAULT_FIELDS
-
-
+                        List.of()
                 )
         );
     }
@@ -154,7 +151,6 @@ class QueryParamsToFullRequestSpecificationMapperTest {
                         KeywordRange.create("last 1 day", "UTC"),
                         List.of(new Grouping("http_method"), new Grouping("controller")),
                         List.of(new Metric("avg", "took_ms"))
-
                 )
         );
     }
