@@ -28,12 +28,12 @@ type MoreActionsIconProps = {
 export const MoreActionsIcon = ({ size = undefined }: MoreActionsIconProps) => <Icon name="more_horiz" size={size} />;
 
 type MoreActionsMenuProps = {
-  id?: string;
   'aria-label'?: string;
   bsStyle?: StyleProps;
-  pullRight?: boolean;
-  keepMounted?: boolean;
   className?: string;
+  id?: string;
+  keepMounted?: boolean;
+  pullRight?: boolean;
   title?: string;
 };
 const StyledDropdownButton = styled(DropdownButton)`
@@ -42,24 +42,25 @@ const StyledDropdownButton = styled(DropdownButton)`
 export const MoreActionsMenu = ({
   'aria-label': ariaLabel,
   bsStyle = undefined,
-  className = undefined,
   children = undefined,
+  className = undefined,
   id = undefined,
-  pullRight = undefined,
   keepMounted = undefined,
+  pullRight = undefined,
   title = 'More Actions',
 }: React.PropsWithChildren<MoreActionsMenuProps>) => (
   <StyledDropdownButton
-    className={className}
+    aria-label={ariaLabel}
+    bsSize="xs"
     bsStyle={bsStyle}
     buttonTitle={title}
-    title={<MoreActionsIcon />}
-    noCaret
-    bsSize="xs"
+    className={className}
     id={id}
-    aria-label={ariaLabel}
+    keepMounted={keepMounted}
+    noCaret
     pullRight={pullRight}
-    keepMounted={keepMounted}>
+    title={<MoreActionsIcon />}
+    withinPortal>
     {children}
   </StyledDropdownButton>
 );
