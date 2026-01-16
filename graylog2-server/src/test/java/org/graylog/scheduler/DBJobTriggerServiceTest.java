@@ -879,6 +879,16 @@ class DBJobTriggerServiceTest {
     }
 
     @Test
+    @MongoDBFixtures("failed-job-trigger.json")
+    void deleteInStateErrorCompleted() {
+        final String docId = "54e3deadbeefdeadbeef0005";
+        assertThat(dbJobTriggerService.get(docId)).isPresent();
+        assertThat(dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS)).isEqualTo(1);
+        //The trigger in state "error" is also deleted:
+        assertThat(dbJobTriggerService.get(docId)).isNotPresent();
+    }
+
+    @Test
     @MongoDBFixtures("stale-job-triggers.json")
     void forceReleaseOwnedTriggers() {
         final Set<String> triggerIds;
