@@ -175,7 +175,6 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));
-        install(new FactoryModuleBuilder().build(SetIndexReadOnlyAndCalculateRangeJob.Factory.class));
 
         install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
 
