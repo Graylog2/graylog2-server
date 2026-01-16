@@ -22,7 +22,6 @@ import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
@@ -65,11 +64,9 @@ class FieldTypeMappingsServiceTest {
     private FieldTypeMappingsService toTest;
 
     @Mock
-    private IndexSetService indexSetService;
+    private MongoIndexSetService indexSetService;
     @Mock
     private MongoIndexSet.Factory mongoIndexSetFactory;
-    @Mock
-    private MongoIndexSetService mongoIndexSetService;
     @Mock
     private MongoIndexSet existingMongoIndexSet;
     @Mock
@@ -79,11 +76,11 @@ class FieldTypeMappingsServiceTest {
 
     @BeforeEach
     void setUp() {
-        toTest = new FieldTypeMappingsService(indexSetService, mongoIndexSetFactory, mongoIndexSetService, profileService);
+        toTest = new FieldTypeMappingsService(indexSetService, mongoIndexSetFactory, profileService);
         existingIndexSet = buildSampleIndexSetConfig("existing_index_set");
 
         //simple storage mocking
-        lenient().when(mongoIndexSetService.save(any())).thenAnswer(i -> i.getArguments()[0]);
+        lenient().when(indexSetService.save(any())).thenAnswer(i -> i.getArguments()[0]);
     }
 
     @Test
@@ -93,7 +90,7 @@ class FieldTypeMappingsServiceTest {
                 Set.of("existing_index_set"),
                 false);
 
-        verify(mongoIndexSetService).save(
+        verify(indexSetService).save(
                 existingIndexSet.toBuilder()
                         .customFieldMappings(new CustomFieldMappings(Set.of(existingCustomFieldMapping, newCustomMapping)))
                         .build());
@@ -113,9 +110,8 @@ class FieldTypeMappingsServiceTest {
                 .customFieldMappings(new CustomFieldMappings(Set.of(existingCustomFieldMapping, newCustomMapping)))
                 .build();
 
-        verify(mongoIndexSetService).save(expectedUpdatedConfig);
+        verify(indexSetService).save(expectedUpdatedConfig);
         verify(existingMongoIndexSet).cycle();
-        verifyNoMoreInteractions(mongoIndexSetService);
     }
 
     @Test
@@ -126,7 +122,6 @@ class FieldTypeMappingsServiceTest {
                 true);
 
         verify(existingMongoIndexSet, never()).cycle();
-        verifyNoMoreInteractions(mongoIndexSetService);
     }
 
     @Test
@@ -155,7 +150,7 @@ class FieldTypeMappingsServiceTest {
     void testRemovesMappingsForIndexSetEvenIfRemovalForAnotherIndexSetThrowsException() {
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
         final IndexSetConfig brokenIndexSet = buildSampleIndexSetConfig("broken_index_set");
-        lenient().when(mongoIndexSetService.save(argThat(indexSetConfig -> Objects.equals(brokenIndexSet.id(), indexSetConfig.id()))))
+        lenient().when(indexSetService.save(argThat(indexSetConfig -> Objects.equals(brokenIndexSet.id(), indexSetConfig.id()))))
                 .thenThrow(new RuntimeException("Broken!"));
 
         final Map<String, BulkOperationResponse> response = toTest.removeCustomMappingForFields(
@@ -191,8 +186,6 @@ class FieldTypeMappingsServiceTest {
         assertThrows(BadRequestException.class, () -> toTest.changeFieldType(newCustomMapping,
                 Set.of("existing_index_set"),
                 false));
-
-        verifyNoInteractions(mongoIndexSetService);
     }
 
 
@@ -221,7 +214,7 @@ class FieldTypeMappingsServiceTest {
         doReturn(Optional.of(profile)).when(profileService).get(profileId);
         toTest.setProfile(Set.of(existingIndexSet.id()), profileId, false);
 
-        verify(mongoIndexSetService).save(
+        verify(indexSetService).save(
                 existingIndexSet.toBuilder()
                         .fieldTypeProfile(profileId)
                         .build());
@@ -244,7 +237,7 @@ class FieldTypeMappingsServiceTest {
         doReturn(Optional.of(profile)).when(profileService).get(profileId);
         toTest.setProfile(Set.of(existingIndexSet.id()), profileId, false);
 
-        verify(mongoIndexSetService, never()).save(any());
+        verify(indexSetService, never()).save(any());
         verifyNoInteractions(existingMongoIndexSet);
     }
 
@@ -256,7 +249,7 @@ class FieldTypeMappingsServiceTest {
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
         toTest.removeProfileFromIndexSets(Set.of(existingIndexSet.id()), false);
 
-        verify(mongoIndexSetService).save(
+        verify(indexSetService).save(
                 existingIndexSet.toBuilder()
                         .fieldTypeProfile(null)
                         .build());
@@ -268,7 +261,7 @@ class FieldTypeMappingsServiceTest {
         doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
         toTest.removeProfileFromIndexSets(Set.of(existingIndexSet.id()), false);
 
-        verify(mongoIndexSetService, never()).save(any());
+        verify(indexSetService, never()).save(any());
         verifyNoInteractions(existingMongoIndexSet);
     }
 
@@ -288,7 +281,7 @@ class FieldTypeMappingsServiceTest {
         doReturn(Optional.of(profile)).when(profileService).get(profileId);
         toTest.setProfile(Set.of(existingIndexSet.id()), profileId, false);
 
-        verify(mongoIndexSetService).save(
+        verify(indexSetService).save(
                 existingIndexSet.toBuilder()
                         .fieldTypeProfile(profileId)
                         .build());
