@@ -100,7 +100,7 @@
     json5 "^2.2.3"
     semver "^6.3.1"
 
-"@babel/core@^7.24.4":
+"@babel/core@^7.24.4", "@babel/core@^7.28.5":
   version "7.28.5"
   resolved "https://registry.yarnpkg.com/@babel/core/-/core-7.28.5.tgz#4c81b35e51e1b734f510c99b07dfbc7bbbb48f7e"
   integrity sha512-e7jT4DxYvIDLk1ZHmU/m/mB19rex9sv0c2ftBtjSBv+kVM/902eh0fINUzD7UwLLNR+jU585GxUJ8/EBfAM5fw==
@@ -4959,6 +4959,13 @@ babel-plugin-polyfill-regenerator@^0.6.5:
   integrity sha512-ISqQ2frbiNU9vIJkzg7dlPpznPZ4jOiUQ1uSmB0fEHeowtN3COYRsXr/xexn64NpU13P06jc/L5TgiJXOgrbEg==
   dependencies:
     "@babel/helper-define-polyfill-provider" "^0.6.5"
+
+babel-plugin-react-compiler@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-react-compiler/-/babel-plugin-react-compiler-1.0.0.tgz#bdf7360a23a4d5ebfca090255da3893efd07425f"
+  integrity sha512-Ixm8tFfoKKIPYdCCKYTsqv+Fd4IJ0DQqMyEimo+pxUOMUR9cVPlwTrFt9Avu+3cb6Zp3mAzl+t1MrG2fxxKsxw==
+  dependencies:
+    "@babel/types" "^7.26.0"
 
 babel-plugin-styled-components@^2.1.4:
   version "2.1.4"
@@ -13063,6 +13070,20 @@ react-color@^2.19.3:
     prop-types "^15.5.10"
     reactcss "^1.2.0"
     tinycolor2 "^1.4.1"
+
+react-compiler-runtime@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-compiler-runtime/-/react-compiler-runtime-1.0.0.tgz#ee565c2cd3437a41e7fc31d8ab6c662f6b568fc0"
+  integrity sha512-rRfjYv66HlG8896yPUDONgKzG5BxZD1nV9U6rkm+7VCuvQc903C4MjcoZR4zPw53IKSOX9wMQVpA1IAbRtzQ7w==
+
+react-compiler-webpack@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/react-compiler-webpack/-/react-compiler-webpack-1.0.0.tgz#60fac1205100a3c771aad36c695853e71ffc4184"
+  integrity sha512-psMWf+k7psntYKTo6IdiQrERADKobtCrahfJ0QAsC+ccbqANKS/3go6+dLvYauUpMBpmrMlt5AqACRJZ4bKCtg==
+  dependencies:
+    "@babel/core" "^7.28.5"
+    "@babel/plugin-syntax-jsx" "^7.27.1"
+    "@babel/plugin-syntax-typescript" "^7.27.1"
 
 react-day-picker@^9.13.0:
   version "9.13.0"
