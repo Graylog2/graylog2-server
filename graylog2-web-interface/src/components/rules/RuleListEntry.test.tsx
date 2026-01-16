@@ -16,9 +16,9 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import type { RuleType } from 'src/stores/rules/RulesStore';
 import userEvent from '@testing-library/user-event';
 
+import type { RuleType } from 'stores/rules/RulesStore';
 import { asMock } from 'helpers/mocking';
 import type { ScopeParams } from 'hooks/useScopePermissions';
 import useGetPermissionsByScope from 'hooks/useScopePermissions';
