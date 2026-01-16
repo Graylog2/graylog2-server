@@ -16,23 +16,39 @@
  */
 package org.graylog.plugins.sidecar.opamp.server;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.InvalidProtocolBufferException;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import jakarta.inject.Inject;
+import jakarta.inject.Singleton;
+import opamp.proto.Anyvalue.KeyValue;
+import opamp.proto.Opamp.AgentDescription;
 import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.ServerToAgent;
+import org.graylog.plugins.sidecar.rest.models.NodeDetails;
+import org.graylog.plugins.sidecar.rest.models.Sidecar;
+import org.graylog.plugins.sidecar.services.SidecarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HexFormat;
+import java.util.Set;
+
+@Singleton
+@ChannelHandler.Sharable
 public class OpAMPFrameHandler extends SimpleChannelInboundHandler<BinaryWebSocketFrame> {
     private static final Logger LOG = LoggerFactory.getLogger(OpAMPFrameHandler.class);
 
+    private final SidecarService sidecarService;
+
     @Inject
-    public OpAMPFrameHandler() {
+    public OpAMPFrameHandler(SidecarService sidecarService) {
+        this.sidecarService = sidecarService;
     }
 
     @Override
@@ -55,15 +71,92 @@ public class OpAMPFrameHandler extends SimpleChannelInboundHandler<BinaryWebSock
         } catch (InvalidProtocolBufferException e) {
             LOG.error("Failed to parse AgentToServer message", e);
             ctx.close();
+        } catch (Exception e) {
+            LOG.error("Error processing AgentToServer message", e);
+            ctx.close();
         }
     }
 
     private ServerToAgent processMessage(AgentToServer message) {
-        // TODO: Implement full message processing
-        // For now, return a basic acknowledgment response
+        final String nodeId = extractNodeId(message.getInstanceUid());
+
+        // Extract agent description and create/update sidecar
+        if (message.hasAgentDescription()) {
+            final Sidecar sidecar = createSidecarFromAgent(nodeId, message.getAgentDescription());
+            sidecarService.save(sidecar);
+            LOG.info("Registered/updated OpAMP agent: nodeId={}, nodeName={}", nodeId, sidecar.nodeName());
+        } else {
+            // Just update last_seen for existing sidecar
+            final Sidecar existing = sidecarService.findByNodeId(nodeId);
+            if (existing != null) {
+                sidecarService.save(existing.toBuilder()
+                        .lastSeen(org.joda.time.DateTime.now(org.joda.time.DateTimeZone.UTC))
+                        .build());
+                LOG.debug("Updated last_seen for OpAMP agent: nodeId={}", nodeId);
+            } else {
+                LOG.warn("Received message from unknown agent without agent_description: nodeId={}", nodeId);
+            }
+        }
+
         return ServerToAgent.newBuilder()
                 .setInstanceUid(message.getInstanceUid())
                 .build();
+    }
+
+    private Sidecar createSidecarFromAgent(String nodeId, AgentDescription agentDescription) {
+        // Extract values from identifying and non-identifying attributes
+        String nodeName = nodeId;  // default
+        String operatingSystem = "unknown";
+        String ip = null;
+        String version = "opamp";
+
+        // Process identifying attributes (service.name, service.version, etc.)
+        for (KeyValue kv : agentDescription.getIdentifyingAttributesList()) {
+            final String key = kv.getKey();
+            final String value = getStringValue(kv);
+            switch (key) {
+                case "service.instance.id" -> nodeName = value;
+                case "service.version" -> version = value;
+            }
+        }
+
+        // Process non-identifying attributes (os.type, host.name, host.ip, etc.)
+        for (KeyValue kv : agentDescription.getNonIdentifyingAttributesList()) {
+            final String key = kv.getKey();
+            final String value = getStringValue(kv);
+            switch (key) {
+                case "host.name" -> nodeName = value;
+                case "os.type" -> operatingSystem = value;
+                case "host.ip" -> ip = value;
+            }
+        }
+
+        final NodeDetails nodeDetails = NodeDetails.create(
+                operatingSystem,
+                ip,
+                null,  // metrics
+                null,  // logFileList
+                null,  // statusList
+                Set.of(),  // tags
+                null   // collectorConfigurationDirectory
+        );
+
+        return Sidecar.create(nodeId, nodeName, nodeDetails, version);
+    }
+
+    private String getStringValue(KeyValue kv) {
+        if (kv.hasValue() && kv.getValue().hasStringValue()) {
+            return kv.getValue().getStringValue();
+        }
+        return "";
+    }
+
+    private String extractNodeId(ByteString instanceUid) {
+        // Convert the 16-byte UUID to a hex string for use as nodeId
+        if (instanceUid.isEmpty()) {
+            return "unknown-" + System.currentTimeMillis();
+        }
+        return HexFormat.of().formatHex(instanceUid.toByteArray());
     }
 
     @Override
