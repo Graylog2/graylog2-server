@@ -27,6 +27,7 @@ import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { asMock } from 'helpers/mocking';
 import useFeature from 'hooks/useFeature';
 import useInputMutations from 'hooks/useInputMutations';
+import usePermissions from 'hooks/usePermissions';
 
 import InputsActions from './InputsActions';
 
@@ -46,6 +47,7 @@ jest.mock('routing/useLocation', () => ({
 }));
 jest.mock('hooks/useFeature');
 jest.mock('hooks/useInputMutations');
+jest.mock('hooks/usePermissions');
 jest.mock('stores/inputs/InputStatesStore', () => ({
   __esModule: true,
   default: {
@@ -149,6 +151,7 @@ describe('InputsActions', () => {
       updateInput: updateInputMock,
       deleteInput: deleteInputMock,
     } as any);
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => true });
   });
 
   it('renders Received messages button with correct query for standard input', () => {
@@ -177,6 +180,38 @@ describe('InputsActions', () => {
     userEvent.click(setupButton);
 
     expect(await screen.findByText(/InputSetupWizard/i)).toBeInTheDocument();
+  });
+
+  it('renders input state controls when user has changestate permission', async () => {
+    const input = {
+      ...baseInput,
+      id: 'input-changestate',
+      title: 'Input with changestate only',
+      type: 'org.graylog2.inputs.gelf.udp.GELFUDPInput',
+    };
+    const isPermitted = jest.fn((permission) => permission === `inputs:changestate:${input.id}`);
+
+    asMock(usePermissions).mockReturnValue({ isPermitted });
+
+    renderSUT(input);
+
+    expect(await screen.findByRole('button', { name: /set up input/i })).toBeInTheDocument();
+    expect(isPermitted).toHaveBeenCalledWith(`inputs:changestate:${input.id}`);
+  });
+
+  it('does not render input state controls without changestate permission', () => {
+    const input = {
+      ...baseInput,
+      id: 'input-no-changestate',
+      title: 'Input without changestate',
+      type: 'org.graylog2.inputs.gelf.udp.GELFUDPInput',
+    };
+
+    asMock(usePermissions).mockReturnValue({ isPermitted: () => false });
+
+    renderSUT(input);
+
+    expect(screen.queryByRole('button', { name: /set up input/i })).not.toBeInTheDocument();
   });
 
   it('opens Static Field form when Add static field is selected', async () => {
