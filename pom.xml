@@ -1156,6 +1156,7 @@
                           See available bug patterns: https://errorprone.info/bugpatterns
                         -->
                         <arg>
+                            -XDaddTypeAnnotationsToSymbol=true
                             -Xplugin:ErrorProne
                             -Xep:DoNotMock:WARN
                             -XepDisableWarningsInGeneratedCode
