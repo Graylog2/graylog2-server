@@ -16,9 +16,9 @@
  */
 package org.graylog.plugins.views.storage.migration;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -41,7 +41,7 @@ import org.graylog2.shared.security.RestPermissions;
 @RequiresAuthentication
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-@Api(value = "ReindexMigration", description = "Migrate data from existing cluster")
+@Tag(name = "ReindexMigration", description = "Migrate data from existing cluster")
 public class RemoteReindexResource {
     private final RemoteReindexingMigrationAdapter migrationService;
 
@@ -54,8 +54,8 @@ public class RemoteReindexResource {
     @Path("/remoteReindex")
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @ApiOperation(value = "by remote reindexing", notes = "configure the host/credentials you want to use to migrate data from")
-    public String migrate(@ApiParam(name = "remote configuration") @NotNull @Valid RemoteReindexParams params) {
+    @Operation(summary = "by remote reindexing", description = "configure the host/credentials you want to use to migrate data from")
+    public String migrate(@Parameter(name = "remote configuration") @NotNull @Valid RemoteReindexParams params) {
         final RemoteReindexRequest req = new RemoteReindexRequest(params.allowlist(), params.hostname(), params.user(), params.password(), params.indices(), params.threadsCount(), params.trustUnknownCerts());
         return migrationService.start(req);
     }
@@ -64,8 +64,8 @@ public class RemoteReindexResource {
     @Path("/status/{migrationID}")
     @NoAuditEvent("No Audit Event needed")
     @RequiresPermissions(RestPermissions.DATANODE_MIGRATION)
-    @ApiOperation(value = "status", notes = "status for a running migration")
-    public RemoteReindexMigration status(@ApiParam(name = "migrationID") @PathParam("migrationID") String migrationID) {
+    @Operation(summary = "status", description = "status for a running migration")
+    public RemoteReindexMigration status(@Parameter(name = "migrationID") @PathParam("migrationID") String migrationID) {
         return migrationService.status(migrationID);
     }
 

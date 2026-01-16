@@ -17,6 +17,9 @@
 package org.graylog2.bootstrap.preflight.web.resources;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -150,7 +153,10 @@ public class PreflightResource {
     @Path("/ca/upload")
     @RequiresPermissions(PreflightWebModule.PERMISSION_PREFLIGHT_ONLY)
     @NoAuditEvent("No Auditing during preflight")
-    public Response uploadCA(@FormDataParam("password") String password, @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
+    public Response uploadCA(
+            @Parameter(name = "password") @FormDataParam("password") String password,
+            @Parameter(name = "files", array = @ArraySchema(schema = @Schema(type = "string", format = "binary")))
+            @FormDataParam("files") List<FormDataBodyPart> bodyParts) {
         try {
             caKeystore.createFromUpload(password, bodyParts);
             return Response.ok().build();
