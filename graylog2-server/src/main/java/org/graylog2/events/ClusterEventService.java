@@ -1,0 +1,212 @@
+/*
+ * Copyright (C) 2020 Graylog, Inc.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Server Side Public License, version 1,
+ * as published by MongoDB, Inc.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * Server Side Public License for more details.
+ *
+ * You should have received a copy of the Server Side Public License
+ * along with this program. If not, see
+ * <http://www.mongodb.com/licensing/server-side-public-license>.
+ */
+package org.graylog2.events;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.DeadEvent;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
+import com.google.common.util.concurrent.AbstractExecutionThreadService;
+import com.mongodb.CursorType;
+import com.mongodb.MongoException;
+import com.mongodb.MongoQueryException;
+import com.mongodb.WriteConcern;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.model.CreateCollectionOptions;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
+import com.mongodb.client.model.UpdateOptions;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
+import org.bson.Document;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.MongoCollection;
+import org.graylog2.database.MongoCollections;
+import org.graylog2.database.MongoConnection;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.security.RestrictedChainingClassLoader;
+import org.graylog2.security.UnsafeClassLoadingAttemptException;
+import org.graylog2.shared.utilities.AutoValueUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.UUID;
+
+public class ClusterEventService extends AbstractExecutionThreadService {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterEventService.class);
+
+    @VisibleForTesting
+    static final String COLLECTION_NAME = "cluster_events";
+
+    private final MongoCollection<ClusterEvent> collection;
+    private final NodeId nodeId;
+    private final ObjectMapper objectMapper;
+    private final EventBus serverEventBus;
+    private final RestrictedChainingClassLoader chainingClassLoader;
+    private Offset offset;
+
+    @Inject
+    public ClusterEventService(final MongoJackObjectMapperProvider mapperProvider,
+                               final MongoConnection mongoConnection,
+                               final NodeId nodeId,
+                               final RestrictedChainingClassLoader chainingClassLoader,
+                               final EventBus serverEventBus,
+                               final ClusterEventBus clusterEventBus,
+                               final Offset offset,
+                               @Named("max_events_collection_size") final Size maxEventsCollectionSize) {
+        this.nodeId = nodeId;
+        this.objectMapper = mapperProvider.get();
+        this.chainingClassLoader = chainingClassLoader;
+        this.serverEventBus = serverEventBus;
+        this.collection = prepareCollection(mongoConnection, mapperProvider, maxEventsCollectionSize);
+        this.offset = offset;
+
+        clusterEventBus.registerClusterEventSubscriber(this);
+    }
+
+    @VisibleForTesting
+    static MongoCollection<ClusterEvent> prepareCollection(final MongoConnection mongoConnection,
+                                                           final MongoJackObjectMapperProvider mapperProvider,
+                                                           final Size maxEventsCollectionSize) {
+        final var collectionExists = mongoConnection.getDatabase().collectionExists(COLLECTION_NAME);
+        final var db = mongoConnection.getMongoDatabase();
+        final long maxCollectionSize = maxEventsCollectionSize.toBytes();
+        if (!collectionExists) {
+            db.createCollection(COLLECTION_NAME, new CreateCollectionOptions()
+                    .capped(true)
+                    .sizeInBytes(maxCollectionSize));
+        } else {
+            final var isCapped = mongoConnection.getMongoDatabase().runCommand(new Document("collStats", COLLECTION_NAME)).getBoolean("capped");
+            if (isCapped) {
+                db.runCommand(new Document("collMod", COLLECTION_NAME)
+                        .append("cappedSize", maxCollectionSize));
+            } else {
+                db.runCommand(new Document("convertToCapped", COLLECTION_NAME)
+                        .append("size", maxCollectionSize));
+            }
+        }
+        final var collection = new MongoCollections(mapperProvider, mongoConnection)
+                .collection(COLLECTION_NAME, ClusterEvent.class)
+                .withWriteConcern(WriteConcern.JOURNALED);
+
+        collection.createIndex(Indexes.ascending(
+                ClusterEvent.FIELD_TIMESTAMP,
+                ClusterEvent.FIELD_PRODUCER));
+
+        return collection;
+    }
+
+    @Override
+    protected void run() {
+        while (!Thread.currentThread().isInterrupted()) {
+            final var events = eventsIterable(this.offset)
+                    .cursorType(CursorType.TailableAwait)
+                    .noCursorTimeout(true);
+            try (final var cursor = events.iterator()) {
+                iterateEvents(cursor);
+                Thread.sleep(1000);
+            } catch (Exception e) {
+                if (!(e instanceof MongoQueryException mqe && mqe.getErrorCodeName().equals("QueryPlanKilled"))) {
+                    LOG.warn("Error while reading cluster events from MongoDB, retrying.", e);
+                }
+            }
+        }
+    }
+
+    @VisibleForTesting
+    void iterateEvents(MongoCursor<ClusterEvent> cursor) {
+            LOG.debug("Opened MongoDB cursor on \"{}\"", COLLECTION_NAME);
+            while (cursor.hasNext()) {
+                final var clusterEvent = cursor.tryNext();
+                if (clusterEvent != null) {
+                    LOG.trace("Processing cluster event: {}", clusterEvent);
+                    Object payload = extractPayload(clusterEvent.payload(), clusterEvent.eventClass());
+                    if (payload != null) {
+                        serverEventBus.post(payload);
+                    } else {
+                        LOG.warn("Couldn't extract payload of cluster event with ID <{}>", clusterEvent.id());
+                        LOG.debug("Invalid payload in cluster event: {}", clusterEvent);
+                    }
+
+                    this.offset = new Offset(clusterEvent.timestamp(), clusterEvent.id());
+                }
+            }
+    }
+
+    @Subscribe
+    public void publishClusterEvent(Object event) {
+        if (event instanceof DeadEvent) {
+            LOG.debug("Skipping DeadEvent on cluster event bus");
+            return;
+        }
+
+        final String className = AutoValueUtils.getCanonicalName(event.getClass());
+        final ClusterEvent clusterEvent = ClusterEvent.create(nodeId.getNodeId(), className, event);
+
+        try {
+            final String id = save(clusterEvent);
+            // We are handling a locally generated event, so we can speed up processing by posting it to the local event
+            // bus immediately. Due to filtering on the `producer` field not being equal to the local node id, it will not be picked up
+            // by the db cursor again, avoiding double processing of the event. See #11263 for details.
+            serverEventBus.post(event);
+            LOG.debug("Published cluster event with ID <{}> and type <{}>", id, className);
+        } catch (MongoException e) {
+            LOG.error("Couldn't publish cluster event of type <" + className + ">", e);
+        }
+    }
+
+    private String save(ClusterEvent clusterEvent) {
+        final var result = collection.updateOne(new Document(Map.of(
+                        // This is just used to make sure there is no matching document present.
+                        "event_key", UUID.randomUUID().toString()
+                )), new Document(Map.of(
+                        "$set", clusterEvent,
+                        "$currentDate", new Document(ClusterEvent.FIELD_TIMESTAMP, true),
+                        "$unset", new Document("event_key", 1)
+                )),
+                new UpdateOptions().upsert(true));
+        return result.getUpsertedId().asObjectId().getValue().toHexString();
+    }
+
+    @VisibleForTesting
+    FindIterable<ClusterEvent> eventsIterable(Offset offset) {
+        final var timestampQuery = offset.lastId() == null
+                ? Filters.gte(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen())
+                : Filters.or(Filters.gt(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()),
+                Filters.and(Filters.eq(ClusterEvent.FIELD_TIMESTAMP, offset.lastSeen()), Filters.ne(ClusterEvent.FIELD_ID, offset.lastId())));
+        final var query = Filters.and(Filters.ne(ClusterEvent.FIELD_PRODUCER, nodeId.toString()), timestampQuery);
+        return collection.find(query);
+    }
+
+    private Object extractPayload(Object payload, String eventClass) {
+        try {
+            final Class<?> clazz = chainingClassLoader.loadClassSafely(eventClass);
+            return objectMapper.convertValue(payload, clazz);
+        } catch (ClassNotFoundException e) {
+            LOG.debug("Couldn't load class <" + eventClass + "> for event", e);
+        } catch (IllegalArgumentException e) {
+            LOG.debug("Error while deserializing payload", e);
+        } catch (UnsafeClassLoadingAttemptException e) {
+            LOG.warn("Couldn't load class <{}>.", eventClass, e);
+        }
+        return null;
+    }
+}
