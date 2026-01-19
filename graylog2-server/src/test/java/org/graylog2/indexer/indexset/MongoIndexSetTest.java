@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.indices.HealthStatus;
@@ -35,7 +36,6 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.system.SimpleNodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,16 +45,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.graylog2.indexer.template.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.graylog2.indexer.indexset.MongoIndexSet.hotIndexName;
+import static org.graylog2.indexer.template.MessageIndexTemplateProvider.MESSAGE_TEMPLATE_TYPE;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -95,7 +95,7 @@ public class MongoIndexSetTest {
     @Mock
     private IndexRangeService indexRangeService;
     @Mock
-    private LegacySystemJobManager systemJobManager;
+    private SystemJobManager systemJobManager;
     @Mock
     private SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     @Mock
@@ -298,13 +298,13 @@ public class MongoIndexSetTest {
         when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
-        when(jobFactory.create(oldIndexName)).thenReturn(rangeJob);
+        when(jobFactory.create()).thenReturn(rangeJob);
 
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
 
-        verify(jobFactory, times(1)).create(oldIndexName);
-        verify(systemJobManager, times(1)).submitWithDelay(rangeJob, 30L, TimeUnit.SECONDS);
+        verify(jobFactory, times(1)).create();
+        verify(systemJobManager, times(1)).submitWithDelay(SetIndexReadOnlyAndCalculateRangeJob.forIndex(oldIndexName), Duration.ofSeconds(30));
     }
 
     @Test

@@ -16,8 +16,20 @@
  */
 package org.graylog2.indexer.indices.jobs;
 
-import com.google.inject.assistedinject.Assisted;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
 import jakarta.inject.Inject;
+import org.graylog.scheduler.system.SystemJob;
+import org.graylog.scheduler.system.SystemJobConfig;
+import org.graylog.scheduler.system.SystemJobContext;
+import org.graylog.scheduler.system.SystemJobInfo;
+import org.graylog.scheduler.system.SystemJobManager;
+import org.graylog.scheduler.system.SystemJobResult;
+import org.graylog2.cluster.lock.AlreadyLockedException;
+import org.graylog2.cluster.lock.RefreshingLockService;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
 import org.graylog2.indexer.indexset.IndexSet;
@@ -27,77 +39,78 @@ import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.LegacySystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.Optional;
+import java.util.UUID;
 
-public class SetIndexReadOnlyAndCalculateRangeJob extends LegacySystemJob {
+import static org.graylog2.cluster.lock.ClusterLockResources.indexModification;
+
+public class SetIndexReadOnlyAndCalculateRangeJob implements SystemJob<SetIndexReadOnlyAndCalculateRangeJob.Config> {
+    public static final String TYPE_NAME = "set-index-read-only-and-calculate-range";
+
     private static final Logger LOG = LoggerFactory.getLogger(SetIndexReadOnlyAndCalculateRangeJob.class);
-    private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
-    private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
     private final IndexSetRegistry indexSetRegistry;
     private final Indices indices;
     private final IndexFieldTypesService indexFieldTypesService;
     private final IndexFieldTypePoller indexFieldTypePoller;
     private final ActivityWriter activityWriter;
-    private final LegacySystemJobManager systemJobManager;
-    private final String indexName;
+    private final SystemJobManager systemJobManager;
+    private final RefreshingLockService.Factory lockServiceFactory;
+
+    public interface Factory extends SystemJob.Factory<SetIndexReadOnlyAndCalculateRangeJob> {
+        @Override
+        SetIndexReadOnlyAndCalculateRangeJob create();
+    }
 
     @Inject
-    public SetIndexReadOnlyAndCalculateRangeJob(OptimizeIndexJob.Factory optimizeIndexJobFactory,
-                                                CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
-                                                IndexSetRegistry indexSetRegistry,
+    public SetIndexReadOnlyAndCalculateRangeJob(IndexSetRegistry indexSetRegistry,
                                                 Indices indices,
                                                 IndexFieldTypesService indexFieldTypesService,
                                                 IndexFieldTypePoller indexFieldTypePoller,
                                                 ActivityWriter activityWriter,
-                                                LegacySystemJobManager systemJobManager,
-                                                @Assisted String indexName) {
-        this.optimizeIndexJobFactory = optimizeIndexJobFactory;
-        this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
+                                                SystemJobManager systemJobManager,
+                                                RefreshingLockService.Factory lockServiceFactory) {
         this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
         this.indexFieldTypesService = indexFieldTypesService;
         this.indexFieldTypePoller = indexFieldTypePoller;
         this.activityWriter = activityWriter;
         this.systemJobManager = systemJobManager;
-        this.indexName = indexName;
+        this.lockServiceFactory = lockServiceFactory;
     }
 
     @Override
-    public void execute() {
+    public SystemJobResult execute(Config config, SystemJobContext ctx) {
+        try (var lockService = lockServiceFactory.create()) {
+            lockService.acquireAndKeepLock(indexModification(config.indexName()), UUID.randomUUID().toString());
+
+            return doExecute(config.indexName());
+        } catch (AlreadyLockedException e) {
+            LOG.debug("Recalculation for index <{}> already running, scheduling retry.", config.indexName());
+            return SystemJobResult.withRetry(Duration.ofSeconds(5));
+        } catch (Exception e) {
+            LOG.error("Error while setting index <{}> to read-only and calculating index range", config.indexName(), e);
+            return SystemJobResult.withError();
+        }
+    }
+
+    public SystemJobResult doExecute(String indexName) {
         if (!indices.exists(indexName)) {
             LOG.debug("Not running job for deleted index <{}>", indexName);
-            return;
+            return SystemJobResult.success();
         }
         if (indices.isClosed(indexName)) {
             LOG.debug("Not running job for closed index <{}>", indexName);
-            return;
+            return SystemJobResult.success();
         }
-        setReadonly();
-        final LegacySystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexName);
-        createNewSingleIndexRangeJob.execute();
 
-        // Update field type information again to make sure we got the latest state
-        indexSetRegistry.getForIndex(indexName)
-                .flatMap(indexSet -> indexFieldTypePoller.pollIndex(indexName, indexSet.getConfig().id()))
-                .ifPresent(indexFieldTypesService::upsert);
-    }
-
-    public String getIndex() {
-        return indexName;
-    }
-
-    public void setReadonly() {
         final Optional<IndexSet> indexSet = indexSetRegistry.getForIndex(indexName);
-
         if (indexSet.isEmpty()) {
             LOG.error("Couldn't find index set for index <{}>", indexName);
-            return;
+            return SystemJobResult.withError();
         }
 
         LOG.info("Flushing old index <{}>.", indexName);
@@ -113,55 +126,55 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends LegacySystemJob {
         activityWriter.write(new Activity("Flushed and set <" + indexName + "> to read-only.", SetIndexReadOnlyAndCalculateRangeJob.class));
 
         if (!indexSet.get().getConfig().indexOptimizationDisabled()) {
-            try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(indexName, indexSet.get().getConfig().indexOptimizationMaxNumSegments()));
-            } catch (SystemJobConcurrencyException e) {
-                // The concurrency limit is very high. This should never happen.
-                LOG.error("Cannot optimize index <" + indexName + ">.", e);
-            }
+            systemJobManager.submit(OptimizeIndexJob.forIndex(
+                    indexName,
+                    indexSet.get().getConfig().indexOptimizationMaxNumSegments()
+            ));
         }
+
+        systemJobManager.submit(CreateNewSingleIndexRangeJob.forIndex(indexName));
+
+        // Update field type information again to make sure we got the latest state
+        indexSetRegistry.getForIndex(indexName)
+                .flatMap(is -> indexFieldTypePoller.pollIndex(indexName, is.getConfig().id()))
+                .ifPresent(indexFieldTypesService::upsert);
+
+        return SystemJobResult.success();
     }
 
-    @Override
-    public void requestCancel() {
+    public static Config forIndex(String indexName) {
+        return Config.Builder.create().indexName(indexName).build();
     }
 
-    @Override
-    public int getProgress() {
-        return 0;
-    }
+    @AutoValue
+    @JsonDeserialize(builder = SetIndexReadOnlyAndCalculateRangeJob.Config.Builder.class)
+    @JsonTypeName(TYPE_NAME)
+    public static abstract class Config implements SystemJobConfig {
+        @JsonProperty("index_name")
+        public abstract String indexName();
 
-    @Override
-    public int maxConcurrency() {
-        return 1000;
-    }
+        @Override
+        public SystemJobInfo toInfo() {
+            return SystemJobInfo.builder()
+                    .type(type())
+                    .description("Sets index to read-only and updates index range information.")
+                    .statusInfo("Setting index to read-only and calculating ranges for index " + indexName() + ".")
+                    .isCancelable(false)
+                    .reportsProgress(false)
+                    .build();
+        }
 
-    @Override
-    public boolean providesProgress() {
-        return false;
-    }
+        @AutoValue.Builder
+        public static abstract class Builder implements SystemJobConfig.Builder<Builder> {
+            @JsonCreator
+            public static Builder create() {
+                return new AutoValue_SetIndexReadOnlyAndCalculateRangeJob_Config.Builder().type(TYPE_NAME);
+            }
 
-    @Override
-    public boolean isCancelable() {
-        return false;
-    }
+            @JsonProperty("index_name")
+            public abstract Builder indexName(String indexName);
 
-    @Override
-    public String getDescription() {
-        return "Makes index " + indexName + " read only and calculates and adds its index range afterwards.";
-    }
-
-    @Override
-    public String getInfo() {
-        return "Make index <%s> read only and calculate ranges".formatted(indexName);
-    }
-
-    @Override
-    public String getClassName() {
-        return this.getClass().getCanonicalName();
-    }
-
-    public interface Factory {
-        SetIndexReadOnlyAndCalculateRangeJob create(String indexName);
+            public abstract Config build();
+        }
     }
 }
