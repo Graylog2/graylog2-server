@@ -1,0 +1,56 @@
+// Custom proto definitions for Graylog Sidecar OpAMP integration.
+// These messages are used within OpAMP's custom_message field.
+
+syntax = "proto3";
+
+package graylog.sidecar;
+
+option java_package = "org.graylog.plugins.sidecar.opamp.proto";
+option java_outer_classname = "SidecarProto";
+
+// Collector process status (separate from agent health)
+message CollectorStatus {
+  string collector_id = 1;
+  Status status = 2;
+  string error_message = 3;
+  int64 pid = 4;
+
+  enum Status {
+    UNKNOWN = 0;
+    RUNNING = 1;
+    STOPPED = 2;
+    FAILING = 3;
+  }
+}
+
+// Host system metrics
+message SystemMetrics {
+  float cpu_percent = 1;
+  float memory_percent = 2;
+  float disk_percent = 3;
+}
+
+// Available log files for collection
+message LogFilesList {
+  repeated string paths = 1;
+}
+
+// Action command from server
+message Action {
+  string action_id = 1;
+  ActionType type = 2;
+  string collector_id = 3;
+
+  enum ActionType {
+    NONE = 0;
+    RESTART = 1;
+    STOP = 2;
+  }
+}
+
+// Action execution result from agent
+message ActionResult {
+  string action_id = 1;
+  bool success = 2;
+  string error_message = 3;
+}

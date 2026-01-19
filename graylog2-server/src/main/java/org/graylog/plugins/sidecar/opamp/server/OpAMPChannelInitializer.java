@@ -21,6 +21,7 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
+import io.netty.handler.codec.http.websocketx.WebSocketFrameAggregator;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import jakarta.inject.Inject;
@@ -62,6 +63,9 @@ public class OpAMPChannelInitializer extends ChannelInitializer<SocketChannel> {
                 true,  // allowExtensions
                 MAX_FRAME_SIZE
         ));
+
+        // Aggregate fragmented WebSocket frames into complete messages
+        pipeline.addLast("ws-aggregator", new WebSocketFrameAggregator(MAX_FRAME_SIZE));
 
         // Our custom handler for OpAMP binary frames
         pipeline.addLast("opamp-handler", frameHandler);
