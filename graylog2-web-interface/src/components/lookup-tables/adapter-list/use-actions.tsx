@@ -58,7 +58,7 @@ function Actions({ adapter }: ActionsProps) {
 
   return (
     <>
-      <MoreActionsMenu id={adapter.id} size="lg" pullRight>
+      <MoreActionsMenu id={adapter.id} size="lg" pullRight title={`More Actions for ${adapter.name}`}>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>

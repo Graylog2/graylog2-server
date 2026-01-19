@@ -58,7 +58,7 @@ function Actions({ cache }: ActionsProps) {
 
   return (
     <>
-      <MoreActionsMenu id={cache.id} size="lg" pullRight>
+      <MoreActionsMenu id={cache.id} size="lg" pullRight title={`More Actions for ${cache.name}`}>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>

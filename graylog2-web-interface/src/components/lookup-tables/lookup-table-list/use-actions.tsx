@@ -58,7 +58,7 @@ function Actions({ lut }: ActionsProps) {
 
   return (
     <>
-      <MoreActionsMenu id={lut.id} size="lg" pullRight>
+      <MoreActionsMenu id={lut.id} size="lg" pullRight title={`More Actions for ${lut.name}`}>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
