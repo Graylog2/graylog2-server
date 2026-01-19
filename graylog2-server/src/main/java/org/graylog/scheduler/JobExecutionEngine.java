@@ -164,7 +164,7 @@ public class JobExecutionEngine {
         // We always get the full set of job type names to populate the cache for the next gauge calls.
         jobFactories.keySet().forEach(jobType -> MetricUtils.safelyRegister(
                 metricRegistry,
-                MetricRegistry.name(getClass(), "executions", "overdue", "type", jobType),
+                MetricRegistry.name(getClass(), name, "executions", "overdue", "type", jobType),
                 (Gauge<Long>) () -> gaugeCache.getAll(jobFactories.keySet()).get(jobType)
         ));
     }
