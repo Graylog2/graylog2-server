@@ -69,7 +69,12 @@ const EventReplaySearchPage = () => {
   return isLoading ? (
     <Spinner />
   ) : (
-    <ReplaySearch alertId={alertId} definitionId={definitionId} searchPageLayout={searchPageLayout} />
+    <ReplaySearch
+      alertId={alertId}
+      definitionId={definitionId}
+      searchPageLayout={searchPageLayout}
+      forceSidebarPinned
+    />
   );
 };
 
