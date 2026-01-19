@@ -52,7 +52,10 @@ const Row = ({ data, index, setSize, style, containerWidth }: RowComponentProps<
 type WindowListProps = Partial<MenuListProps> & {
   listRef?: any;
   children: Array<React.ReactNode>;
-  onRowsRendered?: (visibleRows: { startIndex: number; stopIndex: number }, allRows: { startIndex: number; stopIndex: number }) => void;
+  onRowsRendered?: (
+    visibleRows: { startIndex: number; stopIndex: number },
+    allRows: { startIndex: number; stopIndex: number },
+  ) => void;
 };
 
 export const WindowList = ({ children, listRef = undefined, onRowsRendered = undefined, ...rest }: WindowListProps) => {
@@ -62,21 +65,18 @@ export const WindowList = ({ children, listRef = undefined, onRowsRendered = und
   const containerDimensions = useElementDimensions(containerRef);
   const { width } = containerDimensions;
 
-  const setSize = useCallback(
-    (index: number, size: number) => {
-      setSizeMap((prev) => ({ ...prev, [index]: size }));
-    },
-    [],
-  );
+  const setSize = useCallback((index: number, size: number) => {
+    setSizeMap((prev) => ({ ...prev, [index]: size }));
+  }, []);
 
   const totalHeight = useMemo(() => {
     // Calculate total height based on measured sizes
     // Only sum heights for items that have been measured
     let sum = 0;
-    
+
     for (let i = 0; i < children.length && sum < MAX_CONTAINER_SIZE; i += 1) {
       const size = sizeMap[i];
-      
+
       if (size) {
         sum += parseInt(String(size), 10);
       } else {
