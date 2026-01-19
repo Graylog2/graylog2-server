@@ -1,0 +1,4 @@
+type = "f"
+message = "Use consistent English tile server for world map visualization to fix multi-language label display. Added fallback servers for improved reliability."
+
+issues = ["5443"]
