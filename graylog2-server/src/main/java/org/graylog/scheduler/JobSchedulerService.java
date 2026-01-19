@@ -21,7 +21,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import jakarta.inject.Named;
 import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.eventbus.JobCompletedEvent;
 import org.graylog.scheduler.eventbus.JobSchedulerEventBus;
@@ -38,11 +37,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
+import java.util.function.Supplier;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class JobSchedulerService extends AbstractExecutionThreadService implements GracefulShutdownHook {
     private final Logger log;
     private final JobExecutionEngine jobExecutionEngine;
-    private final JobSchedulerConfig schedulerConfig;
+    private final Supplier<Boolean> canExecuteSupplier;
     private final JobSchedulerClock clock;
     private final JobSchedulerEventBus schedulerEventBus;
     private final ServerStatus serverStatus;
@@ -57,18 +59,18 @@ public abstract class JobSchedulerService extends AbstractExecutionThreadService
     public JobSchedulerService(Logger log,
                                Function<JobWorkerPool, JobExecutionEngine> engineFunction,
                                JobWorkerPool workerPool,
-                               JobSchedulerConfig schedulerConfig,
+                               Supplier<Boolean> canExecuteSupplier,
                                JobSchedulerClock clock,
                                JobSchedulerEventBus schedulerEventBus,
                                ServerStatus serverStatus,
                                GracefulShutdownService gracefulShutdownService,
-                               @Named("shutdown_timeout") int shutdownTimeoutMs,
-                               @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration) {
+                               int shutdownTimeoutMs,
+                               Duration loopSleepDuration) {
         this.log = log;
+        this.canExecuteSupplier = canExecuteSupplier;
         this.jobHeartbeatExecutor = createJobHeartbeatExecutor();
         this.workerPool = workerPool;
         this.jobExecutionEngine = engineFunction.apply(workerPool);
-        this.schedulerConfig = schedulerConfig;
         this.clock = clock;
         this.schedulerEventBus = schedulerEventBus;
         this.serverStatus = serverStatus;
@@ -93,6 +95,10 @@ public abstract class JobSchedulerService extends AbstractExecutionThreadService
         this.executionThread = Thread.currentThread();
     }
 
+    private boolean canExecute() {
+        return requireNonNull(canExecuteSupplier.get(), "canExecuteSupplier returned null");
+    }
+
     @Override
     protected void run() throws Exception {
         // Safety measure to make sure everything is started before we start job scheduling.
@@ -108,7 +114,7 @@ public abstract class JobSchedulerService extends AbstractExecutionThreadService
 
         boolean executionEnabled = true;
         while (isRunning()) {
-            if (!schedulerConfig.canExecute()) {
+            if (!canExecute()) {
                 executionEnabled = logExecutionConfigState(executionEnabled, false);
                 clock.sleepUninterruptibly(1, TimeUnit.SECONDS);
                 continue;

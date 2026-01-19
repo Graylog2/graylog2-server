@@ -177,7 +177,7 @@ class JobSchedulerServiceIT {
                                        JobSchedulerClock clock,
                                        JobSchedulerEventBus schedulerEventBus,
                                        ServerStatus serverStatus) {
-            super(LOG, engineFactory, workerPool, schedulerConfig, clock, schedulerEventBus,
+            super(LOG, engineFactory, workerPool, schedulerConfig::canExecute, clock, schedulerEventBus,
                     serverStatus, new GracefulShutdownService(), 30_000, Duration.milliseconds(200));
         }
     }

@@ -54,7 +54,8 @@ public class SystemJobSchedulerService extends JobSchedulerService {
                                      ServerStatus serverStatus,
                                      GracefulShutdownService gracefulShutdownService,
                                      @Named("shutdown_timeout") int shutdownTimeoutMs,
-                                     @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration) {
+                                     @Named(JobSchedulerConfiguration.LOOP_SLEEP_DURATION) Duration loopSleepDuration,
+                                     @Named(JobSchedulerConfiguration.SYSTEM_WORKER_THREADS) int systemWorkerThreads) {
         super(LOG,
                 (workerPool) -> engineFactory.create(
                         NAME,
@@ -63,8 +64,8 @@ public class SystemJobSchedulerService extends JobSchedulerService {
                         SystemJobSchedulerService::createJobDefinitionLookup,
                         systemJobTriggerService // MUST be the system job trigger service!
                 ),
-                workerPoolFactory.create(NAME, schedulerConfig.numberOfWorkerThreads()),
-                schedulerConfig,
+                workerPoolFactory.create(NAME, systemWorkerThreads),
+                () -> true, // System jobs should always be allowed to execute on all nodes
                 clock,
                 schedulerEventBusFactory.create(NAME),
                 serverStatus,

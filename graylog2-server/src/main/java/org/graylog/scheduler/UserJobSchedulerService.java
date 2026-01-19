@@ -51,7 +51,7 @@ public class UserJobSchedulerService extends JobSchedulerService {
         super(LOG,
                 (workerPool) -> engineFactory.create(NAME, jobFactories, workerPool, jobDefinitionService::get, jobTriggerService),
                 workerPoolFactory.create(NAME, schedulerConfig.numberOfWorkerThreads()),
-                schedulerConfig,
+                schedulerConfig::canExecute,
                 clock,
                 schedulerEventBusFactory.create(NAME),
                 serverStatus,
