@@ -16,6 +16,8 @@
  */
 package org.graylog.scheduler;
 
+import jakarta.annotation.Nonnull;
+
 import java.util.Optional;
 
 /**
@@ -28,5 +30,5 @@ public interface JobDefinitionLookup {
      * @param jobDefinitionId ID of the job definition to look up.
      * @return An Optional containing the job definition if found, or empty if not found.
      */
-    Optional<JobDefinitionDto> lookup(String jobDefinitionId);
+    Optional<JobDefinitionDto> lookup(@Nonnull String jobDefinitionId);
 }
