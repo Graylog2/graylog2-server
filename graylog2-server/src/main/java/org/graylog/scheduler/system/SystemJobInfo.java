@@ -60,9 +60,7 @@ public abstract class SystemJobInfo {
     public abstract boolean reportsProgress();
 
     public static Builder builder() {
-        return new AutoValue_SystemJobInfo.Builder()
-                .isCancelable(false)
-                .reportsProgress(false);
+        return new AutoValue_SystemJobInfo.Builder();
     }
 
     @AutoValue.Builder
