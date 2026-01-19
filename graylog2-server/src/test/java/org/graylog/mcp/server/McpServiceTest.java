@@ -145,7 +145,7 @@ class McpServiceTest {
         assertThat(result.get()).isInstanceOf(McpSchema.InitializeResult.class);
 
         McpSchema.InitializeResult initResult = (McpSchema.InitializeResult) result.get();
-        assertThat(initResult.protocolVersion()).isEqualTo(McpService.supportedVersions.getFirst());
+        assertThat(initResult.protocolVersion()).isEqualTo(McpService.ALL_SUPPORTED_MCP_VERSIONS.getFirst());
         assertThat(initResult.serverInfo().name()).isEqualTo("Graylog");
         assertThat(initResult.capabilities()).isNotNull();
         assertThat(initResult.capabilities().prompts()).isNotNull();

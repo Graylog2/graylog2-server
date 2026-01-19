@@ -54,8 +54,9 @@ import static org.graylog2.shared.utilities.StringUtils.f;
 @Singleton
 public class McpService {
     private static final Logger LOG = LoggerFactory.getLogger(McpService.class);
-    protected static final List<String> supportedVersions = List.of(ProtocolVersions.MCP_2025_06_18);
-    protected static final String FALLBACK_MCP_VERSION = "2025-03-26";
+    private static final String LATEST_SUPPORTED_MCP_VERSION = ProtocolVersions.MCP_2025_06_18;
+    static final String FALLBACK_MCP_VERSION = "2025-03-26";
+    static final List<String> ALL_SUPPORTED_MCP_VERSIONS = List.of(LATEST_SUPPORTED_MCP_VERSION);
 
     private final ObjectMapper objectMapper;
     private final AuditEventSender auditEventSender;
@@ -96,7 +97,7 @@ public class McpService {
                 auditContext.put("request", initializeRequest);
                 final McpSchema.InitializeResult result = new McpSchema.InitializeResult(
                         // Version negotiation: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#version-negotiation
-                        supportedVersions.contains(initializeRequest.protocolVersion()) ? initializeRequest.protocolVersion() : supportedVersions.getFirst(),
+                        ALL_SUPPORTED_MCP_VERSIONS.contains(initializeRequest.protocolVersion()) ? initializeRequest.protocolVersion() : LATEST_SUPPORTED_MCP_VERSION,
                         new McpSchema.ServerCapabilities(
                                 null,
                                 null,

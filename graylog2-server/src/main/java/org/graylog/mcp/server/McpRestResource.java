@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.HeaderParam;
 import jakarta.ws.rs.POST;
@@ -125,12 +124,12 @@ public class McpRestResource extends RestResource {
                     // According to: https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#protocol-version-header
                     // The protocol version sent by the client SHOULD be the one negotiated during initialization.
                     // The server is NOT responsible for ensuring that the negotiated version remains the same over multiple requests.
-                    if (!McpService.supportedVersions.contains(protocolVersionHeader)) {
+                    if (!McpService.ALL_SUPPORTED_MCP_VERSIONS.contains(protocolVersionHeader)) {
                         LOG.warn("Invalid protocol version for request header {}", protocolVersionHeader);
                         // Example: https://modelcontextprotocol.io/specification/2025-06-18/basic/lifecycle#error-handling
                         throw McpError.builder(McpSchema.ErrorCodes.INVALID_PARAMS)
                                 .message("Invalid protocol version header " + protocolVersionHeader)
-                                .data(Map.of("supported", McpService.supportedVersions, "requested", protocolVersionHeader))
+                                .data(Map.of("supported", McpService.ALL_SUPPORTED_MCP_VERSIONS, "requested", protocolVersionHeader))
                                 .build();
                     }
                 } else {
