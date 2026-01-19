@@ -36,9 +36,10 @@ type MoreActionsMenuProps = {
   keepMounted?: boolean;
   pullRight?: boolean;
   title?: string;
+  solid?: boolean;
 };
-const StyledDropdownButton = styled(DropdownButton)`
-  background-color: transparent;
+const StyledDropdownButton = styled(DropdownButton)<{ $transparent?: boolean }>`
+  ${({ $transparent }) => ($transparent ? 'background-color: transparent;' : '')}
 `;
 export const MoreActionsMenu = ({
   'aria-label': ariaLabel,
@@ -50,8 +51,10 @@ export const MoreActionsMenu = ({
   keepMounted = undefined,
   pullRight = undefined,
   title = 'More Actions',
+  solid = false,
 }: React.PropsWithChildren<MoreActionsMenuProps>) => (
   <StyledDropdownButton
+    $transparent={!solid}
     aria-label={ariaLabel}
     bsStyle={bsStyle}
     buttonTitle={title}
