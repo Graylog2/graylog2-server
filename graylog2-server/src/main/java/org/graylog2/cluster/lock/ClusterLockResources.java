@@ -20,7 +20,7 @@ package org.graylog2.cluster.lock;
  * Utility class for generating standardized cluster lock resource names.
  */
 public final class ClusterLockResources {
-    public ClusterLockResources() {
+    private ClusterLockResources() {
     }
 
     public static String indexModification(String indexName) {
