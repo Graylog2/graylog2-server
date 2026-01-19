@@ -113,7 +113,7 @@ public class SystemJobManager {
                 info.statusInfo(),
                 trigger.lock().owner(),
                 trigger.startTime(),
-                Duration.ofMillis(Instant.now().toEpochMilli() - trigger.startTime().getMillis()),
+                Duration.between(Instant.ofEpochMilli(trigger.startTime().getMillis()), Instant.now()),
                 trigger.lock().progress(),
                 info.isCancelable(),
                 info.reportsProgress(),
