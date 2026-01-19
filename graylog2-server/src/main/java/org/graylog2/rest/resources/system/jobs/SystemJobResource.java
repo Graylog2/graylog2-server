@@ -19,7 +19,6 @@ package org.graylog2.rest.resources.system.jobs;
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -64,8 +63,10 @@ import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Tag(name = "System/Jobs", description = "System Jobs")
@@ -99,7 +100,7 @@ public class SystemJobResource extends RestResource {
     @Operation(summary = "List currently running jobs")
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, List<SystemJobSummary>> list() {
-        final List<SystemJobSummary> jobs = Lists.newArrayListWithCapacity(systemJobManager.getRunningJobs().size());
+        final List<SystemJobSummary> jobs = new ArrayList<>();
 
         for (Map.Entry<String, LegacySystemJob> entry : legacySystemJobManager.getRunningJobs().entrySet()) {
             // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
@@ -119,7 +120,7 @@ public class SystemJobResource extends RestResource {
             }
         }
 
-        for (final var summary : systemJobManager.getRunningJobs(nodeId)) {
+        for (final var summary : systemJobManager.getRunningJobs(nodeId).values()) {
             if (isPermitted(RestPermissions.SYSTEMJOBS_READ, summary.jobType())) {
                 jobs.add(summary);
             }
@@ -139,25 +140,30 @@ public class SystemJobResource extends RestResource {
     })
     public SystemJobSummary get(@Parameter(name = "jobId", required = true)
                                 @PathParam("jobId") @NotEmpty String jobId) {
-        // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
-        checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
-
-        LegacySystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
-        if (systemJob == null) {
-            throw new NotFoundException("No system job with ID <" + jobId + "> found");
+        final LegacySystemJob systemJob = legacySystemJobManager.getRunningJobs().get(jobId);
+        if (systemJob != null) {
+            // TODO jobId is ephemeral, this is not a good key for permission checks. we should use the name of the job type (but there is no way to get it yet)
+            checkPermission(RestPermissions.SYSTEMJOBS_READ, jobId);
+            return SystemJobSummary.create(
+                    systemJob.getId(),
+                    systemJob.getDescription(),
+                    systemJob.getClassName(),
+                    systemJob.getInfo(),
+                    nodeId.getNodeId(),
+                    systemJob.getStartedAt(),
+                    systemJob.getProgress(),
+                    systemJob.isCancelable(),
+                    systemJob.providesProgress()
+            );
         }
 
-        return SystemJobSummary.create(
-                systemJob.getId(),
-                systemJob.getDescription(),
-                systemJob.getClassName(),
-                systemJob.getInfo(),
-                nodeId.getNodeId(),
-                systemJob.getStartedAt(),
-                systemJob.getProgress(),
-                systemJob.isCancelable(),
-                systemJob.providesProgress()
-        );
+        final Optional<SystemJobSummary> systemJobSummary = systemJobManager.getRunningJob(jobId);
+        if (systemJobSummary.isPresent()) {
+            checkPermission(RestPermissions.SYSTEMJOBS_READ, systemJobSummary.get().jobType());
+            return systemJobSummary.get();
+        }
+
+        throw new NotFoundException("No system job with ID <" + jobId + "> found");
     }
 
     @POST

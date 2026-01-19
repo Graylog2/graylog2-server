@@ -34,7 +34,12 @@ import org.joda.time.DateTimeZone;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static org.graylog2.shared.utilities.StringUtils.requireNonBlank;
 
 @Singleton
 public class SystemJobManager {
@@ -80,11 +85,11 @@ public class SystemJobManager {
         }
     }
 
-    public List<SystemJobSummary> getRunningJobs() {
+    public Map<String, SystemJobSummary> getRunningJobs() {
         return getJobsByQuery(Filters.eq(JobTriggerDto.FIELD_STATUS, JobTriggerStatus.RUNNING));
     }
 
-    public List<SystemJobSummary> getRunningJobs(NodeId nodeId) {
+    public Map<String, SystemJobSummary> getRunningJobs(NodeId nodeId) {
         return getJobsByQuery(
                 Filters.and(
                         Filters.eq(JobTriggerDto.FIELD_LOCK_OWNER, nodeId.getNodeId()),
@@ -93,9 +98,16 @@ public class SystemJobManager {
         );
     }
 
-    private List<SystemJobSummary> getJobsByQuery(Bson query) {
+    public Optional<SystemJobSummary> getRunningJob(String id) {
+        return triggerService.get(requireNonBlank(id, "id can't be blank"))
+                .filter(trigger -> trigger.status() == JobTriggerStatus.RUNNING)
+                .map(this::toSystemJobInfo);
+    }
+
+    private Map<String, SystemJobSummary> getJobsByQuery(Bson query) {
         try (var stream = triggerService.streamByQuery(query)) {
-            return stream.map(this::toSystemJobInfo).toList();
+            return stream.map(this::toSystemJobInfo)
+                    .collect(Collectors.toMap(SystemJobSummary::id, Function.identity()));
         }
     }
 
