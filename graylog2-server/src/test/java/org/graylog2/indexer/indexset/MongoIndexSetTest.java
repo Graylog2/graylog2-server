@@ -298,12 +298,10 @@ public class MongoIndexSetTest {
         when(indices.waitForRecovery(newIndexName)).thenReturn(HealthStatus.Green);
 
         final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
-        when(jobFactory.create()).thenReturn(rangeJob);
 
         final MongoIndexSet mongoIndexSet = createIndexSet(config);
         mongoIndexSet.cycle();
 
-        verify(jobFactory, times(1)).create();
         verify(systemJobManager, times(1)).submitWithDelay(SetIndexReadOnlyAndCalculateRangeJob.forIndex(oldIndexName), Duration.ofSeconds(30));
     }
 
