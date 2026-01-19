@@ -422,7 +422,7 @@ public class IndicesAdapterOS implements IndicesAdapter {
         GetAliasRequest request = GetAliasRequest.of(r -> r
                 .index(indexPattern)
                 .ignoreUnavailable(false)
-                .allowNoIndices(false)
+                .allowNoIndices(true)
                 .expandWildcards(ExpandWildcard.Open)
         );
         return c.execute(() -> {
