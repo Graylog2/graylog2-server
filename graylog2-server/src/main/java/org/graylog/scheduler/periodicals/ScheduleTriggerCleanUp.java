@@ -90,7 +90,7 @@ public class ScheduleTriggerCleanUp extends Periodical {
 
         int deletedSystem = dbSystemJobTriggerService.deleteCompletedOnceSchedulesOlderThan(OUTOFDATE_IN_DAYS, TimeUnit.DAYS);
         if (deletedSystem > 0) {
-            LOG.debug("Deleted {} completed system job triggers.", deleted);
+            LOG.debug("Deleted {} completed system job triggers.", deletedSystem);
         }
     }
 }
