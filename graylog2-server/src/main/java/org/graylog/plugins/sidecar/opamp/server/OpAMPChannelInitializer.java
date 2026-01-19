@@ -24,7 +24,6 @@ import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import io.netty.handler.codec.http.websocketx.extensions.compression.WebSocketServerCompressionHandler;
 import jakarta.inject.Inject;
-import jakarta.inject.Provider;
 import jakarta.inject.Singleton;
 
 @Singleton
@@ -33,11 +32,13 @@ public class OpAMPChannelInitializer extends ChannelInitializer<SocketChannel> {
     private static final int MAX_FRAME_SIZE = 65536;
     private static final int MAX_HTTP_CONTENT_LENGTH = 65536;
 
-    private final Provider<OpAMPFrameHandler> frameHandlerProvider;
+    private final OpAMPAuthHandler authHandler;
+    private final OpAMPFrameHandler frameHandler;
 
     @Inject
-    public OpAMPChannelInitializer(Provider<OpAMPFrameHandler> frameHandlerProvider) {
-        this.frameHandlerProvider = frameHandlerProvider;
+    public OpAMPChannelInitializer(OpAMPAuthHandler authHandler, OpAMPFrameHandler frameHandler) {
+        this.authHandler = authHandler;
+        this.frameHandler = frameHandler;
     }
 
     @Override
@@ -47,6 +48,9 @@ public class OpAMPChannelInitializer extends ChannelInitializer<SocketChannel> {
         // HTTP codec for WebSocket upgrade handshake
         pipeline.addLast("http-codec", new HttpServerCodec());
         pipeline.addLast("http-aggregator", new HttpObjectAggregator(MAX_HTTP_CONTENT_LENGTH));
+
+        // Authentication - validates token before WebSocket upgrade
+        pipeline.addLast("auth", authHandler);
 
         // WebSocket compression (optional, but recommended)
         pipeline.addLast("ws-compression", new WebSocketServerCompressionHandler());
@@ -60,6 +64,6 @@ public class OpAMPChannelInitializer extends ChannelInitializer<SocketChannel> {
         ));
 
         // Our custom handler for OpAMP binary frames
-        pipeline.addLast("opamp-handler", frameHandlerProvider.get());
+        pipeline.addLast("opamp-handler", frameHandler);
     }
 }
