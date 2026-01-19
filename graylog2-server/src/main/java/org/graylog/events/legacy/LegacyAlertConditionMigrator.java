@@ -23,9 +23,11 @@ import com.google.common.collect.Streams;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.Filters;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import org.bson.Document;
+import org.graylog.events.conditions.BooleanExpression;
 import org.graylog.events.conditions.Expr;
-import org.graylog.events.conditions.Expression;
 import org.graylog.events.notifications.DBNotificationService;
 import org.graylog.events.notifications.EventNotificationHandler;
 import org.graylog.events.notifications.EventNotificationSettings;
@@ -47,9 +49,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
 
 import java.util.List;
 import java.util.Locale;
@@ -232,7 +231,7 @@ public class LegacyAlertConditionMigrator {
 
         var messageCountSeries = Count.builder().id(seriesId).build();
 
-        final Expression<Boolean> expression = helper.createExpression(seriesId, "MORE");
+        final BooleanExpression expression = helper.createExpression(seriesId, "MORE");
         final EventProcessorConfig config = helper.createAggregationProcessorConfig(messageCountSeries, expression, executeEveryMs);
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
@@ -284,7 +283,7 @@ public class LegacyAlertConditionMigrator {
                 throw new IllegalStateException("Couldn't migrate field value alert condition with unknown type: " + type);
         };
 
-        final Expression<Boolean> expression = helper.createExpression(seriesId, "HIGHER");
+        final BooleanExpression expression = helper.createExpression(seriesId, "HIGHER");
         final EventProcessorConfig config = helper.createAggregationProcessorConfig(aggregationSeries, expression, executeEveryMs);
         final EventDefinitionDto definitionDto = helper.createEventDefinition(config);
 
@@ -328,7 +327,7 @@ public class LegacyAlertConditionMigrator {
 
         final Expr.NumberReference left = Expr.NumberReference.create(seriesId);
         final Expr.NumberValue right = Expr.NumberValue.create(0);
-        final Expression<Boolean> expression = Expr.Greater.create(left, right);
+        final BooleanExpression expression = Expr.Greater.create(left, right);
 
         final EventProcessorConfig config = AggregationEventProcessorConfig.builder()
                 .streams(ImmutableSet.of(helper.streamId))
@@ -377,7 +376,7 @@ public class LegacyAlertConditionMigrator {
             return parameters;
         }
 
-        EventProcessorConfig createAggregationProcessorConfig(SeriesSpec aggregationSeries, Expression<Boolean> expression, long executeEveryMs) {
+        EventProcessorConfig createAggregationProcessorConfig(SeriesSpec aggregationSeries, BooleanExpression expression, long executeEveryMs) {
             return AggregationEventProcessorConfig.builder()
                     .streams(ImmutableSet.of(streamId))
                     .query(query)
@@ -391,7 +390,7 @@ public class LegacyAlertConditionMigrator {
                     .build();
         }
 
-        Expression<Boolean> createExpression(String seriesId, String greaterValue) {
+        BooleanExpression createExpression(String seriesId, String greaterValue) {
             final Expr.NumberReference left = Expr.NumberReference.create(seriesId);
             final Expr.NumberValue right = Expr.NumberValue.create(threshold);
 

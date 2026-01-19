@@ -66,7 +66,9 @@ describe('<PasswordFormGroup />', () => {
     });
 
     await waitFor(() => {
-      expect(screen.queryByText('Password must be at least 8 characters long.', { exact: false })).not.toBeInTheDocument();
+      expect(
+        screen.queryByText('Password must be at least 8 characters long.', { exact: false }),
+      ).not.toBeInTheDocument();
     });
   });
 
@@ -81,13 +83,17 @@ describe('<PasswordFormGroup />', () => {
     });
 
     expect(screen.getByText('Password must be at least 8 characters long.', { exact: false })).toBeInTheDocument();
-    expect(screen.getByText('Password must contain at least one uppercase letter.', { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText('Password must contain at least one uppercase letter.', { exact: false }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Password must contain at least one number.', { exact: false })).toBeInTheDocument();
     expect(
       screen.getByText(`Password must contain at least one special character from: ${PASSWORD_SPECIAL_CHARACTERS}`, {
         exact: false,
       }),
     ).toBeInTheDocument();
-    expect(screen.queryByText('Password must contain at least one lowercase letter.', { exact: false })).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Password must contain at least one lowercase letter.', { exact: false }),
+    ).not.toBeInTheDocument();
   });
 });
