@@ -133,8 +133,8 @@ public class StreamPipelineRulesResource extends RestResource {
 
     private Stream<StreamPipelineRulesResponse> buildResponse(PipelineRulesMetadataDao dao, String streamId) {
         List<StreamPipelineRulesResponse> responseList = new java.util.ArrayList<>();
-        final List<String> relevantRules = dao.routingRules().keySet().stream()
-                .filter(ruleId -> dao.routingRules().get(ruleId).contains(streamId)).toList();
+        final List<String> relevantRules = dao.streamsByRuleId().keySet().stream()
+                .filter(ruleId -> dao.streamsByRuleId().get(ruleId).contains(streamId)).toList();
 
         PipelineDao pipelineDao;
         try {

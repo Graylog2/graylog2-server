@@ -56,11 +56,11 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
     @JsonProperty(FIELD_ROUTING_RULES)
     // Maps rule ID to IDs of routed stream
-    public abstract Map<String, Set<String>> routingRules();
+    public abstract Map<String, Set<String>> streamsByRuleId();
 
     @JsonProperty(FIELD_ROUTED_STREAMS)
     // Maps stream ID to stream title
-    public abstract Map<String, String> routedStreams();
+    public abstract Map<String, String> routedStreamTitleById();
 
     @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
     public abstract Boolean hasInputReferences();
@@ -78,8 +78,8 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
                 .functions(new HashSet<>())
                 .deprecatedFunctions(new HashSet<>())
                 .hasInputReferences(false)
-                .routingRules(new HashMap<>())
-                .routedStreams(new HashMap<>());
+                .streamsByRuleId(new HashMap<>())
+                .routedStreamTitleById(new HashMap<>());
     }
 
     @AutoValue.Builder
@@ -101,10 +101,10 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
         public abstract Builder deprecatedFunctions(Set<String> deprecatedFunctions);
 
         @JsonProperty(FIELD_ROUTING_RULES)
-        public abstract Builder routingRules(Map<String, Set<String>> routingRules);
+        public abstract Builder streamsByRuleId(Map<String, Set<String>> routingRules);
 
         @JsonProperty(FIELD_ROUTED_STREAMS)
-        public abstract Builder routedStreams(Map<String, String> routedStreamsMap);
+        public abstract Builder routedStreamTitleById(Map<String, String> routedStreamsMap);
 
         @JsonProperty(FIELD_HAS_INPUT_REFERENCES)
         public abstract Builder hasInputReferences(Boolean hasInputReferences);

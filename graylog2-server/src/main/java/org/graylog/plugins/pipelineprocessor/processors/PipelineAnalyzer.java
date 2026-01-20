@@ -131,8 +131,8 @@ public class PipelineAnalyzer {
                     .streams(connectedStreams)
                     .functions(functionSet)
                     .deprecatedFunctions(deprecatedFunctionSet)
-                    .routingRules(routingRulesMap)
-                    .routedStreams(routedStreamsMap)
+                    .streamsByRuleId(routingRulesMap)
+                    .routedStreamTitleById(routedStreamsMap)
                     .hasInputReferences(hasInputReferences)
                     .build());
         });
@@ -237,11 +237,11 @@ public class PipelineAnalyzer {
             if (descriptor.name().equals(RouteToStream.NAME)) {
                 if (args.getPreComputedValue(RouteToStream.ID_ARG) != null) {
                     String streamId = args.getPreComputedValue(RouteToStream.ID_ARG).toString();
-                    try {
-                        Stream stream = streamService.load(streamId);
-                        routedStreamsMap.put(streamId, stream.getTitle());
+                    String streamTitle = streamService.streamTitleFromCache(streamId);
+                    if (streamTitle != null) {
+                        routedStreamsMap.put(streamId, streamTitle);
                         addToRoutingRules(rule.id(), streamId);
-                    } catch (NotFoundException | IllegalArgumentException e) {
+                    } else {
                         LOG.warn("Could not find stream with id '{}'", streamId);
                     }
                 } else if (args.getPreComputedValue(RouteToStream.NAME_ARG) != null) {
