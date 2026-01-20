@@ -42,18 +42,15 @@ const LogLevelDropdown = ({ nodeId, name, subsystem }: Props) => {
     [name, nodeId, setSubsystemLoggerLevel],
   );
 
-  const _menuLevelClick = useCallback(
-    (loglevel: string) => () => {
-      _changeLoglevel(loglevel);
+  const _menuLevelClick = (loglevel: string) => () => {
+    _changeLoglevel(loglevel);
 
-      sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.LOG_LEVEL_EDITED, {
-        app_pathname: getPathnameWithoutId(location.pathname),
-        app_action_value: 'log-level-change',
-        event_details: { value: loglevel },
-      });
-    },
-    [_changeLoglevel, location?.pathname, sendTelemetry],
-  );
+    sendTelemetry(TELEMETRY_EVENT_TYPE.LOGGING.LOG_LEVEL_EDITED, {
+      app_pathname: getPathnameWithoutId(location.pathname),
+      app_action_value: 'log-level-change',
+      event_details: { value: loglevel },
+    });
+  };
 
   const loglevels = availableLoglevels.map((loglevel) => (
     <MenuItem
