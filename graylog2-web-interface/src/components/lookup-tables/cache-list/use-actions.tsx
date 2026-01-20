@@ -19,13 +19,14 @@ import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Routes from 'routing/Routes';
-import { MenuItem, DeleteMenuItem, DropdownButton, BootstrapModalConfirm } from 'components/bootstrap';
-import { Icon, Spinner } from 'components/common';
+import { MenuItem, DeleteMenuItem, BootstrapModalConfirm } from 'components/bootstrap';
+import { Spinner } from 'components/common';
 import useScopePermissions from 'hooks/useScopePermissions';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import { useDeleteCache } from 'components/lookup-tables/hooks/useLookupTablesAPI';
 import type { CacheEntity } from 'components/lookup-tables/types';
+import { MoreActionsMenu } from 'components/common/MoreActions';
 
 type ActionsProps = {
   cache: CacheEntity;
@@ -57,17 +58,11 @@ function Actions({ cache }: ActionsProps) {
 
   return (
     <>
-      <DropdownButton
-        bsStyle="transparent"
-        title={<Icon name="more_horiz" size="lg" />}
-        id={cache.id}
-        buttonTitle={cache.id}
-        noCaret
-        pullRight>
+      <MoreActionsMenu id={cache.id} size="lg" pullRight title={`More Actions for ${cache.name}`}>
         <MenuItem onSelect={handleEdit}>Edit</MenuItem>
         <MenuItem divider />
         <DeleteMenuItem onSelect={() => setShowDeleteModal(true)}>Delete</DeleteMenuItem>
-      </DropdownButton>
+      </MoreActionsMenu>
       {showDeleteModal && (
         <BootstrapModalConfirm
           showModal
