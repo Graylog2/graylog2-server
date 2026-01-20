@@ -132,6 +132,7 @@ public class DBJobTriggerService {
         collection.createIndex(Indexes.ascending(FIELD_CONSTRAINTS));
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_TYPE));
         collection.createIndex(Indexes.ascending(FIELD_UPDATED_AT));
+        collection.createIndex(Indexes.ascending(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD));
     }
 
     @SuppressWarnings("unused")
