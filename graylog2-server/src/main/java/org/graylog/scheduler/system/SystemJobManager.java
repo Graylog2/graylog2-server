@@ -28,8 +28,6 @@ import org.graylog.scheduler.clock.JobSchedulerClock;
 import org.graylog.scheduler.schedule.OnceJobSchedule;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.SystemJobSummary;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -58,7 +56,7 @@ public class SystemJobManager {
     }
 
     public void submitWithDelay(SystemJobConfig config, Duration delay) {
-        final var now = DateTime.now(DateTimeZone.UTC);
+        final var now = clock.nowUTC();
         final var startTime = now.plusMillis(Ints.saturatedCast(delay.toMillis()));
         final var trigger = JobTriggerDto.builderWithClock(clock)
                 .jobDefinitionType(SystemJobDefinitionConfig.TYPE_NAME)
@@ -128,7 +126,7 @@ public class SystemJobManager {
                 info.statusInfo(),
                 trigger.lock().owner(),
                 trigger.startTime(),
-                Duration.between(Instant.ofEpochMilli(trigger.startTime().getMillis()), Instant.now()),
+                Duration.between(Instant.ofEpochMilli(trigger.startTime().getMillis()), clock.instantNow()),
                 trigger.lock().progress(),
                 info.isCancelable(),
                 info.reportsProgress(),
