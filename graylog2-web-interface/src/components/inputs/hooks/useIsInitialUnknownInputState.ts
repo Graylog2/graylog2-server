@@ -14,16 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.storage.opensearch3.views.export;
+import { useEffect, useMemo } from 'react';
 
-import org.graylog.plugins.views.search.searchfilters.db.UsedSearchFiltersToQueryStringsMapper;
-import org.graylog.storage.opensearch3.OfficialOpensearchClient;
-import org.graylog.storage.views.export.ExportBackendITHelper;
+import type { InputStates } from 'hooks/useInputsStates';
 
-public class OpenSearchExportBackendITHelper extends ExportBackendITHelper {
+const useIsInitialUnknownInputState = (inputStates: InputStates, inputId: string) => {
+  const seenInputIds = useMemo(() => new Set<string>(), []);
 
-    public OpenSearchExportBackendITHelper(OfficialOpensearchClient client, UsedSearchFiltersToQueryStringsMapper filters, String... indices) {
-        super(new OpenSearchExportBackend(mockIndexLookup(indices), false, filters, client));
+  useEffect(() => {
+    if (!inputStates) {
+      return;
     }
 
-}
+    Object.keys(inputStates).forEach((id) => {
+      seenInputIds.add(id);
+    });
+  }, [inputStates, seenInputIds]);
+
+  const hasKnownState = !!inputStates?.[inputId];
+
+  return !hasKnownState && !seenInputIds.has(inputId);
+};
+
+export default useIsInitialUnknownInputState;
