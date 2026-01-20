@@ -16,8 +16,8 @@
  */
 import * as React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
-import type { RuleType } from 'src/stores/rules/RulesStore';
 
+import type { RuleType } from 'stores/rules/RulesStore';
 import { asMock, StoreMock as MockStore } from 'helpers/mocking';
 import DefaultQueryClientProvider from 'contexts/DefaultQueryClientProvider';
 import mockComponent from 'helpers/mocking/MockComponent';

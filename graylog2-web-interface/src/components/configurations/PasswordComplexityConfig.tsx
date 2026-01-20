@@ -197,7 +197,11 @@ const PasswordComplexityConfig = () => {
                           id="require_special_chars"
                           label={<LabelSpan>Require special characters</LabelSpan>}
                           help={
-                            <>Password must include at least one of the following characters:<br />{PASSWORD_SPECIAL_CHARACTERS}</>
+                            <>
+                              Password must include at least one of the following characters:
+                              <br />
+                              {PASSWORD_SPECIAL_CHARACTERS}
+                            </>
                           }
                         />
                       </Col>

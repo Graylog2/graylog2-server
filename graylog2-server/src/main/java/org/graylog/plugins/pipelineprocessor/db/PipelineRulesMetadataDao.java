@@ -55,7 +55,7 @@ public abstract class PipelineRulesMetadataDao implements BuildableMongoEntity<P
 
     @JsonIgnore
     public boolean hasDeprecatedFunctions() {
-        return deprecatedFunctions() != null ? !deprecatedFunctions().isEmpty() : false;
+        return deprecatedFunctions() != null && !deprecatedFunctions().isEmpty();
     }
 
     public static Builder builder() {
