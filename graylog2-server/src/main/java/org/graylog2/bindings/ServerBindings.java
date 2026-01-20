@@ -86,6 +86,7 @@ import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.messageq.MessageQueueModule;
 import org.graylog2.shared.metrics.jersey2.MetricsDynamicBinding;
+import org.graylog2.shared.rest.exceptionmappers.ResultWindowLimitExceededExceptionMapper;
 import org.graylog2.shared.rest.resources.csp.CSPDynamicFeature;
 import org.graylog2.shared.rest.resources.csp.CSPEventListener;
 import org.graylog2.shared.rest.resources.csp.CSPService;
@@ -248,6 +249,7 @@ public class ServerBindings extends Graylog2Module {
         exceptionMappers.addBinding().toInstance(ValidationFailureExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ElasticsearchExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(QueryParsingExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(ResultWindowLimitExceededExceptionMapper.class);
     }
 
     private void bindAdditionalJerseyComponents() {
