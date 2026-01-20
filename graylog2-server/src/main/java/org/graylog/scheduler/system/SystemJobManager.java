@@ -79,8 +79,7 @@ public class SystemJobManager {
 
         try (var stream = triggerService.streamByQuery(query)) {
             return stream.map(JobTriggerDto::data)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
+                    .flatMap(Optional::stream)
                     .map(config -> (SystemJobConfig) config)
                     .toList();
         }
