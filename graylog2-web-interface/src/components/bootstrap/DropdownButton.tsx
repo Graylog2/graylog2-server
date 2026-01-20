@@ -46,6 +46,7 @@ type Props = React.PropsWithChildren<
     onToggle?: (isOpen: boolean) => void;
     pullRight?: boolean;
     title?: React.ReactNode;
+    withinPortal?: boolean;
   }
 >;
 
@@ -67,13 +68,15 @@ const DropdownButton = ({
   pullRight = undefined,
   noCaret = undefined,
   keepMounted = undefined,
+  withinPortal = undefined,
   ...rest
 }: Props) => (
   <Menu
     position={position(pullRight, dropup)}
     onChange={onToggle}
     keepMounted={keepMounted}
-    closeOnItemClick={closeOnItemClick}>
+    closeOnItemClick={closeOnItemClick}
+    withinPortal={withinPortal}>
     <Menu.Target>
       <Button onClick={onMouseDown} aria-label={buttonTitle} {...rest} title={buttonTitle}>
         {title}

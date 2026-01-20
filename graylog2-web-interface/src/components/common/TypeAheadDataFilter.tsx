@@ -15,11 +15,13 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import debounce from 'lodash/debounce';
 import isEqual from 'lodash/isEqual';
 import styled from 'styled-components';
 
 import { Button } from 'components/bootstrap';
-import type { TypeAheadInputRef } from 'components/common/TypeAheadInput';
+import type { TypeAheadInputOnKeyDown, TypeAheadInputRef } from 'components/common/TypeAheadInput';
 import TypeAheadInput from 'components/common/TypeAheadInput';
 
 const StyledButton = styled(Button)`
@@ -55,6 +57,8 @@ type TypeAheadDataFilterProps = {
    * input field.
    */
   searchInKeys?: any[];
+  /** Delay in milliseconds before filtering while typing. */
+  debounceMs?: number;
 };
 
 /**
@@ -65,119 +69,149 @@ type TypeAheadDataFilterProps = {
  * **Note** There are a few quirks around this component and it will be
  * refactored soon.
  */
-class TypeAheadDataFilter extends React.Component<
-  TypeAheadDataFilterProps,
-  {
-    [key: string]: any;
-  }
-> {
-  static defaultProps = {
-    id: '',
-    data: [],
-    filterData: undefined,
-    label: '',
-    onDataFiltered: undefined,
-    searchInKeys: [],
-  };
+const TypeAheadDataFilter = ({
+  id = '',
+  data = [],
+  filterData: filterDataOverride = undefined,
+  label = '',
+  onDataFiltered = undefined,
+  searchInKeys = [],
+  debounceMs = 250,
+}: TypeAheadDataFilterProps) => {
+  const [filterText, setFilterText] = useState('');
+  const filterTextRef = useRef('');
+  const previousDataRef = useRef<any[] | undefined>(data);
+  const typeAheadInputRef = useRef<TypeAheadInputRef | null>(null);
 
-  private typeAheadInput: TypeAheadInputRef;
+  const setFilterTextValue = useCallback((value: string) => {
+    filterTextRef.current = value;
+    setFilterText(value);
+  }, []);
 
-  constructor(props: TypeAheadDataFilterProps) {
-    super(props);
+  const matchStringSearch = useCallback(
+    (datum) =>
+      searchInKeys.some((searchInKey) => {
+        const key = datum[searchInKey];
+        const value = filterTextRef.current;
 
-    this.state = {
-      filterText: '',
-    };
-  }
-
-  componentDidUpdate(prevProps: TypeAheadDataFilterProps) {
-    const { data } = this.props;
-
-    if (!isEqual(prevProps.data, data)) {
-      this.filterData();
-    }
-  }
-
-  _onSearchTextChanged = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    event.stopPropagation();
-    this.setState({ filterText: this.typeAheadInput.getValue() }, this.filterData);
-  };
-
-  _matchStringSearch = (datum) => {
-    const { filterText } = this.state;
-    const { searchInKeys } = this.props;
-
-    return searchInKeys.some((searchInKey) => {
-      const key = datum[searchInKey];
-      const value = filterText;
-
-      if (key === null) {
-        return false;
-      }
-
-      const containsFilter = (entry, thisValue) => {
-        if (typeof entry === 'undefined') {
+        if (key === null) {
           return false;
         }
 
-        return entry.toLocaleLowerCase().indexOf(thisValue.toLocaleLowerCase()) !== -1;
-      };
+        const containsFilter = (entry, thisValue) => {
+          if (typeof entry === 'undefined') {
+            return false;
+          }
 
-      if (typeof key === 'object') {
-        return key.some((arrayEntry) => containsFilter(arrayEntry, value));
-      }
+          return entry.toLocaleLowerCase().indexOf(thisValue.toLocaleLowerCase()) !== -1;
+        };
 
-      return containsFilter(key, value);
-    }, this);
-  };
+        if (typeof key === 'object') {
+          return key.some((arrayEntry) => containsFilter(arrayEntry, value));
+        }
 
-  _resetFilters = () => {
-    this.typeAheadInput.clear();
-    this.setState({ filterText: '' }, this.filterData);
-  };
+        return containsFilter(key, value);
+      }),
+    [searchInKeys],
+  );
 
-  filterData = () => {
-    const { filterData, data, onDataFiltered } = this.props;
-    const { filterText } = this.state;
-
-    if (typeof filterData === 'function') {
-      return filterData(data);
+  const filterData = useCallback(() => {
+    if (typeof filterDataOverride === 'function') {
+      return filterDataOverride(data);
     }
 
-    const filteredData = data.filter((datum) => this._matchStringSearch(datum), this);
+    const filteredData = data.filter((datum) => matchStringSearch(datum));
+    const currentFilterText = filterTextRef.current;
 
-    onDataFiltered(filteredData, filterText);
+    onDataFiltered(filteredData, currentFilterText);
 
     return true;
-  };
+  }, [data, filterDataOverride, matchStringSearch, onDataFiltered]);
 
-  render() {
-    const { filterText } = this.state;
-    const { id, label } = this.props;
+  const filterDataRef = useRef(filterData);
+  useEffect(() => {
+    filterDataRef.current = filterData;
+  }, [filterData]);
 
-    return (
-      <div className="filter">
-        <form
-          className="form-inline"
-          onSubmit={this._onSearchTextChanged}
-          style={{ display: 'inline-flex', alignItems: 'flex-end' }}>
-          <TypeAheadInput
-            id={id}
-            ref={(typeAheadInput) => {
-              this.typeAheadInput = typeAheadInput;
-            }}
-            formGroupClassName=""
-            label={label}
-          />
-          <StyledButton type="submit">Filter</StyledButton>
-          <StyledButton type="button" onClick={this._resetFilters} disabled={filterText === ''}>
-            Reset
-          </StyledButton>
-        </form>
+  const debouncedFilterDataRef = useRef<ReturnType<typeof debounce> | null>(null);
+  useEffect(() => {
+    const debounced = debounce(() => filterDataRef.current(), debounceMs);
+    debouncedFilterDataRef.current = debounced;
+
+    return () => debounced.cancel();
+  }, [debounceMs]);
+
+  useEffect(() => {
+    if (!isEqual(previousDataRef.current, data)) {
+      previousDataRef.current = data;
+      filterDataRef.current();
+    }
+  }, [data]);
+
+  const onFilterTextChanged = useCallback(
+    (value: string) => {
+      setFilterTextValue(value);
+      const debounced = debouncedFilterDataRef.current;
+      if (debounced) {
+        debounced();
+
+        return;
+      }
+
+      filterDataRef.current();
+    },
+    [setFilterTextValue],
+  );
+
+  const applyFilters = useCallback(() => {
+    const debounced = debouncedFilterDataRef.current;
+    if (debounced) {
+      debounced.flush();
+
+      return;
+    }
+
+    filterDataRef.current();
+  }, []);
+
+  const onFilterKeyDown: TypeAheadInputOnKeyDown = useCallback(
+    (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        event.stopPropagation();
+        applyFilters();
+      }
+    },
+    [applyFilters],
+  );
+
+  const resetFilters = useCallback(() => {
+    debouncedFilterDataRef.current?.cancel();
+    typeAheadInputRef.current?.clear();
+    setFilterTextValue('');
+    filterDataRef.current();
+  }, [setFilterTextValue]);
+
+  return (
+    <div className="filter">
+      <div className="form-inline" style={{ display: 'inline-flex', alignItems: 'flex-end' }} role="search">
+        <TypeAheadInput
+          id={id}
+          ref={typeAheadInputRef}
+          formGroupClassName=""
+          label={label}
+          onChange={onFilterTextChanged}
+          onKeyDown={onFilterKeyDown}
+        />
+        <StyledButton type="button" onClick={applyFilters}>
+          Filter
+        </StyledButton>
+        <StyledButton type="button" onClick={resetFilters} disabled={filterText === ''}>
+          Reset
+        </StyledButton>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
 export default TypeAheadDataFilter;
