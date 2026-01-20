@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-import { useMemo } from 'react';
 
 import type Widget from 'views/logic/widgets/Widget';
 import { widgetDefinition } from 'views/logic/Widgets';
@@ -25,9 +24,9 @@ type Props = {
 };
 
 const CustomExportSettings = ({ widget }: Props) => {
-  const { exportComponent: ExportComponent = () => null } =
-    useMemo(() => widget?.type && widgetDefinition(widget.type), [widget]) ?? {};
+  const { exportComponent: ExportComponent = () => null } = (widget?.type && widgetDefinition(widget.type)) ?? {};
 
+  // eslint-disable-next-line react-hooks/static-components
   return <ExportComponent widget={widget} />;
 };
 

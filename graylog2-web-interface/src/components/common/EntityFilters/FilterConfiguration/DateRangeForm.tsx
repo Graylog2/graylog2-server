@@ -118,7 +118,7 @@ const PickerContainer = styled.div`
 `;
 
 const PickerWrap = styled.div`
-  max-width: 240px;
+  max-width: 295px;
 `;
 
 type PickerProps = { name: 'from' | 'until' };

@@ -22,6 +22,7 @@ import { merge } from 'webpack-merge';
 import { EsbuildPlugin } from 'esbuild-loader';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import { defineReactCompilerLoaderOption, reactCompilerLoader } from 'react-compiler-webpack';
+const { defineReactCompilerLoaderOption, reactCompilerLoader } = require('react-compiler-webpack');
 
 import UniqueChunkIdPlugin from './UniqueChunkIdPlugin';
 

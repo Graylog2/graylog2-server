@@ -20,11 +20,14 @@ import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -77,6 +80,7 @@ import org.graylog2.rest.models.users.responses.BasicUserResponse;
 import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
+import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.users.UserManagementService;
 import org.joda.time.DateTime;
@@ -88,10 +92,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static org.graylog2.shared.rest.documentation.generator.Generator.CLOUD_VISIBLE;
 import static org.graylog2.shared.security.RestPermissions.USERS_READ;
 
-@Api(value = "Sidecar", description = "Manage Sidecar fleet", tags = {CLOUD_VISIBLE})
+@PublicCloudAPI
+@Tag(name = "Sidecar", description = "Manage Sidecar fleet")
 @Path("/sidecars")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -139,7 +143,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @GET
     @Timed
     @Path("/all")
-    @ApiOperation(value = "Lists all existing Sidecar registrations")
+    @Operation(summary = "Lists all existing Sidecar registrations")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
     public SidecarListResponse all() {
         final List<Sidecar> sidecars = sidecarService.all();
@@ -158,19 +162,19 @@ public class SidecarResource extends RestResource implements PluginRestResource 
 
     @GET
     @Timed
-    @ApiOperation(value = "Lists existing Sidecar registrations using pagination")
+    @Operation(summary = "Lists existing Sidecar registrations using pagination")
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
-    public SidecarListResponse sidecars(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
-                                        @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
-                                        @ApiParam(name = "query") @QueryParam("query") @DefaultValue("") String query,
-                                        @ApiParam(name = "sort",
-                                                  value = "The field to sort the result on",
+    public SidecarListResponse sidecars(@Parameter(name = "page") @QueryParam("page") @DefaultValue("1") int page,
+                                        @Parameter(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
+                                        @Parameter(name = "query") @QueryParam("query") @DefaultValue("") String query,
+                                        @Parameter(name = "sort",
+                                                  description = "The field to sort the result on",
                                                   required = true,
-                                                  allowableValues = "title,description,name,id")
+                                                  schema = @Schema(allowableValues = {"title", "description", "name", "id"}))
                                         @DefaultValue(Sidecar.FIELD_NODE_NAME) @QueryParam("sort") String sort,
-                                        @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
+                                        @Parameter(name = "order", description = "The sort direction", schema = @Schema(allowableValues = {"asc", "desc"}))
                                         @DefaultValue("asc") @QueryParam("order") SortOrder order,
-                                        @ApiParam(name = "only_active") @QueryParam("only_active") @DefaultValue("false") boolean onlyActive) {
+                                        @Parameter(name = "only_active") @QueryParam("only_active") @DefaultValue("false") boolean onlyActive) {
         final String mappedQuery = sidecarStatusMapper.replaceStringStatusSearchQuery(query);
         SearchQuery searchQuery;
         try {
@@ -189,12 +193,13 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @GET
     @Timed
     @Path("/{sidecarId}")
-    @ApiOperation(value = "Returns at most one Sidecar summary for the specified id")
+    @Operation(summary = "Returns at most one Sidecar summary for the specified id")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "No Sidecar with the specified id exists")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "No Sidecar with the specified id exists")
     })
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_READ)
-    public SidecarSummary get(@ApiParam(name = "sidecarId", required = true)
+    public SidecarSummary get(@Parameter(name = "sidecarId", required = true)
                               @PathParam("sidecarId") @NotEmpty String sidecarId) {
         final Sidecar sidecar = sidecarService.findByNodeId(sidecarId);
         if (sidecar == null) {
@@ -206,16 +211,18 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @PUT
     @Timed
     @Path("/{sidecarId}")
-    @ApiOperation(value = "Create/update a Sidecar registration",
-                  notes = "This is a stateless method which upserts a Sidecar registration")
+    @Operation(summary = "Create/update a Sidecar registration",
+                  description = "This is a stateless method which upserts a Sidecar registration")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "The supplied request is not valid.")
+            @ApiResponse(responseCode = "202", description = "Returns registration response",
+                    content = @Content(schema = @Schema(implementation = RegistrationResponse.class))),
+            @ApiResponse(responseCode = "400", description = "The supplied request is not valid.")
     })
     @RequiresPermissions(SidecarRestPermissions.SIDECARS_UPDATE)
     @NoAuditEvent("this is only a ping from Sidecars, and would overflow the audit log")
-    public Response register(@ApiParam(name = "sidecarId", value = "The id this Sidecar is registering as.", required = true)
+    public Response register(@Parameter(name = "sidecarId", description = "The id this Sidecar is registering as.", required = true)
                              @PathParam("sidecarId") @NotEmpty String nodeId,
-                             @ApiParam(name = "JSON body", required = true)
+                             @RequestBody(required = true)
                              @Valid @NotNull RegistrationRequest request,
                              @HeaderParam(value = "If-None-Match") String ifNoneMatch,
                              @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) throws JsonProcessingException {
@@ -268,10 +275,10 @@ public class SidecarResource extends RestResource implements PluginRestResource 
     @PUT
     @Timed
     @Path("/configurations")
-    @ApiOperation(value = "Assign configurations to sidecars")
+    @Operation(summary = "Assign configurations to sidecars")
     @RequiresPermissions({SidecarRestPermissions.SIDECARS_READ, SidecarRestPermissions.SIDECARS_UPDATE})
     @AuditEvent(type = SidecarAuditEventTypes.SIDECAR_UPDATE)
-    public Response assignConfiguration(@ApiParam(name = "JSON body", required = true)
+    public Response assignConfiguration(@RequestBody(required = true)
                                         @Valid @NotNull NodeConfigurationRequest request) throws NotFoundException {
         List<String> nodeIdList = request.nodes().stream()
                 .filter(distinctByKey(NodeConfiguration::nodeId))
@@ -302,9 +309,10 @@ public class SidecarResource extends RestResource implements PluginRestResource 
 
     @GET
     @Path("/user")
-    @ApiOperation(value = "Get basic sidecar user")
+    @Operation(summary = "Get basic sidecar user")
     @ApiResponses({
-            @ApiResponse(code = 404, message = "The sidecar user could not be found.")
+            @ApiResponse(responseCode = "200", description = "Success", useReturnTypeSchema = true),
+            @ApiResponse(responseCode = "404", description = "The sidecar user could not be found.")
     })
     public BasicUserResponse getBasicSidecarUser() {
 
