@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.events.conditions.Expression;
+import org.graylog.events.conditions.BooleanExpression;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -31,7 +31,7 @@ public abstract class AggregationConditions {
     private static final String FIELD_EXPRESSION = "expression";
 
     @JsonProperty(FIELD_EXPRESSION)
-    public abstract Optional<Expression<Boolean>> expression();
+    public abstract Optional<BooleanExpression> expression();
 
     public static Builder builder() {
         return Builder.create();
@@ -47,7 +47,7 @@ public abstract class AggregationConditions {
         }
 
         @JsonProperty(FIELD_EXPRESSION)
-        public abstract Builder expression(@Nullable Expression<Boolean> expression);
+        public abstract Builder expression(@Nullable BooleanExpression expression);
 
         public abstract AggregationConditions build();
     }
