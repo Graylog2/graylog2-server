@@ -320,6 +320,12 @@ const InputDiagnosisPage = () => {
                 not running, click to see any associated error messages.
               </StyledP>
               <StyledListGroup>
+                {inputMetrics.failedStarts15mRate !== undefined && (
+                  <StyledListGroupItem>
+                    <StyledTitle>Failed starts (15m rate):</StyledTitle>
+                    <StyledSpan>{inputMetrics.failedStarts15mRate} events/sec</StyledSpan>
+                  </StyledListGroupItem>
+                )}
                 {Object.keys(inputNodeStates.states).map((state: InputState) => (
                   <StateListItem key={state} state={state} inputNodeStates={inputNodeStates} />
                 ))}

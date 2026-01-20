@@ -120,6 +120,18 @@ describe('Input Diagnosis Page', () => {
     expect(nodeStateIndicator).toHaveClass('danger');
   });
 
+  it('shows failed starts 15m rate when available', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      inputMetrics: { ...useInputDiagnosisMock.inputMetrics, failedStarts15mRate: '1.25' },
+    });
+
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/Failed starts \(15m rate\):/)).toBeInTheDocument();
+    expect(await screen.findByText(/1.25 events\/sec/)).toBeInTheDocument();
+  });
+
   it('shows node state success indicator', async () => {
     asMock(useInputDiagnosis).mockReturnValue({
       ...useInputDiagnosisMock,
