@@ -49,7 +49,7 @@ const initialFilterConfig = {
   use_cron_scheduling: false,
 };
 
-const initialAggregationConfig = {
+const initialAggregationConfig: Pick<EventDefinition['config'], 'group_by' | 'series' | 'conditions'> = {
   group_by: [],
   series: [],
   conditions: {},
@@ -72,7 +72,8 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
   const [conditionType, setConditionType] = useState(
     isEmpty(group_by) && isEmpty(series) && isEmpty(expression) ? conditionTypes.FILTER : conditionTypes.AGGREGATION,
   );
-  const [existingAggregationConfig, setExistingAggregationConfig] = useState<EventDefinition['config'] | undefined>();
+  const [existingAggregationConfig, setExistingAggregationConfig] =
+    useState<Partial<EventDefinition['config']> | undefined>();
 
   const propagateConfigChange = useCallback(
     (config: EventDefinition['config']) => {
@@ -95,11 +96,12 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
       const nextConditionType = Number(FormsUtils.getValueFromInput(event.target));
 
       setConditionType(nextConditionType);
-      let newExistingAggregationConfig;
+      let newExistingAggregationConfig: Partial<EventDefinition['config']> | undefined;
 
       if (nextConditionType === conditionTypes.FILTER) {
         // Store existing data temporarily in state, to restore it in case the type change was accidental
-        Object.keys(initialAggregationConfig).forEach((key) => {
+        newExistingAggregationConfig = {};
+        (Object.keys(initialAggregationConfig) as Array<keyof typeof initialAggregationConfig>).forEach((key) => {
           newExistingAggregationConfig[key] = eventDefinition.config[key];
         });
 
@@ -110,7 +112,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
         // Reset aggregation data from state if it exists
         const nextConfig = { ...eventDefinition.config, ...existingAggregationConfig };
 
-        propagateConfigChange(nextConfig);
+        propagateConfigChange(nextConfig as EventDefinition['config']);
         newExistingAggregationConfig = undefined;
       }
 
