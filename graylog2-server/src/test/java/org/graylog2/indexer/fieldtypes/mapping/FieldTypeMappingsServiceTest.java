@@ -18,10 +18,10 @@ package org.graylog2.indexer.fieldtypes.mapping;
 
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
-import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.CustomFieldMapping;
 import org.graylog2.indexer.indexset.CustomFieldMappings;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.MongoIndexSet;
 import org.graylog2.indexer.indexset.MongoIndexSetService;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfile;
 import org.graylog2.indexer.indexset.profile.IndexFieldTypeProfileService;
@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -263,6 +264,49 @@ class FieldTypeMappingsServiceTest {
 
         verify(indexSetService, never()).save(any());
         verifyNoInteractions(existingMongoIndexSet);
+    }
+
+    @Test
+    void testRollsBackMongoDBChangesWhenCycleIndexSetFailsForSecondIndexSet() {
+        final IndexSetConfig failingIndexSet = buildSampleIndexSetConfig("failing_index_set");
+        final MongoIndexSet failingMongoIndexSet = mock(MongoIndexSet.class);
+
+        doReturn(Optional.of(existingIndexSet)).when(indexSetService).get("existing_index_set");
+        doReturn(Optional.of(failingIndexSet)).when(indexSetService).get("failing_index_set");
+
+        doReturn(existingMongoIndexSet).when(mongoIndexSetFactory).create(argThat(config ->
+                Objects.equals(config.id(), "existing_index_set")));
+        doReturn(failingMongoIndexSet).when(mongoIndexSetFactory).create(argThat(config ->
+                Objects.equals(config.id(), "failing_index_set")));
+
+        // First index set cycles successfully, second one fails
+        doThrow(new RuntimeException("OpenSearch failure")).when(failingMongoIndexSet).cycle();
+
+        final IndexSetConfig existingIndexSetWithAdditionalMappings = existingIndexSet.toBuilder()
+                .customFieldMappings(new CustomFieldMappings(Set.of(existingCustomFieldMapping, newCustomMapping)))
+                .build();
+        final IndexSetConfig failingIndexSetWithAdditionalMappings = failingIndexSet.toBuilder()
+                .customFieldMappings(new CustomFieldMappings(Set.of(existingCustomFieldMapping, newCustomMapping)))
+                .build();
+
+        // Should throw RuntimeException after rollback of failing index set
+        assertThrows(RuntimeException.class, () ->
+                toTest.changeFieldType(newCustomMapping,
+                        new LinkedHashSet<>(List.of("existing_index_set", "failing_index_set")),
+                        true)
+        );
+
+        // Verify: first index set
+        verify(indexSetService).save(existingIndexSetWithAdditionalMappings); //save attempt
+        verify(existingMongoIndexSet).cycle(); //cycle
+        verify(indexSetService, never()).save(existingIndexSet); // no rollback
+
+        // Verify: failing index set
+        verify(indexSetService).save(failingIndexSetWithAdditionalMappings); //save attempt
+        verify(failingMongoIndexSet).cycle(); //cycle (with exception)
+        verify(indexSetService).save(failingIndexSet); //rollback
+
+        verifyNoMoreInteractions(indexSetService);
     }
 
     @Test

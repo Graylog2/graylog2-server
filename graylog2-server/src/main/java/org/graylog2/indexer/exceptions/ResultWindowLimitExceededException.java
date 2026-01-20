@@ -14,10 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.mcp.server;
+package org.graylog2.indexer.exceptions;
 
-public class McpException extends Exception {
-    public McpException(String reason) {
-        super(reason);
+import org.graylog2.indexer.ElasticsearchException;
+
+public class ResultWindowLimitExceededException extends ElasticsearchException {
+
+    public ResultWindowLimitExceededException(final int resultWindowLimit) {
+        super("Result window is too large, from + size must be less than or equal to: " + resultWindowLimit);
     }
 }
