@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.jsontype.NamedType;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
 import org.graylog.events.JobSchedulerTestClock;
 import org.graylog.scheduler.DBSystemJobTriggerService;
 import org.graylog.scheduler.JobTriggerStatus;
@@ -41,25 +40,17 @@ import org.joda.time.DateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.lenient;
 
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoDBExtension.class)
-@MockitoSettings(strictness = Strictness.WARN)
 class SystemJobManagerTest {
     private static final String NODE_ID = "test-node-1";
     private static final Duration EXPIRATION_DURATION = Duration.minutes(5);
 
     private final NodeId nodeId = new SimpleNodeId(NODE_ID);
-
-    @Mock
-    private SchedulerCapabilitiesService schedulerCapabilitiesService;
 
     private DBSystemJobTriggerService triggerService;
     private SystemJobManager systemJobManager;
@@ -68,8 +59,6 @@ class SystemJobManagerTest {
 
     @BeforeEach
     void setUp(MongoConnection mongoConnection) {
-        lenient().when(schedulerCapabilitiesService.getNodeCapabilities()).thenReturn(ImmutableSet.of());
-
         final var objectMapper = new ObjectMapperProvider().get();
         objectMapper.registerSubtypes(new NamedType(OnceJobSchedule.class, OnceJobSchedule.TYPE_NAME));
         objectMapper.registerSubtypes(new NamedType(TestSystemJobConfig.class, TestSystemJobConfig.TYPE_NAME));
@@ -77,7 +66,7 @@ class SystemJobManagerTest {
         final var mapperProvider = new MongoJackObjectMapperProvider(objectMapper);
         final var mongoCollections = new MongoCollections(mapperProvider, mongoConnection);
 
-        this.triggerService = new DBSystemJobTriggerService(mongoCollections, nodeId, clock, schedulerCapabilitiesService, EXPIRATION_DURATION);
+        this.triggerService = new DBSystemJobTriggerService(mongoCollections, nodeId, clock, new SchedulerCapabilitiesService(Set.of()), EXPIRATION_DURATION);
         this.systemJobManager = new SystemJobManager(triggerService, clock);
     }
 
