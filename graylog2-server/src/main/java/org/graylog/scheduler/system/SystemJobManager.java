@@ -73,8 +73,11 @@ public class SystemJobManager {
     }
 
     public List<SystemJobConfig> getRunningJobConfigs(String type) {
-        // The trigger's job definition ID is the type name for system jobs
-        final var query = Filters.eq(JobTriggerDto.FIELD_JOB_DEFINITION_ID, type);
+        final var query = Filters.and(
+                // The trigger's job definition ID is the type name for system jobs
+                Filters.eq(JobTriggerDto.FIELD_JOB_DEFINITION_ID, type),
+                Filters.eq(JobTriggerDto.FIELD_STATUS, JobTriggerStatus.RUNNING)
+        );
 
         try (var stream = triggerService.streamByQuery(query)) {
             return stream.map(JobTriggerDto::data)
