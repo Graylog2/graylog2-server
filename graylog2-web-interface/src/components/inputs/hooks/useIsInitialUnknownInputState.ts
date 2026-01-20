@@ -14,10 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.mcp.server;
+import { useEffect, useMemo } from 'react';
 
-public class McpException extends Exception {
-    public McpException(String reason) {
-        super(reason);
+import type { InputStates } from 'hooks/useInputsStates';
+
+const useIsInitialUnknownInputState = (inputStates: InputStates, inputId: string) => {
+  const seenInputIds = useMemo(() => new Set<string>(), []);
+
+  useEffect(() => {
+    if (!inputStates) {
+      return;
     }
-}
+
+    Object.keys(inputStates).forEach((id) => {
+      seenInputIds.add(id);
+    });
+  }, [inputStates, seenInputIds]);
+
+  const hasKnownState = !!inputStates?.[inputId];
+
+  return !hasKnownState && !seenInputIds.has(inputId);
+};
+
+export default useIsInitialUnknownInputState;
