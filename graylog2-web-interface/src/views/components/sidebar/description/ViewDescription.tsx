@@ -17,10 +17,10 @@
 import * as React from 'react';
 
 import type QueryResult from 'views/logic/QueryResult';
-import { Icon } from 'components/common';
 import ViewTypeLabel from 'views/components/ViewTypeLabel';
 import useViewType from 'views/hooks/useViewType';
 import useViewMetadata from 'views/hooks/useViewMetadata';
+import { MoreActionsIcon } from 'components/common/MoreActions';
 
 import SearchResultOverview from './SearchResultOverview';
 
@@ -58,8 +58,8 @@ const ViewDescription = ({ results }: Props) => {
     <>
       {(!viewMetadata.summary || !viewMetadata.description) && (
         <SectionInfo>
-          To add a description and summary for this {viewTypeLabel} click on the <Icon name="more_horiz" /> icon in the
-          search bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
+          To add a description and summary for this {viewTypeLabel} click on the <MoreActionsIcon /> icon in the search
+          bar to open its action menu. The action menu includes the option &quot;Edit metadata&quot;.
         </SectionInfo>
       )}
       {resultsSection}
