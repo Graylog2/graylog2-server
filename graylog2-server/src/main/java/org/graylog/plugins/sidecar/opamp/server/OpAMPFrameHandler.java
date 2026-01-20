@@ -36,9 +36,11 @@ import opamp.proto.Opamp.AgentToServer;
 import opamp.proto.Opamp.RemoteConfigStatuses;
 import opamp.proto.Opamp.ServerToAgent;
 import org.graylog.plugins.sidecar.opamp.config.ConfigurationGenerator;
+import org.graylog.plugins.sidecar.rest.models.AgentState;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
+import org.graylog.plugins.sidecar.rest.models.ServerDirectives;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
-import org.graylog.plugins.sidecar.services.SidecarService;
+import org.graylog.plugins.sidecar.services.SidecarRegistrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,13 +55,13 @@ import java.util.UUID;
 public class OpAMPFrameHandler extends SimpleChannelInboundHandler<BinaryWebSocketFrame> {
     private static final Logger LOG = LoggerFactory.getLogger(OpAMPFrameHandler.class);
 
-    private final SidecarService sidecarService;
+    private final SidecarRegistrationService registrationService;
     private final ConfigurationGenerator configurationGenerator;
 
     @Inject
-    public OpAMPFrameHandler(SidecarService sidecarService,
+    public OpAMPFrameHandler(SidecarRegistrationService registrationService,
                             ConfigurationGenerator configurationGenerator) {
-        this.sidecarService = sidecarService;
+        this.registrationService = registrationService;
         this.configurationGenerator = configurationGenerator;
     }
 
@@ -139,110 +141,79 @@ public class OpAMPFrameHandler extends SimpleChannelInboundHandler<BinaryWebSock
 
     private ServerToAgent processMessage(AgentToServer message) {
         final String nodeId = extractNodeId(message.getInstanceUid());
+        final AgentState agentState = mapToAgentState(nodeId, message);
+        final ServerDirectives directives = registrationService.checkIn(agentState);
+        final Sidecar sidecar = directives.sidecar();
 
-        // Extract agent description and create/update sidecar
-        Sidecar sidecar;
-        if (message.hasAgentDescription()) {
-            sidecar = createOrUpdateSidecar(nodeId, message.getAgentDescription());
-            sidecarService.save(sidecar);
-            LOG.info("Registered/updated OpAMP agent: nodeId={}, nodeName={}",
-                    nodeId, sidecar.nodeName());
-        } else {
-            // Just update last_seen for existing sidecar
-            sidecar = sidecarService.findByNodeId(nodeId);
-            if (sidecar != null) {
-                sidecar = sidecar.toBuilder()
-                        .lastSeen(org.joda.time.DateTime.now(org.joda.time.DateTimeZone.UTC))
-                        .build();
-                sidecarService.save(sidecar);
-                LOG.debug("Updated last_seen for OpAMP agent: nodeId={}", nodeId);
-            } else {
-                LOG.warn("Received message from unknown agent without agent_description: nodeId={}", nodeId);
-            }
-        }
+        LOG.info("Processed check-in for OpAMP agent: nodeId={}, nodeName={}", nodeId, sidecar.nodeName());
 
-        // Build response
         final ServerToAgent.Builder responseBuilder = ServerToAgent.newBuilder()
                 .setInstanceUid(message.getInstanceUid());
 
-        // Log remote config status if provided
         if (message.hasRemoteConfigStatus()) {
             logRemoteConfigStatus(nodeId, message);
         }
 
-        // Check if configuration needs to be delivered
-        if (sidecar != null) {
-            final AgentRemoteConfig remoteConfig = buildRemoteConfigIfNeeded(sidecar, message);
-            if (remoteConfig != null) {
-                responseBuilder.setRemoteConfig(remoteConfig);
-                LOG.info("Sending remote config to agent: nodeId={}", nodeId);
-            }
+        final byte[] agentConfigHash = getAgentConfigHash(message);
+        final ConfigurationGenerator.GeneratedConfig generatedConfig = configurationGenerator.generateConfigWithHash(sidecar);
+        if (!Arrays.equals(generatedConfig.hash(), agentConfigHash)) {
+            responseBuilder.setRemoteConfig(buildRemoteConfig(generatedConfig));
+            LOG.info("Sending remote config to agent: nodeId={}", nodeId);
+        }
+
+        // TODO: deliver actions via custom message when needed
+        if (!directives.actions().isEmpty()) {
+            LOG.debug("Pending actions for agent (not yet delivered via OpAMP): nodeId={}, actions={}",
+                    nodeId, directives.actions().size());
         }
 
         return responseBuilder.build();
     }
 
-    private void logRemoteConfigStatus(String nodeId, AgentToServer message) {
-        final var configStatus = message.getRemoteConfigStatus();
-        final RemoteConfigStatuses status = configStatus.getStatus();
+    /**
+     * Maps an OpAMP AgentToServer message to the transport-agnostic AgentState.
+     */
+    private AgentState mapToAgentState(String nodeId, AgentToServer message) {
+        String nodeName = nodeId;
+        String sidecarVersion = "unknown";
+        NodeDetails nodeDetails = NodeDetails.create("unknown", null, null, null, null, Set.of(), null);
 
-        if (status == RemoteConfigStatuses.RemoteConfigStatuses_APPLIED) {
-            LOG.debug("Agent applied config successfully: nodeId={}", nodeId);
-        } else if (status == RemoteConfigStatuses.RemoteConfigStatuses_APPLYING) {
-            LOG.debug("Agent is applying config: nodeId={}", nodeId);
-        } else if (status == RemoteConfigStatuses.RemoteConfigStatuses_FAILED) {
-            LOG.warn("Agent failed to apply config: nodeId={}, error={}",
-                    nodeId, configStatus.getErrorMessage());
-        } else {
-            LOG.debug("Agent config status: nodeId={}, status={}", nodeId, status);
+        if (message.hasAgentDescription()) {
+            final AgentDescription desc = message.getAgentDescription();
+            final ParsedAgentDescription parsed = parseAgentDescription(desc);
+
+            nodeName = parsed.nodeName != null ? parsed.nodeName : nodeId;
+            sidecarVersion = parsed.version;
+            nodeDetails = NodeDetails.create(
+                    parsed.operatingSystem,
+                    parsed.ip,
+                    null,
+                    null,
+                    null,
+                    parsed.tags,
+                    parsed.collectorConfigurationDirectory
+            );
         }
+
+        return AgentState.create(nodeId, nodeName, sidecarVersion, nodeDetails);
     }
 
     /**
-     * Builds the remote config to send to the agent if the agent's config hash
-     * differs from the server's computed hash.
-     *
-     * @param sidecar the sidecar to generate config for
-     * @param message the agent's message containing remote_config_status
-     * @return the remote config, or null if no config update is needed
+     * Parsed values from AgentDescription.
      */
-    private AgentRemoteConfig buildRemoteConfigIfNeeded(Sidecar sidecar, AgentToServer message) {
-        // Compute the config hash for this sidecar
-        final byte[] configHash = configurationGenerator.computeConfigHash(sidecar);
+    private record ParsedAgentDescription(
+            String nodeName,
+            String version,
+            String operatingSystem,
+            String ip,
+            String collectorConfigurationDirectory,
+            Set<String> tags
+    ) {}
 
-        // Get the agent's last known config hash (if provided)
-        byte[] agentConfigHash = null;
-        if (message.hasRemoteConfigStatus()) {
-            agentConfigHash = message.getRemoteConfigStatus().getLastRemoteConfigHash().toByteArray();
-        }
-
-        // Compare hashes - send config if different or if agent has no hash
-        if (agentConfigHash == null || agentConfigHash.length == 0 || !Arrays.equals(configHash, agentConfigHash)) {
-            // Generate the configuration YAML
-            final String configYaml = configurationGenerator.generateConfig(sidecar);
-
-            // Build the config map with a single config file
-            final AgentConfigFile configFile = AgentConfigFile.newBuilder()
-                    .setBody(ByteString.copyFromUtf8(configYaml))
-                    .setContentType("application/x-yaml")
-                    .build();
-
-            final AgentConfigMap configMap = AgentConfigMap.newBuilder()
-                    .putConfigMap("sidecar.yaml", configFile)
-                    .build();
-
-            return AgentRemoteConfig.newBuilder()
-                    .setConfig(configMap)
-                    .setConfigHash(ByteString.copyFrom(configHash))
-                    .build();
-        }
-
-        LOG.debug("Config unchanged for agent: nodeId={}", sidecar.nodeId());
-        return null;
-    }
-
-    private Sidecar createOrUpdateSidecar(String nodeId, AgentDescription agentDescription) {
-        // Extract values from identifying and non-identifying attributes
+    /**
+     * Parses identifying and non-identifying attributes from AgentDescription.
+     */
+    private ParsedAgentDescription parseAgentDescription(AgentDescription agentDescription) {
         String nodeName = null;
         String operatingSystem = "unknown";
         String ip = null;
@@ -282,39 +253,48 @@ public class OpAMPFrameHandler extends SimpleChannelInboundHandler<BinaryWebSock
             }
         }
 
-        // Fall back to nodeId if no name found
-        if (nodeName == null) {
-            nodeName = nodeId;
+        return new ParsedAgentDescription(nodeName, version, operatingSystem, ip, collectorConfigurationDirectory, tags);
+    }
+
+    private void logRemoteConfigStatus(String nodeId, AgentToServer message) {
+        final var configStatus = message.getRemoteConfigStatus();
+        final RemoteConfigStatuses status = configStatus.getStatus();
+
+        if (status == RemoteConfigStatuses.RemoteConfigStatuses_APPLIED) {
+            LOG.debug("Agent applied config successfully: nodeId={}", nodeId);
+        } else if (status == RemoteConfigStatuses.RemoteConfigStatuses_APPLYING) {
+            LOG.debug("Agent is applying config: nodeId={}", nodeId);
+        } else if (status == RemoteConfigStatuses.RemoteConfigStatuses_FAILED) {
+            LOG.warn("Agent failed to apply config: nodeId={}, error={}",
+                    nodeId, configStatus.getErrorMessage());
+        } else {
+            LOG.debug("Agent config status: nodeId={}, status={}", nodeId, status);
         }
+    }
 
-        // Check if sidecar already exists to preserve existing data
-        final Sidecar existing = sidecarService.findByNodeId(nodeId);
+    private byte[] getAgentConfigHash(AgentToServer message) {
+        if (message.hasRemoteConfigStatus()) {
+            final byte[] hash = message.getRemoteConfigStatus().getLastRemoteConfigHash().toByteArray();
+            if (hash.length > 0) {
+                return hash;
+            }
+        }
+        return null;
+    }
 
-        // Use values from agent description, falling back to existing values for fields not sent
-        final NodeDetails nodeDetails = NodeDetails.create(
-                operatingSystem,
-                ip,
-                existing != null ? existing.nodeDetails().metrics() : null,
-                existing != null ? existing.nodeDetails().logFileList() : null,
-                existing != null ? existing.nodeDetails().statusList() : null,
-                !tags.isEmpty() ? tags : (existing != null ? existing.nodeDetails().tags() : Set.of()),
-                collectorConfigurationDirectory != null ? collectorConfigurationDirectory :
-                        (existing != null ? existing.nodeDetails().collectorConfigurationDirectory() : null)
-        );
+    private AgentRemoteConfig buildRemoteConfig(ConfigurationGenerator.GeneratedConfig generatedConfig) {
+        final AgentConfigFile configFile = AgentConfigFile.newBuilder()
+                .setBody(ByteString.copyFromUtf8(generatedConfig.yaml()))
+                .setContentType("application/x-yaml")
+                .build();
 
-        // Preserve existing assignments or start with empty list
-        final List<org.graylog.plugins.sidecar.rest.requests.ConfigurationAssignment> assignments =
-                existing != null ? existing.assignments() : List.of();
+        final AgentConfigMap configMap = AgentConfigMap.newBuilder()
+                .putConfigMap("sidecar.yaml", configFile)
+                .build();
 
-        // Use builder to create sidecar, preserving existing ID if updating
-        return Sidecar.builder()
-                .id(existing != null ? existing.id() : new org.bson.types.ObjectId().toHexString())
-                .nodeId(nodeId)
-                .nodeName(nodeName)
-                .nodeDetails(nodeDetails)
-                .sidecarVersion(version)
-                .lastSeen(org.joda.time.DateTime.now(org.joda.time.DateTimeZone.UTC))
-                .assignments(assignments)
+        return AgentRemoteConfig.newBuilder()
+                .setConfig(configMap)
+                .setConfigHash(ByteString.copyFrom(generatedConfig.hash()))
                 .build();
     }
 

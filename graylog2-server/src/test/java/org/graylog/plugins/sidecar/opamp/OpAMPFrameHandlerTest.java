@@ -31,6 +31,8 @@ import org.graylog.plugins.sidecar.opamp.config.ConfigurationGenerator;
 import org.graylog.plugins.sidecar.opamp.server.OpAMPFrameHandler;
 import org.graylog.plugins.sidecar.rest.models.NodeDetails;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
+import org.graylog.plugins.sidecar.services.ActionService;
+import org.graylog.plugins.sidecar.services.SidecarRegistrationService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,14 +60,20 @@ public class OpAMPFrameHandlerTest {
     private SidecarService sidecarService;
 
     @Mock
+    private ActionService actionService;
+
+    @Mock
     private ConfigurationGenerator configurationGenerator;
 
+    private SidecarRegistrationService registrationService;
     private OpAMPFrameHandler handler;
     private EmbeddedChannel channel;
 
     @BeforeEach
     void setUp() {
-        handler = new OpAMPFrameHandler(sidecarService, configurationGenerator);
+        // Create real registration service with mocked dependencies
+        registrationService = new SidecarRegistrationService(sidecarService, actionService);
+        handler = new OpAMPFrameHandler(registrationService, configurationGenerator);
         channel = new EmbeddedChannel(handler) {
             @Override
             protected SocketAddress remoteAddress0() {
@@ -91,6 +99,9 @@ public class OpAMPFrameHandlerTest {
                         .addNonIdentifyingAttributes(keyValue("host.ip", "192.168.1.50"))
                         .build())
                 .build();
+
+        // Mock the tag assignment update to return the sidecar unchanged
+        when(sidecarService.updateTaggedConfigurationAssignments(any())).thenAnswer(inv -> inv.getArgument(0));
 
         // Mock the config generator to return empty config (no assignments)
         when(configurationGenerator.computeConfigHash(any())).thenReturn(new byte[32]);
@@ -138,6 +149,7 @@ public class OpAMPFrameHandlerTest {
                 .build();
 
         when(sidecarService.findByNodeId(agentUuid.toString())).thenReturn(existingSidecar);
+        when(sidecarService.updateTaggedConfigurationAssignments(any())).thenAnswer(inv -> inv.getArgument(0));
 
         // Server has a different config hash than agent
         byte[] serverConfigHash = "server-config-hash-12345678".getBytes();
@@ -187,6 +199,7 @@ public class OpAMPFrameHandlerTest {
                 .build();
 
         when(sidecarService.findByNodeId(agentUuid.toString())).thenReturn(existingSidecar);
+        when(sidecarService.updateTaggedConfigurationAssignments(any())).thenAnswer(inv -> inv.getArgument(0));
 
         // Server and agent have the same config hash
         byte[] configHash = "same-config-hash-123456789".getBytes();
@@ -230,6 +243,7 @@ public class OpAMPFrameHandlerTest {
                         .build())
                 .build();
 
+        when(sidecarService.updateTaggedConfigurationAssignments(any())).thenAnswer(inv -> inv.getArgument(0));
         when(configurationGenerator.computeConfigHash(any())).thenReturn(new byte[32]);
         when(configurationGenerator.generateConfig(any())).thenReturn("");
 

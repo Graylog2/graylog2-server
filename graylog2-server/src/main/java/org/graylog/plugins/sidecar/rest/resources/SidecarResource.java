@@ -55,7 +55,6 @@ import org.graylog.plugins.sidecar.filter.ActiveSidecarFilter;
 import org.graylog.plugins.sidecar.mapper.SidecarStatusMapper;
 import org.graylog.plugins.sidecar.permissions.SidecarRestPermissions;
 import org.graylog.plugins.sidecar.rest.models.CollectorAction;
-import org.graylog.plugins.sidecar.rest.models.CollectorActions;
 import org.graylog.plugins.sidecar.rest.models.NodeConfiguration;
 import org.graylog.plugins.sidecar.rest.models.Sidecar;
 import org.graylog.plugins.sidecar.rest.models.SidecarRegistrationConfiguration;
@@ -65,8 +64,10 @@ import org.graylog.plugins.sidecar.rest.requests.NodeConfigurationRequest;
 import org.graylog.plugins.sidecar.rest.requests.RegistrationRequest;
 import org.graylog.plugins.sidecar.rest.responses.RegistrationResponse;
 import org.graylog.plugins.sidecar.rest.responses.SidecarListResponse;
-import org.graylog.plugins.sidecar.services.ActionService;
+import org.graylog.plugins.sidecar.rest.models.AgentState;
+import org.graylog.plugins.sidecar.rest.models.ServerDirectives;
 import org.graylog.plugins.sidecar.services.EtagService;
+import org.graylog.plugins.sidecar.services.SidecarRegistrationService;
 import org.graylog.plugins.sidecar.services.SidecarService;
 import org.graylog.plugins.sidecar.system.SidecarConfiguration;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -83,8 +84,6 @@ import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.users.UserManagementService;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.util.List;
 import java.util.Map;
@@ -112,7 +111,7 @@ public class SidecarResource extends RestResource implements PluginRestResource 
             .build();
 
     private final SidecarService sidecarService;
-    private final ActionService actionService;
+    private final SidecarRegistrationService registrationService;
     private final EtagService etagService;
     private final ActiveSidecarFilter activeSidecarFilter;
     private final SearchQueryParser searchQueryParser;
@@ -123,15 +122,15 @@ public class SidecarResource extends RestResource implements PluginRestResource 
 
     @Inject
     public SidecarResource(SidecarService sidecarService,
-                           ActionService actionService,
+                           SidecarRegistrationService registrationService,
                            ClusterConfigService clusterConfigService,
                            SidecarStatusMapper sidecarStatusMapper,
                            EtagService etagService,
                            UserManagementService userManagementService,
                            SidecarPluginConfiguration sidecarPluginConfiguration) {
         this.sidecarService = sidecarService;
+        this.registrationService = registrationService;
         this.sidecarConfiguration = clusterConfigService.getOrDefault(SidecarConfiguration.class, SidecarConfiguration.defaultConfiguration());
-        this.actionService = actionService;
         this.userManagementService = userManagementService;
         this.sidecarUserName = sidecarPluginConfiguration.getUser();
         this.activeSidecarFilter = new ActiveSidecarFilter(sidecarConfiguration.sidecarInactiveThreshold());
@@ -227,49 +226,36 @@ public class SidecarResource extends RestResource implements PluginRestResource 
                              @HeaderParam(value = "If-None-Match") String ifNoneMatch,
                              @HeaderParam(value = "X-Graylog-Sidecar-Version") @NotEmpty String sidecarVersion) throws JsonProcessingException {
 
-        Sidecar sidecar;
-        final Sidecar oldSidecar = sidecarService.findByNodeId(nodeId);
-        if (oldSidecar != null) {
-            sidecar = oldSidecar.toBuilder()
-                    .nodeName(request.nodeName())
-                    .nodeDetails(request.nodeDetails())
-                    .sidecarVersion(sidecarVersion)
-                    .lastSeen(DateTime.now(DateTimeZone.UTC))
-                    .build();
-        } else {
-            sidecar = sidecarService.fromRequest(nodeId, request, sidecarVersion);
-        }
+        final AgentState agentState = AgentState.create(
+                nodeId,
+                request.nodeName(),
+                sidecarVersion,
+                request.nodeDetails()
+        );
 
-        // If the sidecar has the recent registration, return with HTTP 304
+        // Check ETag before full checkIn to avoid consuming actions on 304
         if (ifNoneMatch != null) {
-            EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
-            if (etagService.registrationIsCached(sidecar.nodeId(), etag.toString())) {
-                sidecarService.save(sidecar);
+            final EntityTag etag = new EntityTag(ifNoneMatch.replaceAll("\"", ""));
+            if (etagService.registrationIsCached(nodeId, etag.toString())) {
+                registrationService.updateSidecar(agentState);
                 return Response.notModified().tag(etag).build();
             }
         }
 
-        final Sidecar updated = sidecarService.updateTaggedConfigurationAssignments(sidecar);
-        sidecarService.save(updated);
-        sidecar = updated;
+        final ServerDirectives directives = registrationService.checkIn(agentState);
 
-        final CollectorActions collectorActions = actionService.findActionBySidecar(nodeId, true);
-        List<CollectorAction> collectorAction = null;
-        if (collectorActions != null) {
-            collectorAction = collectorActions.action();
-        }
-        RegistrationResponse sidecarRegistrationResponse = RegistrationResponse.create(
+        final RegistrationResponse response = RegistrationResponse.create(
                 SidecarRegistrationConfiguration.create(
                         sidecarConfiguration.sidecarUpdateInterval().toStandardDuration().getStandardSeconds(),
                         sidecarConfiguration.sidecarSendStatus()),
                 sidecarConfiguration.sidecarConfigurationOverride(),
-                collectorAction,
-                sidecar.assignments());
-        // add new etag to cache
-        EntityTag registrationEtag = etagService.buildEntityTagForResponse(sidecarRegistrationResponse);
-        etagService.addSidecarRegistration(sidecar.nodeId(), registrationEtag.toString());
+                directives.actions(),
+                directives.assignments());
 
-        return Response.accepted(sidecarRegistrationResponse).tag(registrationEtag).build();
+        final EntityTag registrationEtag = etagService.buildEntityTagForResponse(response);
+        etagService.addSidecarRegistration(nodeId, registrationEtag.toString());
+
+        return Response.accepted(response).tag(registrationEtag).build();
     }
 
     @PUT

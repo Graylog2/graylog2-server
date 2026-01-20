@@ -104,13 +104,15 @@ public class ConfigurationGenerator {
      * @param sidecar the sidecar to compute config hash for
      * @return the SHA-256 hash as a byte array
      */
-    public byte[] computeConfigHash(Sidecar sidecar) {
-        final String config = generateConfig(sidecar);
+    public record GeneratedConfig(String yaml, byte[] hash) {}
+
+    public GeneratedConfig generateConfigWithHash(Sidecar sidecar) {
+        final String yaml = generateConfig(sidecar);
         try {
             final MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return digest.digest(config.getBytes(StandardCharsets.UTF_8));
+            final byte[] hash = digest.digest(yaml.getBytes(StandardCharsets.UTF_8));
+            return new GeneratedConfig(yaml, hash);
         } catch (NoSuchAlgorithmException e) {
-            // SHA-256 is always available
             throw new RuntimeException(e);
         }
     }
