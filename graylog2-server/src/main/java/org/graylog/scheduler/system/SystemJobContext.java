@@ -47,7 +47,7 @@ public class SystemJobContext {
      * @see #updateProgress(long, long)
      */
     public void updateProgress(int progress) {
-        ctx.updateProgress(Math.min(Math.max(0, progress), 100));
+        ctx.updateProgress(Math.clamp(progress, 0, 100));
     }
 
     /**
