@@ -264,12 +264,12 @@ public class JobExecutionEngine {
             final JobDefinitionDto jobDefinition = jobDefinitionLookup.lookup(trigger.jobDefinitionId())
                     .orElseThrow(() -> new IllegalStateException("Couldn't find job definition " + trigger.jobDefinitionId()));
 
-            final Job job = jobFactories.get(jobDefinition.config().jobFactoryType()).create(jobDefinition);
-            if (job == null) {
+            final Job.Factory<? extends Job> jobFactory = jobFactories.get(jobDefinition.config().jobFactoryType());
+            if (jobFactory == null) {
                 throw new IllegalStateException("Couldn't find job factory for type " + jobDefinition.config().jobFactoryType());
             }
 
-            executionTime.time(() -> executeJob(trigger, jobDefinition, job));
+            executionTime.time(() -> executeJob(trigger, jobDefinition, jobFactory.create(jobDefinition)));
         } catch (IllegalStateException e) {
             // The trigger cannot be handled because of a permanent error so we mark the trigger as defective
             LOG.error("Couldn't handle trigger due to a permanent error {} - trigger won't be retried", trigger.id(), e);
