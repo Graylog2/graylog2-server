@@ -84,11 +84,11 @@ public class OptimizeIndexJob implements SystemJob<OptimizeIndexJob.Config> {
                 return doExecute(config.indexName(), config.maxNumSegments());
             } catch (AlreadyLockedException e) {
                 LOG.debug("Index optimization for index <{}> already running, scheduling retry.", config.indexName());
-                return SystemJobResult.withRetry(java.time.Duration.ofSeconds(5));
+                return SystemJobResult.withRetry(java.time.Duration.ofSeconds(5), Integer.MAX_VALUE);
             }
         } catch (AlreadyLockedException e) {
             LOG.debug("Maximum of {} concurrent index optimization jobs reached, scheduling retry.", indexOptimizationJobs);
-            return SystemJobResult.withRetry(java.time.Duration.ofSeconds(5));
+            return SystemJobResult.withRetry(java.time.Duration.ofSeconds(5), Integer.MAX_VALUE);
         } catch (Exception e) {
             LOG.error("Error optimizing index <{}>", config.indexName(), e);
             return SystemJobResult.withError();

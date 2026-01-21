@@ -158,7 +158,7 @@ public class RebuildIndexRangesJob implements SystemJob<RebuildIndexRangesJob.Co
                     ctx.updateProgress(indicesToCalculate, indicesCalculated.incrementAndGet());
                 } catch (AlreadyLockedException e) {
                     LOG.debug("Recalculation for index <{}> already running, scheduling retry.", index);
-                    return SystemJobResult.withRetry(Duration.ofSeconds(5));
+                    return SystemJobResult.withRetry(Duration.ofSeconds(5), Integer.MAX_VALUE);
                 }
             }
         }

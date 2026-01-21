@@ -90,7 +90,7 @@ public class CreateNewSingleIndexRangeJob implements SystemJob<CreateNewSingleIn
             return SystemJobResult.success();
         } catch (AlreadyLockedException e) {
             LOG.debug("Recalculation for index <{}> already running, scheduling retry.", indexName);
-            return SystemJobResult.withRetry(Duration.ofSeconds(5));
+            return SystemJobResult.withRetry(Duration.ofSeconds(5), Integer.MAX_VALUE);
         }
     }
 
