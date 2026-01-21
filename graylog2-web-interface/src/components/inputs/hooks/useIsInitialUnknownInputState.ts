@@ -14,20 +14,26 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import { useEffect, useMemo } from 'react';
 
-import type Widget from 'views/logic/widgets/Widget';
-import { widgetDefinition } from 'views/logic/Widgets';
+import type { InputStates } from 'hooks/useInputsStates';
 
-type Props = {
-  widget: Widget;
+const useIsInitialUnknownInputState = (inputStates: InputStates, inputId: string) => {
+  const seenInputIds = useMemo(() => new Set<string>(), []);
+
+  useEffect(() => {
+    if (!inputStates) {
+      return;
+    }
+
+    Object.keys(inputStates).forEach((id) => {
+      seenInputIds.add(id);
+    });
+  }, [inputStates, seenInputIds]);
+
+  const hasKnownState = !!inputStates?.[inputId];
+
+  return !hasKnownState && !seenInputIds.has(inputId);
 };
 
-const CustomExportSettings = ({ widget }: Props) => {
-  const { exportComponent: ExportComponent = () => null } = (widget?.type && widgetDefinition(widget.type)) ?? {};
-
-  // eslint-disable-next-line react-hooks/static-components
-  return <ExportComponent widget={widget} />;
-};
-
-export default CustomExportSettings;
+export default useIsInitialUnknownInputState;
