@@ -81,9 +81,8 @@ const SortIcon = <AscDirection extends string, DescDirection extends string>({
       aria-label={title}
       onClick={handleSortChange}>
       <Icon
-        name="sort"
+        name={isAscSort ? 'arrow_upward' : 'arrow_downward'}
         data-testid="sort-icon-svg"
-        flip={isAscSort ? 'horizontal' : undefined}
         className={`sort-icon-${isAscSort ? 'asc' : 'desc'}`}
       />
       {order && <Bulb>{order}</Bulb>}

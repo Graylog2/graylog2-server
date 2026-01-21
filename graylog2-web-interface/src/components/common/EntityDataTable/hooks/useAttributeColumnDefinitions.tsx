@@ -60,7 +60,7 @@ const RightCol = styled.div`
 const ActiveSliceIcon = styled(Icon)(
   ({ theme }) => css`
     margin-left: ${theme.spacings.xs};
-    color: ${theme.colors.text.secondary};
+    color: ${theme.colors.gray[20]};
   `,
 );
 
