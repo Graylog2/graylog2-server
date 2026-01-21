@@ -27,7 +27,7 @@ import UniqueChunkIdPlugin from './UniqueChunkIdPlugin';
 
 const disableTsc = process.env.disable_tsc === 'true';
 
-const getCssLoaderOptions = (target) => {
+const getCssLoaderOptions = (target: string) => {
   // Development
   if (target === 'start') {
     return {
@@ -45,7 +45,7 @@ const getCssLoaderOptions = (target) => {
   };
 };
 
-export const sortChunks = (c1, c2) => {
+export const sortChunks = (c1: string, c2: string) => {
   // Render the polyfill chunk first
   if (c1 === 'polyfill') {
     return -1;
@@ -66,7 +66,7 @@ export const sortChunks = (c1, c2) => {
   return 0;
 };
 
-const esbuildLoader = (supportedBrowsers) => ({
+const esbuildLoader = (supportedBrowsers: string[]) => ({
   loader: 'esbuild-loader',
   options: {
     target: supportedBrowsers,
@@ -80,7 +80,7 @@ const reactCompiler = {
   }),
 };
 
-export const rules = (target, supportedBrowsers) => [
+export const rules = (target: string, supportedBrowsers: string[]) => [
   {
     test: /\.[jt]s(x)?$/,
     use: [reactCompiler, esbuildLoader(supportedBrowsers)],
@@ -121,7 +121,13 @@ export const rules = (target, supportedBrowsers) => [
   },
 ];
 
-export const config = (target, appPath, rootPath, webInterfaceRoot, supportedBrowsers) => {
+export const config = (
+  target: string,
+  appPath: string,
+  rootPath: string,
+  webInterfaceRoot: string,
+  supportedBrowsers: string[],
+) => {
   const MANIFESTS_PATH = path.resolve(webInterfaceRoot, 'manifests');
   const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
   const BUILD_PATH = path.resolve(rootPath, 'target/web/build');
