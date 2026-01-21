@@ -28,7 +28,6 @@ import type { ResolutionState } from 'contexts/EventReplaySelectedContext';
 import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
 import sidebarSections from 'views/components/sidebar/sidebarSections';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
-import InfoBarBulkEventReplay from 'components/events/bulk-replay/NewBulkEventReplay';
 
 const Container = styled.div`
   display: flex;
@@ -122,7 +121,6 @@ const BulkEventReplay = ({ initialEventIds, events }: Props) => (
   <EventReplaySelectedProvider initialEventIds={initialEventIds}>
     <Container>
       <ReplayedSearchContainer>
-        <InfoBarBulkEventReplay />
         <ReplayedSearch events={events} />
       </ReplayedSearchContainer>
     </Container>

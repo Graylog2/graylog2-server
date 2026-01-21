@@ -35,6 +35,7 @@ import { createGRN } from 'logic/permissions/GRN';
 import useAlertAndEventDefinitionData from 'components/event-definitions/replay-search/hooks/useAlertAndEventDefinitionData';
 import useReplaySearchContext from 'components/event-definitions/replay-search/hooks/useReplaySearchContext';
 import ViewsExecutionInfo from 'views/components/views/ViewsExecutionInto';
+import InfoBarBulkEventReplay from 'components/events/bulk-replay/NewBulkEventReplay';
 
 const links = {
   [View.Type.Dashboard]: ({ id, title }) => [
@@ -63,7 +64,7 @@ const links = {
       label: 'Alerts & Events',
     },
     {
-      label: id,
+      label: <InfoBarBulkEventReplay eventId={id} />,
       dataTestId: 'alert-id-title',
     },
   ],

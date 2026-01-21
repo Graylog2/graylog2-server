@@ -32,6 +32,7 @@ import useEventBulkActions from 'components/events/events/hooks/useEventBulkActi
 import Popover from 'components/common/Popover';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 import useRoutingQuery from 'routing/useQuery';
+import Routes from 'routing/Routes';
 
 import DropdownButton from '../../bootstrap/DropdownButton';
 
@@ -92,9 +93,9 @@ const RemainingBulkActions = ({ completed, events }: RemainingBulkActionsProps) 
 };
 
 const CurentContainer = styled.div(
-  ({ theme }) => css`
+  () => css`
     display: flex;
-    gap: ${theme.spacings.xs};
+    gap: 0;
     align-items: center;
   `,
 );
@@ -125,7 +126,7 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
 
   return (
     <CurentContainer>
-      <IconButton name="arrow_back" onClick={onGoBack} disabled={curIndex === 0} />
+      {curIndex !== 0 && <IconButton name="arrow_back" onClick={onGoBack} />}
       <Popover position="bottom">
         <Popover.Target>
           <div>
@@ -171,9 +172,17 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
           </Container>
         </Popover.Dropdown>
       </Popover>
-      <IconButton name="arrow_forward" disabled={curIndex === eventIds.length - 1} onClick={onGoForward} />
+      {curIndex !== eventIds.length - 1 && <IconButton name="arrow_forward" onClick={onGoForward} />}
     </CurentContainer>
   );
 };
 
-export default InfoBarBulkEventReplay;
+const ReplayEventIdRenderer = ({ eventId }: { eventId: string }) => {
+  const isFromBulkAction = location.pathname === Routes.ALERTS.BULK_REPLAY_SEARCH;
+
+  if (isFromBulkAction) return <InfoBarBulkEventReplay />;
+
+  return eventId;
+};
+
+export default ReplayEventIdRenderer;
