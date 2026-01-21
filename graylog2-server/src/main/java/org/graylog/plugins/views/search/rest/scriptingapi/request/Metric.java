@@ -71,7 +71,7 @@ public class Metric implements Sortable {
     /**
      * Creates a new Metric from its string representation
      *
-     * @param metricString String representation in the form of "function:field", i.e. "avg:took_ms" or "latest:source" (you can ommit field for count function : "count" or "count:")
+     * @param metricString String representation in the form of "function:field", i.e. "avg:took_ms" or "latest:source" (you can omit field for count function : "count" or "count:")
      * @return new Metric, or null if metricString input string is blank
      */
     public static Optional<Metric> fromStringRepresentation(final String metricString) {

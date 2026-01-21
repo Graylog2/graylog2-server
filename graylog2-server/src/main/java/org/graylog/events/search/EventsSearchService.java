@@ -54,7 +54,7 @@ public class EventsSearchService extends AbstractEventsSearchService {
         return new EventsFilterBuilder(parameters).build();
     }
 
-    private Set<String> allowedEventStreams(Subject subject) {
+    public Set<String> allowedEventStreams(Subject subject) {
         final var eventStreams = defaultEventStreams();
         if (subject.isPermitted(RestPermissions.STREAMS_READ)) {
             return eventStreams;

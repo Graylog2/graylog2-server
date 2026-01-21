@@ -40,6 +40,8 @@ public abstract class EventsSearchParameters {
     private static final String FIELD_SORT_BY = "sort_by";
     private static final String FIELD_SORT_DIRECTION = "sort_direction";
     private static final String FIELD_SORT_UNMAPPED_TYPE = "sort_unmapped_type";
+    private static final String FIELD_SLICE = "slice";
+    private static final String FIELD_SLICE_COLUMN = "slice_column";
 
     public enum SortDirection {
         @JsonProperty("asc")
@@ -71,6 +73,12 @@ public abstract class EventsSearchParameters {
 
     @JsonProperty(FIELD_SORT_UNMAPPED_TYPE)
     public abstract Optional<String> sortUnmappedType();
+
+    @JsonProperty(FIELD_SLICE)
+    public abstract Optional<String> slice();
+
+    @JsonProperty(FIELD_SLICE_COLUMN)
+    public abstract Optional<String> sliceColumn();
 
     public static Builder builder() {
         return Builder.create();
@@ -125,6 +133,12 @@ public abstract class EventsSearchParameters {
 
         @JsonProperty(FIELD_SORT_UNMAPPED_TYPE)
         public abstract Builder sortUnmappedType(String sortUnmappedType);
+
+        @JsonProperty(FIELD_SLICE)
+        public abstract Builder slice(String slice);
+
+        @JsonProperty(FIELD_SLICE_COLUMN)
+        public abstract Builder sliceColumn(String sliceColumn);
 
         public abstract EventsSearchParameters build();
     }
