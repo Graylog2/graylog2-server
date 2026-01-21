@@ -24,6 +24,13 @@ import org.graylog.events.event.Event;
 import org.graylog.events.event.EventWithContext;
 import org.graylog.events.processor.EventDefinition;
 
+import java.util.Objects;
+
+import static org.graylog.events.event.EventDto.FIELD_EVENT_DEFINITION_ID;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_DESCRIPTION;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TITLE;
+import static org.graylog.events.notifications.EventNotificationModelData.FIELD_EVENT_DEFINITION_TYPE;
+
 public class EventSummaryModifier implements EventModifier {
     private final Engine templateEngine;
 
@@ -37,6 +44,11 @@ public class EventSummaryModifier implements EventModifier {
         if (!Strings.isNullOrEmpty(eventDefinition.eventSummaryTemplate())) {
             final ImmutableMap.Builder<String, Object> dataModelBuilder = ImmutableMap.builder();
 
+            dataModelBuilder.put(FIELD_EVENT_DEFINITION_ID, Objects.requireNonNull(eventDefinition.id()));
+            dataModelBuilder.put(FIELD_EVENT_DEFINITION_TITLE, eventDefinition.title());
+            dataModelBuilder.put(FIELD_EVENT_DEFINITION_TYPE, eventDefinition.config().type());
+            dataModelBuilder.put(FIELD_EVENT_DEFINITION_DESCRIPTION, eventDefinition.description());
+            
             if (eventWithContext.messageContext().isPresent()) {
                 dataModelBuilder.put("source", eventWithContext.messageContext().get().getFields());
             } else if (eventWithContext.eventContext().isPresent()) {
