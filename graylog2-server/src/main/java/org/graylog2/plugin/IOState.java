@@ -48,7 +48,7 @@ public class IOState<T extends Stoppable> {
     }
 
     protected T stoppable;
-    final private EventBus eventbus;
+    private final EventBus eventbus;
     protected Type state;
     protected DateTime startedAt;
     protected DateTime lastFailedAt;
@@ -116,10 +116,6 @@ public class IOState<T extends Stoppable> {
 
     public void setStartedAt(DateTime startedAt) {
         this.startedAt = startedAt;
-    }
-
-    public void setLastFaileedAt(DateTime lastFailedAt) {
-        this.lastFailedAt = lastFailedAt;
     }
 
     public String getDetailedMessage() {
