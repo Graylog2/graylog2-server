@@ -514,17 +514,13 @@ const FilterForm = ({ currentUser, eventDefinition, onChange, streams, validatio
   const onlyFilters = eventDefinition._scope === 'ILLUMINATE';
 
   // Ensure deleted streams are still displayed in select
-  const formattedStreams = useMemo(
-    () =>
-      [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
-        .map((streamId) => {
-          const stream = streams.find((s) => s.id === streamId);
+  const formattedStreams = [...streams.map((s) => s.id), ...(eventDefinition?.config?.streams ?? [])]
+    .map((streamId) => {
+      const stream = streams.find((s) => s.id === streamId);
 
-          return { label: stream?.title ?? streamId, value: streamId };
-        })
-        .sort((s1, s2) => defaultCompare(s1.label, s2.label)),
-    [eventDefinition?.config?.streams, streams],
-  );
+      return { label: stream?.title ?? streamId, value: streamId };
+    })
+    .sort((s1, s2) => defaultCompare(s1.label, s2.label));
 
   return (
     <fieldset>
