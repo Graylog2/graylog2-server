@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -156,7 +157,9 @@ public class AzureGeoIpFileService extends GeoIpFileService {
         final BlobServiceClientBuilder builder = new BlobServiceClientBuilder()
                 .credential(new StorageSharedKeyCredential(config.azureAccountName(), accountKey));
 
-        config.azureEndpoint().ifPresent(builder::endpoint);
+        config.azureEndpoint().ifPresentOrElse(builder::endpoint, () ->
+                builder.endpoint(String.format(Locale.ROOT, "https://%s.blob.core.windows.net", config.azureAccountName()))
+        );
 
         return builder.buildClient();
     }
