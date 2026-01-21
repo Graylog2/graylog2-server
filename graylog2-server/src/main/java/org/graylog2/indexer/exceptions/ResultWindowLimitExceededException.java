@@ -14,20 +14,13 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.indexer.exceptions;
 
-import type Widget from 'views/logic/widgets/Widget';
-import { widgetDefinition } from 'views/logic/Widgets';
+import org.graylog2.indexer.ElasticsearchException;
 
-type Props = {
-  widget: Widget;
-};
+public class ResultWindowLimitExceededException extends ElasticsearchException {
 
-const CustomExportSettings = ({ widget }: Props) => {
-  const { exportComponent: ExportComponent = () => null } = (widget?.type && widgetDefinition(widget.type)) ?? {};
-
-  // eslint-disable-next-line react-hooks/static-components
-  return <ExportComponent widget={widget} />;
-};
-
-export default CustomExportSettings;
+    public ResultWindowLimitExceededException(final int resultWindowLimit) {
+        super("Result window is too large, from + size must be less than or equal to: " + resultWindowLimit);
+    }
+}
