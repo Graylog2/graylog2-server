@@ -246,6 +246,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 onPageSizeChange={onPageSizeChange}
                 pageSize={layoutConfig.pageSize}
                 activeSort={layoutConfig.sort}
+                activeSliceCol={fetchOptions.sliceCol}
                 entityActions={entityActions}
                 columnRenderers={columnRenderers}
                 columnSchemas={columnSchemas}

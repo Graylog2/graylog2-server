@@ -20,7 +20,7 @@ import type { createColumnHelper, Row, Column, HeaderContext, CellContext } from
 import camelCase from 'lodash/camelCase';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { styled } from 'styled-components';
+import { styled, css } from 'styled-components';
 
 import type {
   EntityBase,
@@ -33,6 +33,8 @@ import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStyl
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
+import Icon from 'components/common/Icon';
+import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
 import SortIcon from '../SortIcon';
 
@@ -54,6 +56,13 @@ const RightCol = styled.div`
   display: flex;
   align-items: center;
 `;
+
+const ActiveSliceIcon = styled(Icon)(
+  ({ theme }) => css`
+    margin-left: ${theme.spacings.xs};
+    color: ${theme.colors.text.secondary};
+  `,
+);
 
 const useSortableCol = (colId: string, disabled: boolean) => {
   const { setColumnTransform } = useContext(DndStylesContext);
@@ -88,6 +97,7 @@ const AttributeHeader = <Entity extends EntityBase>({
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
 }) => {
+  const activeSliceCol = useContext(ActiveSliceColContext);
   const colId = ctx.header.column.id;
   const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
   const { attributes, isDragging, listeners, setNodeRef, setActivatorNodeRef } = useSortableCol(
@@ -99,6 +109,8 @@ const AttributeHeader = <Entity extends EntityBase>({
   const _onChangeSlicing = () => onChangeSlicing(colId);
   const columnLabel = columnMeta?.label ?? colId;
   const headerLabel = columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel;
+  const canSlice = columnMeta?.enableSlicing;
+  const isSliceActive = activeSliceCol === colId;
   const canSort = ctx.header.column.getCanSort();
   const sortDirection = ctx.header.column.getIsSorted();
 
@@ -117,10 +129,11 @@ const AttributeHeader = <Entity extends EntityBase>({
         <HeaderActionsDropdown
           label={columnLabel}
           activeSort={sortDirection}
-          onChangeSlicing={columnMeta?.enableSlicing ? _onChangeSlicing : undefined}
+          onChangeSlicing={canSlice ? _onChangeSlicing : undefined}
           onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
           {headerLabel}
         </HeaderActionsDropdown>
+        {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
         {sortDirection && <SortIcon<Entity> column={ctx.header.column} />}
       </LeftCol>
       <RightCol ref={rightRef}>

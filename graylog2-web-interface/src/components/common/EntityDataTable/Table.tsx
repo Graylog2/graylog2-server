@@ -93,7 +93,11 @@ type Props<Entity extends EntityBase> = {
   rows: Array<Row<Entity>>;
 };
 
-const Table = <Entity extends EntityBase>({ expandedSectionRenderers, headerGroups, rows }: Props<Entity>) => (
+const Table = <Entity extends EntityBase>({
+  expandedSectionRenderers,
+  headerGroups,
+  rows,
+}: Props<Entity>) => (
   <StyledTable striped condensed hover>
     <TableHead headerGroups={headerGroups} />
     {rows.map((row) => (
