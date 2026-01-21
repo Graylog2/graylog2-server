@@ -27,7 +27,7 @@ import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import { ThInner, LeftCol } from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
-import HeaderActionsDropdownButton from 'components/common/EntityDataTable/HeaderActionsDropdownButton';
+import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
 
 const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
@@ -70,6 +70,9 @@ const ThGhostInner = <Entity extends EntityBase>(
 ) => {
   const columnMeta = column.columnDef?.meta as ColumnMetaContext<any>;
   const columnLabel = columnMeta?.label ?? column.id;
+  const canSlice = columnMeta?.enableSlicing;
+  const canSort = column.getCanSort();
+  const sortDirection = column.getIsSorted();
 
   return (
     <CustomDragOverlay ref={ref} $minWidth={column.getSize()}>
@@ -78,14 +81,14 @@ const ThGhostInner = <Entity extends EntityBase>(
           <DragHandle $isDragging>
             <DragIcon name="drag_indicator" />
           </DragHandle>
-          {columnMeta?.enableSlicing ? (
-            <HeaderActionsDropdownButton label={columnLabel} onChangeSlicing={() => {}}>
-              {columnLabel}
-            </HeaderActionsDropdownButton>
-          ) : (
-            columnLabel
-          )}
-          {column.getCanSort() && <SortIcon<Entity> column={column} />}
+          <HeaderActionsDropdown
+            label={columnLabel}
+            activeSort={sortDirection}
+            onChangeSlicing={canSlice ? () => {} : undefined}
+            onSort={canSort ? () => {} : undefined}>
+            {columnLabel}
+          </HeaderActionsDropdown>
+          {sortDirection && <SortIcon<Entity> column={column} />}
         </LeftCol>
         {column.getCanResize() && <ResizeHandle colTitle={columnLabel} />}
       </ThInner>

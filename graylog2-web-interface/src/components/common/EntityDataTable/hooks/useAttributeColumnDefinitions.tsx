@@ -32,7 +32,7 @@ import DragHandle from 'components/common/SortableList/DragHandle';
 import DndStylesContext from 'components/common/EntityDataTable/contexts/DndStylesContext';
 import useHeaderSectionObserver from 'components/common/EntityDataTable/hooks/useHeaderSectionObserver';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
-import HeaderActionsDropdownButton from 'components/common/EntityDataTable/HeaderActionsDropdownButton';
+import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
 
 import SortIcon from '../SortIcon';
 
@@ -99,6 +99,8 @@ const AttributeHeader = <Entity extends EntityBase>({
   const _onChangeSlicing = () => onChangeSlicing(colId);
   const columnLabel = columnMeta?.label ?? colId;
   const headerLabel = columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel;
+  const canSort = ctx.header.column.getCanSort();
+  const sortDirection = ctx.header.column.getIsSorted();
 
   return (
     <ThInner ref={setNodeRef}>
@@ -112,14 +114,14 @@ const AttributeHeader = <Entity extends EntityBase>({
             itemTitle={columnLabel}
           />
         )}
-        {columnMeta?.enableSlicing ? (
-          <HeaderActionsDropdownButton label={columnLabel} onChangeSlicing={_onChangeSlicing}>
-            {headerLabel}
-          </HeaderActionsDropdownButton>
-        ) : (
-          headerLabel
-        )}
-        {ctx.header.column.getCanSort() && <SortIcon<Entity> column={ctx.header.column} />}
+        <HeaderActionsDropdown
+          label={columnLabel}
+          activeSort={sortDirection}
+          onChangeSlicing={columnMeta?.enableSlicing ? _onChangeSlicing : undefined}
+          onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
+          {headerLabel}
+        </HeaderActionsDropdown>
+        {sortDirection && <SortIcon<Entity> column={ctx.header.column} />}
       </LeftCol>
       <RightCol ref={rightRef}>
         {ctx.header.column.getCanResize() && (
