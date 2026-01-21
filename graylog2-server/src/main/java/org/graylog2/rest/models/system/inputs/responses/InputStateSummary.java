@@ -35,8 +35,9 @@ public abstract class InputStateSummary extends IOStateSummary {
     public static InputStateSummary create(@JsonProperty("id") String id,
                                            @JsonProperty("state") String state,
                                            @JsonProperty("started_at") DateTime startedAt,
+                                           @JsonProperty("last_failed_at") @Nullable DateTime lastFailedAt,
                                            @JsonProperty("detailed_message") @Nullable String detailedMessage,
                                            @JsonProperty("message_input") InputSummary messageInput) {
-        return new AutoValue_InputStateSummary(id, state, startedAt, detailedMessage, messageInput);
+        return new AutoValue_InputStateSummary(id, state, startedAt, lastFailedAt, detailedMessage, messageInput);
     }
 }

@@ -51,6 +51,7 @@ public class IOState<T extends Stoppable> {
     final private EventBus eventbus;
     protected Type state;
     protected DateTime startedAt;
+    protected DateTime lastFailedAt;
     protected String detailedMessage;
 
     @AssistedInject
@@ -64,6 +65,7 @@ public class IOState<T extends Stoppable> {
         this.state = state;
         this.stoppable = stoppable;
         this.startedAt = Tools.nowUTC();
+        this.lastFailedAt = null;
     }
 
     public T getStoppable() {
@@ -93,6 +95,10 @@ public class IOState<T extends Stoppable> {
         }
         final IOStateChangedEvent<T> evt = IOStateChangedEvent.create(this.state, state, this);
         this.state = state;
+        if (state == Type.FAILED) {
+            this.lastFailedAt = Tools.nowUTC();
+        }
+
         this.eventbus.post(evt);
     }
 
@@ -104,8 +110,16 @@ public class IOState<T extends Stoppable> {
         return startedAt;
     }
 
+    public DateTime getLastFailedAt() {
+        return lastFailedAt;
+    }
+
     public void setStartedAt(DateTime startedAt) {
         this.startedAt = startedAt;
+    }
+
+    public void setLastFaileedAt(DateTime lastFailedAt) {
+        this.lastFailedAt = lastFailedAt;
     }
 
     public String getDetailedMessage() {
@@ -122,6 +136,7 @@ public class IOState<T extends Stoppable> {
                 "stoppable=" + stoppable +
                 ", state=" + state +
                 ", startedAt=" + startedAt +
+                ", lastFailedAt=" + lastFailedAt +
                 ", detailedMessage='" + detailedMessage + '\'' +
                 '}';
     }
