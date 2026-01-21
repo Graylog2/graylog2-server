@@ -14,10 +14,14 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog.mcp.server;
-
-public class McpException extends Exception {
-    public McpException(String reason) {
-        super(reason);
-    }
-}
+export type StreamConnectedPipeline = {
+  id: string;
+  pipeline: string;
+  pipeline_id: string;
+  rule: string;
+  rule_id: string;
+  connected_streams: Array<{
+    id: string;
+    title: string;
+  }>;
+};

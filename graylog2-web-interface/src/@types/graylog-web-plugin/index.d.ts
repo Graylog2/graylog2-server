@@ -243,7 +243,7 @@ declare module 'graylog-web-plugin/plugin' {
     indexsets_field_restrictions: 'edit';
     indices: 'read' | 'changestate' | 'failures';
     input_types: 'create';
-    inputs: 'create' | 'edit' | 'read' | 'terminate';
+    inputs: 'create' | 'edit' | 'read' | 'terminate' | 'changestate';
     journal: 'read';
     jvmstats: 'read';
     lbstatus: 'change';

@@ -48,6 +48,21 @@ public class SearchTypeErrorParser {
         return new SearchTypeError(query, searchTypeId, ex);
     }
 
+    public static Integer getResultWindowLimitFromError(final Throwable ex) {
+        Throwable possibleResultWindowException = ex;
+        int attempt = 0;
+        while (possibleResultWindowException != null && attempt < MAX_DEPTH_OF_EXCEPTION_CAUSE_ANALYSIS) {
+            final Integer resultWindowLimit = parseResultLimit(possibleResultWindowException);
+            if (resultWindowLimit != null) {
+                return resultWindowLimit;
+            }
+            possibleResultWindowException = possibleResultWindowException.getCause();
+            attempt++;
+        }
+
+        return null;
+    }
+
     private static boolean isSearchTypeAbortedError(ElasticsearchException ex) {
         return ex != null &&
                 (
