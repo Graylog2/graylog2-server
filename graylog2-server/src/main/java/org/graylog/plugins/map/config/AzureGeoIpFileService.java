@@ -64,17 +64,11 @@ public class AzureGeoIpFileService extends GeoIpFileService {
     public void validateConfiguration(GeoIpResolverConfig config) throws ConfigValidationException {
         final boolean hasAccountName = StringUtils.isNotBlank(config.azureAccountName());
         final boolean hasAccountKey = config.azureAccountKey() != null && config.azureAccountKey().isSet();
+        final boolean hasContainerName = StringUtils.isNotBlank(config.azureContainerName());
 
-        if (!hasAccountName || !hasAccountKey) {
-            throw new ConfigValidationException("Azure authentication is required. Provide both account name and account key.");
-        }
 
-        if (StringUtils.isNotBlank(config.cityDbPath()) && extractContainerAndBlob(config.cityDbPath()).isEmpty()) {
-            throw new ConfigValidationException("City database path must be in the format <container-name/blob-name>.");
-        }
-
-        if (StringUtils.isNotBlank(config.asnDbPath()) && extractContainerAndBlob(config.asnDbPath()).isEmpty()) {
-            throw new ConfigValidationException("ASN database path must be in the format <container-name/blob-name>.");
+        if (!hasAccountName || !hasAccountKey || !hasContainerName) {
+            throw new ConfigValidationException("Azure authentication is required. Provide account name, account key, and container name.");
         }
     }
 
@@ -94,24 +88,23 @@ public class AzureGeoIpFileService extends GeoIpFileService {
     }
 
     private Optional<Instant> downloadFile(GeoIpResolverConfig config, String blobPath, Path tempPath) {
-        return extractContainerAndBlob(blobPath).flatMap(cb -> {
-            try {
-                final BlobClient blobClient = getBlobServiceClient(config)
-                        .getBlobContainerClient(cb.container())
-                        .getBlobClient(cb.blob());
+        final String container = config.azureContainerName();
+        try {
+            final BlobClient blobClient = getBlobServiceClient(config)
+                    .getBlobContainerClient(container)
+                    .getBlobClient(blobPath);
 
-                if (!blobClient.exists()) {
-                    LOG.warn("Blob not found in Azure Blob Storage: {}/{}", cb.container(), cb.blob());
-                    return Optional.empty();
-                }
-
-                blobClient.downloadToFile(tempPath.toString(), true);
-                return Optional.of(blobClient.getProperties().getLastModified().toInstant());
-            } catch (Exception e) {
-                LOG.error("Failed to download blob {}/{}: {}", cb.container(), cb.blob(), e.getMessage());
+            if (!blobClient.exists()) {
+                LOG.warn("Blob {} not found in Azure Blob Storage: {}", blobPath, container);
                 return Optional.empty();
             }
-        });
+
+            blobClient.downloadToFile(tempPath.toString(), true);
+            return Optional.of(blobClient.getProperties().getLastModified().toInstant());
+        } catch (Exception e) {
+            LOG.error("Failed to download blob {}: {}", blobPath, e.getMessage());
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -125,25 +118,25 @@ public class AzureGeoIpFileService extends GeoIpFileService {
     }
 
     private Optional<Instant> getFileServerTimestamp(GeoIpResolverConfig config, String blobPath) {
-        return extractContainerAndBlob(blobPath).flatMap(cb -> {
-            try {
-                BlobClient blobClient = getBlobServiceClient(config)
-                        .getBlobContainerClient(cb.container())
-                        .getBlobClient(cb.blob());
+        final String container = config.azureContainerName();
+        try {
+            final BlobClient blobClient = getBlobServiceClient(config)
+                    .getBlobContainerClient(container)
+                    .getBlobClient(blobPath);
 
-                if (Boolean.TRUE.equals(blobClient.exists())) {
-                    return Optional.of(blobClient.getProperties().getLastModified().toInstant());
-                }
-            } catch (Exception e) {
-                LOG.warn("Failed to get last modified time for blob {}/{}: {}", cb.container(), cb.blob(), e.getMessage());
+            if (Boolean.TRUE.equals(blobClient.exists())) {
+                return Optional.of(blobClient.getProperties().getLastModified().toInstant());
             }
-            return Optional.empty();
-        });
+        } catch (Exception e) {
+            LOG.warn("Failed to get last modified time for blob {}: {}", blobPath, e.getMessage());
+        }
+        return Optional.empty();
     }
 
     @Override
     protected boolean isConnected() {
-        return blobServiceClient != null;
+        // Connection is established when trying to download a file or getting its timestamp
+        return true;
     }
 
     private BlobServiceClient getBlobServiceClient(GeoIpResolverConfig config) {
@@ -167,30 +160,4 @@ public class AzureGeoIpFileService extends GeoIpFileService {
 
         return builder.buildClient();
     }
-
-    /**
-     * Extracts container and blob name from a path.
-     * Expected format: container-name/blob-name
-     */
-    private Optional<ContainerAndBlob> extractContainerAndBlob(String path) {
-        if (StringUtils.isBlank(path)) {
-            return Optional.empty();
-        }
-
-        int slashIndex = path.indexOf('/');
-        if (slashIndex <= 0 || slashIndex == path.length() - 1) {
-            return Optional.empty();
-        }
-
-        final String container = path.substring(0, slashIndex);
-        final String blob = path.substring(slashIndex + 1);
-
-        if (container.isBlank() || blob.isBlank()) {
-            return Optional.empty();
-        }
-
-        return Optional.of(new ContainerAndBlob(container, blob));
-    }
-
-    private record ContainerAndBlob(String container, String blob) {}
 }

@@ -56,8 +56,6 @@ class AzureGeoIpFileServiceTest {
     private static final String CONTAINER_NAME = "geoip-container";
     private static final String CITY_BLOB = "GeoLite2-City.mmdb";
     private static final String ASN_BLOB = "GeoLite2-ASN.mmdb";
-    private static final String VALID_CITY_PATH = CONTAINER_NAME + "/" + CITY_BLOB;
-    private static final String VALID_ASN_PATH = CONTAINER_NAME + "/" + ASN_BLOB;
 
     private  final EncryptedValueService encryptedValueService = new EncryptedValueService("p@55w0rdT3stS3cr!");
 
@@ -81,7 +79,7 @@ class AzureGeoIpFileServiceTest {
     @MethodSource("invalidConfigProvider")
     void testInvalidConfig(String accountName, String accountKey, String cityPath, String asnPath) {
         assertThrows(ConfigValidationException.class, () -> {
-            GeoIpResolverConfig invalidConfig = createConfig(accountName, accountKey, cityPath, asnPath);
+            GeoIpResolverConfig invalidConfig = createConfig(accountName, accountKey, CONTAINER_NAME, cityPath, asnPath);
             classUnderTest.validateConfiguration(invalidConfig);
         });
     }
@@ -90,7 +88,7 @@ class AzureGeoIpFileServiceTest {
     void testDownloadCityFile() throws Exception {
         uploadBlob(CITY_BLOB, FAKE_CITY_DB_CONTENT);
         Path cityFile = tempDir.resolve(CITY_BLOB);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), VALID_CITY_PATH, "");
+        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, CITY_BLOB, "");
 
         assertThat(classUnderTest.downloadCityFile(config, cityFile)).isPresent();
         assertThat(Files.readString(cityFile)).isEqualTo(FAKE_CITY_DB_CONTENT);
@@ -100,7 +98,7 @@ class AzureGeoIpFileServiceTest {
     void testDownloadAsnFile() throws Exception {
         uploadBlob(ASN_BLOB, FAKE_ASN_DB_CONTENT);
         Path asnFile = tempDir.resolve(ASN_BLOB);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), VALID_CITY_PATH, VALID_ASN_PATH);
+        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, "", ASN_BLOB);
 
         assertThat(classUnderTest.downloadAsnFile(config, asnFile)).isPresent();
         assertThat(Files.readString(asnFile)).isEqualTo(FAKE_ASN_DB_CONTENT);
@@ -109,7 +107,7 @@ class AzureGeoIpFileServiceTest {
     @Test
     void testGetCityFileServerTimestamp() throws Exception {
         uploadBlob(CITY_BLOB, FAKE_CITY_DB_CONTENT);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), VALID_CITY_PATH, "");
+        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, CITY_BLOB, "");
 
         assertThat(classUnderTest.getCityFileServerTimestamp(config)).isPresent();
     }
@@ -117,17 +115,15 @@ class AzureGeoIpFileServiceTest {
     @Test
     void testGetAsnFileServerTimestamp() throws Exception {
         uploadBlob(ASN_BLOB, FAKE_ASN_DB_CONTENT);
-        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), VALID_CITY_PATH, VALID_ASN_PATH);
+        GeoIpResolverConfig config = createConfig(azuriteContainer.getAccountName(), azuriteContainer.getAccountKey(), CONTAINER_NAME, "", ASN_BLOB);
 
         assertThat(classUnderTest.getAsnFileServerTimestamp(config)).isPresent();
     }
 
     private static Stream<Arguments> invalidConfigProvider() {
         return Stream.of(
-                Arguments.of(null, "key", VALID_CITY_PATH, VALID_ASN_PATH),
-                Arguments.of("account", null, VALID_CITY_PATH, VALID_ASN_PATH),
-                Arguments.of("account", "key", "invalidCityPath", VALID_ASN_PATH),
-                Arguments.of("account", "key", VALID_CITY_PATH, "invalidAsnPath")
+                Arguments.of(null, "key", CITY_BLOB, ASN_BLOB),
+                Arguments.of("account", null, CITY_BLOB, ASN_BLOB)
         );
     }
 
@@ -136,7 +132,7 @@ class AzureGeoIpFileServiceTest {
         blobClient.upload(BinaryData.fromString(content));
     }
 
-    private GeoIpResolverConfig createConfig(String accountName, String accountKey, String cityDbPath, String asnDbPath) {
+    private GeoIpResolverConfig createConfig(String accountName, String accountKey, String containerName, String cityDbPath, String asnDbPath) {
         return GeoIpResolverConfig.builder()
                 .enabled(true)
                 .enforceGraylogSchema(true)
@@ -146,6 +142,7 @@ class AzureGeoIpFileServiceTest {
                 .pullFromCloud(Optional.of(CloudStorageType.ABS))
                 .azureAccountName(accountName)
                 .azureAccountKey(accountKey == null ? null : encryptedValueService.encrypt(accountKey))
+                .azureContainerName(containerName)
                 .cityDbPath(cityDbPath)
                 .asnDbPath(asnDbPath)
                 .azureEndpoint(Optional.ofNullable(azuriteContainer.getEndPoint()))

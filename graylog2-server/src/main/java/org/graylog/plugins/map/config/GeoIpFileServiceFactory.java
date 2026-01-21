@@ -17,13 +17,17 @@
 package org.graylog.plugins.map.config;
 
 import jakarta.inject.Inject;
+import org.graylog2.security.encryption.EncryptedValueService;
 
 public class GeoIpFileServiceFactory {
     private final GeoIpProcessorConfig processorConfig;
+    private final EncryptedValueService encryptedValueService;
 
     @Inject
-    public GeoIpFileServiceFactory(GeoIpProcessorConfig processorConfig) {
+    public GeoIpFileServiceFactory(GeoIpProcessorConfig processorConfig,
+                                   EncryptedValueService encryptedValueService) {
         this.processorConfig = processorConfig;
+        this.encryptedValueService = encryptedValueService;
     }
 
     /**
@@ -33,14 +37,16 @@ public class GeoIpFileServiceFactory {
      * @return a new instance of {@link GeoIpFileService}
      */
     public GeoIpFileService create(GeoIpResolverConfig config) {
-        if (config.useS3() && config.isGcsCloud()) {
-            throw new IllegalArgumentException("Cannot use both S3 and GCS at the same time.");
+        if (config.useS3() && (config.isGcsCloud() || config.isAzureCloud())) {
+            throw new IllegalArgumentException("Cannot use both S3 and GCS/ABS at the same time.");
         }
 
         if (config.useS3() || config.isS3Cloud()) {
             return new S3GeoIpFileService(processorConfig);
         } else if (config.isGcsCloud()) {
             return new GcsGeoIpFileService(processorConfig);
+        } else if (config.isAzureCloud()) {
+            return new AzureGeoIpFileService(processorConfig, encryptedValueService);
         } else {
             return new LocalGeoIpFileService(processorConfig);
         }

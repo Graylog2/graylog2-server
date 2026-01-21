@@ -75,13 +75,17 @@ public abstract class GeoIpResolverConfig {
     @JsonProperty(FIELD_REFRESH_INTERVAL)
     public abstract Long refreshInterval();
 
-    @JsonProperty("azure_account_name")
+    @JsonProperty("azure_account")
     @Nullable
     public abstract String azureAccountName();
 
     @JsonProperty("azure_account_key")
     @Nullable
     public abstract EncryptedValue azureAccountKey();
+
+    @JsonProperty("azure_container")
+    @Nullable
+    public abstract String azureContainerName();
 
     @JsonProperty("azure_endpoint")
     public abstract Optional<String> azureEndpoint();
@@ -103,6 +107,10 @@ public abstract class GeoIpResolverConfig {
         return pullFromCloud().map(CloudStorageType.S3::equals).orElse(false);
     }
 
+    public boolean isAzureCloud() {
+        return pullFromCloud().map(CloudStorageType.ABS::equals).orElse(false);
+    }
+
     @JsonCreator
     public static GeoIpResolverConfig create(@JsonProperty("enabled") boolean cityEnabled,
                                              @JsonProperty("enforce_graylog_schema") boolean enforceGraylogSchema,
@@ -113,7 +121,11 @@ public abstract class GeoIpResolverConfig {
                                              @JsonProperty(FIELD_REFRESH_INTERVAL) Long refreshInterval,
                                              @JsonProperty("use_s3") boolean useS3,
                                              @JsonProperty("pull_from_cloud") Optional<CloudStorageType> pullFromCloud,
-                                             @JsonProperty("gcs_project_id") String gcsProjectId) {
+                                             @JsonProperty("gcs_project_id") String gcsProjectId,
+                                             @JsonProperty("azure_account") String azureAccountName,
+                                             @JsonProperty("azure_account_key") EncryptedValue azureAccountKey,
+                                             @JsonProperty("azure_container") String azureContainerName,
+                                             @JsonProperty("azure_endpoint") Optional<String> azureEndpoint) {
         return builder()
                 .enabled(cityEnabled)
                 .enforceGraylogSchema(enforceGraylogSchema)
@@ -125,6 +137,10 @@ public abstract class GeoIpResolverConfig {
                 .useS3(useS3)
                 .pullFromCloud(pullFromCloud)
                 .gcsProjectId(gcsProjectId)
+                .azureAccountName(azureAccountName)
+                .azureAccountKey(azureAccountKey)
+                .azureContainerName(azureContainerName)
+                .azureEndpoint(azureEndpoint)
                 .build();
     }
 
@@ -179,6 +195,8 @@ public abstract class GeoIpResolverConfig {
         public abstract Builder azureAccountKey(EncryptedValue accountKey);
 
         public abstract Builder azureEndpoint(Optional<String> endpoint);
+
+        public abstract Builder azureContainerName(String containerName);
 
         public abstract GeoIpResolverConfig build();
     }
