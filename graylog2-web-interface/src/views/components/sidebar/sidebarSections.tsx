@@ -31,7 +31,8 @@ export type SidebarSectionProps = {
 
 export type SidebarSection = {
   key: string;
-  title: string;
+  title: string | null;
+  hoverTitle?: string;
   icon: IconName;
   content: React.ComponentType<SidebarSectionProps>;
 };

@@ -36,6 +36,7 @@ export const onErrorHandler = (error) => {
 
 const replaySection: SidebarSection = {
   key: 'eventDescription',
+  hoverTitle: 'Replay Details',
   title: null,
   icon: 'play_arrow',
   content: ReplaySearchSidebar,
