@@ -22,10 +22,13 @@ import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import ReplaySearch from 'components/events/ReplaySearch';
 import type { Event } from 'components/events/events/types';
 import Center from 'components/common/Center';
-import type { LayoutState } from 'views/components/contexts/SearchPageLayoutContext';
 import EventReplaySelectedProvider from 'contexts/EventReplaySelectedProvider';
 import { Alert } from 'components/bootstrap';
 import type { ResolutionState } from 'contexts/EventReplaySelectedContext';
+import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
+import sidebarSections from 'views/components/sidebar/sidebarSections';
+import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import InfoBarBulkEventReplay from 'components/events/bulk-replay/NewBulkEventReplay';
 
 const Container = styled.div`
   display: flex;
@@ -34,21 +37,14 @@ const Container = styled.div`
 
 const ReplayedSearchContainer = styled.div`
   width: 100%;
-  overflow: auto;
-  padding: 5px;
+  display: flex;
+  flex-direction: column;
 `;
 
 type Props = {
   initialEventIds: Array<string>;
   events: { [eventId: string]: { event: Event } };
 };
-
-const searchPageLayout: Partial<LayoutState> = {
-  sidebar: {
-    isShown: false,
-  },
-  synchronizeUrl: false,
-} as const;
 
 const AlertWrapper = ({ children = null }: React.PropsWithChildren) => (
   <Alert bsStyle="info">
@@ -64,21 +60,11 @@ const InfoAlert = ({
   selectedEvent: { event: Event };
 }) => {
   const total = eventIds.length;
-  const completed = eventIds.filter((event) => event.status === 'DONE').length;
 
   if (total === 0) {
     return (
       <AlertWrapper>
         You have removed all events from the list. You can now return back by clicking the &ldquo;Close&rdquo; button.
-      </AlertWrapper>
-    );
-  }
-
-  if (!selectedEvent && total === completed) {
-    return (
-      <AlertWrapper>
-        You are done reviewing all events. You can now select a bulk action to apply to all remaining events, or close
-        the page to return to the events list.
       </AlertWrapper>
     );
   }
@@ -92,6 +78,22 @@ const InfoAlert = ({
   }
 
   return null;
+};
+
+const replaySection: SidebarSection = {
+  key: 'eventDescription',
+  title: null,
+  icon: 'play_arrow',
+  content: ReplaySearchSidebar,
+};
+
+const searchPageLayout = {
+  sidebar: {
+    isShown: true,
+    title: 'Replayed Search',
+    sections: [replaySection, ...sidebarSections],
+    contentColumnWidth: 350,
+  },
 };
 
 const ReplayedSearch = ({
@@ -120,6 +122,7 @@ const BulkEventReplay = ({ initialEventIds, events }: Props) => (
   <EventReplaySelectedProvider initialEventIds={initialEventIds}>
     <Container>
       <ReplayedSearchContainer>
+        <InfoBarBulkEventReplay />
         <ReplayedSearch events={events} />
       </ReplayedSearchContainer>
     </Container>

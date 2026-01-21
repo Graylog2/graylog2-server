@@ -58,7 +58,7 @@ const reducer = (state: SelectedState, action: Action) => {
     const eventIds = state.eventIds.map((event) =>
       event.id === action.id ? ({ id: action.id, status: 'DONE' } as const) : event,
     );
-    const selectedId = state.selectedId === action.id ? pickNextId(eventIds) : state.selectedId;
+    const selectedId = (state.selectedId === action.id && pickNextId(eventIds)) || state.selectedId;
 
     return {
       selectedId,

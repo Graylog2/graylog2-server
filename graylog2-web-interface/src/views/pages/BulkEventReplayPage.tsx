@@ -21,6 +21,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Events } from '@graylog/server-api';
 
+import Store from 'logic/local-storage/Store';
 import useLocation from 'routing/useLocation';
 import Spinner from 'components/common/Spinner';
 import BulkEventReplay from 'components/events/bulk-replay/BulkEventReplay';
@@ -29,6 +30,8 @@ import Routes from 'routing/Routes';
 import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
 import RemainingBulkActions from 'components/events/bulk-replay/RemainingBulkActions';
 import { singleton } from 'logic/singleton';
+import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
+import useRoutingQuery from 'routing/useQuery';
 
 export type BulkEventReplayState = {
   eventIds: Array<string>;
@@ -39,6 +42,7 @@ const useEventsById = (eventIds: Array<string>) =>
   useQuery({
     queryKey: ['events', eventIds],
     queryFn: () => Events.getByIds({ event_ids: eventIds }),
+    enabled: !!eventIds,
   });
 
 type Props = {
@@ -47,18 +51,22 @@ type Props = {
 
 const BulkEventReplayPage = ({ BulkActions = RemainingBulkActions }: Props) => {
   const location = useLocation<BulkEventReplayState>();
-  const { eventIds: initialEventIds = [], returnUrl } = location?.state ?? {};
-  const { data: events, isInitialLoading } = useEventsById(initialEventIds);
+  const { returnUrl } = location?.state ?? {};
+  const params = useRoutingQuery();
+  const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
+
+  const initialEventIds: Array<string> = Store.sessionGet(replaySessionId);
+  const { data: events, isFetched } = useEventsById(initialEventIds);
 
   const history = useHistory();
   const onClose = useCallback(() => {
     history.push(returnUrl ?? Routes.ALERTS.LIST);
   }, [history, returnUrl]);
 
-  return isInitialLoading ? (
-    <Spinner />
-  ) : (
+  return initialEventIds && isFetched ? (
     <BulkEventReplay events={events} initialEventIds={initialEventIds} onClose={onClose} BulkActions={BulkActions} />
+  ) : (
+    <Spinner />
   );
 };
 

@@ -22,15 +22,16 @@ import { useQuery } from '@tanstack/react-query';
 
 import { Events } from '@graylog/server-api';
 
+import Store from 'logic/local-storage/Store';
 import EventListItem from 'components/events/bulk-replay/EventListItem';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
-import { HoverForHelp, IconButton } from 'components/common';
-import useLocation from 'routing/useLocation';
-import type { BulkEventReplayState } from 'views/pages/BulkEventReplayPage';
+import { IconButton } from 'components/common';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
 import Popover from 'components/common/Popover';
+import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
+import useRoutingQuery from 'routing/useQuery';
 
 import DropdownButton from '../../bootstrap/DropdownButton';
 
@@ -50,6 +51,8 @@ const EventsListSidebar = styled.div(
 
 const StyledList = styled.ul`
   padding-inline-start: 0;
+  max-height: 400px;
+  overflow-y: auto;
 `;
 
 const ActionsBar = styled(ButtonToolbar)`
@@ -97,8 +100,9 @@ const CurentContainer = styled.div(
 );
 
 const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) => {
-  const location = useLocation<BulkEventReplayState>();
-  const { eventIds: initialEventIds = [] } = location?.state ?? {};
+  const params = useRoutingQuery();
+  const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
+  const initialEventIds: Array<string> = Store.sessionGet(replaySessionId);
   const { data: _events } = useEventsById(initialEventIds);
 
   const [events] = useState(_events);
@@ -106,14 +110,14 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
   const total = eventIds.length;
   const completed = eventIds.filter((event) => event.status === 'DONE').length;
   const remainingEvents = eventIds.map((eventId) => events[eventId.id]?.event);
-  const curIndex = useMemo(() => eventIds.findIndex((item) => item.id === selectedId), []);
+  const curIndex = useMemo(() => eventIds.findIndex((item) => item.id === selectedId), [eventIds, selectedId]);
 
   const onGoBack = useCallback(() => {
     selectItem(eventIds[curIndex - 1].id);
-  }, []);
+  }, [curIndex, eventIds, selectItem]);
   const onGoForward = useCallback(() => {
     selectItem(eventIds[curIndex + 1].id);
-  }, []);
+  }, [curIndex, eventIds, selectItem]);
 
   if (!initialEventIds?.length) return null;
 
@@ -148,12 +152,12 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
                 Review of {completed}/{total} events completed.
               </i>
               <StyledList>
-                {eventIds.map(({ id: eventId, status }) => (
+                {eventIds.map(({ id: eventId, status: eventStatus }) => (
                   <EventListItem
                     key={`bulk-replay-search-item-${eventId}`}
                     event={events?.[eventId]?.event}
                     selected={eventId === selectedId}
-                    done={status === 'DONE'}
+                    done={eventStatus === 'DONE'}
                     removeItem={removeItem}
                     onClick={() => selectItem(eventId)}
                     markItemAsDone={markItemAsDone}
