@@ -14,21 +14,17 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+package org.graylog2.rest.resources.streams.responses;
 
-import StreamRules from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamRules';
-import StreamConnectedPipelines from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamConnectedPipelines';
-import type { Stream } from 'stores/streams/StreamsStore';
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-type Props = {
-  stream: Stream;
-};
+import java.util.List;
 
-const StreamDataRoutingIntake = ({ stream }: Props) => (
-  <>
-    <StreamRules stream={stream} />
-    <StreamConnectedPipelines stream={stream} />
-  </>
-);
-
-export default StreamDataRoutingIntake;
+public record StreamPipelineRulesResponse(
+        @JsonProperty("id") String id,
+        @JsonProperty("pipeline_id") String pipelineId,
+        @JsonProperty("pipeline") String pipeline,
+        @JsonProperty("rule_id") String ruleId,
+        @JsonProperty("rule") String rule,
+        @JsonProperty("connected_streams") List<StreamReference> connectedStreams
+) {}

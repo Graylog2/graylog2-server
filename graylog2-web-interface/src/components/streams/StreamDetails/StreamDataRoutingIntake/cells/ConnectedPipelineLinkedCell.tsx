@@ -14,21 +14,32 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
+import React from 'react';
 
-import StreamRules from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamRules';
-import StreamConnectedPipelines from 'components/streams/StreamDetails/StreamDataRoutingIntake/StreamConnectedPipelines';
-import type { Stream } from 'stores/streams/StreamsStore';
-
+import { Link } from 'components/common/router';
+import Routes from 'routing/Routes';
 type Props = {
-  stream: Stream;
+  id: string;
+  title: string;
+  type: 'pipeline' | 'rule';
 };
 
-const StreamDataRoutingIntake = ({ stream }: Props) => (
-  <>
-    <StreamRules stream={stream} />
-    <StreamConnectedPipelines stream={stream} />
-  </>
-);
+const ConnectedPipelineLinkedCell = ({ id, title, type }: Props) => {
+  const getRoute = () => {
+    switch (type) {
+      case 'pipeline':
+        return Routes.SYSTEM.PIPELINES.PIPELINE(id);
+      case 'rule':
+        return Routes.SYSTEM.PIPELINES.RULE(id);
+      default:
+        return undefined;
+    }
+  };
 
-export default StreamDataRoutingIntake;
+  const route = getRoute();
+
+  if (!route) return <>{title}</>;
+
+  return <Link to={route}>{title}</Link>;
+};
+export default ConnectedPipelineLinkedCell;
