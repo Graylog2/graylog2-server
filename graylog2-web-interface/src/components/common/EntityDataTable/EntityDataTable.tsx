@@ -161,6 +161,7 @@ type Props<Entity extends EntityBase, Meta = unknown> = {
   pageSize?: number;
   /** Required when parent container does not use contentBackground for the background */
   parentBgColor?: string;
+  appSection?: string;
   /** Actions for each row. */
   entityActions?: (entity: Entity) => React.ReactNode;
   /** Meta data. */
@@ -191,6 +192,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
   onSortChange,
   pageSize = undefined,
   parentBgColor = undefined,
+  appSection = undefined,
 }: Props<Entity, Meta>) => {
   const [selectedEntities, setSelectedEntities] = useState<Array<Entity['id']>>(initialSelection ?? []);
   const hasRowActions = typeof entityActions === 'function';
@@ -253,6 +255,7 @@ const EntityDataTable = <Entity extends EntityBase, Meta = unknown>({
     onChangeSlicing,
     onHeaderSectionResize: handleHeaderSectionResize,
     parentBgColor,
+    appSection,
   });
 
   const table = useTable<Entity>({

@@ -188,7 +188,12 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
       entityTableId={tableLayout.entityTableId}>
       <Container>
         {fetchOptions.sliceCol && (
-          <Slicing sliceCol={fetchOptions.sliceCol} columnSchemas={columnSchemas} onChangeSlicing={onChangeSlicing} />
+          <Slicing
+            appSection={appSection}
+            sliceCol={fetchOptions.sliceCol}
+            columnSchemas={columnSchemas}
+            onChangeSlicing={onChangeSlicing}
+          />
         )}
         <TableWrapper>
           {!externalSearch && (
@@ -247,6 +252,7 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
                 pageSize={layoutConfig.pageSize}
                 activeSort={layoutConfig.sort}
                 activeSliceCol={fetchOptions.sliceCol}
+                appSection={appSection}
                 entityActions={entityActions}
                 columnRenderers={columnRenderers}
                 columnSchemas={columnSchemas}

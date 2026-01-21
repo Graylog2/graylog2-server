@@ -40,6 +40,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   onChangeSlicing,
   onHeaderSectionResize,
   parentBgColor,
+  appSection,
 }: {
   actionsColMinWidth: number;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
@@ -54,6 +55,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
   parentBgColor: string | undefined;
+  appSection?: string;
 }) => {
   const columnHelper = createColumnHelper<Entity>();
   const bulkSelectCol = useBulkSelectColumnDefinition(displayBulkSelectCol, columnWidths[BULK_SELECT_COL_ID]);
@@ -74,6 +76,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     meta,
     onChangeSlicing: onChangeSlicing,
     onHeaderSectionResize,
+    appSection,
   });
 
   return useMemo(

@@ -90,7 +90,7 @@ const EntityFilters = ({
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CREATED, {
         app_section: appSection,
         app_action_value: 'filter-created',
-        attribute_id: attributeId,
+        event_details: { attribute_id: attributeId },
       });
 
       onChangeFilters(OrderedMap(activeFilters).set(attributeId, [...(activeFilters?.get(attributeId) ?? []), filter]));
@@ -103,7 +103,7 @@ const EntityFilters = ({
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_DELETED, {
         app_section: appSection,
         app_action_value: 'filter-deleted',
-        attribute_id: attributeId,
+        event_details: { attribute_id: attributeId },
       });
 
       const filterGroup = activeFilters.get(attributeId);
@@ -123,7 +123,7 @@ const EntityFilters = ({
       sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.FILTER_CHANGED, {
         app_section: appSection,
         app_action_value: 'filter-value-changed',
-        attribute_id: attributeId,
+        event_details: { attribute_id: attributeId },
       });
 
       const filterGroup = activeFilters.get(attributeId);

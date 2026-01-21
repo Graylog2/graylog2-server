@@ -35,6 +35,8 @@ import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
 import Icon from 'components/common/Icon';
 import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 import SortIcon from '../SortIcon';
 
@@ -92,11 +94,14 @@ const AttributeHeader = <Entity extends EntityBase>({
   ctx,
   onHeaderSectionResize,
   onChangeSlicing,
+  appSection,
 }: {
   ctx: HeaderContext<Entity, unknown>;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
+  appSection?: string;
 }) => {
+  const sendTelemetry = useSendTelemetry();
   const activeSliceCol = useContext(ActiveSliceColContext);
   const colId = ctx.header.column.id;
   const columnMeta = ctx.column.columnDef.meta as ColumnMetaContext<Entity>;
@@ -106,8 +111,26 @@ const AttributeHeader = <Entity extends EntityBase>({
   );
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
   const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
-  const _onChangeSlicing = () => onChangeSlicing(colId);
-  const _onRemoveSlicing = () => onChangeSlicing(undefined, undefined);
+  const _onChangeSlicing = () => {
+    if (appSection) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_COLUMN_SELECTED_HEADER, {
+        app_section: appSection,
+        app_action_value: 'slice-column-header',
+        event_details: { attribute_id: colId },
+      });
+    }
+    onChangeSlicing(colId);
+  };
+  const _onRemoveSlicing = () => {
+    if (appSection) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_REMOVED, {
+        app_section: appSection,
+        app_action_value: 'slice-remove',
+        event_details: { attribute_id: colId },
+      });
+    }
+    onChangeSlicing(undefined, undefined);
+  };
   const columnLabel = columnMeta?.label ?? colId;
   const headerLabel = columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel;
   const canSlice = columnMeta?.enableSlicing;
@@ -162,6 +185,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   meta,
   onChangeSlicing,
   onHeaderSectionResize,
+  appSection,
 }: {
   columnHelper: ReturnType<typeof createColumnHelper<Entity>>;
   columnRenderersByAttribute: ColumnRenderersByAttribute<Entity, Meta>;
@@ -171,6 +195,7 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
   meta: Meta;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
   onHeaderSectionResize: (colId: string, part: 'left' | 'right', width: number) => void;
+  appSection?: string;
 }) => {
   const cell = useCallback(
     ({
@@ -195,9 +220,10 @@ const useAttributeColumnDefinitions = <Entity extends EntityBase, Meta>({
         ctx={ctx}
         onHeaderSectionResize={onHeaderSectionResize}
         onChangeSlicing={onChangeSlicing}
+        appSection={appSection}
       />
     ),
-    [onChangeSlicing, onHeaderSectionResize],
+    [appSection, onChangeSlicing, onHeaderSectionResize],
   );
 
   return useMemo(

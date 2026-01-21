@@ -22,34 +22,54 @@ import { DropdownButton } from 'components/bootstrap';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import { defaultCompare } from 'logic/DefaultCompare';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const Container = styled.div`
   min-width: 300px;
 `;
 
 type Props = {
+  appSection: string;
   sliceCol: string;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
 };
 
-const Slicing = ({ sliceCol, columnSchemas, onChangeSlicing }: Props) => {
+const Slicing = ({ appSection, sliceCol, columnSchemas, onChangeSlicing }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const sliceableColumns = columnSchemas
     .filter((schema) => schema.sliceable)
     .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
   const activeColumn = sliceableColumns.find(({ id }) => id === sliceCol);
+  const onSliceColumn = (columnId: string) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_COLUMN_SELECTED_SECTION, {
+      app_section: appSection,
+      app_action_value: 'slice-column-select',
+      event_details: { attribute_id: columnId },
+    });
+    onChangeSlicing(columnId);
+  };
+  const onRemoveSlicing = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_REMOVED, {
+      app_section: appSection,
+      app_action_value: 'slice-remove',
+      event_details: { attribute_id: sliceCol },
+    });
+    onChangeSlicing(undefined, undefined);
+  };
 
   return (
     <Container>
       <DropdownButton bsSize="small" id="slicing-dropdown" title={activeColumn?.title ?? 'Slice by'}>
         <MenuItem header>Slice by</MenuItem>
         {sliceableColumns.map((schema) => (
-          <MenuItem key={schema.id} onClick={() => onChangeSlicing(schema.id)}>
+          <MenuItem key={schema.id} onClick={() => onSliceColumn(schema.id)}>
             {schema.title}
           </MenuItem>
         ))}
         <MenuItem divider />
-        <MenuItem onClick={() => onChangeSlicing(undefined, undefined)}>No slicing</MenuItem>
+        <MenuItem onClick={onRemoveSlicing}>No slicing</MenuItem>
       </DropdownButton>
     </Container>
   );
