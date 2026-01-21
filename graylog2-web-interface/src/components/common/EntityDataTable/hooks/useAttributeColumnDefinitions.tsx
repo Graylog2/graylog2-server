@@ -97,6 +97,8 @@ const AttributeHeader = <Entity extends EntityBase>({
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
   const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const _onChangeSlicing = () => onChangeSlicing(colId);
+  const columnLabel = columnMeta?.label ?? colId;
+  const headerLabel = columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel;
 
   return (
     <ThInner ref={setNodeRef}>
@@ -107,11 +109,16 @@ const AttributeHeader = <Entity extends EntityBase>({
             index={ctx.header.index}
             dragHandleProps={{ ...attributes, ...listeners }}
             isDragging={isDragging}
-            itemTitle={columnMeta.label}
+            itemTitle={columnLabel}
           />
         )}
-        {columnMeta?.columnRenderer?.renderHeader?.(columnMeta.label) ?? columnMeta.label}
-        {columnMeta?.enableSlicing && <HeaderActionsDropdownButton onChangeSlicing={_onChangeSlicing} />}
+        {columnMeta?.enableSlicing ? (
+          <HeaderActionsDropdownButton label={columnLabel} onChangeSlicing={_onChangeSlicing}>
+            {headerLabel}
+          </HeaderActionsDropdownButton>
+        ) : (
+          headerLabel
+        )}
         {ctx.header.column.getCanSort() && <SortIcon<Entity> column={ctx.header.column} />}
       </LeftCol>
       <RightCol ref={rightRef}>
@@ -119,7 +126,7 @@ const AttributeHeader = <Entity extends EntityBase>({
           <ResizeHandle
             onMouseDown={ctx.header.getResizeHandler()}
             onTouchStart={ctx.header.getResizeHandler()}
-            colTitle={columnMeta.label}
+            colTitle={columnLabel}
           />
         )}
       </RightCol>

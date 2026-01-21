@@ -69,6 +69,7 @@ const ThGhostInner = <Entity extends EntityBase>(
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
   const columnMeta = column.columnDef?.meta as ColumnMetaContext<any>;
+  const columnLabel = columnMeta?.label ?? column.id;
 
   return (
     <CustomDragOverlay ref={ref} $minWidth={column.getSize()}>
@@ -77,11 +78,16 @@ const ThGhostInner = <Entity extends EntityBase>(
           <DragHandle $isDragging>
             <DragIcon name="drag_indicator" />
           </DragHandle>
-          {columnMeta.label}
-          {columnMeta?.enableSlicing && <HeaderActionsDropdownButton onChangeSlicing={() => {}} />}
+          {columnMeta?.enableSlicing ? (
+            <HeaderActionsDropdownButton label={columnLabel} onChangeSlicing={() => {}}>
+              {columnLabel}
+            </HeaderActionsDropdownButton>
+          ) : (
+            columnLabel
+          )}
           {column.getCanSort() && <SortIcon<Entity> column={column} />}
         </LeftCol>
-        {column.getCanResize() && <ResizeHandle colTitle={columnMeta.label} />}
+        {column.getCanResize() && <ResizeHandle colTitle={columnLabel} />}
       </ThInner>
     </CustomDragOverlay>
   );

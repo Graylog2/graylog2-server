@@ -16,22 +16,48 @@
  */
 
 import * as React from 'react';
+import styled, { css } from 'styled-components';
 
-import { MenuItem } from 'components/bootstrap';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import Menu from 'components/bootstrap/Menu';
+import Icon from 'components/common/Icon';
 
 type Props = {
-  onChangeSlicing: (event: React.MouseEvent<HTMLDivElement>) => void;
+  children: React.ReactNode;
+  label: string;
+  onChangeSlicing: () => void;
 };
 
-const HeaderActionsDropdownButton = ({ onChangeSlicing }: Props) => (
-  <OverlayDropdownButton
-    title="Toggle column actions"
-    buttonTitle="Toggle column actions"
-    bsSize="xsmall"
-    triggerVariant="icon_horizontal">
-    <MenuItem onClick={onChangeSlicing}>Slice by values</MenuItem>
-  </OverlayDropdownButton>
+const DropdownTrigger = styled.button(
+  ({ theme }) => css`
+    background: transparent;
+    border: 0;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: ${theme.spacings.xxs};
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    line-height: normal;
+
+    &:focus-visible {
+      outline-offset: 2px;
+    }
+  `,
+);
+
+const HeaderActionsDropdownButton = ({ children, label, onChangeSlicing }: Props) => (
+  <Menu shadow="md" withinPortal position="bottom-start">
+    <Menu.Target>
+      <DropdownTrigger type="button" title={`Toggle ${label} actions`} aria-label={`Toggle ${label} actions`}>
+        <span>{children}</span>
+        <Icon name="arrow_drop_down" size="xs" />
+      </DropdownTrigger>
+    </Menu.Target>
+    <Menu.Dropdown>
+      <Menu.Item onClick={onChangeSlicing}>Slice by values</Menu.Item>
+    </Menu.Dropdown>
+  </Menu>
 );
 
 export default HeaderActionsDropdownButton;
