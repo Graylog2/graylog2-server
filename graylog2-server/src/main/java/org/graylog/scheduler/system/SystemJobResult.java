@@ -38,6 +38,8 @@ public record SystemJobResult(JobTriggerStatus status, Duration delay) {
         return new SystemJobResult(JobTriggerStatus.ERROR, Duration.ZERO);
     }
 
+    // We made #toJobTriggerUpdate a static method inside Converter class to avoid exposing scheduler details
+    // (JobTriggerUpdate) into the public API of SystemJobResult.
     static class Converter {
         private Converter() {
         }
