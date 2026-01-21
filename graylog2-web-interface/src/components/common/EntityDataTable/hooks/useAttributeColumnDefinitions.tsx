@@ -107,6 +107,7 @@ const AttributeHeader = <Entity extends EntityBase>({
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
   const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const _onChangeSlicing = () => onChangeSlicing(colId);
+  const _onRemoveSlicing = () => onChangeSlicing(undefined, undefined);
   const columnLabel = columnMeta?.label ?? colId;
   const headerLabel = columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel;
   const canSlice = columnMeta?.enableSlicing;
@@ -129,7 +130,10 @@ const AttributeHeader = <Entity extends EntityBase>({
         <HeaderActionsDropdown
           label={columnLabel}
           activeSort={sortDirection}
-          onChangeSlicing={canSlice ? _onChangeSlicing : undefined}
+          isSliceActive={isSliceActive}
+          onChangeSlicing={
+            canSlice ? (isSliceActive ? _onRemoveSlicing : _onChangeSlicing) : undefined
+          }
           onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
           {headerLabel}
         </HeaderActionsDropdown>

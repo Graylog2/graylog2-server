@@ -51,6 +51,7 @@ type Props = {
   children: React.ReactNode;
   label: string;
   activeSort?: 'asc' | 'desc' | false;
+  isSliceActive?: boolean;
   onChangeSlicing?: () => void;
   onSort?: (desc: boolean) => void;
 };
@@ -59,10 +60,12 @@ const HeaderActionsDropdown = ({
   children,
   label,
   activeSort = false,
+  isSliceActive = false,
   onChangeSlicing = undefined,
   onSort = undefined,
 }: Props) => {
   const hasActions = Boolean(onChangeSlicing || onSort);
+  const sliceLabel = isSliceActive ? 'Remove slicing' : 'Slice by values';
 
   if (!hasActions) {
     return <>{children}</>;
@@ -87,10 +90,10 @@ const HeaderActionsDropdown = ({
             <MenuItemLabel $active={activeSort === 'desc'}>Sort descending</MenuItemLabel>
           </Menu.Item>
         )}
-        {!!onSort && !!onChangeSlicing && <Menu.Divider />}
+        {onSort && onChangeSlicing && <Menu.Divider />}
         {onChangeSlicing && (
           <Menu.Item onClick={onChangeSlicing} leftSection={<Icon name="surgical" />}>
-            Slice by values
+            {sliceLabel}
           </Menu.Item>
         )}
       </Menu.Dropdown>
