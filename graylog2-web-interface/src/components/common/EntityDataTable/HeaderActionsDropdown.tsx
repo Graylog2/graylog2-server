@@ -65,7 +65,6 @@ const HeaderActionsDropdown = ({
   onSort = undefined,
 }: Props) => {
   const hasActions = Boolean(onChangeSlicing || onSort);
-  const sliceLabel = isSliceActive ? 'Remove slicing' : 'Slice by values';
 
   if (!hasActions) {
     return <>{children}</>;
@@ -93,7 +92,7 @@ const HeaderActionsDropdown = ({
         {onSort && onChangeSlicing && <Menu.Divider />}
         {onChangeSlicing && (
           <Menu.Item onClick={onChangeSlicing} leftSection={<Icon name="surgical" />}>
-            {sliceLabel}
+            {isSliceActive ? 'No slicing' : 'Slice by values'}
           </Menu.Item>
         )}
       </Menu.Dropdown>

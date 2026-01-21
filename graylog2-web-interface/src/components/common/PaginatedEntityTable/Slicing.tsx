@@ -16,30 +16,15 @@
  */
 
 import * as React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
-import { DeleteMenuItem } from 'components/bootstrap';
-import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
+import { DropdownButton } from 'components/bootstrap';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
 import { defaultCompare } from 'logic/DefaultCompare';
 
 const Container = styled.div`
   min-width: 300px;
-`;
-
-const Header = styled.div(
-  ({ theme }) => css`
-    display: flex;
-    gap: ${theme.spacings.xxs};
-    align-items: center;
-  `,
-);
-
-const Headline = styled.h2`
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 `;
 
 type Props = {
@@ -56,19 +41,16 @@ const Slicing = ({ sliceCol, columnSchemas, onChangeSlicing }: Props) => {
 
   return (
     <Container>
-      <Header>
-        <Headline>{activeColumn.title ?? 'Slice By'}</Headline>
-        <OverlayDropdownButton title="Slice by column" buttonTitle="Slice by column" triggerVariant="icon_vertical">
-          <MenuItem header>Slice by</MenuItem>
-          {sliceableColumns.map((schema) => (
-            <MenuItem key={schema.id} onClick={() => onChangeSlicing(schema.id)}>
-              {schema.title}
-            </MenuItem>
-          ))}
-          <MenuItem divider />
-          <DeleteMenuItem onClick={() => onChangeSlicing(undefined, undefined)}>Remove slicing</DeleteMenuItem>
-        </OverlayDropdownButton>
-      </Header>
+      <DropdownButton bsSize="small" id="slicing-dropdown" title={activeColumn?.title ?? 'Slice by'}>
+        <MenuItem header>Slice by</MenuItem>
+        {sliceableColumns.map((schema) => (
+          <MenuItem key={schema.id} onClick={() => onChangeSlicing(schema.id)}>
+            {schema.title}
+          </MenuItem>
+        ))}
+        <MenuItem divider />
+        <MenuItem onClick={() => onChangeSlicing(undefined, undefined)}>No slicing</MenuItem>
+      </DropdownButton>
     </Container>
   );
 };
