@@ -67,7 +67,6 @@ const ReplaySearch = ({
           sidebar: {
             isShown: true,
             title: 'Replayed Search',
-            contentColumnWidth: 350,
           },
         },
         searchPageLayout,
