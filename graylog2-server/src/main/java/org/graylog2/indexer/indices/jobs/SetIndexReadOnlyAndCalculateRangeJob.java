@@ -42,7 +42,6 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -89,10 +88,12 @@ public class SetIndexReadOnlyAndCalculateRangeJob implements SystemJob<SetIndexR
 
             return doExecute(config.indexName());
         } catch (AlreadyLockedException e) {
-            LOG.debug("Recalculation for index <{}> already running, scheduling retry.", config.indexName());
-            return SystemJobResult.withRetry(Duration.ofSeconds(5));
+            LOG.debug("Recalculation for index <{}> already running.", config.indexName());
+            // We don't retry here because setting an index to read-only doesn't make much sense to do multiple times.
+            return SystemJobResult.success();
         } catch (Exception e) {
             LOG.error("Error while setting index <{}> to read-only and calculating index range", config.indexName(), e);
+            // TODO: Handle retries once the job scheduler supports retry tracking.
             return SystemJobResult.withError();
         }
     }
