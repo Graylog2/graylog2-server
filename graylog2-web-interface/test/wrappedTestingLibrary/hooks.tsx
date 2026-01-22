@@ -49,7 +49,7 @@ const renderHookWithDataRouter = <TProps, TResult>(
 ) =>
   renderHookWithWrapper(callback, {
     ...options,
-    wrapper: ({ children }: React.PropsWithChildren<{}>) => {
+    wrapper: ({ children }: React.PropsWithChildren) => {
       const CustomWrapper = (options.wrapper as React.ElementType) ?? React.Fragment;
       const Wrapper = () => <CustomWrapper>{children}</CustomWrapper>;
 
