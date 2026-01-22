@@ -100,7 +100,7 @@ const FilterAggregationForm = ({ entityTypes, eventDefinition, streams, validati
 
       if (nextConditionType === conditionTypes.FILTER) {
         // Store existing data temporarily in state, to restore it in case the type change was accidental
-        newExistingAggregationConfig = {};
+        newExistingAggregationConfig = {} as Partial<EventDefinition['config']>;
         (Object.keys(initialAggregationConfig) as Array<keyof typeof initialAggregationConfig>).forEach((key) => {
           newExistingAggregationConfig[key] = eventDefinition.config[key];
         });
