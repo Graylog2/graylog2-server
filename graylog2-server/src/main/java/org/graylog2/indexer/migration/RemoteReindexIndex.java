@@ -22,6 +22,7 @@ import org.graylog2.indexer.datanode.RemoteReindexingMigrationAdapter.Status;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 
+@Deprecated(forRemoval = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record RemoteReindexIndex(String taskId, String name, Status status, DateTime created, Duration took,
