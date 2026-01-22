@@ -551,8 +551,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
     @Override
     public boolean exists(String index) {
         try {
-            indicesClient.get(r -> r.index(index).flatSettings(true).ignoreUnavailable(false));
-            return true;
+            GetIndicesSettingsResponse result = indicesClient.getSettings(b -> b.index(index)
+                    .ignoreUnavailable(true)
+                    .allowNoIndices(true)
+                    .expandWildcards(ExpandWildcard.Open)
+                    .flatSettings(true)
+            );
+            return result.result() != null && result.result().size() == 1 && result.result().containsKey(index);
         } catch (IOException | OpenSearchException e) {
             if (e instanceof OpenSearchException && e.getMessage().contains("no such index")) {
                 return false;
