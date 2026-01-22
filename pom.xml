@@ -127,7 +127,7 @@
         <commons-validator.version>1.10.1</commons-validator.version>
         <commons-io.version>2.21.0</commons-io.version>
         <disruptor.version>4.0.0</disruptor.version>
-        <error-prone.version>2.45.0</error-prone.version>
+        <error-prone.version>2.46.0</error-prone.version>
         <freemarker.version>2.3.34</freemarker.version>
         <gcs.version>2.61.0</gcs.version>
         <azure-blob-storage.version>12.32.0</azure-blob-storage.version>
@@ -149,6 +149,7 @@
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <jakarta.inject.version>2.0.1</jakarta.inject.version>
         <jakarta.ws.rs-api.version>4.0.0</jakarta.ws.rs-api.version>
+        <jakarta.servlet-api.version>6.1.0</jakarta.servlet-api.version>
         <jaxb-api.version>2.3.1</jaxb-api.version>
         <jbcrypt.version>0.4</jbcrypt.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
@@ -173,7 +174,7 @@
         <netty-tcnative-boringssl-static.version>2.0.74.Final</netty-tcnative-boringssl-static.version>
         <okhttp.version>5.3.2</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
-        <opentelemetry.version>1.57.0</opentelemetry.version>
+        <opentelemetry.version>1.58.0</opentelemetry.version>
         <opentelemetry-instrumentation.version>2.23.0</opentelemetry-instrumentation.version>
         <os-platform-finder.version>1.2.3</os-platform-finder.version>
         <pkts.version>3.0.18</pkts.version>
@@ -189,7 +190,8 @@
         <siv-mode.version>1.6.1</siv-mode.version>
         <slf4j.version>2.0.17</slf4j.version>
         <streamex.version>0.8.4</streamex.version>
-        <swagger.version>1.6.16</swagger.version>
+        <swagger.version>2.2.37</swagger.version>
+        <swagger-parser.version>2.1.37</swagger-parser.version>
         <syslog4j.version>0.9.61</syslog4j.version>
         <threeten-extra.version>1.8.0</threeten-extra.version>
         <ulid.version>8.3.0</ulid.version>
@@ -202,7 +204,7 @@
         <jjwt.version>0.13.0</jjwt.version>
         <stateless4j.version>2.6.0</stateless4j.version>
         <poi.version>5.5.1</poi.version>
-        <mcp-bom.version>0.17.0</mcp-bom.version>
+        <mcp-bom.version>0.17.1</mcp-bom.version>
         <json-schema-generator.version>4.38.0</json-schema-generator.version>
 
         <!-- Test dependencies -->
@@ -220,7 +222,7 @@
         <graalvm.version>25.0.1</graalvm.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v20.19.5</nodejs.version>
+        <nodejs.version>v24.13.0</nodejs.version>
         <yarn.version>v1.22.22</yarn.version>
 
         <!-- Plugin versions -->
@@ -1115,6 +1117,8 @@
                             @defaultMessage Use JUnit 6 APIs
                             org.junit.Assert
                             org.junit.Test
+
+                            io.swagger.annotations.** @ Use io.swagger.v3.oas.annotations.**
                         ]]>
 
                     </signatures>
@@ -1152,6 +1156,7 @@
                           See available bug patterns: https://errorprone.info/bugpatterns
                         -->
                         <arg>
+                            -XDaddTypeAnnotationsToSymbol=true
                             -Xplugin:ErrorProne
                             -Xep:DoNotMock:WARN
                             -XepDisableWarningsInGeneratedCode

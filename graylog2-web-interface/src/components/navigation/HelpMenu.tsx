@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { Link } from 'react-router-dom';
 
 import usePluginEntities from 'hooks/usePluginEntities';
 import { NavDropdown } from 'components/bootstrap';
@@ -46,6 +47,14 @@ const HelpMenu = () => {
           );
         }
 
+        if ('path' in item) {
+          return (
+            <Menu.Item key={item.description} component={Link} to={item.path}>
+              {item.description}
+            </Menu.Item>
+          );
+        }
+
         if ('action' in item) {
           return (
             <Menu.Item
@@ -56,7 +65,7 @@ const HelpMenu = () => {
           );
         }
 
-        throw Error('Help menu item must have either external link or action defined');
+        throw Error('Help menu item must have either external link, path, or action defined');
       })}
     </NavDropdown>
   );

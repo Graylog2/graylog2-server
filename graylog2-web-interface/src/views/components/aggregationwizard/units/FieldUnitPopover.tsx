@@ -93,7 +93,7 @@ const FieldUnitPopover = ({ field, predefinedUnit }: { field: string; predefined
   const predefinedInfo = useMemo(() => {
     if (!predefinedUnit?.isDefined) return null;
 
-    const unitName = units[predefinedUnit.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
+    const unitName = units[predefinedUnit?.unitType].find(({ abbrev }) => abbrev === predefinedUnit?.abbrev).name;
 
     return (
       <>
