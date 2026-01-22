@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.joschi.jadconfig.util.Duration;
 import jakarta.inject.Inject;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.graylog.storage.opensearch3.blocks.BlockSettingsParser;
 import org.graylog.storage.opensearch3.cluster.ClusterStateApi;
@@ -86,6 +87,7 @@ import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
 import org.opensearch.client.opensearch.indices.stats.IndicesStats;
 import org.opensearch.client.opensearch.indices.update_aliases.AddAction;
 import org.opensearch.client.opensearch.indices.update_aliases.RemoveAction;
+import org.opensearch.client.transport.httpclient5.ResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -700,12 +702,20 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public HealthStatus waitForRecovery(String index, int timeout) {
-        return c.execute(() -> HealthStatus.fromString(
-                c.sync().cluster().health(r -> r
-                        .index(index)
-                        .timeout(t -> t.time(timeout + "s"))
-                        .waitForStatus(org.opensearch.client.opensearch._types.HealthStatus.Green)
-                ).status().jsonValue()), "Error waiting for index recovery");
+        try {
+            return c.execute(() ->
+                    HealthStatus.fromString(c.sync().cluster().health(r -> r
+                            .index(index)
+                            .timeout(t -> t.time(timeout + "s"))
+                            .waitForStatus(org.opensearch.client.opensearch._types.HealthStatus.Green)
+                    ).status().jsonValue()), "Error waiting for index recovery");
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof ResponseException ex) {
+                String status = StringUtils.substringBetween(ex.getMessage(), "\"status\":\"", "\"");
+                return HealthStatus.fromString(status);
+            }
+            throw e;
+        }
     }
 
     @Override
