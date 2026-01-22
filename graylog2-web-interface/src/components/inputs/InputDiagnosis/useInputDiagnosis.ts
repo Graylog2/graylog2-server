@@ -47,8 +47,9 @@ export type InputDiagnosisMetrics = {
 };
 
 export type InputNodeStateInfo = {
-  detailed_message: string;
+  detailed_message: string | null;
   node_id: string;
+  last_failed_at?: string | null;
 };
 
 export type InputNodeStates = {
@@ -145,13 +146,15 @@ const useInputDiagnosis = (
   const inputStateByNode = inputStates ? inputStates[inputId] || {} : ({} as InputStateByNode);
   const inputNodeStates = { total: Object.keys(inputStateByNode).length, states: {} };
 
-  Object.values(inputStateByNode).forEach(({ state, detailed_message, message_input: { node: node_id } }) => {
-    if (!inputNodeStates.states[state]) {
-      inputNodeStates.states[state] = [{ detailed_message, node_id }];
-    } else if (Array.isArray(inputNodeStates.states[state])) {
-      inputNodeStates.states[state].push({ detailed_message, node_id });
-    }
-  });
+  Object.values(inputStateByNode).forEach(
+    ({ state, detailed_message, last_failed_at, message_input: { node: node_id } }) => {
+      if (!inputNodeStates.states[state]) {
+        inputNodeStates.states[state] = [{ detailed_message, node_id, last_failed_at }];
+      } else if (Array.isArray(inputNodeStates.states[state])) {
+        inputNodeStates.states[state].push({ detailed_message, node_id, last_failed_at });
+      }
+    },
+  );
 
   const failures_indexing = `org.graylog2.inputs.${inputId}.failures.indexing`;
   const failures_processing = `org.graylog2.inputs.${inputId}.failures.processing`;

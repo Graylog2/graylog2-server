@@ -120,6 +120,29 @@ describe('Input Diagnosis Page', () => {
     expect(nodeStateIndicator).toHaveClass('danger');
   });
 
+  it('shows last failed timestamp when provided', async () => {
+    asMock(useInputDiagnosis).mockReturnValue({
+      ...useInputDiagnosisMock,
+      inputNodeStates: {
+        ...useInputDiagnosisMock.inputNodeStates,
+        states: {
+          ...useInputDiagnosisMock.inputNodeStates.states,
+          FAILED: [
+            {
+              node_id: 'test-node-id-2',
+              detailed_message: 'failed for testing',
+              last_failed_at: '2024-01-01T00:00:00.000Z',
+            },
+          ],
+        },
+      },
+    });
+
+    render(<InputDiagnosisPage />);
+
+    expect(await screen.findByText(/Last failed:/i)).toBeInTheDocument();
+  });
+
   it('shows failed starts 15m rate when available', async () => {
     asMock(useInputDiagnosis).mockReturnValue({
       ...useInputDiagnosisMock,
