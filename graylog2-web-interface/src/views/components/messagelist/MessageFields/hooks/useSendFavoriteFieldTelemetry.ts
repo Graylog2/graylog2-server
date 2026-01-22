@@ -30,10 +30,10 @@ const useSendFavoriteFieldTelemetry = () => {
   return useCallback(
     (key: KeyType, extra: TelemetryEvent = {}) =>
       sendTelemetry(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS?.[key], {
-        app_section: widget.type,
+        app_section: widget?.type,
         ...extra,
       }),
-    [sendTelemetry, widget.type],
+    [sendTelemetry, widget?.type],
   );
 };
 
