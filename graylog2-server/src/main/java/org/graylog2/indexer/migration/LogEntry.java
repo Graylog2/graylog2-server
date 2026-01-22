@@ -20,6 +20,7 @@ import org.joda.time.DateTime;
 
 import java.util.Locale;
 
+@Deprecated(forRemoval = true)
 public record LogEntry(DateTime timestamp, LogLevel logLevel, String message) {
     @Override
     public String toString() {

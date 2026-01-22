@@ -155,7 +155,7 @@ const InputsActions = ({ input, inputTypes: _, inputTypeDescriptions, currentNod
         </LinkContainer>
       </IfPermitted>
 
-      <IfPermitted permissions={[`inputs:edit:${input.id}`, `input_types:create:${input.type}`]}>
+      <IfPermitted permissions={`inputs:changestate:${input.id}`}>
         {!isLoadingInputStates && (
           <InputStateControl
             key={`input-state-control-${input.id}`}
