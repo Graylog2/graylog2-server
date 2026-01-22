@@ -97,7 +97,10 @@ const ThGhostInner = <Entity extends EntityBase>(
             label={columnLabel}
             activeSort={sortDirection}
             isSliceActive={isSliceActive}
-            onChangeSlicing={canSlice ? () => {} : undefined}
+            onChangeSlicing={
+              canSlice ? (_sliceCol: string | undefined, _slice?: string) => {} : undefined
+            }
+            sliceColumnId={column.id}
             onSort={canSort ? () => {} : undefined}>
             {columnLabel}
           </HeaderActionsDropdown>

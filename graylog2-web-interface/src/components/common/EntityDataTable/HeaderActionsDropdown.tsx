@@ -20,6 +20,8 @@ import styled, { css } from 'styled-components';
 
 import Menu from 'components/bootstrap/Menu';
 import Icon from 'components/common/Icon';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const DropdownTrigger = styled.button(
   ({ theme }) => css`
@@ -52,7 +54,9 @@ type Props = {
   label: string;
   activeSort?: 'asc' | 'desc' | false;
   isSliceActive?: boolean;
-  onChangeSlicing?: () => void;
+  onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void | undefined;
+  sliceColumnId?: string;
+  appSection?: string;
   onSort?: (desc: boolean) => void;
 };
 
@@ -61,10 +65,32 @@ const HeaderActionsDropdown = ({
   label,
   activeSort = false,
   isSliceActive = false,
-  onChangeSlicing = undefined,
+  onChangeSlicing,
+  sliceColumnId = undefined,
+  appSection = undefined,
   onSort = undefined,
 }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const hasActions = Boolean(onChangeSlicing || onSort);
+
+  const onToggleSlicing = () => {
+    if (isSliceActive) {
+      sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_REMOVED, {
+        app_section: appSection,
+        app_action_value: 'slice-remove',
+        event_details: { attribute_id: sliceColumnId },
+      });
+
+      return onChangeSlicing(undefined, undefined);
+    }
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_COLUMN_SELECTED_HEADER, {
+      app_section: appSection,
+      app_action_value: 'slice-column-header',
+      event_details: { attribute_id: sliceColumnId },
+    });
+
+    return onChangeSlicing(sliceColumnId);
+  };
 
   if (!hasActions) {
     return <>{children}</>;
@@ -91,7 +117,7 @@ const HeaderActionsDropdown = ({
         )}
         {onSort && onChangeSlicing && <Menu.Divider />}
         {onChangeSlicing && (
-          <Menu.Item onClick={onChangeSlicing} leftSection={<Icon name="surgical" />}>
+          <Menu.Item onClick={onToggleSlicing} leftSection={<Icon name="surgical" />}>
             {isSliceActive ? 'No slicing' : 'Slice by values'}
           </Menu.Item>
         )}
