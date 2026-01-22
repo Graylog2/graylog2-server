@@ -788,7 +788,7 @@
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
                             <artifactId>rewrite-testing-frameworks</artifactId>
-                            <version>3.25.0</version>
+                            <version>3.26.0</version>
                         </dependency>
                         <dependency>
                             <groupId>org.openrewrite.recipe</groupId>
