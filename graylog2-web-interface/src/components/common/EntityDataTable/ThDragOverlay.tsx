@@ -17,7 +17,7 @@
 
 import * as React from 'react';
 import type { Column } from '@tanstack/react-table';
-import { forwardRef, type ForwardedRef } from 'react';
+import { forwardRef, type ForwardedRef, useContext } from 'react';
 import styled, { css } from 'styled-components';
 
 import zIndices from 'theme/z-indices';
@@ -27,7 +27,8 @@ import SortIcon from 'components/common/EntityDataTable/SortIcon';
 import ResizeHandle from 'components/common/EntityDataTable/ResizeHandle';
 import { CELL_PADDING } from 'components/common/EntityDataTable/Constants';
 import { ThInner, LeftCol } from 'components/common/EntityDataTable/hooks/useAttributeColumnDefinitions';
-import HeaderActionsDropdownButton from 'components/common/EntityDataTable/HeaderActionsDropdownButton';
+import HeaderActionsDropdown from 'components/common/EntityDataTable/HeaderActionsDropdown';
+import ActiveSliceColContext from 'components/common/EntityDataTable/contexts/ActiveSliceColContext';
 
 const CustomDragOverlay = styled.div<{ $minWidth: number }>(
   ({ theme, $minWidth }) => css`
@@ -64,11 +65,26 @@ const DragIcon = styled(Icon)`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
+const ActiveSliceIcon = styled(Icon)(
+  ({ theme }) => css`
+    display: inline-flex;
+    margin-left: ${theme.spacings.xs};
+    color: ${theme.colors.text.secondary};
+    cursor: default;
+  `,
+);
+
 const ThGhostInner = <Entity extends EntityBase>(
   { column }: { column: Column<Entity> },
   ref: React.ForwardedRef<HTMLDivElement>,
 ) => {
+  const activeSliceCol = useContext(ActiveSliceColContext);
   const columnMeta = column.columnDef?.meta as ColumnMetaContext<any>;
+  const columnLabel = columnMeta?.label ?? column.id;
+  const canSlice = columnMeta?.enableSlicing;
+  const canSort = column.getCanSort();
+  const isSliceActive = Boolean(canSlice && activeSliceCol === column.id);
+  const sortDirection = column.getIsSorted();
 
   return (
     <CustomDragOverlay ref={ref} $minWidth={column.getSize()}>
@@ -77,11 +93,21 @@ const ThGhostInner = <Entity extends EntityBase>(
           <DragHandle $isDragging>
             <DragIcon name="drag_indicator" />
           </DragHandle>
-          {columnMeta.label}
-          {columnMeta?.enableSlicing && <HeaderActionsDropdownButton onChangeSlicing={() => {}} />}
-          {column.getCanSort() && <SortIcon<Entity> column={column} />}
+          <HeaderActionsDropdown
+            label={columnLabel}
+            activeSort={sortDirection}
+            isSliceActive={isSliceActive}
+            onChangeSlicing={
+              canSlice ? (_sliceCol: string | undefined, _slice?: string) => {} : undefined
+            }
+            sliceColumnId={column.id}
+            onSort={canSort ? () => {} : undefined}>
+            {columnLabel}
+          </HeaderActionsDropdown>
+          {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} />}
+          {sortDirection && <SortIcon<Entity> column={column} />}
         </LeftCol>
-        {column.getCanResize() && <ResizeHandle colTitle={columnMeta.label} />}
+        {column.getCanResize() && <ResizeHandle colTitle={columnLabel} />}
       </ThInner>
     </CustomDragOverlay>
   );

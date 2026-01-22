@@ -19,7 +19,7 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 
-import { DeleteMenuItem, ListGroup, ListGroupItem, Badge } from 'components/bootstrap';
+import { DeleteMenuItem, ListGroup, ListGroupItem, Badge, DropdownButton } from 'components/bootstrap';
 import OverlayDropdownButton from 'components/common/OverlayDropdownButton';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
 import MenuItem from 'components/bootstrap/menuitem/MenuItem';
@@ -27,6 +27,8 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import { defaultOnError } from 'util/conditional/onError';
 import type { UrlQueryFilters } from 'components/common/EntityFilters/types';
 import { Spinner } from 'components/common';
+import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
+import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
 const Container = styled.div(
   ({ theme }) => css`
@@ -89,6 +91,7 @@ const Slice = styled.li``;
 type Props = {
   filters: UrlQueryFilters;
   query: string;
+  appSection: string;
   sliceCol: string;
   columnSchemas: Array<ColumnSchema>;
   onChangeSlicing: (sliceCol: string | undefined, slice?: string) => void;
@@ -98,37 +101,53 @@ type Props = {
 };
 
 const Slicing = ({
-  sliceCol,
   activeSlice,
+  appSection,
   columnSchemas,
+  filters,
   onChangeSlicing,
   query,
-  filters,
+  sliceCol,
   sliceRenderers,
   tmpFetchSlices,
 }: Props) => {
+  const sendTelemetry = useSendTelemetry();
   const sliceableColumns = columnSchemas
     .filter((schema) => schema.sliceable)
     .sort(({ title: title1 }, { title: title2 }) => defaultCompare(title1, title2));
   const activeColumn = sliceableColumns.find(({ id }) => id === sliceCol);
+  const onSliceColumn = (columnId: string) => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_COLUMN_SELECTED_SECTION, {
+      app_section: appSection,
+      app_action_value: 'slice-column-select',
+      event_details: { attribute_id: columnId },
+    });
+    onChangeSlicing(columnId);
+  };
+  const onRemoveSlicing = () => {
+    sendTelemetry(TELEMETRY_EVENT_TYPE.ENTITY_DATA_TABLE.SLICE_REMOVED, {
+      app_section: appSection,
+      app_action_value: 'slice-remove',
+      event_details: { attribute_id: sliceCol },
+    });
+    onChangeSlicing(undefined, undefined);
+  };
 
   const { data: slices, isLoading } = useSlices({ column: sliceCol, query, filters, tmpFetchSlices });
 
   return (
     <Container>
-      <Header>
-        <Headline>{activeColumn.title ?? 'Slice By'}</Headline>
-        <OverlayDropdownButton title="Slice by column" buttonTitle="Slice by column" triggerVariant="icon_vertical">
-          <MenuItem header>Slice by</MenuItem>
-          {sliceableColumns.map((schema) => (
-            <MenuItem key={schema.id} onClick={() => onChangeSlicing(schema.id)}>
-              {schema.title}
-            </MenuItem>
-          ))}
-          <MenuItem divider />
-          <MenuItem onClick={() => onChangeSlicing(undefined, undefined)}>No slicing</MenuItem>
-        </OverlayDropdownButton>
-      </Header>
+      <DropdownButton bsSize="small" id="slicing-dropdown" title={activeColumn?.title ?? 'Slice by'}>
+        <MenuItem header>Slice by</MenuItem>
+        {sliceableColumns.map((schema) => (
+          <MenuItem key={schema.id} onClick={() => onSliceColumn(schema.id)}>
+            {schema.title}
+          </MenuItem>
+        ))}
+        <MenuItem divider />
+        <MenuItem onClick={onRemoveSlicing}>No slicing</MenuItem>
+      </DropdownButton>
+
       <SlicesOverview>
         {isLoading && <Spinner />}
         {!isLoading && (

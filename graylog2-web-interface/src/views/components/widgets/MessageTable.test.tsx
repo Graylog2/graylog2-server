@@ -133,6 +133,7 @@ describe('MessageTable', () => {
 
     const message = await screen.findByText('frank.txt');
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(message.closest('tbody')).toHaveStyle(highlightedStyle);
   });
 
@@ -145,6 +146,7 @@ describe('MessageTable', () => {
 
     const message = await screen.findByText('frank.txt');
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(message.closest('tbody')).not.toHaveStyle(highlightedStyle);
   });
 
@@ -153,7 +155,7 @@ describe('MessageTable', () => {
 
     await screen.findByText(/frank.txt/i);
 
-    expect(screen.getByText('sort')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sort file_name/i })).toBeInTheDocument();
   });
 
   it('does not show sort icons in non-interactive context', async () => {
@@ -165,6 +167,6 @@ describe('MessageTable', () => {
 
     await screen.findByText(/frank.txt/i);
 
-    expect(screen.queryByText('sort')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /sort file_name/i })).not.toBeInTheDocument();
   });
 });

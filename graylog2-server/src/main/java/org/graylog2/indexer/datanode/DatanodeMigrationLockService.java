@@ -19,6 +19,11 @@ package org.graylog2.indexer.datanode;
 import org.graylog2.cluster.lock.Lock;
 import org.graylog2.indexer.indexset.IndexSet;
 
+/**
+ * This exists only because of the remote reindex migration, that it no longer supported and should be removed
+ * in the next major release. Let's not forget to remove this service and all related classes.
+ */
+@Deprecated(forRemoval = true)
 public interface DatanodeMigrationLockService {
     /**
      * This is a blocking method. It will try to acquire a lock and repeat the process until the general timeout
