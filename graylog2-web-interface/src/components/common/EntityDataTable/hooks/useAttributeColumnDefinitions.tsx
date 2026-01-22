@@ -109,7 +109,6 @@ const AttributeHeader = <Entity extends EntityBase>({
   const leftRef = useHeaderSectionObserver(colId, 'left', onHeaderSectionResize);
   const rightRef = useHeaderSectionObserver(colId, 'right', onHeaderSectionResize);
   const columnLabel = columnMeta?.label ?? colId;
-  const headerLabel = columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel;
   const canSlice = columnMeta?.enableSlicing;
   const isSliceActive = activeSliceCol === colId;
   const canSort = ctx.header.column.getCanSort();
@@ -135,7 +134,7 @@ const AttributeHeader = <Entity extends EntityBase>({
           sliceColumnId={colId}
           appSection={appSection}
           onSort={canSort ? (desc) => ctx.table.setSorting([{ id: colId, desc }]) : undefined}>
-          {headerLabel}
+          {columnMeta?.columnRenderer?.renderHeader?.(columnLabel) ?? columnLabel}
         </HeaderActionsDropdown>
         {isSliceActive && <ActiveSliceIcon name="surgical" title={`Slicing by ${columnLabel}`} size="xs" />}
         {sortDirection && <SortIcon<Entity> column={ctx.header.column} />}

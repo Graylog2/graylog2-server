@@ -31,13 +31,9 @@ const DropdownTrigger = styled.button(
     display: inline-flex;
     align-items: center;
     gap: ${theme.spacings.xxs};
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    line-height: 1;
+    line-height: normal;
 
     &:focus-visible {
-      outline: 2px solid ${theme.colors.input.borderFocus};
       outline-offset: 2px;
     }
   `,
@@ -45,7 +41,7 @@ const DropdownTrigger = styled.button(
 
 const MenuItemLabel = styled.span<{ $active: boolean }>(
   ({ $active }) => css`
-    font-weight: ${$active ? 700 : 'inherit'};
+    font-weight: ${$active ? 'bold' : 'inherit'};
   `,
 );
 

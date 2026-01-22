@@ -48,7 +48,7 @@ const Container = styled.div(
   ({ theme }) => css`
     display: flex;
     flex-direction: row;
-    gap: ${theme.spacings.xs};
+    gap: ${theme.spacings.sm};
     width: 100%;
   `,
 );

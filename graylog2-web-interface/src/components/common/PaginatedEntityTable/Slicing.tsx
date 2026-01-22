@@ -16,7 +16,7 @@
  */
 
 import * as React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { DropdownButton } from 'components/bootstrap';
 import type { ColumnSchema } from 'components/common/EntityDataTable';
@@ -25,9 +25,13 @@ import { defaultCompare } from 'logic/DefaultCompare';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 
-const Container = styled.div`
-  min-width: 300px;
-`;
+const Container = styled.div(
+  ({ theme }) => css`
+    min-width: 300px;
+    border-right: 1px solid ${theme.colors.gray[90]};
+    padding-right: ${theme.spacings.sm};
+  `,
+);
 
 type Props = {
   appSection: string;

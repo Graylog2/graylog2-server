@@ -74,7 +74,7 @@ const useColumnDefinitions = <Entity extends EntityBase, Meta>({
     columnWidths,
     entityAttributesAreCamelCase,
     meta,
-    onChangeSlicing: onChangeSlicing,
+    onChangeSlicing,
     onHeaderSectionResize,
     appSection,
   });
