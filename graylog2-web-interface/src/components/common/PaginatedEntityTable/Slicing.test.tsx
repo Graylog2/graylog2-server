@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { OrderedMap } from 'immutable';
 import { screen, render } from 'wrappedTestingLibrary';
 import userEvent from '@testing-library/user-event';
 
@@ -36,6 +37,10 @@ describe('Slicing', () => {
         sliceCol="status"
         columnSchemas={columnSchemas}
         onChangeSlicing={() => {}}
+        tmpFetchSlices={jest.fn(async () => [])}
+        query=""
+        filters={OrderedMap<string, Array<string>>()}
+        activeSlice={undefined}
         {...props}
       />,
     );
