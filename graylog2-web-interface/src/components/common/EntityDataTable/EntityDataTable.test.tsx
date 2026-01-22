@@ -29,7 +29,7 @@ import { ATTRIBUTE_STATUS } from 'components/common/EntityDataTable/Constants';
 import EntityDataTable from './EntityDataTable';
 
 jest.mock('hooks/useCurrentUser');
-jest.mock('logic/telemetry/useSendTelemetry');
+jest.mock('logic/telemetry/useSendTelemetry', () => () => jest.fn());
 
 declare module 'graylog-web-plugin/plugin' {
   interface EntityActions {
