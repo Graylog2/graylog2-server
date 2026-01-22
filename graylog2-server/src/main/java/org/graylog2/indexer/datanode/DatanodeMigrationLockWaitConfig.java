@@ -25,5 +25,6 @@ import java.time.Duration;
  * @param lockAcquireListerer Triggered during each acquire attempt, gives caller a chance to log or propagate
  *                            this information.
  */
+@Deprecated(forRemoval = true)
 public record DatanodeMigrationLockWaitConfig(Duration delayBetweenAttempts, Duration lockAcquireTimeout, DatanodeMigrationLockListener lockAcquireListerer) {
 }

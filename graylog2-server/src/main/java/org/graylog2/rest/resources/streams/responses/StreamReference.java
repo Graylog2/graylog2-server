@@ -14,11 +14,11 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-package org.graylog2.indexer.datanode;
+package org.graylog2.rest.resources.streams.responses;
 
-import org.graylog2.indexer.indexset.IndexSet;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Deprecated(forRemoval = true)
-public interface DatanodeMigrationLockListener {
-    void onRetry(IndexSet indexSet, Class<?> caller, long attemptNumber);
-}
+public record StreamReference(
+        @JsonProperty("id") String id,
+        @JsonProperty("title") String title
+) {}

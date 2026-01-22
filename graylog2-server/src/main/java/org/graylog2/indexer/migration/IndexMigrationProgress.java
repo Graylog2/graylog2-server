@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
+@Deprecated(forRemoval = true)
 public record IndexMigrationProgress(long total, long created, long updated, long deleted, long versionConflicts,
                                      long noops) {
 
