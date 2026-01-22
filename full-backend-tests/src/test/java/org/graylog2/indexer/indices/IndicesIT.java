@@ -429,11 +429,11 @@ public class IndicesIT extends SearchServerBaseTest {
 
         assertThat(indices.getIndices(indexSet))
                 .containsOnly(index1, index2);
-        assertThat(indices.getIndices(indexSet, "open", "close"))
+        assertThat(indices.getIndices(indexSet, "open", "closed"))
                 .containsOnly(index1, index2);
         assertThat(indices.getIndices(indexSet, "open"))
                 .containsOnly(index1);
-        assertThat(indices.getIndices(indexSet, "close"))
+        assertThat(indices.getIndices(indexSet, "closed"))
                 .containsOnly(index2);
     }
 
