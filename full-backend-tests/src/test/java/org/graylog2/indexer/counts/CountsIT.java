@@ -211,9 +211,9 @@ public class CountsIT extends SearchServerBaseTest {
             counts.total(indexSet);
             fail("Expected IndexNotFoundException");
         } catch (IndexNotFoundException e) {
-            final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
+            final String expectedErrorDetail = "Index not found for query: \"does_not_exist\". Try recalculating your index ranges.";
             assertThat(e)
-                    .hasMessageStartingWith("Fetching message count failed for indices [does_not_exist]")
+                    .hasMessageStartingWith("Fetching message count failed for indices \"does_not_exist\"")
                     .hasMessageEndingWith(expectedErrorDetail)
                     .hasNoSuppressedExceptions();
             assertThat(e.getErrorDetails()).containsExactly(expectedErrorDetail);
