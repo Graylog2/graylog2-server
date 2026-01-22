@@ -272,7 +272,7 @@ export default class View {
     } = value;
     const viewState: ViewStateMap = Immutable.Map(state).map(ViewState.fromJSON).toMap();
     const createdAtDate = new Date(created_at);
-    const lastUpdatedAtDate = new Date(last_updated_at);
+    const lastUpdatedAtDate = last_updated_at ? new Date(last_updated_at) : undefined;
 
     return View.create()
       .toBuilder()
