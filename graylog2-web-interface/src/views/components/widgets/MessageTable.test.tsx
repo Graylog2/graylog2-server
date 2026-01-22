@@ -133,6 +133,7 @@ describe('MessageTable', () => {
 
     const message = await screen.findByText('frank.txt');
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(message.closest('tbody')).toHaveStyle(highlightedStyle);
   });
 
@@ -145,6 +146,7 @@ describe('MessageTable', () => {
 
     const message = await screen.findByText('frank.txt');
 
+    // eslint-disable-next-line testing-library/no-node-access
     expect(message.closest('tbody')).not.toHaveStyle(highlightedStyle);
   });
 
