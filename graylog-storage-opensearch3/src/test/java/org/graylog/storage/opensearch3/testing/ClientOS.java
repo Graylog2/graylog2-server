@@ -86,10 +86,13 @@ public class ClientOS implements Client {
 
     @Override
     public void deleteIndices(String... indices) {
-        final List<String> toDelete = Arrays.stream(indices).filter(i -> !PROTECTED_INDICES.contains(i)).toList();
-        if (!toDelete.isEmpty()) {
-            opensearchClient.sync(c -> c.indices().delete(r -> r.index(toDelete).ignoreUnavailable(true)), "Failed to delete indices");
-        }
+        Arrays.stream(indices)
+                .filter(i -> !PROTECTED_INDICES.contains(i))
+                .forEach(this::deleteIndex);
+    }
+
+    private void deleteIndex(String index) {
+        opensearchClient.sync(c -> c.indices().delete(r -> r.index(index).ignoreUnavailable(true)), "Failed to delete index " + index);
     }
 
     public void deleteDataStreams() {
