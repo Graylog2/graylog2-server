@@ -26,12 +26,16 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.events.search.EventsHistogramResult;
 import org.graylog.events.search.EventsSearchParameters;
 import org.graylog.events.search.EventsSearchResult;
 import org.graylog.events.search.EventsSearchService;
+import org.graylog.events.search.EventsSlicesRequest;
+import org.graylog.events.search.SlicesResult;
+import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -68,6 +72,14 @@ public class EventsResource extends RestResource implements PluginRestResource {
     @NoAuditEvent("Doesn't change any data, only searches for events")
     public EventsSearchResult search(@Parameter(name = "JSON body") final EventsSearchParameters request) {
         return searchService.search(firstNonNull(request, EventsSearchParameters.empty()), getSubject());
+    }
+
+    @POST
+    @Path("/slices")
+    @Operation(summary = "Return slices for Events")
+    @NoAuditEvent("Doesn't change any data, only searches for slices")
+    public SlicesResult slices(@Context SearchUser searchUser, @Parameter(name = "JSON body") final EventsSlicesRequest request) {
+        return searchService.slices(firstNonNull(request, EventsSlicesRequest.empty()), getSubject(), searchUser);
     }
 
     @POST
