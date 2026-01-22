@@ -315,4 +315,67 @@ public class ViewServiceTest {
         assertThatThrownBy(() -> dbService.saveDefault(ViewDTO.builder().title("err").searchId("abc123").state(Collections.emptyMap()).build()))
                 .isInstanceOf(IllegalArgumentException.class);
     }
+
+    @Test
+    public void searchPaginatedSortedByFavorite() {
+        // Create several views
+        final ViewDTO view1 = dbService.save(ViewDTO.builder().title("View Alpha").searchId("abc123").state(Collections.emptyMap()).build());
+        final ViewDTO view2 = dbService.save(ViewDTO.builder().title("View Beta").searchId("abc123").state(Collections.emptyMap()).build());
+        final ViewDTO view3 = dbService.save(ViewDTO.builder().title("View Gamma").searchId("abc123").state(Collections.emptyMap()).build());
+        final ViewDTO view4 = dbService.save(ViewDTO.builder().title("View Delta").searchId("abc123").state(Collections.emptyMap()).build());
+
+        // Manually insert favorites for view2 and view4 into the favorites collection
+        // This simulates marking views as favorite
+        mongodb.mongoConnection()
+                .getMongoDatabase()
+                .getCollection("favorites")
+                .insertOne(new org.bson.Document()
+                        .append("user_id", searchUser.getUser().getId())
+                        .append("items", java.util.List.of(
+                                "grn::::search:" + view2.id(),
+                                "grn::::search:" + view4.id()
+                        )));
+
+        final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, ImmutableMap.of());
+
+        // Test sorting by favorite DESCENDING (favorites first)
+        PaginatedList<ViewDTO> result = dbService.searchPaginated(
+                searchUser,
+                queryParser.parse(""),
+                view -> true,
+                SortOrder.DESCENDING,
+                ViewDTO.FIELD_FAVORITE,
+                1,
+                10
+        );
+
+        assertThat(result)
+                .hasSize(4)
+                .extracting(ViewDTO::favorite)
+                .containsExactly(true, true, false, false);
+
+        // Verify the specific views (favorites should be view2 and view4)
+        assertThat(result.stream().filter(ViewDTO::favorite).map(ViewDTO::id))
+                .containsExactlyInAnyOrder(view2.id(), view4.id());
+
+        // Test sorting by favorite ASCENDING (non-favorites first)
+        result = dbService.searchPaginated(
+                searchUser,
+                queryParser.parse(""),
+                view -> true,
+                SortOrder.ASCENDING,
+                ViewDTO.FIELD_FAVORITE,
+                1,
+                10
+        );
+
+        assertThat(result)
+                .hasSize(4)
+                .extracting(ViewDTO::favorite)
+                .containsExactly(false, false, true, true);
+
+        // Verify non-favorites are first (view1 and view3)
+        assertThat(result.stream().filter(v -> !v.favorite()).map(ViewDTO::id))
+                .containsExactlyInAnyOrder(view1.id(), view3.id());
+    }
 }
