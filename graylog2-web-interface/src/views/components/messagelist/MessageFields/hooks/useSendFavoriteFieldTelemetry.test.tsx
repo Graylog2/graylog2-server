@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 Graylog, Inc.
+ * Copyright (C) 2020 Graylog, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Server Side Public License, version 1,
@@ -14,7 +14,6 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-
 import { renderHook } from 'wrappedTestingLibrary/hooks';
 import React from 'react';
 
