@@ -114,7 +114,7 @@ const HeaderActionsDropdown = ({
         {onSort && onChangeSlicing && <Menu.Divider />}
         {onChangeSlicing && (
           <Menu.Item onClick={onToggleSlicing} leftSection={<Icon name="surgical" />}>
-            {isSliceActive ? 'No slicing' : 'Slice by values'}
+            {isSliceActive ? 'Remove slicing' : 'Slice by values'}
           </Menu.Item>
         )}
       </Menu.Dropdown>
