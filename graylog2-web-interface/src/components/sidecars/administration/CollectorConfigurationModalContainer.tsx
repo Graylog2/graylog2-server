@@ -18,10 +18,11 @@ import React, { useState, useMemo } from 'react';
 import countBy from 'lodash/countBy';
 import intersection from 'lodash/intersection';
 import uniq from 'lodash/uniq';
+import { Modal as MantineModal } from '@mantine/core';
 import styled from 'styled-components';
 
 import { naturalSortIgnoreCase } from 'util/SortUtils';
-import { BootstrapModalConfirm } from 'components/bootstrap';
+import ModalSubmit from 'components/common/ModalSubmit';
 import useSendTelemetry from 'logic/telemetry/useSendTelemetry';
 import { TELEMETRY_EVENT_TYPE } from 'logic/telemetry/Constants';
 
@@ -188,17 +189,30 @@ const CollectorConfigurationModalContainer = ({
     const summary = selectedSidecarCollectorPairs.length <= 5 ? sidecarsSummary : numberOfSidecarsSummary;
 
     return (
-      <BootstrapModalConfirm
-        showModal={showConfirmModal}
-        title="Configuration summary"
-        onConfirm={confirmConfigurationChange}
-        onCancel={cancelConfigurationChange}>
-        <ConfigurationSummary>
-          <p>
-            Are you sure you want to proceed with this action for <b>{summary}</b>?
-          </p>
-        </ConfigurationSummary>
-      </BootstrapModalConfirm>
+      <MantineModal.Root opened={showConfirmModal} onClose={cancelConfigurationChange}>
+        <MantineModal.Overlay style={{ zIndex: 1060 }} />
+        <MantineModal.Content style={{ zIndex: 1070 }}>
+          <MantineModal.Header>
+            <MantineModal.Title>Configuration summary</MantineModal.Title>
+            <MantineModal.CloseButton />
+          </MantineModal.Header>
+          <MantineModal.Body>
+            <ConfigurationSummary>
+              <p>
+                Are you sure you want to proceed with this action for <b>{summary}</b>?
+              </p>
+            </ConfigurationSummary>
+          </MantineModal.Body>
+          <MantineModal.Body>
+            <ModalSubmit
+              onCancel={cancelConfigurationChange}
+              onSubmit={confirmConfigurationChange}
+              submitButtonText="Confirm"
+              submitButtonType="button"
+            />
+          </MantineModal.Body>
+        </MantineModal.Content>
+      </MantineModal.Root>
     );
   };
 
