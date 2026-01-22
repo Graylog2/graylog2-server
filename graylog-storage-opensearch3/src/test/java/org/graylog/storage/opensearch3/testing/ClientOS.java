@@ -40,7 +40,6 @@ import org.opensearch.client.opensearch.core.BulkRequest.Builder;
 import org.opensearch.client.opensearch.indices.GetIndexResponse;
 import org.opensearch.client.opensearch.indices.GetMappingResponse;
 import org.opensearch.client.opensearch.indices.IndexSettings;
-import org.opensearch.client.opensearch.indices.add_block.IndicesBlockOptions;
 import org.opensearch.client.opensearch.indices.get_mapping.IndexMappingRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -215,7 +214,7 @@ public class ClientOS implements Client {
 
     @Override
     public void setIndexBlock(String index) {
-        opensearchClient.sync(c -> c.indices().addBlock(req -> req.index(index).block(IndicesBlockOptions.ReadOnly)), "Unable to set index block for " + index);
+        opensearchClient.sync(c -> c.indices().putSettings(req -> req.index(index).settings(s -> s.customSettings("index.blocks.read_only_allow_delete", JsonData.of(true)))), "Unable to set index block for " + index);
     }
 
     @Override
