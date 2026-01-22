@@ -61,7 +61,7 @@ describe('useSendFavoriteFieldTelemetry', () => {
     );
   });
 
-  it('should send telemetry without widget type when widget context is undefined', () => {
+  it('should send telemetry without widget type when widget context is permalink', () => {
     const wrapper = ({ children }) => (
       <WidgetContext.Provider value={undefined}>
         {children}
@@ -75,7 +75,7 @@ describe('useSendFavoriteFieldTelemetry', () => {
     expect(mockSendTelemetry).toHaveBeenCalledWith(
       TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED,
       {
-        app_section: undefined,
+        app_section: 'permalink',
         app_action_value: 'remove',
       },
     );
@@ -118,7 +118,7 @@ describe('useSendFavoriteFieldTelemetry', () => {
     expect(mockSendTelemetry).toHaveBeenCalledWith(
       TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS.TOGGLED,
       {
-        app_section: undefined,
+        app_section: 'permalink',
         app_action_value: 'add',
       },
     );
