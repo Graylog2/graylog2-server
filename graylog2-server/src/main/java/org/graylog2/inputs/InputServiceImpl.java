@@ -409,16 +409,24 @@ public class InputServiceImpl implements InputService {
                 MongoUtils.idEq(inputId)
         ).projection(Projections.include(InputImpl.EMBEDDED_STATIC_FIELDS)).first();
 
-        return Optional.ofNullable(resultDoc)
-                .map(d -> d.getList(InputImpl.EMBEDDED_STATIC_FIELDS, Document.class))
-                .orElse(Collections.emptyList())
-                .stream()
+        if (resultDoc == null) {
+            return Collections.emptyList();
+        }
+
+        final List<Object> rawList = resultDoc.getList(InputImpl.EMBEDDED_STATIC_FIELDS, Object.class);
+        if (rawList == null || rawList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        return rawList.stream()
+                .map(this::toDocument)
                 .map(field -> Map.entry(
                         field.getString(InputImpl.FIELD_STATIC_FIELD_KEY),
                         field.getString(InputImpl.FIELD_STATIC_FIELD_VALUE)
                 ))
                 .toList();
     }
+
 
     @Override
     @SuppressWarnings("unchecked")
