@@ -54,5 +54,6 @@ export function asElement<T extends new (...args: any) => any>(elem: any, elemen
   throw new Error(`Unable to cast ${elem?.constructor?.name ?? 'unknown'} to ${name}!`);
 }
 
-export { act, renderHook, screen, fireEvent, within, waitFor } from '@testing-library/react';
+export type { Matcher } from '@testing-library/react';
+export { act, renderHook, screen, fireEvent, within, waitFor, waitForElementToBeRemoved } from '@testing-library/react';
 export { renderWithWrapper as render, renderPreflightWithWrapper as renderPreflight, render as renderUnwrapped };
