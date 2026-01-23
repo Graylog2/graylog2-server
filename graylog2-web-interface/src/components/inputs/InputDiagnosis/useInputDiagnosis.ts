@@ -36,7 +36,7 @@ export type InputDiagnosisMetrics = {
   read_bytes_total: number;
   write_bytes_1sec: number;
   write_bytes_total: number;
-  failedStarts15mRate?: string;
+  failedStarts15mCount?: number;
   message_errors: {
     failures_indexing: number;
     failures_processing: number;
@@ -87,31 +87,6 @@ const getValueFromMetric = (metric) => {
       return undefined;
   }
 };
-
-const useFailedStarts15mRate = (metricsByNode, failedStartsMetricName): string | undefined =>
-  useMemo(() => {
-    if (!metricsByNode) {
-      return undefined;
-    }
-
-    const totalRate = Object.keys(metricsByNode).reduce((previous, nodeId) => {
-      const metric = metricsByNode[nodeId]?.[failedStartsMetricName];
-
-      if (!metric || metric.type !== 'meter') {
-        return previous;
-      }
-
-      const rateValue = metric.metric.rate?.fifteen_minute;
-
-      if (rateValue === undefined) {
-        return previous;
-      }
-
-      return Number.isNaN(previous) ? rateValue : previous + rateValue;
-    }, NaN);
-
-    return Number.isFinite(totalRate) ? totalRate.toFixed(2) : undefined;
-  }, [failedStartsMetricName, metricsByNode]);
 
 export const fetchInputDiagnostics = (inputId: string): Promise<InputDiagnostics> =>
   fetch<InputDiagnostics>('GET', qualifyUrl(`system/inputs/diagnostics/${inputId}`));
@@ -210,7 +185,11 @@ const useInputDiagnosis = (
   };
 
   const aggregatedMetrics = aggregateMetrics();
-  const failedStarts15mRate = useFailedStarts15mRate(metricsByNode, failed_starts);
+  const failedStarts15mCount = useMemo(() => {
+    const value = aggregatedMetrics[failed_starts];
+
+    return Number.isFinite(value) ? value : undefined;
+  }, [aggregatedMetrics, failed_starts]);
 
   useEffect(() => {
     InputDiagnosisMetricNames.forEach((metricName) => MetricsActions.addGlobal(metricName));
@@ -232,7 +211,7 @@ const useInputDiagnosis = (
       read_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'read_bytes_total')],
       write_bytes_1sec: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_1sec')],
       write_bytes_total: aggregatedMetrics[metricWithPrefix(input, 'write_bytes_total')],
-      failedStarts15mRate,
+      failedStarts15mCount,
       message_errors: {
         failures_indexing: aggregatedMetrics[failures_indexing] || 0,
         failures_processing: aggregatedMetrics[failures_processing] || 0,
