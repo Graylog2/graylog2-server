@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -193,10 +194,9 @@ public class Version implements Comparable<Version> {
      * @param defaultVersion  The {@link Version} to return if reading the information from the properties files failed.
      */
     public static Version fromClasspathProperties(@Nonnull Class<?> clazz, String path, String propertyName, String gitPath, String gitPropertyName, Version defaultVersion) {
-        try {
-            final URL resource = getResource(clazz, path);
-            final Properties versionProperties = new Properties();
-            versionProperties.load(resource.openStream());
+        final Properties versionProperties = new Properties();
+        try (InputStream is = getResource(clazz, path).openStream()) {
+            versionProperties.load(is);
 
             final com.github.zafarkhaja.semver.Version version = com.github.zafarkhaja.semver.Version.parse(versionProperties.getProperty(propertyName));
             final long major = version.majorVersion();
@@ -212,10 +212,9 @@ public class Version implements Comparable<Version> {
             }
 
             String commitSha = null;
-            try {
-                final Properties git = new Properties();
-                final URL gitResource = getResource(clazz, gitPath);
-                git.load(gitResource.openStream());
+            final Properties git = new Properties();
+            try (InputStream gitIs = getResource(clazz, gitPath).openStream()) {
+                git.load(gitIs);
                 commitSha = git.getProperty(gitPropertyName);
                 // abbreviate if present and looks like a long sha
                 if (commitSha != null && commitSha.length() > 7) {

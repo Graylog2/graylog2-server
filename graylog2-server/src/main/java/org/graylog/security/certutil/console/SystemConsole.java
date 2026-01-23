@@ -16,6 +16,8 @@
  */
 package org.graylog.security.certutil.console;
 
+import org.apache.commons.io.input.CloseShieldInputStream;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,8 +36,11 @@ public class SystemConsole implements CommandLineConsole {
             return System.console().readLine(prompt.question());
         } else {
             printLine(String.format(Locale.ROOT, prompt.question()));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
-            try {
+            try (BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(
+                            CloseShieldInputStream.wrap(System.in), //prevent closing System.in
+                            StandardCharsets.UTF_8))
+            ) {
                 return reader.readLine();
             } catch (IOException e) {
                 throw new ConsoleException(e);

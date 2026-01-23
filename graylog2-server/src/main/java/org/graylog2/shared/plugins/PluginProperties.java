@@ -57,8 +57,7 @@ public class PluginProperties {
      */
     public static PluginProperties fromJarFile(final String filename) {
         final Properties properties = new Properties();
-        try {
-            final JarFile jarFile = new JarFile(requireNonNull(filename));
+        try (JarFile jarFile = new JarFile(requireNonNull(filename))) {
             final Optional<String> propertiesPath = getPropertiesPath(jarFile);
 
             if (propertiesPath.isPresent()) {
@@ -66,7 +65,9 @@ public class PluginProperties {
                 final ZipEntry entry = jarFile.getEntry(propertiesPath.get());
 
                 if (entry != null) {
-                    properties.load(jarFile.getInputStream(entry));
+                    try (var inputStream = jarFile.getInputStream(entry)) {
+                        properties.load(inputStream);
+                    }
                 } else {
                     LOG.debug("Plugin properties <{}> are missing in <{}>", propertiesPath.get(), filename);
                 }
