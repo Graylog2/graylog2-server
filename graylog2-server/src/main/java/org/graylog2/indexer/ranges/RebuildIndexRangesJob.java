@@ -28,7 +28,7 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class RebuildIndexRangesJob extends SystemJob {
+public class RebuildIndexRangesJob extends LegacySystemJob {
     public interface Factory {
         RebuildIndexRangesJob create(Set<BasicIndexSet> indexSets);
     }

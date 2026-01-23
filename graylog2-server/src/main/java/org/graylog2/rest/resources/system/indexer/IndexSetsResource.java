@@ -68,7 +68,7 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetsResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +97,7 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
     private final IndexSetStatsCreator indexSetStatsCreator;
     private final ClusterConfigService clusterConfigService;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
     private final DataTieringStatusService tieringStatusService;
     private final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories;
     private final IndexSetRestrictionsService indexSetRestrictionsService;
@@ -110,7 +110,7 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
-                             final SystemJobManager systemJobManager,
+                             final LegacySystemJobManager systemJobManager,
                              final DataTieringStatusService tieringStatusService,
                              final Set<OpenIndexSetFilterFactory> openIndexSetFilterFactories, IndexSetRestrictionsService indexSetRestrictionsService) {
         this.indices = requireNonNull(indices);
