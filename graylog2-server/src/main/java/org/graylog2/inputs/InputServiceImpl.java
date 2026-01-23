@@ -410,7 +410,7 @@ public class InputServiceImpl implements InputService {
         ).projection(Projections.include(InputImpl.EMBEDDED_STATIC_FIELDS)).first();
 
         return Optional.ofNullable(resultDoc)
-                .map(d -> d.getList(InputImpl.EMBEDDED_STATIC_FIELDS, Map.class, List.of()))
+                .map(d -> d.getList(InputImpl.EMBEDDED_STATIC_FIELDS, Map.class))
                 .orElse(Collections.emptyList())
                 .stream()
                 .map(field -> Map.entry(
