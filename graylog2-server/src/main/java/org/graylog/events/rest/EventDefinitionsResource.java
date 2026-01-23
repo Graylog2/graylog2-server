@@ -322,8 +322,14 @@ public class EventDefinitionsResource extends RestResource implements PluginRest
         if (result.failed()) {
             return Response.status(Response.Status.BAD_REQUEST).entity(result).build();
         }
-
-        dto = dto.toBuilder().state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED).build();
+        if (NonDeletableSystemScope.NAME.equals(dto.scope())) {
+            //never change the state of system definitions, as the state cannot be later on changed in the UI
+            dto = dto.toBuilder().build();
+        } else {
+            dto = dto.toBuilder()
+                    .state(schedule ? EventDefinition.State.ENABLED : EventDefinition.State.DISABLED)
+                    .build();
+        }
         recentActivityService.update(definitionId, GRNTypes.EVENT_DEFINITION, userContext.getUser());
         return Response.ok().entity(eventDefinitionHandler.update(dto, schedule)).build();
     }
