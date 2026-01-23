@@ -14,18 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { DocumentTitle, PageHeader } from 'components/common';
-import { CollectorsOverview } from 'components/collectors/overview';
-
-const CollectorsOverviewPage = () => (
-  <DocumentTitle title="Collectors Overview">
-    <PageHeader title="Collectors Overview">
-      <span>Overview of all collectors and sources across your infrastructure.</span>
-    </PageHeader>
-    <CollectorsOverview />
-  </DocumentTitle>
-);
-
-export default CollectorsOverviewPage;
+export { default as CollectorsOverview } from './CollectorsOverview';
+export { default as SourcesTable } from './SourcesTable';
