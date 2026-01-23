@@ -5,6 +5,10 @@ then
   let json = parse_json(to_string($message.flat_json));
   set_fields(to_map(json));
 
+  // Parse escaped chars, including non-standard ones
+  let escaped_json = parse_json("{\"escaped\":\"\\a \\t \\+\"}");
+  set_fields(to_map(escaped_json));
+
   // Don't fail on invalid input
   let invalid_json = parse_json("#FOOBAR#");
   set_fields(to_map(invalid_json));
