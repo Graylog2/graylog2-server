@@ -18,9 +18,17 @@ package org.graylog.plugins.views.search.views;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
+import org.graylog.grn.GRN;
+import org.graylog.grn.GRNRegistry;
+import org.graylog.grn.GRNTypes;
+import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
+import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
+import org.graylog.plugins.views.search.rest.TestUser;
 import org.graylog.security.entities.EntityRegistrar;
+import org.graylog.testing.GRNExtension;
 import org.graylog.testing.mongodb.MongoDBExtension;
 import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
@@ -42,8 +50,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -51,15 +61,19 @@ import static org.mockito.Mockito.mock;
 
 @ExtendWith(MongoDBExtension.class)
 @ExtendWith(MongoJackExtension.class)
+@ExtendWith(GRNExtension.class)
 public class ViewServiceTest {
     private ViewService dbService;
+    private FavoritesService favoritesService;
+    private GRNRegistry grnRegistry;
 
     private SearchUser searchUser;
     private MongoDBTestService mongodb;
 
     @BeforeEach
-    public void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider mongoJackObjectMapperProvider, MongoCollections mongoCollections) throws Exception {
+    public void setUp(MongoDBTestService mongodb, MongoJackObjectMapperProvider mongoJackObjectMapperProvider, MongoCollections mongoCollections, GRNRegistry grnRegistry) throws Exception {
         this.mongodb = mongodb;
+        this.grnRegistry = grnRegistry;
         ClusterConfigServiceImpl clusterConfigService = new ClusterConfigServiceImpl(
                 mongoJackObjectMapperProvider,
                 mongodb.mongoConnection(),
@@ -75,7 +89,23 @@ public class ViewServiceTest {
                 mock(ViewSummaryService.class),
                 mock(EntitySourceService.class),
                 mongoCollections);
-        this.searchUser = TestSearchUser.builder().build();
+
+        // Set up FavoritesService using reflection to access protected constructor
+        try {
+            Constructor<FavoritesService> constructor = FavoritesService.class.getDeclaredConstructor(
+                    MongoCollections.class, EventBus.class, org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever.class, GRNRegistry.class);
+            constructor.setAccessible(true);
+            this.favoritesService = constructor.newInstance(mongoCollections, new EventBus(), null, grnRegistry);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create FavoritesService for testing", e);
+        }
+
+        // Create a test user with a specific ID for favorites testing
+        final org.graylog2.plugin.database.users.User testUser = TestUser.builder()
+                .withId("637748db06e1d74da0a54330")
+                .withUsername("test")
+                .build();
+        this.searchUser = TestSearchUser.builder().withUser(testUser).build();
     }
 
     @AfterEach
@@ -324,17 +354,10 @@ public class ViewServiceTest {
         final ViewDTO view3 = dbService.save(ViewDTO.builder().title("View Gamma").searchId("abc123").state(Collections.emptyMap()).build());
         final ViewDTO view4 = dbService.save(ViewDTO.builder().title("View Delta").searchId("abc123").state(Collections.emptyMap()).build());
 
-        // Manually insert favorites for view2 and view4 into the favorites collection
-        // This simulates marking views as favorite
-        mongodb.mongoConnection()
-                .getMongoDatabase()
-                .getCollection("favorites")
-                .insertOne(new org.bson.Document()
-                        .append("user_id", searchUser.getUser().getId())
-                        .append("items", java.util.List.of(
-                                "grn::::search:" + view2.id(),
-                                "grn::::search:" + view4.id()
-                        )));
+        // Mark view2 and view4 as favorites using FavoritesService
+        final GRN grn2 = grnRegistry.newGRN(GRNTypes.SEARCH, view2.id());
+        final GRN grn4 = grnRegistry.newGRN(GRNTypes.SEARCH, view4.id());
+        favoritesService.save(new FavoritesForUserDTO(searchUser.getUser().getId(), java.util.List.of(grn2, grn4)));
 
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, ImmutableMap.of());
 
