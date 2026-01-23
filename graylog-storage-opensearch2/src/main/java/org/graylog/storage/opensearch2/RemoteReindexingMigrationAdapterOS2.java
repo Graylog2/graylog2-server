@@ -114,6 +114,7 @@ import static org.graylog.shaded.opensearch2.org.opensearch.index.query.QueryBui
 import static org.graylog2.notifications.Notification.Type.REMOTE_REINDEX_FINISHED;
 import static org.graylog2.notifications.Notification.Type.REMOTE_REINDEX_RUNNING;
 
+@Deprecated(forRemoval = true)
 @Singleton
 public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigrationAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(RemoteReindexingMigrationAdapterOS2.class);

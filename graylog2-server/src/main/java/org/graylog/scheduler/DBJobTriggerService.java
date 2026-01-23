@@ -146,6 +146,8 @@ public class DBJobTriggerService {
         collection.createIndex(Indexes.ascending(FIELD_NEXT_TIME));
         collection.createIndex(Indexes.ascending(FIELD_CONSTRAINTS));
         collection.createIndex(Indexes.ascending(FIELD_JOB_DEFINITION_TYPE));
+        collection.createIndex(Indexes.ascending(FIELD_UPDATED_AT));
+        collection.createIndex(Indexes.ascending(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD));
     }
 
     @SuppressWarnings("unused")
@@ -342,7 +344,8 @@ public class DBJobTriggerService {
                 eq(FIELD_LOCK_OWNER, null),
                 or(
                         eq(FIELD_STATUS, JobTriggerStatus.COMPLETE),
-                        eq(FIELD_STATUS, JobTriggerStatus.CANCELLED)
+                        eq(FIELD_STATUS, JobTriggerStatus.CANCELLED),
+                        eq(FIELD_STATUS, JobTriggerStatus.ERROR)
                 ),
                 eq(FIELD_SCHEDULE + "." + JobSchedule.TYPE_FIELD, OnceJobSchedule.TYPE_NAME),
                 lt(FIELD_UPDATED_AT, clock.nowUTC().minus(unit.toMillis(timeValue)))

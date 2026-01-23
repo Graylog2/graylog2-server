@@ -34,6 +34,7 @@ export const toAWSCloudTrailInputCreateRequest = ({
   key,
   secret,
   sqsMessageBatchSize,
+  includeFullMessageJson,
 }: FormDataType): AWSCloudTrailInputCreateRequest => ({
   name: awsCloudTrailName?.value,
   ...(awsAuthenticationType?.value === AWS_AUTH_TYPES.keysecret
@@ -53,6 +54,7 @@ export const toAWSCloudTrailInputCreateRequest = ({
   assume_role_arn: awsAssumeRoleArn?.value,
   override_source: overrideSource?.value,
   sqs_message_batch_size: sqsMessageBatchSize?.value,
+  include_full_message_json: !!includeFullMessageJson?.value,
 });
 
 export const toGenericInputCreateRequest = ({
@@ -70,6 +72,7 @@ export const toGenericInputCreateRequest = ({
   secret,
   overrideSource,
   sqsMessageBatchSize,
+  includeFullMessageJson,
 }: FormDataType): AWSCloudTrailGenericInputCreateRequest => ({
   type: 'org.graylog.aws.inputs.cloudtrail.CloudTrailInput',
   title: awsCloudTrailName?.value,
@@ -92,5 +95,6 @@ export const toGenericInputCreateRequest = ({
     assume_role_arn: awsAssumeRoleArn?.value,
     override_source: overrideSource?.value,
     sqs_message_batch_size: sqsMessageBatchSize?.value,
+    include_full_message_json: !!includeFullMessageJson?.value,
   },
 });
