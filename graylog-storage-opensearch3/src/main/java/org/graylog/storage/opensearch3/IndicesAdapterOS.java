@@ -577,29 +577,22 @@ public class IndicesAdapterOS implements IndicesAdapter {
 
     @Override
     public Set<String> indices(String indexWildcard, List<IndexStatus> status, String indexSetId) {
-        final List<String> ewc = (status.isEmpty()) ? List.of(ExpandWildcard.All.name()) : status.stream().map(this::toStatusName).toList();
+        final List<ExpandWildcard> ewc = (status.isEmpty()) ? List.of(ExpandWildcard.All) : status.stream().map(this::statusToEwc).toList();
         return c.execute(() -> {
             GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
                     .index(indexWildcard)
                     .flatSettings(true)
-                    .expandWildcards(ewc.stream().map(this::resolveWildcard).collect(Collectors.toList()))
+                    .expandWildcards(ewc)
                     .ignoreUnavailable(true)));
             return result.result().keySet();
         }, "Couldn't get index list for index set <" + indexSetId + ">");
     }
 
-    private String toStatusName(IndexStatus status) {
+    private ExpandWildcard statusToEwc(IndexStatus status) {
         return switch (status) {
-            case OPEN -> "open";
-            case CLOSED -> "closed";
+            case OPEN -> ExpandWildcard.Open;
+            case CLOSED -> ExpandWildcard.Closed;
         };
-    }
-
-    private ExpandWildcard resolveWildcard(String s) {
-        return Arrays.stream(ExpandWildcard.values())
-                .filter(w -> w.name().equalsIgnoreCase(s))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Unknown wildcard " + s));
     }
 
     @Override
