@@ -20,16 +20,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.swrve.ratelimitedlogger.RateLimitedLog;
+import jakarta.inject.Inject;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 
+import static com.fasterxml.jackson.core.json.JsonReadFeature.ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER;
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog2.plugin.utilities.ratelimitedlog.RateLimitedLogFactory.createDefaultRateLimitedLog;
 
@@ -43,7 +43,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
 
     @Inject
     public JsonParse(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper.copy().configure(ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER.mappedFeature(), true);
         valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
         depthParam = ParameterDescriptor.integer("depth").optional().description("Number of levels to parse. Default: no limit").build();
     }

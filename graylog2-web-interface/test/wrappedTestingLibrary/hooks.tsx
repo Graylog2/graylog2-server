@@ -21,6 +21,7 @@ import 'jest-styled-components';
 import type { RenderHookOptions } from '@testing-library/react';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import type { QueryClientConfig } from '@tanstack/react-query';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 
 import DefaultQueryClientProvider from '../DefaultQueryClientProvider';
 
@@ -42,4 +43,18 @@ const renderHookWithWrapper = <TProps, TResult>(
     },
   });
 
-export { renderHookWithWrapper as renderHook, act, waitFor };
+const renderHookWithDataRouter = <TProps, TResult>(
+  callback: (props: TProps) => TResult,
+  options: RenderHookOptions<TProps> & { queryClientOptions?: QueryClientConfig } = {},
+) =>
+  renderHookWithWrapper(callback, {
+    ...options,
+    wrapper: ({ children }: React.PropsWithChildren) => {
+      const CustomWrapper = (options.wrapper as React.ElementType) ?? React.Fragment;
+      const Wrapper = () => <CustomWrapper>{children}</CustomWrapper>;
+
+      return <RouterProvider router={createMemoryRouter([{ path: '/', element: <Wrapper /> }])} />;
+    },
+  });
+
+export { renderHookWithWrapper as renderHook, act, waitFor, renderHookWithDataRouter };
