@@ -146,13 +146,13 @@ describe('Input Diagnosis Page', () => {
   it('shows failed starts 15m count when available', async () => {
     asMock(useInputDiagnosis).mockReturnValue({
       ...useInputDiagnosisMock,
-      inputMetrics: { ...useInputDiagnosisMock.inputMetrics, failedStarts15mCount: 4 },
+      inputMetrics: { ...useInputDiagnosisMock.inputMetrics, failedStarts15mCount: 42 },
     });
 
     render(<InputDiagnosisPage />);
 
     expect(await screen.findByText(/Failed starts \(15m\):/)).toBeInTheDocument();
-    expect(await screen.findByText(/4/)).toBeInTheDocument();
+    expect(await screen.findByText('42')).toBeInTheDocument();
   });
 
   it('shows node state success indicator', async () => {
