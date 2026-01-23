@@ -14,18 +14,4 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { DocumentTitle, PageHeader } from 'components/common';
-import { DeploymentForm } from 'components/collectors/deployment';
-
-const CollectorsDeploymentPage = () => (
-  <DocumentTitle title="Deploy Collectors">
-    <PageHeader title="Deploy Collectors">
-      <span>Generate enrollment tokens and installation scripts.</span>
-    </PageHeader>
-    <DeploymentForm />
-  </DocumentTitle>
-);
-
-export default CollectorsDeploymentPage;
+export { default as DeploymentForm } from './DeploymentForm';
