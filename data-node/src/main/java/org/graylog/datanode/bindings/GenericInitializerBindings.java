@@ -23,6 +23,7 @@ import org.graylog.datanode.initializers.PeriodicalsService;
 import org.graylog.datanode.shutdown.GracefulShutdownService;
 import org.graylog2.bootstrap.preflight.PreflightConfigService;
 import org.graylog2.bootstrap.preflight.PreflightConfigServiceImpl;
+import org.graylog2.events.ClusterEventService;
 
 public class GenericInitializerBindings extends AbstractModule {
     @Override
@@ -32,5 +33,6 @@ public class GenericInitializerBindings extends AbstractModule {
         Multibinder<Service> serviceBinder = Multibinder.newSetBinder(binder(), Service.class);
         serviceBinder.addBinding().to(PeriodicalsService.class);
         serviceBinder.addBinding().to(GracefulShutdownService.class).asEagerSingleton();
+        serviceBinder.addBinding().to(ClusterEventService.class).asEagerSingleton();
     }
 }
