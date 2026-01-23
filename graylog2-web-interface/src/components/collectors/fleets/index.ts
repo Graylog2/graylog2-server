@@ -14,22 +14,5 @@
  * along with this program. If not, see
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
-import * as React from 'react';
-
-import { useParams } from 'react-router-dom';
-
-import { DocumentTitle, PageHeader } from 'components/common';
-import { FleetDetail } from 'components/collectors/fleets';
-
-const CollectorsFleetDetailPage = () => {
-  const { fleetId } = useParams<{ fleetId: string }>();
-
-  return (
-    <DocumentTitle title="Fleet Detail">
-      <PageHeader title="Fleet Detail" />
-      {fleetId && <FleetDetail fleetId={fleetId} />}
-    </DocumentTitle>
-  );
-};
-
-export default CollectorsFleetDetailPage;
+export { default as FleetList } from './FleetList';
+export { default as FleetDetail } from './FleetDetail';

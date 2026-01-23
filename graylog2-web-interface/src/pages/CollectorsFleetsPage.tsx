@@ -16,15 +16,21 @@
  */
 import * as React from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { FleetList } from 'components/collectors/fleets';
+import { useFleets } from 'components/collectors/hooks';
 
-const CollectorsFleetsPage = () => (
-  <DocumentTitle title="Collector Fleets">
-    <PageHeader title="Fleets">
-      <span>Manage collector fleets and their configurations.</span>
-    </PageHeader>
-    <div>Fleets list coming soon...</div>
-  </DocumentTitle>
-);
+const CollectorsFleetsPage = () => {
+  const { data: fleets, isLoading } = useFleets();
+
+  return (
+    <DocumentTitle title="Collector Fleets">
+      <PageHeader title="Fleets">
+        <span>Manage collector fleets and their configurations.</span>
+      </PageHeader>
+      {isLoading ? <Spinner /> : <FleetList fleets={fleets || []} />}
+    </DocumentTitle>
+  );
+};
 
 export default CollectorsFleetsPage;
