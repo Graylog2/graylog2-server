@@ -3604,6 +3604,11 @@
   resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.90.16.tgz#19a972c2ffbc47727ab6649028af1bee70e28cdf"
   integrity sha512-MvtWckSVufs/ja463/K4PyJeqT+HMlJWtw6PrCpywznd2NSgO3m4KwO9RqbFqGg6iDE8vVMFWMeQI4Io3eEYww==
 
+"@tanstack/query-core@5.90.17":
+  version "5.90.17"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.90.17.tgz#e97c44cde35c341f2c8dd56f5f6621b4c50004a2"
+  integrity sha512-hDww+RyyYhjhUfoYQ4es6pbgxY7LNiPWxt4l1nJqhByjndxJ7HIjDxTBtfvMr5HwjYavMrd+ids5g4Rfev3lVQ==
+
 "@tanstack/query-persist-client-core@5.91.15":
   version "5.91.15"
   resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.91.15.tgz#68ef8d96d7fc3007b6697ad991b6a1bf5e002864"
@@ -3626,12 +3631,12 @@
   dependencies:
     "@tanstack/query-persist-client-core" "5.91.15"
 
-"@tanstack/react-query@5.90.16":
-  version "5.90.16"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.90.16.tgz#76955d7027b5bff3d7f51163db7ea1c0bd430cb5"
-  integrity sha512-bpMGOmV4OPmif7TNMteU/Ehf/hoC0Kf98PDc0F4BZkFrEapRMEqI/V6YS0lyzwSV6PQpY1y4xxArUIfBW5LVxQ==
+"@tanstack/react-query@5.90.17":
+  version "5.90.17"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.90.17.tgz#509cc41ee1700b852866b477ee086fc3a4ed1e27"
+  integrity sha512-PGc2u9KLwohDUSchjW9MZqeDQJfJDON7y4W7REdNBgiFKxQy+Pf7eGjiFWEj5xPqKzAeHYdAb62IWI1a9UJyGQ==
   dependencies:
-    "@tanstack/query-core" "5.90.16"
+    "@tanstack/query-core" "5.90.17"
 
 "@tanstack/react-table@^8.21.3":
   version "8.21.3"
@@ -9832,7 +9837,7 @@ graphemer@^1.4.0:
   dependencies:
     "@graylog/sawmill" "4.0.0"
     "@reduxjs/toolkit" "^2.5.1"
-    "@tanstack/react-query" "5.90.16"
+    "@tanstack/react-query" "5.90.17"
     "@types/react" "18.3.13"
     babel-preset-graylog "file:packages/babel-preset-graylog"
     eslint-config-graylog "file:packages/eslint-config-graylog"
@@ -14088,10 +14093,10 @@ react-grid-layout@^1.5.2:
     react-resizable "^3.0.5"
     resize-observer-polyfill "^1.5.1"
 
-react-hotkeys-hook@^4.4.1:
-  version "4.6.1"
-  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-4.6.1.tgz#db9066c07377a1c8be067a238ab16e328266345a"
-  integrity sha512-XlZpbKUj9tkfgPgT9gA+1p7Ey6vFIZHttUjPqpTdyT5nqQ8mHL7elxvSbaC+dpSiHUSmr21Ya1mDxBZG3aje4Q==
+react-hotkeys-hook@^5.2.3:
+  version "5.2.3"
+  resolved "https://registry.yarnpkg.com/react-hotkeys-hook/-/react-hotkeys-hook-5.2.3.tgz#251ddc60ead2b68498af999b07dba2bf278b8999"
+  integrity sha512-Q27F8EuImYJOVSXAjSQrQPj9cx4GSNY+WdSdk5tSNN085H8/a00W6LZp0PrytEDwF6iT0pGTJeVEDKPRpEK2Bg==
 
 react-immutable-proptypes@2.2.0:
   version "2.2.0"
