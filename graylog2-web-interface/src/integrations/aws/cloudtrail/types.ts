@@ -31,6 +31,7 @@ export type AWSCloudTrailGenericInputCreateRequest = {
     assume_role_arn: string;
     override_source?: string;
     sqs_message_batch_size: number;
+    include_full_message_json: boolean;
   };
 };
 
@@ -46,6 +47,7 @@ export type AWSCloudTrailInputCreateRequest = {
   assume_role_arn: string;
   override_source?: string;
   sqs_message_batch_size: number;
+  include_full_message_json: boolean;
 };
 
 export type ErrorMessageType = {

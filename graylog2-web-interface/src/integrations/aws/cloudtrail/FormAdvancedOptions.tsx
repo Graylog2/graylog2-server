@@ -33,7 +33,7 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
   const { formData } = useContext(FormDataContext);
   const { isAdvancedOptionsVisible, setAdvancedOptionsVisibility } = useContext(AdvancedOptionsContext);
 
-  const { overrideSource, awsCloudTrailThrottleEnabled, sqsMessageBatchSize } = formData;
+  const { overrideSource, awsCloudTrailThrottleEnabled, sqsMessageBatchSize, includeFullMessageJson } = formData;
 
   const handleToggle = (visible) => {
     setAdvancedOptionsVisibility(visible);
@@ -75,6 +75,15 @@ const FormAdvancedOptions = ({ onChange, handleSqsMessageBatchSizeChange }: Form
         onChange={internalHandleSqsBatchSizeChange}
         label="SQS Message Batch Size"
         help="The maximum number of messages to query from SQS at a time. The maximum acceptable value is 10."
+      />
+
+      <Input
+        id="includeFullMessageJson"
+        type="checkbox"
+        checked={includeFullMessageJson?.value}
+        onChange={onChange}
+        label="Include full_message_json?"
+        help="Store the complete CloudTrail event as JSON in the full_message_json field?"
       />
     </AdditionalFields>
   );
