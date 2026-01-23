@@ -30,8 +30,6 @@ import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -41,7 +39,6 @@ import java.util.Map;
 @JsonDeserialize(builder = InputImpl.Builder.class)
 @DbEntity(collection = InputServiceImpl.COLLECTION_NAME, readPermission = RestPermissions.INPUTS_READ)
 public abstract class InputImpl implements Input, MongoEntity {
-    private static final Logger LOG = LoggerFactory.getLogger(InputImpl.class);
 
     public static final String FIELD_ID = "_id";
     public static final String FIELD_TYPE = "type";
@@ -198,8 +195,8 @@ public abstract class InputImpl implements Input, MongoEntity {
         doc.put(FIELD_CONFIGURATION, getConfiguration());
 
         final List<Map<String, String>> staticFields = getEmbeddedStaticFields();
-        if (staticFields != null && !getStaticFields().isEmpty()) {
-            doc.put(EMBEDDED_STATIC_FIELDS, getEmbeddedStaticFields());
+        if (staticFields != null && !staticFields.isEmpty()) {
+            doc.put(EMBEDDED_STATIC_FIELDS, staticFields);
         }
 
         if (getContentPack() != null) {
