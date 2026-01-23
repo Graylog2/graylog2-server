@@ -34,6 +34,7 @@ import org.graylog.events.EventsModule;
 import org.graylog.events.processor.EventDefinitionConfiguration;
 import org.graylog.grn.GRNTypesModule;
 import org.graylog.mcp.server.McpServerModule;
+import org.graylog2.opamp.OpAmpModule;
 import org.graylog.metrics.prometheus.PrometheusExporterConfiguration;
 import org.graylog.metrics.prometheus.PrometheusMetricsModule;
 import org.graylog.plugins.cef.CEFInputModule;
@@ -224,7 +225,8 @@ public class Server extends ServerBootstrap implements DocumentedBeansService {
                 new TelemetryModule(),
                 new DataNodeModule(),
                 new McpServerModule(),
-                new QuickJumpModule(featureFlags)
+                new QuickJumpModule(featureFlags),
+                new OpAmpModule()
         );
 
         modules.add(new FieldTypeManagementModule());
