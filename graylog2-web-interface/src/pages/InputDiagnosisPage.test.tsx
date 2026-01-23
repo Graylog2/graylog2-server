@@ -151,7 +151,7 @@ describe('Input Diagnosis Page', () => {
 
     render(<InputDiagnosisPage />);
 
-    expect(await screen.findByText(/Failed starts \(15m\):/)).toBeInTheDocument();
+    expect(await screen.findByText(/Failed starts \(last 15min\):/)).toBeInTheDocument();
     expect(await screen.findByText('42')).toBeInTheDocument();
   });
 

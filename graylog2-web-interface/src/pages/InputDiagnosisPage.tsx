@@ -346,7 +346,7 @@ const InputDiagnosisPage = () => {
               <StyledListGroup>
                 {inputMetrics.failedStarts15mCount !== undefined && (
                   <StyledListGroupItem>
-                    <StyledTitle>Failed starts (15m):</StyledTitle>
+                    <StyledTitle>Failed starts (last 15min):</StyledTitle>
                     <StyledSpan>{inputMetrics.failedStarts15mCount}</StyledSpan>
                   </StyledListGroupItem>
                 )}
