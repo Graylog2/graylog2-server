@@ -24,7 +24,7 @@ import org.testcontainers.containers.Network;
 
 public class AzuriteContainer extends GenericContainer<AzuriteContainer> {
 
-    private static final String IMAGE_NAME = "mcr.microsoft.com/azure-storage/azurite";
+    private static final String IMAGE_NAME = "mcr.microsoft.com/azure-storage/azurite:3.35.0";
     public static final int PORT = 10000;
     private final Network network;
 
