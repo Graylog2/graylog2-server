@@ -18,9 +18,9 @@ package org.graylog2.rest.resources.system.contentpacks;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableSet;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -51,7 +51,7 @@ import org.graylog2.shared.security.RestPermissions;
 import java.util.Set;
 
 @RequiresAuthentication
-@Api(value = "System/Catalog", description = "Entity Catalog")
+@Tag(name = "System/Catalog", description = "Entity Catalog")
 @Path("/system/catalog")
 @Produces(MediaType.APPLICATION_JSON)
 public class CatalogResource extends RestResource {
@@ -67,7 +67,7 @@ public class CatalogResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "List available entities in this Graylog cluster")
+    @Operation(summary = "List available entities in this Graylog cluster")
     @RequiresPermissions(RestPermissions.CATALOG_LIST)
     public CatalogIndexResponse showEntityIndex() {
         final Set<EntityExcerpt> entities = contentPackEntityResolver.listAllEntityExcerpts();
@@ -76,11 +76,11 @@ public class CatalogResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Resolve dependencies of entities and return their configuration")
+    @Operation(summary = "Resolve dependencies of entities and return their configuration")
     @RequiresPermissions(RestPermissions.CATALOG_RESOLVE)
     @NoAuditEvent("this is not changing any data")
     public CatalogResolveResponse resolveEntities(
-            @ApiParam(name = "JSON body", required = true)
+            @RequestBody(required = true)
             @Valid @NotNull CatalogResolveRequest request) {
         final Set<EntityDescriptor> requestedEntities = request.entities();
         final Set<EntityDescriptor> resolvedEntities = contentPackEntityResolver.resolveEntities(requestedEntities);
@@ -91,11 +91,11 @@ public class CatalogResource extends RestResource {
 
     @POST
     @Timed
-    @ApiOperation(value = "Get titles of provided entities")
+    @Operation(summary = "Get titles of provided entities")
     @NoAuditEvent("This endpoint does not change any data")
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/entities/titles")
-    public EntitiesTitleResponse getTitles(@ApiParam(name = "JSON body", required = true) final EntityTitleRequest request, @Context SearchUser searchUser) {
+    public EntitiesTitleResponse getTitles(@RequestBody(required = true) final EntityTitleRequest request, @Context SearchUser searchUser) {
         return entityTitleService.getTitles(request, searchUser);
     }
 }

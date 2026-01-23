@@ -24,9 +24,12 @@ import org.graylog.plugins.pipelineprocessor.functions.FromInput;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
+import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
+import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.inputs.InputService;
 import org.graylog2.shared.inputs.InputRegistry;
 
@@ -45,7 +48,8 @@ public class PipelineTestUtil {
             StringConversion.NAME, new StringConversion(),
             HasField.NAME, new HasField(),
             RemoveField.NAME, new RemoveField(),
-            FromInput.NAME, new FromInput(mock(InputRegistry.class))));
+            FromInput.NAME, new FromInput(mock(InputRegistry.class)),
+            RouteToStream.NAME, new RouteToStream(mock(StreamCacheService.class), mock(DefaultStreamProvider.class))));
     private final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
     private final PipelineStreamConnectionsService connectionsService;
 
@@ -53,8 +57,13 @@ public class PipelineTestUtil {
     public static final String REMOVE_FIELD_ID = "remove_field_id";
     public static final String FROM_INPUT_ID = "from_input_id";
     public static final String GL2_SOURCE_INPUT_ID = "source_input_id";
+    public static final String ROUTING_ID = "routing_id";
     public static final String CONNECTION_ID = "connection1_id";
-    public static final String STREAM_ID = "stream1_id";
+    public static final String STREAM1_ID = "stream1_id";
+    public static final String STREAM2_ID = "stream2_id";
+    public static final String STREAM3_ID = "stream3_id";
+    public static final String STREAM2_TITLE = "stream2";
+    public static final String STREAM3_TITLE = "stream3";
     public static final String INPUT_NAME = "input1";
     public static final String INPUT_ID = INPUT_NAME + "_id";
 
@@ -62,6 +71,7 @@ public class PipelineTestUtil {
     public final Rule REMOVE_FIELD = parser.parseRule(REMOVE_FIELD_ID, "rule \"removeField\" when true then remove_field(\"dummy\"); end", true);
     public final Rule FROM_INPUT = parser.parseRule(FROM_INPUT_ID, "rule \"fromInput\" when from_input(name: \"input1\") then end", true);
     public final Rule GL2_SOURCE_INPUT = parser.parseRule(GL2_SOURCE_INPUT_ID, "rule \"sourceInput\" when has_field(\"gl2_source_input\") AND to_string($message.gl2_source_input)==\"input1_id\" then end", true);
+    public final Rule ROUTING = parser.parseRule(ROUTING_ID, "rule \"routing\" when true then route_to_stream(id:\"" + STREAM2_ID + "\"); route_to_stream(name:\"" + STREAM3_TITLE + "\"); end", true);
 
     public PipelineTestUtil(PipelineStreamConnectionsService connectionsService, InputService inputService) {
         this.connectionsService = connectionsService;
@@ -76,7 +86,7 @@ public class PipelineTestUtil {
                 .stages(createStagesWithRules(rules))
                 .build();
         PipelineConnections connections = PipelineConnections.create(
-                CONNECTION_ID, STREAM_ID, Set.of(pipelineId));
+                CONNECTION_ID, STREAM1_ID, Set.of(pipelineId));
         when(connectionsService.loadByPipelineId(pipelineId)).thenReturn(Set.of(connections));
 
         return pipeline;

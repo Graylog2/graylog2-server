@@ -171,12 +171,12 @@ const PaginatedEntityTableInner = <T extends EntityBase, M = unknown>({
         pageSize={layoutConfig.pageSize}
         showPageSizeSelect={false}
         totalItems={total}
-      useQueryParameter={!withoutURLParams}
-      onChange={
-        withoutURLParams
-          ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
-          : undefined
-      }>
+        useQueryParameter={!withoutURLParams}
+        onChange={
+          withoutURLParams
+            ? (currentPage: number, pageSize: number) => paginationState.setPagination({ page: currentPage, pageSize })
+            : undefined
+        }>
         {!externalSearch && (
           <SearchRow>
             <SearchForm

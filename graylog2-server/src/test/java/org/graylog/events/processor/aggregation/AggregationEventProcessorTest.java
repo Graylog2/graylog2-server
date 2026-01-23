@@ -16,6 +16,7 @@
  */
 package org.graylog.events.processor.aggregation;
 
+import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -99,6 +100,7 @@ public class AggregationEventProcessorTest {
     private PermittedStreams permittedStreams;
     private EventStreamService eventStreamService;
     private final MessageFactory messageFactory = new TestMessageFactory();
+    private final Engine templateEngine = new Engine();
 
     @BeforeEach
     public void setUp() throws Exception {

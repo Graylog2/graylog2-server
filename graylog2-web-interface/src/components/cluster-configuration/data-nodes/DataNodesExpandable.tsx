@@ -21,7 +21,11 @@ import type { ColumnSchema } from 'components/common/EntityDataTable';
 import DataNodeActions from 'components/datanode/DataNodeList/DataNodeActions';
 import type { FetchOptions } from 'components/common/PaginatedEntityTable/useFetchEntities';
 
-import { createColumnDefinitions, createColumnRenderers, DEFAULT_VISIBLE_COLUMNS } from './DataNodesColumnConfiguration';
+import {
+  createColumnDefinitions,
+  createColumnRenderers,
+  DEFAULT_VISIBLE_COLUMNS,
+} from './DataNodesColumnConfiguration';
 import { clusterDataNodesKeyFn, fetchClusterDataNodesWithMetrics } from './fetchClusterDataNodes';
 import type { ClusterDataNode } from './fetchClusterDataNodes';
 

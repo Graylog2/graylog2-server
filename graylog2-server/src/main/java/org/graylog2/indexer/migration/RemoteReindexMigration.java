@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 /**
  * Caution: this object will be heavily mutated from outside as the migration progresses.
  */
+@Deprecated(forRemoval = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class RemoteReindexMigration {

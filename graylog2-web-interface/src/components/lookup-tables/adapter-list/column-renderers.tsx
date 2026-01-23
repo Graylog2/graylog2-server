@@ -15,6 +15,7 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
+import { useCallback } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -49,7 +50,7 @@ const TitleCol = ({ adapter, children }: { adapter: DataAdapterEntity; children:
   const adapterErrorText = errors?.adapterErrors[adapter.name];
   const navigate = useNavigate();
 
-  const onClick = React.useCallback(() => {
+  const onClick = useCallback(() => {
     navigate(Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(adapter?.name));
   }, [navigate, adapter?.name]);
 
