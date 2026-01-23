@@ -31,6 +31,8 @@ import java.util.Set;
 
 public abstract class IndexerGeneratedQueryContext<S> implements GeneratedQueryContext {
 
+    public static final String CONTEXT_KEY_ROW_BUCKET = "currentRowBucket";
+
     protected final Map<Object, Object> contextMap;
     protected final Set<SearchError> errors;
     protected final FieldTypesLookup fieldTypes;

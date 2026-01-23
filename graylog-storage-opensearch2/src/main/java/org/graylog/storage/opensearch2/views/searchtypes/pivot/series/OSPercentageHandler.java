@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext.CONTEXT_KEY_ROW_BUCKET;
+
 public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, ValueCount> {
     private static final Logger LOG = LoggerFactory.getLogger(OSCountHandler.class);
     private final OSCountHandler osCountHandler;
@@ -120,7 +122,7 @@ public class OSPercentageHandler extends OSPivotSeriesSpecHandler<Percentage, Va
             value = valueCount.getValue();
         }
 
-        var initialBucket = osGeneratedQueryContext.rowBucket().orElseGet(() -> InitialBucket.create(searchResult));
+        var initialBucket = (HasAggregations) osGeneratedQueryContext.contextMap().getOrDefault(CONTEXT_KEY_ROW_BUCKET, InitialBucket.create(searchResult));
         var rootResult = extractNestedSeriesAggregation(pivot, percentage, initialBucket, osGeneratedQueryContext);
         var nestedSeriesResult = handleNestedSeriesResults(pivot, percentage, searchResult, rootResult, osGeneratedQueryContext);
 

@@ -47,6 +47,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import static org.graylog.plugins.views.search.engine.IndexerGeneratedQueryContext.CONTEXT_KEY_ROW_BUCKET;
+
 public class OSPivot implements OSSearchTypeHandler<Pivot> {
     private static final Logger LOG = LoggerFactory.getLogger(OSPivot.class);
     private static final String AGG_NAME = "agg";
@@ -202,16 +204,20 @@ public class OSPivot implements OSSearchTypeHandler<Pivot> {
                         processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(), rowBucket, true, "row-leaf");
                     }
                     if (!pivot.columnGroups().isEmpty()) {
-                        var contextWithRowBucket = queryContext.withRowBucket(rowBucket);
-                        retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
-                                .forEach(columnBucketTuple -> {
-                                    final ImmutableList<String> columnKeys = columnBucketTuple.keys();
-                                    colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
+                        queryContext.contextMap().put(CONTEXT_KEY_ROW_BUCKET, rowBucket);
+                        try {
+                            retrieveBuckets(pivot, pivot.columnGroups(), rowBucket)
+                                    .forEach(columnBucketTuple -> {
+                                        final ImmutableList<String> columnKeys = columnBucketTuple.keys();
+                                        colGroupNames.add(String.join(", ", Stream.concat(columnKeys.stream(), seriesNames.stream()).toList()));
 
-                                    final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
+                                        final MultiBucketsAggregation.Bucket columnBucket = columnBucketTuple.bucket();
 
-                                    processSeries(rowBuilder, queryResult, contextWithRowBucket, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
-                                });
+                                        processSeries(rowBuilder, queryResult, queryContext, pivot, new ArrayDeque<>(columnKeys), columnBucket, false, "col-leaf");
+                                    });
+                        } finally {
+                            queryContext.contextMap().remove(CONTEXT_KEY_ROW_BUCKET);
+                        }
                     }
                     resultBuilder.addRow(rowBuilder.build());
                 });
