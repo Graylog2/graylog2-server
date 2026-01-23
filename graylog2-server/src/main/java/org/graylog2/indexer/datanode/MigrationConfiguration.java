@@ -32,6 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Deprecated(forRemoval = true)
 public record MigrationConfiguration(
         @ObjectId
         @Id
