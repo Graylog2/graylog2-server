@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.security.encryption.EncryptedConfigUpdatePreparation;
 import org.graylog2.security.encryption.EncryptedValue;
 
 import javax.annotation.Nullable;
@@ -32,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AutoValue
-public abstract class GeoIpResolverConfig {
+public abstract class GeoIpResolverConfig implements EncryptedConfigUpdatePreparation {
 
     private static final Long DEFAULT_INTERVAL = 10L;
     public static final String FIELD_REFRESH_INTERVAL_UNIT = "refresh_interval_unit";
@@ -156,6 +157,29 @@ public abstract class GeoIpResolverConfig {
                 .useS3(false)
                 .pullFromCloud(Optional.empty())
                 .build();
+    }
+
+    @Override
+    public Object prepareConfigUpdate(Object existingConfig, Object newConfig) {
+        if (this.azureAccountKey() == null) {
+            return this;
+        }
+
+        final EncryptedValue accountKey = this.azureAccountKey();
+
+        if (accountKey.isDeleteValue()) {
+            return this.toBuilder()
+                    .azureAccountKey(EncryptedValue.createUnset())
+                    .build();
+        }
+
+        if (accountKey.isKeepValue()) {
+            return this.toBuilder()
+                    .azureAccountKey(((GeoIpResolverConfig) existingConfig).azureAccountKey())
+                    .build();
+        }
+
+        return this;
     }
 
     public static Builder builder() {

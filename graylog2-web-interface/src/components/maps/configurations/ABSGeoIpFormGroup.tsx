@@ -30,7 +30,7 @@ const ABSGeoIpFormGroup = () => {
 
   const setAccessKey = useCallback(
     (nextAccessKey) => {
-      setFieldValue('azure_account_key', { set_value: nextAccessKey });
+      setFieldValue('azure_account_key', nextAccessKey);
     },
     [setFieldValue],
   );
