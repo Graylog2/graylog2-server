@@ -18,5 +18,5 @@ package org.graylog2.indexer.indices;
 
 public enum IndexStatus {
     OPEN,
-    CLOSED // for ES/OS1 the status is called "close", for ES2+ it's called "closed". Let's leave the decision to the storage module
+    CLOSED // for ES/OS1/OS2 the status is called "close", for ES3 it's called "closed". Let's leave the decision to the storage module
 }
