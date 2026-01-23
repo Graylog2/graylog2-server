@@ -29,7 +29,7 @@ const ReplaySearchSidebar = () => {
   const EventSideBarDetails = useMemo<React.ComponentType<EventReplaySideBarDetailsProps>>(() => {
     const sideBarDetails = sideBarDetailsPlugin[0];
 
-    const hasPlugin = typeof sideBarDetails.useCondition === 'function' ? sideBarDetails.useCondition() : true;
+    const hasPlugin = typeof sideBarDetails?.useCondition === 'function' ? sideBarDetails.useCondition() : true;
 
     if (hasPlugin && !!sideBarDetails?.component) return sideBarDetails.component;
 
