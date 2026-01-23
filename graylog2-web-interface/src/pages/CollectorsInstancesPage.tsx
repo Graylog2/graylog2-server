@@ -16,15 +16,33 @@
  */
 import * as React from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import { InstanceList } from 'components/collectors/instances';
+import { useInstances, useFleets } from 'components/collectors/hooks';
 
-const CollectorsInstancesPage = () => (
-  <DocumentTitle title="Collector Instances">
-    <PageHeader title="Instances">
-      <span>View all collector instances across fleets.</span>
-    </PageHeader>
-    <div>Instances list coming soon...</div>
-  </DocumentTitle>
-);
+const CollectorsInstancesPage = () => {
+  const { data: instances, isLoading: instancesLoading } = useInstances();
+  const { data: fleets, isLoading: fleetsLoading } = useFleets();
+
+  const isLoading = instancesLoading || fleetsLoading;
+
+  const fleetNames = (fleets || []).reduce(
+    (acc, fleet) => ({ ...acc, [fleet.id]: fleet.name }),
+    {} as Record<string, string>,
+  );
+
+  return (
+    <DocumentTitle title="Collector Instances">
+      <PageHeader title="Instances">
+        <span>View all collector instances across fleets.</span>
+      </PageHeader>
+      {isLoading ? (
+        <Spinner />
+      ) : (
+        <InstanceList instances={instances || []} fleetNames={fleetNames} />
+      )}
+    </DocumentTitle>
+  );
+};
 
 export default CollectorsInstancesPage;
