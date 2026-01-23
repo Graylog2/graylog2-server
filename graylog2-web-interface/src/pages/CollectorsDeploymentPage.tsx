@@ -18,9 +18,11 @@ import * as React from 'react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { DeploymentForm } from 'components/collectors/deployment';
+import { CollectorsPageNavigation } from 'components/collectors/common';
 
 const CollectorsDeploymentPage = () => (
   <DocumentTitle title="Deploy Collectors">
+    <CollectorsPageNavigation />
     <PageHeader title="Deploy Collectors">
       <span>Generate enrollment tokens and installation scripts.</span>
     </PageHeader>

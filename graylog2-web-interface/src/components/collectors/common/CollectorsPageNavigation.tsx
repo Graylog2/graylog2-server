@@ -16,18 +16,14 @@
  */
 import * as React from 'react';
 
-import { DocumentTitle, PageHeader } from 'components/common';
-import { CollectorsOverview } from 'components/collectors/overview';
-import { CollectorsPageNavigation } from 'components/collectors/common';
+import PageNavigation from 'components/common/PageNavigation';
+import { Row } from 'components/bootstrap';
+import { PAGE_NAV_TITLE } from 'components/collectors/bindings';
 
-const CollectorsOverviewPage = () => (
-  <DocumentTitle title="Collectors Overview">
-    <CollectorsPageNavigation />
-    <PageHeader title="Collectors Overview">
-      <span>Overview of all collectors and sources across your infrastructure.</span>
-    </PageHeader>
-    <CollectorsOverview />
-  </DocumentTitle>
+const CollectorsPageNavigation = () => (
+  <Row>
+    <PageNavigation page={PAGE_NAV_TITLE} />
+  </Row>
 );
 
-export default CollectorsOverviewPage;
+export default CollectorsPageNavigation;

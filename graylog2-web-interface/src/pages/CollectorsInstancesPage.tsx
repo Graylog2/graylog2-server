@@ -19,6 +19,7 @@ import * as React from 'react';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { InstanceList } from 'components/collectors/instances';
 import { useInstances, useFleets } from 'components/collectors/hooks';
+import { CollectorsPageNavigation } from 'components/collectors/common';
 
 const CollectorsInstancesPage = () => {
   const { data: instances, isLoading: instancesLoading } = useInstances();
@@ -33,6 +34,7 @@ const CollectorsInstancesPage = () => {
 
   return (
     <DocumentTitle title="Collector Instances">
+      <CollectorsPageNavigation />
       <PageHeader title="Instances">
         <span>View all collector instances across fleets.</span>
       </PageHeader>

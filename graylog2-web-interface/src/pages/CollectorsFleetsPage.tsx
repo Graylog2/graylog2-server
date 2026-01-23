@@ -19,12 +19,14 @@ import * as React from 'react';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { FleetList } from 'components/collectors/fleets';
 import { useFleets } from 'components/collectors/hooks';
+import { CollectorsPageNavigation } from 'components/collectors/common';
 
 const CollectorsFleetsPage = () => {
   const { data: fleets, isLoading } = useFleets();
 
   return (
     <DocumentTitle title="Collector Fleets">
+      <CollectorsPageNavigation />
       <PageHeader title="Fleets">
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>

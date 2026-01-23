@@ -18,15 +18,16 @@ import * as React from 'react';
 
 import { useParams } from 'react-router-dom';
 
-import { DocumentTitle, PageHeader } from 'components/common';
+import { DocumentTitle } from 'components/common';
 import { FleetDetail } from 'components/collectors/fleets';
+import { CollectorsPageNavigation } from 'components/collectors/common';
 
 const CollectorsFleetDetailPage = () => {
   const { fleetId } = useParams<{ fleetId: string }>();
 
   return (
     <DocumentTitle title="Fleet Detail">
-      <PageHeader title="Fleet Detail" />
+      <CollectorsPageNavigation />
       {fleetId && <FleetDetail fleetId={fleetId} />}
     </DocumentTitle>
   );
