@@ -36,6 +36,7 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.HealthStatus;
 import org.graylog2.indexer.indices.IndexMoveResult;
 import org.graylog2.indexer.indices.IndexSettings;
+import org.graylog2.indexer.indices.IndexStatus;
 import org.graylog2.indexer.indices.IndexTemplateAdapter;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.IndicesAdapter;
@@ -575,8 +576,8 @@ public class IndicesAdapterOS implements IndicesAdapter {
     }
 
     @Override
-    public Set<String> indices(String indexWildcard, List<String> status, String indexSetId) {
-        final List<String> ewc = (status.isEmpty()) ? List.of(ExpandWildcard.All.name()) : status;
+    public Set<String> indices(String indexWildcard, List<IndexStatus> status, String indexSetId) {
+        final List<String> ewc = (status.isEmpty()) ? List.of(ExpandWildcard.All.name()) : status.stream().map(this::toStatusName).toList();
         return c.execute(() -> {
             GetIndexResponse result = indicesClient.get(GetIndexRequest.of(b -> b
                     .index(indexWildcard)
@@ -585,6 +586,13 @@ public class IndicesAdapterOS implements IndicesAdapter {
                     .ignoreUnavailable(true)));
             return result.result().keySet();
         }, "Couldn't get index list for index set <" + indexSetId + ">");
+    }
+
+    private String toStatusName(IndexStatus status) {
+        return switch (status) {
+            case OPEN -> "open";
+            case CLOSED -> "closed";
+        };
     }
 
     private ExpandWildcard resolveWildcard(String s) {
