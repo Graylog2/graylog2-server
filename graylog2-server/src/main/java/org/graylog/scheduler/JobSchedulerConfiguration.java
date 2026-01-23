@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.documentation.Documentation;
 import com.github.joschi.jadconfig.documentation.DocumentationSection;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
+import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.configuration.converters.MapConverter;
 import org.graylog2.plugin.PluginConfigBean;
 
@@ -34,9 +35,17 @@ import java.util.Map;
 @SuppressWarnings({"FieldCanBeLocal", "unused", "WeakerAccess", "FieldMayBeFinal"})
 @DocumentationSection(heading = "Job Scheduler", description = "")
 public class JobSchedulerConfiguration implements PluginConfigBean {
+    public static final String SYSTEM_WORKER_THREADS = "job_scheduler_system_worker_threads";
     public static final String LOOP_SLEEP_DURATION = "job_scheduler_loop_sleep_duration";
     public static final String LOCK_EXPIRATION_DURATION = "job_scheduler_lock_expiration_duration";
     public static final String CONCURRENCY_LIMITS = "job_scheduler_concurrency_limits";
+
+    @Documentation("""
+            The number of worker threads for the system job scheduler. (e.g., index maintenance jobs)
+            Default: 5
+            """)
+    @Parameter(value = SYSTEM_WORKER_THREADS, validators = PositiveIntegerValidator.class)
+    private int jobSchedulerSystemWorkerThreads = 5;
 
     @Documentation("tbd")
     @Parameter(value = LOOP_SLEEP_DURATION, validators = PositiveDurationValidator.class)
