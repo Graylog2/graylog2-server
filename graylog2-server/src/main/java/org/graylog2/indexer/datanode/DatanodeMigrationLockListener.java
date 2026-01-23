@@ -18,6 +18,7 @@ package org.graylog2.indexer.datanode;
 
 import org.graylog2.indexer.indexset.IndexSet;
 
+@Deprecated(forRemoval = true)
 public interface DatanodeMigrationLockListener {
     void onRetry(IndexSet indexSet, Class<?> caller, long attemptNumber);
 }

@@ -19,6 +19,7 @@ package org.graylog2.indexer.migration;
 import java.util.Collections;
 import java.util.List;
 
+@Deprecated(forRemoval = true)
 public record IndexerConnectionCheckResult(List<RemoteIndex> indices, String error) {
 
     public static IndexerConnectionCheckResult success(List<RemoteIndex> indexNames) {

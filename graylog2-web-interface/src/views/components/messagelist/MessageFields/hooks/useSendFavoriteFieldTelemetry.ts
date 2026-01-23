@@ -26,14 +26,16 @@ type KeyType = keyof typeof TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS;
 const useSendFavoriteFieldTelemetry = () => {
   const widget = useContext(WidgetContext);
   const sendTelemetry = useSendTelemetry();
+  
+  const widgetType = widget?.type ?? 'permalink';
 
   return useCallback(
     (key: KeyType, extra: TelemetryEvent = {}) =>
       sendTelemetry(TELEMETRY_EVENT_TYPE.FAVORITE_FIELDS?.[key], {
-        app_section: widget.type,
+        app_section: widgetType,
         ...extra,
       }),
-    [sendTelemetry, widget.type],
+    [sendTelemetry, widgetType],
   );
 };
 
