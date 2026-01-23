@@ -27,12 +27,13 @@ import EventListItem from 'components/events/bulk-replay/EventListItem';
 import useSelectedEvents from 'components/events/bulk-replay/useSelectedEvents';
 import ButtonToolbar from 'components/bootstrap/ButtonToolbar';
 import type { RemainingBulkActionsProps } from 'components/events/bulk-replay/types';
-import { IconButton } from 'components/common';
+import { Icon } from 'components/common';
 import useEventBulkActions from 'components/events/events/hooks/useEventBulkActions';
 import Popover from 'components/common/Popover';
 import { REPLAY_SESSION_ID_PARAM } from 'components/events/Constants';
 import useRoutingQuery from 'routing/useQuery';
 import Routes from 'routing/Routes';
+import { Button } from 'components/bootstrap';
 
 import DropdownButton from '../../bootstrap/DropdownButton';
 
@@ -97,9 +98,18 @@ const CurentContainer = styled.div(
     display: flex;
     gap: 0;
     align-items: center;
+    justify-content: space-between;
   `,
 );
 
+const ArrowButton = styled(Button)`
+  padding: 0;
+  border: 0;
+`;
+
+const TargetContainer = styled.div`
+  flex-grow: 1;
+`;
 const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) => {
   const params = useRoutingQuery();
   const replaySessionId = params[REPLAY_SESSION_ID_PARAM];
@@ -126,10 +136,12 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
 
   return (
     <CurentContainer>
-      {curIndex !== 0 && <IconButton name="arrow_back" onClick={onGoBack} />}
+      <ArrowButton onClick={onGoBack} disabled={curIndex === 0}>
+        <Icon name="keyboard_arrow_left" />
+      </ArrowButton>
       <Popover position="bottom">
         <Popover.Target>
-          <div>
+          <TargetContainer>
             <EventListItem
               key={`bulk-replay-search-item-${selectedId}`}
               event={events?.[selectedId]?.event}
@@ -138,8 +150,9 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
               removeItem={removeItem}
               onClick={() => {}}
               markItemAsDone={markItemAsDone}
+              isDropdown
             />
-          </div>
+          </TargetContainer>
         </Popover.Target>
         <Popover.Dropdown title="Info">
           <Container>
@@ -172,12 +185,14 @@ const InfoBarBulkEventReplay = ({ BulkActions = RemainingBulkActions }: Props) =
           </Container>
         </Popover.Dropdown>
       </Popover>
-      {curIndex !== eventIds.length - 1 && <IconButton name="arrow_forward" onClick={onGoForward} />}
+      <ArrowButton onClick={onGoForward} disabled={curIndex === eventIds.length - 1}>
+        <Icon name="keyboard_arrow_right" />
+      </ArrowButton>
     </CurentContainer>
   );
 };
 
-const ReplayEventIdRenderer = ({ eventId }: { eventId: string }) => {
+const ReplayEventIdRenderer = ({ eventId = null }: { eventId?: string }) => {
   const isFromBulkAction = location.pathname === Routes.ALERTS.BULK_REPLAY_SEARCH;
 
   if (isFromBulkAction) return <InfoBarBulkEventReplay />;

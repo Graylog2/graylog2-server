@@ -165,7 +165,7 @@ const ContentColumn = ({
         <Header>
           <TitleSection title={title}>
             <CenterVertical>
-              <Title onClick={closeSidebar}>{title}</Title>
+              <Title>{title}</Title>
             </CenterVertical>
             {!forceSideBarPinned && enableSidebarPinning && (
               <CenterVertical>

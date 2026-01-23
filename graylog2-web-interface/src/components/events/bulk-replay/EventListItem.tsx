@@ -18,8 +18,8 @@ import * as React from 'react';
 import styled, { css } from 'styled-components';
 
 import IconButton from 'components/common/IconButton';
-import ButtonGroup from 'components/bootstrap/ButtonGroup';
 import type { Event } from 'components/events/events/types';
+import { Icon } from 'components/common';
 
 type EventListItemProps = {
   event: Event;
@@ -28,6 +28,8 @@ type EventListItemProps = {
   onClick: () => void;
   removeItem: (id: string) => void;
   markItemAsDone: (id: string) => void;
+  className?: string;
+  isDropdown?: boolean;
 };
 
 type StyledItemProps = {
@@ -41,8 +43,9 @@ const StyledItem = styled.div<StyledItemProps>(
     height: 30px;
     background-color: ${$selected ? theme.colors.background.secondaryNav : 'transparent'};
     cursor: pointer;
-    max-width: 400px;
+    max-width: 285px;
     position: relative;
+    gap: ${theme.spacings.xs};
 
     &:hover {
       background-color: ${theme.colors.background.body};
@@ -56,17 +59,16 @@ type SummaryProps = {
 
 const Summary = styled.span<SummaryProps>(
   ({ theme, $done }) => css`
-    margin: 10px;
     color: ${$done ? theme.colors.text.secondary : theme.colors.text.primary};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    &:hover {
-      text-decoration: underline;
-    }
+    flex-grow: 1;
   `,
 );
+const Ellipsis = styled.span`
+  text-overflow: ellipsis;
+`;
 
 const CompletedButton = styled(IconButton)<{ $done: boolean }>(
   ({ theme, $done }) => css`
@@ -74,7 +76,16 @@ const CompletedButton = styled(IconButton)<{ $done: boolean }>(
   `,
 );
 
-const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsDone }: EventListItemProps) => {
+const EventListItem = ({
+  done,
+  event,
+  onClick,
+  selected,
+  removeItem,
+  markItemAsDone,
+  className = '',
+  isDropdown = false,
+}: EventListItemProps) => {
   const _removeItem = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
@@ -87,19 +98,22 @@ const EventListItem = ({ done, event, onClick, selected, removeItem, markItemAsD
   };
 
   return (
-    <StyledItem key={`event-replay-list-${event?.id}`} $selected={selected} onClick={onClick}>
-      <Summary $done={done}>{event?.message ?? <i>Unknown</i>}</Summary>
-
-      <ButtonGroup>
+    <StyledItem key={`event-replay-list-${event?.id}`} $selected={selected} onClick={onClick} className={className}>
+      <CompletedButton
+        onClick={_markItemAsDone}
+        title={`Mark event "${event?.id}" as ${done ? 'not' : ''} reviewed`}
+        name="verified"
+        iconType={done ? 'solid' : 'regular'}
+        $done={done}
+      />
+      <Summary $done={done}>
+        <Ellipsis>{event?.message ?? <i>Unknown</i>}</Ellipsis>
+      </Summary>
+      {isDropdown ? (
+        <Icon name="arrow_drop_down" />
+      ) : (
         <IconButton onClick={_removeItem} title={`Remove event "${event?.id}" from list`} name="delete" />
-        <CompletedButton
-          onClick={_markItemAsDone}
-          title={`Mark event "${event?.id}" as ${done ? 'not' : ''} reviewed`}
-          name="verified"
-          iconType={done ? 'solid' : 'regular'}
-          $done={done}
-        />
-      </ButtonGroup>
+      )}
     </StyledItem>
   );
 };

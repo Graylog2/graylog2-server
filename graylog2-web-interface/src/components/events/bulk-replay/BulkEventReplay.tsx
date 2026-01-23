@@ -28,6 +28,7 @@ import type { ResolutionState } from 'contexts/EventReplaySelectedContext';
 import type { SidebarSection } from 'views/components/sidebar/sidebarSections';
 import sidebarSections from 'views/components/sidebar/sidebarSections';
 import ReplaySearchSidebar from 'components/events/ReplaySearchSidebar/ReplaySearchSidebar';
+import ReplayEventIdRenderer from 'components/events/bulk-replay/NewBulkEventReplay';
 
 const Container = styled.div`
   display: flex;
@@ -82,6 +83,7 @@ const InfoAlert = ({
 const replaySection: SidebarSection = {
   key: 'eventDescription',
   title: null,
+  hoverTitle: 'Replayed Search',
   icon: 'play_arrow',
   content: ReplaySearchSidebar,
 };
@@ -89,7 +91,7 @@ const replaySection: SidebarSection = {
 const searchPageLayout = {
   sidebar: {
     isShown: true,
-    title: 'Replayed Search',
+    title: <ReplayEventIdRenderer />,
     sections: [replaySection, ...sidebarSections],
     contentColumnWidth: 350,
   },
@@ -112,6 +114,7 @@ const ReplayedSearch = ({
         alertId={selectedEvent?.event?.id}
         definitionId={selectedEvent?.event?.event_definition_id}
         searchPageLayout={searchPageLayout}
+        forceSidebarPinned
       />
     </>
   );
