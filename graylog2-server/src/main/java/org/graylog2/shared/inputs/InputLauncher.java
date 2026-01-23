@@ -28,10 +28,12 @@ import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.InputFailureRecorder;
 import org.graylog2.plugin.buffers.InputBuffer;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.shared.metrics.SlidingWindowCounter;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -42,6 +44,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class InputLauncher {
     private static final Logger LOG = LoggerFactory.getLogger(InputLauncher.class);
     public static final String FAILED_STARTS_METRIC = "failed_starts";
+    private static final Duration FAILED_STARTS_WINDOW = Duration.ofMinutes(15);
 
     private final IOState.Factory<MessageInput> inputStateFactory;
     private final InputBuffer inputBuffer;
@@ -124,19 +127,25 @@ public class InputLauncher {
 
     protected void handleLaunchException(Throwable e, IOState<MessageInput> inputState) {
         final MessageInput input = inputState.getStoppable();
-        metricRegistry.meter(name(Input.class, FAILED_STARTS_METRIC, input.getId())).mark();
+        failedStartsCounter(input).inc();
         StringBuilder msg = new StringBuilder("The [" + input.getClass().getCanonicalName() + "] input " + input.toIdentifier() + " misfired. Reason: ");
 
         String causeMsg = ExceptionUtils.getRootCauseMessage(e);
-
         msg.append(causeMsg);
-
         LOG.error(msg.toString(), e);
-
-        // Clean up.
-        //cleanInput(input);
-
         inputState.setState(IOState.Type.FAILED, causeMsg);
+    }
+
+    private SlidingWindowCounter failedStartsCounter(MessageInput input) {
+        final String metricName = name(Input.class, FAILED_STARTS_METRIC, input.getId());
+        final var existing = metricRegistry.getMetrics().get(metricName);
+        if (existing instanceof SlidingWindowCounter counter) {
+            return counter;
+        }
+        if (existing != null) {
+            metricRegistry.remove(metricName);
+        }
+        return metricRegistry.register(metricName, new SlidingWindowCounter(FAILED_STARTS_WINDOW));
     }
 
     public void launchAllPersisted() {
