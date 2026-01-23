@@ -16,12 +16,12 @@
  */
 package org.graylog.scheduler.periodicals;
 
+import jakarta.inject.Inject;
 import org.graylog.scheduler.DBJobTriggerService;
+import org.graylog.scheduler.DBSystemJobTriggerService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.inject.Inject;
 
 import java.util.concurrent.TimeUnit;
 
@@ -29,13 +29,16 @@ public class ScheduleTriggerCleanUp extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ScheduleTriggerCleanUp.class);
 
     private final DBJobTriggerService dbJobTriggerService;
+    private final DBSystemJobTriggerService dbSystemJobTriggerService;
 
     // Remove completed job triggers after a day
     private static final long OUTOFDATE_IN_DAYS = 1;
 
     @Inject
-    public ScheduleTriggerCleanUp(DBJobTriggerService dbJobTriggerService) {
+    public ScheduleTriggerCleanUp(DBJobTriggerService dbJobTriggerService,
+                                  DBSystemJobTriggerService dbSystemJobTriggerService) {
         this.dbJobTriggerService = dbJobTriggerService;
+        this.dbSystemJobTriggerService = dbSystemJobTriggerService;
     }
 
     @Override
@@ -80,9 +83,14 @@ public class ScheduleTriggerCleanUp extends Periodical {
 
     @Override
     public void doRun() {
-        int deleted = dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(1, TimeUnit.DAYS);
+        int deleted = dbJobTriggerService.deleteCompletedOnceSchedulesOlderThan(OUTOFDATE_IN_DAYS, TimeUnit.DAYS);
         if (deleted > 0) {
             LOG.debug("Deleted {} outdated OnceJobSchedule triggers.", deleted);
+        }
+
+        int deletedSystem = dbSystemJobTriggerService.deleteCompletedOnceSchedulesOlderThan(OUTOFDATE_IN_DAYS, TimeUnit.DAYS);
+        if (deletedSystem > 0) {
+            LOG.debug("Deleted {} completed system job triggers.", deletedSystem);
         }
     }
 }

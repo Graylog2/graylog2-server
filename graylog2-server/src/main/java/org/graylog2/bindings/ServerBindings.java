@@ -37,9 +37,9 @@ import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.HtmlSafeJmteEngineProvider;
 import org.graylog2.bindings.providers.JsonSafeEngineProvider;
+import org.graylog2.bindings.providers.LegacySystemJobFactoryProvider;
+import org.graylog2.bindings.providers.LegacySystemJobManagerProvider;
 import org.graylog2.bindings.providers.SecureFreemarkerConfigProvider;
-import org.graylog2.bindings.providers.SystemJobFactoryProvider;
-import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.bootstrap.uncaughtexeptions.DefaultUncaughtExceptionHandlerCreator;
 import org.graylog2.buffers.processors.OutputBufferProcessor;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
@@ -100,8 +100,8 @@ import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.debug.ClusterDebugEventListener;
 import org.graylog2.system.debug.LocalDebugEventListener;
-import org.graylog2.system.jobs.SystemJobFactory;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobFactory;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
 import org.graylog2.system.traffic.OpenTrafficCounterCalculator;
@@ -191,9 +191,9 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindSingletons() {
         bind(DefaultUncaughtExceptionHandlerCreator.class).asEagerSingleton();
-        bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
+        bind(LegacySystemJobManager.class).toProvider(LegacySystemJobManagerProvider.class);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
-        bind(SystemJobFactory.class).toProvider(SystemJobFactoryProvider.class);
+        bind(LegacySystemJobFactory.class).toProvider(LegacySystemJobFactoryProvider.class);
         bind(GracefulShutdown.class).in(Scopes.SINGLETON);
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
