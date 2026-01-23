@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -39,21 +40,18 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.LegacySystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.time.Duration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -76,7 +74,7 @@ public class MongoIndexSet implements IndexSet {
     private final IndexRangeService indexRangeService;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
-    private final LegacySystemJobManager systemJobManager;
+    private final SystemJobManager systemJobManager;
     private final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
     private final ActivityWriter activityWriter;
     private final NotificationService notificationService;
@@ -88,7 +86,7 @@ public class MongoIndexSet implements IndexSet {
                          final NodeId nodeId,
                          final IndexRangeService indexRangeService,
                          final AuditEventSender auditEventSender,
-                         final LegacySystemJobManager systemJobManager,
+                         final SystemJobManager systemJobManager,
                          final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory,
                          final ActivityWriter activityWriter, NotificationService notificationService
     ) {
@@ -346,12 +344,7 @@ public class MongoIndexSet implements IndexSet {
         // it can happen that an index request still writes to the old deflector target, while we cycled it above.
         // setting the index to readOnly would result in ClusterBlockExceptions in the indexing request.
         // waiting 30 seconds to perform the background task should completely get rid of these errors.
-        final LegacySystemJob setIndexReadOnlyAndCalculateRangeJob = jobFactory.create(indexName);
-        try {
-            systemJobManager.submitWithDelay(setIndexReadOnlyAndCalculateRangeJob, 30, TimeUnit.SECONDS);
-        } catch (SystemJobConcurrencyException e) {
-            LOG.error("Cannot set index <" + indexName + "> to read only and calculate its range. It won't be optimized.", e);
-        }
+        systemJobManager.submitWithDelay(SetIndexReadOnlyAndCalculateRangeJob.forIndex(indexName), Duration.ofSeconds(30));
     }
 
     private void addDeflectorIndexRange(String indexName) {

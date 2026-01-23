@@ -28,9 +28,9 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.ForbiddenException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog.shaded.opensearch2.org.opensearch.OpenSearchException;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
 import org.graylog.shaded.opensearch2.org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
@@ -82,9 +82,6 @@ import org.graylog2.periodical.IndexRangesCleanupPeriodical;
 import org.graylog2.plugin.Tools;
 import org.graylog2.rest.resources.datanodes.DatanodeResolver;
 import org.graylog2.rest.resources.datanodes.DatanodeRestApiProxy;
-import org.graylog2.system.jobs.LegacySystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
@@ -135,9 +132,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
     private final NotificationService notificationService;
 
     private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
-    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
-    private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
-    private final LegacySystemJobManager systemJobManager;
+    private final SystemJobManager systemJobManager;
 
     private final DatanodeMigrationLockService migrationLockService;
 
@@ -151,9 +146,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
                                                DatanodeRestApiProxy datanodeRestApiProxy,
                                                NotificationService notificationService,
                                                IndexRangesCleanupPeriodical indexRangesCleanupPeriodical,
-                                               RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
-                                               CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
-                                               LegacySystemJobManager systemJobManager,
+                                               SystemJobManager systemJobManager,
                                                DatanodeMigrationLockService migrationLockService) {
         this.client = client;
         this.indices = indices;
@@ -164,8 +157,6 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
         this.datanodeRestApiProxy = datanodeRestApiProxy;
         this.notificationService = notificationService;
         this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
-        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
-        this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.systemJobManager = systemJobManager;
         this.migrationLockService = migrationLockService;
     }
@@ -658,11 +649,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void recalculateIndexRanges(String index) {
         indices.refresh(index);
-        try {
-            systemJobManager.submit(singleIndexRangeJobFactory.create(index));
-        } catch (SystemJobConcurrencyException e) {
-            LOG.warn("Unable to trigger index range calculation for index: {}", index, e);
-        }
+        systemJobManager.submit(CreateNewSingleIndexRangeJob.forIndex(index));
     }
 
     private void onMigrationFinished(Status status, Set<Lock> locks) {
@@ -674,14 +661,7 @@ public class RemoteReindexingMigrationAdapterOS2 implements RemoteReindexingMigr
 
     private void recalculateAllIndexRanges() {
         this.indexRangesCleanupPeriodical.doRun();
-        final LegacySystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSetRegistry.getAllBasicIndexSets());
-        try {
-            this.systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(errorMsg, e);
-            throw new ForbiddenException(errorMsg);
-        }
+        systemJobManager.submit(RebuildIndexRangesJob.rebuildAll());
     }
 
     private Status getMigrationStatus(MigrationConfiguration migration) {

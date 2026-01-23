@@ -27,19 +27,6 @@ import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
-import jakarta.inject.Inject;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.ws.rs.BadRequestException;
-import jakarta.ws.rs.ForbiddenException;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
@@ -49,11 +36,11 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.scheduler.system.SystemJobManager;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.indexset.IndexSet;
-import org.graylog2.indexer.indexset.basic.BasicIndexSet;
 import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -65,13 +52,7 @@ import org.graylog2.rest.models.system.indexer.responses.IndexRangesResponse;
 import org.graylog2.shared.rest.PublicCloudAPI;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.system.jobs.LegacySystemJob;
-import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.LegacySystemJobManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
@@ -81,25 +62,17 @@ import java.util.SortedSet;
 @Tag(name = "System/IndexRanges", description = "Index timeranges")
 @Path("/system/indices/ranges")
 public class IndexRangesResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexRangesResource.class);
-
     private final IndexRangeService indexRangeService;
-    private final RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory;
-    private final CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory;
     private final IndexSetRegistry indexSetRegistry;
-    private final LegacySystemJobManager systemJobManager;
+    private final SystemJobManager systemJobManager;
     private final IndexRangesCleanupPeriodical indexRangesCleanupPeriodical;
 
     @Inject
     public IndexRangesResource(IndexRangeService indexRangeService,
-                               RebuildIndexRangesJob.Factory rebuildIndexRangesJobFactory,
-                               CreateNewSingleIndexRangeJob.Factory singleIndexRangeJobFactory,
+                               SystemJobManager systemJobManager,
                                IndexSetRegistry indexSetRegistry,
-                               LegacySystemJobManager systemJobManager,
                                IndexRangesCleanupPeriodical indexRangesCleanupPeriodical) {
         this.indexRangeService = indexRangeService;
-        this.rebuildIndexRangesJobFactory = rebuildIndexRangesJobFactory;
-        this.singleIndexRangeJobFactory = singleIndexRangeJobFactory;
         this.indexSetRegistry = indexSetRegistry;
         this.systemJobManager = systemJobManager;
         this.indexRangesCleanupPeriodical = indexRangesCleanupPeriodical;
@@ -157,9 +130,9 @@ public class IndexRangesResource extends RestResource {
     @Path("/rebuild")
     @RequiresPermissions(RestPermissions.INDEXRANGES_REBUILD)
     @Operation(summary = "Rebuild/sync index range information.",
-                  description = "This triggers a systemjob that scans every index and stores meta information " +
-                          "about what indices contain messages in what timeranges. It atomically overwrites " +
-                          "already existing meta information.")
+               description = "This triggers a systemjob that scans every index and stores meta information " +
+                       "about what indices contain messages in what timeranges. It atomically overwrites " +
+                       "already existing meta information.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Rebuild/sync systemjob triggered.")
     })
@@ -167,7 +140,7 @@ public class IndexRangesResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
         submitIndexRangesCleanupJob();
-        submitIndexRangesJob(indexSetRegistry.getAllBasicIndexSets());
+        submitIndexRangesJob(RebuildIndexRangesJob.rebuildAll());
 
         return Response.accepted().build();
     }
@@ -177,9 +150,9 @@ public class IndexRangesResource extends RestResource {
     @Path("/index_set/{indexSetId}/rebuild")
     @RequiresPermissions(RestPermissions.INDEXRANGES_REBUILD)
     @Operation(summary = "Rebuild/sync index range information for the given index set.",
-                  description = "This triggers a systemjob that scans every index in the given index set and stores meta information " +
-                          "about what indices contain messages in what timeranges. It atomically overwrites " +
-                          "already existing meta information.")
+               description = "This triggers a systemjob that scans every index in the given index set and stores meta information " +
+                       "about what indices contain messages in what timeranges. It atomically overwrites " +
+                       "already existing meta information.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Rebuild/sync systemjob triggered.")
     })
@@ -189,7 +162,7 @@ public class IndexRangesResource extends RestResource {
         final IndexSet indexSet = indexSetRegistry.get(indexSetId)
                 .orElseThrow(() -> new jakarta.ws.rs.NotFoundException("Index set <" + indexSetId + "> not found!"));
 
-        submitIndexRangesJob(Collections.singleton(indexSet));
+        submitIndexRangesJob(RebuildIndexRangesJob.forIndexSets(Set.of(indexSet)));
 
         return Response.accepted().build();
     }
@@ -198,9 +171,9 @@ public class IndexRangesResource extends RestResource {
     @Timed
     @Path("/{index: [a-z_0-9-]+}/rebuild")
     @Operation(summary = "Rebuild/sync index range information.",
-                  description = "This triggers a system job that scans an index and stores meta information " +
-                          "about what indices contain messages in what time ranges. It atomically overwrites " +
-                          "already existing meta information.")
+               description = "This triggers a system job that scans an index and stores meta information " +
+                       "about what indices contain messages in what time ranges. It atomically overwrites " +
+                       "already existing meta information.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "202", description = "Rebuild/sync system job triggered.")
     })
@@ -214,27 +187,13 @@ public class IndexRangesResource extends RestResource {
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);
 
-        final LegacySystemJob rebuildJob = singleIndexRangeJobFactory.create(index);
-        try {
-            this.systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String msg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.error(msg);
-            throw new ForbiddenException(msg, e);
-        }
+        systemJobManager.submit(CreateNewSingleIndexRangeJob.forIndex(index));
 
         return Response.accepted().build();
     }
 
-    public void submitIndexRangesJob(final Set<BasicIndexSet> indexSets) {
-        final LegacySystemJob rebuildJob = rebuildIndexRangesJobFactory.create(indexSets);
-        try {
-            this.systemJobManager.submit(rebuildJob);
-        } catch (SystemJobConcurrencyException e) {
-            final String errorMsg = "Concurrency level of this job reached: " + e.getMessage();
-            LOG.info(errorMsg, e);
-            throw new ForbiddenException(errorMsg);
-        }
+    public void submitIndexRangesJob(final RebuildIndexRangesJob.Config config) {
+        systemJobManager.submit(config);
     }
 
     private void submitIndexRangesCleanupJob() {
