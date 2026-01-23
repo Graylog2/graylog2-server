@@ -24,6 +24,7 @@ import { Spinner } from 'components/common';
 import { useFleet, useFleetStats, useInstances, useSources } from '../hooks';
 import StatCard from '../common/StatCard';
 import SourcesTable from '../overview/SourcesTable';
+import InstanceList from '../instances/InstanceList';
 
 type Props = {
   fleetId: string;
@@ -86,7 +87,7 @@ const FleetDetail = ({ fleetId }: Props) => {
         </Tabs.Panel>
 
         <Tabs.Panel value="instances" pt="md">
-          <p>Instance list coming in next task...</p>
+          <InstanceList instances={instances || []} fleetNames={fleetNames} showStats={false} />
         </Tabs.Panel>
 
         <Tabs.Panel value="settings" pt="md">
