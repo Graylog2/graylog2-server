@@ -70,7 +70,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 @ExtendWith(MongoDBExtension.class)
 @MockitoSettings(strictness = Strictness.WARN)
-public class InputServiceImplTest {
+class InputServiceImplTest {
 
     @Mock
     private ExtractorFactory extractorFactory;
@@ -88,7 +88,7 @@ public class InputServiceImplTest {
 
     @BeforeEach
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
-    public void setUp(MongoCollections mongoCollections) throws Exception {
+    void setUp(MongoCollections mongoCollections) {
         clusterEventBus = new ClusterEventBus("inputs-test", Executors.newSingleThreadExecutor());
         encryptedValueService = new EncryptedValueService(UUID.randomUUID().toString());
         inputService = new InputServiceImpl(
@@ -102,28 +102,28 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void allReturnsAllInputs() {
+    void allReturnsAllInputs() {
         final List<Input> inputs = inputService.all();
         assertThat(inputs).hasSize(3);
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void allOfThisNodeReturnsAllLocalAndGlobalInputs() {
+    void allOfThisNodeReturnsAllLocalAndGlobalInputs() {
         final List<Input> inputs = inputService.allOfThisNode("cd03ee44-b2a7-cafe-babe-0000deadbeef");
         assertThat(inputs).hasSize(3);
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void allOfThisNodeReturnsGlobalInputsIfNodeIDDoesNotExist() {
+    void allOfThisNodeReturnsGlobalInputsIfNodeIDDoesNotExist() {
         final List<Input> inputs = inputService.allOfThisNode("cd03ee44-b2a7-0000-0000-000000000000");
         assertThat(inputs).hasSize(1);
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void findByIdsReturnsRequestedInputs() {
+    void findByIdsReturnsRequestedInputs() {
         assertThat(inputService.findByIds(ImmutableSet.of())).isEmpty();
         assertThat(inputService.findByIds(ImmutableSet.of("54e300000000000000000000"))).isEmpty();
         assertThat(inputService.findByIds(ImmutableSet.of("54e3deadbeefdeadbeef0001"))).hasSize(1);
@@ -133,39 +133,39 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void findReturnsExistingInput() throws NotFoundException {
+    void findReturnsExistingInput() throws NotFoundException {
         final Input input = inputService.find("54e3deadbeefdeadbeef0002");
         assertThat(input.getId()).isEqualTo("54e3deadbeefdeadbeef0002");
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void findThrowsNotFoundExceptionIfInputDoesNotExist() {
+    void findThrowsNotFoundExceptionIfInputDoesNotExist() {
         assertThatThrownBy(() -> inputService.find("54e300000000000000000000"))
                 .isExactlyInstanceOf(NotFoundException.class);
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void globalCountReturnsNumberOfGlobalInputs() {
+    void globalCountReturnsNumberOfGlobalInputs() {
         assertThat(inputService.globalCount()).isEqualTo(1);
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void localCountReturnsNumberOfLocalInputs() {
+    void localCountReturnsNumberOfLocalInputs() {
         assertThat(inputService.localCount()).isEqualTo(2);
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void localCountForNodeReturnsNumberOfLocalInputs() {
+    void localCountForNodeReturnsNumberOfLocalInputs() {
         assertThat(inputService.localCountForNode("cd03ee44-b2a7-cafe-babe-0000deadbeef")).isEqualTo(2);
-        assertThat(inputService.localCountForNode("cd03ee44-b2a7-0000-0000-000000000000")).isEqualTo(0);
+        assertThat(inputService.localCountForNode("cd03ee44-b2a7-0000-0000-000000000000")).isZero();
     }
 
     @Test
-    public void handlesEncryptedValue() throws ValidationException, NotFoundException {
+    void handlesEncryptedValue() throws ValidationException, NotFoundException {
 
         // Setup required to detect fields that need conversion from Map to EncryptedValue when reading
         final MessageInput.Config inputConfig = mock(MessageInput.Config.class);
@@ -216,14 +216,14 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void findByTitle() {
+    void findByTitle() {
         String rawTcp = "Raw TCP";
         List<String> idsByTitle = inputService.findIdsByTitle(rawTcp);
         assertThat(idsByTitle).hasSize(1);
     }
 
     @Test
-    public void createInput() {
+    void createInput() {
         Map<String, Object> localFields = Map.of(
                 MessageInput.FIELD_TYPE, "test type",
                 MessageInput.FIELD_TITLE, "test title",
@@ -255,7 +255,7 @@ public class InputServiceImplTest {
     }
 
     @Test
-    public void inputWithOutDesiredStateDefaultsToRunning() {
+    void inputWithOutDesiredStateDefaultsToRunning() {
         Map<String, Object> localFields = Map.of(
                 MessageInput.FIELD_TYPE, "test type",
                 MessageInput.FIELD_TITLE, "test title",
@@ -268,7 +268,7 @@ public class InputServiceImplTest {
     }
 
     @Test
-    public void saveInput() throws Exception {
+    void saveInput() throws Exception {
         InputImpl newInput = createTestInput();
 
         String id = inputService.save(newInput);
@@ -283,7 +283,7 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void testExtractor() throws Exception {
+    void testExtractor() throws Exception {
         Input input = inputService.find("54e3deadbeefdeadbeef0001");
 
         String extractorId = new ObjectId().toHexString();
@@ -326,19 +326,19 @@ public class InputServiceImplTest {
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void testDeleteExtractor() throws Exception {
+    void testDeleteExtractor() throws Exception {
         Input input = inputService.find("54e3deadbeefdeadbeef0002");
         Extractor extractor = Mockito.mock(Extractor.class);
         when(extractorFactory.factory(any(), any(), anyLong(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(extractor);
         assertThat(inputService.getExtractors(input.getId())).hasSize(1);
         inputService.removeExtractor(input, "4ec88750-c522-11f0-bdff-9eee7e74cea5");
-        assertThat(inputService.getExtractors(input.getId())).hasSize(0);
+        assertThat(inputService.getExtractors(input.getId())).isEmpty();
     }
 
     @Test
     @MongoDBFixtures("InputServiceImplTest.json")
-    public void testPaginated() {
+    void testPaginated() {
         PaginatedList<Input> paginated = inputService.paginated(Filters.empty(), input -> true, SortOrder.ASCENDING, InputImpl.FIELD_TITLE, 1, 2);
 
         assertThat(paginated).isNotNull();
