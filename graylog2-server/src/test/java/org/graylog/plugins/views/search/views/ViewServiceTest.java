@@ -23,7 +23,6 @@ import org.graylog.grn.GRN;
 import org.graylog.grn.GRNRegistry;
 import org.graylog.grn.GRNTypes;
 import org.graylog.plugins.views.favorites.FavoritesForUserDTO;
-import org.graylog.plugins.views.favorites.FavoritesService;
 import org.graylog.plugins.views.search.permissions.SearchUser;
 import org.graylog.plugins.views.search.rest.TestSearchUser;
 import org.graylog.plugins.views.search.rest.TestUser;
@@ -34,6 +33,7 @@ import org.graylog.testing.mongodb.MongoDBTestService;
 import org.graylog.testing.mongodb.MongoJackExtension;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
+import org.graylog2.database.MongoCollection;
 import org.graylog2.database.MongoCollections;
 import org.graylog2.database.PaginatedList;
 import org.graylog2.database.entities.source.EntitySourceService;
@@ -50,10 +50,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.lang.reflect.Constructor;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -64,7 +63,7 @@ import static org.mockito.Mockito.mock;
 @ExtendWith(GRNExtension.class)
 public class ViewServiceTest {
     private ViewService dbService;
-    private FavoritesService favoritesService;
+    private MongoCollection<FavoritesForUserDTO> favoritesCollection;
     private GRNRegistry grnRegistry;
 
     private SearchUser searchUser;
@@ -90,15 +89,8 @@ public class ViewServiceTest {
                 mock(EntitySourceService.class),
                 mongoCollections);
 
-        // Set up FavoritesService using reflection to access protected constructor
-        try {
-            Constructor<FavoritesService> constructor = FavoritesService.class.getDeclaredConstructor(
-                    MongoCollections.class, EventBus.class, org.graylog.plugins.views.startpage.title.StartPageItemTitleRetriever.class, GRNRegistry.class);
-            constructor.setAccessible(true);
-            this.favoritesService = constructor.newInstance(mongoCollections, new EventBus(), null, grnRegistry);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to create FavoritesService for testing", e);
-        }
+        // Set up favorites collection using MongoCollections to ensure proper serialization
+        this.favoritesCollection = mongoCollections.collection("favorites", FavoritesForUserDTO.class);
 
         // Create a test user with a specific ID for favorites testing
         final org.graylog2.plugin.database.users.User testUser = TestUser.builder()
@@ -354,10 +346,12 @@ public class ViewServiceTest {
         final ViewDTO view3 = dbService.save(ViewDTO.builder().title("View Gamma").searchId("abc123").state(Collections.emptyMap()).build());
         final ViewDTO view4 = dbService.save(ViewDTO.builder().title("View Delta").searchId("abc123").state(Collections.emptyMap()).build());
 
-        // Mark view2 and view4 as favorites using FavoritesService
+        // Mark view2 and view4 as favorites using MongoCollection with FavoritesForUserDTO
+        // This uses the same data structure as FavoritesService to avoid storage format drift
         final GRN grn2 = grnRegistry.newGRN(GRNTypes.SEARCH, view2.id());
         final GRN grn4 = grnRegistry.newGRN(GRNTypes.SEARCH, view4.id());
-        favoritesService.save(new FavoritesForUserDTO(searchUser.getUser().getId(), java.util.List.of(grn2, grn4)));
+        final FavoritesForUserDTO favorites = new FavoritesForUserDTO(searchUser.getUser().getId(), List.of(grn2, grn4));
+        favoritesCollection.insertOne(favorites);
 
         final SearchQueryParser queryParser = new SearchQueryParser(ViewDTO.FIELD_TITLE, ImmutableMap.of());
 
