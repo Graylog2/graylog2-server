@@ -18,24 +18,24 @@ package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
 import jakarta.inject.Inject;
-import org.graylog2.indexer.indexset.IndexSet;
-import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypePoller;
 import org.graylog2.indexer.fieldtypes.IndexFieldTypesService;
+import org.graylog2.indexer.indexset.IndexSet;
+import org.graylog2.indexer.indexset.registry.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
-import org.graylog2.system.jobs.SystemJob;
+import org.graylog2.system.jobs.LegacySystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
-import org.graylog2.system.jobs.SystemJobManager;
+import org.graylog2.system.jobs.LegacySystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
 
-public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
+public class SetIndexReadOnlyAndCalculateRangeJob extends LegacySystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(SetIndexReadOnlyAndCalculateRangeJob.class);
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
@@ -44,7 +44,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     private final IndexFieldTypesService indexFieldTypesService;
     private final IndexFieldTypePoller indexFieldTypePoller;
     private final ActivityWriter activityWriter;
-    private final SystemJobManager systemJobManager;
+    private final LegacySystemJobManager systemJobManager;
     private final String indexName;
 
     @Inject
@@ -55,7 +55,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
                                                 IndexFieldTypesService indexFieldTypesService,
                                                 IndexFieldTypePoller indexFieldTypePoller,
                                                 ActivityWriter activityWriter,
-                                                SystemJobManager systemJobManager,
+                                                LegacySystemJobManager systemJobManager,
                                                 @Assisted String indexName) {
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
@@ -79,7 +79,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
             return;
         }
         setReadonly();
-        final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexName);
+        final LegacySystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexName);
         createNewSingleIndexRangeJob.execute();
 
         // Update field type information again to make sure we got the latest state

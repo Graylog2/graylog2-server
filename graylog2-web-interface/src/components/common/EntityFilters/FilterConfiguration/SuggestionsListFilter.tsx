@@ -17,7 +17,7 @@
 import * as React from 'react';
 import { useState } from 'react';
 
-import type { Filters, Filter } from 'components/common/EntityFilters/types';
+import type { Filters } from 'components/common/EntityFilters/types';
 import type { Attribute } from 'stores/PaginationTypes';
 import useFilterValueSuggestions from 'components/common/EntityFilters/hooks/useFilterValueSuggestions';
 
@@ -26,8 +26,8 @@ import SuggestionsList from './SuggestionsList';
 type Props = {
   allActiveFilters: Filters | undefined;
   attribute: Attribute;
-  filter: Filter | undefined;
   filterValueRenderer: (value: unknown, title: string) => React.ReactNode | undefined;
+  multiSelect: boolean;
   onSubmit: (filter: { title: string; value: string }, closeDropdown: boolean) => void;
 };
 
@@ -37,7 +37,7 @@ const DEFAULT_SEARCH_PARAMS = {
   page: 1,
 };
 
-const SuggestionsListFilter = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, filter }: Props) => {
+const SuggestionsListFilter = ({ attribute, filterValueRenderer, onSubmit, allActiveFilters, multiSelect }: Props) => {
   const [searchParams, setSearchParams] = useState(DEFAULT_SEARCH_PARAMS);
   const {
     data: { pagination, suggestions },
@@ -53,7 +53,7 @@ const SuggestionsListFilter = ({ attribute, filterValueRenderer, onSubmit, allAc
       setSearchParams={setSearchParams}
       allActiveFilters={allActiveFilters}
       attribute={attribute}
-      filter={filter}
+      multiSelect={multiSelect}
       filterValueRenderer={filterValueRenderer}
       onSubmit={onSubmit}
       suggestions={suggestions}
