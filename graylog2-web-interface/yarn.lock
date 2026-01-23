@@ -3599,39 +3599,39 @@
   dependencies:
     "@typescript-eslint/utils" "^8.18.1"
 
-"@tanstack/query-core@5.90.16":
-  version "5.90.16"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.90.16.tgz#19a972c2ffbc47727ab6649028af1bee70e28cdf"
-  integrity sha512-MvtWckSVufs/ja463/K4PyJeqT+HMlJWtw6PrCpywznd2NSgO3m4KwO9RqbFqGg6iDE8vVMFWMeQI4Io3eEYww==
+"@tanstack/query-core@5.90.17":
+  version "5.90.17"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-core/-/query-core-5.90.17.tgz#e97c44cde35c341f2c8dd56f5f6621b4c50004a2"
+  integrity sha512-hDww+RyyYhjhUfoYQ4es6pbgxY7LNiPWxt4l1nJqhByjndxJ7HIjDxTBtfvMr5HwjYavMrd+ids5g4Rfev3lVQ==
 
-"@tanstack/query-persist-client-core@5.91.15":
-  version "5.91.15"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.91.15.tgz#68ef8d96d7fc3007b6697ad991b6a1bf5e002864"
-  integrity sha512-vnPSfQVo41EKJN8v20nkhWNZPyB1dMJIy5icOvCGzcCJzsmRefYY1owtr63ICOcjOiPPTuNEfPsdjdBhkzYnmA==
+"@tanstack/query-persist-client-core@5.91.16":
+  version "5.91.16"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-persist-client-core/-/query-persist-client-core-5.91.16.tgz#734fa0bee732072651834b04809a00736e82d6d2"
+  integrity sha512-jhcLN5vRpI3+DgXhLqPWvBjVorE9MxGH59uezwVBW7FJ9uTriaRmodoXytn557po6D4s1jb+tPTJYLscqLFSSw==
   dependencies:
-    "@tanstack/query-core" "5.90.16"
+    "@tanstack/query-core" "5.90.17"
 
 "@tanstack/query-sync-storage-persister@^5.87.1":
-  version "5.90.18"
-  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.90.18.tgz#154ea9ad7bfc81392ec275881299ac3a2e3bb372"
-  integrity sha512-tKngFopz/TuAe7LBDg7IOhWPh9blxdQ6QG/vVL2dFzRmlPNcSo4WdCSONqSDioJkcyTwh1YCSlcikmJ1WnSb3Q==
+  version "5.90.19"
+  resolved "https://registry.yarnpkg.com/@tanstack/query-sync-storage-persister/-/query-sync-storage-persister-5.90.19.tgz#3dd57a7a31679039c054efa9927061fb4cb3e6bb"
+  integrity sha512-V9cUlfZuJp1OcfXNjhaZX70we23iJdnBY+FryozRGDd0HiavJd3BbrcdJUs/2/6nBydDzyUKcCHUbDs1EJ/LTg==
   dependencies:
-    "@tanstack/query-core" "5.90.16"
-    "@tanstack/query-persist-client-core" "5.91.15"
+    "@tanstack/query-core" "5.90.17"
+    "@tanstack/query-persist-client-core" "5.91.16"
 
 "@tanstack/react-query-persist-client@^5.87.1":
-  version "5.90.18"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.90.18.tgz#02d45bf1a81e4e44af29f71d1b019e4af7f7c166"
-  integrity sha512-ToVRTVpjzTrd9S/p7JIvGdLs+Xtz9aDMM/7+TQGSV9notY8Jt64irfAAAkZ05syftLKS+3KPgyKAnHcVeKVbWQ==
+  version "5.90.19"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query-persist-client/-/react-query-persist-client-5.90.19.tgz#7816d31779d849670f4993bd375a92067ec158b6"
+  integrity sha512-9afBZIAgipv79Nt2WgStlFijvB7GRIlglrI4vYETAtHV0s5qNpxxu6V1FZlWXqMxaXdcPoF/ADqs+Q4hKdUfQg==
   dependencies:
-    "@tanstack/query-persist-client-core" "5.91.15"
+    "@tanstack/query-persist-client-core" "5.91.16"
 
-"@tanstack/react-query@5.90.16":
-  version "5.90.16"
-  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.90.16.tgz#76955d7027b5bff3d7f51163db7ea1c0bd430cb5"
-  integrity sha512-bpMGOmV4OPmif7TNMteU/Ehf/hoC0Kf98PDc0F4BZkFrEapRMEqI/V6YS0lyzwSV6PQpY1y4xxArUIfBW5LVxQ==
+"@tanstack/react-query@5.90.17":
+  version "5.90.17"
+  resolved "https://registry.yarnpkg.com/@tanstack/react-query/-/react-query-5.90.17.tgz#509cc41ee1700b852866b477ee086fc3a4ed1e27"
+  integrity sha512-PGc2u9KLwohDUSchjW9MZqeDQJfJDON7y4W7REdNBgiFKxQy+Pf7eGjiFWEj5xPqKzAeHYdAb62IWI1a9UJyGQ==
   dependencies:
-    "@tanstack/query-core" "5.90.16"
+    "@tanstack/query-core" "5.90.17"
 
 "@tanstack/react-table@^8.21.3":
   version "8.21.3"
@@ -9832,7 +9832,7 @@ graphemer@^1.4.0:
   dependencies:
     "@graylog/sawmill" "4.0.0"
     "@reduxjs/toolkit" "^2.5.1"
-    "@tanstack/react-query" "5.90.16"
+    "@tanstack/react-query" "5.90.17"
     "@types/react" "18.3.13"
     babel-preset-graylog "file:packages/babel-preset-graylog"
     eslint-config-graylog "file:packages/eslint-config-graylog"
