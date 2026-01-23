@@ -1,0 +1,6 @@
+type = "fixed"
+message = "Removed unnecessary automatic disabling of system event definitions during editing operations."
+
+issues = ["22946"]
+pulls = ["24780"]
+
