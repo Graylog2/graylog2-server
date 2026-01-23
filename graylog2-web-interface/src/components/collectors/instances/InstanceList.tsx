@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-
 import styled from 'styled-components';
 import { Table, Badge, Flex } from '@mantine/core';
 
@@ -47,6 +46,7 @@ const OsIcon = ({ os }: { os: string | null }) => {
   if (os === 'linux') return <span title="Linux">🐧</span>;
   if (os === 'windows') return <span title="Windows">🪟</span>;
   if (os === 'darwin') return <span title="macOS">🍎</span>;
+
   return <span>❓</span>;
 };
 

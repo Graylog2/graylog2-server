@@ -15,16 +15,16 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-
 import styled, { css } from 'styled-components';
 import { Flex, Title } from '@mantine/core';
 
 import { Spinner } from 'components/common';
 
+import SourcesTable from './SourcesTable';
+
 import { useCollectorStats, useFleets, useSources } from '../hooks';
 import StatCard from '../common/StatCard';
 
-import SourcesTable from './SourcesTable';
 
 const StatsRow = styled(Flex)(
   ({ theme }) => css`

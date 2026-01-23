@@ -17,9 +17,10 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import InstanceList from './InstanceList';
+
 import type { CollectorInstanceView } from '../types';
 
-import InstanceList from './InstanceList';
 
 const mockInstances: CollectorInstanceView[] = [
   {

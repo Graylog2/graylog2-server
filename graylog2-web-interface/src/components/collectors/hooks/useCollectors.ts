@@ -31,13 +31,16 @@ import {
 const QUERY_KEY_PREFIX = 'collectors';
 
 // Simulate API delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise<void>((resolve) => {
+  setTimeout(resolve, ms);
+});
 
 export const useCollectorStats = () =>
   useQuery<CollectorStats>({
     queryKey: [QUERY_KEY_PREFIX, 'stats'],
     queryFn: async () => {
       await delay(200);
+
       return mockStats;
     },
   });
@@ -47,6 +50,7 @@ export const useFleets = () =>
     queryKey: [QUERY_KEY_PREFIX, 'fleets'],
     queryFn: async () => {
       await delay(200);
+
       return mockFleets;
     },
   });
@@ -56,6 +60,7 @@ export const useFleet = (fleetId: string) =>
     queryKey: [QUERY_KEY_PREFIX, 'fleets', fleetId],
     queryFn: async () => {
       await delay(200);
+
       return getFleetById(fleetId);
     },
     enabled: !!fleetId,
@@ -66,6 +71,7 @@ export const useFleetStats = (fleetId: string) =>
     queryKey: [QUERY_KEY_PREFIX, 'fleets', fleetId, 'stats'],
     queryFn: async () => {
       await delay(100);
+
       return getFleetStats(fleetId);
     },
     enabled: !!fleetId,
@@ -76,6 +82,7 @@ export const useInstances = (fleetId?: string) =>
     queryKey: [QUERY_KEY_PREFIX, 'instances', { fleetId }],
     queryFn: async () => {
       await delay(200);
+
       return fleetId ? getInstancesByFleetId(fleetId) : mockInstances;
     },
   });
@@ -85,6 +92,7 @@ export const useSources = (fleetId?: string) =>
     queryKey: [QUERY_KEY_PREFIX, 'sources', { fleetId }],
     queryFn: async () => {
       await delay(200);
+
       return fleetId ? getSourcesByFleetId(fleetId) : mockSources;
     },
   });

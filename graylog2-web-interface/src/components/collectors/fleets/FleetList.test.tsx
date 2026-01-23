@@ -17,9 +17,10 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import FleetList from './FleetList';
+
 import type { Fleet } from '../types';
 
-import FleetList from './FleetList';
 
 const mockFleets: Fleet[] = [
   {

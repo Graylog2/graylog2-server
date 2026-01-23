@@ -15,7 +15,6 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 import * as React from 'react';
-
 import styled from 'styled-components';
 import { Table, Badge, Button } from '@mantine/core';
 

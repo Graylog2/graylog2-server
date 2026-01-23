@@ -17,9 +17,10 @@
 import React from 'react';
 import { render, screen } from 'wrappedTestingLibrary';
 
+import SourcesTable from './SourcesTable';
+
 import type { Source } from '../types';
 
-import SourcesTable from './SourcesTable';
 
 const mockSources: Source[] = [
   {
