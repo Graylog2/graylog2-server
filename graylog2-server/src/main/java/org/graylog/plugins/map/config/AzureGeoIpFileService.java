@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.map.config;
 
+import com.azure.core.http.policy.ExponentialBackoffOptions;
+import com.azure.core.http.policy.RetryOptions;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
@@ -27,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Locale;
 import java.util.Optional;
@@ -153,8 +156,16 @@ public class AzureGeoIpFileService extends GeoIpFileService {
     }
 
     private BlobServiceClient createBlobServiceClient(GeoIpResolverConfig config) {
+        final ExponentialBackoffOptions exponentialOptions = new ExponentialBackoffOptions()
+                .setMaxRetries(3)
+                .setBaseDelay(Duration.ofSeconds(1))
+                .setMaxDelay(Duration.ofSeconds(1));
+
+        final RetryOptions retryOptions = new RetryOptions(exponentialOptions);
+
         final String accountKey = encryptedValueService.decrypt(config.azureAccountKey());
         final BlobServiceClientBuilder builder = new BlobServiceClientBuilder()
+                .retryOptions(retryOptions)
                 .credential(new StorageSharedKeyCredential(config.azureAccountName(), accountKey));
 
         config.azureEndpoint().ifPresentOrElse(builder::endpoint, () ->
