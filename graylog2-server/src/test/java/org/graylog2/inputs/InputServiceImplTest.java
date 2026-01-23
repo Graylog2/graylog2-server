@@ -346,6 +346,14 @@ class InputServiceImplTest {
         assertThat((long) paginated.size()).isEqualTo(2);
     }
 
+    @Test
+    @MongoDBFixtures("InputServiceImplTest.json")
+    void testStaticFields() {
+        assertThat(inputService.getStaticFields("54e3deadbeefdeadbeef0002")).isEmpty();
+        List<Map.Entry<String, String>> staticFields = inputService.getStaticFields("54e3deadbeefdeadbeef0003");
+        assertThat(staticFields).isNotNull().hasSize(1).isEqualTo(List.of(Map.entry("static_field", "foo")));
+    }
+
     private InputImpl createTestInput() {
         return InputImpl.builder()
                 .setTitle("input title")

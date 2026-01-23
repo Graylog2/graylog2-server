@@ -29,7 +29,7 @@
       "type": "org.graylog2.inputs.raw.tcp.RawTCPInput",
       "title": "Raw TCP",
       "content_pack": null,
-      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef",
+      "node_id": "cd03ee44-b2a7-cafe-babe-0000deadbeef"
     },
     {
       "_id": {
@@ -97,6 +97,12 @@
         "tls_client_auth": "disabled",
         "override_source": null
       },
+      "static_fields": [
+        {
+          "key": "static_field",
+          "value": "foo"
+        }
+      ],
       "name": "GELF TCP",
       "created_at": {
         "$date": "2018-03-28T13:03:00.000Z"
