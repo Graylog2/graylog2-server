@@ -67,7 +67,6 @@ const ABSGeoIpFormGroup = () => {
       setFieldValue('azure_auth_type', newAuthType);
 
       if (newAuthType === 'automatic') {
-        // Clear key/secret fields when switching to automatic
         setFieldValue('azure_account', undefined);
         setFieldValue('azure_account_key', undefined);
       }
