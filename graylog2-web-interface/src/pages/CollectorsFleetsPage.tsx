@@ -18,6 +18,7 @@ import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 import { Button, Group } from '@mantine/core';
 
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -58,16 +59,20 @@ const CollectorsFleetsPage = () => {
         <span>Manage collector fleets and their configurations.</span>
       </PageHeader>
 
-      <PaginatedEntityTable<Fleet>
-        humanName="fleets"
-        tableLayout={DEFAULT_LAYOUT}
-        additionalAttributes={ADDITIONAL_ATTRIBUTES}
-        fetchEntities={fetchEntities}
-        keyFn={fleetsKeyFn}
-        entityAttributesAreCamelCase={false}
-        columnRenderers={columnRenderers}
-        entityActions={() => null}
-      />
+      <Row className="content">
+        <Col md={12}>
+          <PaginatedEntityTable<Fleet>
+            humanName="fleets"
+            tableLayout={DEFAULT_LAYOUT}
+            additionalAttributes={ADDITIONAL_ATTRIBUTES}
+            fetchEntities={fetchEntities}
+            keyFn={fleetsKeyFn}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+            entityActions={() => null}
+          />
+        </Col>
+      </Row>
 
       {showFleetModal && (
         <FleetFormModal

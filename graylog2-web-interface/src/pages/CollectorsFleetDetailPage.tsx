@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle } from 'components/common';
 import { FleetDetail } from 'components/collectors/fleets';
 import { CollectorsPageNavigation } from 'components/collectors/common';
@@ -27,7 +28,11 @@ const CollectorsFleetDetailPage = () => {
   return (
     <DocumentTitle title="Fleet Detail">
       <CollectorsPageNavigation />
-      {fleetId && <FleetDetail fleetId={fleetId} />}
+      <Row className="content">
+        <Col md={12}>
+          {fleetId && <FleetDetail fleetId={fleetId} />}
+        </Col>
+      </Row>
     </DocumentTitle>
   );
 };

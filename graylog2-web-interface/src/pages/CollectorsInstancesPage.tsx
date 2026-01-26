@@ -17,6 +17,7 @@
 import * as React from 'react';
 import { useState, useMemo, useCallback } from 'react';
 
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import PaginatedEntityTable from 'components/common/PaginatedEntityTable';
 import type { SearchParams } from 'stores/PaginationTypes';
@@ -72,16 +73,20 @@ const CollectorsInstancesPage = () => {
         <span>View all collector instances across fleets.</span>
       </PageHeader>
 
-      <PaginatedEntityTable<CollectorInstanceView>
-        humanName="instances"
-        entityActions={entityActions}
-        tableLayout={DEFAULT_LAYOUT}
-        additionalAttributes={ADDITIONAL_ATTRIBUTES}
-        fetchEntities={fetchEntities}
-        keyFn={instancesKeyFn}
-        entityAttributesAreCamelCase={false}
-        columnRenderers={columnRenderers}
-      />
+      <Row className="content">
+        <Col md={12}>
+          <PaginatedEntityTable<CollectorInstanceView>
+            humanName="instances"
+            entityActions={entityActions}
+            tableLayout={DEFAULT_LAYOUT}
+            additionalAttributes={ADDITIONAL_ATTRIBUTES}
+            fetchEntities={fetchEntities}
+            keyFn={instancesKeyFn}
+            entityAttributesAreCamelCase={false}
+            columnRenderers={columnRenderers}
+          />
+        </Col>
+      </Row>
 
       {selectedInstance && (
         <InstanceDetailDrawer

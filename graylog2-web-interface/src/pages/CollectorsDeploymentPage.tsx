@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { DeploymentForm } from 'components/collectors/deployment';
 import { CollectorsPageNavigation } from 'components/collectors/common';
@@ -26,7 +27,11 @@ const CollectorsDeploymentPage = () => (
     <PageHeader title="Deploy Collectors">
       <span>Generate enrollment tokens and installation scripts.</span>
     </PageHeader>
-    <DeploymentForm />
+    <Row className="content">
+      <Col md={12}>
+        <DeploymentForm />
+      </Col>
+    </Row>
   </DocumentTitle>
 );
 

@@ -16,6 +16,7 @@
  */
 import * as React from 'react';
 
+import { Row, Col } from 'components/bootstrap';
 import { DocumentTitle, PageHeader } from 'components/common';
 import { CollectorsOverview } from 'components/collectors/overview';
 import { CollectorsPageNavigation } from 'components/collectors/common';
@@ -26,7 +27,11 @@ const CollectorsOverviewPage = () => (
     <PageHeader title="Collectors Overview">
       <span>Overview of all collectors and sources across your infrastructure.</span>
     </PageHeader>
-    <CollectorsOverview />
+    <Row className="content">
+      <Col md={12}>
+        <CollectorsOverview />
+      </Col>
+    </Row>
   </DocumentTitle>
 );
 
