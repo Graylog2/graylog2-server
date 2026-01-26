@@ -17,13 +17,15 @@
 import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import mapValues from 'lodash/mapValues';
+import { useQuery } from '@tanstack/react-query';
+
+import { Streams } from '@graylog/server-api';
 
 import { BootstrapModalForm, Alert, Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import StreamLink from 'components/streams/StreamLink';
 import IndexSetsTable from 'views/logic/fieldactions/ChangeFieldType/IndexSetsTable';
 import usePutFieldTypeMutation from 'views/logic/fieldactions/ChangeFieldType/hooks/useFieldTypeMutation';
-import useStream from 'components/streams/hooks/useStream';
 import { DocumentationLink } from 'components/support';
 import DocsHelper from 'util/DocsHelper';
 import { defaultCompare } from 'logic/DefaultCompare';
@@ -67,10 +69,15 @@ const FailureStreamLink = () => {
     data: failureStream,
     isFetching: isFetchingFailureStream,
     isError: isErrorFailureStream,
-  } = useStream(failureStreamId);
-  if (isFetchingFailureStream) return <Spinner />;
+  } = useQuery({
+    queryKey: ['fetchFailureStream'],
+    queryFn: () => Streams.getBystreamId(failureStreamId),
+    retry: 0,
+  });
 
-  return (
+  return isFetchingFailureStream ? (
+    <Spinner />
+  ) : (
     <span>
       <StreamLink
         stream={
