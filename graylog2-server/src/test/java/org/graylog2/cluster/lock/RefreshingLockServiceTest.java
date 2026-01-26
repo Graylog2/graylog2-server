@@ -21,8 +21,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.quality.Strictness;
-import org.mockito.junit.jupiter.MockitoSettings;
 
 import java.time.Duration;
 import java.time.ZoneOffset;
@@ -30,18 +28,12 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
 public class RefreshingLockServiceTest {
 
     @Mock
@@ -51,8 +43,20 @@ public class RefreshingLockServiceTest {
     private ScheduledExecutorService scheduler;
 
     private RefreshingLockService refreshingLockService;
-    private Lock firstLock;
-    private Lock secondLock;
+    
+    private final Lock firstLock = Lock.builder()
+            .resource("first-resource")
+            .lockedBy("node-123")
+            .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
+            .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
+            .build();
+
+    private final Lock secondLock = Lock.builder()
+            .resource("second-resource")
+            .lockedBy("node-123")
+            .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
+            .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
+            .build();
 
     @BeforeEach
     void setUp() {
@@ -61,35 +65,16 @@ public class RefreshingLockServiceTest {
                 scheduler,
                 Duration.ofMinutes(5)
         );
+    }
 
-        // Create mock locks
-        firstLock = Lock.builder()
-                .resource("first-resource")
-                .lockedBy("node-123")
-                .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .build();
-
-        secondLock = Lock.builder()
-                .resource("second-resource")
-                .lockedBy("node-123")
-                .createdAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .updatedAt(ZonedDateTime.now(ZoneOffset.UTC))
-                .build();
-
+    @Test
+    void throwsIllegalStateExceptionWhenAcquiringLockWhileAlreadyHoldingOne() throws AlreadyLockedException {
         // Mock the lock service to return locks
         when(lockService.lock(eq("first-resource"), anyString()))
                 .thenReturn(Optional.of(firstLock));
         when(lockService.lock(eq("second-resource"), anyString()))
                 .thenReturn(Optional.of(secondLock));
-        when(lockService.lock(eq("first-resource"), eq(1)))
-                .thenReturn(Optional.of(firstLock));
-        when(lockService.lock(eq("second-resource"), eq(1)))
-                .thenReturn(Optional.of(secondLock));
-    }
 
-    @Test
-    void throwsIllegalStateExceptionWhenAcquiringLockWhileAlreadyHoldingOne() throws AlreadyLockedException {
         // Acquire first lock successfully
         refreshingLockService.acquireAndKeepLock("first-resource", "context-1");
 
@@ -101,6 +86,12 @@ public class RefreshingLockServiceTest {
 
     @Test
     void throwsIllegalStateExceptionWhenAcquiringLockWithMaxConcurrencyWhileAlreadyHoldingOne() throws AlreadyLockedException {
+        // Mock the lock service to return locks
+        when(lockService.lock(eq("first-resource"), eq(1)))
+                .thenReturn(Optional.of(firstLock));
+        when(lockService.lock(eq("second-resource"), eq(1)))
+                .thenReturn(Optional.of(secondLock));
+
         // Acquire first lock successfully
         refreshingLockService.acquireAndKeepLock("first-resource", 1);
 
