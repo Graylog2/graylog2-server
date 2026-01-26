@@ -91,7 +91,7 @@ public class SavedSearchesResource extends RestResource {
                                                   @ApiParam(name = "sort",
                                                             value = "The field to sort the result on",
                                                             required = true,
-                                                            allowableValues = "id,title,created_at,description,summary,owner") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
+                                                            allowableValues = "id,title,created_at,description,summary,owner,favorite") @DefaultValue(DEFAULT_SORT_FIELD) @QueryParam("sort") String sortField,
                                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc") @DefaultValue("asc") @QueryParam("order") SortOrder order,
                                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                                   @ApiParam(name = "filters") @QueryParam("filters") List<String> filters,
