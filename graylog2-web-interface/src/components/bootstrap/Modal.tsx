@@ -19,10 +19,11 @@ import type { ModalRootProps } from '@mantine/core';
 import { Modal as MantineModal } from '@mantine/core';
 import styled, { css } from 'styled-components';
 
-import type { BsSize } from 'components/bootstrap/types';
 import zIndices from 'theme/z-indices';
 
-export type ModalSize = 'lg' | 'large' | 'sm' | 'small';
+export type ModalSize = 'lg' | 'large' | 'sm' | 'small' | 'xl' | 'xlarge';
+
+const XLARGE_MODAL_WIDTH_PX = 1200;
 
 const ModalOverlay = styled(MantineModal.Overlay)`
   z-index: ${zIndices.modalOverlay};
@@ -63,7 +64,7 @@ const StyledModalRoot = styled(MantineModal.Root)<{ $scrollInContent: boolean }>
   `,
 );
 
-const sizeForMantine = (size: BsSize) => {
+const sizeForMantine = (size?: ModalSize) => {
   switch (size) {
     case 'sm':
     case 'small':
@@ -71,6 +72,9 @@ const sizeForMantine = (size: BsSize) => {
     case 'lg':
     case 'large':
       return 'xl';
+    case 'xl':
+    case 'xlarge':
+      return XLARGE_MODAL_WIDTH_PX;
     default:
       return 'lg';
   }
