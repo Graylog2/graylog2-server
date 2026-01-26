@@ -60,22 +60,7 @@ public class OpAmpHttpHandler extends HttpHandler {
 
     @Override
     public void service(Request request, Response response) throws Exception {
-        // Only accept POST
-        if (request.getMethod() != Method.POST) {
-            response.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
-            response.finish();
-            return;
-        }
-
-        // Validate auth
-        final var authHeader = request.getHeader("Authorization");
-        if (!opAmpService.validateToken(authHeader)) {
-            response.setStatus(HttpStatus.UNAUTHORIZED_401);
-            response.finish();
-            return;
-        }
-
-        // Suspend response and dispatch to virtual thread
+        // Suspend immediately, dispatch everything to separate thread
         response.suspend();
 
         executor.submit(() -> {
@@ -88,7 +73,20 @@ public class OpAmpHttpHandler extends HttpHandler {
     }
 
     private void processRequest(Request request, Response response) {
-        // Check Content-Length header first (if present)
+        // Only accept POST
+        if (request.getMethod() != Method.POST) {
+            response.setStatus(HttpStatus.METHOD_NOT_ALLOWED_405);
+            response.finish();
+            return;
+        }
+
+        // Only proceed when authorized
+        if (!opAmpService.validateToken(request.getHeader("Authorization"))) {
+            response.setStatus(HttpStatus.UNAUTHORIZED_401);
+            return;
+        }
+
+        // Early exit if Content-Length header indicates too large body (if present)
         final int contentLength = request.getContentLength();
         if (contentLength > maxMessageSize) {
             LOG.warn("OpAMP request Content-Length {} exceeds maximum {}", contentLength, maxMessageSize);
