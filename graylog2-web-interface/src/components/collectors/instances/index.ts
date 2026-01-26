@@ -15,3 +15,4 @@
  * <http://www.mongodb.com/licensing/server-side-public-license>.
  */
 export { default as InstanceList } from './InstanceList';
+export { default as InstanceDetailDrawer } from './InstanceDetailDrawer';
